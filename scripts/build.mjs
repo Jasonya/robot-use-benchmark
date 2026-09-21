@@ -1,0 +1,541 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import * as cheerio from 'cheerio';
+import * as OpenCC from 'opencc-js';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const PROJECT = path.dirname(ROOT);
+const OUT = path.join(ROOT, 'docs');
+const CONTENT = path.join(ROOT, 'content');
+const config = JSON.parse(await fs.readFile(path.join(ROOT, 'site.config.json'), 'utf8'));
+const tc = OpenCC.Converter({ from: 'cn', to: 'twp' });
+const sc = OpenCC.Converter({ from: 'twp', to: 'cn' });
+const LOCALES = ['zh-hant', 'zh-hans'];
+const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const jsonSafe = value => JSON.stringify(value).replace(/</g, '\\u003c');
+const plain = html => cheerio.load(html).text().replace(/\s+/g, ' ').trim();
+const translate = (value, locale) => locale === 'zh-hans' ? sc(tc(String(value))) : tc(String(value));
+const relative = (from, target) => path.posix.relative(path.posix.dirname(from), target) || path.posix.basename(target);
+const exists = file => fs.access(file).then(() => true, () => false);
+const generated = [];
+await fs.mkdir(CONTENT, { recursive: true });
+await fs.mkdir(OUT, { recursive: true });
+
+async function write(file, content) {
+  const target = path.join(OUT, file);
+  await fs.mkdir(path.dirname(target), { recursive: true });
+  await fs.writeFile(target, content);
+  generated.push(file);
+}
+
+// Refresh from the local handbook if available. The repository keeps the public
+// snapshot, so it can also build independently after checkout on GitHub.
+const sourceBook = path.join(PROJECT, 'handbook/ROBOT_USE_BENCHMARK_MASTER_REPORT.html');
+if (await exists(sourceBook)) {
+  const $ = cheerio.load(await fs.readFile(sourceBook, 'utf8'));
+  const sections = [];
+  for (const node of $('body > section.chapter').toArray()) {
+    const section = $(node).clone();
+    const id = section.attr('id');
+    if (id === 'reading-guide') continue;
+    const heading = section.find('h1').first().text();
+    const title = heading.split('｜').slice(1).join('｜') || heading;
+    section.find('> .eyebrow, > h1').remove();
+    for (const image of section.find('img').toArray()) {
+      const img = $(image);
+      const src = img.attr('src') || '';
+      if (src.startsWith('data:image/png;base64,')) {
+        const buffer = Buffer.from(src.split(',')[1], 'base64');
+        const name = `figure-${crypto.createHash('sha256').update(buffer).digest('hex').slice(0, 12)}.png`;
+        await fs.mkdir(path.join(ROOT, 'static/assets/figures'), { recursive: true });
+        await fs.writeFile(path.join(ROOT, 'static/assets/figures', name), buffer);
+        img.attr('src', `@assets/figures/${name}`);
+      }
+    }
+    sections.push({ id, title, html: section.html() });
+  }
+  await fs.writeFile(path.join(CONTENT, 'handbook.json'), JSON.stringify(sections));
+  for (const filename of ['taxonomy.json', 'task_registry.json', 'task_families.json', 'ego_observation_probes.json', 'metrics_catalogue.json', 'literature_snapshot.json', 'design_statistics.json']) {
+    await fs.copyFile(path.join(PROJECT, filename), path.join(CONTENT, filename));
+  }
+  await fs.mkdir(path.join(OUT, 'downloads'), { recursive: true });
+  await fs.copyFile(path.join(PROJECT, 'handbook/ROBOT_USE_BENCHMARK_MASTER_REPORT.pdf'), path.join(OUT, 'downloads/full-report-zh-hant.pdf'));
+}
+
+const readJSON = async file => JSON.parse(await fs.readFile(path.join(CONTENT, file), 'utf8'));
+const [sections, taxonomy, tasks, families, probes, metrics, papers, statistics] = await Promise.all([
+  'handbook.json', 'taxonomy.json', 'task_registry.json', 'task_families.json',
+  'ego_observation_probes.json', 'metrics_catalogue.json', 'literature_snapshot.json', 'design_statistics.json'
+].map(readJSON));
+const sectionById = Object.fromEntries(sections.map(section => [section.id, section]));
+const taskById = Object.fromEntries(tasks.map(record => [record.scenario_id, record]));
+const familyById = Object.fromEntries(families.map(record => [record.family_id, record]));
+const probeById = Object.fromEntries(probes.map(record => [record.probe_id, record]));
+const metricById = Object.fromEntries(metrics.map(record => [record.metric_id, record]));
+const paperById = Object.fromEntries(papers.map(record => [record.id, record]));
+const chapters = sections.filter(section => /^c\d{2}$/.test(section.id));
+const groups = {
+  families: sections.filter(s => s.id === 'appA' || s.id.startsWith('familypage-')),
+  tasks: sections.filter(s => s.id === 'appB' || s.id.startsWith('catalogue-')),
+  probes: sections.filter(s => s.id === 'appC' || s.id.startsWith('probes-')),
+  metrics: sections.filter(s => s.id === 'appD' || s.id.startsWith('metrics-')),
+  axes: sections.filter(s => s.id === 'appE' || s.id.startsWith('axes-') || s.id.startsWith('coverage-') || s.id === 'physics-dictionary'),
+  comparison: sections.filter(s => ['appF','libero-audit','comparison-versions'].includes(s.id)),
+  literature: sections.filter(s => s.id === 'appG' || s.id.startsWith('bib-')),
+  methods: sections.filter(s => ['appH','search-record','corpus-extra','legacy-examples','data-dictionary','planning-schema','document-provenance'].includes(s.id))
+};
+const groupRoutes = {
+  families:'explore/families.html', tasks:'explore/tasks.html', probes:'explore/probes.html',
+  metrics:'explore/metrics.html', axes:'appendices/axes.html', comparison:'appendices/comparison.html',
+  literature:'library.html', methods:'appendices/methods.html'
+};
+const summaries = {
+  c01:['研究產物是可執行的 benchmark，文獻 survey 是設計依據。','目前只有模擬範圍；已完成設計，實際評測為 0。','下一步先審核原生任務，再做 6–8 個可跑通的情境。'],
+  c02:['文獻分類回答「研究測什麼」，任務規格回答「機器人要做什麼」。','以摺毛巾走過家族、任務、實例、測例與一次執行。','問答、預測、規劃和物理完成需要不同證據。'],
+  c03:['Domain、family、task spec、instance、case、trial 分六層報告。','180 是情境藍圖；G2 待定，實際 G3–G5 仍為 0。','同一題重跑五次，不會自動多出五種任務。'],
+  c04:['168 篇來源分成十二個主分類，含影片、Ego、預測與操作。','文獻篇數比例不能直接當作領域缺口或出題比例。','書目、摘要閱讀和程式重現的證據深度分開。'],
+  c05:['先保留原作者單位，再對齊 domain、task、case 和資料量。','既有任務、資產和評分器可復用，但要重新審核相容性。','影片到動作、摺衣、恢復都有先例，新貢獻需要實驗支持。'],
+  c06:['完整候選庫含 12 場域、48 家族與 180 情境藍圖。','八個模組只有在資料與標籤充足時，才形成有效測例。','材料、觀測、機體、學習設定各自獨立記錄。'],
+  c07:['先以原始活動或錄製 session 分組，再產生 clips 與 QA。','示範與 robot 的配對可能只有共同目標，不能假設幾何一致。','資訊不足的題目應補線索或允許詢問，不能當成難題。'],
+  c08:['終態成功、完整合規成功、配對目標成功分開報告。','恢復要同時列全 episode、擾動施加率與條件式成功。','模型在相同資訊、控制、資料和預算下比較。'],
+  c09:['六個具體案例展示目標、證據、近失敗和資料前提。','涵蓋摺毛巾、記憶取物、配送、協作、流體和數位工具。','案例中的尺寸、容差與接口仍是設計，尚未校準。'],
+  c10:['難度屬於某個實例加上完整評測條件，不屬於論文名稱。','十維人工向量是設計註記；經驗難度需要固定 agent panel。','全模型失敗時，先排除不可解任務和錯誤評分器。'],
+  c11:['投稿核心預算為 100–140 個藍圖，正式數量由驗證決定。','120 藍圖的示例可規劃 2,880 cases、每模型 14,400 次執行。','以上是容量估算；unique QA、影片數和 G2 都要另外計數。'],
+  c12:['先建立 registry、instance builder、adapter、evaluator 與結果紀錄。','共同 API 不代表不同模擬器有相同動力學。','本網站提供公開研究文件；正式評測和平台代跑仍待實作。'],
+  c13:['M0–M2 先驗證研究問題、可解性與評分可靠性。','M3 凍結測試集合，M4 才跑主實驗與消融。','24 週是排程示例，不是投稿或交付保證。'],
+  c14:['所有數量統一區分文獻、設計、規劃與實際驗證。','48 類是作者分組，180 個是藍圖，24 個 Ego 題型另列。','正式 backend、資料與測例仍需按 milestones 建立。']
+};
+const descriptions = {
+  c01:'計畫的研究問題、已完成內容、當前狀態與第一個實作目標。',
+  c02:'用摺毛巾把 taxonomy、ontology 和評測流程講清楚。',
+  c03:'讓任務數、題數、資料量與執行量能公平比較。',
+  c04:'從 VLOG、Ego 與預測，讀到操作和世界模型的文獻地圖。',
+  c05:'比較最近 benchmark，釐清可復用資源與新的研究價值。',
+  c06:'場域、任務家族、物理材料和八個評測模組的完整設計。',
+  c07:'人類示範如何配對、標註、切分，避免不合理的測例。',
+  c08:'成功、恢復、基線、對照實驗與不確定性怎麼計算。',
+  c09:'六張詳細案例，說清楚目標、資料與判分證據。',
+  c10:'從十維設計向量，到固定模型群下的經驗難度。',
+  c11:'領域、情境、測例與算力預算，使用不同粒度分開估算。',
+  c12:'把設計變成可執行、可評分與可重現的系統。',
+  c13:'從 paper pitch、最小閉環、pilot 到發布的八個 milestones。',
+  c14:'整理版本差異、計數更正與尚待實作期決定的項目。'
+};
+const timeFor = section => Math.max(3, Math.ceil(plain(section.html).length / 600));
+const chapterRoute = section => `chapters/${section.id.slice(1)}.html`;
+const anchors = {};
+function register(section, route) {
+  anchors[section.id] = `${route}#${section.id}`;
+  const $ = cheerio.load(section.html);
+  $('[id]').each((_, node) => { anchors[$(node).attr('id')] = `${route}#${$(node).attr('id')}`; });
+}
+chapters.forEach(section => register(section, chapterRoute(section)));
+for (const [key, items] of Object.entries(groups)) items.forEach(section => register(section, groupRoutes[key]));
+for (const cid of Object.keys(taxonomy.application_contexts)) anchors[`catalogue-${cid}`] = `explore/tasks.html?domain=${cid}`;
+for (const xid of Object.keys(taxonomy.observation_diagnostic_strata)) anchors[`probes-${xid}`] = `explore/probes.html?stratum=${xid}`;
+for (const tid of Object.keys(taxonomy.tracks)) anchors[`metrics-${tid}`] = `explore/metrics.html?track=${tid}`;
+for (const code of [...new Set(papers.map(p => p.primary_category_code))]) anchors[`bib-${code}`] = `library.html?category=${code}`;
+
+const docRewrites = [
+  ['使用者表示資源充足並希望推進上線，但沒有確認人數、GPU 數、模擬器、機體、控制介面、人類影片取得方式或 hosting。',
+   '人數、GPU 數、模擬器、機體、控制介面與人類影片取得方式尚未定案；研究文件由 GitHub Pages 公開提供。'],
+  ['離線網站與文件已備；公開部署／正式排行榜未完成', '研究網站與文件公開提供；正式評測服務與排行榜未完成'],
+  ['已有本機離線預覽，尚未公開部署', '研究文件已提供網站閱讀；正式評測服務尚未推出'],
+  ['正式排行榜或公開部署', '正式評測排行榜或平台代跑服務'],
+  ['正式排行榜和公開部署', '正式評測排行榜和平台代跑服務'],
+  ['使用者已確認目前只有模擬', '目前研究範圍只有模擬'],
+  ['使用者確認先做模擬benchmark', '本計畫先做模擬 benchmark'],
+  ['使用者原先的「eco-predix」', '原始研究需求中的「eco-predix」'],
+  ['本次整理 PDF 所需的確認', '閱讀本網站所需的前提'],
+  ['使用者表示資源充足', '資源規劃仍需量化'],
+  ['使用者已確認', '目前已確認'],
+  ['這份 PDF', '完整報告'], ['本 PDF', '完整報告'], ['本冊', '本報告'],
+  ['相邻 build_manifest.json', '原始整理版的 build_manifest.json']
+];
+function publicText(value) {
+  let output = value;
+  for (const [from, to] of docRewrites) output = output.replaceAll(from, to);
+  return output;
+}
+function convertDOM($, locale) {
+  function visit(node) {
+    if (node.type === 'text') node.data = translate(publicText(node.data), locale);
+    if (node.type === 'tag' && !['script','style'].includes(node.name)) {
+      for (const key of ['alt','title','aria-label','placeholder']) if (node.attribs[key]) node.attribs[key] = translate(node.attribs[key], locale);
+    }
+    if (!['script','style'].includes(node.name)) node.children?.forEach(visit);
+  }
+  $.root().contents().each((_, node) => visit(node));
+}
+function transform(html, locale, route, prefix='section') {
+  const current = `${locale}/${route}`;
+  const $ = cheerio.load(html, {}, false);
+  $('a[href]').each((_, node) => {
+    const link = $(node);
+    const href = link.attr('href');
+    if (href.startsWith('#')) {
+      const id = href.slice(1);
+      if (anchors[id]) {
+        const target = anchors[id];
+        const [targetRoute, suffix=''] = target.split(/(?=[?#])/s);
+        // Keep queries and hashes intact; route resolution only applies to the pathname.
+        const mark = target.search(/[?#]/);
+        const pathname = mark < 0 ? target : target.slice(0, mark);
+        const tail = mark < 0 ? '' : target.slice(mark);
+        link.attr('href', relative(current, `${locale}/${pathname}`) + tail);
+      }
+    } else if (/^https?:/.test(href)) {
+      link.attr('target', '_blank').attr('rel', 'noopener noreferrer');
+    }
+  });
+  $('img[src]').each((_, node) => {
+    const image = $(node);
+    if (image.attr('src').startsWith('@assets/')) image.attr('src', relative(current, image.attr('src').slice(1)));
+    image.attr('loading','lazy').attr('decoding','async');
+  });
+  $('table').each((_, node) => {
+    $(node).wrap('<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"></div>');
+  });
+  let count = 0;
+  $('h2,h3').each((_, node) => { if (!$(node).attr('id')) $(node).attr('id', `${prefix}-${++count}`); });
+  convertDOM($, locale);
+  return $.html();
+}
+
+function icon(name) {
+  const paths = {
+    brand:'<path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+    search:'<circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+  };
+  return `<svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor">${paths[name] || paths.search}</svg>`;
+}
+const t = (value, locale) => escape(translate(value, locale));
+function routeLink(route, target, locale) { return relative(`${locale}/${route}`, `${locale}/${target}`); }
+const chapterLink = (id, route, locale) => routeLink(route, `chapters/${id}.html`, locale);
+const pdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/full-report-zh-hant.pdf');
+function navHTML(route, locale) {
+  const links = [
+    ['index.html','重點導讀',route==='index.html'],
+    ['chapters/index.html','章節閱讀',route.startsWith('chapters/')],
+    ['explore/tasks.html','任務探索',route.startsWith('explore/')],
+    ['library.html','文獻地圖',route==='library.html'],
+    ['chapters/13.html','實作路線',false],
+  ];
+  return `<header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="${routeLink(route,'index.html',locale)}"><span class="brand-mark">${icon('brand')}</span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="${t('主要導覽',locale)}">${links.map(([target,label,active])=>`<a href="${routeLink(route,target,locale)}"${active?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}<a class="mobile-search" href="${routeLink(route,'search.html',locale)}">${t('全文搜尋',locale)}</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="${t('搜尋整個網站',locale)}" aria-haspopup="dialog">${icon('search')}<kbd>/</kbd></button>
+  <div class="language-switch" aria-label="${t('語言',locale)}">${LOCALES.map(lang=>`<a href="${relative(`${locale}/${route}`,`${lang}/${route}`)}" data-locale="${lang}" hreflang="${lang==='zh-hant'?'zh-Hant':'zh-Hans'}"${lang===locale?' aria-current="true"':''}>${lang==='zh-hant'?'繁體':'简体'}</a>`).join('')}</div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">${t('選單',locale)}</button></div></div></header>`;
+}
+function footerHTML(route, locale) {
+  return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('從文獻到任務、評測與實作的公開研究設計。',locale)}</div>
+  <div class="footer-links"><a href="${routeLink(route,'glossary.html',locale)}">${t('名詞小辭典',locale)}</a><a href="${routeLink(route,'appendices/methods.html',locale)}">${t('來源與方法',locale)}</a><a href="${pdfHref(route,locale)}">${t('完整 PDF',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">${t(`文獻與設計快照：${config.researchDate} · 設計 v${config.designVersion} · Scale schema ${config.scaleVersion}。168 篇是範疇蒐集；180 個是情境藍圖。正式驗證測例與實際模擬執行均為 0。`,locale)}</p></div></footer>`;
+}
+const strings = {
+  copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
+  searchHint:'可搜尋章節、物件、論文名称或 ID，例如「摺衣」「记忆」「SC-H15」「Ego4D」。',
+  noSearch:'沒有找到結果，試試較短的關鍵字或 ID。',showing:'顯示',records:'筆',allShown:'已顯示全部',
+  paginate:'分頁顯示',showAll:'顯示全部',shareResults:'複製目前篩選的連結',continueReading:'繼續上次閱讀',
+  demoA:'相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。',
+  demoB:'更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。',
+  kinds:{chapter:'章節',task:'情境藍圖',family:'任務家族',paper:'文獻',probe:'Ego 觀測題型',metric:'評測指標',reference:'參考資料'}
+};
+function translateObject(value, locale) {
+  if (typeof value==='string') return translate(value,locale);
+  if (Array.isArray(value)) return value.map(item=>translateObject(item,locale));
+  return Object.fromEntries(Object.entries(value).map(([key,item])=>[key,translateObject(item,locale)]));
+}
+const allPageRecords = [];
+function shell({route,locale,title,description,body,kind='page'}) {
+  const current = `${locale}/${route}`;
+  const canonical = `${config.siteUrl}/${current}`;
+  const jsConfig={locale,route,title:translate(title,locale),kind,localeRoot:relative(current,`${locale}/index.html`).replace(/index\.html$/,''),text:translateObject(strings,locale)};
+  allPageRecords.push({route,locale,title:translate(title,locale),file:current});
+  return `<!doctype html><html lang="${locale==='zh-hant'?'zh-Hant':'zh-Hans'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${t(title,locale)} · Robot-use Benchmark</title>
+  <meta name="description" content="${t(description,locale)}"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="${canonical}">
+  ${LOCALES.map(lang=>`<link rel="alternate" hreflang="${lang==='zh-hant'?'zh-Hant':'zh-Hans'}" href="${config.siteUrl}/${lang}/${route}">`).join('')}
+  <meta property="og:type" content="website"><meta property="og:title" content="${t(title,locale)} · Robot-use Benchmark"><meta property="og:description" content="${t(description,locale)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="${relative(current,'assets/favicon.svg')}" type="image/svg+xml"><link rel="stylesheet" href="${relative(current,'assets/site.css')}">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE=${jsonSafe(jsConfig)};</script>
+  <script defer src="${relative(current,`assets/search-${locale}.js`)}"></script><script defer src="${relative(current,'assets/site.js')}"></script></head>
+  <body><a class="skip-link" href="#main-content">${t('跳至主要內容',locale)}</a>${navHTML(route,locale)}${body}${footerHTML(route,locale)}
+  <dialog class="search-dialog" id="global-search" aria-label="${t('搜尋整個網站',locale)}"><div class="dialog-search-head">${icon('search')}<input id="global-search-input" type="search" autocomplete="off" placeholder="${t('搜尋章節、任務或文獻…',locale)}" aria-label="${t('關鍵字',locale)}" aria-describedby="global-search-help"><button id="close-search" aria-label="${t('關閉搜尋',locale)}">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>`;
+}
+const breadcrumb = (label,route,locale) => `<div class="breadcrumb"><a href="${routeLink(route,'index.html',locale)}">${t('首頁',locale)}</a><span>/</span><span>${t(label,locale)}</span></div>`;
+function head(title,description,route,locale,extra='') {
+  return `<div class="page-head">${breadcrumb(title,route,locale)}<div class="eyebrow">RESEARCH ATLAS</div><h1>${t(title,locale)}</h1><p class="lede">${t(description,locale)}</p>${extra}</div>`;
+}
+function chapterNav(route,locale) {
+  const chapterLinks=chapters.map(s=>`<a href="${routeLink(route,chapterRoute(s),locale)}"${route===chapterRoute(s)?' class="active" aria-current="page"':''}><span>${s.id.slice(1)}</span>${t(s.title,locale)}</a>`).join('');
+  const extras=[['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['library.html','168 篇文獻'],['appendices/methods.html','來源與資料字典']];
+  return `<div class="sidebar-label">${t('研究與設計',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
+}
+function readingPage(section,locale) {
+  const route=chapterRoute(section);
+  const content=transform(`<section id="${section.id}">${section.html}</section>`,locale,route);
+  const $=cheerio.load(content);
+  const headings=$('h2,h3').toArray().map(n=>({id:$(n).attr('id'),title:$(n).text()}));
+  const index=chapters.indexOf(section);
+  const navigation=chapterNav(route,locale);
+  const nextPrev=[chapters[index-1],chapters[index+1]].map((s,i)=>s?`<a href="${routeLink(route,chapterRoute(s),locale)}"><small>${t(i===0?'← 上一章':'下一章 →',locale)}</small>${s.id.slice(1)} · ${t(s.title,locale)}</a>`:'<span></span>').join('');
+  const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${navigation}</aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節目錄與附錄',locale)}</summary>${navigation}</details>
+  ${breadcrumb('章節閱讀',route,locale)}<div class="eyebrow">CHAPTER ${section.id.slice(1)} / 14</div><h1>${t(section.title,locale)}</h1>
+  <div class="page-meta"><span>${t(`約 ${timeFor(section)} 分鐘`,locale)}</span><span>·</span><span>${t(`資料快照 ${config.researchDate}`,locale)}</span><span class="pill status">${t('設計階段 Q0',locale)}</span></div>
+  <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul>${summaries[section.id].map(line=>`<li>${t(line,locale)}</li>`).join('')}</ul></div>
+  <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本章連結',locale)}</button><button class="text-button print-page">${t('列印本章',locale)}</button><a class="text-button" href="${pdfHref(route,locale)}">${t('完整 PDF',locale)} ↗</a></div>
+  <nav class="prev-next" aria-label="${t('前後章節',locale)}">${nextPrev}</nav></main>
+  <aside class="on-this-page" aria-label="${t('本章內容',locale)}"><div class="sidebar-label">${t('本章內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
+  return shell({route,locale,title:section.title,description:descriptions[section.id],body,kind:'chapter'});
+}
+
+function chapterTiles(route,locale) {
+  return chapters.map(s=>`<a class="chapter-tile" href="${routeLink(route,chapterRoute(s),locale)}"><span class="chapter-number">${s.id.slice(1)}</span><span><h3>${t(s.title,locale)}</h3><p>${t(descriptions[s.id],locale)}</p><span class="time">${t(`約 ${timeFor(s)} 分鐘`,locale)}</span></span></a>`).join('');
+}
+function chaptersPage(locale) {
+  const route='chapters/index.html';
+  const cards=[
+    ['01','第一次接觸這個計畫','先看研究目標與摺毛巾例子，再認識「題數」的不同層級。','chapters/01.html'],
+    ['04','我要評估研究新穎性','從文獻地圖、最近 benchmark 和公平比較開始。','chapters/04.html'],
+    ['09','我要開始做 benchmark','先看詳細案例，再讀規模、工程與 milestones。','chapters/09.html']
+  ];
+  const body=`<main class="wrap" id="main-content">${head('完整章節閱讀','每一章先給重點，再展開完整設計。可按顺序閱讀，也能選擇最適合你的入口。',route,locale)}
+  <div class="reading-routes">${cards.map(([number,title,description,target])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${number}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t('由這裡開始',locale)} →</span></a>`).join('')}</div>
+  <div class="section-head"><div><div class="eyebrow">THE COMPLETE REPORT</div><h2>${t('14 個章節，從問題走到實作',locale)}</h2></div><a class="section-link" id="resume-reading" hidden></a></div>
+  <div class="chapter-grid">${chapterTiles(route,locale)}</div></main>`;
+  return shell({route,locale,title:'完整章節閱讀',description:'14 章完整研究設計，附重點、術語、來源與實作路線。',body});
+}
+
+const collectionInfo={
+  tasks:{title:'探索 180 個情境藍圖',description:'從居家到工坊，把「機器人要做什麼」寫成具體情境。先看初態與目標，再展開判分、擾動和來源。',group:'tasks',selector:'.scenario-card',key:'scenario_id',kind:'task',badge:'情境藍圖 · Q0',intro:'appB',data:tasks},
+  families:{title:'48 個任務家族',description:'依共同語義整理任務，而不是每換一個物件就增加一類。47 個執行家族和 1 個主動資訊家族分開記錄。',group:'families',selector:'.family-card',key:'family_id',kind:'family',badge:'作者定義家族',intro:'appA',data:families},
+  probes:{title:'24 個 Ego 觀測題型',description:'用技能、程序、戶外、專門工作、生活與非人類視角測理解和預測。這些是題型藍圖，還不是已收集的 QA。',group:'probes',selector:'.probe-card',key:'probe_id',kind:'probe',badge:'觀測題型 · Q0',intro:'appC',data:probes},
+  metrics:{title:'40 個評測指標',description:'每個指標都附單位、分母、資料前提與解讀界線。依有效資料選用，不把它們任意加成一個總分。',group:'metrics',selector:'.metric-card',key:'metric_id',kind:'metric',badge:'候選指標定義',intro:'appD',data:metrics},
+  literature:{title:'168 篇文獻地圖',description:'影片、Ego、預測、操作、柔性物、協作與世界模型的研究脈絡。每篇都附中文用途、證據深度與原始來源。',group:'literature',selector:'.bibliography-card',key:'id',kind:'paper',badge:'文獻來源',intro:'appG',data:papers}
+};
+const extractedCards={};
+for(const [key,info] of Object.entries(collectionInfo)){
+  const $=cheerio.load(groups[info.group].map(s=>s.html).join('\n'));
+  extractedCards[key]=$(info.selector).toArray().map(node=>({id:$(node).attr('id'),html:$.html(node)}));
+  if(extractedCards[key].length!==info.data.length)throw new Error(`Missing ${key} cards`);
+}
+function filterDefinitions(key){
+  const domains=Object.entries(taxonomy.application_contexts).map(([id,v])=>[id,v.name]);
+  const tracks=Object.entries(taxonomy.tracks).map(([id,v])=>[id,`${id} ${v.name}`]);
+  const common=[{key:'q',label:'關鍵字',placeholder:'搜尋名稱、物件或 ID'}];
+  const stages={key:'stage',label:'實作分組',options:[['A','A · 優先原型'],['B','B · 進階原型'],['C','C · 專項物理']]};
+  if(key==='tasks')return [...common,{key:'domain',label:'應用場域',options:domains},{key:'material',label:'材料模型',options:[['rigid','剛體'],['cloth','布料'],['rope','繩索'],['granular','顆粒'],['fluid','流體'],['soft_solid','其他柔順固體']]},stages,{key:'family',label:'任務家族',options:families.map(f=>[f.family_id,`${f.family_id} ${f.family_name}`])}];
+  if(key==='families')return [...common,stages];
+  if(key==='probes')return [...common,{key:'stratum',label:'診斷來源',options:Object.entries(taxonomy.observation_diagnostic_strata)},{key:'track',label:'評測模組',options:tracks}];
+  if(key==='metrics')return [...common,{key:'track',label:'評測模組',options:tracks}];
+  const categories=[...new Map(papers.map(p=>[p.primary_category_code,p.primary_category_zh])).entries()];
+  return [...common,{key:'category',label:'研究主分類',options:categories},{key:'evidence',label:'閱讀紀錄',options:[['E2','已核對書目與完整摘要'],['E1','書目／來源核對']]},{key:'year',label:'版本年份',options:[...new Set(papers.map(p=>p.year))].sort((a,b)=>b-a).map(year=>[String(year),String(year)])}];
+}
+function filterAttrs(key,record){
+  if(key==='tasks')return {domain:record.application_context_id,material:record.active_material,stage:record.implementation_stage,family:record.task_family_id};
+  if(key==='families')return {stage:record.implementation_stage};
+  if(key==='probes')return {stratum:record.stratum_id,track:record.track};
+  if(key==='metrics')return {track:record.track};
+  return {category:record.primary_category_code,year:String(record.year),evidence:record.snapshot_membership!=='baseline_163'||record.evidence_depth.includes('complete abstract reviewed')?'E2':'E1'};
+}
+function cardHTML(card,key,locale,route){
+  const info=collectionInfo[key];
+  const record=info.data.find(r=>r[info.key]===card.id);
+  const $=cheerio.load(card.html,{},false);
+  const article=$('article');
+  article.addClass('record-card').attr('data-entry','').attr('data-kind',info.kind);
+  const searchText=plain(card.html)+' '+Object.values(filterAttrs(key,record)).join(' ')+' '+(record.display_name||record.scenario_name||record.family_name||'');
+  article.attr('data-search',tc(searchText)+' '+sc(tc(searchText)));
+  for(const [name,value] of Object.entries(filterAttrs(key,record)))article.attr(`data-${name}`,value);
+  const paragraphs=article.children('p').toArray();
+  const visible=new Set();
+  if(key==='literature'){
+    for(const p of paragraphs)if($(p).hasClass('paper-title')||$(p).text().startsWith('用途與界線'))visible.add(p);
+  }else if(key==='tasks'){
+    paragraphs.slice(0,3).forEach(p=>visible.add(p));
+  }else if(key==='families'){
+    paragraphs.slice(0,2).forEach(p=>visible.add(p));
+  }else paragraphs.slice(0,3).forEach(p=>visible.add(p));
+  const details=$('<details><summary>完整資料與來源</summary><div class="detail-content"></div></details>');
+  paragraphs.filter(p=>!visible.has(p)).forEach(p=>details.find('.detail-content').append($(p)));
+  article.append(details);
+  article.prepend(`<span class="entry-badge">${escape(info.badge)}</span>`);
+  return transform($.html(),locale,route,`card-${card.id}`);
+}
+function collectionPage(key,locale){
+  const info=collectionInfo[key];const route=groupRoutes[info.group];
+  const filters=filterDefinitions(key);
+  const filterHTML=filters.map(f=>`<div class="filter-field"><label for="filter-${f.key}">${t(f.label,locale)}</label>${f.options?`<select id="filter-${f.key}" data-filter="${f.key}"><option value="">${t('全部',locale)}</option>${f.options.map(([value,label])=>`<option value="${escape(value)}">${t(label,locale)}</option>`).join('')}</select>`:`<input type="search" id="filter-${f.key}" data-filter="${f.key}" placeholder="${t(f.placeholder,locale)}">`}</div>`).join('');
+  const intro$=cheerio.load(sectionById[info.intro].html,{},false);
+  if(key!=='literature')intro$('table,.table-scroll,h2').remove();
+  const intro=transform(intro$.html(),locale,route);
+  let chart='';
+  if(key==='literature'){
+    const categories=[...new Map(papers.map(p=>[p.primary_category_code,p.primary_category_zh])).entries()];
+    chart=`<div class="library-chart" aria-label="${t('文獻主分類分布',locale)}">${categories.map(([code,name])=>{const count=papers.filter(p=>p.primary_category_code===code).length;return `<a class="bar-row" href="?category=${code}"><span class="bar-title"><span>${t(name,locale)}</span><b>${count}</b></span><span class="bar-track"><span style="width:${count/27*100}%"></span></span></a>`;}).join('')}</div><p class="note-inline">${t('比例只描述本次收錄，不代表整個領域的研究比例，也不決定任務配額。',locale)}</p>`;
+  }
+  const body=`<main class="wrap" id="main-content">${head(info.title,info.description,route,locale,`<div class="page-meta"><span class="pill green">${info.data.length} ${t(key==='literature'?'篇註釋文獻':'筆設計紀錄',locale)}</span><span>${t(`快照 ${config.researchDate}`,locale)}</span>${key!=='literature'?`<span class="pill status">${t('實際驗證 0',locale)}</span>`:''}</div>`)}${chart}
+  <details class="explainer" id="${info.intro}"><summary>${t('如何閱讀這個資料庫與計數',locale)}</summary><div class="prose">${intro}</div></details>
+  <noscript><p class="no-js-note">${t('目前顯示全部內容。啟用 JavaScript 可使用搜尋、篩選與分頁。',locale)}</p></noscript>
+  <div class="catalogue-layout"><aside class="filter-panel js-only" aria-label="${t('篩選條件',locale)}"><h2>${t('找到你關心的內容',locale)}</h2><div class="filter-fields">${filterHTML}</div><button class="button secondary small" id="reset-filters">${t('清除篩選',locale)}</button><p class="filter-note">${t('繁體、簡體、英文名稱與 ID 都能搜尋。篩選條件會保留在網址中，方便分享。',locale)}</p></aside>
+  <section data-catalogue="${key}" data-page-size="12" aria-label="${t(info.title,locale)}"><div class="result-bar"><div id="result-count" role="status" aria-live="polite">${info.data.length} ${t('筆',locale)}</div><button class="text-button js-only" id="share-results">${t('分享篩選',locale)} ↗</button></div><div class="empty-state" id="no-results" hidden><h3>${t('沒有符合的結果',locale)}</h3><p>${t('試試較短的關鍵字，或清除部分篩選條件。',locale)}</p></div>
+  <div class="record-grid">${extractedCards[key].map(card=>cardHTML(card,key,locale,route)).join('')}</div>
+  <div class="pagination js-only"><button id="previous-page">${t('上一頁',locale)}</button><span id="page-status"></span><button id="next-page">${t('下一頁',locale)}</button><button id="show-all">${t('顯示全部',locale)}</button></div></section></div></main>`;
+  return shell({route,locale,title:info.title,description:info.description,body,kind:'collection'});
+}
+
+function towelSVG(){
+  return `<svg viewBox="0 0 410 190" role="img" aria-label="同一條毛巾，兩個摺疊目標的幾何示意">
+  <rect x="82" y="30" width="246" height="126" rx="5" fill="#f7faf1" stroke="#aec9a4" stroke-dasharray="4 4"/>
+  <g fill="#6b8d66" font-size="11" font-family="sans-serif"><text x="67" y="169">A</text><text x="335" y="169">B</text><text x="335" y="25">C</text><text x="67" y="25">D</text></g>
+  <g id="towel-fold-a"><rect x="83" y="94" width="244" height="61" rx="5" fill="#a5c899" stroke="#648c5c"/><path d="M84 92h242" stroke="#567e4e" stroke-dasharray="5 5"/><path d="M124 42v27m-5-5 5 6 5-6M286 42v27m-5-5 5 6 5-6" fill="none" stroke="#6d9871" stroke-width="2"/><path d="M88 144h232" stroke="#d5e9c6" stroke-width="2"/></g>
+  <g id="towel-fold-b" visibility="hidden"><rect x="83" y="31" width="121" height="124" rx="5" fill="#a5c899" stroke="#648c5c"/><path d="M205 33v120" stroke="#567e4e" stroke-dasharray="5 5"/><path d="M302 62h-44m5-5-6 5 6 5M302 124h-44m5-5-6 5 6 5" fill="none" stroke="#6d9871" stroke-width="2"/><path d="M95 38v110" stroke="#d5e9c6" stroke-width="2"/></g>
+  <text x="205" y="184" text-anchor="middle" fill="#8aa181" font-size="9" font-family="monospace">SC-H15 · GOAL-CONDITIONED DESIGN</text></svg>`;
+}
+function homePage(locale){
+  const route='index.html';
+  const quickCards=[
+    ['01','用示範指定要完成的事','同一個起始場景，換一段示範就可能換一個目標。評測要確認機器人確實跟隨了目標。','chapters/02.html','看懂整個流程'],
+    ['02','把數量放在正確的層級','領域、家族、情境藍圖、實例、測例和執行次數各有單位，才能和以前的 benchmark 比較。','chapters/03.html','理解六個尺度'],
+    ['03','用證據確認完整完成','除了最後畫面，也檢查必要順序、物件身份、摺法、穩定性和恢復過程。','chapters/08.html','了解如何判分']
+  ];
+  const routes=[
+    ['↗','第一次了解這個題目','先認識 benchmark 要回答的問題，再用具體例子理解分類。','chapters/01.html','从第 01 章開始'],
+    ['⌘','研究者與論文作者','直接比較先例、分類分布、難度設計與可驗證的研究主張。','chapters/04.html','進入文獻與比較'],
+    ['→','準備開始實作','讀六個案例、資料規格、算力估算與 milestone 驗收條件。','chapters/09.html','進入具體設計']
+  ];
+  const body=`<main id="main-content"><div class="wrap">
+  <section class="hero"><div><div class="eyebrow">${t('公開研究地圖 · 模擬評測設計',locale)}</div><h1>${t('從看懂示範，',locale)}<br>${t('到',locale)}<em>${t('可靠完成任務。',locale)}</em></h1>
+  <p class="lede">${t('我們把分散的机器人研究，整理成一套可追溯的 benchmark 設計。從 VLOG、第一人稱影片到摺衣、配送與協作，一起釐清要測什麼、怎麼測、怎麼比較。',locale)}</p>
+  <div class="cta-row"><a class="button" href="#quick-start">${t('3 分鐘掌握重點',locale)} <span class="arrow">→</span></a><a class="button secondary" href="${routeLink(route,'chapters/index.html',locale)}">${t('閱讀完整章節',locale)}</a></div>
+  <p class="note">${t('公開閱讀・免登入・繁體／簡體・完整 PDF',locale)}<br>${t('目前為設計階段 Q0，尚無正式模擬實驗成績。',locale)}</p></div>
+  <div class="hero-visual"><div class="visual-top"><span>ONE SCENE. TWO GOALS.</span><span class="visual-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+  <span class="demo-label">${t('用一條毛巾，理解這個 benchmark',locale)}</span><div class="demo-title">${t('示範變了，目標也跟著變。',locale)}</div>
+  <div class="goal-switch" role="group" aria-label="${t('切換示範目標',locale)}"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div>
+  <div class="towel-scene">${translate(towelSVG(),locale)}</div><div class="scene-caption"><span id="fold-pairs">D → A · C → B</span><span>${t('概念示意，非模擬結果',locale)}</span></div>
+  <p class="demo-message" id="demo-message" aria-live="polite">${t(strings.demoA,locale)}</p><a class="section-link" href="${routeLink(route,'chapters/09.html#detail-SC-H15',locale)}">${t('深入這個案例',locale)} →</a></div></section>
+  <div class="metrics-strip" aria-label="${t('目前設計規模',locale)}"><a class="metric" href="${routeLink(route,'library.html',locale)}"><strong>168</strong><span>${t('篇註釋文獻',locale)}</span><small>${t('研究依據',locale)}</small></a><a class="metric" href="${routeLink(route,'explore/tasks.html',locale)}"><strong>180</strong><span>${t('個情境藍圖',locale)}</span><small>${t('178 執行＋2 主動問答',locale)}</small></a><a class="metric" href="${routeLink(route,'explore/families.html',locale)}"><strong>48</strong><span>${t('個作者定義家族',locale)}</span><small>${t('跨場域的任務結構',locale)}</small></a><a class="metric" href="${routeLink(route,'chapters/01.html',locale)}"><strong>0</strong><span>${t('個已驗證測例',locale)}</span><small>${t('實際模擬執行也為 0',locale)}</small></a></div>
+  <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">THE SHORT VERSION</div><h2>${t('先掌握三個重點',locale)}</h2><p>${t('不需要先讀完論文，先知道這份設計想解決什麼。',locale)}</p></div><a class="section-link" href="${routeLink(route,'glossary.html',locale)}">${t('不熟悉術語？看小辭典',locale)} →</a></div>
+  <div class="card-grid">${quickCards.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div>
+  <div class="concept-band"><div><h3>${t('180 個藍圖，不直接等於 180 道可跑的題。',locale)}</h3><p>${t('先有正式規格與有效初態，再有測例；每個模型的一次執行，才是一個 trial。',locale)}</p></div><div class="scale-line"><b>${t('情境藍圖',locale)}<small>B0 · 180</small></b><span class="arr">→</span><b>${t('任務規格',locale)}<small>G2 · TBD</small></b><span class="arr">→</span><b>${t('實例／測例',locale)}<small>G3 / G4 · 0</small></b><span class="arr">→</span><b>${t('實際執行',locale)}<small>G5 · 0</small></b></div></div></section>
+  <section class="section"><div class="section-head"><div><div class="eyebrow">WHERE TASKS HAPPEN</div><h2>${t('從生活到工作，12 個候選場域',locale)}</h2><p>${t('場域說明任務用在哪裡；摺疊、記憶或導航則屬於任務與能力軸。',locale)}</p></div><a class="section-link" href="${routeLink(route,'explore/tasks.html',locale)}">${t('探索全部情境',locale)} →</a></div>
+  <div class="domain-grid">${Object.entries(taxonomy.application_contexts).map(([id,v])=>`<a class="domain-card" href="${routeLink(route,'explore/tasks.html',locale)}?domain=${id}"><span class="code">${id}</span><b>${t(v.name,locale)}</b><span class="num">${tasks.filter(task=>task.application_context_id===id).length} →</span></a>`).join('')}</div>
+  <p class="note-inline">${t('8 個評測模組涵蓋理解、記憶、預測、規劃、執行、恢復、協作與世界模型。24 個額外 Ego 觀測題型另列。',locale)}</p></section>
+  <section class="section"><div class="section-head"><div><div class="eyebrow">CHOOSE YOUR READING PATH</div><h2>${t('選一個適合你的入口',locale)}</h2><p>${t('每章先給摘要，再保留完整推理、定義、表格與來源。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/index.html',locale)}">${t('查看 14 章完整目錄',locale)} →</a></div>
+  <div class="card-grid">${routes.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><div class="eyebrow">FROM DESIGN TO EVIDENCE</div><h2>${t('如何把設計做成一篇 benchmark 論文',locale)}</h2><p>${t('先驗證可解性與判分，讓實驗決定正式規模與研究主張。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/13.html',locale)}">${t('查看 milestones',locale)} →</a></div>
+  <div class="roadmap-preview"><div class="roadmap-step current"><small>M0 · ${t('目前',locale)}</small><h3>${t('定位與設計',locale)}</h3><p>${t('整理文獻、定義問題、建立候選規格。',locale)}</p></div><div class="roadmap-step"><small>M1–M2</small><h3>${t('可跑的最小閉環',locale)}</h3><p>${t('審核 20–30 個原生任務，先跑通 6–8 個情境。',locale)}</p></div><div class="roadmap-step"><small>M3–M4</small><h3>${t('凍結與主實驗',locale)}</h3><p>${t('驗證資料與評分，再比較基線、擾動與泛化。',locale)}</p></div><div class="roadmap-step"><small>M5–M7</small><h3>${t('重現與發布',locale)}</h3><p>${t('依結果寫文章，發布可重現版本並逐步擴展。',locale)}</p></div></div></section>
+  <div class="download-band"><div><h2>${t('需要一次讀完整個計畫？',locale)}</h2><p>${t('257 頁完整報告：主文第 5–43 頁，附錄收齊所有文獻、情境與規格。',locale)}</p></div><a class="button" href="${pdfHref(route,locale)}" download>${t('下載 PDF · 繁體原版',locale)} <span class="arrow">↓</span></a></div>
+  </div></main>`;
+  return shell({route,locale,title:'從看懂示範，到可靠完成任務',description:'3 分鐘了解 Robot-use Benchmark 研究設計，再深入 14 章、168 篇文獻與 180 個情境藍圖。支援繁體、簡體，公開免登入。',body,kind:'home'});
+}
+
+function referencePage(group,locale){
+  const route=groupRoutes[group];
+  const meta={
+    axes:['完整分類軸與覆蓋','34 個能力、12 個變化軸、觀測、機體、學習設定與全部候選覆蓋矩陣。'],
+    comparison:['原生規模與版本查核','逐筆保留原作者的數量、單位、scope 和版本，並完整展開 LIBERO 的部分 goal 查核。'],
+    methods:['來源、方法與資料字典','檢索紀錄、未解決線索、資料欄位、規劃器與原始文件對照，集中在這裡。']
+  }[group];
+  const content=groups[group].map((section,index)=>`<section id="${section.id}">${index?`<h2>${escape(section.title)}</h2>`:''}${section.html}</section>`).join('\n');
+  const html=transform(content,locale,route,`ref-${group}`);
+  const $=cheerio.load(html);
+  const headings=$('h2').toArray().map(n=>({id:$(n).attr('id'),title:$(n).text()}));
+  const nav=chapterNav(route,locale);
+  const body=`<div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節與附錄目錄',locale)}</summary>${nav}</details>${breadcrumb(meta[0],route,locale)}<div class="eyebrow">REFERENCE</div><h1>${t(meta[0],locale)}</h1><p class="lede">${t(meta[1],locale)}</p><div class="source-note">${t('完整保留原始整理版的定義和證據界線；目前仍無正式模擬評測結果。寬表格可以水平捲動。',locale)}</div><div class="prose">${html}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製連結',locale)}</button><button class="text-button print-page">${t('列印此頁',locale)}</button></div></main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
+  return shell({route,locale,title:meta[0],description:meta[1],body});
+}
+const glossary=[
+  ['benchmark','評測基準','一組有明確輸入、任務、條件與評分規則的共同測試，用來比較不同方法。','chapters/01.html'],
+  ['taxonomy','文獻分類','整理研究在測什麼，例如影片理解、預測、操作、協作；不直接決定考題配額。','chapters/02.html'],
+  ['ontology','任務概念結構','定義場域、家族、物件、目標、過程與證據之間的關係，讓出題規格一致。','chapters/02.html'],
+  ['domain','應用場域（G0）','任務發生的應用背景，例如住家或工坊。同一個摺疊家族可在多個場域出現。','chapters/03.html'],
+  ['family','任務家族（G1）','按共通語義結構分組，例如「開啟、存入並關閉」。換個抽屜不一定是新家族。','explore/families.html'],
+  ['blueprint','情境藍圖（B0）','尚未實作的具體出題構想，包含初態、目標與驗收條件。本計畫目前有 180 個。','explore/tasks.html'],
+  ['spec','正式任務規格（G2）','明訂目標邏輯、指涉、必要過程與機構要求。共同去重後的數量目前仍待定。','chapters/03.html'],
+  ['instance','任務實例（G3）','把任務綁定到實際資產、物件、物理參數與初始狀態。文件中有名稱不代表已有實例。','chapters/03.html'],
+  ['case','測例（G4）','一個有合法輸入、條件、答案與評分器的測試題。QA 與機器人控制必須標示不同型態。','chapters/03.html'],
+  ['trial','一次執行（G5）','某個模型在一個固定測例上跑一次。重跑會增加執行量，不自動增加任務種類。','chapters/11.html'],
+  ['ego','第一人稱觀測','從行動者附近的視角觀察活動；要另記頭戴、胸前、robot camera 等相機位置。','chapters/04.html'],
+  ['contract','共同評測約定','模型能看什麼、能做哪些動作、允許多少資料與時間，以及如何判成功。','chapters/08.html'],
+  ['evaluator','判分器','根據狀態和軌跡判斷是否完成任務。它需要接受合法解，也能拒絕近失敗。','chapters/08.html'],
+  ['oracle','診斷上界','提供正確目標、計畫或特權狀態的對照，用來定位瓶頸，與一般模型排名分開。','chapters/08.html'],
+  ['split','資料切分','定義訓練與測試的邊界；先按來源 session 分組，避免同源片段洩漏到兩邊。','chapters/07.html'],
+  ['readiness','驗證階段 Q0–Q4','Q0 是語義設計，接著才是實例、專家可解性、判分器審核和基線重現。','appendices/axes.html#axes-readiness']
+];
+function glossaryPage(locale){
+  const route='glossary.html';
+  const body=`<main class="wrap" id="main-content">${head('名詞小辭典','從一般讀者的角度，快速理解網站裡常見的研究用語。',route,locale)}<div class="glossary-grid">${glossary.map(([id,title,description,target])=>`<article class="glossary-card" id="${id}"><small>${id.toUpperCase()}</small><h2>${t(title,locale)}</h2><p>${t(description,locale)}</p><a class="section-link" href="${routeLink(route,target,locale)}">${t('深入閱讀',locale)} →</a></article>`).join('')}</div></main>`;
+  return shell({route,locale,title:'名詞小辭典',description:'用白話理解 benchmark、taxonomy、ontology、instance、case、trial 與評測術語。',body});
+}
+function searchPage(locale){
+  const route='search.html';
+  const body=`<main class="wrap" id="main-content">${head('搜尋整個研究網站','搜尋章節、情境、家族、論文、Ego 題型或指標；繁體、簡體和英文都能用。',route,locale)}<div class="standalone-search"><label for="site-search-input">${t('關鍵字或 ID',locale)}</label><input type="search" id="site-search-input" placeholder="${t('例如：摺衣、记忆、SC-H15、Ego4D',locale)}" aria-describedby="site-search-help"><p class="search-help" id="site-search-help" aria-live="polite"></p><div class="search-results" id="site-search-results"></div><noscript><p class="no-js-note">${t('全文搜尋需要 JavaScript；仍可從章節目錄和各資料庫閱讀完整內容。',locale)}</p></noscript></div></main>`;
+  return shell({route,locale,title:'搜尋整個研究網站',description:'搜尋全部章節、168 篇文獻和完整情境、家族與指標。',body});
+}
+function searchData(locale){
+  const result=[];
+  for(const chapter of chapters){
+    result.push({kind:'chapter',title:translate(`${chapter.id.slice(1)} · ${chapter.title}`,locale),path:chapterRoute(chapter),summary:translate(descriptions[chapter.id],locale),search:tc(chapter.title+' '+plain(chapter.html))+' '+sc(tc(chapter.title+' '+plain(chapter.html)))});
+  }
+  for(const [key,info] of Object.entries(collectionInfo)){
+    for(const card of extractedCards[key]){
+      const $=cheerio.load(card.html);
+      const title=$('h3').first().text();
+      const textContent=plain(card.html);
+      let description;
+      if(key==='literature') description=$('p').toArray().map(p=>$(p).text()).find(value=>value.startsWith('用途與界線')) || textContent;
+      else if(key==='tasks')description=$('p').toArray().slice(1,3).map(p=>$(p).text()).join(' ');
+      else description=$('p').toArray().slice(0,2).map(p=>$(p).text()).join(' ');
+      result.push({kind:info.kind,title:translate(title,locale),path:`${groupRoutes[info.group]}#${card.id}`,summary:translate(description.slice(0,180),locale),search:tc(textContent)+' '+sc(tc(textContent))});
+    }
+  }
+  for(const group of ['axes','comparison','methods']){
+    const section=groups[group][0];
+    const content=groups[group].map(s=>s.title+' '+plain(s.html)).join(' ');
+    result.push({kind:'reference',title:translate(section.title,locale),path:groupRoutes[group],summary:translate(plain(section.html).slice(0,120),locale),search:tc(content)+' '+sc(tc(content))});
+  }
+  return result;
+}
+
+async function copyStatic(dir,relativeDir=''){
+  for(const entry of await fs.readdir(dir,{withFileTypes:true})){
+    const name=path.posix.join(relativeDir,entry.name);
+    if(entry.isDirectory())await copyStatic(path.join(dir,entry.name),name);
+    else await write(name,await fs.readFile(path.join(dir,entry.name)));
+  }
+}
+await copyStatic(path.join(ROOT,'static'));
+await write('assets/favicon.svg',`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#146e5b"/><g fill="#e7f1d6"><rect x="15" y="16" width="13" height="13" rx="2"/><rect x="36" y="16" width="13" height="13" rx="2"/><rect x="15" y="37" width="13" height="13" rx="2"/><rect x="36" y="37" width="13" height="13" rx="2"/></g><path d="M28 22h8M22 29v8M42 29v8M28 43h8" stroke="#e7f1d6" stroke-width="3"/></svg>`);
+for(const locale of LOCALES){
+  await write(`${locale}/index.html`,homePage(locale));
+  await write(`${locale}/chapters/index.html`,chaptersPage(locale));
+  for(const chapter of chapters)await write(`${locale}/${chapterRoute(chapter)}`,readingPage(chapter,locale));
+  for(const key of Object.keys(collectionInfo))await write(`${locale}/${groupRoutes[collectionInfo[key].group]}`,collectionPage(key,locale));
+  for(const group of ['axes','comparison','methods'])await write(`${locale}/${groupRoutes[group]}`,referencePage(group,locale));
+  await write(`${locale}/glossary.html`,glossaryPage(locale));
+  await write(`${locale}/search.html`,searchPage(locale));
+  const data=searchData(locale);
+  await write(`assets/search-${locale}.js`,`window.SEARCH_INDEX=${jsonSafe(data)};`);
+}
+const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
+await write('index.html',rootHtml.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · 公開研究網站"><meta property="og:description" content="繁體／簡體中文：首頁掌握重點，深入 14 章、168 篇文獻與 180 個情境藍圖。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
+await write('404.html',`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找不到頁面 · Robot-use Benchmark</title><link rel="stylesheet" href="${config.siteUrl}/assets/site.css"></head><body><main class="wrap narrow" style="padding:90px 0"><div class="eyebrow">404</div><h1>這個頁面找不到了。<br>这个页面找不到了。</h1><p>可以回到首頁，從章節、情境或文獻重新找到內容。</p><div class="cta-row"><a class="button" href="${config.siteUrl}/zh-hant/">繁體首頁</a><a class="button secondary" href="${config.siteUrl}/zh-hans/">简体首页</a></div></main></body></html>`);
+await write('.nojekyll','');
+await write('robots.txt',`User-agent: *\nAllow: /\nSitemap: ${config.siteUrl}/sitemap.xml\n`);
+await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allPageRecords.map(p=>`<url><loc>${escape(config.siteUrl+'/'+p.file)}</loc><lastmod>${config.researchDate}</lastmod></url>`).join('')}</urlset>`);
+const manifest={
+  siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,
+  pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,tasks:tasks.length,families:families.length,probes:probes.length,metrics:metrics.length,validatedCases:0,simulatorRuns:0},
+  sourceSections:sections.length,sourceSectionIds:sections.map(s=>s.id),assets:generated.filter(file=>!file.endsWith('.html')),
+  pdf:'downloads/full-report-zh-hant.pdf',
+  note:'This is a public research-documentation website. The benchmark remains a Q0 design without executed evaluation results.'
+};
+await fs.mkdir(path.join(ROOT,'verification'),{recursive:true});
+await fs.writeFile(path.join(ROOT,'verification/build-manifest.json'),JSON.stringify(manifest,null,2));
+console.log(JSON.stringify({generatedPages:allPageRecords.length,languages:LOCALES,counts:manifest.counts,sourceSections:sections.length,output:OUT},null,2));

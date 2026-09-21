@@ -1,0 +1,247 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>完整 benchmark 的覆盖设计 · Robot-use Benchmark</title>
+  <meta name="description" content="场域、任务家族、物理材料和八个评测模块的完整设计。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/06.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/06.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/06.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="完整 benchmark 的覆盖设计 · Robot-use Benchmark"><meta property="og:description" content="场域、任务家族、物理材料和八个评测模块的完整设计。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/06.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"chapters/06.html","title":"完整 benchmark 的覆盖设计","kind":"chapter","localeRoot":"../","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料"}}};</script>
+  <script defer src="../../assets/search-zh-hans.js"></script><script defer src="../../assets/site.js"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../index.html">重点导读</a><a href="index.html" class="active" aria-current="page">章节阅读</a><a href="../explore/tasks.html">任务探索</a><a href="../library.html">文献地图</a><a href="13.html">实作路线</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/chapters/06.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="06.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章节导览"><div class="sidebar-label">研究与设计</div><a href="01.html"><span>01</span>研究目标与当前状态</a><a href="02.html"><span>02</span>用一个例子理解整套系统</a><a href="03.html"><span>03</span>规模的六个 granularity levels</a><a href="04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="06.html" class="active" aria-current="page"><span>06</span>完整 benchmark 的覆盖设计</a><a href="07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="08.html"><span>08</span>评测协定、指针与比较方法</a><a href="09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="10.html"><span>10</span>难度如何量化</a><a href="11.html"><span>11</span>题数、领域与运行预算</a><a href="12.html"><span>12</span>工程实作、数据格式与发布</a><a href="13.html"><span>13</span>论文流程与 milestones</a><a href="14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="../explore/families.html">48 个任务家族</a><a href="../explore/tasks.html">180 个情境蓝图</a><a href="../explore/probes.html">24 个 Ego 题型</a><a href="../explore/metrics.html">40 个指针</a><a href="../appendices/axes.html">完整分类轴</a><a href="../appendices/comparison.html">原生规模比较</a><a href="../library.html">168 篇文献</a><a href="../appendices/methods.html">来源与数据字典</a></aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章节目录与附录</summary><div class="sidebar-label">研究与设计</div><a href="01.html"><span>01</span>研究目标与当前状态</a><a href="02.html"><span>02</span>用一个例子理解整套系统</a><a href="03.html"><span>03</span>规模的六个 granularity levels</a><a href="04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="06.html" class="active" aria-current="page"><span>06</span>完整 benchmark 的覆盖设计</a><a href="07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="08.html"><span>08</span>评测协定、指针与比较方法</a><a href="09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="10.html"><span>10</span>难度如何量化</a><a href="11.html"><span>11</span>题数、领域与运行预算</a><a href="12.html"><span>12</span>工程实作、数据格式与发布</a><a href="13.html"><span>13</span>论文流程与 milestones</a><a href="14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="../explore/families.html">48 个任务家族</a><a href="../explore/tasks.html">180 个情境蓝图</a><a href="../explore/probes.html">24 个 Ego 题型</a><a href="../explore/metrics.html">40 个指针</a><a href="../appendices/axes.html">完整分类轴</a><a href="../appendices/comparison.html">原生规模比较</a><a href="../library.html">168 篇文献</a><a href="../appendices/methods.html">来源与数据字典</a></details>
+  <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>章节阅读</span></div><div class="eyebrow">CHAPTER 06 / 14</div><h1>完整 benchmark 的覆盖设计</h1>
+  <div class="page-meta"><span>约 6 分钟</span><span>·</span><span>数据快照 2026-09-21</span><span class="pill status">设计阶段 Q0</span></div>
+  <div class="chapter-summary"><div class="label">先掌握这三件事</div><ul><li>完整候选库含 12 场域、48 家族与 180 情境蓝图。</li><li>八个模块只有在数据与标签充足时，才形成有效测例。</li><li>材料、观测、机体、学习设置各自独立记录。</li></ul></div>
+  <div class="prose"><section id="c06"><h3 id="section-1">12 个应用场域：描述用途，不混入技能</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>ID／场域</th>
+<th>边界</th>
+<th>B0 数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span id="D01">D01 · 居家生活空间</span></td>
+<td>私人住宅中的整理、备餐、衣物和家庭设备；以住家任务目的作主分类。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D02">D02 · 餐饮服务场所</span></td>
+<td>餐厅、商用备餐与餐桌服务；与客房布品服务分开。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D03">D03 · 零售门店</span></td>
+<td>面向商品陈列、门店拣选、包装和顾客服务的场景。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D04">D04 · 仓储与配送场所</span></td>
+<td>库存、拣货、集货、载运和路线配送；不是将所有移动任务都放在此。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D05">D05 · 办公与行政空间</span></td>
+<td>文件、办公设备、内部物品管理和可验证的数字到实体工作。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D06">D06 · 工坊、制造与维修场所</span></td>
+<td>零件、机构、工具、拆装和功能验收。</td>
+<td>20</td>
+</tr>
+<tr>
+<td><span id="D07">D07 · 实验室例行对象操作</span></td>
+<td>器材、容器、惰性颗粒与模拟设备程序；不验证化学或生物效果。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D08">D08 · 旅宿与洗衣服务</span></td>
+<td>布品、客房整理、洗衣周转和住宿服务准备；餐厅归 D02。</td>
+<td>14</td>
+</tr>
+<tr>
+<td><span id="D09">D09 · 建筑设施维护服务</span></td>
+<td>公共或商用建筑的表面处理、设备复位、耗材与维护工具管理。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D10">D10 · 园艺与户外作业场域</span></td>
+<td>工具、容器、作物几何代理和户外搬运；不宣称模拟植物生长效果。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D11">D11 · 辅助生活服务场域</span></td>
+<td>非临床的日常物品协助与模拟人类交互；不评估医疗效果。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D12">D12 · 公共场馆与活动场域</span></td>
+<td>图书馆、展馆、活动空间及公众设施中的整理、准备与服务。</td>
+<td>14</td>
+</tr>
+</tbody>
+</table></div>
+<p>每个情境指定一个主要场域方便计数，跨类用途可另加标签。同一折衣家族可以出现在住家与旅宿；导航、双臂、记忆不是应用场域。180 个蓝图中，178 个是运行候选，2 个是主动场景问答；后者不放进 T5 操作成功率。</p>
+<h3 id="section-2">48 个家族与完整情境</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>查阅范围</th>
+<th>阅读导引（精确名称见附录 A）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F01–F12</td>
+<td>取放、分类、配置、堆栈、装箱、机构、遮挡、历史、盘点、检查与程序</td>
+</tr>
+<tr>
+<td>F13–F19</td>
+<td>封口、插入、装配／拆卸、工具、紧固与大型物协调搬运</td>
+</tr>
+<tr>
+<td>F20–F26</td>
+<td>柔性片材、折叠与收纳、悬挂、穿线、绑定与套合</td>
+</tr>
+<tr>
+<td>F27–F34</td>
+<td>接触覆盖、散物收集、颗粒／流体转移、配量、搅动、分割与成形</td>
+</tr>
+<tr>
+<td>F35–F42</td>
+<td>设备程序、导航、寻物、载运、配送、通行、交接与共享资源</td>
+</tr>
+<tr>
+<td>F43–F48</td>
+<td>意图协助、共同支承、跟随、主动信息、数字到实体与工作区复原</td>
+</tr>
+</tbody>
+</table></div>
+<p>家族按语义需求整理，例如「打开—存入—关闭」、「依历史取物」、「指定折法」、「工具操作」、「共同支承」、「数字查找—实体完成」。这 48 个是本计划的 authored grouping，跨工作 canonical mapping 尚未完成。</p>
+<p>附录 A 完整列出每个家族的子目标图、证据、近失败、扰动、物理需求和 A/B symbolic template；附录 B 完整列出 180 个情境的初态、A/B 目标与专属验收。它们是设计规格，不是已写好的环境或可运行 predicates。</p>
+<h3 id="section-3">八个评测模块</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>模型输出</th>
+<th>评测／oracle 分界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span id="T1">T1 · 理解、定位与状态</span></td>
+<td>对象、关系、状态、证据位置或答案</td>
+<td>依子任务分开报告 accuracy/F1、定位误差、关系一致性、证据正确率<br>诊断：特权 scene state 仅供 evaluator <a href="../library.html#P029">P029</a> <a href="../library.html#P026">P026</a> <a href="../library.html#P017">P017</a> <a href="../library.html#P042">P042</a> <a href="../library.html#P168">P168</a></td>
+</tr>
+<tr>
+<td><span id="T2">T2 · 情节记忆</span></td>
+<td>过去事件／位置、关联证据、记忆引导的行动</td>
+<td>记忆 QA 与证据正确率、干扰量曲线；行动成功另报<br>诊断：完整无干扰历史与正确检索，分别作诊断 <a href="../library.html#P028">P028</a> <a href="../library.html#P033">P033</a> <a href="../library.html#P043">P043</a> <a href="../library.html#P115">P115</a></td>
+</tr>
+<tr>
+<td><span id="T3">T3 · 动作、交互与轨迹预测</span></td>
+<td>未来动作、对象／接触、接触时间、2D/3D 轨迹与不确定性</td>
+<td>固定 horizon/K 下的 label/contact 指针、时间误差、ADE/FDE、适用的校准指针<br>诊断：真实未来只供标注；不能喂给 policy <a href="../library.html#P046">P046</a> <a href="../library.html#P047">P047</a> <a href="../library.html#P049">P049</a> <a href="../library.html#P050">P050</a> <a href="../library.html#P052">P052</a> <a href="../library.html#P053">P053</a> <a href="../library.html#P058">P058</a></td>
+</tr>
+<tr>
+<td><span id="T4">T4 · 目标与计划</span></td>
+<td>目标图、子任务依赖图、可运行的高层计划</td>
+<td>目标一致性、语义 transition validity、goal reachability；物理运行另报<br>诊断：oracle goal、oracle state、oracle plan 分开比较 <a href="../library.html#P031">P031</a> <a href="../library.html#P072">P072</a> <a href="../library.html#P101">P101</a> <a href="../library.html#P123">P123</a></td>
+</tr>
+<tr>
+<td><span id="T5">T5 · 闭回路任务运行</span></td>
+<td>机器人动作与完整 trajectory</td>
+<td>目标成功、符合约束的完整成功、pair success、时间、干预、覆盖<br>诊断：专家／特权状态控制器验证可解性 <a href="../library.html#P064">P064</a> <a href="../library.html#P067">P067</a> <a href="../library.html#P100">P100</a> <a href="../library.html#P071">P071</a> <a href="../library.html#P083">P083</a> <a href="../library.html#P164">P164</a></td>
+</tr>
+<tr>
+<td><span id="T6">T6 · 诊断与恢复</span></td>
+<td>错误类型、状态修复、恢复后完成</td>
+<td>诊断F1、完整成功、触发率、条件式恢复、额外成本；snapshot 另列<br>诊断：已知错误类型／恢复子目标，不与主榜混合 <a href="../library.html#P112">P112</a> <a href="../library.html#P022">P022</a> <a href="../library.html#P109">P109</a> <a href="../library.html#P165">P165</a> <a href="../library.html#P113">P113</a></td>
+</tr>
+<tr>
+<td><span id="T7">T7 · 交互与协作</span></td>
+<td>协作动作、询问、等待、交接与角色分配</td>
+<td>共同完成、时序／协议违反、回应延迟、协助负担；知觉QA独立<br>诊断：明确人类意图与合作方状态仅作上界 <a href="../library.html#P141">P141</a> <a href="../library.html#P143">P143</a> <a href="../library.html#P147">P147</a> <a href="../library.html#P168">P168</a> <a href="../library.html#P145">P145</a> <a href="../library.html#P146">P146</a></td>
+</tr>
+<tr>
+<td><span id="T8">T8 · 世界模型与可运行性</span></td>
+<td>动作条件化的未来状态／视频及可转成动作的预测</td>
+<td>状态／接触一致性、固定 adapter 下的运行成功；视觉品质独立<br>诊断：固定重建／动作转换器的 oracle reconstruction <a href="../library.html#P054">P054</a> <a href="../library.html#P149">P149</a> <a href="../library.html#P150">P150</a> <a href="../library.html#P152">P152</a> <a href="../library.html#P151">P151</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>每个模块需通过自己的数据条件：T2 要证明历史必要；T3 要有合法未来与时间标签；T7 要固定 partner model；T8 要固定重建／动作转换界面。以来源充分性决定可生成哪些 packets，而非把 180×8 当成覆盖量。</p>
+<h3 id="section-4">观测、机体与学习设置是不同轴</h3>
+<p>O1–O8 是可重叠的来源 presets：文字／语音、头戴视频、胸前／身体摄影机、外部／多视角、剪辑 VLOG、模拟 robot 示范、多 session 历史、非人类第一视角诊断。头戴片段也可能是剪辑 VLOG；不能把这两种标签当互斥来源。</p>
+<p>正式 metadata 分开记录 agent origin、camera mount、view pairing、temporal packaging、language、history 和 sensors。EgoBody 研究从头戴设备观察人体，不能只凭名称把它当成胸前摄影机数据。非人类视角可测域移与 egomotion，但不能增加 robot 实体操作覆盖。<a href="../library.html#P019">P019</a> <a href="../library.html#P025">P025</a></p>
+<p>R1–R6 分别是固定单臂、固定双臂、固定灵巧双臂、移动单臂、移动双臂、全身／人形的候选能力配置，不是已选定六台机器人。L0–L4 分别是 frozen、offline adaptation、few-shot、online adaptation、continual learning；这些参数更新设置与 T2 的推理时记忆分开。</p>
+<p>34 个能力、12 个变化轴、8 个来源 preset、独立观测轴、6 个 profile 与 5 种 learning regimes 全部定义在附录 E。</p>
+<h3 id="section-5">物理模型与覆盖缺口</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>材料模型</th>
+<th>全部 B0</th>
+<th>T5 候选</th>
+<th>T5 家族（可跨材料）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>刚体 (rigid)</td>
+<td>137</td>
+<td>135</td>
+<td>33</td>
+</tr>
+<tr>
+<td>布料 (cloth)</td>
+<td>18</td>
+<td>18</td>
+<td>11</td>
+</tr>
+<tr>
+<td>颗粒 (granular)</td>
+<td>11</td>
+<td>11</td>
+<td>4</td>
+</tr>
+<tr>
+<td>绳索 (rope)</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+</tr>
+<tr>
+<td>流体 (fluid)</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr>
+<td>其他柔顺固体 (soft_solid)</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<p>材料模型分为 rigid、cloth、rope、granular、fluid、soft_solid。Articulation 是对象结构，不能当成材料；137 个 rigid 蓝图中包含 2 个信息情境，真正 T5 候选为 135。</p>
+<p>目前仍以刚体为主。4 个 fluid 情境集中在 1 个运行家族，不能叫做完整流体操作覆盖。绳索、切割、人体／布料、动态支承和世界模型的验证仍有限。场景换名字不会自动增加接触机制或物理能力。</p>
+<p>接触覆盖不等于消毒；机械搅动不等于化学均匀；设备状态机不等于真实热学或洗净效果。若只验证逻辑程序或模拟代理量，就按实际内容命名与分榜。</p>
+<figure class=""><img src="../../assets/figures/figure-067aa344e67e.png" alt="图 2．材料与实作阶段的候选分布。A／B／C 是设计标记，非校准难度；没有 validated cases。" loading="lazy" decoding="async"><figcaption>图 2．材料与实作阶段的候选分布。A／B／C 是设计标记，非校准难度；没有 validated cases。</figcaption></figure>
+
+<p>A／B／C 是提出的实作分组：A 93 个偏原型优先；B 64 个需要柔性物、特殊接触或交互；C 23 个涉及更专项的物理／拓扑／复合需求。它们不是已量测的难度级别。</p>
+<p>附录 E 的场域×能力矩阵分开「家族本身需求」、「可额外产生的 probes」与联集。所有 verified cells 仍为 0；C33／C34 等观测能力主要由额外 24 个 Ego 题型支持，不能灌入操作成功率。</p></section></div><div class="reader-actions"><button class="text-button copy-link">拷贝本章链接</button><button class="text-button print-page">打印本章</button><a class="text-button" href="../../downloads/full-report-zh-hant.pdf">完整 PDF ↗</a></div>
+  <nav class="prev-next" aria-label="前后章节"><a href="05.html"><small>← 上一章</small>05 · 和既有 benchmark 比，哪些可以复用</a><a href="07.html"><small>下一章 →</small>07 · 示范、标注、数据切分与有效性</a></nav></main>
+  <aside class="on-this-page" aria-label="本章内容"><div class="sidebar-label">本章内容</div><a href="#section-1">12 个应用场域：描述用途，不混入技能</a><a href="#section-2">48 个家族与完整情境</a><a href="#section-3">八个评测模块</a><a href="#section-4">观测、机体与学习设置是不同轴</a><a href="#section-5">物理模型与覆盖缺口</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>从文献到任务、评测与实作的公开研究设计。</div>
+  <div class="footer-links"><a href="../glossary.html">名词小辞典</a><a href="../appendices/methods.html">来源与方法</a><a href="../../downloads/full-report-zh-hant.pdf">完整 PDF</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">文献与设计快照：2026-09-21 · 设计 v0.2 · Scale schema 1.0。168 篇是范畴搜集；180 个是情境蓝图。正式验证测例与实际模拟运行均为 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

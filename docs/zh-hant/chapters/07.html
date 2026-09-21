@@ -1,0 +1,168 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>示範、標註、資料切分與有效性 · Robot-use Benchmark</title>
+  <meta name="description" content="人類示範如何配對、標註、切分，避免不合理的測例。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/07.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/07.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/07.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="示範、標註、資料切分與有效性 · Robot-use Benchmark"><meta property="og:description" content="人類示範如何配對、標註、切分，避免不合理的測例。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/07.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"chapters/07.html","title":"示範、標註、資料切分與有效性","kind":"chapter","localeRoot":"../","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料"}}};</script>
+  <script defer src="../../assets/search-zh-hant.js"></script><script defer src="../../assets/site.js"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../index.html">重點導讀</a><a href="index.html" class="active" aria-current="page">章節閱讀</a><a href="../explore/tasks.html">任務探索</a><a href="../library.html">文獻地圖</a><a href="13.html">實作路線</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="07.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/chapters/07.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章節導覽"><div class="sidebar-label">研究與設計</div><a href="01.html"><span>01</span>研究目標與當前狀態</a><a href="02.html"><span>02</span>用一個例子理解整套系統</a><a href="03.html"><span>03</span>規模的六個 granularity levels</a><a href="04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="06.html"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="07.html" class="active" aria-current="page"><span>07</span>示範、標註、資料切分與有效性</a><a href="08.html"><span>08</span>評測協定、指標與比較方法</a><a href="09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="10.html"><span>10</span>難度如何量化</a><a href="11.html"><span>11</span>題數、領域與執行預算</a><a href="12.html"><span>12</span>工程實作、資料格式與發布</a><a href="13.html"><span>13</span>論文流程與 milestones</a><a href="14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="../explore/families.html">48 個任務家族</a><a href="../explore/tasks.html">180 個情境藍圖</a><a href="../explore/probes.html">24 個 Ego 題型</a><a href="../explore/metrics.html">40 個指標</a><a href="../appendices/axes.html">完整分類軸</a><a href="../appendices/comparison.html">原生規模比較</a><a href="../library.html">168 篇文獻</a><a href="../appendices/methods.html">來源與資料字典</a></aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章節目錄與附錄</summary><div class="sidebar-label">研究與設計</div><a href="01.html"><span>01</span>研究目標與當前狀態</a><a href="02.html"><span>02</span>用一個例子理解整套系統</a><a href="03.html"><span>03</span>規模的六個 granularity levels</a><a href="04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="06.html"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="07.html" class="active" aria-current="page"><span>07</span>示範、標註、資料切分與有效性</a><a href="08.html"><span>08</span>評測協定、指標與比較方法</a><a href="09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="10.html"><span>10</span>難度如何量化</a><a href="11.html"><span>11</span>題數、領域與執行預算</a><a href="12.html"><span>12</span>工程實作、資料格式與發布</a><a href="13.html"><span>13</span>論文流程與 milestones</a><a href="14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="../explore/families.html">48 個任務家族</a><a href="../explore/tasks.html">180 個情境藍圖</a><a href="../explore/probes.html">24 個 Ego 題型</a><a href="../explore/metrics.html">40 個指標</a><a href="../appendices/axes.html">完整分類軸</a><a href="../appendices/comparison.html">原生規模比較</a><a href="../library.html">168 篇文獻</a><a href="../appendices/methods.html">來源與資料字典</a></details>
+  <div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>章節閱讀</span></div><div class="eyebrow">CHAPTER 07 / 14</div><h1>示範、標註、資料切分與有效性</h1>
+  <div class="page-meta"><span>約 5 分鐘</span><span>·</span><span>資料快照 2026-09-21</span><span class="pill status">設計階段 Q0</span></div>
+  <div class="chapter-summary"><div class="label">先掌握這三件事</div><ul><li>先以原始活動或錄製 session 分組，再產生 clips 與 QA。</li><li>示範與 robot 的配對可能只有共同目標，不能假設幾何一致。</li><li>資訊不足的題目應補線索或允許詢問，不能當成難題。</li></ul></div>
+  <div class="prose"><section id="c07"><h3 id="section-1">1. 來源與配對</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>來源</th>
+<th>可支援內容</th>
+<th>必須另確認</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>頭戴／胸前影片</td>
+<td>第一人稱目標、手物互動、歷史和人類未來</td>
+<td>相機、時間、遮擋、目標充分性、來源使用條件</td>
+</tr>
+<tr>
+<td>外部／多視角影片</td>
+<td>程式、全身、手部、視角轉移</td>
+<td>無校準時只能宣稱語義對齊，不能假定3D</td>
+</tr>
+<tr>
+<td>VLOG／教學剪輯</td>
+<td>多領域活動、步驟、敘述和工具</td>
+<td>剪接、變速、旁白對齊與遺漏資訊</td>
+</tr>
+<tr>
+<td>模擬robot示範</td>
+<td>動作、物理狀態、接觸、可控失敗</td>
+<td>不可標成人類第一人稱影片</td>
+</tr>
+<tr>
+<td>多session／互動</td>
+<td>歷史、角色、意圖、詢問和恢復</td>
+<td>身份、時間線、來源隔離及合作方模型</td>
+</tr>
+</tbody>
+</table></div>
+<p>配對分為 <code>same_scene_calibrated</code>、<code>same_objects_semantically_aligned</code>、<code>same_goal_only</code>。第三種不是精確重建，不能直接使用跨機體軌跡距離。來源使用條件及必要參與者同意資料，是收集／發布前需記錄的欄位，不假定公開影片皆可再分發。</p>
+<p>來源設定可重疊，例如頭戴影片也可被剪成VLOG。分別記錄相機安裝、agent來源、時間包裝、語言與sensor，不從Ego命名推斷攝影機位置。</p>
+<h3 id="section-2">2. 五層標註</h3>
+<ol>
+<li>來源：活動、錄製session、人物／角色、相機／時間、剪輯來源、場景和物件身份。</li>
+<li>語義：目標、合法替代、步驟、依賴、必要順序、錯誤和恢復。</li>
+<li>幾何／物理：可見性、接觸、姿態、材料、座標系；有根據才填值。</li>
+<li>知識：已知什麼、需哪段歷史、是否有唯一答案、何時可詢問。</li>
+<li>執行／結果：contract、軌跡、觸發、結果證據、量測有效性與evaluator版本。</li>
+</ol>
+<p>錯誤需區分錯目標、程式、接觸／機構、材料狀態、未完成、錯誤恢復與不可判定。人類做錯下一步時，T3預測其實際行為，T4可要求提出正確下一步。</p>
+<h3 id="section-3">3. 目標有效性</h3>
+<p>成對目標共享robot初態；示範與答案同步更換，獨立標註者應能辨別且專家都能完成。</p>
+<p>例項化時記錄初態是否已滿足目標。主操作測試不能混入大量直接停止就成功的初態；辨認已完成、允許不動作可另成診斷條件。也要檢查兩個目標在物件對稱、身份重新命名或允許對齊後，是否其實變成同一個結果。</p>
+<p>若外觀相同杯子被隨機交換，歷史和當前觀測都不提供身份對映，這是不可辨識，不是高難度記憶。須補線索、接受合法目標集合或改測詢問。</p>
+<p>無影片、單幀、時間打亂和遮擋是診斷對照。打亂時序可能產生不可能過程，剪去關鍵資訊會改變答案集合。不能一律保留舊答案，將不再可解樣本算模型失敗。</p>
+<h3 id="section-4">4. 切分順序</h3>
+<pre><code class="language-text">原始活動／錄製／場景身份
+→ source-group split
+→ clips、QA、plans、prediction labels、sim pairs
+→ 額外object/material/composition holdouts
+</code></pre>
+<p>追蹤原始session與相鄰clips、人物與場地、物件／衣物身份、mesh和改色版本、功能替代／擾動指令碼、teacher示範及衍生標籤。</p>
+<p>跨人物、跨場景與跨材料是不同主張；每個split列出隔離軸和重用軸。不同資料集名不保證獨立來源：EgoSchema衍生自Ego4D；RoboReward沿用OXE／RoboArena。WatchAct使用LIBERO環境，則不等於所有人類影片也相同。</p>
+<h3 id="section-5">5. 預訓練與生命週期</h3>
+<p>分為控制資料、宣告外部資料、固定few-shot support、明訂online adaptation tracks。無法審核完整預訓練資料時，標未知／開放條件，不宣稱完全無汙染。</p>
+<p>普通trial清空跨trial隱狀態，記憶track保留明訂session範圍。不能讓成對目標的上一個答案洩漏到下一個trial。</p>
+<p>另保留LIBERO／Meta-World等工作啟發的學習設定軸：凍結策略、離線調適、固定few-shot、線上互動、連續任務學習。連續學習需預先排定回測舊任務，儲存「學到第幾個任務×被測任務」的成功率矩陣，辨識保留和遺忘；這不是T2的推理時記憶。</p>
+<p>跨機體轉移需同時確認來源和目標profile的可解性、共享語義目標、adapter和目標資料預算。不能把不同DOF或action space的raw success直接混比，也不能假設人手3D軌跡可直接當robot joint actions。</p>
+<h3 id="section-6">6. 品質與發布</h3>
+<p>抽查可推斷性、標註分歧、校準誤差、合法替代、失敗／近失敗和目標對無關線索，公佈排除理由。開發版可提供候選spec；正式結果須經Q1–Q4，包含資料、assets、simulator、policy、config、evaluator及case版本／hash。</p>
+<h3 id="section-7">收集前先固定一份 data card</h3>
+<p>每一個來源活動需儲存來源 ID、session、人物／角色、相機安裝、時間與剪輯方式、物件／場景身份、使用條件與可發布範圍。每組 human–robot 配對必須說明是校準同場景、同物件語義對齊，還是隻有同一目標。</p>
+<p>沒有校準的第三視角影片可以用來測語義理解，不應填入推測的 3D 座標。沒有保留真即時間的 VLOG 可以測程式圖，但未必能測接觸時間。沒有合法身份對映的記憶題要補資料或改變答案集合，不能用 hidden ground truth 製造不可解題。</p>
+<h3 id="section-8">來源相依的實際例子</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>子來源</th>
+<th>父來源</th>
+<th>關係</th>
+<th>解讀</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EgoSchema <a href="../library.html#P028">P028</a></td>
+<td>Ego4D <a href="../library.html#P013">P013</a></td>
+<td>衍生影片來源</td>
+<td>先按原始source activity切分</td>
+</tr>
+<tr>
+<td>EPIC-KITCHENS VISOR <a href="../library.html#P011">P011</a></td>
+<td>EPIC-KITCHENS-100 <a href="../library.html#P010">P010</a></td>
+<td>原影片上新增標註</td>
+<td>核對原始影片ID</td>
+</tr>
+<tr>
+<td>EPIC Fields <a href="../library.html#P024">P024</a></td>
+<td>EPIC-KITCHENS <a href="../library.html#P009">P009</a></td>
+<td>共享來源家族</td>
+<td>精確影片集合需要逐ID審核</td>
+</tr>
+<tr>
+<td>RoboReward <a href="../library.html#P111">P111</a></td>
+<td>Open X-Embodiment <a href="../library.html#P125">P125</a></td>
+<td>衍生 robot data</td>
+<td>不要以不同資料集名推定獨立</td>
+</tr>
+<tr>
+<td>RoboReward <a href="../library.html#P111">P111</a></td>
+<td>RoboArena <a href="../library.html#P108">P108</a></td>
+<td>衍生 robot data</td>
+<td>negative或near-miss也須追蹤來源</td>
+</tr>
+<tr>
+<td>LIBERO-Plus <a href="../library.html#P105">P105</a></td>
+<td>LIBERO <a href="../library.html#P064">P064</a></td>
+<td>benchmark 變體</td>
+<td>場景和任務來源可能重疊</td>
+</tr>
+<tr>
+<td>LIBERO-Recover <a href="../library.html#P165">P165</a></td>
+<td>LIBERO <a href="../library.html#P064">P064</a></td>
+<td>benchmark 變體</td>
+<td>failure scenarios不等於新task families</td>
+</tr>
+<tr>
+<td>WatchAct <a href="../library.html#P123">P123</a></td>
+<td>LIBERO <a href="../library.html#P064">P064</a></td>
+<td>環境依賴</td>
+<td>不等同人類影片來源亦相同</td>
+</tr>
+<tr>
+<td>SafeVLA-Bench <a href="../library.html#P166">P166</a></td>
+<td>LIBERO <a href="../library.html#P064">P064</a></td>
+<td>評測宿主環境</td>
+<td>不等同新增獨立資料集</td>
+</tr>
+<tr>
+<td>SafeVLA-Bench <a href="../library.html#P166">P166</a></td>
+<td>RoboCasa365 <a href="../library.html#P071">P071</a></td>
+<td>評測宿主環境</td>
+<td>以同一環境重評過程約束</td>
+</tr>
+</tbody>
+</table></div>
+<p>這些邊只表示已有來源關係的例子，不是完整 contamination audit。資料集同名／異名與 source independence 是兩件事；公開預訓練來源無法全面查核時，應標示 open／unknown 條件。</p></section></div><div class="reader-actions"><button class="text-button copy-link">複製本章連結</button><button class="text-button print-page">列印本章</button><a class="text-button" href="../../downloads/full-report-zh-hant.pdf">完整 PDF ↗</a></div>
+  <nav class="prev-next" aria-label="前後章節"><a href="06.html"><small>← 上一章</small>06 · 完整 benchmark 的覆蓋設計</a><a href="08.html"><small>下一章 →</small>08 · 評測協定、指標與比較方法</a></nav></main>
+  <aside class="on-this-page" aria-label="本章內容"><div class="sidebar-label">本章內容</div><a href="#section-1">1. 來源與配對</a><a href="#section-2">2. 五層標註</a><a href="#section-3">3. 目標有效性</a><a href="#section-4">4. 切分順序</a><a href="#section-5">5. 預訓練與生命週期</a><a href="#section-6">6. 品質與發布</a><a href="#section-7">收集前先固定一份 data card</a><a href="#section-8">來源相依的實際例子</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>從文獻到任務、評測與實作的公開研究設計。</div>
+  <div class="footer-links"><a href="../glossary.html">名詞小辭典</a><a href="../appendices/methods.html">來源與方法</a><a href="../../downloads/full-report-zh-hant.pdf">完整 PDF</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">文獻與設計快照：2026-09-21 · 設計 v0.2 · Scale schema 1.0。168 篇是範疇蒐集；180 個是情境藍圖。正式驗證測例與實際模擬執行均為 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

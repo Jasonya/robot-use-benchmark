@@ -1,0 +1,113 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>難度如何量化 · Robot-use Benchmark</title>
+  <meta name="description" content="從十維設計向量，到固定模型群下的經驗難度。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/10.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/10.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/10.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="難度如何量化 · Robot-use Benchmark"><meta property="og:description" content="從十維設計向量，到固定模型群下的經驗難度。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/10.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"chapters/10.html","title":"難度如何量化","kind":"chapter","localeRoot":"../","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料"}}};</script>
+  <script defer src="../../assets/search-zh-hant.js"></script><script defer src="../../assets/site.js"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../index.html">重點導讀</a><a href="index.html" class="active" aria-current="page">章節閱讀</a><a href="../explore/tasks.html">任務探索</a><a href="../library.html">文獻地圖</a><a href="13.html">實作路線</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="10.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/chapters/10.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章節導覽"><div class="sidebar-label">研究與設計</div><a href="01.html"><span>01</span>研究目標與當前狀態</a><a href="02.html"><span>02</span>用一個例子理解整套系統</a><a href="03.html"><span>03</span>規模的六個 granularity levels</a><a href="04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="06.html"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="07.html"><span>07</span>示範、標註、資料切分與有效性</a><a href="08.html"><span>08</span>評測協定、指標與比較方法</a><a href="09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="10.html" class="active" aria-current="page"><span>10</span>難度如何量化</a><a href="11.html"><span>11</span>題數、領域與執行預算</a><a href="12.html"><span>12</span>工程實作、資料格式與發布</a><a href="13.html"><span>13</span>論文流程與 milestones</a><a href="14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="../explore/families.html">48 個任務家族</a><a href="../explore/tasks.html">180 個情境藍圖</a><a href="../explore/probes.html">24 個 Ego 題型</a><a href="../explore/metrics.html">40 個指標</a><a href="../appendices/axes.html">完整分類軸</a><a href="../appendices/comparison.html">原生規模比較</a><a href="../library.html">168 篇文獻</a><a href="../appendices/methods.html">來源與資料字典</a></aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章節目錄與附錄</summary><div class="sidebar-label">研究與設計</div><a href="01.html"><span>01</span>研究目標與當前狀態</a><a href="02.html"><span>02</span>用一個例子理解整套系統</a><a href="03.html"><span>03</span>規模的六個 granularity levels</a><a href="04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="06.html"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="07.html"><span>07</span>示範、標註、資料切分與有效性</a><a href="08.html"><span>08</span>評測協定、指標與比較方法</a><a href="09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="10.html" class="active" aria-current="page"><span>10</span>難度如何量化</a><a href="11.html"><span>11</span>題數、領域與執行預算</a><a href="12.html"><span>12</span>工程實作、資料格式與發布</a><a href="13.html"><span>13</span>論文流程與 milestones</a><a href="14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="../explore/families.html">48 個任務家族</a><a href="../explore/tasks.html">180 個情境藍圖</a><a href="../explore/probes.html">24 個 Ego 題型</a><a href="../explore/metrics.html">40 個指標</a><a href="../appendices/axes.html">完整分類軸</a><a href="../appendices/comparison.html">原生規模比較</a><a href="../library.html">168 篇文獻</a><a href="../appendices/methods.html">來源與資料字典</a></details>
+  <div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>章節閱讀</span></div><div class="eyebrow">CHAPTER 10 / 14</div><h1>難度如何量化</h1>
+  <div class="page-meta"><span>約 3 分鐘</span><span>·</span><span>資料快照 2026-09-21</span><span class="pill status">設計階段 Q0</span></div>
+  <div class="chapter-summary"><div class="label">先掌握這三件事</div><ul><li>難度屬於某個例項加上完整評測條件，不屬於論文名稱。</li><li>十維人工向量是設計註記；經驗難度需要固定 agent panel。</li><li>全模型失敗時，先排除不可解任務和錯誤評分器。</li></ul></div>
+  <div class="prose"><section id="c10"><p>難度的單位是 <strong>instance 加上完整評測 contract</strong>。同一條毛巾、同一目標，在不同手部能力、觀測、controller、示範量和時間限制下，難度會改變。不相容或不可解的配置應標為不適用／無效，不能當作高難題。</p>
+<h3 id="section-1">設計難度：十維向量</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>維度</th>
+<th>0 的錨點</th>
+<th>2 的錨點</th>
+<th>4 的錨點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H 依賴長度</td>
+<td>一個獨立 primitive</td>
+<td>數個因果依賴步驟</td>
+<td>長分支、多個持續承諾</td>
+</tr>
+<tr>
+<td>C 組合／因果</td>
+<td>直接對應</td>
+<td>選擇／排序已知子目標</td>
+<td>新組合、多約束與依賴</td>
+</tr>
+<tr>
+<td>O 觀測／記憶</td>
+<td>相關狀態現在可見</td>
+<td>遮擋或短歷史</td>
+<td>隱藏狀態需長／跨 session 歷史</td>
+</tr>
+<tr>
+<td>P 接觸／精度</td>
+<td>不需接觸</td>
+<td>中等容差的穩定接觸</td>
+<td>窄容差、動態、柔順或密集接觸</td>
+</tr>
+<tr>
+<td>D 形變</td>
+<td>剛體狀態</td>
+<td>中等材料形變</td>
+<td>重大形狀／拓撲、自遮擋、混合材料</td>
+</tr>
+<tr>
+<td>B 機體協調</td>
+<td>單末端、固定底座</td>
+<td>雙末端或底座與手臂協調</td>
+<td>全身／多末端強耦合</td>
+</tr>
+<tr>
+<td>G 泛化差異</td>
+<td>匹配訓練分佈</td>
+<td>held-out instances／scenes</td>
+<td>新類別、組合、材料或機體組合</td>
+</tr>
+<tr>
+<td>U 不確定性</td>
+<td>目標／合法動作已知</td>
+<td>多種可能解釋</td>
+<td>需觀測／詢問的目標與結果不確定性</td>
+</tr>
+<tr>
+<td>R 恢復需求</td>
+<td>沒有注入擾動</td>
+<td>一個可恢復擾動</td>
+<td>多個相互影響的失敗與重規劃</td>
+</tr>
+<tr>
+<td>S 社會協調</td>
+<td>單獨執行</td>
+<td>共享時序／輪流</td>
+<td>意圖相關協作與變動對方行為</td>
+</tr>
+</tbody>
+</table></div>
+<p>每維 0–4，中間值 1／3 由相鄰錨點判定。需保留完整向量，unknown 不填 0，並由獨立標註者檢查一致性。以下等權公式只是舊報告中的透明設計摘要：</p>
+<pre><code class="language-text">D_design = 2.5 × (H + C + O + P + D + B + G + U + R + S)
+</code></pre>
+<p>它不是公認難度標準，不能拿來排列 168 篇論文，也不能跨 QA 和實體操作比較。專門的高精度任務可能很難，卻因沒有社交／記憶需求而總分低。舊報告的十個假設評分例子保留在附錄 H，沒有套到 180 個情境上。</p>
+<h3 id="section-2">經驗難度：固定 agent panel 後再估</h3>
+<pre><code class="language-text">D_empirical(t) = 100 × [1 − Σ_m w_m × P(success | m,t,contract)]
+Σ_m w_m = 1
+</code></pre>
+<p>需要相同模組、相容 contract、固定方法群、多次實驗和不確定性區間。這只是該 panel 下的相對難度；換模型群就可能改變。少數共享 checkpoint／controller 的系統也不是大量獨立方法。</p>
+<p>保留 method×task 的結果矩陣，先檢查是否存在足夠的成功／失敗差異，再考慮 IRT 或多維／階層模型：</p>
+<pre><code class="language-text">P(success | m,t) = logistic[a_t × (ability_m − difficulty_t)]
+</code></pre>
+<p>需要檢查識別性、資料量、residual dependence、模型家族敏感性與 held-out-agent 預測；fit 成功不等於量尺有效。更新題庫時保留 anchor items，但重新驗證版本影響。tinyBenchmarks 是相鄰領域的方法啟發，Rliable 提供 agent 評測的統計方法參考；都不自動證明這套機器人難度量尺有效。<a href="../library.html#P159">P159</a> <a href="../library.html#P160">P160</a></p>
+<h3 id="section-3">難度、診斷力和重要性分開</h3>
+<p>全模型都失敗，可能是難，也可能是不可解、label 錯或 adapter 壞。先用專家、oracle 與判分器審核排除錯題。全模型都成功的題仍可重要，但對當前排序的鑑別力有限。</p>
+<p>影片長度、子目標數、物件數、A/B/C 實作階段都不能直接取代實測難度。EgoSchema 的時間證據觀點提醒我們：應測「必須看多少歷史」，不只是「影片有幾分鐘」。<a href="../library.html#P028">P028</a></p></section></div><div class="reader-actions"><button class="text-button copy-link">複製本章連結</button><button class="text-button print-page">列印本章</button><a class="text-button" href="../../downloads/full-report-zh-hant.pdf">完整 PDF ↗</a></div>
+  <nav class="prev-next" aria-label="前後章節"><a href="09.html"><small>← 上一章</small>09 · 六個詳細情境：從概念到驗收</a><a href="11.html"><small>下一章 →</small>11 · 題數、領域與執行預算</a></nav></main>
+  <aside class="on-this-page" aria-label="本章內容"><div class="sidebar-label">本章內容</div><a href="#section-1">設計難度：十維向量</a><a href="#section-2">經驗難度：固定 agent panel 後再估</a><a href="#section-3">難度、診斷力和重要性分開</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>從文獻到任務、評測與實作的公開研究設計。</div>
+  <div class="footer-links"><a href="../glossary.html">名詞小辭典</a><a href="../appendices/methods.html">來源與方法</a><a href="../../downloads/full-report-zh-hant.pdf">完整 PDF</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">文獻與設計快照：2026-09-21 · 設計 v0.2 · Scale schema 1.0。168 篇是範疇蒐集；180 個是情境藍圖。正式驗證測例與實際模擬執行均為 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

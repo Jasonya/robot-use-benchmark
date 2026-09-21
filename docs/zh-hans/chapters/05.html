@@ -1,0 +1,304 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>和既有 benchmark 比，哪些可以复用 · Robot-use Benchmark</title>
+  <meta name="description" content="比较最近 benchmark，厘清可复用资源与新的研究价值。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/05.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/05.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/05.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="和既有 benchmark 比，哪些可以复用 · Robot-use Benchmark"><meta property="og:description" content="比较最近 benchmark，厘清可复用资源与新的研究价值。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/05.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"chapters/05.html","title":"和既有 benchmark 比，哪些可以复用","kind":"chapter","localeRoot":"../","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料"}}};</script>
+  <script defer src="../../assets/search-zh-hans.js"></script><script defer src="../../assets/site.js"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../index.html">重点导读</a><a href="index.html" class="active" aria-current="page">章节阅读</a><a href="../explore/tasks.html">任务探索</a><a href="../library.html">文献地图</a><a href="13.html">实作路线</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/chapters/05.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="05.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章节导览"><div class="sidebar-label">研究与设计</div><a href="01.html"><span>01</span>研究目标与当前状态</a><a href="02.html"><span>02</span>用一个例子理解整套系统</a><a href="03.html"><span>03</span>规模的六个 granularity levels</a><a href="04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="05.html" class="active" aria-current="page"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="08.html"><span>08</span>评测协定、指针与比较方法</a><a href="09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="10.html"><span>10</span>难度如何量化</a><a href="11.html"><span>11</span>题数、领域与运行预算</a><a href="12.html"><span>12</span>工程实作、数据格式与发布</a><a href="13.html"><span>13</span>论文流程与 milestones</a><a href="14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="../explore/families.html">48 个任务家族</a><a href="../explore/tasks.html">180 个情境蓝图</a><a href="../explore/probes.html">24 个 Ego 题型</a><a href="../explore/metrics.html">40 个指针</a><a href="../appendices/axes.html">完整分类轴</a><a href="../appendices/comparison.html">原生规模比较</a><a href="../library.html">168 篇文献</a><a href="../appendices/methods.html">来源与数据字典</a></aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章节目录与附录</summary><div class="sidebar-label">研究与设计</div><a href="01.html"><span>01</span>研究目标与当前状态</a><a href="02.html"><span>02</span>用一个例子理解整套系统</a><a href="03.html"><span>03</span>规模的六个 granularity levels</a><a href="04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="05.html" class="active" aria-current="page"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="08.html"><span>08</span>评测协定、指针与比较方法</a><a href="09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="10.html"><span>10</span>难度如何量化</a><a href="11.html"><span>11</span>题数、领域与运行预算</a><a href="12.html"><span>12</span>工程实作、数据格式与发布</a><a href="13.html"><span>13</span>论文流程与 milestones</a><a href="14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="../explore/families.html">48 个任务家族</a><a href="../explore/tasks.html">180 个情境蓝图</a><a href="../explore/probes.html">24 个 Ego 题型</a><a href="../explore/metrics.html">40 个指针</a><a href="../appendices/axes.html">完整分类轴</a><a href="../appendices/comparison.html">原生规模比较</a><a href="../library.html">168 篇文献</a><a href="../appendices/methods.html">来源与数据字典</a></details>
+  <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>章节阅读</span></div><div class="eyebrow">CHAPTER 05 / 14</div><h1>和既有 benchmark 比，哪些可以复用</h1>
+  <div class="page-meta"><span>约 7 分钟</span><span>·</span><span>数据快照 2026-09-21</span><span class="pill status">设计阶段 Q0</span></div>
+  <div class="chapter-summary"><div class="label">先掌握这三件事</div><ul><li>先保留原作者单位，再对齐 domain、task、case 和数据量。</li><li>既有任务、资产和评分器可复用，但要重新审核兼容性。</li><li>视频到动作、折衣、恢复都有先例，新贡献需要实验支持。</li></ul></div>
+  <div class="prose"><section id="c05"><h3 id="section-1">先看原生规模，再谈共同尺度</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>工作</th>
+<th>原始／规划规模</th>
+<th>对应层级</th>
+<th>比较注意</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EgoSchema <a href="../library.html#P028">P028</a></td>
+<td>5,000+ QA</td>
+<td>G4 video_qa bank</td>
+<td>不是 robot tasks</td>
+</tr>
+<tr>
+<td>EgoPlan-Bench2 <a href="../library.html#P031">P031</a></td>
+<td>4 大类／24 细类；1,321 QA／1,113 videos</td>
+<td>G0 原生 taxonomy；G4／R-video</td>
+<td>24 细类不是物理初态；类别深度不同</td>
+</tr>
+<tr>
+<td>WatchAct <a href="../library.html#P123">P123</a></td>
+<td>14 tasks；3,000 instances；4 认知类</td>
+<td>G2-native；G4 待 schema；facet</td>
+<td>4 是能力，不是应用域</td>
+</tr>
+<tr>
+<td>RoboReel <a href="../library.html#P124">P124</a></td>
+<td>10 tasks；4 test suites</td>
+<td>G2-native；protocol facet</td>
+<td>suites 不是 domain／family</td>
+</tr>
+<tr>
+<td>The Imitator Game <a href="../library.html#P164">P164</a></td>
+<td>50+ base tasks；6 domains；20,000+ paired episodes</td>
+<td>G2-native／G0／R-demo</td>
+<td>全资源与各模型实验 subset 分开</td>
+</tr>
+<tr>
+<td>VLABench <a href="../library.html#P072">P072</a></td>
+<td>100 task categories</td>
+<td>G1／G2-native 边界待审</td>
+<td>不是已共通范式的 100 specs</td>
+</tr>
+<tr>
+<td>RoboCasa365 <a href="../library.html#P071">P071</a></td>
+<td>365 tasks；榜单 50 target tasks；2,500 kitchens</td>
+<td>whole resource／leaderboard subset／R-scene</td>
+<td>三种 scope／单位分开</td>
+</tr>
+<tr>
+<td>BEHAVIOR-1K <a href="../library.html#P100">P100</a></td>
+<td>1,000 activities；50 scenes</td>
+<td>G2-native／R-scene</td>
+<td>activity 不等于 episode；scene 不等于 domain</td>
+</tr>
+<tr>
+<td>RoboDojo <a href="../library.html#P083">P083</a></td>
+<td>42 sim tasks；18 real tasks；5 能力维度</td>
+<td>G2-native 分 substrate／facet</td>
+<td>不直接相加成 60 独立 tasks</td>
+</tr>
+<tr>
+<td>LIBERO-Recover <a href="../library.html#P165">P165</a></td>
+<td>1,000+ failure scenarios</td>
+<td>G3／G4-native 待 schema</td>
+<td>不是 1,000 个新家族</td>
+</tr>
+<tr>
+<td>LIBERO 固定 manifest <a href="../library.html#P064">P064</a></td>
+<td>130 个不同 native IDs；10 goals 抽查</td>
+<td>G2-native（只读程序数据）</td>
+<td>未跑 130 任务，未完成 canonical mapping</td>
+</tr>
+<tr>
+<td>我们：完整设计</td>
+<td>12 labels／48 families／180 blueprints</td>
+<td>G0／G1 authored；B0</td>
+<td>G2 TBD；G3–G5 实际 0</td>
+</tr>
+<tr>
+<td>我们：内核预算</td>
+<td>8–10 labels／30–40 groups／100–140 blueprints</td>
+<td>规划目标</td>
+<td>实际规模以 M3 通过验证的 subset 为准</td>
+</tr>
+</tbody>
+</table></div>
+<p>例如 EgoPlan-Bench2 的 Work 大类包含 lab work、blacksmith、mechanic、farmer 等细类，可能横跨我们的工坊、实验室和户外。不能用「12 对 4」宣称广三倍。RoboDojo 的 42 sim 与 18 real 任务未做语义去重前，也不能宣称 60 种独立任务。</p>
+<p>上述为先前已核对来源的版本快照，不是本次重新查核的实时榜单。每笔数字的版本、native term、对应尺度、scope 和解读限制完整列在附录 F。</p>
+<h3 id="section-2">覆盖比较与最接近的先例</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>工作</th>
+<th>已知重点</th>
+<th>本设计采用的方向</th>
+<th>比较限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../library.html#P013">Ego4D</a></td>
+<td>第一视角的记忆、交互、预测等多种任务</td>
+<td>T1–T3与来源层</td>
+<td>不是闭回路robot操控的替代</td>
+</tr>
+<tr>
+<td><a href="../library.html#P014">Ego-Exo4D</a></td>
+<td>熟练活动、多视角、姿态与品质理解</td>
+<td>人体／技能观测probe</td>
+<td>人类技能理解不自动成为robot能力</td>
+</tr>
+<tr>
+<td><a href="../library.html#P033">EgoLife</a></td>
+<td>长时间生活观测与记忆问答</td>
+<td>T2及来源／session设计</td>
+<td>QA正确不等于完成物理任务</td>
+</tr>
+<tr>
+<td><a href="../library.html#P041">EgoCross</a></td>
+<td>跨领域egocentric QA</td>
+<td>域移观测probe</td>
+<td>专业／动物观测不计入运行覆盖</td>
+</tr>
+<tr>
+<td><a href="../library.html#P031">EgoPlan-Bench2</a></td>
+<td>第一视角情境中的规划</td>
+<td>T4、目标充分性与依赖</td>
+<td>计划与物理可行性分开</td>
+</tr>
+<tr>
+<td><a href="../library.html#P141">HoloAssist</a></td>
+<td>协作、错误、介入及手部预测</td>
+<td>T3、T6、T7子任务</td>
+<td>人类协作数据不等同robot恢复成功</td>
+</tr>
+<tr>
+<td><a href="../library.html#P168">HRIBench (perception, 2025)</a></td>
+<td>人类知觉VQA及延迟</td>
+<td>T1/T7知觉部分</td>
+<td>与2026同名交互benchmark区分</td>
+</tr>
+<tr>
+<td><a href="../library.html#P147">HRIBench (interaction, 2026)</a></td>
+<td>交互角色、时序、协作与运行</td>
+<td>T7</td>
+<td>模拟partner结果不外推真实人类体验</td>
+</tr>
+<tr>
+<td><a href="../library.html#P123">WatchAct</a></td>
+<td>人类视频、计划和可运行任务的分解评测</td>
+<td>T4/T5及oracle对照</td>
+<td>视频到运行不是本计划首次提出</td>
+</tr>
+<tr>
+<td><a href="../library.html#P124">RoboReel</a></td>
+<td>从人类视频学技能的共同评测</td>
+<td>T5与数据／界面约定</td>
+<td>公平比较需要一致assumptions</td>
+</tr>
+<tr>
+<td><a href="../library.html#P164">The Imitator Game</a></td>
+<td>多领域示范到运行与功能替代，包含衣物</td>
+<td>A/B与多替代配置的动机</td>
+<td>不能靠折衣或功能替代本身称新</td>
+</tr>
+<tr>
+<td><a href="../library.html#P100">BEHAVIOR-1K</a></td>
+<td>广泛日常活动与物理／状态模型</td>
+<td>完整任务和多材料来源</td>
+<td>规格、资源总量和实际eval集合不同</td>
+</tr>
+<tr>
+<td><a href="../library.html#P071">RoboCasa365</a></td>
+<td>厨房环境、多任务与泛化</td>
+<td>backend／家务操作审核</td>
+<td>环境数量不是应用领域数量</td>
+</tr>
+<tr>
+<td><a href="../library.html#P072">VLABench</a></td>
+<td>长流程语言条件操作与推理</td>
+<td>T4/T5</td>
+<td>任务类别不等于我们的canonical family粒度</td>
+</tr>
+<tr>
+<td><a href="../library.html#P083">RoboDojo</a></td>
+<td>多能力与sim-and-real评测</td>
+<td>诊断与protocol审核</td>
+<td>本计划目前只有sim范围</td>
+</tr>
+<tr>
+<td><a href="../library.html#P087">GarmentLab</a></td>
+<td>广泛garment／deformable环境</td>
+<td>F20–F26等physics和metrics</td>
+<td>有资产不等于新scenario已有效</td>
+</tr>
+<tr>
+<td><a href="../library.html#P167">DexGarmentLab</a></td>
+<td>灵巧双臂garment场景与泛化策略</td>
+<td>灵巧手、布料与数据生成</td>
+<td>布料操作已有直接先例</td>
+</tr>
+<tr>
+<td><a href="../library.html#P093">MoDeSuite</a></td>
+<td>移动操作结合柔性物</td>
+<td>移动／材料交叉</td>
+<td>移动＋柔性物也非首次提出</td>
+</tr>
+<tr>
+<td><a href="../library.html#P165">LIBERO-Recover</a></td>
+<td>多种失败状态与恢复需求</td>
+<td>T6</td>
+<td>failure scenarios不是独立task families</td>
+</tr>
+<tr>
+<td><a href="../library.html#P166">SafeVLA-Bench</a></td>
+<td>以时序规则检查成功轨迹中的违反</td>
+<td>过程与完集成规成功</td>
+<td>过程约束与success-safety gap已有先例</td>
+</tr>
+<tr>
+<td><a href="../library.html#P151">H2R-Bench</a></td>
+<td>人类到robot视频生成评测</td>
+<td>T8的跨机体生成部分</td>
+<td>生成画面中的成功不等于控制成功</td>
+</tr>
+<tr>
+<td><a href="../library.html#P152">RoboWM-Bench</a></td>
+<td>把预测转为action并评估可运行性</td>
+<td>T8的固定adapter／executor</td>
+<td>需辨识世界模型与转换器瓶颈</td>
+</tr>
+</tbody>
+</table></div>
+<p>表中的「设计启发」是研究方向，不是已证明原作没有的功能。没有列出某项能力，也不能当作原作不支持。真正的新颖性仍需具体 task／data／evaluator 审核和 matched experiments。</p>
+<h3 id="section-3">是否全部用之前的 benchmark 整理就好</h3>
+<p><strong>可以大量复用，但整理本身只完成文献地图与候选设计。</strong> 要成为 benchmark paper，需要让既有资源在共同定义下形成可验证的任务、数据与评测，并用实验证明它回答了有价值的问题。</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>复用方式</th>
+<th>可以沿用</th>
+<th>必须补的部分</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原协定重现</td>
+<td>原始任务、资产、示范、评分器与 split</td>
+<td>固定版本、运行验证、真实原生计数；可用来创建参考成绩</td>
+</tr>
+<tr>
+<td>任务／资产移植</td>
+<td>场景、对象、controller 或子技能</td>
+<td>新 backend 的接触、reset、观测／动作和判分重新验证</td>
+</tr>
+<tr>
+<td>评测条件扩充</td>
+<td>已可解的 base tasks</td>
+<td>人类示范 A/B、历史、扰动、替代、必要过程与新 labels</td>
+</tr>
+<tr>
+<td>多来源集成</td>
+<td>不同 suite 的合法子集</td>
+<td>G2 映射、source lineage、兼容性、去重、权重与结果分层</td>
+</tr>
+<tr>
+<td>新物理情境</td>
+<td>既有 mesh／流程可作起点</td>
+<td>真正 physics、量测、专家解、合法替代与近失败；不能靠动画补齐</td>
+</tr>
+</tbody>
+</table></div>
+<p>不能只改 task 名称或把多套排行榜拼在一起。若观测、控制器、robot、数据和评分不同，合并平均会把方法差异与评测差异混在一起。</p>
+<h3 id="section-4">LIBERO 的实际粒度示例</h3>
+<p>固定官方 commit <code>8f1084e3132a39270c3a13ebe37270a43ece2a01</code> 的 manifest 有 <strong>130 个不同 native task IDs</strong>：spatial 10、object 10、goal 10、libero_10 10、libero_90 90。这次只抽查其中 10 个 BDDL goal 字段，没有运行模拟。</p>
+<p>三个 spatial 任务的完整 goal expression 相同，但 instruction 的位置／关系指涉不同；三个 object 任务的对象名称不同，运算形状都是 <code>In(object, basket)</code>。抽样出现 5 种粗粒度 goal patterns，<strong>不代表它们正式等于 5 个 canonical tasks，也不代表整个 LIBERO 只有 5 种任务</strong>。必须连指涉、机构、reset 和 evaluator 一起核对。完整例子与固定来源在附录 F。</p></section></div><div class="reader-actions"><button class="text-button copy-link">拷贝本章链接</button><button class="text-button print-page">打印本章</button><a class="text-button" href="../../downloads/full-report-zh-hant.pdf">完整 PDF ↗</a></div>
+  <nav class="prev-next" aria-label="前后章节"><a href="04.html"><small>← 上一章</small>04 · 文献地图、Ego 与预测研究</a><a href="06.html"><small>下一章 →</small>06 · 完整 benchmark 的覆盖设计</a></nav></main>
+  <aside class="on-this-page" aria-label="本章内容"><div class="sidebar-label">本章内容</div><a href="#section-1">先看原生规模，再谈共同尺度</a><a href="#section-2">覆盖比较与最接近的先例</a><a href="#section-3">是否全部用之前的 benchmark 整理就好</a><a href="#section-4">LIBERO 的实际粒度示例</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>从文献到任务、评测与实作的公开研究设计。</div>
+  <div class="footer-links"><a href="../glossary.html">名词小辞典</a><a href="../appendices/methods.html">来源与方法</a><a href="../../downloads/full-report-zh-hant.pdf">完整 PDF</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">文献与设计快照：2026-09-21 · 设计 v0.2 · Scale schema 1.0。168 篇是范畴搜集；180 个是情境蓝图。正式验证测例与实际模拟运行均为 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

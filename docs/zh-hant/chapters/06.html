@@ -1,0 +1,247 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>完整 benchmark 的覆蓋設計 · Robot-use Benchmark</title>
+  <meta name="description" content="場域、任務家族、物理材料和八個評測模組的完整設計。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/06.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/06.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/06.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="完整 benchmark 的覆蓋設計 · Robot-use Benchmark"><meta property="og:description" content="場域、任務家族、物理材料和八個評測模組的完整設計。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/06.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"chapters/06.html","title":"完整 benchmark 的覆蓋設計","kind":"chapter","localeRoot":"../","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料"}}};</script>
+  <script defer src="../../assets/search-zh-hant.js"></script><script defer src="../../assets/site.js"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../index.html">重點導讀</a><a href="index.html" class="active" aria-current="page">章節閱讀</a><a href="../explore/tasks.html">任務探索</a><a href="../library.html">文獻地圖</a><a href="13.html">實作路線</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="06.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/chapters/06.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章節導覽"><div class="sidebar-label">研究與設計</div><a href="01.html"><span>01</span>研究目標與當前狀態</a><a href="02.html"><span>02</span>用一個例子理解整套系統</a><a href="03.html"><span>03</span>規模的六個 granularity levels</a><a href="04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="06.html" class="active" aria-current="page"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="07.html"><span>07</span>示範、標註、資料切分與有效性</a><a href="08.html"><span>08</span>評測協定、指標與比較方法</a><a href="09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="10.html"><span>10</span>難度如何量化</a><a href="11.html"><span>11</span>題數、領域與執行預算</a><a href="12.html"><span>12</span>工程實作、資料格式與發布</a><a href="13.html"><span>13</span>論文流程與 milestones</a><a href="14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="../explore/families.html">48 個任務家族</a><a href="../explore/tasks.html">180 個情境藍圖</a><a href="../explore/probes.html">24 個 Ego 題型</a><a href="../explore/metrics.html">40 個指標</a><a href="../appendices/axes.html">完整分類軸</a><a href="../appendices/comparison.html">原生規模比較</a><a href="../library.html">168 篇文獻</a><a href="../appendices/methods.html">來源與資料字典</a></aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章節目錄與附錄</summary><div class="sidebar-label">研究與設計</div><a href="01.html"><span>01</span>研究目標與當前狀態</a><a href="02.html"><span>02</span>用一個例子理解整套系統</a><a href="03.html"><span>03</span>規模的六個 granularity levels</a><a href="04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="06.html" class="active" aria-current="page"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="07.html"><span>07</span>示範、標註、資料切分與有效性</a><a href="08.html"><span>08</span>評測協定、指標與比較方法</a><a href="09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="10.html"><span>10</span>難度如何量化</a><a href="11.html"><span>11</span>題數、領域與執行預算</a><a href="12.html"><span>12</span>工程實作、資料格式與發布</a><a href="13.html"><span>13</span>論文流程與 milestones</a><a href="14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="../explore/families.html">48 個任務家族</a><a href="../explore/tasks.html">180 個情境藍圖</a><a href="../explore/probes.html">24 個 Ego 題型</a><a href="../explore/metrics.html">40 個指標</a><a href="../appendices/axes.html">完整分類軸</a><a href="../appendices/comparison.html">原生規模比較</a><a href="../library.html">168 篇文獻</a><a href="../appendices/methods.html">來源與資料字典</a></details>
+  <div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>章節閱讀</span></div><div class="eyebrow">CHAPTER 06 / 14</div><h1>完整 benchmark 的覆蓋設計</h1>
+  <div class="page-meta"><span>約 6 分鐘</span><span>·</span><span>資料快照 2026-09-21</span><span class="pill status">設計階段 Q0</span></div>
+  <div class="chapter-summary"><div class="label">先掌握這三件事</div><ul><li>完整候選庫含 12 場域、48 家族與 180 情境藍圖。</li><li>八個模組只有在資料與標籤充足時，才形成有效測例。</li><li>材料、觀測、機體、學習設定各自獨立記錄。</li></ul></div>
+  <div class="prose"><section id="c06"><h3 id="section-1">12 個應用場域：描述用途，不混入技能</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>ID／場域</th>
+<th>邊界</th>
+<th>B0 數</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span id="D01">D01 · 居家生活空間</span></td>
+<td>私人住宅中的整理、備餐、衣物和家庭裝置；以住家任務目的作主分類。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D02">D02 · 餐飲服務場所</span></td>
+<td>餐廳、商用備餐與餐桌服務；與客房布品服務分開。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D03">D03 · 零售門店</span></td>
+<td>面向商品陳列、門店揀選、包裝和顧客服務的場景。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D04">D04 · 倉儲與配送場所</span></td>
+<td>庫存、揀貨、集貨、載運和路線配送；不是將所有移動任務都放在此。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D05">D05 · 辦公與行政空間</span></td>
+<td>檔案、辦公裝置、內部物品管理和可驗證的數位到實體工作。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D06">D06 · 工坊、製造與維修場所</span></td>
+<td>零件、機構、工具、拆裝和功能驗收。</td>
+<td>20</td>
+</tr>
+<tr>
+<td><span id="D07">D07 · 實驗室例行物件操作</span></td>
+<td>器材、容器、惰性顆粒與模擬裝置程式；不驗證化學或生物效果。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D08">D08 · 旅宿與洗衣服務</span></td>
+<td>布品、客房整理、洗衣周轉和住宿服務準備；餐廳歸 D02。</td>
+<td>14</td>
+</tr>
+<tr>
+<td><span id="D09">D09 · 建築設施維護服務</span></td>
+<td>公共或商用建築的表面處理、裝置復位、耗材與維護工具管理。</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span id="D10">D10 · 園藝與戶外作業場域</span></td>
+<td>工具、容器、作物幾何代理和戶外搬運；不宣稱模擬植物生長效果。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D11">D11 · 輔助生活服務場域</span></td>
+<td>非臨床的日常物品協助與模擬人類互動；不評估醫療效果。</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span id="D12">D12 · 公共場館與活動場域</span></td>
+<td>圖書館、展館、活動空間及公眾設施中的整理、準備與服務。</td>
+<td>14</td>
+</tr>
+</tbody>
+</table></div>
+<p>每個情境指定一個主要場域方便計數，跨類用途可另加標籤。同一摺衣家族可以出現在住家與旅宿；導航、雙臂、記憶不是應用場域。180 個藍圖中，178 個是執行候選，2 個是主動場景問答；後者不放進 T5 操作成功率。</p>
+<h3 id="section-2">48 個家族與完整情境</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>查閱範圍</th>
+<th>閱讀導引（精確名稱見附錄 A）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F01–F12</td>
+<td>取放、分類、配置、堆疊、裝箱、機構、遮擋、歷史、盤點、檢查與程式</td>
+</tr>
+<tr>
+<td>F13–F19</td>
+<td>封口、插入、裝配／拆卸、工具、緊固與大型物協調搬運</td>
+</tr>
+<tr>
+<td>F20–F26</td>
+<td>柔性片材、摺疊與收納、懸掛、穿線、繫結與套合</td>
+</tr>
+<tr>
+<td>F27–F34</td>
+<td>接觸覆蓋、散物收集、顆粒／流體轉移、配量、攪動、分割與成形</td>
+</tr>
+<tr>
+<td>F35–F42</td>
+<td>裝置程式、導航、尋物、載運、配送、通行、交接與共享資源</td>
+</tr>
+<tr>
+<td>F43–F48</td>
+<td>意圖協助、共同支承、跟隨、主動資訊、數位到實體與工作區復原</td>
+</tr>
+</tbody>
+</table></div>
+<p>家族按語義需求整理，例如「開啟—存入—關閉」、「依歷史取物」、「指定摺法」、「工具操作」、「共同支承」、「數位查詢—實體完成」。這 48 個是本計畫的 authored grouping，跨工作 canonical mapping 尚未完成。</p>
+<p>附錄 A 完整列出每個家族的子目標圖、證據、近失敗、擾動、物理需求和 A/B symbolic template；附錄 B 完整列出 180 個情境的初態、A/B 目標與專屬驗收。它們是設計規格，不是已寫好的環境或可執行 predicates。</p>
+<h3 id="section-3">八個評測模組</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>模組</th>
+<th>模型輸出</th>
+<th>評測／oracle 分界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span id="T1">T1 · 理解、定位與狀態</span></td>
+<td>物件、關係、狀態、證據位置或答案</td>
+<td>依子任務分開報告 accuracy/F1、定位誤差、關係一致性、證據正確率<br>診斷：特權 scene state 僅供 evaluator <a href="../library.html#P029">P029</a> <a href="../library.html#P026">P026</a> <a href="../library.html#P017">P017</a> <a href="../library.html#P042">P042</a> <a href="../library.html#P168">P168</a></td>
+</tr>
+<tr>
+<td><span id="T2">T2 · 情節記憶</span></td>
+<td>過去事件／位置、關聯證據、記憶引導的行動</td>
+<td>記憶 QA 與證據正確率、幹擾量曲線；行動成功另報<br>診斷：完整無幹擾歷史與正確檢索，分別作診斷 <a href="../library.html#P028">P028</a> <a href="../library.html#P033">P033</a> <a href="../library.html#P043">P043</a> <a href="../library.html#P115">P115</a></td>
+</tr>
+<tr>
+<td><span id="T3">T3 · 動作、互動與軌跡預測</span></td>
+<td>未來動作、物件／接觸、接觸時間、2D/3D 軌跡與不確定性</td>
+<td>固定 horizon/K 下的 label/contact 指標、時間誤差、ADE/FDE、適用的校準指標<br>診斷：真實未來只供標註；不能餵給 policy <a href="../library.html#P046">P046</a> <a href="../library.html#P047">P047</a> <a href="../library.html#P049">P049</a> <a href="../library.html#P050">P050</a> <a href="../library.html#P052">P052</a> <a href="../library.html#P053">P053</a> <a href="../library.html#P058">P058</a></td>
+</tr>
+<tr>
+<td><span id="T4">T4 · 目標與計畫</span></td>
+<td>目標圖、子任務依賴圖、可執行的高層計畫</td>
+<td>目標一致性、語義 transition validity、goal reachability；物理執行另報<br>診斷：oracle goal、oracle state、oracle plan 分開比較 <a href="../library.html#P031">P031</a> <a href="../library.html#P072">P072</a> <a href="../library.html#P101">P101</a> <a href="../library.html#P123">P123</a></td>
+</tr>
+<tr>
+<td><span id="T5">T5 · 閉迴路任務執行</span></td>
+<td>機器人動作與完整 trajectory</td>
+<td>目標成功、符合約束的完整成功、pair success、時間、幹預、覆蓋<br>診斷：專家／特權狀態控制器驗證可解性 <a href="../library.html#P064">P064</a> <a href="../library.html#P067">P067</a> <a href="../library.html#P100">P100</a> <a href="../library.html#P071">P071</a> <a href="../library.html#P083">P083</a> <a href="../library.html#P164">P164</a></td>
+</tr>
+<tr>
+<td><span id="T6">T6 · 診斷與恢復</span></td>
+<td>錯誤型別、狀態修復、恢復後完成</td>
+<td>診斷F1、完整成功、觸發率、條件式恢復、額外成本；snapshot 另列<br>診斷：已知錯誤型別／恢復子目標，不與主榜混合 <a href="../library.html#P112">P112</a> <a href="../library.html#P022">P022</a> <a href="../library.html#P109">P109</a> <a href="../library.html#P165">P165</a> <a href="../library.html#P113">P113</a></td>
+</tr>
+<tr>
+<td><span id="T7">T7 · 互動與協作</span></td>
+<td>協作動作、詢問、等待、交接與角色分配</td>
+<td>共同完成、時序／協議違反、回應延遲、協助負擔；知覺QA獨立<br>診斷：明確人類意圖與合作方狀態僅作上界 <a href="../library.html#P141">P141</a> <a href="../library.html#P143">P143</a> <a href="../library.html#P147">P147</a> <a href="../library.html#P168">P168</a> <a href="../library.html#P145">P145</a> <a href="../library.html#P146">P146</a></td>
+</tr>
+<tr>
+<td><span id="T8">T8 · 世界模型與可執行性</span></td>
+<td>動作條件化的未來狀態／影片及可轉成動作的預測</td>
+<td>狀態／接觸一致性、固定 adapter 下的執行成功；視覺品質獨立<br>診斷：固定重建／動作轉換器的 oracle reconstruction <a href="../library.html#P054">P054</a> <a href="../library.html#P149">P149</a> <a href="../library.html#P150">P150</a> <a href="../library.html#P152">P152</a> <a href="../library.html#P151">P151</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>每個模組需通過自己的資料條件：T2 要證明歷史必要；T3 要有合法未來與時間標籤；T7 要固定 partner model；T8 要固定重建／動作轉換介面。以來源充分性決定可生成哪些 packets，而非把 180×8 當成覆蓋量。</p>
+<h3 id="section-4">觀測、機體與學習設定是不同軸</h3>
+<p>O1–O8 是可重疊的來源 presets：文字／語音、頭戴影片、胸前／身體攝影機、外部／多視角、剪輯 VLOG、模擬 robot 示範、多 session 歷史、非人類第一視角診斷。頭戴片段也可能是剪輯 VLOG；不能把這兩種標籤當互斥來源。</p>
+<p>正式 metadata 分開記錄 agent origin、camera mount、view pairing、temporal packaging、language、history 和 sensors。EgoBody 研究從頭戴裝置觀察人體，不能只憑名稱把它當成胸前攝影機資料。非人類視角可測域移與 egomotion，但不能增加 robot 實體操作覆蓋。<a href="../library.html#P019">P019</a> <a href="../library.html#P025">P025</a></p>
+<p>R1–R6 分別是固定單臂、固定雙臂、固定靈巧雙臂、移動單臂、移動雙臂、全身／人形的候選能力配置，不是已選定六臺機器人。L0–L4 分別是 frozen、offline adaptation、few-shot、online adaptation、continual learning；這些引數更新設定與 T2 的推理時記憶分開。</p>
+<p>34 個能力、12 個變化軸、8 個來源 preset、獨立觀測軸、6 個 profile 與 5 種 learning regimes 全部定義在附錄 E。</p>
+<h3 id="section-5">物理模型與覆蓋缺口</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>材料模型</th>
+<th>全部 B0</th>
+<th>T5 候選</th>
+<th>T5 家族（可跨材料）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>剛體 (rigid)</td>
+<td>137</td>
+<td>135</td>
+<td>33</td>
+</tr>
+<tr>
+<td>布料 (cloth)</td>
+<td>18</td>
+<td>18</td>
+<td>11</td>
+</tr>
+<tr>
+<td>顆粒 (granular)</td>
+<td>11</td>
+<td>11</td>
+<td>4</td>
+</tr>
+<tr>
+<td>繩索 (rope)</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+</tr>
+<tr>
+<td>流體 (fluid)</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr>
+<td>其他柔順固體 (soft_solid)</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<p>材料模型分為 rigid、cloth、rope、granular、fluid、soft_solid。Articulation 是物件結構，不能當成材料；137 個 rigid 藍圖中包含 2 個資訊情境，真正 T5 候選為 135。</p>
+<p>目前仍以剛體為主。4 個 fluid 情境集中在 1 個執行家族，不能叫做完整流體操作覆蓋。繩索、切割、人體／布料、動態支承和世界模型的驗證仍有限。場景換名字不會自動增加接觸機制或物理能力。</p>
+<p>接觸覆蓋不等於消毒；機械攪動不等於化學均勻；裝置狀態機不等於真實熱學或洗淨效果。若只驗證邏輯程式或模擬代理量，就按實際內容命名與分榜。</p>
+<figure class=""><img src="../../assets/figures/figure-067aa344e67e.png" alt="圖 2．材料與實作階段的候選分佈。A／B／C 是設計標記，非校準難度；沒有 validated cases。" loading="lazy" decoding="async"><figcaption>圖 2．材料與實作階段的候選分佈。A／B／C 是設計標記，非校準難度；沒有 validated cases。</figcaption></figure>
+
+<p>A／B／C 是提出的實作分組：A 93 個偏原型優先；B 64 個需要柔性物、特殊接觸或互動；C 23 個涉及更專項的物理／拓撲／複合需求。它們不是已量測的難度級別。</p>
+<p>附錄 E 的場域×能力矩陣分開「家族本身需求」、「可額外產生的 probes」與聯集。所有 verified cells 仍為 0；C33／C34 等觀測能力主要由額外 24 個 Ego 題型支援，不能灌入操作成功率。</p></section></div><div class="reader-actions"><button class="text-button copy-link">複製本章連結</button><button class="text-button print-page">列印本章</button><a class="text-button" href="../../downloads/full-report-zh-hant.pdf">完整 PDF ↗</a></div>
+  <nav class="prev-next" aria-label="前後章節"><a href="05.html"><small>← 上一章</small>05 · 和既有 benchmark 比，哪些可以復用</a><a href="07.html"><small>下一章 →</small>07 · 示範、標註、資料切分與有效性</a></nav></main>
+  <aside class="on-this-page" aria-label="本章內容"><div class="sidebar-label">本章內容</div><a href="#section-1">12 個應用場域：描述用途，不混入技能</a><a href="#section-2">48 個家族與完整情境</a><a href="#section-3">八個評測模組</a><a href="#section-4">觀測、機體與學習設定是不同軸</a><a href="#section-5">物理模型與覆蓋缺口</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>從文獻到任務、評測與實作的公開研究設計。</div>
+  <div class="footer-links"><a href="../glossary.html">名詞小辭典</a><a href="../appendices/methods.html">來源與方法</a><a href="../../downloads/full-report-zh-hant.pdf">完整 PDF</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">文獻與設計快照：2026-09-21 · 設計 v0.2 · Scale schema 1.0。168 篇是範疇蒐集；180 個是情境藍圖。正式驗證測例與實際模擬執行均為 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

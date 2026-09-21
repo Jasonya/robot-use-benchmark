@@ -1,0 +1,199 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>评测协定、指针与比较方法 · Robot-use Benchmark</title>
+  <meta name="description" content="成功、恢复、基线、对照实验与不确定性怎么计算。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/08.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/chapters/08.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/08.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="评测协定、指针与比较方法 · Robot-use Benchmark"><meta property="og:description" content="成功、恢复、基线、对照实验与不确定性怎么计算。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/chapters/08.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"chapters/08.html","title":"评测协定、指针与比较方法","kind":"chapter","localeRoot":"../","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料"}}};</script>
+  <script defer src="../../assets/search-zh-hans.js"></script><script defer src="../../assets/site.js"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../index.html">重点导读</a><a href="index.html" class="active" aria-current="page">章节阅读</a><a href="../explore/tasks.html">任务探索</a><a href="../library.html">文献地图</a><a href="13.html">实作路线</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/chapters/08.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="08.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章节导览"><div class="sidebar-label">研究与设计</div><a href="01.html"><span>01</span>研究目标与当前状态</a><a href="02.html"><span>02</span>用一个例子理解整套系统</a><a href="03.html"><span>03</span>规模的六个 granularity levels</a><a href="04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="08.html" class="active" aria-current="page"><span>08</span>评测协定、指针与比较方法</a><a href="09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="10.html"><span>10</span>难度如何量化</a><a href="11.html"><span>11</span>题数、领域与运行预算</a><a href="12.html"><span>12</span>工程实作、数据格式与发布</a><a href="13.html"><span>13</span>论文流程与 milestones</a><a href="14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="../explore/families.html">48 个任务家族</a><a href="../explore/tasks.html">180 个情境蓝图</a><a href="../explore/probes.html">24 个 Ego 题型</a><a href="../explore/metrics.html">40 个指针</a><a href="../appendices/axes.html">完整分类轴</a><a href="../appendices/comparison.html">原生规模比较</a><a href="../library.html">168 篇文献</a><a href="../appendices/methods.html">来源与数据字典</a></aside>
+  <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章节目录与附录</summary><div class="sidebar-label">研究与设计</div><a href="01.html"><span>01</span>研究目标与当前状态</a><a href="02.html"><span>02</span>用一个例子理解整套系统</a><a href="03.html"><span>03</span>规模的六个 granularity levels</a><a href="04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="08.html" class="active" aria-current="page"><span>08</span>评测协定、指针与比较方法</a><a href="09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="10.html"><span>10</span>难度如何量化</a><a href="11.html"><span>11</span>题数、领域与运行预算</a><a href="12.html"><span>12</span>工程实作、数据格式与发布</a><a href="13.html"><span>13</span>论文流程与 milestones</a><a href="14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="../explore/families.html">48 个任务家族</a><a href="../explore/tasks.html">180 个情境蓝图</a><a href="../explore/probes.html">24 个 Ego 题型</a><a href="../explore/metrics.html">40 个指针</a><a href="../appendices/axes.html">完整分类轴</a><a href="../appendices/comparison.html">原生规模比较</a><a href="../library.html">168 篇文献</a><a href="../appendices/methods.html">来源与数据字典</a></details>
+  <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>章节阅读</span></div><div class="eyebrow">CHAPTER 08 / 14</div><h1>评测协定、指针与比较方法</h1>
+  <div class="page-meta"><span>约 8 分钟</span><span>·</span><span>数据快照 2026-09-21</span><span class="pill status">设计阶段 Q0</span></div>
+  <div class="chapter-summary"><div class="label">先掌握这三件事</div><ul><li>终态成功、完集成规成功、配对目标成功分开报告。</li><li>恢复要同时列全 episode、扰动施加率与条件式成功。</li><li>模型在相同信息、控制、数据和预算下比较。</li></ul></div>
+  <div class="prose"><section id="c08"><h3 id="section-1">1. 一个 episode 的共同约定</h3>
+<p>固定：</p>
+<ul>
+<li>task family 与 release version；</li>
+<li>robot profile、action interface、观测；</li>
+<li>示范／文字输入 track；</li>
+<li>训练、在线适应与推理预算；</li>
+<li>simulator、资产、控制／物理步进设置；</li>
+<li>reset seed、初始状态与验证摘要；</li>
+<li>成功 predicate、必要过程、时间和干预规则。</li>
+</ul>
+<p>兼容的模型在同一评测 contract 下比较。不同机体、输入、oracle 信息与 adaptation regime 分榜。</p>
+<p><code>goal_spec</code>、私有测试答案、精确 evaluator state 和正式测试 seed 不得作为 policy input。公开的任务家族说明与训练案例可以存在，但不等于公开正式测试 instance。</p>
+<h3 id="section-2">2. 成对目标测试</h3>
+<p>对同一 task family、同一 initial scene、同一 generalization／disturbance 条件和 seed，创建 A/B 两个有效目标。使用两个示范分别指定 A 和 B。</p>
+<p>要求：</p>
+<ol>
+<li>初始可观测状态匹配，不能只靠场景猜答案。</li>
+<li>示范改变时，ground-truth 目标同步改变。</li>
+<li>A/B 都可解，而且可以客观区分；若终态可以同时成立，另定互斥要求或换一组目标。</li>
+<li>配对示范的无关因素应匹配或平衡。</li>
+<li>不能让 task filename、public ID、长度或提示模板泄漏目标。</li>
+</ol>
+<p>定义：</p>
+<pre><code class="language-text">valid_success(e) =
+    required_final_predicates(e)
+    AND required_trace_constraints(e)
+    AND no_disallowed_intervention(e)
+    AND within_declared_budget(e)
+
+pair_success(p) =
+    valid_success(p.A) AND valid_success(p.B)
+    AND both_outcomes_follow_the_corresponding_demonstration
+</code></pre>
+<p>若评分器还输出另一目标是否成立，应检查两个目标的区分。不要假定 pair success 的 chance level 固定为 25%；它取决于动作空间、目标结构与模型先验。</p>
+<p><code>no_video</code> 对照用来量测先验或场景捷径，不能假装它也获得同样的目标信息。<code>oracle_goal</code> 是诊断上界，不是正式模型排名。</p>
+<h3 id="section-3">3. 2×2 条件与变化类型</h3>
+<pre><code class="language-text">Seen-Clean：已见实例，无扰动
+Unseen-Clean：未见实例，无扰动
+Seen-Disturbed：已见实例，运行中扰动
+Unseen-Disturbed：未见实例，运行中扰动
+</code></pre>
+<p>「未见」依 track 具体定义为 object identity、geometry、material parameter 或合法功能替代；不得在不同方法间改定义。每个条件内包含多个真实有效的变化实例，不以重复 seed 冒充新物体。</p>
+<p>材料子研究需记录可比几何、摩擦、质量／密度、弯曲与拉伸参数、参数取值依据和 simulator 适用范围。若没有校准物理材料，结论仅能针对「模拟参数变化」。</p>
+<p>不要把这四个条件当成必然递增的难度级别；难度需由结果检查。</p>
+<h3 id="section-4">4. 扰动与恢复：避免分母偏差</h3>
+<p>主测试在完整 episode 中，在预定的语义 checkpoint 注入扰动。checkpoint 应对合法策略公平；不能只奖励某一种轨迹，或阻挡本来允许的替代解法。</p>
+<p>必须记录：</p>
+<ul>
+<li>是否到达 checkpoint；</li>
+<li>是否真的注入扰动；</li>
+<li>触发事件／时间、扰动参数；</li>
+<li>扰动后状态是否有效；</li>
+<li>最后是否成功、额外时间／动作数。</li>
+</ul>
+<p>分开报告：</p>
+<pre><code class="language-text">Full success rate =
+    完整成功 episodes / 全部有效起始试验
+
+Trigger delivery rate =
+    确实注入扰动 episodes / 全部有效起始试验
+
+Conditional recovery success =
+    扰动后完整成功 episodes / 确实注入且状态有效的扰动 episodes
+</code></pre>
+<p>最后一个量受模型能否到达 checkpoint 影响，不能单独拿来排序整体能力。未能到达 checkpoint 的模型不应因为少进入难案例而获得更好的总榜分数。</p>
+<p>若合法策略完成了任务却没有经过触发点，应修正触发定义或将它标为未施加介入的试验；不可把它宣称为恢复成功。</p>
+<p>可以另外创建<strong>固定失败快照</strong>诊断集，让模型从同一组状态与同一个可用历史重新规划。该结果标为 <code>snapshot_replanning</code>，不可与 <code>online_recovery</code> 混成一个量。</p>
+<p>模拟器故障、无效 reset、evaluator 传感缺失要记录并按预定规则处理。模型 crash、超时、控制失败通常是方法结果，不应为了提高分数而丢掉。所有排除事件及数量都要公开。</p>
+<h3 id="section-5">5. 真正完成与表面完成</h3>
+<p>每个 task family 须有：</p>
+<ul>
+<li>成功解及至少一种合法替代解；</li>
+<li>部分完成反例；</li>
+<li>错物体／错位置反例；</li>
+<li>必要过程未完成但终态看似正确的反例；</li>
+<li>过渡性成功但最终不稳定的反例；</li>
+<li>evaluator 无法可靠量测时的处理规则。</li>
+</ul>
+<p>布料折叠不能只用面积或紧密度；至少检查指定折法对应的拓扑／边缘关系、几何与最后位置。具体量测方法与容差在物理 backend、资产与独立评分样本上校准，再冻结。</p>
+<p>过程约束只包含用户任务真的需要的事件。不能为了让题目变难而要求逐帧模仿示范，除非 track 明确评测轨迹模仿。</p>
+<h3 id="section-6">6. 聚合与不确定性</h3>
+<p>先在固定 case 的重跑内平均，再按 instance／spec／family 和场域的预先公布权重聚合。场域与家族交叉时须明确分配权重，不能让同一家族只因跨场域重复出现便无限制加权。成对目标和同一来源／对象／变化 instance 的关联要保留。</p>
+<p>报告内容：</p>
+<ul>
+<li>full valid success、pair success；</li>
+<li>四个条件的成功率；</li>
+<li>每个领域与变化类型的分布；</li>
+<li>trigger delivery 和 conditional recovery；</li>
+<li>final-only 与 trace-valid 判定差异；</li>
+<li>时间、动作、干预与排除试验；</li>
+<li>兼容任务覆盖与未支持格子；</li>
+<li>不确定性与 trial 数。</li>
+</ul>
+<p>模型比较采相同 case 的配对分析。Bootstrap／阶层模型要对应实际抽样单位，避免把同一视频的 clips 或同一物体的 seeds 当成大量独立证据。很少的任务家族只能支撑 pilot 结论。</p>
+<p>不先设计一个把正确性、时间、风险等任意加权的「universal intelligence score」。正式排行榜可以有主要成功率，但必须同时显示复盖与分项。</p>
+<h3 id="section-7">八模块的计分分界</h3>
+<h3 id="section-8">1. 成功的层次</h3>
+<pre><code class="language-text">GoalSuccess = required_final_goal_predicates_at_valid_termination
+CompliantSuccess =
+    GoalSuccess AND required_process_constraints
+    AND within_budget AND no_disallowed_intervention
+</code></pre>
+<p>两者同时报告。过程约束只包含任务明订需求，不要求逐帧模仿。SafeVLA-Bench、OopsieVerse和Embodied Agent Interface是相关先例。</p>
+<p>平均子目标分数不能代替完整成功：在篮内不表示折法正确；两站都送到不表示必要顺序正确；面板复位不表示程序曾运行。</p>
+<h3 id="section-9">2. 各模块的计分边界</h3>
+<ul>
+<li>T1：答案、定位、关系与状态分开。</li>
+<li>T2：记忆答案、证据和干扰曲线；行动成功另列。</li>
+<li>T3：固定horizon与K。2D／3D、串行、接触和时间分开；有效时间和座标标签是前提。</li>
+<li>T4：语义计划有效与物理可行分开，用固定executor和oracle诊断。</li>
+<li>T5：固定机体、输入、动作与数据条件。</li>
+<li>T6：diagnosis、online recovery和snapshot replanning分开。</li>
+<li>T7：共同结果、时序、协议、延迟；模拟代理量不当成真实人类满意度。</li>
+<li>T8：视觉品质、状态一致性与固定adapter下可运行性分开。</li>
+</ul>
+<p>剪辑视频不能直接以播放秒数计物理接触时间。轨迹要声明座标、尺度与有效frames；best-of-K不单独证明概率校准。</p>
+<p>40 个候选指针在附录 D 逐项列出名称、单位、分母／标签需求、解读限制和来源。这 40 项不是每题都要算，也不应任意加成一个 universal score。</p>
+<h3 id="section-10">基线与必要对照</h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>路线／控制</th>
+<th>主要用途</th>
+<th>比较时固定什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>信息对照：无视频、单帧、完整视频、匹配文字</td>
+<td>检查模型是否使用任务相关信息，以及场景捷径</td>
+<td>信息不足时重审可解性；无视频不是等信息条件</td>
+</tr>
+<tr>
+<td>视频／语言理解与规划模型</td>
+<td>测 T1–T4 的推理与证据</td>
+<td>输入、history、tools、label 与预算</td>
+</tr>
+<tr>
+<td>模块式 video → goal／plan → controller</td>
+<td>区分上游与控制瓶颈</td>
+<td>共用 executor；以 oracle goal／plan／state 分别诊断</td>
+</tr>
+<tr>
+<td>直接 visuomotor imitation，如 ACT／Diffusion Policy</td>
+<td>创建动作学习参考</td>
+<td>示范与训练数据、观测、action interface、训练预算 <a href="../library.html#P130">P130</a> <a href="../library.html#P138">P138</a></td>
+</tr>
+<tr>
+<td>通用策略／VLA 参考</td>
+<td>测开放或受控数据设置下的泛化</td>
+<td>checkpoint、外部数据、适应方式、profile 兼容性 <a href="../library.html#P134">P134</a> <a href="../library.html#P135">P135</a> <a href="../library.html#P136">P136</a> <a href="../library.html#P137">P137</a></td>
+</tr>
+<tr>
+<td>记忆／恢复消融</td>
+<td>检查 history、diagnosis、replanning 的作用</td>
+<td>相同 case、触发、可用历史和计算预算</td>
+</tr>
+<tr>
+<td>特权 state／专家／oracle</td>
+<td>验证可解性并定位瓶颈</td>
+<td>明确标为诊断上界，与一般方法分栏</td>
+</tr>
+</tbody>
+</table></div>
+<p>这是方法路线规划，不是已确认所有 checkpoint 都能读取人类视频或使用同一双臂 controller。M1–M2 要先确认兼容性；不兼容的模型不得暗换输入或控制器后放进同一栏比较。</p>
+<h3 id="section-11">主实验需要回答的问题</h3>
+<ol>
+<li>示范改变时，行为是否跟随 A/B 目标？无视频与单帧可解释多少捷径？</li>
+<li>在分开控制对象、材料、场景、替代与任务组合后，哪些变化造成下降？</li>
+<li>GoalSuccess 与 CompliantSuccess 的差距有多大，哪些近失败会被终态判分漏掉？</li>
+<li>FullEpisodeSR、TriggerDelivery、ConditionalRecovery 和 snapshot replanning 是否给出不同诊断？</li>
+<li>Oracle goal／state／plan 解除哪个瓶颈？上游 QA 好是否真的预测运行好？</li>
+<li>排序对家族／场域权重、样本选择、模型家族和不确定性有多敏感？</li>
+</ol>
+<p>这些是假设与分析计划，不预设一定显著。主测试冻结后不应根据模型表现挑题；改判分器时升版本，重跑受影响比较。</p></section></div><div class="reader-actions"><button class="text-button copy-link">拷贝本章链接</button><button class="text-button print-page">打印本章</button><a class="text-button" href="../../downloads/full-report-zh-hant.pdf">完整 PDF ↗</a></div>
+  <nav class="prev-next" aria-label="前后章节"><a href="07.html"><small>← 上一章</small>07 · 示范、标注、数据切分与有效性</a><a href="09.html"><small>下一章 →</small>09 · 六个详细情境：从概念到验收</a></nav></main>
+  <aside class="on-this-page" aria-label="本章内容"><div class="sidebar-label">本章内容</div><a href="#section-1">1. 一个 episode 的共同约定</a><a href="#section-2">2. 成对目标测试</a><a href="#section-3">3. 2×2 条件与变化类型</a><a href="#section-4">4. 扰动与恢复：避免分母偏差</a><a href="#section-5">5. 真正完成与表面完成</a><a href="#section-6">6. 聚合与不确定性</a><a href="#section-7">八模块的计分分界</a><a href="#section-8">1. 成功的层次</a><a href="#section-9">2. 各模块的计分边界</a><a href="#section-10">基线与必要对照</a><a href="#section-11">主实验需要回答的问题</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>从文献到任务、评测与实作的公开研究设计。</div>
+  <div class="footer-links"><a href="../glossary.html">名词小辞典</a><a href="../appendices/methods.html">来源与方法</a><a href="../../downloads/full-report-zh-hant.pdf">完整 PDF</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">文献与设计快照：2026-09-21 · 设计 v0.2 · Scale schema 1.0。168 篇是范畴搜集；180 个是情境蓝图。正式验证测例与实际模拟运行均为 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

@@ -1,0 +1,740 @@
+{
+  "version": "0.2",
+  "date": "2026-09-21",
+  "status": "design_not_validated_benchmark",
+  "counting_units": {
+    "paper": "A bibliographic record, not an independent benchmark.",
+    "application_context": "Declared primary application context for counting; not a capability.",
+    "task_family": "Canonical semantic task structure; can recur across contexts.",
+    "scenario": "An authored application of a task family, with proposed initial scene and goal alternatives.",
+    "instance": "An instantiated scene/material/goal configuration; none collected in this release.",
+    "episode": "One actual execution under a frozen contract; none collected in this release.",
+    "evaluation_packet": "Track-specific inputs/labels/metrics derived from a valid instance; not every scenario supports every track."
+  },
+  "application_contexts": {
+    "D01": {
+      "name": "居家生活空間",
+      "boundary": "私人住宅中的整理、備餐、衣物和家庭設備；以住家任務目的作主分類。"
+    },
+    "D02": {
+      "name": "餐飲服務場所",
+      "boundary": "餐廳、商用備餐與餐桌服務；與客房布品服務分開。"
+    },
+    "D03": {
+      "name": "零售門店",
+      "boundary": "面向商品陳列、門店揀選、包裝和顧客服務的場景。"
+    },
+    "D04": {
+      "name": "倉儲與配送場所",
+      "boundary": "庫存、揀貨、集貨、載運和路線配送；不是將所有移動任务都放在此。"
+    },
+    "D05": {
+      "name": "辦公與行政空間",
+      "boundary": "文件、辦公設備、內部物品管理和可驗證的數位到實體工作。"
+    },
+    "D06": {
+      "name": "工坊、製造與維修場所",
+      "boundary": "零件、機構、工具、拆裝和功能驗收。"
+    },
+    "D07": {
+      "name": "實驗室例行物件操作",
+      "boundary": "器材、容器、惰性顆粒與模擬設備程序；不驗證化學或生物效果。"
+    },
+    "D08": {
+      "name": "旅宿與洗衣服務",
+      "boundary": "布品、客房整理、洗衣周轉和住宿服務準備；餐廳歸 D02。"
+    },
+    "D09": {
+      "name": "建築設施維護服務",
+      "boundary": "公共或商用建築的表面處理、設備復位、耗材與维护工具管理。"
+    },
+    "D10": {
+      "name": "園藝與戶外作業場域",
+      "boundary": "工具、容器、作物幾何代理和戶外搬運；不宣稱模擬植物生長效果。"
+    },
+    "D11": {
+      "name": "輔助生活服務場域",
+      "boundary": "非臨床的日常物品協助與模擬人類互動；不評估醫療效果。"
+    },
+    "D12": {
+      "name": "公共場館與活動場域",
+      "boundary": "圖書館、展館、活動空間及公眾設施中的整理、準備與服務。"
+    }
+  },
+  "robot_profiles": {
+    "R1": {
+      "name": "固定單臂夾爪",
+      "mobile": false,
+      "effectors": 1,
+      "dexterous": false
+    },
+    "R2": {
+      "name": "固定雙臂夾爪",
+      "mobile": false,
+      "effectors": 2,
+      "dexterous": false
+    },
+    "R3": {
+      "name": "固定雙臂靈巧手",
+      "mobile": false,
+      "effectors": 2,
+      "dexterous": true
+    },
+    "R4": {
+      "name": "移動單臂夾爪",
+      "mobile": true,
+      "effectors": 1,
+      "dexterous": false
+    },
+    "R5": {
+      "name": "移動雙臂",
+      "mobile": true,
+      "effectors": 2,
+      "dexterous": false
+    },
+    "R6": {
+      "name": "全身／人形機器人",
+      "mobile": true,
+      "effectors": 2,
+      "dexterous": true
+    }
+  },
+  "capabilities": [
+    {
+      "id": "C01",
+      "name": "物件辨識與語義定位",
+      "source_ids": [
+        "P009",
+        "P011",
+        "P026"
+      ]
+    },
+    {
+      "id": "C02",
+      "name": "三維幾何與座標系理解",
+      "source_ids": [
+        "P017",
+        "P018",
+        "P042"
+      ]
+    },
+    {
+      "id": "C03",
+      "name": "手物接觸與關係辨識",
+      "source_ids": [
+        "P026",
+        "P017",
+        "P018"
+      ]
+    },
+    {
+      "id": "C04",
+      "name": "物件狀態與變化辨識",
+      "source_ids": [
+        "P123",
+        "P032",
+        "P039"
+      ]
+    },
+    {
+      "id": "C05",
+      "name": "Affordance 與功能替代",
+      "source_ids": [
+        "P164",
+        "P084",
+        "P048"
+      ]
+    },
+    {
+      "id": "C06",
+      "name": "從示範推斷目標",
+      "source_ids": [
+        "P029",
+        "P030",
+        "P164"
+      ]
+    },
+    {
+      "id": "C07",
+      "name": "程序與事件順序",
+      "source_ids": [
+        "P003",
+        "P004",
+        "P023",
+        "P015"
+      ]
+    },
+    {
+      "id": "C08",
+      "name": "因果、依賴與反事實判斷",
+      "source_ids": [
+        "P032",
+        "P101",
+        "P084"
+      ]
+    },
+    {
+      "id": "C09",
+      "name": "情節與跨 session 記憶",
+      "source_ids": [
+        "P028",
+        "P033",
+        "P115"
+      ]
+    },
+    {
+      "id": "C10",
+      "name": "注意力與視線證據",
+      "source_ids": [
+        "P008",
+        "P012"
+      ]
+    },
+    {
+      "id": "C11",
+      "name": "未來動作與序列預測",
+      "source_ids": [
+        "P046",
+        "P047",
+        "P049",
+        "P050",
+        "P055"
+      ]
+    },
+    {
+      "id": "C12",
+      "name": "下一互動物件、接觸與時間預測",
+      "source_ids": [
+        "P052",
+        "P053",
+        "P057"
+      ]
+    },
+    {
+      "id": "C13",
+      "name": "二維／三維軌跡預測",
+      "source_ids": [
+        "P051",
+        "P058",
+        "P059"
+      ]
+    },
+    {
+      "id": "C14",
+      "name": "Action-conditioned 世界預測",
+      "source_ids": [
+        "P054",
+        "P149",
+        "P152",
+        "P151"
+      ]
+    },
+    {
+      "id": "C15",
+      "name": "多步與長流程規劃",
+      "source_ids": [
+        "P065",
+        "P072",
+        "P100",
+        "P101"
+      ]
+    },
+    {
+      "id": "C16",
+      "name": "剛體抓取與放置",
+      "source_ids": [
+        "P062",
+        "P063",
+        "P064"
+      ]
+    },
+    {
+      "id": "C17",
+      "name": "關節物件與機構操作",
+      "source_ids": [
+        "P067",
+        "P080",
+        "P071"
+      ]
+    },
+    {
+      "id": "C18",
+      "name": "精密接觸與裝配",
+      "source_ids": [
+        "P079",
+        "P081",
+        "P084"
+      ]
+    },
+    {
+      "id": "C19",
+      "name": "雙臂協調",
+      "source_ids": [
+        "P074",
+        "P130",
+        "P131"
+      ]
+    },
+    {
+      "id": "C20",
+      "name": "手指級靈巧操作",
+      "source_ids": [
+        "P119",
+        "P120",
+        "P167"
+      ]
+    },
+    {
+      "id": "C21",
+      "name": "形變與拓撲狀態",
+      "source_ids": [
+        "P085",
+        "P087",
+        "P167",
+        "P091"
+      ]
+    },
+    {
+      "id": "C22",
+      "name": "動態、非抓取與物料操作",
+      "source_ids": [
+        "P088",
+        "P085",
+        "P100"
+      ]
+    },
+    {
+      "id": "C23",
+      "name": "導航與移動操作",
+      "source_ids": [
+        "P099",
+        "P098",
+        "P093",
+        "P102"
+      ]
+    },
+    {
+      "id": "C24",
+      "name": "工具使用",
+      "source_ids": [
+        "P084",
+        "P072",
+        "P164"
+      ]
+    },
+    {
+      "id": "C25",
+      "name": "集合、數量與庫存一致性",
+      "source_ids": [
+        "P039",
+        "P100",
+        "P032"
+      ]
+    },
+    {
+      "id": "C26",
+      "name": "錯誤偵測與診斷",
+      "source_ids": [
+        "P022",
+        "P112",
+        "P110",
+        "P109"
+      ]
+    },
+    {
+      "id": "C27",
+      "name": "失敗恢復與重新規劃",
+      "source_ids": [
+        "P165",
+        "P109",
+        "P113"
+      ]
+    },
+    {
+      "id": "C28",
+      "name": "人類意圖與社交線索",
+      "source_ids": [
+        "P141",
+        "P168",
+        "P061"
+      ]
+    },
+    {
+      "id": "C29",
+      "name": "協作、時序與角色協調",
+      "source_ids": [
+        "P143",
+        "P147",
+        "P145",
+        "P148"
+      ]
+    },
+    {
+      "id": "C30",
+      "name": "不確定性、主動觀測與詢問",
+      "source_ids": [
+        "P038",
+        "P141",
+        "P033"
+      ]
+    },
+    {
+      "id": "C31",
+      "name": "必要過程、約束與副作用",
+      "source_ids": [
+        "P166",
+        "P116",
+        "P101"
+      ]
+    },
+    {
+      "id": "C32",
+      "name": "數位資訊到實體操作",
+      "source_ids": [
+        "P039",
+        "P101",
+        "P097"
+      ]
+    },
+    {
+      "id": "C33",
+      "name": "全身姿態與自我運動",
+      "source_ids": [
+        "P019",
+        "P020",
+        "P014",
+        "P025"
+      ]
+    },
+    {
+      "id": "C34",
+      "name": "人類技能品質與程序錯誤",
+      "source_ids": [
+        "P014",
+        "P022",
+        "P112"
+      ]
+    }
+  ],
+  "tracks": {
+    "T1": {
+      "name": "理解、定位與狀態",
+      "output": "物件、關係、狀態、證據位置或答案",
+      "metric": "依子任務分開報告 accuracy/F1、定位誤差、關係一致性、證據正確率",
+      "oracle": "特權 scene state 僅供 evaluator",
+      "source_ids": [
+        "P029",
+        "P026",
+        "P017",
+        "P042",
+        "P168"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T2": {
+      "name": "情節記憶",
+      "output": "過去事件／位置、關聯證據、記憶引導的行動",
+      "metric": "記憶 QA 與證據正確率、干擾量曲線；行動成功另報",
+      "oracle": "完整無干擾歷史與正確檢索，分別作診斷",
+      "source_ids": [
+        "P028",
+        "P033",
+        "P043",
+        "P115"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T3": {
+      "name": "動作、互動與軌跡預測",
+      "output": "未來動作、物件／接觸、接觸時間、2D/3D 軌跡與不確定性",
+      "metric": "固定 horizon/K 下的 label/contact 指標、時間誤差、ADE/FDE、適用的校準指標",
+      "oracle": "真實未來只供標註；不能餵給 policy",
+      "source_ids": [
+        "P046",
+        "P047",
+        "P049",
+        "P050",
+        "P052",
+        "P053",
+        "P058"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T4": {
+      "name": "目標與計畫",
+      "output": "目標圖、子任務依賴圖、可執行的高層計畫",
+      "metric": "目標一致性、語義 transition validity、goal reachability；物理執行另報",
+      "oracle": "oracle goal、oracle state、oracle plan 分開比較",
+      "source_ids": [
+        "P031",
+        "P072",
+        "P101",
+        "P123"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T5": {
+      "name": "閉迴路任務執行",
+      "output": "機器人動作與完整 trajectory",
+      "metric": "目標成功、符合約束的完整成功、pair success、時間、干預、覆蓋",
+      "oracle": "專家／特權狀態控制器驗證可解性",
+      "source_ids": [
+        "P064",
+        "P067",
+        "P100",
+        "P071",
+        "P083",
+        "P164"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T6": {
+      "name": "診斷與恢復",
+      "output": "錯誤類型、狀態修復、恢復後完成",
+      "metric": "診斷F1、完整成功、觸發率、條件式恢復、額外成本；snapshot 另列",
+      "oracle": "已知錯誤類型／恢復子目標，不與主榜混合",
+      "source_ids": [
+        "P112",
+        "P022",
+        "P109",
+        "P165",
+        "P113"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T7": {
+      "name": "互動與協作",
+      "output": "協作動作、詢問、等待、交接與角色分配",
+      "metric": "共同完成、時序／協議違反、回應延遲、協助負担；知覺QA獨立",
+      "oracle": "明確人類意圖與合作方狀態僅作上界",
+      "source_ids": [
+        "P141",
+        "P143",
+        "P147",
+        "P168",
+        "P145",
+        "P146"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    },
+    "T8": {
+      "name": "世界模型與可執行性",
+      "output": "動作條件化的未來狀態／影片及可轉成動作的預測",
+      "metric": "狀態／接觸一致性、固定 adapter 下的執行成功；視覺品質獨立",
+      "oracle": "固定重建／動作轉換器的 oracle reconstruction",
+      "source_ids": [
+        "P054",
+        "P149",
+        "P150",
+        "P152",
+        "P151"
+      ],
+      "scoring_ready": false,
+      "status": "requires_data_and_evaluator_instantiation"
+    }
+  },
+  "goal_observation_sources": [
+    {
+      "id": "O1",
+      "name": "文字／語音目標",
+      "origin": "declared_instruction",
+      "requirements": "保留語音轉錄與延遲；完整目標文字與影片推斷不得當成相同資訊條件。"
+    },
+    {
+      "id": "O2",
+      "name": "人類頭戴第一視角",
+      "origin": "observed_human",
+      "requirements": "記錄頭部運動、時間戳與來源 session；不能等同 robot ego camera。"
+    },
+    {
+      "id": "O3",
+      "name": "人類胸前／身體攝影機",
+      "origin": "observed_human",
+      "requirements": "單獨記錄相機安裝位置、手部遮擋和相機座標；不是只有重新命名 O2。"
+    },
+    {
+      "id": "O4",
+      "name": "第三視角／多視角人類示範",
+      "origin": "observed_human",
+      "requirements": "有校準才可使用跨視角3D指標；否則僅宣稱語義對齊。"
+    },
+    {
+      "id": "O5",
+      "name": "VLOG／剪輯教學影片",
+      "origin": "observed_human_edited",
+      "requirements": "標記剪接、遺漏步驟、旁白、目標資訊充分性與非等速播放。"
+    },
+    {
+      "id": "O6",
+      "name": "模擬機器人示範",
+      "origin": "simulated_robot",
+      "requirements": "可開發環境與產生未來標籤；不得標成人類影片或真實 body-camera 資料。"
+    },
+    {
+      "id": "O7",
+      "name": "多 session 觀測與互動歷史",
+      "origin": "mixed_with_lineage",
+      "requirements": "追蹤來源、時間和干擾；防止同一來源的 clips 跨 split。"
+    },
+    {
+      "id": "O8",
+      "name": "非人類第一視角診斷",
+      "origin": "nonhuman_egocentric_diagnostic_only",
+      "requirements": "只用於觀測、egomotion或域移診斷，不冒充人類操作示範或robot action資料。"
+    }
+  ],
+  "variation_axes": [
+    {
+      "id": "V01",
+      "name": "視角與感測",
+      "definition": "相機位置、遮擋、曝光、感測噪音；保留目標可辨識性"
+    },
+    {
+      "id": "V02",
+      "name": "物件身份／外觀",
+      "definition": "同語義類別的新實例、材質外觀；不自動等同物理材料改變"
+    },
+    {
+      "id": "V03",
+      "name": "幾何與機構",
+      "definition": "尺寸、形狀、接口、關節；各變化要確認目標仍可解"
+    },
+    {
+      "id": "V04",
+      "name": "物理／材料參數",
+      "definition": "質量、摩擦、柔順、拉伸、彎曲；記錄校準和有效範圍"
+    },
+    {
+      "id": "V05",
+      "name": "場景與配置",
+      "definition": "新房間、布局、容器位置、可達性與背景"
+    },
+    {
+      "id": "V06",
+      "name": "功能替代與工具可用性",
+      "definition": "改變可用工具／物件但保持意圖；每個替代經人工或專家驗證"
+    },
+    {
+      "id": "V07",
+      "name": "任務組合",
+      "definition": "保留 primitives，改變依賴圖、目標組合或必要順序"
+    },
+    {
+      "id": "V08",
+      "name": "時間與記憶負荷",
+      "definition": "必需歷史長度、干擾 session、延遲與來源混淆"
+    },
+    {
+      "id": "V09",
+      "name": "執行中擾動",
+      "definition": "明訂語義checkpoint和擾動；完整成功／delivery／conditional recovery分報"
+    },
+    {
+      "id": "V10",
+      "name": "互動對象與行為",
+      "definition": "不同角色、意圖、速度、可見線索與合作策略"
+    },
+    {
+      "id": "V11",
+      "name": "指令與資訊充分性",
+      "definition": "改寫、多語、語音噪音、矛盾／缺失；無唯一答案時需調整標籤"
+    },
+    {
+      "id": "V12",
+      "name": "機體與介面",
+      "definition": "不同末端、DOF、移動能力；獨立 eligibility 與 contract，不暗換控制器"
+    }
+  ],
+  "implementation_stages": {
+    "A": "優先原型：剛體／機構／宣告狀態；仍未實作驗證",
+    "B": "進階原型：柔性物、特殊接觸或互動；仍未實作驗證",
+    "C": "研究型物理／拓撲／複合互動；驗證前不納入正式成績"
+  },
+  "readiness_levels": {
+    "Q0": "Authored semantic candidate",
+    "Q1": "Instantiated assets and feasible goals",
+    "Q2": "Expert solvability and reset reproducibility checked",
+    "Q3": "Evaluator validated with valid success and near-miss cases",
+    "Q4": "Baselines, data/split provenance and uncertainty reproduced; eligible for a frozen release"
+  },
+  "all_current_scenarios_readiness": "Q0",
+  "observation_probe_blueprints_are_separate": true,
+  "observation_diagnostic_strata": {
+    "X01": "技能運動影片",
+    "X02": "手作與熟練程序影片",
+    "X03": "戶外人類第一視角",
+    "X04": "專門工作領域的觀測",
+    "X05": "長時間生活與社交觀測",
+    "X06": "非人類第一視角"
+  },
+  "observation_axes": {
+    "agent_origin": [
+      "human",
+      "robot",
+      "nonhuman",
+      "mixed",
+      "unknown"
+    ],
+    "camera_mount": [
+      "head",
+      "chest_or_body",
+      "external",
+      "robot_fixed",
+      "robot_wrist",
+      "virtual",
+      "unknown"
+    ],
+    "view_pairing": [
+      "single_view",
+      "synchronized_multiview",
+      "asynchronous_semantic_pair",
+      "unknown"
+    ],
+    "temporal_packaging": [
+      "continuous",
+      "excerpt",
+      "edited_vlog",
+      "variable_rate",
+      "unknown"
+    ],
+    "language_channel": [
+      "none",
+      "written_goal",
+      "spoken_instruction",
+      "narration",
+      "mixed"
+    ],
+    "history_scope": [
+      "single_event",
+      "single_episode",
+      "multiple_sessions"
+    ],
+    "sensor_channels": [
+      "RGB",
+      "depth",
+      "audio",
+      "IMU",
+      "gaze",
+      "proprioception",
+      "contact_or_tactile"
+    ]
+  },
+  "observation_source_note": "O1–O8 are convenience presets, not mutually exclusive taxonomy axes. A head-camera recording may also be an edited VLOG.",
+  "material_structure_note": "Articulation is an object-structure property, not a material. The active_material field denotes the selected physical material-model class; chemical/material identities require actual asset annotation.",
+  "learning_regimes": {
+    "L0": "frozen policy; no benchmark-driven parameter update",
+    "L1": "offline adaptation with a declared fixed training pool",
+    "L2": "fixed few-shot support budget on the target task or embodiment",
+    "L3": "online adaptation with explicit interaction and update budgets",
+    "L4": "continual task sequence with a predeclared revisit schedule and retained-task success matrix"
+  },
+  "learning_regime_note": "Learning/parameter updates are separate from inference-time episodic memory. Results across regimes are not pooled.",
+  "embodiment_transfer_note": "Source-to-target transfer needs both profiles' eligibility, a shared semantic goal, a declared adapter and target-data budget; it is not a direct comparison of incompatible action spaces."
+}
