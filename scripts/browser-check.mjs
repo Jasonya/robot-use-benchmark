@@ -161,6 +161,7 @@ try{
   await cdp.send('Page.navigate',{url:new URL('zh-hant/explore/tasks.html',BASE).href});
   await waitFor("document.readyState==='complete'&&document.querySelectorAll('[data-entry]').length===180");
   assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-entry]')).filter(e=>getComputedStyle(e).display!=='none').length"),180);
+  assert.ok(await evaluate("document.querySelector('[data-catalogue]').getBoundingClientRect().width>800"),'No-JavaScript reading should use the available content width.');
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
   pass('Reading without JavaScript','All 180 pre-rendered task cards remain available without scripts.');
 
