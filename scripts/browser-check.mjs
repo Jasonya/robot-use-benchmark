@@ -135,6 +135,32 @@ try{
   assert.ok(await evaluate("document.querySelectorAll('#site-search-results .search-result').length>0"));
   pass('Standalone search','Search URLs are directly shareable and searchable by stable IDs.');
 
+  await go('zh-hant/scale-plan.html');
+  assert.ok(await evaluate("document.querySelector('#main-content').textContent.includes('2,000–3,000')"));
+  assert.ok(await noOverflow());
+  await snapshot('scale-plan-desktop');
+  await go('zh-hant/native-tasks.html');
+  assert.equal(await evaluate('window.NATIVE_SOURCE_DATA.records.length'),5020);
+  assert.equal(await evaluate("document.querySelectorAll('[data-native-record]').length"),24);
+  await setValue('#native-source','roboverse');
+  assert.ok(await evaluate("document.querySelector('#native-count').textContent.includes('2,897')"));
+  await evaluate("document.getElementById('native-hide-config').click()");
+  assert.ok(await evaluate("document.querySelector('#native-count').textContent.includes('310')"));
+  await snapshot('native-source-filtered-desktop');
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&!!window.NATIVE_SOURCE_DATA");
+  assert.equal(await evaluate("document.getElementById('native-source').value"),'roboverse');
+  assert.equal(await evaluate("document.getElementById('native-hide-config').checked"),true);
+  assert.ok(await evaluate("document.querySelector('#native-count').textContent.includes('310')"));
+  pass('Native source browser and conservative variant filter','5,020 source records; RoboVerse has 2,897 groups and 310 remain after hiding only the 2,587 reviewed config-only derivations.');
+  const nativeAnchor=await evaluate("window.NATIVE_SOURCE_DATA.records.find(record=>record.s==='behavior').id");
+  await go('zh-hant/native-tasks.html#'+nativeAnchor);
+  assert.equal(await evaluate(`document.getElementById(${JSON.stringify(nativeAnchor)}).querySelector('details').open`),true);
+  await go('zh-hant/chapters/11.html');
+  assert.ok(await evaluate("document.querySelector('#c11').textContent.includes('2,000–3,000')"));
+  assert.equal(await evaluate("document.querySelector('details.legacy-content').open"),false);
+  pass('New scope and source deep links','The v0.3 budget leads; the v0.2 budget is explicitly archived, and native records have shareable anchors.');
+
   await viewport(390,1000,true);
   await go('zh-hant/index.html');
   assert.ok(await noOverflow());
@@ -149,10 +175,18 @@ try{
   await go('zh-hans/explore/tasks.html#SC-H15');
   assert.ok(await noOverflow());
   await snapshot('task-simplified-mobile');
+  await go('zh-hans/native-tasks.html?source=robocasa');
+  assert.ok(await noOverflow());
+  await snapshot('native-source-mobile');
+  await go('zh-hans/scale-plan.html');
+  assert.ok(await noOverflow());
+  await snapshot('scale-plan-mobile');
   pass('Mobile layout and menu','390px homepage, chapter and task pages have no document-level horizontal overflow.');
 
   await viewport(320,900,true);
   await go('zh-hans/index.html');
+  assert.ok(await noOverflow());
+  await go('zh-hans/scale-plan.html');
   assert.ok(await noOverflow());
   pass('Small-screen layout','Homepage stays within a 320px viewport.');
 

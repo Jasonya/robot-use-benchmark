@@ -1,0 +1,175 @@
+# 規模優先的 All-in-one Robot-use Benchmark：設計 v0.3
+
+更新：2026-09-22。使用者明確要求：**以任務種類更多、涵蓋更廣、整合完整為主要貢獻**。
+
+本版調整研究主線，不把原本 100–140 個情境的工程預算當作完整 benchmark 規模。原有 180 個情境保留為設計種子與驗收範例。正式任務數使用共同正規化後的 G2 定義，實際場景、測例與模型執行另外計數。
+
+## 1. 要達到什麼規模
+
+| 項目 | 初始研發目標 | 正式驗收條件 |
+|---|---|---|
+| 完整模擬任務庫 | **2,000–3,000 個正規化 G2 任務定義** | 每個計入者都有可追蹤定義、相容實例、同介面專家解與經審核判分；此範圍目前是目標，不是取得／可行性估計 |
+| 相對規模優勢 | **至少最大可比基準的 2 倍** | 在同一 ontology、task kind、scope、版本和去重規則下比較；參照最大值尚未完成正規化 |
+| 人類觀測到執行 | 初始規劃 **300–500 個 G2 任務**，並接受相同的相對規模檢查 | 真的有人類觀測、合法目標配對與 robot 執行證據；不以合成 robot 影片代替人類資料 |
+| 領域與能力廣度 | 對預先登記比較集合形成可驗證的覆蓋擴張 | 使用共同場域／家族／互動機制分類；公布各基準已涵蓋、新增和未支持格子 |
+| 統一入口 | 共用 registry、資料與任務查詢、執行接口規格、紀錄格式和報告 | 多 backend／profile 的適用集合可追蹤；不同輸入與 action contracts 分層比較 |
+
+2,000–3,000 是這一輪的研發目標，**沒有從目前原生紀錄數推導出已完成的任務數**。若對照庫正規化後比預期大，目標也要上調；若正式 release 沒達門檻，就公開實績並繼續擴張，不能先宣稱規模領先。
+
+不設定「換成 20 個領域標籤就比較廣」這種門檻。原 12 個應用場域先保留為共同映射起點；新增場域必须有獨立的應用邊界、任務、場景與有效評測支持。共同分類若需擴充，必須同時重編對照工作。
+
+## 2. 規模優勢怎麼證明
+
+定義 `T(w)` 為工作 w 在共同規則下的正規化任務集合，`T(ours)` 為本計畫通過驗收的集合。
+
+```text
+TaskScaleRatio = |T(ours)| / max_w |T(w)|
+初始驗收目標：TaskScaleRatio ≥ 2
+
+ReusedTasks = T(ours) ∩ union_w T(w)
+NewTasks = T(ours) − union_w T(w)
+```
+
+這些集合目前尚未計算完成；`NewTasks` 不能由新 ID、檔名、自然語言改寫或新增配置數得到。
+
+領域廣度另用預先固定的 `context × family × interaction mechanism` 格子及機體適用條件報告：
+
+- 對每個比較工作，列出共同覆蓋、我們新增、我們仍缺少的格子。
+- 規模與廣度主張都以通過驗證的任務／格子為基礎。
+- 不能只挑較小 benchmark 比較，或只取大型基準的 50 題子集來代表它的完整資源。
+- 比較 whole resource、正式 test subset、實際被每個模型執行的集合時，分開列數字。
+- 人類影片 QA、軌跡預測和 robot control 分開型態；不把不同型態的題相加作操作任務數。
+
+## 3. 任務庫從哪裡來
+
+採用完整來源庫盤點，優先覆蓋：
+
+1. **廣泛活動與操作**：BEHAVIOR-1K、RoboCasa、RLBench、LIBERO、Meta-World、ManiSkill、VLABench。
+2. **雙臂、靈巧與柔性物**：RoboTwin、SoftGym、DeformableRavens、GarmentLab、DexGarmentLab。
+3. **導航、對話與協作**：ALFRED、TEACh、PARTNR，並保留其他導航／HRI 來源的擴展查核。
+4. **人類觀測到執行**：WatchAct、The Imitator Game、RoboReel 等；同時審核原始環境與示範來源。
+5. **整合型對照與基礎設施**：RoboVerse、Embodied Agent Interface、RoboDojo。既要比較，也可審核可復用組件。
+
+上述來源的原生單位不同：活動目錄、註冊 ID、任務 class、schema、任務場景入口、示範程式、生成配置都要保留型態。**原生紀錄總和是盤點進度，不是獨立 G2 任務數。**
+
+RoboVerse 等框架移植的 LIBERO／RLBench／ManiSkill 任務，不與原作簡單重複相加。共享 simulator 也不等於任務語義完全相同；需要保留 environment dependency、task alias、版本變體和新增任務等不同來源關係。
+
+具體來源、固定 commit、提取規則與所有原生紀錄見本版附帶的 inventory。來源表是可擴展清單，不宣稱已窮盡所有既有工作。RoboReel 等尚未完成原生任務表提取的對照不得在 novelty 審核中被忽略。
+
+## 4. 從原生紀錄到真正的任務數
+
+```text
+完整原生 task/config/scene inventory
+→ 保留 native IDs、source versions、assets 與資料來源
+→ 處理同一來源的別名、版本與移植關係
+→ 抽取 goal/reference/process/mechanism/validity 定義
+→ 在共同規則下建立 G2 canonical task specs
+→ 綁定 backend、profile、assets、初態與觀測／動作約定
+→ 同介面專家可解性與 reset 驗證
+→ 成功／近失敗／合法替代的 evaluator 審核
+→ 有效 G4 cases 與凍結 release
+```
+
+G2 的去重欄位沿用 scale schema 1.0：task kind、typed goals、reference rules、goal/operator graph、必要過程、關鍵角色／機構／功能要求及有效結束語義。不能只靠標題 embedding 或相同終態 predicate 合併。
+
+每個 spec 需要能回查「為什麼與另一個相同或不同」。自動聚類只產生候選，對照規則和人工審核才決定正式數量。
+
+## 5. 如何增加真正的任務種類
+
+先計算已復用、去重且可驗證的任務數 `N_reused`，再依覆蓋缺口建立新增任務：
+
+```text
+需要補足的規模 = max(0, N_target − N_reused)
+```
+
+新增候選可來自：
+
+- 原基準尚未覆蓋、但人類程序資料中可辨識的完整工作目標。
+- 有實際用途的多步目標圖、必要流程和資源依賴，而非任意排列步驟。
+- 關鍵機構、功能測試、材料互動或多人協作要求不同的任務。
+- 以歷史、允許查詢或版本化工作資訊決定目標的不同指涉規則。
+
+這些是產生候選的方法，不是已證明文獻不存在的空白。每個候選仍要對照原任務聯集、確認獨立語義、建立實例與判分。
+
+以下變化一般增加 G3／G4，不自動增加 G2：同義改寫、顏色、物件身份、位置、相機、seed、機體更換、同一任務的額外影片。不同原作者可能把這些算作不同 native tasks，本計畫必須一視同仁地重編。
+
+## 6. All-in-one 的系統形式
+
+全庫使用一個 task ID／provenance／結果格式，但依真實能力需求分 backend 與相容 track：
+
+| 層 | 共同內容 | 各來源要綁定的內容 |
+|---|---|---|
+| 任務 | G2 goals、必要流程、角色和成功語義 | native task IDs 與對應證據 |
+| 場景 | instance、資產／物理／初態 hash | 場景檔案、reset、材料與幾何 |
+| 機體 | profile、eligibility、observation/action contract | robot、controller、控制頻率與轉換器 |
+| 資訊 | text／human video／history／tools 的合法範圍 | 來源配對、labels、時間、資訊充分性 |
+| 執行 | reset／step／介入／trace 的共同記錄 | backend plugin 和原生有效性檢查 |
+| 評分 | GoalSuccess、CompliantSuccess、coverage、uncertainty | 原生 predicates、必要事件與校準容差 |
+
+先審核並復用已有框架的 adapters／資料格式，不把「統一接口」本身宣稱首次提出。RoboVerse 與 EAI 已有直接相關先例；本計畫須以更大的已驗證任務聯集、覆蓋及可重現實驗證明擴充價值。
+
+同一個 G2 在不同機體上實作仍只計一次語義任務；不同 profile 的可測集合、成功率和成本另列。每個模型實際跑了多少題，必須隨結果一起公布。
+
+## 7. 完整任務庫與深入模組的關係
+
+完整模擬任務庫是規模主體。T1–T8 的資料與指標按各 task 的有效前提啟用，不預設所有任務同時支援全部模組。
+
+原先 100–140 個情境的預算只保留為 v0.2 的深入標註成本示例；它不再是完整任務庫的規模目標，也不是 v0.3 的任務上限。人類觀測 track 另有 300–500 個 G2 的初始目標，並須對照最接近工作進行共同粒度審核。
+
+影片題數、原始錄製 sessions、示範 pairs 和 robot trajectories 分開計數。只有模擬影片的項目不得標示為人類觀測任務；未收集的資料保持 0／TBD。
+
+## 8. 任務規模確立後，再算評测量
+
+以下只示範容量計算；每一項都需要有效、去重、相容：
+
+```text
+2,000–3,000 個 G2 任務
+× 每任務 10 個具體 G3 實例
+= 20,000–30,000 個 task instances
+
+× 每實例 2 種有效資訊條件 × 2 種介入條件
+= 80,000–120,000 個 G4 case assignments
+
+× 每個固定 case 3 次 policy repeats
+= 240,000–360,000 次 planned rollouts／完整相容模型
+
+8 個完整相容 baseline 系統
+= 1,920,000–2,880,000 次主要 planned rollouts
+```
+
+實際數量以 eligibility、資料充分性、去重和方法覆蓋計算，不按乘法宣稱已完成。兩種資訊條件可能不等資訊，須作分層結果或診斷對照；兩種介入也可能對某些 task 不適用。
+
+這些數量不含訓練、人類資料收集、oracle、額外消融、重複 training seeds 或人工審核。機器時數與人力須由 pilot 測得的單位成本估算；原 24 週排程不作 v0.3 的交付保證。
+
+## 9. Milestones 改成規模與有效性的驗收階梯
+
+| 階段 | 交付 | 通過條件 |
+|---|---|---|
+| S0 完整來源盤點 | 官方來源、固定版本、完整 native IDs、型態與 lineage | 提取规则可重跑；混合單位與來源重複不被隱藏 |
+| S1 共同比較與去重 | baseline task sets、G2 mapping、分歧審核、覆蓋矩陣 | 能確定最大可比基準及本版增量；正式目標依結果調整 |
+| S2 跨 backend 最小閉環 | 代表性剛體、機構、布料、移動／協作 anchors | 初始 6–8 個 anchors 只驗證接口與判分，不作論文規模上限 |
+| S3 批次擴展到 250／500／1,000 | 每批已綁定、可解、可評分的 G2 與實例 | 每批同時通過品質與來源檢查，公布實際成功移植率與成本 |
+| S4 規模門檻 | 朝 2,000–3,000 個 G2 推進，完成 relative-size 與 coverage checks | 達共同口徑的 2× 門檻，或據實記錄尚未達成並繼續擴展 |
+| S5 凍結與全規模實驗 | 固定 release、baseline、成本與分層結果 | 所有正式數字能回查 spec、case、trace 與版本；測試後不挑題 |
+| S6 論文與公開發布 | 論文、資料／程式／評分器、可核驗平台 | 對「更多、更廣、all-in-one」的每個主張都有相應證據 |
+
+## 10. 論文的主比較表
+
+主表同時列：
+
+1. 原作者 native counts 與共同正規化 G2 counts。
+2. 完整資源庫、可取得部分、已實例化部分、正式評測 subset。
+3. 領域／家族／互動機制覆蓋，以及同一 G2 在多機體實作的情況。
+4. inherited、modified、genuinely new specs 的來源與判定規則。
+5. human-observation-conditioned tasks 的實際數量與配對品質。
+6. G3、typed G4、G5 和資料資源量。
+
+主實驗應包括全庫與各來源／領域的 macro 結果、held-out 語義／物件／材料條件、規模增加後的排序穩定性、以及影片／過程／恢復診斷。不能用大量相似取放樣本掩蓋其他機制的弱項。
+
+## 11. 目前已完成與仍未完成
+
+本次完成的是規模主線重設、官方來源版本盤點、可追溯原生紀錄提取與網站規劃更新。靜態來源紀錄可作為構建大型任務庫的輸入。
+
+目前仍沒有共同正規化後的完整 G2 計數、實際 instance、已驗證 cases 或 simulator rollouts。因此本版不宣稱已建成最大 benchmark，也不把來源庫條目自動登記為本計畫完成的任務。
+
+**本版的承諾是把規模與覆蓋優勢作為主要驗收目標，並沿完整任務庫路線推進。**

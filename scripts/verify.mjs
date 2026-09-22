@@ -73,8 +73,24 @@ const requiredSectionIds=manifest.sourceSectionIds.filter(id=>!(/^(familypage-|c
 const missingSections=requiredSectionIds.filter(id=>!usedSections.has(id));
 assert.deepEqual(missingSections,[]);
 assert.ok((await fs.stat(path.join(out,manifest.pdf))).size>1000000,'PDF missing');
+const nativeScript=await fs.readFile(path.join(out,'assets/native-source-data.js'),'utf8');
+const nativeData=JSON.parse(nativeScript.replace(/^window\.NATIVE_SOURCE_DATA=/,'').replace(/;$/,''));
+assert.equal(nativeData.records.length,manifest.counts.nativeSourceRecords);
+assert.equal(new Set(nativeData.records.map(record=>record.id)).size,nativeData.records.length);
+assert.equal(nativeData.records.filter(record=>record.s==='robocasa').length,365);
+assert.equal(nativeData.records.filter(record=>record.s==='robocasa'&&record.ds===true).length,317);
+assert.equal(nativeData.records.filter(record=>record.v).length,2587);
+for(const locale of ['zh-hant','zh-hans']){
+  assert.ok(pages.has(path.join(out,locale,'scale-plan.html')));
+  assert.ok(pages.has(path.join(out,locale,'native-tasks.html')));
+  const budget=pages.get(path.join(out,locale,'chapters/11.html')).$;
+  assert.ok(budget('#c11').text().includes('2,000–3,000'));
+  assert.equal(budget('details.legacy-content').length,1);
+  const comparison=pages.get(path.join(out,locale,'chapters/05.html')).$.text();
+  assert.ok(comparison.includes('v0.3')&&comparison.includes('2,000–3,000'));
+}
 await fs.mkdir(path.join(root,'verification'),{recursive:true});
-const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,sourceSectionsPreserved:requiredSectionIds.length,issues};
+const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,scopeVersion:'0.3',issues};
 await fs.writeFile(path.join(root,'verification/static-checks.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify({...report,issues:issues.slice(0,20)},null,2));
 assert.equal(issues.length,0,`${issues.length} static site issues`);
