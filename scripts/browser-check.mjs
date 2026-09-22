@@ -138,6 +138,24 @@ try{
   assert.ok(await evaluate("document.querySelectorAll('#site-search-results .search-result').length>0"));
   pass('Standalone search','Search URLs are directly shareable and searchable by stable IDs.');
 
+  await go('zh-hant/design.html');
+  assert.ok(await evaluate("document.querySelector('#design-section-3').textContent.includes('共同門檻')"));
+  assert.ok(await evaluate("document.querySelector('#overall-design-spec').textContent.includes('100 個不同 G2')"));
+  assert.ok(await noOverflow());
+  await snapshot('overall-design-desktop');
+  await evaluate("document.getElementById('capacity-explorer').scrollIntoView({behavior:'instant',block:'center'})");
+  assert.equal(await evaluate("document.querySelector('[data-capacity-output=\"total\"]').textContent"),'2,880,000');
+  await setValue('#capacity-instances','20');
+  assert.equal(await evaluate("document.querySelector('[data-capacity-output=\"instances\"]').textContent"),'60,000');
+  assert.equal(await evaluate("document.querySelector('[data-capacity-output=\"total\"]').textContent"),'5,760,000');
+  assert.ok(await evaluate("document.querySelector('#capacity-explorer').textContent.includes('固定 2,400')"));
+  await setValue('#capacity-conditions','1');
+  await setValue('#capacity-repeats','1');
+  await setValue('#capacity-methods','1');
+  assert.equal(await evaluate("document.querySelector('[data-capacity-output=\"total\"]').textContent"),'60,000');
+  await snapshot('capacity-planner-desktop');
+  pass('Overall design and planning units','Both scale and breadth gates are visible; instances and conditions change workload while the example retains 2,400 independent G2 tasks.');
+
   await go('zh-hant/scale-plan.html');
   assert.ok(await evaluate("document.querySelector('#main-content').textContent.includes('2,000–3,000')"));
   assert.ok(await noOverflow());
@@ -162,7 +180,8 @@ try{
   await go('zh-hant/chapters/11.html');
   assert.ok(await evaluate("document.querySelector('#c11').textContent.includes('2,000–3,000')"));
   assert.equal(await evaluate("document.querySelector('details.legacy-content').open"),false);
-  pass('New scope and source deep links','The v0.3 budget leads; the v0.2 budget is explicitly archived, and native records have shareable anchors.');
+  assert.ok(await evaluate("document.querySelector('#c11').textContent.includes('B_execution')"));
+  pass('New scope and source deep links','The v0.4 budget separates global tasks from execution bindings; the v0.2 budget is archived, and native records have shareable anchors.');
 
   await viewport(390,1000,true);
   await go('zh-hant/index.html');
@@ -184,12 +203,23 @@ try{
   await go('zh-hans/scale-plan.html');
   assert.ok(await noOverflow());
   await snapshot('scale-plan-mobile');
+  await go('zh-hans/design.html');
+  assert.ok(await noOverflow());
+  await snapshot('overall-design-mobile');
+  await evaluate("document.getElementById('capacity-explorer').scrollIntoView({behavior:'instant',block:'center'})");
+  assert.ok(await noOverflow());
+  await snapshot('capacity-planner-mobile');
   pass('Mobile layout and menu','390px homepage, chapter and task pages have no document-level horizontal overflow.');
 
   await viewport(320,900,true);
   await go('zh-hans/index.html');
   assert.ok(await noOverflow());
   await go('zh-hans/scale-plan.html');
+  assert.ok(await noOverflow());
+  await go('zh-hans/design.html');
+  assert.ok(await noOverflow());
+  await viewport(1024,900);
+  await go('zh-hant/design.html');
   assert.ok(await noOverflow());
   pass('Small-screen layout','Homepage stays within a 320px viewport.');
 

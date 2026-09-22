@@ -1,0 +1,510 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>整體設計 v0.4：大規模、廣覆蓋、統一評測 · Robot-use Benchmark</title>
+  <meta name="description" content="全庫目標、12 場域配額、機制與材料、機體與觀測、平臺架構、完整評測、難度、預算與 milestones 集中說明。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/design.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="整體設計 v0.4：大規模、廣覆蓋、統一評測 · Robot-use Benchmark"><meta property="og:description" content="全庫目標、12 場域配額、機制與材料、機體與觀測、平臺架構、完整評測、難度、預算與 milestones 集中說明。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/site.css?v=9d823b30f8d5">
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"design.html","title":"整體設計 v0.4：大規模、廣覆蓋、統一評測","kind":"design","localeRoot":"","searchIndexURL":"../assets/search-zh-hant.js?v=9d823b30f8d5","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原始定義","staticOnly":"靜態提取；G2 與可執行性尚未驗證","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"來源與對應細節","empty":"沒有符合的來源紀錄","showing":"顯示","records":"筆來源紀錄","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原生任務 ID","native_task_class":"任務類別實作","native_task_registration":"任務註冊項","native_task_module":"任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務 schema","generator_configuration":"生成／協作設定","integration_registration_group":"整合框架註冊組","evaluation_protocol":"評測協定入口","video_task_schema":"影片任務 schema","human_sim_task_mapping":"人類／模擬任務對映"},"buckets":{"native_task_candidates":"原生任務候選（異質粒度）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口"}}}};</script>
+  <script defer src="../assets/site.js?v=9d823b30f8d5"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="design.html" class="active" aria-current="page">整體設計</a><a href="scale-plan.html">規模與比較</a><a href="native-tasks.html">來源任務庫</a><a href="chapters/index.html">章節閱讀</a><a href="explore/tasks.html">情境種子</a><a href="library.html">文獻地圖</a><a class="mobile-search" href="search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="design.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../zh-hans/design.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章節導覽"><div class="sidebar-label">v0.4 整體設計</div><a href="design.html" class="active" aria-current="page">整體設計、廣度與目標</a><a href="scale-plan.html">規模比較與來源查核</a><a href="native-tasks.html">完整原生來源盤點</a><div class="sidebar-divider"></div><div class="sidebar-label">研究與設計章節</div><a href="chapters/01.html"><span>01</span>研究目標與當前狀態</a><a href="chapters/02.html"><span>02</span>用一個例子理解整套系統</a><a href="chapters/03.html"><span>03</span>規模的六個 granularity levels</a><a href="chapters/04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="chapters/05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="chapters/06.html"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="chapters/07.html"><span>07</span>示範、標註、資料切分與有效性</a><a href="chapters/08.html"><span>08</span>評測協定、指標與比較方法</a><a href="chapters/09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="chapters/10.html"><span>10</span>難度如何量化</a><a href="chapters/11.html"><span>11</span>題數、領域與執行預算</a><a href="chapters/12.html"><span>12</span>工程實作、資料格式與發布</a><a href="chapters/13.html"><span>13</span>論文流程與 milestones</a><a href="chapters/14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="explore/families.html">48 個任務家族</a><a href="explore/tasks.html">180 個情境藍圖</a><a href="explore/probes.html">24 個 Ego 題型</a><a href="explore/metrics.html">40 個指標</a><a href="appendices/axes.html">完整分類軸</a><a href="appendices/comparison.html">原生規模比較</a><a href="library.html">168 篇文獻</a><a href="appendices/methods.html">來源與資料字典</a></aside><main class="reader" id="main-content">
+    <details class="mobile-chapter-nav"><summary>章節與資料庫</summary><div class="sidebar-label">v0.4 整體設計</div><a href="design.html" class="active" aria-current="page">整體設計、廣度與目標</a><a href="scale-plan.html">規模比較與來源查核</a><a href="native-tasks.html">完整原生來源盤點</a><div class="sidebar-divider"></div><div class="sidebar-label">研究與設計章節</div><a href="chapters/01.html"><span>01</span>研究目標與當前狀態</a><a href="chapters/02.html"><span>02</span>用一個例子理解整套系統</a><a href="chapters/03.html"><span>03</span>規模的六個 granularity levels</a><a href="chapters/04.html"><span>04</span>文獻地圖、Ego 與預測研究</a><a href="chapters/05.html"><span>05</span>和既有 benchmark 比，哪些可以復用</a><a href="chapters/06.html"><span>06</span>完整 benchmark 的覆蓋設計</a><a href="chapters/07.html"><span>07</span>示範、標註、資料切分與有效性</a><a href="chapters/08.html"><span>08</span>評測協定、指標與比較方法</a><a href="chapters/09.html"><span>09</span>六個詳細情境：從概念到驗收</a><a href="chapters/10.html"><span>10</span>難度如何量化</a><a href="chapters/11.html"><span>11</span>題數、領域與執行預算</a><a href="chapters/12.html"><span>12</span>工程實作、資料格式與發布</a><a href="chapters/13.html"><span>13</span>論文流程與 milestones</a><a href="chapters/14.html"><span>14</span>版本口徑、閱讀結論與尚待決策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入資料庫</div><a href="explore/families.html">48 個任務家族</a><a href="explore/tasks.html">180 個情境藍圖</a><a href="explore/probes.html">24 個 Ego 題型</a><a href="explore/metrics.html">40 個指標</a><a href="appendices/axes.html">完整分類軸</a><a href="appendices/comparison.html">原生規模比較</a><a href="library.html">168 篇文獻</a><a href="appendices/methods.html">來源與資料字典</a></details><div class="breadcrumb"><a href="index.html">首頁</a><span>/</span><span>整體設計</span></div>
+    <div class="eyebrow">OVERALL DESIGN · v0.4</div><h1>任務多、涵蓋廣，放進同一套評測。</h1>
+    <p class="lede">整個 benchmark 改成大型任務庫、具體廣度配額與共用評測平臺。每批擴張都同時檢查「多了哪些任務」和「補足哪些覆蓋」。</p>
+    <div class="page-meta"><span>2026-09-22</span><span class="pill status">研發目標提案 · 尚未達成</span><span>模擬環境</span></div>
+    <div class="chapter-summary"><div class="label">先掌握這三件事</div><ul><li>全庫初始目標 2,000–3,000 種獨立任務；任務數與有效覆蓋各以至少最大可比基準 2 倍為目標。</li><li>12 個核心場域各提出 100 個有效任務繫結、8 個家族、3 類機制的最低支撐量。</li><li>同一任務換場域或機體，增加覆蓋、例項和實作量；全球 G2 只計一次。</li></ul></div>
+    <ol class="design-flow" aria-label="整體建置流程"><li><small>01</small><b>完整來源庫</b><span>原作、版本、原生 ID 與來源關係</span></li><li><small>02</small><b>獨立任務庫</b><span>合併重複、保留真正不同的目標與流程</span></li><li><small>03</small><b>廣度與例項</b><span>跨場域、材料、機體建立有效情境</span></li><li><small>04</small><b>統一評測平臺</b><span>共用入口、合法測例、判分與結果</span></li></ol>
+    <div class="cta-row"><a class="button" href="#design-section-3">看目標與共同門檻 ↓</a><a class="button secondary" href="scale-plan.html">查前作規模與來源 →</a></div>
+    <div class="prose"><section id="overall-design-spec">
+<p>更新：2026-09-22。研究範圍仍是模擬。這是一份整體研發設計，沒有把尚未實作的任務、場景或實驗列為成果。</p>
+<p><strong>整個設計改成：完整來源任務庫 → 正規化任務庫 → 廣度約束下的場景例項 → 共用評測平臺。</strong></p>
+<p>主目標同時要求「真正不同的任務多」、「實際覆蓋的場域與機制廣」和「一套入口能管理與評測」。2,000–3,000 個正規化任務仍是初始研發目標；數量和覆蓋要各自驗收。</p>
+<h2 id="design-section-1">1. 哪些地方改，哪些保留</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>原先設計／預算</th>
+<th>現在的整體設計</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>規模主體</td>
+<td>180 個手寫情境；100–140 個核心情境預算</td>
+<td>完整任務庫以 2,000–3,000 個 G2 為初始目標，並接受相對規模門檻</td>
+</tr>
+<tr>
+<td>180 個情境</td>
+<td>曾作為完整平臺的候選清單</td>
+<td>保留為設計種子、具體例子和判分器驗收 anchors，不作全庫上限</td>
+</tr>
+<tr>
+<td>任務來源</td>
+<td>由文獻設計場景，再尋找實作</td>
+<td>先盤點完整原生庫、保留來源，再正規化、移植與補足真正的缺口</td>
+</tr>
+<tr>
+<td>領域廣度</td>
+<td>有 12 個場域標籤與候選矩陣</td>
+<td>每個場域須有足量、跨家族與機制的可解任務；與基準使用同一分類</td>
+</tr>
+<tr>
+<td>任務數</td>
+<td>容易混合 scenario、instance、case 和 rollout</td>
+<td>全球去重的 G2 只計一次；場域、機體與配置繫結另計</td>
+</tr>
+<tr>
+<td>平臺</td>
+<td>共通規格與網站設計</td>
+<td>任務、場景、資料、backend、policy adapter、判分和結果格式分層</td>
+</tr>
+<tr>
+<td>主實驗</td>
+<td>容易停在少量深入案例</td>
+<td>完整任務庫要有正式 T5 評測覆蓋；較昂貴的影片與診斷子集另報</td>
+</tr>
+<tr>
+<td>比較方式</td>
+<td>任務量與覆蓋的概念性比較</td>
+<td>「任務數」和「有效覆蓋格子」兩道相對門檻同時檢查</td>
+</tr>
+</tbody>
+</table></div>
+<p>保留已有的 168 篇文獻、48 個作者家族、180 個情境種子、24 個 Ego 題型、8 個模組、40 個指標和資料／切分規則。它們是基礎材料，不限制後續正規化任務庫的大小。</p>
+<h2 id="design-section-2">2. 用四層資料把整套系統串起來</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>層</th>
+<th>內容</th>
+<th>數量代表什麼</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>來源層</td>
+<td>原作、commit、native task ID、class、schema、資產引用、資料 lineage</td>
+<td>目前 5,020 筆原生紀錄；不同型態不能直接當獨立任務</td>
+</tr>
+<tr>
+<td>任務層</td>
+<td>全球唯一 task spec ID、目標、指涉規則、必要流程、功能／機制與成功語義</td>
+<td>正規化 G2；本版初始目標 2,000–3,000</td>
+</tr>
+<tr>
+<td>例項層</td>
+<td>task 繫結應用場域、backend、機體、真實資產、材料與可追蹤初態</td>
+<td>G3；同一 G2 可在多個場域或機體建立例項</td>
+</tr>
+<tr>
+<td>評測層</td>
+<td>instance 加輸入、歷史、介入、預算、labels、判分器，再交給模型執行</td>
+<td>typed G4 cases 與 G5 trials；與任務種類分開</td>
+</tr>
+</tbody>
+</table></div>
+<p>例如「摺好並收納指定布品」是一個任務定義，可以在住家和旅宿各建立有效情境，也可在不同雙臂機體上實作。<strong>全庫的語義任務只計一次；新增的是 task–context 或 execution bindings、例項和覆蓋。</strong></p>
+<pre><code class="language-text">原作來源與版本
+→ 全球 task spec 與來源對應
+→ task × context 的有效繫結
+→ task × context × profile × backend contract 的執行繫結
+→ 實際資產／初態
+→ 各模組的合法測例
+→ policy 執行
+→ 結果、trace、覆蓋與統計
+</code></pre>
+<h2 id="design-section-3">3. 「大」和「廣」設成兩道共同門檻</h2>
+<p>以下數字是<strong>本計畫的研發驗收提案</strong>，不是文獻公認標準或已完成的結果。在 S1 完成共同分類、參照集與可行性分析後，確認並預先登記；之後若變更要升版本並解釋原因，不能看完 test 結果才改口徑。</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>驗收專案</th>
+<th>v0.4 提案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全球獨立任務數</td>
+<td>初始目標 2,000–3,000 個 G2；每個計入者都有有效例項、專家解與判分器審核</td>
+</tr>
+<tr>
+<td>相對規模</td>
+<td>至少最大可比基準的 <strong>2 倍 G2</strong>，分母須以同一 task kind、scope、版本與正規化規則取得</td>
+</tr>
+<tr>
+<td>相對廣度</td>
+<td>至少最大可比基準的 <strong>2 倍有效 coverage cells</strong>；格子定義見下文</td>
+</tr>
+<tr>
+<td>核心場域</td>
+<td>起始 12 個共同場域均需要實際覆蓋；若參照集或新任務涉及其他應用，先擴充共同 ontology 再比較</td>
+</tr>
+<tr>
+<td>每個核心場域</td>
+<td>至少 <strong>100 個不同 G2 的有效 task–context 繫結、8 個任務家族、3 類互動／流程機制</strong></td>
+</tr>
+<tr>
+<td>有效覆蓋格子</td>
+<td>至少由 1 個 G2、3 個不同且有效的 G3 初態／例項，以及專家與判分證據支援</td>
+</tr>
+<tr>
+<td>非剛體材料</td>
+<td>布料、繩索、顆粒、流體、柔順固體各初步要求至少 20 個適用 G2、3 個家族；實際模型與量測必須有效</td>
+</tr>
+<tr>
+<td>機體廣度</td>
+<td>至少固定單臂、雙臂／靈巧、移動操作三組執行 track，各有至少 100 個適用 G2；全身／人形繼續擴充套件</td>
+</tr>
+<tr>
+<td>人類觀測 track</td>
+<td>初始目標 300–500 個 G2，至少 8 個共同應用場域；來源視角、剪輯方式與實際配對量另報</td>
+</tr>
+</tbody>
+</table></div>
+<p>2,000–3,000 是初始規劃區間，不是硬性上限。若最大可比基準的共同 G2 數量超過 1,500，至少 2× 的目標就需要超過 3,000；先按共同規則完成比較，再上調建置目標。</p>
+<p>每個場域的 100 個 G2 可以與其他場域重疊；每個機體的 G2 也可能重疊。這些是廣度支撐要求，<strong>不能相加成全庫任務數</strong>。機體 track 也不是增加 G2 的理由。</p>
+<p><code>coverage cell</code> 定義為：</p>
+<pre><code class="language-text">共同應用場域 D × 主要任務家族 F × 任務真正需要的互動／流程機制 K
+</code></pre>
+<p>一格必須能回查實際 task/context/instance IDs、有效 reset、可解性和判分證據。相機視角、可額外產生的問答、任意能力標籤或 profile 數不能直接乘進格子數。</p>
+<p>同一 G3 可能支援數個真正需要的機制；這些是非互斥覆蓋，仍要保留支撐證據。沒有足夠例項支援的格子列為薄弱／待驗證，不提前計入主張。</p>
+<h3 id="overall-1">與前作比較的共同規則</h3>
+<p>規模與廣度各自取比較集合中的最大值，可能來自不同工作。比較集合在 S1 凍結，包含大型任務庫、專門機制庫和整合框架；原作的完整資源與正式實驗 subset 分欄。</p>
+<p>每項證據區分「原作報告」「公開定義可對映」「有同等例項／專家／判分支援」和「本計畫重跑驗證」。對前作與我們使用同一計入規則；公開資料不足填 unknown，不能當成 0 來拉高倍數。若最大分母仍未知，只報已核對範圍、缺失比例和界限，不宣佈 2× 已達成。</p>
+<p>同時公佈相對每個前作、相對前作聯集的共有／新增／缺失格子，以及 F/K 較粗、主要和較細粒度的敏感性分析。只用一套有利於自己的分類得到 2×，不足以支援穩健的廣度優勢。場域、家族、機制的邊際數量與實際分佈也一起報告，不能只留一個總分。</p>
+<h2 id="design-section-4">4. 廣度如何落到任務分配</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>核心場域</th>
+<th>應包含的完整工作方向</th>
+<th>特別需要避免的薄弱覆蓋</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D01 居家生活</td>
+<td>整理、取物、布品處理、裝置程式、復原</td>
+<td>只有桌面取放</td>
+</tr>
+<tr>
+<td>D02 餐飲服務</td>
+<td>備料程式、擺設、配送、回收、物料處理</td>
+<td>只換不同食物名稱</td>
+</tr>
+<tr>
+<td>D03 零售門店</td>
+<td>揀選、陳列、盤點、包裝、補貨</td>
+<td>只有商品辨識</td>
+</tr>
+<tr>
+<td>D04 倉儲配送</td>
+<td>訂單集貨、裝箱、載荷搬運、多站服務</td>
+<td>只有導航到點</td>
+</tr>
+<tr>
+<td>D05 辦公行政</td>
+<td>檔案與物品管理、裝置流程、資訊到實體工作</td>
+<td>只有數位問答</td>
+</tr>
+<tr>
+<td>D06 工坊製造維修</td>
+<td>工具、插接、拆裝、緊固、功能驗收</td>
+<td>只碰觸零件、不驗功能</td>
+</tr>
+<tr>
+<td>D07 實驗室例行物件操作</td>
+<td>惰性物品、容器、配量、裝置與紀錄流程</td>
+<td>宣稱未模擬的化學／生物效果</td>
+</tr>
+<tr>
+<td>D08 旅宿洗衣</td>
+<td>分類、展開、摺疊、懸掛、收納、周轉</td>
+<td>只有單一摺毛巾設定</td>
+</tr>
+<tr>
+<td>D09 設施維護</td>
+<td>耗材更換、表面處理、裝置復位、工具管理</td>
+<td>接觸覆蓋被當成實際消毒</td>
+</tr>
+<tr>
+<td>D10 園藝戶外</td>
+<td>工具、容器、材料、支承、搬運與戶外配置</td>
+<td>用植物外觀代替生長或作業效果</td>
+</tr>
+<tr>
+<td>D11 非臨床輔助生活</td>
+<td>意圖相關取物、交接、等待、協助與協作</td>
+<td>將模擬 partner 結果當真實人類體驗</td>
+</tr>
+<tr>
+<td>D12 公共場館活動</td>
+<td>場地準備、物件整理、服務、共享資源、復原</td>
+<td>換場館名稱但任務與條件不變</td>
+</tr>
+</tbody>
+</table></div>
+<p>這 12 類是已有分類的起點，不能靠拆細名稱製造廣度。來源任務若落在真正不同的新應用範圍，就擴充 ontology，並用同一版本重新對映所有比較工作。</p>
+<p>場域繫結要有任務相關的環境、流程、資源或角色條件。只有改背景圖、房間名稱或用途標籤，不算新增的有效場域覆蓋。</p>
+<h3 id="overall-2">分佈控制</h3>
+<p>完整任務庫保留所有合格任務，不為了表面均衡而刪除大量已復用任務。任務庫的實際分佈、跨場域重疊和來源集中度都公開。</p>
+<p>正式結果同時提供：</p>
+<ul>
+<li><strong>場域等權 macro 結果</strong>：每個核心場域權重相同，再在場域內按預先定義的家族／任務權重聚合。</li>
+<li><strong>完整任務庫 micro 結果</strong>：保留真實樣本分佈，和 macro 分開呈現。</li>
+<li><strong>每個場域／家族／材料的覆蓋與成功率</strong>：缺項和薄弱項可見。</li>
+</ul>
+<p>這避免把「單一場域佔比上限」錯套成任務庫刪題規則，也避免大量居家／廚房樣本直接決定整體排名。每個方法實際接受的 eligible 集合先凍結，不能自行只挑擅長的題。</p>
+<h2 id="design-section-5">5. 材料、機體與觀測各自管理</h2>
+<h3 id="overall-3">材料與機制</h3>
+<p>六種物理材料模型仍分開：剛體、布料、繩索、顆粒、流體、其他柔順固體。關節、扣件、容器與多零件結構另記，不當成材料。</p>
+<p>互動／流程機制先提出九組共同索引，待 S1 與原生任務共同審核：</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>機制</th>
+<th>需要的證據</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>K01</td>
+<td>抓取、放置與支承</td>
+<td>物件身份、接觸、位置和穩定性</td>
+</tr>
+<tr>
+<td>K02</td>
+<td>關節、封口與裝置狀態</td>
+<td>機構狀態、必要事件、合法轉移</td>
+</tr>
+<tr>
+<td>K03</td>
+<td>精密接觸、插接、緊固與功能裝配</td>
+<td>配合／連線狀態、工具作用與功能結果</td>
+</tr>
+<tr>
+<td>K04</td>
+<td>形變、層次、拓撲與柔性結構</td>
+<td>材料狀態、形狀／邊／拓撲與穩定釋放</td>
+</tr>
+<tr>
+<td>K05</td>
+<td>物料轉移、配量與可驗證混合</td>
+<td>量、殘量、流失與模型有效性</td>
+</tr>
+<tr>
+<td>K06</td>
+<td>工具作用、表面處理與非抓取操作</td>
+<td>任務相關接觸或作用結果</td>
+</tr>
+<tr>
+<td>K07</td>
+<td>導航、載荷與移動操作</td>
+<td>到達、載荷保持、交付與路徑事件</td>
+</tr>
+<tr>
+<td>K08</td>
+<td>交接、共同支承、時序與角色協作</td>
+<td>partner 協定、共同結果與幹擾</td>
+</tr>
+<tr>
+<td>K09</td>
+<td>由歷史或數位查詢決定實體目標</td>
+<td>合法資訊、身份／版本指涉與實體結果</td>
+</tr>
+</tbody>
+</table></div>
+<p>K 是互動／流程索引；不是九種材料，也不取代原有 C01–C34 能力標籤或 T1–T8 模組。只有任務真正需要且有證據的機制才參與 coverage 計數。</p>
+<p>純裝置狀態機可支援程式評測，但不冒充熱學、化學、清洗或其他未模擬的物理效果。材料覆蓋需由對應模型、量測與有效性檢查支援。</p>
+<h3 id="overall-4">機體</h3>
+<p>保留六個候選 profile，先建立三組明確可執行 track：</p>
+<ul>
+<li>固定單臂：以 R1 為起點。</li>
+<li>雙臂／靈巧操作：以 R2／R3 為起點，依不同控制與手部介面分層。</li>
+<li>移動操作：以 R4／R5 為起點，底座與手臂的控制約定固定。</li>
+</ul>
+<p>R6 全身／人形可以繼續擴充套件。每個被宣稱支援的 profile 都須有真實 adapter、可解性與結果；不能只靠 ontology 中有這個名稱就算覆蓋。</p>
+<h3 id="overall-5">觀測</h3>
+<p>保留文字、頭戴、胸前／身體、外部／多視角、VLOG／剪輯、robot 示範、多 session 歷史等來源。相機安裝、agent origin、剪輯、語言、history 與 sensors 分欄記錄。</p>
+<p>人類觀測 track 必須真的有人的觀測與合法 goal pairing，不能以 robot 模擬影片補數。沒有校準的影片仍可作語義測試，但不宣稱有度量 3D 標籤。</p>
+<h2 id="design-section-6">6. 任務怎麼建出來</h2>
+<p>任務來源分為三類：</p>
+<ol>
+<li><strong>直接復用</strong>：原生任務、初態、控制與判分對得上，通過同介面驗證。</li>
+<li><strong>移植或修改</strong>：保留來源與改動清單，重新檢查 simulator、assets、controller、目標與判分。</li>
+<li><strong>補足新任務</strong>：針對廣度矩陣的真實缺口，建立新目標、必要流程或互動機制，再對照已有任務聯集確認增量。</li>
+</ol>
+<p>新增候選可以取材自人類程式與活動文獻、具體部署工作流、既有資產的合理重組。但只改名稱、顏色、位置、相機、seed 或不必要的步驟，不能自動增加 G2。</p>
+<p>每個 G2 必須儲存完整的合併／拆分理由。共同規則先固定，對我們與對照工作一致套用；抽樣隱去來源做獨立覆核，避免為了讓數字好看而採不同粒度。</p>
+<p>一個完整工作也不應只因有多個控制動作就多算多個任務。主要 task bank 收錄有獨立使用者目標與完整 outcome 的規格；僅作控制校準或子技能診斷的專案另列。原生、短組合與完整工作流的分佈仍須分開報告。</p>
+<h2 id="design-section-7">7. 平臺架構改成可替換的模組</h2>
+<pre><code class="language-text">同一個研究／評測入口
+    ↓
+Task Registry + Source/Dedup Ledger
+    ↓
+Task–Context / Execution Binding Builder
+    ↓
+Observation &amp; Dataset Builder
+    ↓
+Simulator Adapter ↔ Policy Adapter
+    ↓
+Evaluator + Event/Trace Recorder
+    ↓
+Coverage / Statistics / Result Package
+    ↓
+網站、下載與核驗排行榜
+</code></pre>
+<p>Task Registry 是共同核心。Backend 可以不同，但每次執行必須固定 robot、action、觀測、資料、時間與介入條件。</p>
+<p>每個 backend adapter 至少要提供 reset、step、允許觀測、evaluator 私有狀態、介入、snapshot 和 trace。Policy adapter 負責不同模型的輸入與動作約定。共同格式不表示跨引擎動力學或 action space 相同。</p>
+<p>可以審核復用 RoboVerse、EAI 及各原生環境的介面與元件，但需要保留原作的角色與限制。真正的增量要由任務庫、覆蓋與可重現結果證明。</p>
+<p>網站已能公開閱讀與搜尋，正式執行服務尚未實作。未來採下載自行執行或平臺代跑，皆使用同一 release／case／trace 格式；核驗狀態明確區分。</p>
+<h2 id="design-section-8">8. 評測核心保留，改成全庫與模組分層</h2>
+<p><strong>T5 完整執行與 T6 恢復是機器人使用能力的主體。</strong> T1 理解、T2 記憶、T3 預測、T4 規劃、T7 協作、T8 世界模型連到同一 task／instance，在資料足夠時產生合法 packets。</p>
+<p>不是每個任務都自動有八種測例。每個模組報告自己的適用 G2、instance、資料來源與有效測例數。</p>
+<p>主結果保留：</p>
+<ul>
+<li>GoalSuccess 與 CompliantSuccess，分別看終態與完整明訂要求。</li>
+<li>成對目標成功與影片／文字／單幀／無影片對照；資訊不等量時清楚解讀。</li>
+<li>完整 episode 成功、介入施加率與條件式恢復；snapshot replanning 另報。</li>
+<li>時間、動作、允許詢問、禁止介入與副作用。</li>
+<li>oracle goal／state／plan 的瓶頸診斷。</li>
+<li>按 task family、場域、機制、材料、profile 與條件的 macro 分佈及不確定性。</li>
+</ul>
+<p>完整 task bank 的正式 T5 評測不能只跑原 100–140 個案例，卻宣稱全部 2,000 個都經過比較。每個方法／track 都公佈完整 eligible G2 與實際執行集合；昂貴的影片或專門診斷子集另外報告。</p>
+<p>資料仍先按來源活動／錄製 session／資產家族切分，再生成 clips、QA、plans 或其他衍生標籤。凍結、離線適應、few-shot、online 和 continual learning 分開；公開預訓練未知的情況如實記錄。</p>
+<p>難度先保留十維設計描述，再以固定 agent panel 和 contract 校準。場景多、步驟多或影片長本身不等於經驗難度。</p>
+<h3 id="overall-6">難度如何在大題庫中量化</h3>
+<p>先替測例記錄任務鏈、精度、遮擋、形變、記憶等設計條件，用它們檢查分佈和抽樣。這些描述不直接決定「難／易」。</p>
+<p>正式難度以同一評測模組、輸入／控制約定和固定方法群下的成功率估計：</p>
+<pre><code class="language-text">D_empirical(case, contract) = 100 × (1 − 加權平均成功率)
+</code></pre>
+<p>方法權重、重複次數和不確定性估計先固定；共享 checkpoint 的方法不當成大量獨立證據。任務層只在預先定義的 instance 分佈上聚合。可依凍結的校準集劃分四個難度區間，實際邊界由 S3 pilot 校準並在 S5 前凍結；目前不替 5,020 筆來源紀錄虛填難度級別。</p>
+<p>全方法失敗先檢查專家解、reset、資訊充分性和判分器，再判定是否高難度。難度、評測鑑別力和任務的重要性各自報告；換方法群或 control contract 後，要重新檢查量尺。</p>
+<h2 id="design-section-9">9. 同時做大和做廣後，預算怎麼算</h2>
+<p>新增場域和機體會增加實作與測試量，但不必增加 G2。因此 v0.4 明確分三種集合：</p>
+<pre><code class="language-text">N_task = 全球唯一的 G2 task specs
+B_context = 不同 (task, context) 有效繫結
+B_execution = 不同 (task, context, profile, backend contract) 執行繫結
+</code></pre>
+<p>一個純規劃示例：</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>層級</th>
+<th>假設</th>
+<th style="text-align: right;">規劃數量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G2</td>
+<td>全球去重任務</td>
+<td style="text-align: right;">2,400</td>
+</tr>
+<tr>
+<td>Task–context bindings</td>
+<td>部分任務在多場域使用</td>
+<td style="text-align: right;">2,800</td>
+</tr>
+<tr>
+<td>Execution bindings</td>
+<td>部分場域再支援另一機體／contract</td>
+<td style="text-align: right;">3,000</td>
+</tr>
+<tr>
+<td>G3 assignments</td>
+<td>每執行繫結 10 個不同有效初態</td>
+<td style="text-align: right;">30,000</td>
+</tr>
+<tr>
+<td>G4 assignments</td>
+<td>每例項 2 種有效資訊條件 × 2 種介入</td>
+<td style="text-align: right;">120,000</td>
+</tr>
+<tr>
+<td>G5／完整相容模型</td>
+<td>每固定 case 3 次 policy repeats</td>
+<td style="text-align: right;">360,000</td>
+</tr>
+<tr>
+<td>8 個完整相容方法</td>
+<td>主執行量，不含訓練和額外消融</td>
+<td style="text-align: right;">2,880,000</td>
+</tr>
+</tbody>
+</table></div>
+<p>這個例子仍只有 <strong>2,400 個 G2 任務</strong>，不能因為有 2,800 個場域繫結或 3,000 個執行繫結而改報成更多工。</p>
+<p>各模型未必適用全體 bindings，資訊與介入也不一定每題都適用。實際預算應對合法 eligible records 加總，不把乘法當已去重的實績。單位時間、人力與計算成本由 pilot 量測，沒有假設既有 24 週示例可以直接交付全量。</p>
+<h2 id="design-section-10">10. Milestones 重新對齊整體目標</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="資料表，可水平捲動"><table>
+<thead>
+<tr>
+<th>階段</th>
+<th>主要交付</th>
+<th>驗收重點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S0 來源盤點</td>
+<td>完整 native records、版本、單位與 lineage</td>
+<td>本輪已有 5,020 筆靜態紀錄；不算成正式任務數</td>
+</tr>
+<tr>
+<td>S1 共同分類與缺口</td>
+<td>G2 規則、參照集、F/K 分類、場域矩陣與配額定版</td>
+<td>確定兩個相對門檻的分母；不能只挑較小對照</td>
+</tr>
+<tr>
+<td>S2 跨 backend 閉環</td>
+<td>代表性 6–8 個 anchors、例項、專家解與判分</td>
+<td>驗證介面和量測；不是論文規模上限</td>
+</tr>
+<tr>
+<td>S3 批次擴張</td>
+<td>250／500／1,000 個驗證任務及其 bindings</td>
+<td>每批同時看 N_task 和各廣度配額，避免只擴容易的一類</td>
+</tr>
+<tr>
+<td>S4 達雙門檻</td>
+<td>向 2,000–3,000 與更多有效覆蓋推進</td>
+<td>任務規模及 coverage ratio 同時達標，核心場域／材料／機體支撐足夠</td>
+</tr>
+<tr>
+<td>S5 凍結與主實驗</td>
+<td>固定測例、完整 eligible 集合、基線、oracle／ablation</td>
+<td>所有正式結果能回查版本、cases 和 traces；測試後不挑題</td>
+</tr>
+<tr>
+<td>S6 發布與論文</td>
+<td>code、data、evaluator、核驗結果與完整稿件</td>
+<td>「更多、更廣、統一」每個主張都有相應證據</td>
+</tr>
+</tbody>
+</table></div>
+<p>設計網站和階段性 beta 可以持續公開；只有通過共同門檻的正式版本，才能標示已達成「規模與廣度優勢」。未達時公開進度並繼續擴充，不以換單位或降標準代替成果。</p>
+<h2 id="design-section-11">11. 論文最後要怎麼呈現</h2>
+<p>主表同時列出：native counts、正規化 G2、有效場域／家族／機制格子、材料與機體支撐、G3、typed G4、實際 G5，以及資料來源量。</p>
+<p>與對照工作的完整資源、可取得部分、已例項化部分和實驗 subset 分欄。原生 task、資料 episodes、影片 QA 和 benchmark wrappers 不能直接混加。</p>
+<p>論文的主實驗須回答：擴大的任務庫與覆蓋是否帶來穩定、可解釋的新評測證據；哪些領域、材料、流程與來源仍是瓶頸；新增任務相對原作聯集有何真正差異。統一介面本身已有相關工作，不單獨當作新穎性。</p>
+<h2 id="design-section-12">12. 目前進度與下一個具體產物</h2>
+<p>目前已完成研究檔案、網站、規模主線、來源盤點與本版整體設計。既有 5,020 筆靜態紀錄來自 20 個官方程式庫、21 個版本來源；它們仍未完成共同 G2 去重。</p>
+<p>目前 G2 正式總數為 TBD，已例項化任務、已驗證測例、實際模擬執行和本計畫收集的人類影片 pairs 均為 0。</p>
+<p>下一個具體產物是 <strong>G2／task–context／機制的審核表及缺口清單</strong>：每列連回原定義，記錄合併／拆分理由、資產與介面需求、可行性，以及它補足哪個廣度格子。依這份表安排實作批次，並同步審核可用 backend 與 profile。</p></section></div><section class="capacity-explorer" id="capacity-explorer" data-capacity-bindings="3000">
+    <h2>互動估算：做廣之後，需要跑多少？</h2>
+    <p>純規劃示例：固定 2,400 種獨立任務、2,800 個場域繫結、3,000 個執行繫結。調整下列條件，獨立任務數仍是 2,400。</p>
+    <div class="capacity-controls js-only"><label for="capacity-instances">每執行繫結的有效初態<select id="capacity-instances" data-capacity-input="instances"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label><label for="capacity-conditions">每例項的合法條件組合<select id="capacity-conditions" data-capacity-input="conditions"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option></select></label><label for="capacity-repeats">每固定測例的執行次數<select id="capacity-repeats" data-capacity-input="repeats"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option></select></label><label for="capacity-methods">完整相容的方法數<select id="capacity-methods" data-capacity-input="methods"><option value="1">1</option><option value="4">4</option><option value="8" selected>8</option></select></label></div>
+    <div class="capacity-results" aria-live="polite" aria-atomic="true"><div><strong data-capacity-output="instances">30,000</strong><span>G3 例項配置</span></div><div><strong data-capacity-output="cases">120,000</strong><span>G4 合法測例配置</span></div><div><strong data-capacity-output="per-method">360,000</strong><span>每個方法的執行量</span></div><div><strong data-capacity-output="total">2,880,000</strong><span>所有方法的總執行量</span></div></div>
+    <p class="capacity-note">4 種條件可代表 2 種資訊 × 2 種介入；只有合法且適用時才能相乘。假設所有方法能執行全部繫結。這些是預算，不是已完成的實驗；實際成本由 pilot 量測。</p>
+  </section>
+    <div class="reader-actions"><button class="text-button copy-link">複製本頁連結</button><button class="text-button print-page">列印本頁</button><a class="text-button" href="../downloads/overall-design/OVERALL_DESIGN_V0_4.md" download>下載完整設計</a><a class="text-button" href="../downloads/overall-design/breadth_quota_template.csv" download>下載 12 場域配額表</a><a class="text-button" href="../downloads/overall-design/overall_design_plan.json" download>下載計畫 JSON</a></div>
+    </main><aside class="on-this-page" aria-label="本頁內容"><div class="sidebar-label">本頁內容</div><a href="#design-section-1">1. 哪些地方改，哪些保留</a><a href="#design-section-2">2. 用四層資料把整套系統串起來</a><a href="#design-section-3">3. 「大」和「廣」設成兩道共同門檻</a><a href="#design-section-4">4. 廣度如何落到任務分配</a><a href="#design-section-5">5. 材料、機體與觀測各自管理</a><a href="#design-section-6">6. 任務怎麼建出來</a><a href="#design-section-7">7. 平臺架構改成可替換的模組</a><a href="#design-section-8">8. 評測核心保留，改成全庫與模組分層</a><a href="#design-section-9">9. 同時做大和做廣後，預算怎麼算</a><a href="#design-section-10">10. Milestones 重新對齊整體目標</a><a href="#design-section-11">11. 論文最後要怎麼呈現</a><a href="#design-section-12">12. 目前進度與下一個具體產物</a><a href="#capacity-explorer">互動題量估算</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>從文獻到任務、評測與實作的公開研究設計。</div>
+  <div class="footer-links"><a href="design.html">最新整體設計</a><a href="glossary.html">名詞小辭典</a><a href="appendices/methods.html">來源與方法</a><a href="../downloads/full-report-zh-hant.pdf">原版 PDF · v0.2</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">整體設計 v0.4 · 設計與來源盤點 2026-09-22 · 原文獻快照 2026-09-21。2,000–3,000 個 G2，以及任務數／有效覆蓋各至少 2×，均為研發驗收提案。5,020 筆是未完成跨作去重的來源紀錄；正式驗證測例與模擬執行仍為 0。</p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

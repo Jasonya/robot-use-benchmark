@@ -75,9 +75,14 @@ const [scalePlan, sourceRecords, sourceReports, sourceStats] = await Promise.all
 ].map(async name => JSON.parse(await fs.readFile(path.join(SCALE_DIR, name), 'utf8'))));
 const scaleSpecHTML = await fs.readFile(path.join(SCALE_DIR, 'SCALE_FIRST_SPEC_V0_3.html'), 'utf8');
 const scaleAuditHTML = await fs.readFile(path.join(SCALE_DIR, 'SOURCE_INVENTORY_REPORT.html'), 'utf8');
+const DESIGN_DIR = path.join(CONTENT, 'overall_design');
+const [overallPlan, overallSpecHTML] = await Promise.all([
+  fs.readFile(path.join(DESIGN_DIR, 'overall_design_plan.json'), 'utf8').then(JSON.parse),
+  fs.readFile(path.join(DESIGN_DIR, 'OVERALL_DESIGN_V0_4.html'), 'utf8')
+]);
 const sourceInfoById = Object.fromEntries(sourceReports.map(source => [source.id, source]));
 const assetHasher=crypto.createHash('sha256');
-assetHasher.update(JSON.stringify({config,scalePlan,sourceStats,sourceReports,sections,tasks,papers}));
+assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,sourceStats,sourceReports,sections,tasks,papers}));
 for(const name of ['scripts/build.mjs','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
@@ -105,19 +110,19 @@ const groupRoutes = {
   literature:'library.html', methods:'appendices/methods.html'
 };
 const summaries = {
-  c01:['v0.3 以更多獨立任務、更廣覆蓋與 all-in-one 整合為主目標。','初始目標 2,000–3,000 個正規化任務，並接受最大可比基準至少 2 倍的驗收。','已盤點原生來源；G2 尚未完成歸一，實際模擬驗證仍為 0。'],
+  c01:['v0.4 將大型任務庫、廣度配額與共用評測平台串成一套設計。','初始目標 2,000–3,000 個正規化任務；任務數與有效覆蓋各以至少最大可比基準 2 倍為目標。','已盤點原生來源；G2 尚未完成歸一，實際模擬驗證仍為 0。'],
   c02:['文獻分類回答「研究測什麼」，任務規格回答「機器人要做什麼」。','以摺毛巾走過家族、任務、實例、測例與一次執行。','問答、預測、規劃和物理完成需要不同證據。'],
-  c03:['Domain、family、task spec、instance、case、trial 分六層報告。','180 是情境藍圖；G2 待定，實際 G3–G5 仍為 0。','同一題重跑五次，不會自動多出五種任務。'],
+  c03:['Domain、family、task spec、instance、case、trial 分六層報告。','v0.4 新增 task–context 與 execution bindings，分開估計覆蓋和工程量。','同一任務跨場域、換機體或重跑，不會自動增加全球 G2 數量。'],
   c04:['168 篇來源分成十二個主分類，含影片、Ego、預測與操作。','文獻篇數比例不能直接當作領域缺口或出題比例。','書目、摘要閱讀和程式重現的證據深度分開。'],
   c05:['先保留原作者單位，再對齊 domain、task、case 和資料量。','既有任務、資產和評分器可復用，但要重新審核相容性。','影片到動作、摺衣、恢復都有先例，新貢獻需要實驗支持。'],
-  c06:['原有設計種子含 12 場域、48 家族與 180 藍圖；v0.3 的完整任務庫向更大規模擴展。','八個模組只有在資料與標籤充足時，才形成有效測例。','材料、觀測、機體、學習設定各自獨立記錄。'],
+  c06:['v0.4 為 12 個核心場域各提出至少 100 個有效任務綁定、8 個家族、3 類機制的支撐目標。','共同 coverage cell 使用場域 × 家族 × 必需機制；每格需要實際任務與實例證據。','材料、觀測、機體、學習設定各自記錄；原 180 個藍圖是設計種子。'],
   c07:['先以原始活動或錄製 session 分組，再產生 clips 與 QA。','示範與 robot 的配對可能只有共同目標，不能假設幾何一致。','資訊不足的題目應補線索或允許詢問，不能當成難題。'],
   c08:['終態成功、完整合規成功、配對目標成功分開報告。','恢復要同時列全 episode、擾動施加率與條件式成功。','模型在相同資訊、控制、資料和預算下比較。'],
   c09:['六個具體案例展示目標、證據、近失敗和資料前提。','涵蓋摺毛巾、記憶取物、配送、協作、流體和數位工具。','案例中的尺寸、容差與接口仍是設計，尚未校準。'],
   c10:['難度屬於某個實例加上完整評測條件，不屬於論文名稱。','十維人工向量是設計註記；經驗難度需要固定 agent panel。','全模型失敗時，先排除不可解任務和錯誤評分器。'],
-  c11:['v0.3 完整任務庫目標改為 2,000–3,000 個正規化 G2；180 個藍圖是設計種子。','先達任務規模與覆蓋門檻，再規劃實例、測例與執行量。','原 100–140 情境只保留為舊版深入標註預算，不作全庫上限。'],
+  c11:['v0.4 同時驗收任務數與有效覆蓋；2,000–3,000 個 G2 是初始目標，並非上限。','全球任務數、場域綁定與執行綁定各有數量；後兩者增加不等於新增任務。','預算從執行綁定、有效初態、合法條件和 policy repeats 計算；原 100–140 預算屬歷史方案。'],
   c12:['先建立 registry、instance builder、adapter、evaluator 與結果紀錄。','共同 API 不代表不同模擬器有相同動力學。','本網站提供公開研究文件；正式評測和平台代跑仍待實作。'],
-  c13:['v0.3 改用完整來源盤點、共同去重、接口驗證與批次擴展的階梯。','依序驗證 250／500／1,000，朝 2,000–3,000 個 G2 和 2× 參照門檻推進。','達規模與品質門檻才凍結主實驗；原 24 週示例不作本版承諾。'],
+  c13:['v0.4 先固定共同分類、參照集與廣度配額，再驗證跨 backend 閉環。','每批 250／500／1,000 都同時檢查數量、場域、家族、機制、材料與機體支撐。','規模與廣度共同達標後凍結主實驗；原 24 週示例不作本版承諾。'],
   c14:['所有數量統一區分文獻、設計、規劃與實際驗證。','48 類是作者分組，180 個是藍圖，24 個 Ego 題型另列。','正式 backend、資料與測例仍需按 milestones 建立。']
 };
 const descriptions = {
@@ -133,7 +138,7 @@ const descriptions = {
   c10:'從十維設計向量，到固定模型群下的經驗難度。',
   c11:'領域、情境、測例與算力預算，使用不同粒度分開估算。',
   c12:'把設計變成可執行、可評分與可重現的系統。',
-  c13:'從 paper pitch、最小閉環、pilot 到發布的八個 milestones。',
+  c13:'從 S0 來源盘點到 S6 發布，任務規模與有效廣度共同驗收。',
   c14:'整理版本差異、計數更正與尚待實作期決定的項目。'
 };
 const timeFor = section => Math.max(3, Math.ceil(plain(section.html).length / 600));
@@ -231,6 +236,7 @@ const chapterLink = (id, route, locale) => routeLink(route, `chapters/${id}.html
 const pdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/full-report-zh-hant.pdf');
 function navHTML(route, locale) {
   const links = [
+    ['design.html','整體設計',route==='design.html'],
     ['scale-plan.html','規模與比較',route==='scale-plan.html'],
     ['native-tasks.html','來源任務庫',route==='native-tasks.html'],
     ['chapters/index.html','章節閱讀',route.startsWith('chapters/')],
@@ -246,8 +252,8 @@ function navHTML(route, locale) {
 }
 function footerHTML(route, locale) {
   return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('從文獻到任務、評測與實作的公開研究設計。',locale)}</div>
-  <div class="footer-links"><a href="${routeLink(route,'glossary.html',locale)}">${t('名詞小辭典',locale)}</a><a href="${routeLink(route,'appendices/methods.html',locale)}">${t('來源與方法',locale)}</a><a href="${pdfHref(route,locale)}">${t('完整 PDF',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
-  <p class="footer-note">${t(`規模主線 v${config.designVersion} · 來源盤點 ${config.sourceInventoryDate} · 原文獻快照 ${config.researchDate}。2,000–3,000 個 G2 與至少 2× 為研發驗收目標；${sourceStats.source_records.toLocaleString('en-US')} 筆是未完成跨作去重的來源紀錄。正式驗證測例與模擬執行仍為 0。`,locale)}</p></div></footer>`;
+  <div class="footer-links"><a href="${routeLink(route,'design.html',locale)}">${t('最新整體設計',locale)}</a><a href="${routeLink(route,'glossary.html',locale)}">${t('名詞小辭典',locale)}</a><a href="${routeLink(route,'appendices/methods.html',locale)}">${t('來源與方法',locale)}</a><a href="${pdfHref(route,locale)}">${t('原版 PDF · v0.2',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">${t(`整體設計 v${config.designVersion} · 設計與來源盤點 ${config.designDate} · 原文獻快照 ${config.researchDate}。2,000–3,000 個 G2，以及任務數／有效覆蓋各至少 2×，均為研發驗收提案。${sourceStats.source_records.toLocaleString('en-US')} 筆是未完成跨作去重的來源紀錄；正式驗證測例與模擬執行仍為 0。`,locale)}</p></div></footer>`;
 }
 const strings = {
   copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
@@ -286,10 +292,10 @@ function head(title,description,route,locale,extra='') {
   return `<div class="page-head">${breadcrumb(title,route,locale)}<div class="eyebrow">RESEARCH ATLAS</div><h1>${t(title,locale)}</h1><p class="lede">${t(description,locale)}</p>${extra}</div>`;
 }
 function scopeNotice(route,locale){
-  return `<div class="scope-notice"><b>${t('v0.3：主攻規模與覆蓋優勢',locale)}</b><p>${t('完整任務庫初始目標為 2,000–3,000 個正規化 G2，並要求至少最大可比基準 2 倍。180 個藍圖是設計種子；原 100–140 情境預算不再代表全庫規模。',locale)}</p><a href="${routeLink(route,'scale-plan.html',locale)}">${t('查看最新規模計畫與比較門檻',locale)} →</a></div>`;
+  return `<div class="scope-notice"><b>${t('v0.4：任務規模與廣度共同驗收',locale)}</b><p>${t('完整任務庫初始目標為 2,000–3,000 個 G2；任務數與有效覆蓋各以最大可比基準至少 2 倍為目標。新增場域、家族、材料與機體的支撐配額。180 個藍圖保留為設計種子，原 100–140 預算屬歷史方案。',locale)}</p><a href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計、配額、架構與 milestones',locale)} →</a></div>`;
 }
-function scaleSections(numbers,locale,route,prefix){
-  const $=cheerio.load(scaleSpecHTML,{},false);const result=[];
+function designSections(numbers,locale,route,prefix){
+  const $=cheerio.load(overallSpecHTML,{},false);const result=[];
   let keep=false;
   $.root().contents().each((_,node)=>{
     if(node.type==='tag'&&node.name==='h2'){
@@ -299,6 +305,59 @@ function scaleSections(numbers,locale,route,prefix){
     if(keep)result.push($.html(node));
   });
   return transform(result.join(''),locale,route,prefix);
+}
+function capacityExplorer(locale){
+  const c=overallPlan.capacity_example;
+  const controls=[
+    ['instances','每執行綁定的有效初態',[1,3,5,10,20],c.g3_per_execution_binding],
+    ['conditions','每實例的合法條件組合',[1,2,4],c.information_conditions*c.intervention_conditions],
+    ['repeats','每固定測例的執行次數',[1,3,5],c.policy_repeats_per_fixed_case],
+    ['methods','完整相容的方法數',[1,4,8],c.example_fully_compatible_models]
+  ];
+  const outputs=[
+    ['instances','G3 實例配置',c.planned_g3_assignments],
+    ['cases','G4 合法測例配置',c.planned_g4_assignments],
+    ['per-method','每個方法的執行量',c.planned_rollouts_per_fully_compatible_model],
+    ['total','所有方法的總執行量',c.planned_main_rollouts]
+  ];
+  return `<section class="capacity-explorer" id="capacity-explorer" data-capacity-bindings="${c.execution_bindings}">
+    <h2>${t('互動估算：做廣之後，需要跑多少？',locale)}</h2>
+    <p>${t('純規劃示例：固定 2,400 種獨立任務、2,800 個場域綁定、3,000 個執行綁定。調整下列條件，獨立任務數仍是 2,400。',locale)}</p>
+    <div class="capacity-controls js-only">${controls.map(([id,label,values,value])=>`<label for="capacity-${id}">${t(label,locale)}<select id="capacity-${id}" data-capacity-input="${id}">${values.map(v=>`<option value="${v}"${v===value?' selected':''}>${v}</option>`).join('')}</select></label>`).join('')}</div>
+    <div class="capacity-results" aria-live="polite" aria-atomic="true">${outputs.map(([id,label,value])=>`<div><strong data-capacity-output="${id}">${value.toLocaleString('en-US')}</strong><span>${t(label,locale)}</span></div>`).join('')}</div>
+    <p class="capacity-note">${t('4 種條件可代表 2 種資訊 × 2 種介入；只有合法且適用時才能相乘。假設所有方法能執行全部綁定。這些是預算，不是已完成的實驗；實際成本由 pilot 量測。',locale)}</p>
+  </section>`;
+}
+function overallDesignPage(locale){
+  const route='design.html';
+  const spec=cheerio.load(overallSpecHTML,{},false);spec('h1').remove();
+  spec('h2').each((_,node)=>{
+    const num=(spec(node).text().match(/^(\d+)\./)||[])[1];
+    if(num)spec(node).attr('id',`design-section-${num}`);
+  });
+  const content=transform(`<section id="overall-design-spec">${spec.html()}</section>`,locale,route,'overall');
+  const $=cheerio.load(content);
+  const headings=$('h2').toArray().map(node=>({id:$(node).attr('id'),title:$(node).text()}));
+  const downloads=relative(`${locale}/${route}`,'downloads/overall-design/');
+  const nav=chapterNav(route,locale);
+  const steps=[
+    ['01','完整來源库','原作、版本、原生 ID 與來源關係'],
+    ['02','獨立任務库','合併重複、保留真正不同的目標與流程'],
+    ['03','廣度與實例','跨場域、材料、機體建立有效情境'],
+    ['04','統一評測平台','共用入口、合法測例、判分與結果']
+  ];
+  const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content">
+    <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('整體設計',route,locale)}
+    <div class="eyebrow">OVERALL DESIGN · v0.4</div><h1>${t('任務多、涵蓋廣，放進同一套評測。',locale)}</h1>
+    <p class="lede">${t('整個 benchmark 改成大型任務庫、具體廣度配額與共用評測平台。每批擴張都同時檢查「多了哪些任務」和「補足哪些覆蓋」。',locale)}</p>
+    <div class="page-meta"><span>${config.designDate}</span><span class="pill status">${t('研發目標提案 · 尚未達成',locale)}</span><span>${t('模擬環境',locale)}</span></div>
+    <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul><li>${t('全庫初始目標 2,000–3,000 種獨立任務；任務數與有效覆蓋各以至少最大可比基準 2 倍為目標。',locale)}</li><li>${t('12 個核心場域各提出 100 個有效任務綁定、8 個家族、3 類機制的最低支撐量。',locale)}</li><li>${t('同一任務換場域或機體，增加覆蓋、實例和實作量；全球 G2 只計一次。',locale)}</li></ul></div>
+    <ol class="design-flow" aria-label="${t('整體建置流程',locale)}">${steps.map(([id,title,text])=>`<li><small>${id}</small><b>${t(title,locale)}</b><span>${t(text,locale)}</span></li>`).join('')}</ol>
+    <div class="cta-row"><a class="button" href="#design-section-3">${t('看目標與共同門檻',locale)} ↓</a><a class="button secondary" href="${routeLink(route,'scale-plan.html',locale)}">${t('查前作規模與來源',locale)} →</a></div>
+    <div class="prose">${content}</div>${capacityExplorer(locale)}
+    <div class="reader-actions"><button class="text-button copy-link">${t('複製本頁連結',locale)}</button><button class="text-button print-page">${t('列印本頁',locale)}</button><a class="text-button" href="${downloads}/OVERALL_DESIGN_V0_4.md" download>${t('下載完整設計',locale)}</a><a class="text-button" href="${downloads}/breadth_quota_template.csv" download>${t('下載 12 場域配額表',locale)}</a><a class="text-button" href="${downloads}/overall_design_plan.json" download>${t('下載計畫 JSON',locale)}</a></div>
+    </main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}<a href="#capacity-explorer">${t('互動題量估算',locale)}</a></aside></div>`;
+  return shell({route,locale,title:'整體設計 v0.4：大規模、廣覆蓋、統一評測',description:'全庫目標、12 場域配額、機制與材料、機體與觀測、平台架構、完整評測、難度、預算與 milestones 集中說明。',body,kind:'design'});
 }
 function scalePlanPage(locale){
   const route='scale-plan.html';
@@ -310,14 +369,14 @@ function scalePlanPage(locale){
   const downloads=relative(`${locale}/${route}`,'downloads/scale-first/');
   const nav=chapterNav(route,locale);
   const body=`<div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content">
-  <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('規模與比較',route,locale)}<div class="eyebrow">SCALE FIRST · v0.3</div><h1>${t('更多任務、更廣覆蓋，All-in-one。',locale)}</h1>
-  <p class="lede">${t('完整任務庫是論文主體。以共同粒度下的任務數與已驗證覆蓋作為規模主張，從完整來源庫向 2,000–3,000 個 G2 推進。',locale)}</p>
+  <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('規模與比較',route,locale)}<div class="eyebrow">SCALE &amp; SOURCE EVIDENCE</div><h1>${t('規模比較、完整來源與查核證據。',locale)}</h1>
+  <p class="lede">${t('這裡保留 v0.3 規模方案和來源盤點證據。v0.4 已把廣度配額、執行綁定與整體架構統整成新版設計。',locale)}</p>${scopeNotice(route,locale)}
   <div class="scale-target-grid"><div><strong>2,000–3,000</strong><span>${t('正規化 G2 任務：初始研發目標',locale)}</span></div><div><strong>≥ 2×</strong><span>${t('最大可比基準：相對驗收門檻',locale)}</span></div><div><strong>${sourceStats.source_records.toLocaleString('en-US')}</strong><span>${t('原生來源紀錄：未完成跨作去重',locale)}</span></div><div><strong>0</strong><span>${t('已驗證測例／實際模擬執行',locale)}</span></div></div>
   <p class="source-note">${t('目前是規模優先的設計與來源盤點，尚未證明領先。2× 的分母要在共同 ontology、task kind、scope 和版本下正規化；若對照規模更大，目標也上調。',locale)}</p>
-  <div class="cta-row"><a class="button" href="${routeLink(route,'native-tasks.html',locale)}">${t('探索完整來源紀錄',locale)} →</a><a class="button secondary" href="${downloads}/native_source_inventory.csv" download>${t('下載來源 CSV',locale)}</a></div>
+  <div class="cta-row"><a class="button" href="${routeLink(route,'appendices/comparison.html',locale)}">${t('前作原生規模比較表',locale)} →</a><a class="button secondary" href="${routeLink(route,'chapters/05.html',locale)}">${t('領域、規模與增量比較',locale)}</a><a class="button secondary" href="${routeLink(route,'native-tasks.html',locale)}">${t('探索完整來源紀錄',locale)}</a><a class="button secondary" href="${downloads}/native_source_inventory.csv" download>${t('下載來源 CSV',locale)}</a></div>
   <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本頁連結',locale)}</button><button class="text-button print-page">${t('列印本頁',locale)}</button><a class="text-button" href="${downloads}/SCALE_FIRST_SPEC_V0_3.md">${t('下載設計原稿',locale)}</a></div>
   </main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
-  return shell({route,locale,title:'規模優勢與 All-in-one 設計 v0.3',description:'以 2,000–3,000 個正規化任務、至少最大可比基準 2 倍與更廣覆蓋作為研發目標，附完整來源盤點與驗收路線。',body});
+  return shell({route,locale,title:'規模比較與來源查核',description:'保留 v0.3 規模提案與完整來源盤點，並連結 v0.4 的數量／廣度共同驗收設計。',body});
 }
 const nativeUnitLabels=Object.fromEntries(sourceRecords.map(r=>[r.native_unit,r.native_unit_zh]));
 const nativeBucketLabels={
@@ -348,7 +407,7 @@ function nativePage(locale){
   const options=(values)=>values.map(([value,label])=>`<option value="${escape(value)}">${t(label,locale)}</option>`).join('');
   const body=`<main class="wrap" id="main-content">${head('原生任務來源聯合庫','從完整來源庫建立可追溯的盤點，再做語義去重、資產綁定與驗證。這裡展示的是來源紀錄，不是已完成的 benchmark 任務。',route,locale,
   `<div class="page-meta"><span class="pill green">${sourceStats.source_records.toLocaleString('en-US')} ${t('筆原生紀錄',locale)}</span><span>${sourceStats.source_repositories_pinned} ${t('個官方程式庫',locale)} / ${sourceStats.source_snapshots_pinned} ${t('個固定版本來源',locale)}</span><span>${config.sourceInventoryDate}</span><span class="pill status">${t('正式 G2 待歸一；驗證 0',locale)}</span></div>`)}
-  <div class="scope-notice"><b>${t('規模主體已改為完整任務庫',locale)}</b><p>${t('2,000–3,000 個 G2 與至少 2× 為研發目標。原生 ID、活動目錄、schema、整合註冊與配置不得直接相加當成獨立任務。',locale)}</p><a href="${routeLink(route,'scale-plan.html',locale)}">${t('規模計畫與比較方法',locale)} →</a></div>
+  <div class="scope-notice"><b>${t('完整來源庫是 v0.4 設計的起點',locale)}</b><p>${t('全庫初始目標 2,000–3,000 個 G2，任務數與有效覆蓋共同驗收。原生 ID、活動目錄、schema、整合註冊與配置仍需正規化，不能直接相加當成獨立任務。',locale)}</p><a href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計與廣度配額',locale)} →</a></div>
   <details class="explainer" id="source-summary"><summary>${t('查看全部來源、提取數與固定版本',locale)}</summary><div class="table-scroll"><table><thead><tr><th>${t('來源',locale)}</th><th>${t('紀錄數',locale)}</th><th>${t('原生單位',locale)}</th><th>${t('固定 commit',locale)}</th></tr></thead><tbody>${sourceRows}</tbody></table></div></details>
   <div class="catalogue-layout native-layout"><aside class="filter-panel js-only" aria-label="${t('來源篩選',locale)}"><h2>${t('查找來源與任務定義',locale)}</h2><div class="filter-fields">
   <div class="filter-field"><label for="native-q">${t('關鍵字／原生 ID',locale)}</label><input id="native-q" data-native-filter="q" type="search" placeholder="${t('例如 fold、抽屜、PegInsertion',locale)}"></div>
@@ -367,7 +426,7 @@ function nativePage(locale){
 function chapterNav(route,locale) {
   const chapterLinks=chapters.map(s=>`<a href="${routeLink(route,chapterRoute(s),locale)}"${route===chapterRoute(s)?' class="active" aria-current="page"':''}><span>${s.id.slice(1)}</span>${t(s.title,locale)}</a>`).join('');
   const extras=[['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['library.html','168 篇文獻'],['appendices/methods.html','來源與資料字典']];
-  return `<div class="sidebar-label">${t('v0.3 規模主線',locale)}</div><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模目標、比較與 milestones',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
+  return `<div class="sidebar-label">${t('v0.4 整體設計',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模比較與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
 }
 function readingPage(section,locale) {
   const route=chapterRoute(section);
@@ -377,8 +436,8 @@ function readingPage(section,locale) {
     draft('tr').each((_,row)=>{
       const cells=draft(row).children('td');const first=cells.first().text();
       if(first.includes('我們：核心預算')){
-        cells.eq(0).text('我們：v0.3 規模目標');
-        cells.eq(1).text('2,000–3,000 個 G2 任務；至少最大可比基準 2 倍');
+        cells.eq(0).text('我們：v0.4 規模與廣度目標');
+        cells.eq(1).text('2,000–3,000 個 G2；任務數與有效覆蓋各至少最大可比基準 2 倍');
         cells.eq(2).text('正規化任務的研發目標');
         cells.eq(3).text('尚未達成；以共同 ontology、scope、來源去重與驗證後的實績比較');
       }
@@ -387,9 +446,9 @@ function readingPage(section,locale) {
   }
   let content=transform(`<section id="${section.id}">${sourceHTML}</section>`,locale,route);
   const currentNote=scopeNotice(route,locale);
-  if(['c01','c05','c06','c12','c14'].includes(section.id))content=currentNote+content;
+  if(['c01','c03','c05','c06','c12','c14'].includes(section.id))content=currentNote+content;
   if(['c11','c13'].includes(section.id)){
-    const current=section.id==='c11'?scaleSections([1,7,8],locale,route,'updated-budget'):scaleSections([9,10,11],locale,route,'updated-milestones');
+    const current=section.id==='c11'?designSections([3,9],locale,route,'updated-budget'):designSections([10,11,12],locale,route,'updated-milestones');
     const legacy=content.replace(`id="${section.id}"`,`id="legacy-${section.id}"`);
     content=`<section id="${section.id}">${currentNote}${current}<details class="legacy-content"><summary>${t('查看 v0.2 原始預算／排程（歷史方案）',locale)}</summary>${legacy}</details></section>`;
   }
@@ -403,7 +462,7 @@ function readingPage(section,locale) {
   ${breadcrumb('章節閱讀',route,locale)}<div class="eyebrow">CHAPTER ${section.id.slice(1)} / 14</div><h1>${t(section.title,locale)}</h1>
   <div class="page-meta"><span>${t(`約 ${timeFor(section)} 分鐘`,locale)}</span><span>·</span><span>${t(`資料快照 ${config.researchDate}`,locale)}</span><span class="pill status">${t('設計階段 Q0',locale)}</span></div>
   <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul>${summaries[section.id].map(line=>`<li>${t(line,locale)}</li>`).join('')}</ul></div>
-  <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本章連結',locale)}</button><button class="text-button print-page">${t('列印本章',locale)}</button><a class="text-button" href="${pdfHref(route,locale)}">${t('完整 PDF',locale)} ↗</a></div>
+  <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本章連結',locale)}</button><button class="text-button print-page">${t('列印本章',locale)}</button><a class="text-button" href="${pdfHref(route,locale)}">${t('原版 PDF · v0.2',locale)} ↗</a></div>
   <nav class="prev-next" aria-label="${t('前後章節',locale)}">${nextPrev}</nav></main>
   <aside class="on-this-page" aria-label="${t('本章內容',locale)}"><div class="sidebar-label">${t('本章內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
   return shell({route,locale,title:section.title,description:descriptions[section.id],body,kind:'chapter'});
@@ -515,40 +574,40 @@ function towelSVG(){
 function homePage(locale){
   const route='index.html';
   const quickCards=[
-    ['01','用示範指定要完成的事','同一個起始場景，換一段示範就可能換一個目標。評測要確認機器人確實跟隨了目標。','chapters/02.html','看懂整個流程'],
-    ['02','把數量放在正確的層級','領域、家族、情境藍圖、實例、測例和執行次數各有單位，才能和以前的 benchmark 比較。','chapters/03.html','理解六個尺度'],
-    ['03','用證據確認完整完成','除了最後畫面，也檢查必要順序、物件身份、摺法、穩定性和恢復過程。','chapters/08.html','了解如何判分']
+    ['01','任務種類要多，覆蓋也要廣','把全來源庫正規化，再補足各場域、家族、機制、材料與機體的缺口。兩道門檻一起驗收。','design.html#design-section-3','看目標與廣度配額'],
+    ['02','任務數和測試量分開算','同一任務在不同場域、機體建立實例，可以增加覆蓋和測試量；全球獨立任務只計一次。','design.html#capacity-explorer','互動估算題量'],
+    ['03','用共用平台確認完整完成','文字、影片、歷史和介入條件連到合法測例，保留完整執行、恢復與分項診斷。','design.html#design-section-8','了解如何評測']
   ];
   const routes=[
-    ['↗','第一次了解這個題目','先認識 benchmark 要回答的問題，再用具體例子理解分類。','chapters/01.html','从第 01 章開始'],
+    ['↗','第一次了解這個題目','先看新版的整體目標、任務來源、廣度配額和執行流程。','design.html','從整體設計開始'],
     ['⌘','研究者與論文作者','直接比較先例、分類分布、難度設計與可驗證的研究主張。','chapters/04.html','進入文獻與比較'],
     ['→','準備開始實作','讀六個案例、資料規格、算力估算與 milestone 驗收條件。','chapters/09.html','進入具體設計']
   ];
   const body=`<main id="main-content"><div class="wrap">
-  <section class="hero"><div><div class="eyebrow">${t('規模優先 · v0.3 · All-in-one',locale)}</div><h1>${t('更多獨立任務，',locale)}<br><em>${t('更廣評測覆蓋。',locale)}</em></h1>
-  <p class="lede">${t(`以任務種類、領域覆蓋與統一評測為主軸，構建大型機器人 benchmark。完整任務庫初始目標為 2,000–3,000 個正規化 G2，並設下至少最大可比基準 2 倍的驗收門檻。`,locale)}</p>
-  <div class="cta-row"><a class="button" href="${routeLink(route,'scale-plan.html',locale)}">${t('看規模計畫與比較',locale)} <span class="arrow">→</span></a><a class="button secondary" href="${routeLink(route,'native-tasks.html',locale)}">${t('探索完整來源庫',locale)}</a></div>
+  <section class="hero"><div><div class="eyebrow">${t('大規模 × 廣覆蓋 · v0.4 · All-in-one',locale)}</div><h1>${t('更多獨立任務，',locale)}<br><em>${t('更廣評測覆蓋。',locale)}</em></h1>
+  <p class="lede">${t('大型機器人任務庫、具體廣度配額與一套評測平台。全庫初始目標為 2,000–3,000 種獨立任務；任務數與有效覆蓋，各以至少最大可比基準 2 倍為目標。',locale)}</p>
+  <div class="cta-row"><a class="button" href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計',locale)} <span class="arrow">→</span></a><a class="button secondary" href="${routeLink(route,'scale-plan.html',locale)}">${t('查看前作與規模比較',locale)}</a></div>
   <p class="note">${t(`已盤點 ${sourceStats.source_repositories_pinned} 個官方程式庫、${sourceStats.source_snapshots_pinned} 個版本來源，共 ${sourceStats.source_records.toLocaleString('en-US')} 筆原生紀錄。`,locale)}<br>${t('規模為研發目標；來源紀錄尚未完成 G2 去重，正式模擬驗證仍為 0。',locale)}</p></div>
   <div class="hero-visual"><div class="visual-top"><span>ONE SCENE. TWO GOALS.</span><span class="visual-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
   <span class="demo-label">${t('用一條毛巾，理解這個 benchmark',locale)}</span><div class="demo-title">${t('示範變了，目標也跟著變。',locale)}</div>
   <div class="goal-switch" role="group" aria-label="${t('切換示範目標',locale)}"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div>
   <div class="towel-scene">${translate(towelSVG(),locale)}</div><div class="scene-caption"><span id="fold-pairs">D → A · C → B</span><span>${t('概念示意，非模擬結果',locale)}</span></div>
   <p class="demo-message" id="demo-message" aria-live="polite">${t(strings.demoA,locale)}</p><a class="section-link" href="${routeLink(route,'chapters/09.html#detail-SC-H15',locale)}">${t('深入這個案例',locale)} →</a></div></section>
-  <div class="metrics-strip" aria-label="${t('規模目標與目前進度',locale)}"><a class="metric" href="${routeLink(route,'scale-plan.html',locale)}"><strong class="long">2,000–3,000</strong><span>${t('正規化 G2 任務目標',locale)}</span><small>${t('研發目標，尚未達成',locale)}</small></a><a class="metric" href="${routeLink(route,'scale-plan.html',locale)}"><strong>≥ 2×</strong><span>${t('最大可比基準的規模門檻',locale)}</span><small>${t('共同粒度與 scope 後驗收',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}"><strong>${sourceStats.source_records.toLocaleString('en-US')}</strong><span>${t('已提取原生来源紀錄',locale)}</span><small>${t('異質單位，未跨作去重',locale)}</small></a><a class="metric" href="${routeLink(route,'chapters/01.html',locale)}"><strong>0</strong><span>${t('個已驗證測例',locale)}</span><small>${t('實際模擬執行也為 0',locale)}</small></a></div>
-  <div class="scope-notice"><b>${t('完整任務庫不再以 180 個情境為上限',locale)}</b><p>${t('原有 180 個藍圖與 48 個作者家族保留為設計種子；原 100–140 個情境只保留作舊版深入標註預算。完整庫從既有來源的全部任務盤點、共同去重與新任務擴展開始。',locale)}</p><a href="#quick-start">${t('3 分鐘理解計數與評測原則',locale)} →</a></div>
+  <div class="metrics-strip" aria-label="${t('規模目標與目前進度',locale)}"><a class="metric" href="${routeLink(route,'design.html#design-section-3',locale)}"><strong class="long">2,000–3,000</strong><span>${t('正規化 G2 任務初始目標',locale)}</span><small>${t('研發目標，尚未達成',locale)}</small></a><a class="metric" href="${routeLink(route,'design.html#design-section-3',locale)}"><strong>≥ 2×</strong><span>${t('任務數與有效覆蓋各自驗收',locale)}</span><small>${t('共同分類與 scope 後比較',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}"><strong>${sourceStats.source_records.toLocaleString('en-US')}</strong><span>${t('已提取原生來源紀錄',locale)}</span><small>${t('異質單位，未跨作去重',locale)}</small></a><a class="metric" href="${routeLink(route,'design.html#design-section-12',locale)}"><strong>0</strong><span>${t('個已驗證測例',locale)}</span><small>${t('實際模擬執行也為 0',locale)}</small></a></div>
+  <div class="scope-notice"><b>${t('廣度也有具體支撐量',locale)}</b><p>${t('12 個核心場域各提出至少 100 個有效任務綁定、8 個家族、3 類機制的目標。材料和機體另設配額；共用同一任務時，全球 G2 只計一次。原 180 個藍圖保留為種子，100–140 預算屬歷史方案。',locale)}</p><a href="#quick-start">${t('3 分鐘理解整體設計',locale)} →</a></div>
   <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">THE SHORT VERSION</div><h2>${t('先掌握三個重點',locale)}</h2><p>${t('不需要先讀完論文，先知道這份設計想解決什麼。',locale)}</p></div><a class="section-link" href="${routeLink(route,'glossary.html',locale)}">${t('不熟悉術語？看小辭典',locale)} →</a></div>
   <div class="card-grid">${quickCards.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div>
-  <div class="concept-band"><div><h3>${t('180 個藍圖，不直接等於 180 道可跑的題。',locale)}</h3><p>${t('先有正式規格與有效初態，再有測例；每個模型的一次執行，才是一個 trial。',locale)}</p></div><div class="scale-line"><b>${t('情境藍圖',locale)}<small>B0 · 180</small></b><span class="arr">→</span><b>${t('任務規格',locale)}<small>G2 · TBD</small></b><span class="arr">→</span><b>${t('實例／測例',locale)}<small>G3 / G4 · 0</small></b><span class="arr">→</span><b>${t('實際執行',locale)}<small>G5 · 0</small></b></div></div></section>
+  <div class="concept-band"><div><h3>${t('從完整來源庫到正式評測。',locale)}</h3><p>${t('來源紀錄先正規化，再綁定實際場域、機體和有效初態；每次模型執行另計。',locale)}</p></div><div class="scale-line"><b>${t('來源紀錄',locale)}<small>5,020</small></b><span class="arr">→</span><b>${t('任務規格',locale)}<small>G2 · TBD</small></b><span class="arr">→</span><b>${t('實例／測例',locale)}<small>G3 / G4 · 0</small></b><span class="arr">→</span><b>${t('實際執行',locale)}<small>G5 · 0</small></b></div></div></section>
   <section class="section"><div class="section-head"><div><div class="eyebrow">SEED DESIGNS</div><h2>${t('原有設計種子：12 個應用場域',locale)}</h2><p>${t('這是 v0.2 的 180 個情境種子；完整任務庫正由更大來源聯集擴展。場域新增要由真正的任務與場景證據支持。',locale)}</p></div><a class="section-link" href="${routeLink(route,'explore/tasks.html',locale)}">${t('探索情境種子',locale)} →</a></div>
   <div class="domain-grid">${Object.entries(taxonomy.application_contexts).map(([id,v])=>`<a class="domain-card" href="${routeLink(route,'explore/tasks.html',locale)}?domain=${id}"><span class="code">${id}</span><b>${t(v.name,locale)}</b><span class="num">${tasks.filter(task=>task.application_context_id===id).length} →</span></a>`).join('')}</div>
   <p class="note-inline">${t('8 個評測模組涵蓋理解、記憶、預測、規劃、執行、恢復、協作與世界模型。24 個額外 Ego 觀測題型另列。',locale)}</p></section>
   <section class="section"><div class="section-head"><div><div class="eyebrow">CHOOSE YOUR READING PATH</div><h2>${t('選一個適合你的入口',locale)}</h2><p>${t('每章先給摘要，再保留完整推理、定義、表格與來源。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/index.html',locale)}">${t('查看 14 章完整目錄',locale)} →</a></div>
   <div class="card-grid">${routes.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
-  <section class="section"><div class="section-head"><div><div class="eyebrow">FROM SCALE TARGET TO EVIDENCE</div><h2>${t('用規模門檻推進，不停在小型集合',locale)}</h2><p>${t('先做全來源盤點，再以批次驗證逐步擴到正式規模。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/13.html',locale)}">${t('查看新版 milestones',locale)} →</a></div>
-  <div class="roadmap-preview"><div class="roadmap-step current"><small>S0 · ${t('目前',locale)}</small><h3>${t('完整來源盤點',locale)}</h3><p>${t(`${sourceStats.source_records.toLocaleString('en-US')} 筆來源紀錄已提取，進入共同 G2 與來源去重審核。`,locale)}</p></div><div class="roadmap-step"><small>S1–S2</small><h3>${t('正規化與閉環',locale)}</h3><p>${t('凍結共同規則、核對最大的比較集合，驗證 backend 與判分。',locale)}</p></div><div class="roadmap-step"><small>S3–S4</small><h3>${t('批次擴到全量',locale)}</h3><p>${t('250／500／1,000，朝 2,000–3,000 G2 與 2× 門檻推進。',locale)}</p></div><div class="roadmap-step"><small>S5–S6</small><h3>${t('全規模實驗與發布',locale)}</h3><p>${t('凍結後比較基線、覆蓋與泛化，公布可重現的規模證據。',locale)}</p></div></div></section>
-  <div class="download-band"><div><h2>${t('需要一次讀完整個計畫？',locale)}</h2><p>${t('257 頁完整報告：主文第 5–43 頁，附錄收齊所有文獻、情境與規格。',locale)}</p></div><a class="button" href="${pdfHref(route,locale)}" download>${t('下載 PDF · 繁體原版',locale)} <span class="arrow">↓</span></a></div>
+  <section class="section"><div class="section-head"><div><div class="eyebrow">FROM SCALE AND BREADTH TO EVIDENCE</div><h2>${t('每批任務，同時檢查數量與覆蓋。',locale)}</h2><p>${t('從全來源盤點向完整任務庫推進，場域、材料和機體一起擴展。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/13.html',locale)}">${t('查看新版 milestones',locale)} →</a></div>
+  <div class="roadmap-preview"><div class="roadmap-step current"><small>S0 · ${t('目前',locale)}</small><h3>${t('完整來源盤點',locale)}</h3><p>${t(`${sourceStats.source_records.toLocaleString('en-US')} 筆來源紀錄已提取，進入共同 G2 與來源去重審核。`,locale)}</p></div><div class="roadmap-step"><small>S1–S2</small><h3>${t('共同分類與閉環',locale)}</h3><p>${t('固定參照集、廣度配額與共同規則，驗證 backend 和判分。',locale)}</p></div><div class="roadmap-step"><small>S3–S4</small><h3>${t('規模與廣度一起擴',locale)}</h3><p>${t('250／500／1,000，每批檢查缺口，朝全庫與兩道 2× 目標推進。',locale)}</p></div><div class="roadmap-step"><small>S5–S6</small><h3>${t('全規模實驗與發布',locale)}</h3><p>${t('凍結完整適用集合，比較基線、覆蓋與泛化，公開可重現證據。',locale)}</p></div></div></section>
+  <div class="download-band"><div><h2>${t('整體設計與完整文獻，各有入口。',locale)}</h2><p>${t('新版設計集中於「整體設計」。257 頁 PDF 保留 v0.2 文獻、情境與規格快照，不含本次更新。',locale)}</p></div><a class="button" href="${pdfHref(route,locale)}" download>${t('原版 PDF · v0.2',locale)} <span class="arrow">↓</span></a></div>
   </div></main>`;
-  return shell({route,locale,title:'更多獨立任務，更廣評測覆蓋',description:'規模優先的 All-in-one Robot-use Benchmark 設計：以 2,000–3,000 個正規化任務與至少最大可比基準兩倍為目標，附完整來源盤點。',body,kind:'home'});
+  return shell({route,locale,title:'更多獨立任務，更廣評測覆蓋',description:'v0.4 整體設計：大型任務庫、12 場域廣度配額與統一評測，任務數和有效覆蓋共同驗收。',body,kind:'home'});
 }
 
 function referencePage(group,locale){
@@ -563,7 +622,7 @@ function referencePage(group,locale){
   const $=cheerio.load(html);
   const headings=$('h2').toArray().map(n=>({id:$(n).attr('id'),title:$(n).text()}));
   const nav=chapterNav(route,locale);
-  const body=`<div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節與附錄目錄',locale)}</summary>${nav}</details>${breadcrumb(meta[0],route,locale)}<div class="eyebrow">REFERENCE</div><h1>${t(meta[0],locale)}</h1><p class="lede">${t(meta[1],locale)}</p><div class="source-note">${t('完整保留原始整理版的定義和證據界線；目前仍無正式模擬評測結果。寬表格可以水平捲動。',locale)}</div><div class="prose">${html}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製連結',locale)}</button><button class="text-button print-page">${t('列印此頁',locale)}</button></div></main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
+  const body=`<div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節與附錄目錄',locale)}</summary>${nav}</details>${breadcrumb(meta[0],route,locale)}<div class="eyebrow">REFERENCE</div><h1>${t(meta[0],locale)}</h1><p class="lede">${t(meta[1],locale)}</p>${group==='comparison'||group==='axes'?scopeNotice(route,locale):''}<div class="source-note">${t('完整保留原始整理版的定義和證據界線；目前仍無正式模擬評測結果。寬表格可以水平捲動。',locale)}</div><div class="prose">${html}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製連結',locale)}</button><button class="text-button print-page">${t('列印此頁',locale)}</button></div></main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
   return shell({route,locale,title:meta[0],description:meta[1],body});
 }
 const glossary=[
@@ -616,7 +675,8 @@ function searchData(locale){
     const content=groups[group].map(s=>s.title+' '+plain(s.html)).join(' ');
     result.push({kind:'reference',title:translate(section.title,locale),path:groupRoutes[group],summary:translate(plain(section.html).slice(0,120),locale),search:tc(content)+' '+sc(tc(content))});
   }
-  result.push({kind:'reference',title:translate('規模優勢與 All-in-one 設計 v0.3',locale),path:'scale-plan.html',summary:translate('2,000–3,000 個 G2 研發目標、至少 2× 門檻、全來源庫與新版 milestones。',locale),search:'scale all in one 规模 規模 比較 比较 2000 3000 2x 來源 联合库'});
+  result.push({kind:'reference',title:translate('整體設計 v0.4：大規模、廣覆蓋、統一評測',locale),path:'design.html',summary:translate('完整新版設計：2,000–3,000 G2、兩道 2× 目標、12 場域配額、材料／機體／影片、評測與互動預算。',locale),search:tc(plain(overallSpecHTML))+' '+sc(tc(plain(overallSpecHTML)))+' overall design all in one v0.4 2000 3000 2x'});
+  result.push({kind:'reference',title:translate('規模比較與來源查核',locale),path:'scale-plan.html',summary:translate('v0.3 規模提案與全來源盤點證據；整體設計已更新至 v0.4。',locale),search:'scale all in one 规模 規模 比較 比较 2000 3000 2x 來源 联合库'});
   for(const record of sourceRecords){
     const summary=`${record.source_work} · ${record.native_unit_zh} · 靜態紀錄，未完成 G2 去重`;
     result.push({kind:'native',title:record.native_id,path:`native-tasks.html#${record.anchor_id}`,summary:translate(summary,locale),search:`${record.native_id} ${record.title} ${record.source_work} ${record.native_aliases_or_variants.join(' ')} ${nativeSearchHints(record)}`});
@@ -641,6 +701,7 @@ for(const locale of LOCALES){
   for(const group of ['axes','comparison','methods'])await write(`${locale}/${groupRoutes[group]}`,referencePage(group,locale));
   await write(`${locale}/glossary.html`,glossaryPage(locale));
   await write(`${locale}/search.html`,searchPage(locale));
+  await write(`${locale}/design.html`,overallDesignPage(locale));
   await write(`${locale}/scale-plan.html`,scalePlanPage(locale));
   await write(`${locale}/native-tasks.html`,nativePage(locale));
   const data=searchData(locale);
@@ -661,18 +722,21 @@ await write('assets/native-source-data.js',`window.NATIVE_SOURCE_DATA=${jsonSafe
 for(const filename of ['SCALE_FIRST_SPEC_V0_3.md','SOURCE_INVENTORY_REPORT.md','native_source_inventory.csv','native_source_inventory.json','scale_first_plan.json','source_extraction_report.json','pinned_sources.json','inventory_statistics.json']){
   await write(`downloads/scale-first/${filename}`,await fs.readFile(path.join(SCALE_DIR,filename)));
 }
+for(const filename of ['OVERALL_DESIGN_V0_4.md','overall_design_plan.json','breadth_quota_template.csv','design_validation.json']){
+  await write(`downloads/overall-design/${filename}`,await fs.readFile(path.join(DESIGN_DIR,filename)));
+}
 const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
 const scaleRoot=rootHtml
   .replace('從看懂示範，到可靠完成任務。','更多獨立任務，更廣評測覆蓋。')
-  .replace('公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。','規模優先 v0.3：2,000–3,000 個正規化任務為研發目標。<br>规模优先 v0.3：2,000–3,000 个正规化任务为研发目标。<br>正式驗證仍為 0；來源盤點與目標分開呈現。')
+  .replace('公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。','整體設計 v0.4：大規模、廣覆蓋、統一評測。<br>整体设计 v0.4：大规模、广覆盖、统一评测。<br>2,000–3,000 個任務為初始研發目標；正式驗證仍為 0。')
   .replace('從重點導讀到完整文獻、情境和章節。','以規模與覆蓋優勢為主軸，附完整來源任務庫、文獻與章節。');
-await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · 規模優先 v0.3"><meta property="og:description" content="All-in-one 規模計畫：2,000–3,000 個正規化任務與至少最大可比基準兩倍為研發目標；公開來源盤點與驗收方法。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
+await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · 整體設計 v0.4"><meta property="og:description" content="All-in-one 整體設計：大型任務庫、12 場域廣度配額與共用評測平台，任務數和有效覆蓋共同驗收。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
 await write('404.html',`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找不到頁面 · Robot-use Benchmark</title><link rel="stylesheet" href="${config.siteUrl}/assets/site.css"></head><body><main class="wrap narrow" style="padding:90px 0"><div class="eyebrow">404</div><h1>這個頁面找不到了。<br>这个页面找不到了。</h1><p>可以回到首頁，從章節、情境或文獻重新找到內容。</p><div class="cta-row"><a class="button" href="${config.siteUrl}/zh-hant/">繁體首頁</a><a class="button secondary" href="${config.siteUrl}/zh-hans/">简体首页</a></div></main></body></html>`);
 await write('.nojekyll','');
 await write('robots.txt',`User-agent: *\nAllow: /\nSitemap: ${config.siteUrl}/sitemap.xml\n`);
-await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allPageRecords.map(p=>`<url><loc>${escape(config.siteUrl+'/'+p.file)}</loc><lastmod>${config.researchDate}</lastmod></url>`).join('')}</urlset>`);
+await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allPageRecords.map(p=>`<url><loc>${escape(config.siteUrl+'/'+p.file)}</loc><lastmod>${config.designDate}</lastmod></url>`).join('')}</urlset>`);
 const manifest={
-  siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,
+  siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,designDate:config.designDate,designVersion:config.designVersion,
   pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,tasks:tasks.length,families:families.length,probes:probes.length,metrics:metrics.length,nativeSourceRecords:sourceRecords.length,sourceRepositories:sourceStats.source_repositories_pinned,sourceSnapshots:sourceStats.source_snapshots_pinned,validatedCases:0,simulatorRuns:0},
   sourceSections:sections.length,sourceSectionIds:sections.map(s=>s.id),assets:generated.filter(file=>!file.endsWith('.html')),
   pdf:'downloads/full-report-zh-hant.pdf',

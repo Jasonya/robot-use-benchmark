@@ -265,8 +265,25 @@
     $('#demo-message').textContent = goal === 'a' ? text.demoA : text.demoB;
   }));
 
-  if (config.kind === 'chapter') {
-    storage.set('robot-use-reading', JSON.stringify({ path: config.route, title: config.title }));
+  const capacity = $('[data-capacity-bindings]');
+  if (capacity) {
+    const controls = $$('[data-capacity-input]', capacity);
+    const updateCapacity = () => {
+      const values = Object.fromEntries(controls.map(control => [control.dataset.capacityInput, Number(control.value)]));
+      const instances = Number(capacity.dataset.capacityBindings) * values.instances;
+      const cases = instances * values.conditions;
+      const perMethod = cases * values.repeats;
+      const outputs = { instances, cases, 'per-method': perMethod, total: perMethod * values.methods };
+      for (const [key, value] of Object.entries(outputs)) {
+        $(`[data-capacity-output="${key}"]`, capacity).textContent = value.toLocaleString('en-US');
+      }
+    };
+    controls.forEach(control => control.addEventListener('change', updateCapacity));
+    updateCapacity();
+  }
+
+  if (config.kind === 'chapter' || config.kind === 'design') {
+    if (config.kind === 'chapter') storage.set('robot-use-reading', JSON.stringify({ path: config.route, title: config.title }));
     const headingLinks = $$('.on-this-page a');
     const headings = headingLinks.map(link => document.getElementById(decodeURIComponent(link.hash.slice(1)))).filter(Boolean);
     if ('IntersectionObserver' in window) {
