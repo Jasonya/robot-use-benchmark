@@ -92,7 +92,22 @@ assert.equal(capacity.execution_bindings*capacity.g3_per_execution_binding,capac
 assert.equal(capacity.planned_g3_assignments*capacity.information_conditions*capacity.intervention_conditions,capacity.planned_g4_assignments);
 assert.equal(capacity.planned_g4_assignments*capacity.policy_repeats_per_fixed_case*capacity.example_fully_compatible_models,capacity.planned_main_rollouts);
 assert.ok(capacity.global_g2_tasks<capacity.task_context_bindings&&capacity.task_context_bindings<capacity.execution_bindings);
+const comparisonData=JSON.parse(await fs.readFile(path.join(out,'downloads/benchmark-comparison/benchmark_matrix.json'),'utf8'));
+assert.equal(comparisonData.rows.length,35);
+assert.equal(comparisonData.rows.filter(row=>row.group!=='ours').length,33);
+assert.ok(comparisonData.rows.every(row=>row.canonical_g2===null));
+assert.ok(comparisonData.rows.find(row=>row.id==='partnr').cases.includes('100,000 train'));
+assert.ok(comparisonData.rows.find(row=>row.id==='watchact').tasks.includes('schemas'));
+assert.equal(comparisonData.rows.find(row=>row.id==='ours-current').domain_map.D01,'zero');
+assert.equal(comparisonData.rows.find(row=>row.id==='ours-target').domain_map.D01,'planned');
 for(const locale of ['zh-hant','zh-hans']){
+  const comparisonPage=pages.get(path.join(out,locale,'compare.html'));
+  assert.ok(comparisonPage);
+  assert.equal(comparisonPage.$('[data-comparison-panel]').length,4);
+  for(const view of ['scale','domains','materials','features'])assert.equal(comparisonPage.$(`#comparison-${view} tbody tr`).length,35);
+  assert.equal(comparisonPage.$('#comparison-domains thead th').length,13);
+  assert.equal(comparisonPage.$('#comparison-features thead th').length,10);
+  assert.equal(comparisonPage.$('[data-comparison-evidence]').length,35);
   const overall=pages.get(path.join(out,locale,'design.html'));
   assert.ok(overall);
   assert.equal(overall.$('#overall-design-spec h2').length,12);

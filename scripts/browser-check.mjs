@@ -156,6 +156,37 @@ try{
   await snapshot('capacity-planner-desktop');
   pass('Overall design and planning units','Both scale and breadth gates are visible; instances and conditions change workload while the example retains 2,400 independent G2 tasks.');
 
+  await go('zh-hant/compare.html');
+  const comparedRows=()=>evaluate("Array.from(document.querySelectorAll('#comparison-scale tbody tr')).filter(row=>!row.hidden).length");
+  assert.equal(await comparedRows(),35);
+  assert.equal(await evaluate("typeof window.SEARCH_INDEX"),'undefined');
+  assert.ok(await noOverflow());
+  await snapshot('benchmark-comparison-desktop');
+  await setValue('#comparison-query','PARTNR');
+  assert.equal(await comparedRows(),3);
+  assert.ok(await evaluate("document.querySelector('#comparison-scale [data-comparison-row=\"partnr\"]').textContent.includes('100,000')"));
+  await setValue('#comparison-query','');
+  await setValue('#comparison-group','human_transfer');
+  assert.equal(await comparedRows(),5);
+  await evaluate("document.getElementById('comparison-view-domains').click()");
+  assert.equal(await evaluate("document.getElementById('comparison-panel-domains').hidden"),false);
+  assert.equal(await evaluate("document.querySelectorAll('#comparison-domains thead th').length"),13);
+  await snapshot('benchmark-domains-desktop');
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&window.ROBOT_SITE.locale==='zh-hans'");
+  assert.equal(await evaluate("document.getElementById('comparison-group').value"),'human_transfer');
+  assert.equal(await evaluate("document.getElementById('comparison-panel-domains').hidden"),false);
+  assert.equal(await comparedRows(),5);
+  await evaluate("document.getElementById('comparison-pin').click()");
+  assert.equal(await comparedRows(),3);
+  await setValue('#comparison-query','zz-no-comparison');
+  assert.equal(await comparedRows(),0);
+  assert.equal(await evaluate("document.getElementById('comparison-empty').hidden"),false);
+  await go('zh-hant/compare.html?group=human_transfer#benchmark-behavior');
+  assert.equal(await evaluate("document.getElementById('benchmark-behavior').open"),true);
+  assert.equal(await evaluate("document.getElementById('benchmark-behavior').hidden"),false);
+  pass('Benchmark comparison matrices','35 rows, separate native units, 12 domain columns, research filters, pinned plan/current rows, cross-language state, empty results and source deep links work.');
+
   await go('zh-hant/scale-plan.html');
   assert.ok(await evaluate("document.querySelector('#main-content').textContent.includes('2,000–3,000')"));
   assert.ok(await noOverflow());
@@ -209,6 +240,12 @@ try{
   await evaluate("document.getElementById('capacity-explorer').scrollIntoView({behavior:'instant',block:'center'})");
   assert.ok(await noOverflow());
   await snapshot('capacity-planner-mobile');
+  await go('zh-hant/compare.html?group=human_transfer');
+  assert.ok(await noOverflow());
+  await evaluate("document.getElementById('comparison-panel-scale').scrollIntoView({behavior:'instant',block:'start'})");
+  await snapshot('benchmark-comparison-mobile');
+  await evaluate("document.getElementById('comparison-view-features').click()");
+  assert.ok(await noOverflow());
   pass('Mobile layout and menu','390px homepage, chapter and task pages have no document-level horizontal overflow.');
 
   await viewport(320,900,true);
@@ -217,6 +254,8 @@ try{
   await go('zh-hans/scale-plan.html');
   assert.ok(await noOverflow());
   await go('zh-hans/design.html');
+  assert.ok(await noOverflow());
+  await go('zh-hans/compare.html');
   assert.ok(await noOverflow());
   await viewport(1024,900);
   await go('zh-hant/design.html');
@@ -229,8 +268,11 @@ try{
   await waitFor("document.readyState==='complete'&&document.querySelectorAll('[data-entry]').length===180");
   assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-entry]')).filter(e=>getComputedStyle(e).display!=='none').length"),180);
   assert.ok(await evaluate("document.querySelector('[data-catalogue]').getBoundingClientRect().width>800"),'No-JavaScript reading should use the available content width.');
+  await cdp.send('Page.navigate',{url:new URL('zh-hant/compare.html',BASE).href});
+  await waitFor("document.readyState==='complete'&&document.querySelectorAll('#comparison-scale tbody tr').length===35");
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-comparison-panel]')).filter(panel=>getComputedStyle(panel).display!=='none').length"),4);
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
-  pass('Reading without JavaScript','All 180 pre-rendered task cards remain available without scripts.');
+  pass('Reading without JavaScript','All 180 task cards and all four 35-row comparison tables remain readable without scripts.');
 
   assert.deepEqual(errors,[],'Unexpected browser runtime errors');
   const report={status:'passed',baseURL:BASE,checks,consoleErrors:errors,screenshots:await fs.readdir(screenshots)};

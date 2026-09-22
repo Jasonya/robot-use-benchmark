@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
 import * as OpenCC from 'opencc-js';
+import {renderComparisonPage} from './comparison-page.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -80,10 +81,12 @@ const [overallPlan, overallSpecHTML] = await Promise.all([
   fs.readFile(path.join(DESIGN_DIR, 'overall_design_plan.json'), 'utf8').then(JSON.parse),
   fs.readFile(path.join(DESIGN_DIR, 'OVERALL_DESIGN_V0_4.html'), 'utf8')
 ]);
+const COMPARISON_DIR = path.join(CONTENT, 'benchmark_comparison');
+const comparisonModel = JSON.parse(await fs.readFile(path.join(COMPARISON_DIR, 'benchmark_matrix.json'), 'utf8'));
 const sourceInfoById = Object.fromEntries(sourceReports.map(source => [source.id, source]));
 const assetHasher=crypto.createHash('sha256');
-assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,sourceStats,sourceReports,sections,tasks,papers}));
-for(const name of ['scripts/build.mjs','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js']){
+assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,comparisonModel,sourceStats,sourceReports,sections,tasks,papers}));
+for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
 const assetRevision=assetHasher.digest('hex').slice(0,12);
@@ -237,7 +240,7 @@ const pdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/ful
 function navHTML(route, locale) {
   const links = [
     ['design.html','整體設計',route==='design.html'],
-    ['scale-plan.html','規模與比較',route==='scale-plan.html'],
+    ['compare.html','Benchmark 比較',route==='compare.html'||route==='scale-plan.html'],
     ['native-tasks.html','來源任務庫',route==='native-tasks.html'],
     ['chapters/index.html','章節閱讀',route.startsWith('chapters/')],
     ['explore/tasks.html','情境種子',route.startsWith('explore/')],
@@ -281,6 +284,7 @@ function shell({route,locale,title,description,body,kind='page'}) {
   ${LOCALES.map(lang=>`<link rel="alternate" hreflang="${lang==='zh-hant'?'zh-Hant':'zh-Hans'}" href="${config.siteUrl}/${lang}/${route}">`).join('')}
   <meta property="og:type" content="website"><meta property="og:title" content="${t(title,locale)} · Robot-use Benchmark"><meta property="og:description" content="${t(description,locale)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="${relative(current,'assets/favicon.svg')}" type="image/svg+xml"><link rel="stylesheet" href="${relative(current,'assets/site.css')}?v=${assetRevision}">
+${route==='compare.html'?`<link rel="stylesheet" href="${relative(current,'assets/comparison.css')}?v=${assetRevision}"><script defer src="${relative(current,'assets/comparison.js')}?v=${assetRevision}"></script>`:''}
   <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE=${jsonSafe(jsConfig)};</script>
   ${route==='native-tasks.html'?`<script defer src="${relative(current,'assets/native-source-data.js')}?v=${assetRevision}"></script><script defer src="${relative(current,'assets/native-browser.js')}?v=${assetRevision}"></script>`:''}<script defer src="${relative(current,'assets/site.js')}?v=${assetRevision}"></script></head>
   <body><a class="skip-link" href="#main-content">${t('跳至主要內容',locale)}</a>${navHTML(route,locale)}${body}${footerHTML(route,locale)}
@@ -353,7 +357,7 @@ function overallDesignPage(locale){
     <div class="page-meta"><span>${config.designDate}</span><span class="pill status">${t('研發目標提案 · 尚未達成',locale)}</span><span>${t('模擬環境',locale)}</span></div>
     <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul><li>${t('全庫初始目標 2,000–3,000 種獨立任務；任務數與有效覆蓋各以至少最大可比基準 2 倍為目標。',locale)}</li><li>${t('12 個核心場域各提出 100 個有效任務綁定、8 個家族、3 類機制的最低支撐量。',locale)}</li><li>${t('同一任務換場域或機體，增加覆蓋、實例和實作量；全球 G2 只計一次。',locale)}</li></ul></div>
     <ol class="design-flow" aria-label="${t('整體建置流程',locale)}">${steps.map(([id,title,text])=>`<li><small>${id}</small><b>${t(title,locale)}</b><span>${t(text,locale)}</span></li>`).join('')}</ol>
-    <div class="cta-row"><a class="button" href="#design-section-3">${t('看目標與共同門檻',locale)} ↓</a><a class="button secondary" href="${routeLink(route,'scale-plan.html',locale)}">${t('查前作規模與來源',locale)} →</a></div>
+    <div class="cta-row"><a class="button" href="#design-section-3">${t('看目標與共同門檻',locale)} ↓</a><a class="button secondary" href="${routeLink(route,'compare.html',locale)}">${t('前作 × 領域／場景／題數比較',locale)} →</a></div>
     <div class="prose">${content}</div>${capacityExplorer(locale)}
     <div class="reader-actions"><button class="text-button copy-link">${t('複製本頁連結',locale)}</button><button class="text-button print-page">${t('列印本頁',locale)}</button><a class="text-button" href="${downloads}/OVERALL_DESIGN_V0_4.md" download>${t('下載完整設計',locale)}</a><a class="text-button" href="${downloads}/breadth_quota_template.csv" download>${t('下載 12 場域配額表',locale)}</a><a class="text-button" href="${downloads}/overall_design_plan.json" download>${t('下載計畫 JSON',locale)}</a></div>
     </main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}<a href="#capacity-explorer">${t('互動題量估算',locale)}</a></aside></div>`;
@@ -373,7 +377,7 @@ function scalePlanPage(locale){
   <p class="lede">${t('這裡保留 v0.3 規模方案和來源盤點證據。v0.4 已把廣度配額、執行綁定與整體架構統整成新版設計。',locale)}</p>${scopeNotice(route,locale)}
   <div class="scale-target-grid"><div><strong>2,000–3,000</strong><span>${t('正規化 G2 任務：初始研發目標',locale)}</span></div><div><strong>≥ 2×</strong><span>${t('最大可比基準：相對驗收門檻',locale)}</span></div><div><strong>${sourceStats.source_records.toLocaleString('en-US')}</strong><span>${t('原生來源紀錄：未完成跨作去重',locale)}</span></div><div><strong>0</strong><span>${t('已驗證測例／實際模擬執行',locale)}</span></div></div>
   <p class="source-note">${t('目前是規模優先的設計與來源盤點，尚未證明領先。2× 的分母要在共同 ontology、task kind、scope 和版本下正規化；若對照規模更大，目標也上調。',locale)}</p>
-  <div class="cta-row"><a class="button" href="${routeLink(route,'appendices/comparison.html',locale)}">${t('前作原生規模比較表',locale)} →</a><a class="button secondary" href="${routeLink(route,'chapters/05.html',locale)}">${t('領域、規模與增量比較',locale)}</a><a class="button secondary" href="${routeLink(route,'native-tasks.html',locale)}">${t('探索完整來源紀錄',locale)}</a><a class="button secondary" href="${downloads}/native_source_inventory.csv" download>${t('下載來源 CSV',locale)}</a></div>
+  <div class="cta-row"><a class="button" href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數總表',locale)} →</a><a class="button secondary" href="${routeLink(route,'appendices/comparison.html',locale)}">${t('原生規模查核附錄',locale)}</a><a class="button secondary" href="${routeLink(route,'native-tasks.html',locale)}">${t('探索完整來源紀錄',locale)}</a><a class="button secondary" href="${downloads}/native_source_inventory.csv" download>${t('下載來源 CSV',locale)}</a></div>
   <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本頁連結',locale)}</button><button class="text-button print-page">${t('列印本頁',locale)}</button><a class="text-button" href="${downloads}/SCALE_FIRST_SPEC_V0_3.md">${t('下載設計原稿',locale)}</a></div>
   </main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
   return shell({route,locale,title:'規模比較與來源查核',description:'保留 v0.3 規模提案與完整來源盤點，並連結 v0.4 的數量／廣度共同驗收設計。',body});
@@ -426,7 +430,7 @@ function nativePage(locale){
 function chapterNav(route,locale) {
   const chapterLinks=chapters.map(s=>`<a href="${routeLink(route,chapterRoute(s),locale)}"${route===chapterRoute(s)?' class="active" aria-current="page"':''}><span>${s.id.slice(1)}</span>${t(s.title,locale)}</a>`).join('');
   const extras=[['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['library.html','168 篇文獻'],['appendices/methods.html','來源與資料字典']];
-  return `<div class="sidebar-label">${t('v0.4 整體設計',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模比較與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
+  return `<div class="sidebar-label">${t('v0.4 整體設計',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模方案與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
 }
 function readingPage(section,locale) {
   const route=chapterRoute(section);
@@ -447,6 +451,7 @@ function readingPage(section,locale) {
   let content=transform(`<section id="${section.id}">${sourceHTML}</section>`,locale,route);
   const currentNote=scopeNotice(route,locale);
   if(['c01','c03','c05','c06','c12','c14'].includes(section.id))content=currentNote+content;
+  if(section.id==='c05')content=`<div class="scope-notice"><b>${t('直接看每個 benchmark 的差別',locale)}</b><p>${t('新版比較總表以 benchmark 為列，領域、場景、任務種類、題數、材料、機體和影片為欄；33 項前作與我們的目標／實績並排。',locale)}</p><a href="${routeLink(route,'compare.html',locale)}">${t('開啟橫向比較矩陣',locale)} →</a></div>`+content;
   if(['c11','c13'].includes(section.id)){
     const current=section.id==='c11'?designSections([3,9],locale,route,'updated-budget'):designSections([10,11,12],locale,route,'updated-milestones');
     const legacy=content.replace(`id="${section.id}"`,`id="legacy-${section.id}"`);
@@ -586,7 +591,7 @@ function homePage(locale){
   const body=`<main id="main-content"><div class="wrap">
   <section class="hero"><div><div class="eyebrow">${t('大規模 × 廣覆蓋 · v0.4 · All-in-one',locale)}</div><h1>${t('更多獨立任務，',locale)}<br><em>${t('更廣評測覆蓋。',locale)}</em></h1>
   <p class="lede">${t('大型機器人任務庫、具體廣度配額與一套評測平台。全庫初始目標為 2,000–3,000 種獨立任務；任務數與有效覆蓋，各以至少最大可比基準 2 倍為目標。',locale)}</p>
-  <div class="cta-row"><a class="button" href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計',locale)} <span class="arrow">→</span></a><a class="button secondary" href="${routeLink(route,'scale-plan.html',locale)}">${t('查看前作與規模比較',locale)}</a></div>
+  <div class="cta-row"><a class="button" href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計',locale)} <span class="arrow">→</span></a><a class="button secondary" href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／題數比較',locale)}</a></div>
   <p class="note">${t(`已盤點 ${sourceStats.source_repositories_pinned} 個官方程式庫、${sourceStats.source_snapshots_pinned} 個版本來源，共 ${sourceStats.source_records.toLocaleString('en-US')} 筆原生紀錄。`,locale)}<br>${t('規模為研發目標；來源紀錄尚未完成 G2 去重，正式模擬驗證仍為 0。',locale)}</p></div>
   <div class="hero-visual"><div class="visual-top"><span>ONE SCENE. TWO GOALS.</span><span class="visual-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
   <span class="demo-label">${t('用一條毛巾，理解這個 benchmark',locale)}</span><div class="demo-title">${t('示範變了，目標也跟著變。',locale)}</div>
@@ -655,6 +660,10 @@ function searchPage(locale){
 }
 function searchData(locale){
   const result=[];
+  for(const row of comparisonModel.rows){
+    const content=[row.name,row.domain,row.scenes,row.tasks,row.cases,row.materials,row.observation,row.difference].join(' ');
+    result.push({kind:'reference',title:translate('比較｜'+row.name,locale),path:`compare.html#benchmark-${row.id}`,summary:translate(row.tasks+'；'+row.scenes,locale),search:tc(content)+' '+sc(tc(content))+' benchmark comparison 比較 比较'});
+  }
   for(const chapter of chapters){
     result.push({kind:'chapter',title:translate(`${chapter.id.slice(1)} · ${chapter.title}`,locale),path:chapterRoute(chapter),summary:translate(descriptions[chapter.id],locale),search:tc(chapter.title+' '+plain(chapter.html))+' '+sc(tc(chapter.title+' '+plain(chapter.html)))});
   }
@@ -702,6 +711,7 @@ for(const locale of LOCALES){
   await write(`${locale}/glossary.html`,glossaryPage(locale));
   await write(`${locale}/search.html`,searchPage(locale));
   await write(`${locale}/design.html`,overallDesignPage(locale));
+  await write(`${locale}/compare.html`,renderComparisonPage(locale,comparisonModel,{t,escape,translate,relative,routeLink,head,shell}));
   await write(`${locale}/scale-plan.html`,scalePlanPage(locale));
   await write(`${locale}/native-tasks.html`,nativePage(locale));
   const data=searchData(locale);
@@ -724,6 +734,9 @@ for(const filename of ['SCALE_FIRST_SPEC_V0_3.md','SOURCE_INVENTORY_REPORT.md','
 }
 for(const filename of ['OVERALL_DESIGN_V0_4.md','overall_design_plan.json','breadth_quota_template.csv','design_validation.json']){
   await write(`downloads/overall-design/${filename}`,await fs.readFile(path.join(DESIGN_DIR,filename)));
+}
+for(const filename of ['benchmark_matrix.json','benchmark_matrix.csv','benchmark_domains_matrix.csv','benchmark_features_matrix.csv','BENCHMARK_COMPARISON.md','source_verification.json','matrix_validation.json']){
+  await write(`downloads/benchmark-comparison/${filename}`,await fs.readFile(path.join(COMPARISON_DIR,filename)));
 }
 const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
 const scaleRoot=rootHtml
