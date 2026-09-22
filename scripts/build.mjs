@@ -251,6 +251,7 @@ function footerHTML(route, locale) {
 }
 const strings = {
   copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
+  searchLoading:'正在載入搜尋索引…',searchLoadFailed:'搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。',
   searchHint:'可搜尋章節、物件、論文名称或 ID，例如「摺衣」「记忆」「SC-H15」「Ego4D」。',
   noSearch:'沒有找到結果，試試較短的關鍵字或 ID。',showing:'顯示',records:'筆',allShown:'已顯示全部',
   paginate:'分頁顯示',showAll:'顯示全部',shareResults:'複製目前篩選的連結',continueReading:'繼續上次閱讀',
@@ -267,7 +268,7 @@ const allPageRecords = [];
 function shell({route,locale,title,description,body,kind='page'}) {
   const current = `${locale}/${route}`;
   const canonical = `${config.siteUrl}/${current}`;
-  const jsConfig={locale,route,title:translate(title,locale),kind,localeRoot:relative(current,`${locale}/index.html`).replace(/index\.html$/,''),text:translateObject(strings,locale)};
+  const jsConfig={locale,route,title:translate(title,locale),kind,localeRoot:relative(current,`${locale}/index.html`).replace(/index\.html$/,''),searchIndexURL:relative(current,`assets/search-${locale}.js`)+`?v=${assetRevision}`,text:translateObject(strings,locale)};
   allPageRecords.push({route,locale,title:translate(title,locale),file:current});
   return `<!doctype html><html lang="${locale==='zh-hant'?'zh-Hant':'zh-Hans'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${t(title,locale)} · Robot-use Benchmark</title>
   <meta name="description" content="${t(description,locale)}"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="${canonical}">
@@ -275,7 +276,7 @@ function shell({route,locale,title,description,body,kind='page'}) {
   <meta property="og:type" content="website"><meta property="og:title" content="${t(title,locale)} · Robot-use Benchmark"><meta property="og:description" content="${t(description,locale)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="${relative(current,'assets/favicon.svg')}" type="image/svg+xml"><link rel="stylesheet" href="${relative(current,'assets/site.css')}?v=${assetRevision}">
   <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE=${jsonSafe(jsConfig)};</script>
-  <script defer src="${relative(current,`assets/search-${locale}.js`)}?v=${assetRevision}"></script>${route==='native-tasks.html'?`<script defer src="${relative(current,'assets/native-source-data.js')}?v=${assetRevision}"></script><script defer src="${relative(current,'assets/native-browser.js')}?v=${assetRevision}"></script>`:''}<script defer src="${relative(current,'assets/site.js')}?v=${assetRevision}"></script></head>
+  ${route==='native-tasks.html'?`<script defer src="${relative(current,'assets/native-source-data.js')}?v=${assetRevision}"></script><script defer src="${relative(current,'assets/native-browser.js')}?v=${assetRevision}"></script>`:''}<script defer src="${relative(current,'assets/site.js')}?v=${assetRevision}"></script></head>
   <body><a class="skip-link" href="#main-content">${t('跳至主要內容',locale)}</a>${navHTML(route,locale)}${body}${footerHTML(route,locale)}
   <dialog class="search-dialog" id="global-search" aria-label="${t('搜尋整個網站',locale)}"><div class="dialog-search-head">${icon('search')}<input id="global-search-input" type="search" autocomplete="off" placeholder="${t('搜尋章節、任務或文獻…',locale)}" aria-label="${t('關鍵字',locale)}" aria-describedby="global-search-help"><button id="close-search" aria-label="${t('關閉搜尋',locale)}">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
   <div id="toast" class="toast" role="status" hidden></div></body></html>`;

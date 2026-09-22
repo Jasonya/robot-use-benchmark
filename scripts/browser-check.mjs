@@ -40,7 +40,7 @@ try{
     if(result.exceptionDetails)throw new Error(result.exceptionDetails.exception?.description||result.exceptionDetails.text);
     return result.result?.value;
   };
-  async function waitFor(expression,timeout=15000){
+  async function waitFor(expression,timeout=30000){
     const until=Date.now()+timeout;
     while(Date.now()<until){if(await evaluate(expression))return;await sleep(80);}
     throw new Error('Timed out waiting for '+expression);
@@ -68,6 +68,7 @@ try{
   await go('zh-hant/index.html');
   assert.equal(await evaluate("document.documentElement.lang"),'zh-Hant');
   assert.ok(await noOverflow());
+  assert.equal(await evaluate("typeof window.SEARCH_INDEX"),'undefined','Ordinary reading should not download the full search index.');
   await snapshot('home-traditional-desktop');
   await evaluate("document.querySelector('[data-demo-goal=\"b\"]').click()");
   assert.equal(await evaluate("document.querySelector('#towel-fold-b').getAttribute('visibility')"),'visible');
@@ -76,6 +77,7 @@ try{
 
   await evaluate("document.querySelector('.search-trigger').click()");
   await setValue('#global-search-input','记忆');
+  await waitFor("document.querySelectorAll('#global-search-results .search-result').length>0",45000);
   assert.ok(await evaluate("document.querySelectorAll('#global-search-results .search-result').length>0"));
   assert.equal(await evaluate('document.activeElement.id'),'global-search-input');
   await evaluate("document.querySelector('#close-search').click()");
@@ -132,6 +134,7 @@ try{
   pass('Full chapter reading','Chapter summary, source content, sticky navigation and wide-table containment render.');
 
   await go('zh-hans/search.html?q=SC-H15');
+  await waitFor("document.querySelectorAll('#site-search-results .search-result').length>0",45000);
   assert.ok(await evaluate("document.querySelectorAll('#site-search-results .search-result').length>0"));
   pass('Standalone search','Search URLs are directly shareable and searchable by stable IDs.');
 

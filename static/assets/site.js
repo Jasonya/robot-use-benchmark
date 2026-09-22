@@ -62,7 +62,33 @@
   const searchResults = $('#global-search-results');
   const searchHelp = $('#global-search-help');
   let lastFocus = null;
-  const searchIndex = window.SEARCH_INDEX || [];
+  let searchIndex = window.SEARCH_INDEX || [];
+  let searchPromise = null;
+  const searchSequences = new WeakMap();
+  function ensureSearchIndex() {
+    if (Array.isArray(window.SEARCH_INDEX)) {
+      searchIndex = window.SEARCH_INDEX;
+      return Promise.resolve();
+    }
+    if (searchPromise) return searchPromise;
+    searchPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = config.searchIndexURL;
+      script.async = true;
+      script.onload = () => {
+        if (!Array.isArray(window.SEARCH_INDEX)) {
+          searchPromise = null;
+          reject(new Error('Invalid search index'));
+          return;
+        }
+        searchIndex = window.SEARCH_INDEX;
+        resolve();
+      };
+      script.onerror = () => { searchPromise = null; script.remove(); reject(new Error('Search index unavailable')); };
+      document.head.append(script);
+    });
+    return searchPromise;
+  }
   function resultsFor(query) {
     const terms = normalize(query).split(' ').filter(Boolean);
     if (!terms.length) return searchIndex.filter(entry => entry.kind === 'chapter').slice(0, 6);
@@ -74,8 +100,18 @@
       return { ...entry, score };
     }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 60);
   }
-  function renderSearch(query, output, help) {
+  async function renderSearch(query, output, help) {
     if (!output) return;
+    const sequence = (searchSequences.get(output) || 0) + 1;
+    searchSequences.set(output, sequence);
+    if (!searchIndex.length && help) help.textContent = text.searchLoading;
+    try {
+      await ensureSearchIndex();
+    } catch {
+      if (searchSequences.get(output) === sequence && help) help.textContent = text.searchLoadFailed;
+      return;
+    }
+    if (searchSequences.get(output) !== sequence) return;
     const matches = resultsFor(query);
     output.replaceChildren();
     if (help) help.textContent = normalize(query) ? `${text.searchMatches} ${matches.length}${matches.length === 60 ? '+' : ''}` : text.searchHint;
