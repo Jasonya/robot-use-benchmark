@@ -1,0 +1,25 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"urn:robot-use:evidence-cell:0.1",
+  "title":"Review completion and support strength are distinct",
+  "type":"object",
+  "required":["work_id","axis","axis_value","review_state","support_state","scope_checked","evidence_statement","sources","review_method","limitations"],
+  "properties":{
+    "work_id":{"type":"string"},
+    "axis":{"enum":["application_context","common_family","mechanism","material","observation","evaluation_feature"]},
+    "axis_value":{"type":"string"},
+    "review_state":{"enum":["unreviewed","machine_indexed","reviewed_primary_overview","reviewed_specific_definition","runtime_replayed","independently_reviewed"]},
+    "support_state":{"enum":["explicit_source_claim","task_definition_supported","instance_trace_supported","partial_or_adjacent","data_only","not_an_endpoint","not_determined_from_reviewed_scope"]},
+    "scope_checked":{"type":"string","minLength":1},
+    "evidence_statement":{"type":"string","minLength":1},
+    "sources":{"type":"array","items":{"type":"object","required":["url","version_or_snapshot","locator"],"properties":{"url":{"type":"string"},"version_or_snapshot":{"type":"string"},"locator":{"type":"string"},"content_sha256":{"type":["string","null"]},"character_start":{"type":["integer","null"],"minimum":0},"character_end":{"type":["integer","null"],"minimum":0}}}},
+    "review_method":{"enum":["not_reviewed","automated_source_index","single_model_assisted_review","independent_human_review","independent_implementation_check","runtime_replay"]},
+    "limitations":{"type":"array","items":{"type":"string"}},
+    "counts_as_validated_coverage_cell":{"type":"boolean"},
+    "validated_cell_support":{"type":"object","required":["canonical_g2_ids","distinct_valid_instance_ids","reset_evidence","expert_evidence","evaluator_evidence"],"properties":{"canonical_g2_ids":{"type":"array","minItems":1,"uniqueItems":true},"distinct_valid_instance_ids":{"type":"array","minItems":3,"uniqueItems":true},"reset_evidence":{"type":"array","minItems":1},"expert_evidence":{"type":"array","minItems":1},"evaluator_evidence":{"type":"array","minItems":1}}}
+  },
+  "allOf":[
+    {"if":{"properties":{"review_state":{"not":{"const":"unreviewed"}}}},"then":{"properties":{"sources":{"minItems":1}}}},
+    {"if":{"properties":{"counts_as_validated_coverage_cell":{"const":true}},"required":["counts_as_validated_coverage_cell"]},"then":{"required":["validated_cell_support"],"properties":{"support_state":{"const":"instance_trace_supported"}}}}
+  ]
+}

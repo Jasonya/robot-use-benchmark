@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "robot-use-benchmark-runtime"
+version = "0.2.0"
+description = "Typed native-task adapters, reproducible execution traces and evidence validation for Robot-use Benchmark."
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "metaworld==3.1.1",
+  "mujoco==3.3.0",
+  "gymnasium[mujoco]==1.3.0",
+  "numpy>=2.0",
+  "jsonschema>=4.23"
+]
+
+[project.scripts]
+robot-use-run = "robot_use_runtime.run_metaworld:main"
+robot-use-validate = "robot_use_runtime.validate_runs:main"
+robot-use-train-bc = "robot_use_runtime.train_bc:main"
+
+[project.optional-dependencies]
+training = ["scikit-learn==1.9.1"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/robot_use_runtime"]

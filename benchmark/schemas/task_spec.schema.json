@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:robot-use:task-spec:0.1",
+  "title": "Explicit authored task specification; schema validity is not release validation",
+  "type": "object",
+  "required": ["schema_version","task_kind","roles","goal_program","reference_program","required_process","required_mechanisms","completion_semantics","primary_family","status","source_provenance"],
+  "properties": {
+    "schema_version": {"const":"task-spec-0.1"},
+    "task_kind": {"enum":["external_work","motor_diagnostic","active_information","video_qa","forecasting","world_model"]},
+    "roles": {"type":"object","minProperties":1,"additionalProperties":{"type":"object","required":["functional_type"],"properties":{"functional_type":{"type":"string","minLength":1},"binding_scope":{"enum":["task_required","instance_parameter"]}}}},
+    "goal_program": {"type":"object","required":["language","expression"],"properties":{"language":{"type":"string","minLength":1},"expression":{"type":["array","object"]}}},
+    "reference_program": {"type":"object","required":["kind"],"properties":{"kind":{"enum":["given_binding","relational_selector","history_lookup","digital_lookup","observation_conditioned","unresolved"]}}},
+    "required_process": {"type":"array","items":{"type":"object","required":["constraint","justification"],"properties":{"constraint":{"type":["array","object"]},"justification":{"type":"string","minLength":1}}}},
+    "required_mechanisms": {"type":"array","uniqueItems":true,"items":{"enum":["K01","K02","K03","K04","K05","K06","K07","K08","K09"]}},
+    "completion_semantics": {"type":"object","required":["success_definition","termination_rule"],"properties":{"success_definition":{"type":"string","minLength":1},"termination_rule":{"type":"string","minLength":1}}},
+    "primary_family": {"enum":["CF01","CF02","CF03","CF04","CF05","CF06","CF07","CF08","CF09","CF10","CF11","CF12","CF13","CF14","CF15","CF16"]},
+    "status": {"enum":["authored","source_reviewed","equivalence_adjudicated","execution_verified","release_verified"]},
+    "source_provenance": {"type":"array","items":{"type":"object","required":["source_id","version","locator"],"properties":{"source_id":{"type":"string"},"version":{"type":"string"},"locator":{"type":"string"}}}},
+    "canonical_equivalence_status": {"enum":["unresolved","single_reviewer_adjudicated","independently_adjudicated"]},
+    "execution_evidence": {"type":"array","items":{"type":"object","required":["instance_id","contract_hash","trace_hash","expert_solvable","evaluator_validated"],"properties":{"instance_id":{"type":"string"},"contract_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},"trace_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},"expert_solvable":{"type":"boolean"},"evaluator_validated":{"type":"boolean"}}}},
+    "official_scoring_allowed": {"type":"boolean"}
+  },
+  "allOf": [
+    {
+      "if":{"properties":{"official_scoring_allowed":{"const":true}},"required":["official_scoring_allowed"]},
+      "then":{
+        "properties":{
+          "status":{"const":"release_verified"},
+          "canonical_equivalence_status":{"enum":["single_reviewer_adjudicated","independently_adjudicated"]},
+          "reference_program":{"properties":{"kind":{"not":{"const":"unresolved"}}}},
+          "execution_evidence":{"minItems":1,"items":{"properties":{"expert_solvable":{"const":true},"evaluator_validated":{"const":true}}}}
+        },
+        "required":["canonical_equivalence_status","execution_evidence"]
+      }
+    }
+  ]
+}

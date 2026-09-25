@@ -123,8 +123,11 @@ try{
   assert.ok(await evaluate("Array.from(document.querySelectorAll('[data-entry]')).some(e=>!e.hidden&&e.id==='P013')"));
   await setValue('#filter-q','');
   await setValue('#filter-evidence','E2');
-  assert.ok((await evaluate("document.querySelector('#result-count').textContent")).includes('/ 55'));
-  pass('Literature filters','Ego4D is discoverable; 50 original plus 5 supplementary full-abstract records total 55.');
+  assert.ok((await evaluate("document.querySelector('#result-count').textContent")).includes('/ 137'));
+  await setValue('#filter-evidence','');
+  await setValue('#filter-q','Bench2Dex');
+  assert.equal(await visibleCount(),1);
+  pass('Literature filters','Original and added sources are discoverable; 137 complete-abstract records remain separate from metadata-only records.');
 
   await go('zh-hant/chapters/03.html');
   assert.ok(await evaluate("document.querySelector('h1').textContent.includes('granularity')"));
@@ -158,8 +161,8 @@ try{
 
   await go('zh-hant/readiness.html');
   assert.equal(await evaluate("document.querySelectorAll('[data-audit-gap]').length"),15);
-  assert.equal(await evaluate("document.querySelector('[data-audit-stat=\"domain-unknown\"]').textContent"),'83.3%');
-  assert.equal(await evaluate("document.querySelector('[data-audit-stat=\"feature-unknown\"]').textContent"),'67.3%');
+  assert.equal(await evaluate("document.querySelector('[data-audit-stat=\"domain-unknown\"]').textContent"),'90.2%');
+  assert.equal(await evaluate("document.querySelector('[data-audit-stat=\"feature-unknown\"]').textContent"),'69.6%');
   assert.ok(await noOverflow());
   await snapshot('readiness-audit-desktop');
   await go('zh-hant/readiness.html#gap-14');
@@ -170,10 +173,31 @@ try{
   assert.equal(await evaluate("location.hash"),'#gap-14');
   pass('Readiness audit and evidence gaps','Metadata backlog percentages are separate from benchmark coverage; 15 gap records, source links and Traditional/Simplified deep links render.');
 
+  await go('zh-hant/execution.html');
+  assert.equal(await evaluate("document.querySelectorAll('#execution-method-summary tbody tr').length"),5);
+  assert.equal(await evaluate("document.querySelectorAll('#execution-native-task-table tbody tr').length"),50);
+  assert.ok(await evaluate("document.querySelector('#execution-method-summary').textContent.includes('65.6%')"));
+  assert.ok(await evaluate("document.querySelector('#main-content').textContent.includes('1,250')"));
+  assert.ok(await noOverflow());
+  await snapshot('execution-desktop');
+  await evaluate("document.querySelector('video').load()");
+  await waitFor("document.querySelector('video').readyState>=1",45000);
+  assert.equal(await evaluate("document.querySelector('video').error"),null);
+  assert.ok(await evaluate("document.querySelector('video').videoWidth>0"));
+  pass('Native execution and actual video','All 50 tasks and five methods render; the saved-action replay video decodes successfully.');
+
+  await go('zh-hans/research.html');
+  assert.equal(await evaluate("document.querySelectorAll('#research-category-table tbody tr').length"),12);
+  assert.equal(await evaluate("document.querySelectorAll('#research-additions-table tbody tr').length"),82);
+  assert.ok(await evaluate("document.querySelector('#main-content').textContent.includes('588')"));
+  assert.ok(await noOverflow());
+  await snapshot('research-desktop');
+  pass('Research update and scope','250-record corpus, 82 additions, category distribution and unreviewed-candidate limits are displayed separately.');
+
   await go('zh-hant/compare.html');
-  assert.ok(await evaluate("document.getElementById('comparison-review-status').textContent.includes('330／396')"));
+  assert.ok(await evaluate("document.getElementById('comparison-review-status').textContent.includes('736／816')"));
   const comparedRows=()=>evaluate("Array.from(document.querySelectorAll('#comparison-scale tbody tr')).filter(row=>!row.hidden).length");
-  assert.equal(await comparedRows(),35);
+  assert.equal(await comparedRows(),70);
   assert.equal(await evaluate("typeof window.SEARCH_INDEX"),'undefined');
   assert.ok(await noOverflow());
   await snapshot('benchmark-comparison-desktop');
@@ -182,7 +206,7 @@ try{
   assert.ok(await evaluate("document.querySelector('#comparison-scale [data-comparison-row=\"partnr\"]').textContent.includes('100,000')"));
   await setValue('#comparison-query','');
   await setValue('#comparison-group','human_transfer');
-  assert.equal(await comparedRows(),5);
+  assert.equal(await comparedRows(),7);
   await evaluate("document.getElementById('comparison-view-domains').click()");
   assert.equal(await evaluate("document.getElementById('comparison-panel-domains').hidden"),false);
   assert.equal(await evaluate("document.querySelectorAll('#comparison-domains thead th').length"),13);
@@ -191,16 +215,16 @@ try{
   await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&window.ROBOT_SITE.locale==='zh-hans'");
   assert.equal(await evaluate("document.getElementById('comparison-group').value"),'human_transfer');
   assert.equal(await evaluate("document.getElementById('comparison-panel-domains').hidden"),false);
-  assert.equal(await comparedRows(),5);
+  assert.equal(await comparedRows(),7);
   await evaluate("document.getElementById('comparison-pin').click()");
-  assert.equal(await comparedRows(),3);
+  assert.equal(await comparedRows(),5);
   await setValue('#comparison-query','zz-no-comparison');
   assert.equal(await comparedRows(),0);
   assert.equal(await evaluate("document.getElementById('comparison-empty').hidden"),false);
   await go('zh-hant/compare.html?group=human_transfer#benchmark-behavior');
   assert.equal(await evaluate("document.getElementById('benchmark-behavior').open"),true);
   assert.equal(await evaluate("document.getElementById('benchmark-behavior').hidden"),false);
-  pass('Benchmark comparison matrices','35 rows, separate native units, 12 domain columns, research filters, pinned plan/current rows, cross-language state, empty results and source deep links work.');
+  pass('Benchmark comparison matrices','70 rows, separate native units, 12 domain columns, research filters, pinned plan/current rows, cross-language state, empty results and source deep links work.');
 
   await go('zh-hant/scale-plan.html');
   assert.ok(await evaluate("document.querySelector('#main-content').textContent.includes('2,000–3,000')"));
@@ -289,10 +313,10 @@ try{
   assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-entry]')).filter(e=>getComputedStyle(e).display!=='none').length"),180);
   assert.ok(await evaluate("document.querySelector('[data-catalogue]').getBoundingClientRect().width>800"),'No-JavaScript reading should use the available content width.');
   await cdp.send('Page.navigate',{url:new URL('zh-hant/compare.html',BASE).href});
-  await waitFor("document.readyState==='complete'&&document.querySelectorAll('#comparison-scale tbody tr').length===35");
+  await waitFor("document.readyState==='complete'&&document.querySelectorAll('#comparison-scale tbody tr').length===70");
   assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-comparison-panel]')).filter(panel=>getComputedStyle(panel).display!=='none').length"),4);
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
-  pass('Reading without JavaScript','All 180 task cards and all four 35-row comparison tables remain readable without scripts.');
+  pass('Reading without JavaScript','All 180 task cards and all four 70-row comparison tables remain readable without scripts.');
 
   assert.deepEqual(errors,[],'Unexpected browser runtime errors');
   const report={status:'passed',baseURL:BASE,checks,consoleErrors:errors,screenshots:await fs.readdir(screenshots)};
