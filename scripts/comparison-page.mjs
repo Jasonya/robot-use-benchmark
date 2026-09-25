@@ -1,5 +1,5 @@
 export function renderComparisonPage(locale, model, helpers) {
-  const {t, escape, translate, relative, routeLink, head, shell} = helpers;
+  const {t, escape, translate, relative, routeLink, head, shell, auditStatistics} = helpers;
   const route = 'compare.html';
   const downloads = relative(`${locale}/${route}`, 'downloads/benchmark-comparison/');
   const short = value => value.length > 108 ? value.slice(0, 106) + '…' : value;
@@ -26,6 +26,7 @@ export function renderComparisonPage(locale, model, helpers) {
   const body=`<main id="main-content" class="comparison-main"><div class="wrap comparison-wrap">
     ${head('Benchmark 橫向比較','每列一個 benchmark，每欄一個分類：直接對照領域、場景、任務種類、實例／題數、材料、機體、影片與評測能力。',route,locale,`<div class="page-meta"><span class="pill green">33 ${t('項前作',locale)} + 2 ${t('列本計畫',locale)}</span><span>${model.as_of}</span><span>${t('原作單位保留；共同 G2 尚未完成',locale)}</span></div>`)}
     <div class="comparison-guide"><p><b>${t('先看規模總表，再切換領域與能力。',locale)}</b> ${t('我們的目標與實績分成兩列；前作的資料缺項標成「待核」。表格可以橫向捲動，點 benchmark 名稱可展開該列原文與完整說明。',locale)}</p><a href="#comparison-implications">${t('這張表對我們的設計意味著什麼',locale)} ↓</a></div>
+    <div class="source-note" id="comparison-review-status"><b>${t(`全 ${auditStatistics.comparison_prior_works} 項前作的整理待核量：`,locale)}</b> ${t(`領域 ${auditStatistics.domain_matrix.unknown_cells}／${auditStatistics.domain_matrix.total_cells} 格（${auditStatistics.domain_matrix.unknown_percent}%）；能力 ${auditStatistics.feature_matrix.unknown_cells}／${auditStatistics.feature_matrix.total_cells} 格（${auditStatistics.feature_matrix.unknown_percent}%）。這是我們的查核缺口，不是前作缺少該能力；此數量涵蓋全表，不隨下方篩選改變。`,locale)} <a href="${routeLink(route,'readiness.html',locale)}">${t('查看全部待完善事項',locale)} →</a></div>
     <section class="comparison-controls js-only" aria-label="${t('比較表篩選',locale)}">
       <label for="comparison-query">${t('找 benchmark、領域或關鍵字',locale)}<input id="comparison-query" type="search" placeholder="${t('例如 PARTNR、布料、實驗室、Ego',locale)}"></label>
       <label for="comparison-group">${t('研究類型',locale)}<select id="comparison-group"><option value="">${t('所有類型',locale)}</option>${Object.entries(model.groups).map(([id,name])=>`<option value="${id}">${t(name,locale)}</option>`).join('')}</select></label>

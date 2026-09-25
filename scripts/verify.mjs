@@ -100,7 +100,27 @@ assert.ok(comparisonData.rows.find(row=>row.id==='partnr').cases.includes('100,0
 assert.ok(comparisonData.rows.find(row=>row.id==='watchact').tasks.includes('schemas'));
 assert.equal(comparisonData.rows.find(row=>row.id==='ours-current').domain_map.D01,'zero');
 assert.equal(comparisonData.rows.find(row=>row.id==='ours-target').domain_map.D01,'planned');
+const readiness=JSON.parse(await fs.readFile(path.join(out,'downloads/readiness/readiness_audit.json'),'utf8'));
+const priorComparisons=comparisonData.rows.filter(row=>row.group!=='ours');
+for(const [field,statKey] of [['domain_map','domain_matrix'],['features','feature_matrix']]){
+  const values=priorComparisons.flatMap(row=>Object.values(row[field]));
+  assert.equal(readiness.statistics[statKey].total_cells,values.length);
+  assert.equal(readiness.statistics[statKey].unknown_cells,values.filter(value=>value==='unknown').length);
+}
+assert.equal(readiness.audit_date,config.auditDate);
+assert.equal(readiness.statistics.new_literature_search_performed,false);
+assert.equal(readiness.statistics.canonical_g2_count,null);
+assert.equal(readiness.statistics.simulator_trials,0);
+assert.equal(readiness.issues.filter(issue=>issue.status==='open').length,14);
+assert.equal(readiness.issues.find(issue=>issue.id==='GAP-14').status,'open');
+assert.equal(readiness.issues.find(issue=>issue.id==='GAP-15').status,'documentation_fixed');
 for(const locale of ['zh-hant','zh-hans']){
+  const auditPage=pages.get(path.join(out,locale,'readiness.html'));
+  assert.ok(auditPage);
+  assert.equal(auditPage.$('[data-audit-gap]').length,readiness.issues.length);
+  assert.equal(auditPage.$('#audit-gap-table tbody tr').length,readiness.issues.length);
+  assert.equal(auditPage.$('[data-audit-stat="domain-unknown"]').text(),'83.3%');
+  assert.equal(auditPage.$('[data-audit-stat="feature-unknown"]').text(),'67.3%');
   const comparisonPage=pages.get(path.join(out,locale,'compare.html'));
   assert.ok(comparisonPage);
   assert.equal(comparisonPage.$('[data-comparison-panel]').length,4);
@@ -108,6 +128,7 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(comparisonPage.$('#comparison-domains thead th').length,13);
   assert.equal(comparisonPage.$('#comparison-features thead th').length,10);
   assert.equal(comparisonPage.$('[data-comparison-evidence]').length,35);
+  assert.ok(comparisonPage.$('#comparison-review-status').text().includes('330／396'));
   const overall=pages.get(path.join(out,locale,'design.html'));
   assert.ok(overall);
   assert.equal(overall.$('#overall-design-spec h2').length,12);

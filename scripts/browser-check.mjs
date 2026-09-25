@@ -156,7 +156,22 @@ try{
   await snapshot('capacity-planner-desktop');
   pass('Overall design and planning units','Both scale and breadth gates are visible; instances and conditions change workload while the example retains 2,400 independent G2 tasks.');
 
+  await go('zh-hant/readiness.html');
+  assert.equal(await evaluate("document.querySelectorAll('[data-audit-gap]').length"),15);
+  assert.equal(await evaluate("document.querySelector('[data-audit-stat=\"domain-unknown\"]').textContent"),'83.3%');
+  assert.equal(await evaluate("document.querySelector('[data-audit-stat=\"feature-unknown\"]').textContent"),'67.3%');
+  assert.ok(await noOverflow());
+  await snapshot('readiness-audit-desktop');
+  await go('zh-hant/readiness.html#gap-14');
+  assert.equal(await evaluate("document.getElementById('gap-14').open"),true);
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&window.ROBOT_SITE.locale==='zh-hans'");
+  assert.equal(await evaluate("document.getElementById('gap-14').open"),true);
+  assert.equal(await evaluate("location.hash"),'#gap-14');
+  pass('Readiness audit and evidence gaps','Metadata backlog percentages are separate from benchmark coverage; 15 gap records, source links and Traditional/Simplified deep links render.');
+
   await go('zh-hant/compare.html');
+  assert.ok(await evaluate("document.getElementById('comparison-review-status').textContent.includes('330／396')"));
   const comparedRows=()=>evaluate("Array.from(document.querySelectorAll('#comparison-scale tbody tr')).filter(row=>!row.hidden).length");
   assert.equal(await comparedRows(),35);
   assert.equal(await evaluate("typeof window.SEARCH_INDEX"),'undefined');
@@ -240,6 +255,9 @@ try{
   await evaluate("document.getElementById('capacity-explorer').scrollIntoView({behavior:'instant',block:'center'})");
   assert.ok(await noOverflow());
   await snapshot('capacity-planner-mobile');
+  await go('zh-hans/readiness.html');
+  assert.ok(await noOverflow());
+  await snapshot('readiness-audit-mobile');
   await go('zh-hant/compare.html?group=human_transfer');
   assert.ok(await noOverflow());
   await evaluate("document.getElementById('comparison-panel-scale').scrollIntoView({behavior:'instant',block:'start'})");
@@ -256,6 +274,8 @@ try{
   await go('zh-hans/design.html');
   assert.ok(await noOverflow());
   await go('zh-hans/compare.html');
+  assert.ok(await noOverflow());
+  await go('zh-hans/readiness.html');
   assert.ok(await noOverflow());
   await viewport(1024,900);
   await go('zh-hant/design.html');

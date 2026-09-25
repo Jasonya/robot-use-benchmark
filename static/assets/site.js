@@ -282,7 +282,26 @@
     updateCapacity();
   }
 
-  if (config.kind === 'chapter' || config.kind === 'design') {
+  if (config.kind === 'readiness') {
+    const openAuditHash = () => {
+      let id;
+      try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+      const node = document.getElementById(id);
+      if (!node?.matches('[data-audit-gap]')) return;
+      node.open = true;
+      requestAnimationFrame(() => node.scrollIntoView({ behavior: 'instant', block: 'start' }));
+    };
+    document.addEventListener('click', event => {
+      const link = event.target.closest('a[href^="#gap-"]');
+      if (!link) return;
+      const node = document.getElementById(link.hash.slice(1));
+      if (node?.matches('[data-audit-gap]')) node.open = true;
+    });
+    window.addEventListener('hashchange', openAuditHash);
+    openAuditHash();
+  }
+
+  if (['chapter', 'design', 'readiness'].includes(config.kind)) {
     if (config.kind === 'chapter') storage.set('robot-use-reading', JSON.stringify({ path: config.route, title: config.title }));
     const headingLinks = $$('.on-this-page a');
     const headings = headingLinks.map(link => document.getElementById(decodeURIComponent(link.hash.slice(1)))).filter(Boolean);

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
 import * as OpenCC from 'opencc-js';
 import {renderComparisonPage} from './comparison-page.mjs';
+import {renderReadinessPage} from './readiness-page.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -83,10 +84,12 @@ const [overallPlan, overallSpecHTML] = await Promise.all([
 ]);
 const COMPARISON_DIR = path.join(CONTENT, 'benchmark_comparison');
 const comparisonModel = JSON.parse(await fs.readFile(path.join(COMPARISON_DIR, 'benchmark_matrix.json'), 'utf8'));
+const READINESS_DIR = path.join(CONTENT, 'readiness');
+const readinessModel = JSON.parse(await fs.readFile(path.join(READINESS_DIR, 'readiness_audit.json'), 'utf8'));
 const sourceInfoById = Object.fromEntries(sourceReports.map(source => [source.id, source]));
 const assetHasher=crypto.createHash('sha256');
-assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,comparisonModel,sourceStats,sourceReports,sections,tasks,papers}));
-for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
+assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,comparisonModel,readinessModel,sourceStats,sourceReports,sections,tasks,papers}));
+for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','scripts/readiness-page.mjs','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
 const assetRevision=assetHasher.digest('hex').slice(0,12);
@@ -255,8 +258,8 @@ function navHTML(route, locale) {
 }
 function footerHTML(route, locale) {
   return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('從文獻到任務、評測與實作的公開研究設計。',locale)}</div>
-  <div class="footer-links"><a href="${routeLink(route,'design.html',locale)}">${t('最新整體設計',locale)}</a><a href="${routeLink(route,'glossary.html',locale)}">${t('名詞小辭典',locale)}</a><a href="${routeLink(route,'appendices/methods.html',locale)}">${t('來源與方法',locale)}</a><a href="${pdfHref(route,locale)}">${t('原版 PDF · v0.2',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
-  <p class="footer-note">${t(`整體設計 v${config.designVersion} · 設計與來源盤點 ${config.designDate} · 原文獻快照 ${config.researchDate}。2,000–3,000 個 G2，以及任務數／有效覆蓋各至少 2×，均為研發驗收提案。${sourceStats.source_records.toLocaleString('en-US')} 筆是未完成跨作去重的來源紀錄；正式驗證測例與模擬執行仍為 0。`,locale)}</p></div></footer>`;
+  <div class="footer-links"><a href="${routeLink(route,'design.html',locale)}">${t('最新整體設計',locale)}</a><a href="${routeLink(route,'readiness.html',locale)}">${t('待完善事項',locale)}</a><a href="${routeLink(route,'glossary.html',locale)}">${t('名詞小辭典',locale)}</a><a href="${routeLink(route,'appendices/methods.html',locale)}">${t('來源與方法',locale)}</a><a href="${pdfHref(route,locale)}">${t('原版 PDF · v0.2',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">${t(`整體設計 v${config.designVersion} · 設計與來源盤點 ${config.designDate} · 原文獻快照 ${config.researchDate} · 文件審查 ${config.auditDate}。2,000–3,000 個 G2，以及任務數／有效覆蓋各至少 2×，均為研發驗收提案。${sourceStats.source_records.toLocaleString('en-US')} 筆是未完成跨作去重的來源紀錄；正式驗證測例與模擬執行仍為 0。`,locale)}</p></div></footer>`;
 }
 const strings = {
   copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
@@ -296,7 +299,7 @@ function head(title,description,route,locale,extra='') {
   return `<div class="page-head">${breadcrumb(title,route,locale)}<div class="eyebrow">RESEARCH ATLAS</div><h1>${t(title,locale)}</h1><p class="lede">${t(description,locale)}</p>${extra}</div>`;
 }
 function scopeNotice(route,locale){
-  return `<div class="scope-notice"><b>${t('v0.4：任務規模與廣度共同驗收',locale)}</b><p>${t('完整任務庫初始目標為 2,000–3,000 個 G2；任務數與有效覆蓋各以最大可比基準至少 2 倍為目標。新增場域、家族、材料與機體的支撐配額。180 個藍圖保留為設計種子，原 100–140 預算屬歷史方案。',locale)}</p><a href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計、配額、架構與 milestones',locale)} →</a></div>`;
+  return `<div class="scope-notice"><b>${t('v0.4：任務規模與廣度共同驗收',locale)}</b><p>${t('完整任務庫初始目標為 2,000–3,000 個 G2；任務數與有效覆蓋各以最大可比基準至少 2 倍為目標。新增場域、家族、材料與機體的支撐配額。180 個藍圖保留為設計種子，原 100–140 預算屬歷史方案。',locale)}</p><a href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計、配額、架構與 milestones',locale)} →</a><br><a href="${routeLink(route,'readiness.html',locale)}">${t('目前還缺哪些證據與實作',locale)} →</a></div>`;
 }
 function designSections(numbers,locale,route,prefix){
   const $=cheerio.load(overallSpecHTML,{},false);const result=[];
@@ -430,7 +433,7 @@ function nativePage(locale){
 function chapterNav(route,locale) {
   const chapterLinks=chapters.map(s=>`<a href="${routeLink(route,chapterRoute(s),locale)}"${route===chapterRoute(s)?' class="active" aria-current="page"':''}><span>${s.id.slice(1)}</span>${t(s.title,locale)}</a>`).join('');
   const extras=[['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['library.html','168 篇文獻'],['appendices/methods.html','來源與資料字典']];
-  return `<div class="sidebar-label">${t('v0.4 整體設計',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模方案與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
+  return `<div class="sidebar-label">${t('v0.4 整體設計',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'readiness.html',locale)}"${route==='readiness.html'?' class="active" aria-current="page"':''}>${t('待完善事項與驗收',locale)}</a><a href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模方案與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
 }
 function readingPage(section,locale) {
   const route=chapterRoute(section);
@@ -599,7 +602,7 @@ function homePage(locale){
   <div class="towel-scene">${translate(towelSVG(),locale)}</div><div class="scene-caption"><span id="fold-pairs">D → A · C → B</span><span>${t('概念示意，非模擬結果',locale)}</span></div>
   <p class="demo-message" id="demo-message" aria-live="polite">${t(strings.demoA,locale)}</p><a class="section-link" href="${routeLink(route,'chapters/09.html#detail-SC-H15',locale)}">${t('深入這個案例',locale)} →</a></div></section>
   <div class="metrics-strip" aria-label="${t('規模目標與目前進度',locale)}"><a class="metric" href="${routeLink(route,'design.html#design-section-3',locale)}"><strong class="long">2,000–3,000</strong><span>${t('正規化 G2 任務初始目標',locale)}</span><small>${t('研發目標，尚未達成',locale)}</small></a><a class="metric" href="${routeLink(route,'design.html#design-section-3',locale)}"><strong>≥ 2×</strong><span>${t('任務數與有效覆蓋各自驗收',locale)}</span><small>${t('共同分類與 scope 後比較',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}"><strong>${sourceStats.source_records.toLocaleString('en-US')}</strong><span>${t('已提取原生來源紀錄',locale)}</span><small>${t('異質單位，未跨作去重',locale)}</small></a><a class="metric" href="${routeLink(route,'design.html#design-section-12',locale)}"><strong>0</strong><span>${t('個已驗證測例',locale)}</span><small>${t('實際模擬執行也為 0',locale)}</small></a></div>
-  <div class="scope-notice"><b>${t('廣度也有具體支撐量',locale)}</b><p>${t('12 個核心場域各提出至少 100 個有效任務綁定、8 個家族、3 類機制的目標。材料和機體另設配額；共用同一任務時，全球 G2 只計一次。原 180 個藍圖保留為種子，100–140 預算屬歷史方案。',locale)}</p><a href="#quick-start">${t('3 分鐘理解整體設計',locale)} →</a></div>
+  <div class="scope-notice"><b>${t('廣度也有具體支撐量',locale)}</b><p>${t('12 個核心場域各提出至少 100 個有效任務綁定、8 個家族、3 類機制的目標。材料和機體另設配額；共用同一任務時，全球 G2 只計一次。原 180 個藍圖保留為種子，100–140 預算屬歷史方案。',locale)}</p><a href="#quick-start">${t('3 分鐘理解整體設計',locale)} →</a><br><a href="${routeLink(route,'readiness.html',locale)}">${t('查看還沒完善的地方與優先交付',locale)} →</a></div>
   <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">THE SHORT VERSION</div><h2>${t('先掌握三個重點',locale)}</h2><p>${t('不需要先讀完論文，先知道這份設計想解決什麼。',locale)}</p></div><a class="section-link" href="${routeLink(route,'glossary.html',locale)}">${t('不熟悉術語？看小辭典',locale)} →</a></div>
   <div class="card-grid">${quickCards.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div>
   <div class="concept-band"><div><h3>${t('從完整來源庫到正式評測。',locale)}</h3><p>${t('來源紀錄先正規化，再綁定實際場域、機體和有效初態；每次模型執行另計。',locale)}</p></div><div class="scale-line"><b>${t('來源紀錄',locale)}<small>5,020</small></b><span class="arr">→</span><b>${t('任務規格',locale)}<small>G2 · TBD</small></b><span class="arr">→</span><b>${t('實例／測例',locale)}<small>G3 / G4 · 0</small></b><span class="arr">→</span><b>${t('實際執行',locale)}<small>G5 · 0</small></b></div></div></section>
@@ -660,6 +663,10 @@ function searchPage(locale){
 }
 function searchData(locale){
   const result=[];
+  for(const issue of readinessModel.issues){
+    const content=[issue.id,issue.title,issue.current,issue.deliverable,issue.acceptance].join(' ');
+    result.push({kind:'reference',title:translate('待完善｜'+issue.title,locale),path:`readiness.html#${issue.id.toLowerCase()}`,summary:translate(issue.priority+' · '+issue.deliverable,locale),search:tc(content)+' '+sc(tc(content))+' readiness audit 缺口 待完善'});
+  }
   for(const row of comparisonModel.rows){
     const content=[row.name,row.domain,row.scenes,row.tasks,row.cases,row.materials,row.observation,row.difference].join(' ');
     result.push({kind:'reference',title:translate('比較｜'+row.name,locale),path:`compare.html#benchmark-${row.id}`,summary:translate(row.tasks+'；'+row.scenes,locale),search:tc(content)+' '+sc(tc(content))+' benchmark comparison 比較 比较'});
@@ -711,7 +718,8 @@ for(const locale of LOCALES){
   await write(`${locale}/glossary.html`,glossaryPage(locale));
   await write(`${locale}/search.html`,searchPage(locale));
   await write(`${locale}/design.html`,overallDesignPage(locale));
-  await write(`${locale}/compare.html`,renderComparisonPage(locale,comparisonModel,{t,escape,translate,relative,routeLink,head,shell}));
+  await write(`${locale}/compare.html`,renderComparisonPage(locale,comparisonModel,{t,escape,translate,relative,routeLink,head,shell,auditStatistics:readinessModel.statistics}));
+  await write(`${locale}/readiness.html`,renderReadinessPage(locale,readinessModel,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell}));
   await write(`${locale}/scale-plan.html`,scalePlanPage(locale));
   await write(`${locale}/native-tasks.html`,nativePage(locale));
   const data=searchData(locale);
@@ -738,6 +746,9 @@ for(const filename of ['OVERALL_DESIGN_V0_4.md','overall_design_plan.json','brea
 for(const filename of ['benchmark_matrix.json','benchmark_matrix.csv','benchmark_domains_matrix.csv','benchmark_features_matrix.csv','BENCHMARK_COMPARISON.md','source_verification.json','matrix_validation.json']){
   await write(`downloads/benchmark-comparison/${filename}`,await fs.readFile(path.join(COMPARISON_DIR,filename)));
 }
+for(const filename of ['gap_register.json','gap_register.csv','audit_statistics.json','milestones_v0_4.csv','version_index.json','READINESS_AUDIT_2026_09_25.md','readiness_audit.json']){
+  await write(`downloads/readiness/${filename}`,await fs.readFile(path.join(READINESS_DIR,filename)));
+}
 const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
 const scaleRoot=rootHtml
   .replace('從看懂示範，到可靠完成任務。','更多獨立任務，更廣評測覆蓋。')
@@ -747,9 +758,9 @@ await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href
 await write('404.html',`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找不到頁面 · Robot-use Benchmark</title><link rel="stylesheet" href="${config.siteUrl}/assets/site.css"></head><body><main class="wrap narrow" style="padding:90px 0"><div class="eyebrow">404</div><h1>這個頁面找不到了。<br>这个页面找不到了。</h1><p>可以回到首頁，從章節、情境或文獻重新找到內容。</p><div class="cta-row"><a class="button" href="${config.siteUrl}/zh-hant/">繁體首頁</a><a class="button secondary" href="${config.siteUrl}/zh-hans/">简体首页</a></div></main></body></html>`);
 await write('.nojekyll','');
 await write('robots.txt',`User-agent: *\nAllow: /\nSitemap: ${config.siteUrl}/sitemap.xml\n`);
-await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allPageRecords.map(p=>`<url><loc>${escape(config.siteUrl+'/'+p.file)}</loc><lastmod>${config.designDate}</lastmod></url>`).join('')}</urlset>`);
+await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allPageRecords.map(p=>`<url><loc>${escape(config.siteUrl+'/'+p.file)}</loc><lastmod>${config.auditDate}</lastmod></url>`).join('')}</urlset>`);
 const manifest={
-  siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,designDate:config.designDate,designVersion:config.designVersion,
+  siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,designDate:config.designDate,designVersion:config.designVersion,auditDate:config.auditDate,
   pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,tasks:tasks.length,families:families.length,probes:probes.length,metrics:metrics.length,nativeSourceRecords:sourceRecords.length,sourceRepositories:sourceStats.source_repositories_pinned,sourceSnapshots:sourceStats.source_snapshots_pinned,validatedCases:0,simulatorRuns:0},
   sourceSections:sections.length,sourceSectionIds:sections.map(s=>s.id),assets:generated.filter(file=>!file.endsWith('.html')),
   pdf:'downloads/full-report-zh-hant.pdf',
