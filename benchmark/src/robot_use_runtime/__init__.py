@@ -1,3 +1,3 @@
-"""Execution evidence for native tasks. This module does not declare canonical G2 counts."""
+"""Native and synthetic joint-workflow evidence; no certified canonical G2 count."""
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
