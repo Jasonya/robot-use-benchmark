@@ -1,9 +1,10 @@
 {
-  "version": "1.2",
-  "as_of": "2026-09-25",
+  "version": "1.3",
+  "as_of": "2026-09-29",
   "baseline_source_snapshot": "2026-09-22",
   "design_version": "0.4",
-  "current_execution_as_of": "2026-09-25",
+  "current_execution_as_of": "2026-09-29",
+  "prior_work_review_as_of": "2026-09-25",
   "additional_data_snapshot_as_of": "2026-09-25",
   "scope": "68 selected prior benchmarks/datasets/frameworks + our proposed and current rows; not an exhaustive literature search.",
   "prior_works": 68,
@@ -45,7 +46,8 @@
   },
   "reference_aliases": {
     "@design": "https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html",
-    "@execution": "https://jasonya.github.io/robot-use-benchmark/zh-hant/execution.html"
+    "@execution": "https://jasonya.github.io/robot-use-benchmark/zh-hant/execution.html",
+    "@joint": "https://jasonya.github.io/robot-use-benchmark/zh-hant/joint-pilot.html"
   },
   "domains": {
     "D01": "居家生活空間",
@@ -127,8 +129,8 @@
       "year": 2026,
       "group": "ours",
       "group_label": "本計畫：目標與實績",
-      "scope": "僅模擬；人類影片配對另有 track",
-      "version_note": "設計 v0.4；原生開發證據 2026-09-25 / adapter 0.2",
+      "scope": "兩個分開的模擬track；人類影片到執行仍未驗證",
+      "version_note": "設計v0.4／v0.5；原生證據9/25；聯合資料9/29／contract0.3",
       "canonical_g2": null,
       "references": [
         {
@@ -142,28 +144,34 @@
           "label": "目前實際執行與完整結果",
           "url": "@execution",
           "scope": "50 native task IDs; state-based development contract; not new canonical tasks"
+        },
+        {
+          "id": "our-joint-pilot",
+          "label": "自建RGB、工具與物理聯合資料",
+          "url": "@joint",
+          "scope": "1 workflow candidate, 120 cases, 720 frozen program trials +2 post-test annotations; local post-commit response-loss recovery only"
         }
       ],
       "outside_common_domains": "新應用範圍可擴充共同 ontology；不能強行壓進12類再聲稱全涵蓋。",
       "id": "ours-current",
       "name": "我們｜目前開發實績",
       "status": "current",
-      "domain": "12 類設計標籤；0 個已驗證場域覆蓋格子",
-      "scenes": "750 個原生 task-bound 初態；獨立房屋／layout 聯集尚未建立",
-      "tasks": "正式去重 G2：TBD；已跑 50 個 Meta-World 原生任務，皆為復用；180 authored blueprints 另列",
-      "cases": "250 個新初態 × 5 方法＝1,250 次測試；歷史 4,286 次開發執行",
-      "data": "5,020 原生來源紀錄、20 repos／21 snapshots；本計畫 human pairs 0",
+      "domain": "1個合成桌面出貨工作流，部分倉儲語境；正式D×F×K覆蓋格子尚未驗收",
+      "scenes": "原生750個task-bound初態／36個MJCF入口；聯合試作1個layout／15初態，不是15個場景",
+      "tasks": "50個Meta-World原生任務（復用）＋1個自建聯合工作流候選；跨作去重G2仍TBD",
+      "cases": "原生250測例×5＝1,250次；聯合120測例（40開發／80驗證）×6＝720次，另2次可解性annotation",
+      "data": "原生來源5,020筆另列；joint保存2,568個RGB影格、SQLite與動作；人類影片執行pairs仍0",
       "materials": "MuJoCo 原生剛體／關節接觸任務已跑；6 類材料目標的全庫支撐未完成",
-      "embodiment": "1 個 Sawyer 單臂 state＋goal adapter；雙臂／移動／其他材料仍待驗證",
-      "observation": "39 維 state＋明示目標；robot 模擬重播影片；人類影片到執行 pairs 仍 0",
-      "evaluation": "腳本參考、隨機、零動作、線性 BC、Extra Trees BC；100 次重播、權重與 reset 核驗",
-      "difference": "已有可追蹤的原生執行和學習基線；正式 G2 規模、廣度與通用效能優勢仍待驗證。",
-      "note": "50 是既有原生任務 ID；750 初態、1,250 本次測試和 4,286 歷史 trials 都不是新增 G2。BC 為每任務專用 state 模型，測新初態，不宣稱新任務泛化。",
+      "embodiment": "同為Sawyer單臂；原生state＋goal與joint RGB＋工具約定分開",
+      "observation": "原生39維state＋goal；joint RGB、合成訂單／庫存、工具回應與robot本體狀態",
+      "evaluation": "原生五方法；joint六固定程式／診斷控制，720完整工具鏈重播；物理、數位與聯合完成分列",
+      "difference": "已做出RGB—entity—SQLite—robot—聯合判分資料鏈；仍未證明G2規模、廣度或學習型agent優勢。",
+      "note": "joint只有1個工作流候選；120測例、720次程式和2次事後annotation不增加G2。完整RGB程式在80測例上92.5%，非VLM/VLA成績；原生4,286次歷史執行另列。",
       "domain_map": {
         "D01": "zero",
         "D02": "zero",
         "D03": "zero",
-        "D04": "zero",
+        "D04": "partial",
         "D05": "zero",
         "D06": "zero",
         "D07": "zero",
@@ -177,7 +185,7 @@
         "execution": "development",
         "human_to_robot": "zero",
         "long_horizon": "zero",
-        "recovery": "zero",
+        "recovery": "development",
         "collaboration": "zero",
         "deformable": "zero",
         "bimanual": "zero",
@@ -185,8 +193,8 @@
         "transition_model": "zero"
       },
       "canonical_g2_status": "待共同審核",
-      "evidence_status": "原生開發執行有完整證據；正式通用 release 未完成",
-      "difficulty_note": "已有五方法×50原生任務結果與五個seed區塊的不確定性描述；尚未建立通用難度校準。"
+      "evidence_status": "原生與合成聯合資料都有執行證據；正式通用release與新增G2仍未完成",
+      "difficulty_note": "原生五方法×50任務；joint按10個共享世界區塊作描述性bootstrap。6個固定程式不是6個學習agent，通用難度未校準。"
     },
     {
       "id": "behavior",

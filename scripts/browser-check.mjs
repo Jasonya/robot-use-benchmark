@@ -186,6 +186,39 @@ try{
   assert.ok(await evaluate("document.querySelector('video').videoWidth>0"));
   pass('Native execution and actual video','All 50 tasks and five methods render; the saved-action replay video decodes successfully.');
 
+  await go('zh-hant/joint-pilot.html');
+  await waitFor("!!document.querySelector('[data-joint-viewer]').dataset.selectedTrial");
+  assert.equal(await evaluate("document.querySelectorAll('#joint-method-table tbody tr').length"),6);
+  assert.ok(await noOverflow());
+  const initialImage=await evaluate("document.getElementById('joint-initial-image').src");
+  const leftFinal=await evaluate("document.getElementById('joint-final-image').src");
+  await setValue('#joint-bay','BAY-R');
+  assert.equal(await evaluate("document.getElementById('joint-initial-image').src"),initialImage);
+  assert.notEqual(await evaluate("document.getElementById('joint-final-image').src"),leftFinal);
+  await setValue('#joint-method','digital_only');
+  assert.equal(await evaluate("document.getElementById('joint-physical').dataset.passed"),'false');
+  assert.equal(await evaluate("document.getElementById('joint-digital').dataset.passed"),'true');
+  assert.equal(await evaluate("document.getElementById('joint-success').dataset.passed"),'false');
+  await setValue('#joint-method','rgb_tools_new_key_retry');
+  assert.equal(await evaluate("document.getElementById('joint-dispatch-count').textContent"),'2');
+  assert.equal(await evaluate("document.getElementById('joint-physical').dataset.passed"),'true');
+  assert.equal(await evaluate("document.getElementById('joint-digital').dataset.passed"),'false');
+  await evaluate("document.getElementById('joint-case-viewer').scrollIntoView({behavior:'instant',block:'start'})");
+  await waitFor("Array.from(document.querySelectorAll('#joint-case-viewer img')).every(i=>i.complete&&i.naturalWidth===640)");
+  await snapshot('joint-pilot-diagnostic-desktop');
+  const selectedTrial=await evaluate("document.querySelector('[data-joint-viewer]').dataset.selectedTrial");
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&!!window.JOINT_PILOT_DEMOS");
+  assert.equal(await evaluate("document.querySelector('[data-joint-viewer]').dataset.selectedTrial"),selectedTrial);
+  assert.equal(await evaluate("document.getElementById('joint-bay').value"),'BAY-R');
+  assert.equal(await evaluate("document.getElementById('joint-method').value"),'rgb_tools_new_key_retry');
+  pass('Joint data and diagnostic controls','Shared RGB stays identical across goals; saved outcomes show physical/digital disagreement and duplicate commits; selected trial survives the language switch.');
+  await evaluate("document.querySelector('video').load()");
+  await waitFor("document.querySelector('video').readyState>=1",45000);
+  assert.equal(await evaluate("document.querySelector('video').error"),null);
+  assert.ok(await evaluate("document.querySelector('video').videoWidth>0"));
+  pass('Joint saved-action replay video','The actual RGB/tool/robot replay video decodes, with the complete original outcomes linked separately.');
+
   await go('zh-hans/research.html');
   assert.equal(await evaluate("document.querySelectorAll('#research-category-table tbody tr').length"),12);
   assert.equal(await evaluate("document.querySelectorAll('#research-additions-table tbody tr').length"),82);
@@ -282,6 +315,12 @@ try{
   await go('zh-hans/readiness.html');
   assert.ok(await noOverflow());
   await snapshot('readiness-audit-mobile');
+  await go('zh-hans/joint-pilot.html?sku=SKU-G&bay=BAY-R&fault=clean&method=digital_only');
+  assert.ok(await noOverflow());
+  assert.equal(await evaluate("document.getElementById('joint-success').dataset.passed"),'false');
+  await snapshot('joint-pilot-mobile');
+  await evaluate("document.getElementById('joint-case-viewer').scrollIntoView({behavior:'instant',block:'start'})");
+  await snapshot('joint-pilot-viewer-mobile');
   await go('zh-hant/compare.html?group=human_transfer');
   assert.ok(await noOverflow());
   await evaluate("document.getElementById('comparison-panel-scale').scrollIntoView({behavior:'instant',block:'start'})");
@@ -301,6 +340,8 @@ try{
   assert.ok(await noOverflow());
   await go('zh-hans/readiness.html');
   assert.ok(await noOverflow());
+  await go('zh-hans/joint-pilot.html');
+  assert.ok(await noOverflow());
   await viewport(1024,900);
   await go('zh-hant/design.html');
   assert.ok(await noOverflow());
@@ -315,8 +356,14 @@ try{
   await cdp.send('Page.navigate',{url:new URL('zh-hant/compare.html',BASE).href});
   await waitFor("document.readyState==='complete'&&document.querySelectorAll('#comparison-scale tbody tr').length===70");
   assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-comparison-panel]')).filter(panel=>getComputedStyle(panel).display!=='none').length"),4);
+  await cdp.send('Page.navigate',{url:new URL('zh-hant/joint-pilot.html',BASE).href});
+  await waitFor("document.readyState==='complete'&&document.querySelectorAll('#joint-method-table tbody tr').length===6");
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.joint-controls')).display"),'none');
+  assert.ok(await evaluate("document.querySelector('#joint-initial-image').complete&&document.querySelector('#joint-initial-image').naturalWidth>0"));
+  assert.equal(await evaluate("document.getElementById('joint-dispatch-count').textContent"),'1');
+  assert.ok(await noOverflow());
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
-  pass('Reading without JavaScript','All 180 task cards and all four 70-row comparison tables remain readable without scripts.');
+  pass('Reading without JavaScript','All 180 task cards, four 70-row comparison tables and the joint pilot default case/results remain readable without scripts.');
 
   assert.deepEqual(errors,[],'Unexpected browser runtime errors');
   const report={status:'passed',baseURL:BASE,checks,consoleErrors:errors,screenshots:await fs.readdir(screenshots)};

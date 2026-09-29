@@ -147,6 +147,46 @@ for(const method of execution.summary){
 }
 const modelDownload=JSON.parse(await fs.readFile(path.join(out,'downloads/execution/model_download.json'),'utf8'));
 assert.equal(crypto.createHash('sha256').update(await fs.readFile(path.join(out,modelDownload.archive))).digest('hex'),modelDownload.sha256);
+const joint=JSON.parse(await fs.readFile(path.join(out,'downloads/joint-pilot/pilot_report.json'),'utf8'));
+const jointCases=JSON.parse(await fs.readFile(path.join(out,'downloads/joint-pilot/case_ledger.json'),'utf8'));
+const jointTrials=JSON.parse(await fs.readFile(path.join(out,'downloads/joint-pilot/trial_ledger.json'),'utf8'));
+const jointDownload=JSON.parse(await fs.readFile(path.join(out,'downloads/joint-pilot/download_info.json'),'utf8'));
+const jointPublication=JSON.parse(await fs.readFile(path.join(out,'downloads/joint-pilot/publication_receipt.json'),'utf8'));
+const demoScript=await fs.readFile(path.join(out,'assets/joint-pilot-data.js'),'utf8');
+const jointDemos=JSON.parse(demoScript.replace(/^window\.JOINT_PILOT_DEMOS=/,'').replace(/;$/,''));
+assert.equal(joint.workflow_candidates,1);
+assert.equal(joint.canonical_g2_count,null);
+assert.equal(joint.baseline_is_learned_vlm,false);
+assert.equal(jointCases.length,120);
+assert.equal(new Set(jointCases.map(r=>r.case_id)).size,120);
+assert.equal(new Set(jointCases.map(r=>r.world_seed)).size,15);
+assert.equal(jointCases.filter(r=>r.split==='test').length,80);
+assert.ok(jointCases.every(r=>r.completion_witness_available));
+assert.equal(jointTrials.length,720);
+assert.equal(new Set(jointTrials.map(r=>r.trial_id)).size,720);
+assert.equal(joint.supplemental_annotation_trials,2);
+assert.equal(jointDemos.length,48);
+assert.equal(new Set(jointDemos.map(r=>r.initial_image_ref)).size,1);
+assert.equal(jointDownload.publication_status,'published_and_public_downloads_hash_verified');
+assert.equal(jointPublication.assets.find(a=>a.file===jointDownload.file).url,jointDownload.url);
+assert.equal(jointDownload.sha256,'93b5ddde3fc7e05507e0470c60e22c9561edae13f0e1fff5c0d3361516866f92');
+for(const method of joint.method_results){
+  const trials=jointTrials.filter(r=>r.split==='test'&&r.method_id===method.method_id);
+  assert.equal(trials.length,80);
+  for(const metric of ['physical_success','digital_success','joint_success']){
+    assert.equal(trials.reduce((n,r)=>n+Number(r[metric]),0)/80,method[metric]);
+  }
+}
+for(const record of jointDemos){
+  const trial=jointTrials.find(r=>r.trial_id===record.trial_id);
+  assert.ok(trial&&trial.split==='test');
+  for(const metric of ['case_id','physical_success','digital_success','joint_success','dispatch_events']){
+    assert.equal(record[metric],trial[metric]);
+  }
+  for(const ref of [record.initial_image_ref,record.final_image_ref]){
+    assert.ok(allFiles.includes(path.join(out,'assets/joint-pilot',ref)));
+  }
+}
 for(const locale of ['zh-hant','zh-hans']){
   const auditPage=pages.get(path.join(out,locale,'readiness.html'));
   assert.ok(auditPage);
@@ -166,6 +206,12 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(executionPage.$('#execution-method-summary tbody tr').length,5);
   assert.equal(executionPage.$('#execution-native-task-table tbody tr').length,50);
   assert.equal(executionPage.$('video source').length,1);
+  const jointPage=pages.get(path.join(out,locale,'joint-pilot.html'));
+  assert.equal(jointPage.$('#joint-method-table tbody tr').length,6);
+  assert.equal(jointPage.$('[data-joint-viewer] select').length,4);
+  assert.equal(jointPage.$('video source').length,1);
+  assert.ok(jointPage.$('#joint-evidence').text().includes('92.5%'));
+  assert.ok(jointPage.$(`a[href="${jointDownload.url}"]`).length);
   const researchPage=pages.get(path.join(out,locale,'research.html'));
   assert.equal(researchPage.$('#research-category-table tbody tr').length,12);
   assert.equal(researchPage.$('#research-additions-table tbody tr').length,82);
@@ -189,7 +235,7 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.ok(comparison.includes('v0.4')&&comparison.includes('2,000–3,000'));
 }
 await fs.mkdir(path.join(root,'verification'),{recursive:true});
-const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,scopeVersion:config.iterationVersion,designScope:'Research and design website, plus linked native execution evidence. Website validation is separate from native-run validation and formal universal-release gates.',issues};
+const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,jointPilot:{cases:jointCases.length,programTrials:jointTrials.length,supplementalAnnotations:joint.supplemental_annotation_trials},scopeVersion:config.iterationVersion,designScope:'Research, design, native execution and synthetic joint-data website. Website checks are separate from physics replay, learned-agent evaluation and formal universal-release gates.',issues};
 await fs.writeFile(path.join(root,'verification/static-checks.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify({...report,issues:issues.slice(0,20)},null,2));
 assert.equal(issues.length,0,`${issues.length} static site issues`);

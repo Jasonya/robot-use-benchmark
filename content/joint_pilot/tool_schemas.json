@@ -1,0 +1,158 @@
+[
+  {
+    "name": "camera.capture",
+    "description": "Capture the current fixed-overhead RGB image. Returns an image attachment and public camera calibration; no object-state labels.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "vision.locate_parts",
+    "description": "Locate the two known colored part markers from a delivered RGB frame. Returns pixel evidence and calibrated estimated XY coordinates, not simulator object positions.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "frame_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "frame_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "catalog.list",
+    "description": "Read the synthetic part catalog and visual marker identities. No physical locations are stored here.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "orders.get",
+    "description": "Retrieve the indicated order's part SKU, destination bay, quantity and status.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "order_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "inventory.list",
+    "description": "Read available counts and DECLARED locations from the local SQLite fixture; these are not measured physical locations.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "workcell.bays",
+    "description": "Read fixed dispatch-region centers and dimensions in the robot/workcell coordinate frame.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "robot.push_xy",
+    "description": "Use the inherited articulated Sawyer controller to push from the supplied estimated source XY toward the supplied destination. The motion controller reads robot TCP proprioception only; its reply does not certify object success.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_xy": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "destination_xy": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "source_xy",
+        "destination_xy"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "robot.park",
+    "description": "Raise and park the gripper and let the workcell settle.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "dispatch.record",
+    "description": "Append one claimed dispatch and update the synthetic inventory. The same idempotency key plus identical payload is deduplicated. A reply may be lost after commit. A new key creates another event; the API does not observe physics.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "sku": {
+          "type": "string",
+          "enum": [
+            "SKU-P",
+            "SKU-G"
+          ]
+        },
+        "bay_id": {
+          "type": "string",
+          "enum": [
+            "BAY-L",
+            "BAY-R"
+          ]
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "order_id",
+        "sku",
+        "bay_id",
+        "idempotency_key"
+      ],
+      "additionalProperties": false
+    }
+  }
+]

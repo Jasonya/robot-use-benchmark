@@ -1,5 +1,10 @@
 # Native execution runtime
 
+The separate [RGB + SQLite + robot pilot](JOINT_PILOT.md) uses contract 0.3 and
+provides 120 synthetic cases, 720 frozen fixed-program trials and two separately
+labeled post-test solvability annotations. It does not change the native results
+below or establish a learned VLM/VLA score.
+
 This is an executable development component of Robot-use Benchmark. It preserves upstream native task IDs, simulator state, action traces, reset seeds and endpoint evidence. Running 50 native environments does not establish 50 cross-benchmark canonical G2 specifications or new tasks.
 
 The adapter uses Meta-World 3.1.1 with MuJoCo 3.3.0 and Gymnasium 1.3.0. Contract 0.2 exposes the same native 39-value state and explicit goal to every method. Its action space is the native four-dimensional Cartesian/gripper control. The published development test has 50 native tasks × 5 new initial states × 5 methods = 1,250 trials. It is a state-based development track.

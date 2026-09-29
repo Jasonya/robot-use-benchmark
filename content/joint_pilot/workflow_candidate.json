@@ -1,0 +1,52 @@
+{
+  "id": "joint-dispatch-workflow-candidate-v1",
+  "status": "authored_execution_workflow_candidate_not_global_G2_adjudicated",
+  "task_kind": "robot_control_with_digital_tool_state",
+  "roles": [
+    "ordered_part",
+    "non_target_part",
+    "requested_dispatch_region",
+    "order_record",
+    "inventory",
+    "dispatch_ledger"
+  ],
+  "reference_program": "Resolve the part SKU and bay via the specified order; ground the SKU's visual marker in current RGB.",
+  "goal_program": "The whole ordered rigid part is in the requested dispatch region and supported on the table; the other part's position is preserved; one matching dispatch is recorded and inventory/order state agrees.",
+  "required_process": [
+    "Record a mutating dispatch only after physical completion.",
+    "Do not record the same shipment twice."
+  ],
+  "completion_semantics": {
+    "joint": "physical_success AND digital_success AND all_mutating_commits_after_physical_completion",
+    "physical": "All eight box vertices inside the XY region; lower-face z within +/-0.006m of table and upper face at most0.065m (geometric proxy); last40 control-step translational speed below0.04m/s; other-part center displacement at most0.02m.",
+    "digital": "Exactly one correct dispatch row, matching completed order, target availability0 at requested bay, other availability1 in buffer.",
+    "not_measured": [
+      "General object semantics",
+      "Human demonstration understanding",
+      "Natural language understanding by the packaged rule programs",
+      "Real-world transfer",
+      "Contact-force support certification, full angular stability or general physical safety"
+    ]
+  },
+  "instance_parameters": [
+    "Initial part positions",
+    "Assignment of visual markers to left/right positions",
+    "Order SKU",
+    "Requested bay"
+  ],
+  "case_conditions": [
+    "Clean transport",
+    "First commit response lost after the database mutation"
+  ],
+  "do_not_count_as_new_tasks": [
+    "Reset seeds",
+    "SKU or bay parameter values",
+    "Fault conditions",
+    "Methods or repeated rollouts"
+  ],
+  "material": "Rigid boxes only",
+  "robot": "One Sawyer arm",
+  "camera": "Fixed overhead synthetic robot-workcell RGB; no human video",
+  "formal_canonical_g2_count": null,
+  "formal_validated_domain_coverage_claim": false
+}

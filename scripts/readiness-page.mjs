@@ -11,6 +11,7 @@ export function renderReadinessPage(locale, model, helpers) {
   const nav=chapterNav(route,locale);
   const issues=implementation?.issues||model.issues;
   const current=implementation?.current_execution;
+  const joint=implementation?.joint_pilot_update;
   const remaining=issues.filter(issue=>!['documentation_fixed','documentation_complete'].includes(issue.status)).length;
   const progressDownloads=relative(`${locale}/${route}`,'downloads/implementation/');
   const gapId=issue=>issue.id.toLowerCase();
@@ -21,7 +22,8 @@ export function renderReadinessPage(locale, model, helpers) {
     <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('待完善事項',route,locale)}
     <div class="eyebrow">DESIGN &amp; EVIDENCE REVIEW</div><h1>${t('還缺什麼，怎樣才算完成。',locale)}</h1>
     <p class="lede">${t('已有原生模擬執行、學習基線、來源索引與開發規則；完整G2、廣度與通用release仍待完成。這裡把新證據和剩餘工作逐項列出。',locale)}</p>
-    <div class="page-meta"><span>${model.audit_date}</span><span class="pill status">${t('開發證據持續更新',locale)}</span><span>${t('整合更新 v0.5',locale)}</span></div>
+    <div class="page-meta"><span>${implementation?.date||model.audit_date}</span><span class="pill status">${t('開發證據持續更新',locale)}</span><span>${t('整合更新 v0.6 · 原始審核快照9/25',locale)}</span></div>
+    ${joint?`<div class="scope-notice"><b>${t('9/29已有自建聯合資料，剩餘門檻仍分項驗收',locale)}</b><p>${t('1個合成工作流、15初態、120測例、720次固定程式執行已完成RGB、SQLite與物理動作重播；另2次事後可解性annotation。這補足了一條資料鏈的實作證據，尚未完成跨域G2、VLM/VLA panel或人類影片執行。',locale)}</p><a href="${routeLink(route,'joint-pilot.html',locale)}">${t('查看實際案例、結果與完整資料',locale)} →</a></div>`:''}
     <div class="scale-target-grid audit-statistics"><div><strong data-audit-stat="domain-unknown">${d.unknown_percent}%</strong><span>${t(`前作領域 ${d.unknown_cells}／${d.total_cells} 格支撐仍未由已查範圍確定`,locale)}</span></div><div><strong data-audit-stat="feature-unknown">${f.unknown_percent}%</strong><span>${t(`前作能力 ${f.unknown_cells}／${f.total_cells} 格支撐仍未知`,locale)}</span></div><div><strong>${remaining}</strong><span>${t('尚待完成或持續擴展的事項；不是工程完成百分比',locale)}</span></div><div><strong>${current?current.recorded_development_trials.toLocaleString('en-US'):'0'}</strong><span>${t('已記錄原生開發執行；正式 G2 與 2× 分母仍未定',locale)}</span></div></div>
     ${current?`<div class="scope-notice"><b>${t('目前已有真正的模擬與模型驗證',locale)}</b><p>${t(`50個原生任務、${current.forward_consistent_native_initial_cases}個forward-consistent初態，本次新初態测试${current.heldout_test_trials.toLocaleString('en-US')}次。這些是Meta-World state-based開發證據，不是新造通用G2或全部材料／機體的驗證。`,locale)}</p><a href="${routeLink(route,'execution.html',locale)}">${t('查看實際結果與完整紀錄',locale)} →</a></div>`:''}
     <div class="scope-notice"><b>${t('支撐未知與審閱是否完成，是不同欄位。',locale)}</b><p>${t(`${implementation.comparison_evidence.cell_records}個格子已建立來源索引；自動定位字詞不是覆蓋證據。新增加的前作多以摘要作範圍查核，未知比例不能當工程未完成百分比。來源概覽、具體task定義、instance與runtime證據分層保留，正式覆蓋仍需足夠task／instance／expert／evaluator。`,locale)}</p><a href="${routeLink(route,'compare.html',locale)}">${t('對照 benchmark 矩陣',locale)} →</a></div>

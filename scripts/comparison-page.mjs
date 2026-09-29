@@ -3,10 +3,10 @@ export function renderComparisonPage(locale, model, helpers) {
   const route = 'compare.html';
   const downloads = relative(`${locale}/${route}`, 'downloads/benchmark-comparison/');
   const sourceLink = ref => {
-    const local = {'@design':'design.html','@execution':'execution.html'}[ref.url];
+    const local = {'@design':'design.html','@execution':'execution.html','@joint':'joint-pilot.html'}[ref.url];
     const href = local ? routeLink(route,local,locale) : escape(ref.url);
     const extra = local ? '' : ' target="_blank" rel="noopener noreferrer"';
-    const locator = local ? (ref.url==='@design'?'v0.4':'2026-09-25') : ref.url.replace('https://arxiv.org/','arXiv / ');
+    const locator = local ? ({'@design':'v0.4 / v0.5','@execution':'2026-09-25','@joint':'2026-09-29'}[ref.url]) : ref.url.replace('https://arxiv.org/','arXiv / ');
     return `<li><a href="${href}"${extra}>${t(ref.label,locale)}${local?'':' ↗'}</a> <span>${escape(locator)}</span></li>`;
   };
   const short = value => value.length > 108 ? value.slice(0, 106) + '…' : value;
@@ -33,7 +33,7 @@ export function renderComparisonPage(locale, model, helpers) {
   const body=`<main id="main-content" class="comparison-main"><div class="wrap comparison-wrap">
     ${head('Benchmark 橫向比較','每列一個 benchmark，每欄一個分類：直接對照領域、場景、任務種類、實例／題數、材料、機體、影片與評測能力。',route,locale,`<div class="page-meta"><span class="pill green">${model.prior_works} ${t('項前作',locale)} + 2 ${t('列本計畫',locale)}</span><span>${model.as_of}</span><span>${t('原作單位保留；共同 G2 尚未完成',locale)}</span></div>`)}
     <div class="comparison-guide"><p><b>${t('先看規模總表，再切換領域與能力。',locale)}</b> ${t('我們的目標與實績分成兩列；前作的資料缺項標成「待核」。表格可以橫向捲動，點 benchmark 名稱可展開該列原文與完整說明。',locale)}</p><a href="#comparison-implications">${t('這張表對我們的設計意味著什麼',locale)} ↓</a></div>
-    <p class="source-note">${t('目前實績更新至2026-09-25：50個原生任務、1,250次新初態測試。原33項前作保留2026-09-22快照，新增35項於2026-09-25核對摘要。WatchAct另列固定HF版本3,045個評測列，避免版本、原例與視角數混加。',locale)} <a href="${routeLink(route,'execution.html',locale)}">${t('查看實際執行證據',locale)} →</a></p>
+    <p class="source-note">${t('本計畫實績更新至2026-09-29：原50任務／1,250次新初態測試，另有1個自建聯合工作流／120測例／720次原定程式執行。兩個track分開計數；新測例不直接增加G2。前作查核截止日仍為2026-09-25：原33項保留9/22快照，新增35項核對摘要。',locale)} <a href="${routeLink(route,'joint-pilot.html',locale)}">${t('查看自建聯合資料',locale)} →</a></p>
     <div class="source-note" id="comparison-review-status"><b>${t(`全 ${auditStatistics.comparison_prior_works} 項前作的整理待核量：`,locale)}</b> ${t(`領域 ${auditStatistics.domain_matrix.unknown_cells}／${auditStatistics.domain_matrix.total_cells} 格（${auditStatistics.domain_matrix.unknown_percent}%）；能力 ${auditStatistics.feature_matrix.unknown_cells}／${auditStatistics.feature_matrix.total_cells} 格（${auditStatistics.feature_matrix.unknown_percent}%）。這是我們的查核缺口，不是前作缺少該能力；此數量涵蓋全表，不隨下方篩選改變。`,locale)} <a href="${routeLink(route,'readiness.html',locale)}">${t('查看全部待完善事項',locale)} →</a></div>
     <section class="comparison-controls js-only" aria-label="${t('比較表篩選',locale)}">
       <label for="comparison-query">${t('找 benchmark、領域或關鍵字',locale)}<input id="comparison-query" type="search" placeholder="${t('例如 PARTNR、布料、實驗室、Ego',locale)}"></label>
