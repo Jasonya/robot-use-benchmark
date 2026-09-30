@@ -3,10 +3,10 @@ export function renderComparisonPage(locale, model, helpers) {
   const route = 'compare.html';
   const downloads = relative(`${locale}/${route}`, 'downloads/benchmark-comparison/');
   const sourceLink = ref => {
-    const local = {'@design':'design.html','@execution':'execution.html','@joint':'joint-pilot.html'}[ref.url];
+    const local = {'@design':'design.html','@execution':'execution.html','@joint':'joint-pilot.html','@union':'survey-union.html'}[ref.url];
     const href = local ? routeLink(route,local,locale) : escape(ref.url);
     const extra = local ? '' : ' target="_blank" rel="noopener noreferrer"';
-    const locator = local ? ({'@design':'v0.4 / v0.5','@execution':'2026-09-25','@joint':'2026-09-29'}[ref.url]) : ref.url.replace('https://arxiv.org/','arXiv / ');
+    const locator = local ? ({'@design':'v0.7','@execution':'2026-09-25','@joint':'2026-09-29','@union':'v0.7'}[ref.url]) : ref.url.replace('https://arxiv.org/','arXiv / ');
     return `<li><a href="${href}"${extra}>${t(ref.label,locale)}${local?'':' ↗'}</a> <span>${escape(locator)}</span></li>`;
   };
   const short = value => value.length > 108 ? value.slice(0, 106) + '…' : value;
@@ -31,6 +31,7 @@ export function renderComparisonPage(locale, model, helpers) {
     ['類型／範圍','scope'],['領域','domain'],['場景','scenes'],['任務種類','tasks'],['實例／題數','cases'],['資料量','data'],['材料／物理','materials'],['機體','embodiment'],['觀測','observation'],['評測','evaluation'],['難度／泛化','difficulty_note'],['與本計畫的差異','difference'],['計數注意','note']
   ].map(([title,key])=>`<div><dt>${t(title,locale)}</dt><dd>${t(row[key],locale)}</dd></div>`).join('')}</dl>${row.outside_common_domains?`<p class="source-note">${t(row.outside_common_domains,locale)}</p>`:''}<ul class="benchmark-sources">${row.references.map(sourceLink).join('')}${row.inventory?`<li><a href="${routeLink(route,'native-tasks.html',locale)}?source=${escape(row.inventory.source_id)}">${t('查看固定程式來源紀錄',locale)} →</a><span>${row.inventory.records.toLocaleString('en-US')} records · commit ${escape(row.inventory.commit.slice(0,12))}</span></li>`:''}</ul></div></details>`).join('');
   const body=`<main id="main-content" class="comparison-main"><div class="wrap comparison-wrap">
+    <div class="union-intent-note"><b>${t('完整總目錄已擴為143條評測來源',locale)}</b><p>${t('本頁保留原68項的詳細比較。全部250篇書目、75條先前未接入的評測來源、新補原生任務與規則擴充，統整到新的總庫入口。',locale)}</p><a href="${routeLink(route,'survey-union.html',locale)}">${t('前往Benchmark總庫與Survey分類',locale)} →</a></div>
     ${head('Benchmark 橫向比較','每列一個 benchmark，每欄一個分類：直接對照領域、場景、任務種類、實例／題數、材料、機體、影片與評測能力。',route,locale,`<div class="page-meta"><span class="pill green">${model.prior_works} ${t('項前作',locale)} + 2 ${t('列本計畫',locale)}</span><span>${model.as_of}</span><span>${t('原作單位保留；共同 G2 尚未完成',locale)}</span></div>`)}
     <div class="comparison-guide"><p><b>${t('先看規模總表，再切換領域與能力。',locale)}</b> ${t('我們的目標與實績分成兩列；前作的資料缺項標成「待核」。表格可以橫向捲動，點 benchmark 名稱可展開該列原文與完整說明。',locale)}</p><a href="#comparison-implications">${t('這張表對我們的設計意味著什麼',locale)} ↓</a></div>
     <p class="source-note">${t('本計畫實績更新至2026-09-29：原50任務／1,250次新初態測試，另有1個自建聯合工作流／120測例／720次原定程式執行。兩個track分開計數；新測例不直接增加G2。前作查核截止日仍為2026-09-25：原33項保留9/22快照，新增35項核對摘要。',locale)} <a href="${routeLink(route,'joint-pilot.html',locale)}">${t('查看自建聯合資料',locale)} →</a></p>

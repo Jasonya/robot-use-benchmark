@@ -1,0 +1,334 @@
+[
+  {
+    "id": "EX01",
+    "operator": "X01",
+    "name": "摺疊後按尺寸收納",
+    "parent_source_ids": [
+      "behavior::fold_towels"
+    ],
+    "parent_paper_ids": [
+      "P100"
+    ],
+    "parent_sources": [
+      "https://github.com/StanfordVL/BEHAVIOR-1K/blob/4b0f43dfb7f7f759e5e9f575e8d72f56492eab5f/bddl3/bddl/activity_definitions/fold_towels/problem0.bddl"
+    ],
+    "base_definition": "將毛巾摺好",
+    "extended_definition": "摺疊符合尺寸規格，並放入對應收納區",
+    "distinguishing_example": "只在桌上摺好：父任務可滿足，但新增收納條件未滿足",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "cloth_fold_quality",
+      "target_region",
+      "object_identity"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "task_spec_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX02",
+    "operator": "X02",
+    "name": "掃集時限制非目標物位移",
+    "parent_source_ids": [
+      "vima::constraint_satisfaction/sweep_without_touching"
+    ],
+    "parent_paper_ids": [
+      "P075"
+    ],
+    "parent_sources": [
+      "https://github.com/vimalabs/VIMABench/blob/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/constraint_satisfaction/without_touching.py"
+    ],
+    "base_definition": "完成原掃集目標及原作限制",
+    "extended_definition": "為指定非目標物增加明確的整段位移上限",
+    "distinguishing_example": "掃集完成但非目標物超過新上限：原版是否接受依原作判分，新規格拒絕",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "target_collection",
+      "protected_object_trace",
+      "tolerance"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "rule_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX03",
+    "operator": "X03",
+    "name": "取物後關回抽屜",
+    "parent_source_ids": [
+      "arnold::open_drawer",
+      "arnold::close_drawer"
+    ],
+    "parent_paper_ids": [
+      "P081"
+    ],
+    "parent_sources": [
+      "https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/open_drawer.py",
+      "https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/close_drawer.py"
+    ],
+    "base_definition": "達到指定抽屜開合程度",
+    "extended_definition": "開抽屜、取得指定物件、最後關回；加入必要事件順序",
+    "distinguishing_example": "最後抽屜關好但未取物：單一關閉任務可滿足，組合程序未完成",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "drawer_state",
+      "grasp_or_acquired_object",
+      "event_order"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "process_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX04",
+    "operator": "X04",
+    "name": "依接收容器餘量選擇分裝",
+    "parent_source_ids": [
+      "arnold::transfer_water"
+    ],
+    "parent_paper_ids": [
+      "P081"
+    ],
+    "parent_sources": [
+      "https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/transfer_water.py"
+    ],
+    "base_definition": "轉移到指定連續物料目標",
+    "extended_definition": "先取得容器餘量；容量足夠時一次轉移，不足時依規則分裝",
+    "distinguishing_example": "達到總轉移量但任一容器超容：新增容量分支規則拒絕",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "source_and_destination_volume",
+      "capacity",
+      "branch_observation"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "conditional_task_spec",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX05",
+    "operator": "X05",
+    "name": "按訂單打包後交付",
+    "parent_source_ids": [
+      "behavior::packing_meal_for_delivery",
+      "behavior::delivering_groceries_to_doorstep"
+    ],
+    "parent_paper_ids": [
+      "P100"
+    ],
+    "parent_sources": [
+      "https://github.com/StanfordVL/BEHAVIOR-1K/blob/4b0f43dfb7f7f759e5e9f575e8d72f56492eab5f/bddl3/bddl/activity_definitions/packing_meal_for_delivery/problem0.bddl",
+      "https://github.com/StanfordVL/BEHAVIOR-1K/blob/4b0f43dfb7f7f759e5e9f575e8d72f56492eab5f/bddl3/bddl/activity_definitions/delivering_groceries_to_doorstep/problem0.bddl"
+    ],
+    "base_definition": "來源分別提供打包與送達工作的起點",
+    "extended_definition": "按清單打包、保留載荷、送到指定交付點並完成確認",
+    "distinguishing_example": "打包正確但送錯交付點：打包子任務完成，組合任務未完成",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "order_contents",
+      "container_state",
+      "load_retention",
+      "delivery_region"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "composite_task_spec",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX06",
+    "operator": "X06",
+    "name": "按先前鄰接關係取回",
+    "parent_source_ids": [
+      "vima::require_memory/manipulate_old_neighbor"
+    ],
+    "parent_paper_ids": [
+      "P075"
+    ],
+    "parent_sources": [
+      "https://github.com/vimalabs/VIMABench/blob/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/require_memory/manipulate_old_neighbor.py"
+    ],
+    "base_definition": "根據原作歷史／鄰接規則選取物件",
+    "extended_definition": "加入明訂參考時刻與物件身份，移動後仍按該時刻關係選取",
+    "distinguishing_example": "選了目前鄰居而非參考時刻的鄰居：兩套指涉規則給出不同答案",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "history_snapshot",
+      "object_identity",
+      "reference_time"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "reference_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX07",
+    "operator": "X07",
+    "name": "拉直並保持端點在指定區",
+    "parent_source_ids": [
+      "rlbench::straighten_rope"
+    ],
+    "parent_paper_ids": [
+      "P062"
+    ],
+    "parent_sources": [
+      "https://github.com/stepjam/RLBench/blob/02720bba4c73fe02eb75df946b8791b806028a9d/rlbench/tasks/straighten_rope.py"
+    ],
+    "base_definition": "完成原繩索拉直目標",
+    "extended_definition": "加上兩端點區域與禁止跨越區；確認材料模型可支援後實作",
+    "distinguishing_example": "繩索拉直但端點位於區外：原拉直目標可滿足，擴充約束未滿足",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "rope_geometry",
+      "endpoints",
+      "forbidden_region"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "constraint_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX08",
+    "operator": "X08",
+    "name": "接收確認後才釋放載荷",
+    "parent_source_ids": [
+      "behavior::delivering_groceries_to_doorstep"
+    ],
+    "parent_paper_ids": [
+      "P100"
+    ],
+    "parent_sources": [
+      "https://github.com/StanfordVL/BEHAVIOR-1K/blob/4b0f43dfb7f7f759e5e9f575e8d72f56492eab5f/bddl3/bddl/activity_definitions/delivering_groceries_to_doorstep/problem0.bddl"
+    ],
+    "base_definition": "把物品送到指定交付位置",
+    "extended_definition": "加入接收方與可觀察接穩事件，之後才允許釋放",
+    "distinguishing_example": "物品到達但提前釋放：到達子目標可滿足，交接順序違反",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "partner_model",
+      "supported_load",
+      "receive_event",
+      "release_event"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "role_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX09",
+    "operator": "X09",
+    "name": "偏離後完成装配並復原工具",
+    "parent_source_ids": [
+      "metaworld::assembly-v3"
+    ],
+    "parent_paper_ids": [
+      "P063"
+    ],
+    "parent_sources": [
+      "https://github.com/Farama-Foundation/Metaworld/blob/59fc34d7768af9785e4688c3e1db671424f4a6c3/metaworld/env_dict.py"
+    ],
+    "base_definition": "完成原生裝配目標",
+    "extended_definition": "在記錄的中途偏離條件後完成裝配，並把使用工具放回指定狀態",
+    "distinguishing_example": "裝配成功但工具未復原：新增終態尚未全部完成",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "assembly_predicate",
+      "intervention_event",
+      "tool_restoration"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "recovery_spec_or_intervention_case",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX10",
+    "operator": "X10",
+    "name": "依最新有效訂單分揀並登記",
+    "parent_source_ids": [
+      "vima::instruction_following/visual_manipulation"
+    ],
+    "parent_paper_ids": [
+      "P075"
+    ],
+    "parent_sources": [
+      "https://github.com/vimalabs/VIMABench/blob/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/instruction_following/simple_manipulation.py"
+    ],
+    "base_definition": "依視覺／文字提示移動指定物件",
+    "extended_definition": "查詢有效訂單版本，完成對應放置後登記；物理與數位結果需一致",
+    "distinguishing_example": "依過期版本正確放置：舊提示可滿足，最新版本規格不接受",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "order_version",
+      "image_entity_binding",
+      "physical_goal",
+      "database_goal"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "tool_process_variant",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX11",
+    "operator": "X11",
+    "name": "摺疊規格保持，增加觀測條件",
+    "parent_source_ids": [
+      "softgym::ClothFold"
+    ],
+    "parent_paper_ids": [
+      "P085"
+    ],
+    "parent_sources": [
+      "https://github.com/Xingyu-Lin/softgym/blob/bb383f64cd488062587714abbae38f27ed9f2457/softgym/registered_env.py"
+    ],
+    "base_definition": "完成同一摺疊目標",
+    "extended_definition": "分別提供固定相機、多視角或可主動觀察條件；保留足夠線索",
+    "distinguishing_example": "這項擴充不宣稱新的物理目標；它形成不同的觀測測例",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "same_fold_goal",
+      "camera_or_observation_contract",
+      "information_sufficiency"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "observation_or_instance_case",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  },
+  {
+    "id": "EX12",
+    "operator": "X12",
+    "name": "從架子製作程序建立下一步判斷",
+    "parent_source_ids": [
+      "crosstask::59684"
+    ],
+    "parent_paper_ids": [
+      "P004"
+    ],
+    "parent_sources": [
+      "https://www.di.ens.fr/~dzhukov/crosstask/crosstask_release.zip"
+    ],
+    "base_definition": "來源提供製作架子的活動與步驟定義",
+    "extended_definition": "給定可用影片前綴／已完成步驟，判斷下一個合法程序步驟",
+    "distinguishing_example": "下一步推論正確只滿足資訊題；機器人完成實物另有控制task",
+    "distinguishing_example_is_executed": false,
+    "evaluator_requirements": [
+      "activity_identity",
+      "observed_prefix",
+      "partial_order_or_reference_step",
+      "answer_set"
+    ],
+    "status": "authored_extension_specification_not_executed",
+    "novelty_vs_prior_union": "pending; equivalent existing rules must be linked rather than claimed new",
+    "count_level": "typed_information_spec",
+    "scope": "Example design, not a calibrated difficulty label or valid case count."
+  }
+]

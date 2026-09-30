@@ -1,26 +1,402 @@
-<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>整体设计 v0.5：大规模、广覆盖、统一评测 · Robot-use Benchmark</title>
-  <meta name="description" content="全库目标、12 场域配额、场景制作、机体与观测、实验、难度、预算与milestones集中说明。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/design.html">
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>主设计v0.7：前作联集、Survey分类与任务规则扩充 · Robot-use Benchmark</title>
+  <meta name="description" content="以全面来源收集、任务分类、联集和可扩充规则创建大而广的benchmark；来源目录与可运行子集分开。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/design.html">
   <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/design.html">
-  <meta property="og:type" content="website"><meta property="og:title" content="整体设计 v0.5：大规模、广覆盖、统一评测 · Robot-use Benchmark"><meta property="og:description" content="全库目标、12 场域配额、场景制作、机体与观测、实验、难度、预算与milestones集中说明。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/design.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/site.css?v=30d0900cbcb1">
+  <meta property="og:type" content="website"><meta property="og:title" content="主设计v0.7：前作联集、Survey分类与任务规则扩充 · Robot-use Benchmark"><meta property="og:description" content="以全面来源收集、任务分类、联集和可扩充规则创建大而广的benchmark；来源目录与可运行子集分开。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/design.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/site.css?v=8e0e332ca777">
+  <link rel="stylesheet" href="../assets/survey-union.css?v=8e0e332ca777">
 
-  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"design.html","title":"整体设计 v0.5：大规模、广覆盖、统一评测","kind":"design","localeRoot":"","searchIndexURL":"../assets/search-zh-hans.js?v=30d0900cbcb1","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原始定义","staticOnly":"静态提取；G2 与可运行性尚未验证","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"来源与对应细节","empty":"没有符合的来源纪录","showing":"显示","records":"笔来源纪录","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原生任务 ID","native_task_class":"任务类别实作","native_task_registration":"任务注册项","native_task_module":"任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务 schema","generator_configuration":"生成／协作设置","integration_registration_group":"集成框架注册组","evaluation_protocol":"评测协定入口","video_task_schema":"视频任务 schema","human_sim_task_mapping":"人类／模拟任务映射"},"buckets":{"native_task_candidates":"原生任务候选（异质粒度）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口"}}}};</script>
-  <script defer src="../assets/site.js?v=30d0900cbcb1"></script></head>
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"design.html","title":"主设计v0.7：前作联集、Survey分类与任务规则扩充","kind":"design","localeRoot":"","searchIndexURL":"../assets/search-zh-hans.js?v=8e0e332ca777","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原始定义","staticOnly":"静态提取；G2 与可运行性尚未验证","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"来源与对应细节","empty":"没有符合的来源纪录","showing":"显示","records":"笔来源纪录","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原生任务 ID","native_task_class":"原生任务类别","native_task_registration":"任务注册项","native_task_module":"任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务 schema","generator_configuration":"生成／协作设置","integration_registration_group":"集成框架注册组","evaluation_protocol":"评测协定入口","video_task_schema":"视频任务 schema","human_sim_task_mapping":"人类／模拟任务映射","native_task_template":"原生任务模板","instructional_activity_definition":"人类程序活动定义"},"buckets":{"native_task_candidates":"原生任务候选（异质粒度）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类程序活动（视频来源）"}}}};</script>
+  <script defer src="../assets/site.js?v=8e0e332ca777"></script></head>
   <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
   <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
-  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="design.html" class="active" aria-current="page">整体设计</a><a href="compare.html">Benchmark 比较</a><a href="native-tasks.html">来源任务库</a><a href="chapters/index.html">章节阅读</a><a href="explore/tasks.html">情境种子</a><a href="library.html">文献地图</a><a class="mobile-search" href="search.html">全文搜索</a></nav>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="survey-union.html">Benchmark 总库</a><a href="design.html" class="active" aria-current="page">整体设计</a><a href="compare.html">详细比较</a><a href="native-tasks.html">来源任务库</a><a href="chapters/index.html">章节阅读</a><a href="library.html">文献地图</a><a class="mobile-search" href="search.html">全文搜索</a></nav>
   <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
   <div class="language-switch" aria-label="语言"><a href="../zh-hant/design.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="design.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
-  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="章节导览"><div class="sidebar-label">设计与实际开发</div><a href="design.html" class="active" aria-current="page">整体设计、广度与目标</a><a href="execution.html">实际运行、模型与验证</a><a href="readiness.html">待完善事项与验收</a><a href="compare.html">Benchmark × 领域／场景／题数</a><a href="scale-plan.html">规模方案与来源查核</a><a href="native-tasks.html">完整原生来源盘点</a><div class="sidebar-divider"></div><div class="sidebar-label">研究与设计章节</div><a href="chapters/01.html"><span>01</span>研究目标与当前状态</a><a href="chapters/02.html"><span>02</span>用一个例子理解整套系统</a><a href="chapters/03.html"><span>03</span>规模的六个 granularity levels</a><a href="chapters/04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="chapters/05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="chapters/06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="chapters/07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="chapters/08.html"><span>08</span>评测协定、指针与比较方法</a><a href="chapters/09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="chapters/10.html"><span>10</span>难度如何量化</a><a href="chapters/11.html"><span>11</span>题数、领域与运行预算</a><a href="chapters/12.html"><span>12</span>工程实作、数据格式与发布</a><a href="chapters/13.html"><span>13</span>论文流程与 milestones</a><a href="chapters/14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="joint-pilot.html">自建120联合测例</a><a href="explore/families.html">48 个任务家族</a><a href="explore/tasks.html">180 个情境蓝图</a><a href="explore/probes.html">24 个 Ego 题型</a><a href="explore/metrics.html">40 个指针</a><a href="appendices/axes.html">完整分类轴</a><a href="appendices/comparison.html">原生规模比较</a><a href="research.html">文献更新与分类</a><a href="library.html">250 篇文献</a><a href="appendices/methods.html">来源与数据字典</a></aside><main class="reader" id="main-content">
-    <details class="mobile-chapter-nav"><summary>章节与数据库</summary><div class="sidebar-label">设计与实际开发</div><a href="design.html" class="active" aria-current="page">整体设计、广度与目标</a><a href="execution.html">实际运行、模型与验证</a><a href="readiness.html">待完善事项与验收</a><a href="compare.html">Benchmark × 领域／场景／题数</a><a href="scale-plan.html">规模方案与来源查核</a><a href="native-tasks.html">完整原生来源盘点</a><div class="sidebar-divider"></div><div class="sidebar-label">研究与设计章节</div><a href="chapters/01.html"><span>01</span>研究目标与当前状态</a><a href="chapters/02.html"><span>02</span>用一个例子理解整套系统</a><a href="chapters/03.html"><span>03</span>规模的六个 granularity levels</a><a href="chapters/04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="chapters/05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="chapters/06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="chapters/07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="chapters/08.html"><span>08</span>评测协定、指针与比较方法</a><a href="chapters/09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="chapters/10.html"><span>10</span>难度如何量化</a><a href="chapters/11.html"><span>11</span>题数、领域与运行预算</a><a href="chapters/12.html"><span>12</span>工程实作、数据格式与发布</a><a href="chapters/13.html"><span>13</span>论文流程与 milestones</a><a href="chapters/14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="joint-pilot.html">自建120联合测例</a><a href="explore/families.html">48 个任务家族</a><a href="explore/tasks.html">180 个情境蓝图</a><a href="explore/probes.html">24 个 Ego 题型</a><a href="explore/metrics.html">40 个指针</a><a href="appendices/axes.html">完整分类轴</a><a href="appendices/comparison.html">原生规模比较</a><a href="research.html">文献更新与分类</a><a href="library.html">250 篇文献</a><a href="appendices/methods.html">来源与数据字典</a></details><div class="breadcrumb"><a href="index.html">首页</a><span>/</span><span>整体设计</span></div>
-    <div class="eyebrow">OVERALL DESIGN · v0.5 UPDATE</div><h1>任务多、涵盖广，放进同一套评测。</h1>
-    <p class="lede">整个 benchmark 改成大型任务库、具体广度配额与共用评测平台。每批扩张都同时检查「多了哪些任务」和「补足哪些覆盖」。</p>
-    <div class="page-meta"><span>2026-09-29</span><span class="pill status">已有开发实绩 · 全库目标尚未达成</span><span>模拟环境</span></div>
-    <div class="chapter-summary"><div class="label">先掌握这三件事</div><ul><li>全库初始目标 2,000–3,000 种独立任务；任务数与有效覆盖各以至少最大可比基准 2 倍为目标。</li><li>12 个核心场域各提出 100 个有效任务绑定、8 个家族、3 类机制的最低支撑量。</li><li>同一任务换场域或机体，增加覆盖、实例和实作量；全球 G2 只计一次。</li></ul></div>
-    <ol class="design-flow" aria-label="整体建置流程"><li><small>01</small><b>完整来源库</b><span>原作、版本、原生 ID 与来源关系</span></li><li><small>02</small><b>独立任务库</b><span>合并重复、保留真正不同的目标与流程</span></li><li><small>03</small><b>广度与实例</b><span>跨场域、材料、机体创建有效情境</span></li><li><small>04</small><b>统一评测平台</b><span>共用入口、合法测例、判分与结果</span></li></ol>
-    <div class="cta-row"><a class="button" href="#iteration-section-3">看目标与共同门槛 ↓</a><a class="button secondary" href="compare.html">前作 × 领域／场景／题数比较 →</a></div>
-    <div class="scope-notice"><b>新版集成设计与完整证据</b><p>本页先读v0.5更新：新文献、场景规模、实验、数据与milestone。后段保留v0.4原则和容量模型，当时的状态与现在分开。</p><a href="../downloads/current-report-zh-hant.pdf">下载383页最新集成PDF →</a></div>
-    <div class="prose"><section id="current-design-update">
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar"><div class="sidebar-label">研究主线与来源总库</div><a href="design.html" class="active" aria-current="page">整体设计、广度与目标</a><a href="execution.html">工程附录：原生模型与验证</a><a href="readiness.html">待完善事项与验收</a><a href="compare.html">Benchmark × 领域／场景／题数</a><a href="scale-plan.html">规模方案与来源查核</a><a href="native-tasks.html">完整原生来源盘点</a><div class="sidebar-divider"></div><div class="sidebar-label">研究与设计章节</div><a href="chapters/01.html"><span>01</span>研究目标与当前状态</a><a href="chapters/02.html"><span>02</span>用一个例子理解整套系统</a><a href="chapters/03.html"><span>03</span>规模的六个 granularity levels</a><a href="chapters/04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="chapters/05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="chapters/06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="chapters/07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="chapters/08.html"><span>08</span>评测协定、指针与比较方法</a><a href="chapters/09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="chapters/10.html"><span>10</span>难度如何量化</a><a href="chapters/11.html"><span>11</span>题数、领域与运行预算</a><a href="chapters/12.html"><span>12</span>工程实作、数据格式与发布</a><a href="chapters/13.html"><span>13</span>论文流程与 milestones</a><a href="chapters/14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="survey-union.html">Benchmark总库与任务规则</a><a href="joint-pilot.html">工程附录：联合流程试作</a><a href="explore/families.html">48 个任务家族</a><a href="explore/tasks.html">180 个情境蓝图</a><a href="explore/probes.html">24 个 Ego 题型</a><a href="explore/metrics.html">40 个指针</a><a href="appendices/axes.html">完整分类轴</a><a href="appendices/comparison.html">原生规模比较</a><a href="research.html">文献更新与分类</a><a href="library.html">250 篇文献</a><a href="appendices/methods.html">来源与数据字典</a></aside><main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>章节与数据库</summary><div class="sidebar-label">研究主线与来源总库</div><a href="design.html" class="active" aria-current="page">整体设计、广度与目标</a><a href="execution.html">工程附录：原生模型与验证</a><a href="readiness.html">待完善事项与验收</a><a href="compare.html">Benchmark × 领域／场景／题数</a><a href="scale-plan.html">规模方案与来源查核</a><a href="native-tasks.html">完整原生来源盘点</a><div class="sidebar-divider"></div><div class="sidebar-label">研究与设计章节</div><a href="chapters/01.html"><span>01</span>研究目标与当前状态</a><a href="chapters/02.html"><span>02</span>用一个例子理解整套系统</a><a href="chapters/03.html"><span>03</span>规模的六个 granularity levels</a><a href="chapters/04.html"><span>04</span>文献地图、Ego 与预测研究</a><a href="chapters/05.html"><span>05</span>和既有 benchmark 比，哪些可以复用</a><a href="chapters/06.html"><span>06</span>完整 benchmark 的覆盖设计</a><a href="chapters/07.html"><span>07</span>示范、标注、数据切分与有效性</a><a href="chapters/08.html"><span>08</span>评测协定、指针与比较方法</a><a href="chapters/09.html"><span>09</span>六个详细情境：从概念到验收</a><a href="chapters/10.html"><span>10</span>难度如何量化</a><a href="chapters/11.html"><span>11</span>题数、领域与运行预算</a><a href="chapters/12.html"><span>12</span>工程实作、数据格式与发布</a><a href="chapters/13.html"><span>13</span>论文流程与 milestones</a><a href="chapters/14.html"><span>14</span>版本口径、阅读结论与尚待决策</a><div class="sidebar-divider"></div><div class="sidebar-label">深入数据库</div><a href="survey-union.html">Benchmark总库与任务规则</a><a href="joint-pilot.html">工程附录：联合流程试作</a><a href="explore/families.html">48 个任务家族</a><a href="explore/tasks.html">180 个情境蓝图</a><a href="explore/probes.html">24 个 Ego 题型</a><a href="explore/metrics.html">40 个指针</a><a href="appendices/axes.html">完整分类轴</a><a href="appendices/comparison.html">原生规模比较</a><a href="research.html">文献更新与分类</a><a href="library.html">250 篇文献</a><a href="appendices/methods.html">来源与数据字典</a></details><div class="breadcrumb"><a href="index.html">首页</a><span>/</span><span>目前主设计</span></div>
+  <div class="eyebrow">SURVEY → TASK UNION → EXTENSIONS · v0.7</div><h1>完整前作联集，加上可扩充的任务与规则。</h1><p class="lede">先全面收集既有benchmark，再像survey一样整理领域、任务和规则。集成互补来源，扩充新的目标与流程；可运行子集是后续集成工作的进度。</p>
+  <div class="page-meta"><span>2026-09-29</span><span class="pill green">目前主设计 v0.7</span><span>来源含模拟、实体与人类视频；运行以模拟为主</span></div>
+  <div class="chapter-summary"><div class="label">研究主线</div><ul><li>完整搜集前作，保留各benchmark的原生领域、任务定义、规则与版本。</li><li>以Survey分类与任务联集取得更大、更广的覆盖，再逐层量化增量。</li><li>允许扩充任务目标、规则、程序与组合；目录收录不以本机先跑通为条件。</li></ul></div>
+  <ol class="design-flow"><li><small>01</small><b>全面来源</b><span>前作、版本、原生领域和task清单</span></li><li><small>02</small><b>Survey与联集</b><span>共同分类、来源链接与多粒度规模</span></li><li><small>03</small><b>任务／规则扩充</b><span>目标、约束、程序和工作组合</span></li><li><small>04</small><b>分层集成与评测</b><span>目录保持完整，运行子集另列</span></li></ol>
+  <div class="cta-row"><a class="button" href="survey-union.html">看Benchmark总库与分类 →</a><a class="button secondary" href="#union-design-6">任务与规则如何扩充 ↓</a></div>
+  <div class="prose"><section id="union-first-design">
+<p>更新：2026-09-29。这是目前主设计。v0.4／v0.5的配额和容量数字保留为历史规划；v0.6的小型联合试作移到工程附录。研究范围由来源与任务决定，本机目前能跑哪些环境另列进度。</p>
+<h2 id="union-design-1">1. 计划要完成的三件事</h2>
+<ol>
+<li><strong>全面收集过去相关的 benchmark、含评测的数据集与任务套件。</strong> 涵盖机器人操作、导航／移动操作、柔性物、协作、恢复、从人类观察到操作，以及 Ego／body camera／VLOG 的理解、记忆、规划、预测和世界模型评测。模拟与实体前作均收录；本计划的运行平台以模拟为主。</li>
+<li><strong>像 survey 一样分类，把各来源的领域与任务整理成联集。</strong> 原作的任务名称、类别、规则、场景、机体、观测、数量和版本必须能查回。集成后保留前作的互补范围，按多个粒度展示规模和广度。</li>
+<li><strong>在来源任务上扩充定义与规则。</strong> 增加目标、约束、条件分支、过程要求、组合工作与观测条件，形成可追溯的扩充规格和测例。</li>
+</ol>
+<p>论文主体是「survey 支持的综合任务库＋任务／规则扩充＋统一评测」。复用、集成、分类与标准化都可以是贡献；无须把每一题都说成从零发明。</p>
+<h2 id="union-design-2">2. 从前作联集取得规模与广度</h2>
+<pre><code class="language-text">相关前作的完整来源清单
+        ↓
+研究类型 taxonomy ＋ 原生领域／任务／规则
+        ↓
+保留来源的任务联集 U_base
+        ↓
+目标扩充 ∪ 规则扩充 ∪ 工作组合
+        ↓
+综合任务目录 U_total
+        ↓
+按兼容平台创建场景、观测和可运行测例
+        ↓
+分 track 评测，再报共同与分项结果
+</code></pre>
+<p>在相同分类和计数口径下，完整保留各来源的联集，范围不小于其中任一来源。若来源提供互补的领域、任务或规则，联集便会更大、更广。最后以「共有、只在某来源、集成后增加、我们再扩充」四种数量展示增量。</p>
+<p>这是本计划取得规模优势的主要方法。单一小型试作的成功率不决定这条主线。原先2,000–3,000任务、12场域、240 layouts等数字作容量参考；完整来源清单和实际联集决定下一版规模，不以旧预算封顶。</p>
+<h2 id="union-design-3">3. 收集必须覆盖哪些类型</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>Survey 分支</th>
+<th>收集内容</th>
+<th>集成后可提供什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一般操作与灵巧控制</td>
+<td>取放、排列、工具、设备、装配、连续目标、多步操作</td>
+<td>任务定义、对象／机体、控制与判分</td>
+</tr>
+<tr>
+<td>柔性物与材料</td>
+<td>布料、衣物、绳索、袋、颗粒、液体、柔顺固体</td>
+<td>材料专属任务、状态与成功条件</td>
+</tr>
+<tr>
+<td>导航与移动操作</td>
+<td>导航、搜索、载运、跨房间、跟随、移动操作</td>
+<td>场景、路径／访问约束、载荷与操作流程</td>
+</tr>
+<tr>
+<td>协作与辅助</td>
+<td>多机器人、交接、共同操作、人机协作</td>
+<td>角色、依赖、时序、资源与共同目标</td>
+</tr>
+<tr>
+<td>恢复、稳健与过程评测</td>
+<td>扰动、错误、重试、复原、过程限制</td>
+<td>规则、介入条件与失败判分</td>
+</tr>
+<tr>
+<td>人类观察到操作</td>
+<td>人类示范、模仿、观察后运行</td>
+<td>视频／任务关系、目标指涉与转移条件</td>
+</tr>
+<tr>
+<td>人类视频与动作资源</td>
+<td>Ego、身体相机、VLOG、教学、外部／多视角</td>
+<td>活动、程序、对象、领域与观测资源</td>
+</tr>
+<tr>
+<td>理解、记忆与推理</td>
+<td>QA、空间、历史、意图、程序理解</td>
+<td>信息型任务与可接到操作的中间目标</td>
+</tr>
+<tr>
+<td>Ego／行为预测</td>
+<td>动作、对象、接触时间、手／身体／路径、交互</td>
+<td>各预测目标、输入时间窗与答案型态</td>
+</tr>
+<tr>
+<td>世界模型</td>
+<td>状态转移、动作条件预测、视频／物理未来</td>
+<td>模型预测与规划／运行的分项评测</td>
+</tr>
+<tr>
+<td>通用策略与集成平台</td>
+<td>数据联集、跨机体、模拟界面、综合评测</td>
+<td>任务来源、界面与数据相依关系</td>
+</tr>
+<tr>
+<td>评测方法与延伸工具</td>
+<td>统计、难度、multimodal tool use、数字／物理工作</td>
+<td>评测规则与可选工具扩充</td>
+</tr>
+</tbody>
+</table></div>
+<p>主要分支使用既有十二类作索引，次分类与来源原生分类继续扩充。专门场域与尚不能本机重跑的资源仍留在来源库。纯方法论文可保留于 survey 的 related works；其所使用的父 benchmark 另链接，避免把方法本身当成添加任务库。</p>
+<h2 id="union-design-4">4. 分类字段要足以回查任务</h2>
+<p>每个来源至少有下列字段：</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>轴</th>
+<th>记录方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源身份</td>
+<td>paper／dataset／benchmark ID、原名、年份、版本、官方入口、父来源</td>
+</tr>
+<tr>
+<td>资源角色</td>
+<td>benchmark、含评测数据集、任务／平台、数据源、方法、survey；可复选</td>
+</tr>
+<tr>
+<td>研究 taxonomy</td>
+<td>操作、预测、理解、恢复等主要／次要分支</td>
+</tr>
+<tr>
+<td>应用领域</td>
+<td>保留原作者的领域名称，再映射共同 domain；共同分类可以扩充</td>
+</tr>
+<tr>
+<td>任务家族</td>
+<td>导航、装配、折叠、选取、倒注、协作等，多粒度保留</td>
+</tr>
+<tr>
+<td>原生任务</td>
+<td>task／activity／schema ID、原始指令、goal、必要过程、参数范围</td>
+</tr>
+<tr>
+<td>物理与环境</td>
+<td>材料、机构、scene／layout、对象、机体与动作界面</td>
+</tr>
+<tr>
+<td>观测与任务类型</td>
+<td>文字／图像／视频／state／历史；控制、QA、规划、预测、世界模型分型</td>
+</tr>
+<tr>
+<td>数量</td>
+<td>原作数字及单位、全库／训练／测试subset、已提取的原生定义量</td>
+</tr>
+<tr>
+<td>收集进度</td>
+<td>已登记、已读来源、已取得原生清单、已完成共同映射</td>
+</tr>
+<tr>
+<td>运行进度</td>
+<td>资产取得、adapter、可解性、判分、模型测试；独立于收录状态</td>
+</tr>
+</tbody>
+</table></div>
+<p>先完成来源与原生任务盘点，保留原作者的细分类；共同 taxonomy 可逐步细化。已有107篇原始书目被标记含benchmark贡献，与68项详细比较交集之外尚有75篇来源先前未进比较表；它们现在全部接到来源总目录，来源层标记与逐任务审核状态仍分开。</p>
+<h2 id="union-design-5">5. 任务目录与运行子集分开管理</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>集合</th>
+<th>收录依据</th>
+<th>需要本机先跑通吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源总库</td>
+<td>确认前作身份、范围、角色与出处</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>原生任务库</td>
+<td>原作者的task／activity／schema定义与ID</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>共同任务目录</td>
+<td>对齐目标、规则、家族和来源关系</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>扩充规格库</td>
+<td>有明确父任务、修改内容与判分需求</td>
+<td>不需要先有运行结果；标为规格</td>
+</tr>
+<tr>
+<td>可运行任务／测例</td>
+<td>实际资产、adapter、合法初态与有效判分</td>
+<td>需要</td>
+</tr>
+<tr>
+<td>模型结果库</td>
+<td>固定方法、条件与预算下的实际运行</td>
+<td>需要</td>
+</tr>
+</tbody>
+</table></div>
+<p>因此，某个布料或导航套件需要其他硬件时，仍可以先纳入其任务与规则，完成survey和任务目录。部署和实验进度由运行表呈现。物理控制、视频QA和预测在同一平台中使用各自的task kind、输入与分数。</p>
+<h2 id="union-design-6">6. 任务定义与规则怎么扩充</h2>
+<p>每个扩充都保存 <code>parent_source_ids → base_task_id → variant_spec_id → change → evaluator_requirements</code>。以下是可以实际采用的扩充方向：</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>扩充方式</th>
+<th>具体例子</th>
+<th>计数字置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>增加终态目标</td>
+<td>折好布品，再按规格收纳</td>
+<td>task spec／规格变体，另保留父任务</td>
+</tr>
+<tr>
+<td>改变成功规则</td>
+<td>放进容器，且不得突出边界、不得混入其他类别</td>
+<td>规则变体</td>
+</tr>
+<tr>
+<td>增加必要顺序</td>
+<td>先检查，再封箱；取物后关回柜门</td>
+<td>过程规格／规则变体</td>
+</tr>
+<tr>
+<td>条件分支</td>
+<td>尺寸不合则换容器；库存不足则改配或询问</td>
+<td>条件式任务规格</td>
+</tr>
+<tr>
+<td>复合工作</td>
+<td>拣选→装箱→配送→交接</td>
+<td>组合工作规格，链接所有子任务</td>
+</tr>
+<tr>
+<td>历史与指涉</td>
+<td>找回上一次使用或移动过的对象</td>
+<td>指涉／观测规格；是否改变base task另记</td>
+</tr>
+<tr>
+<td>资源与容量</td>
+<td>同时满足订单、载重、容器容量与工具可用性</td>
+<td>约束规格</td>
+</tr>
+<tr>
+<td>协作规则</td>
+<td>交接需对方接稳才释放；多人依序使用工作站</td>
+<td>角色／时序规格</td>
+</tr>
+<tr>
+<td>恢复与复原</td>
+<td>中途掉落后续作；完成后恢复指定状态</td>
+<td>恢复task／介入测例，分栏</td>
+</tr>
+<tr>
+<td>数字工具</td>
+<td>查到有效订单或版本后才运行；登记需与物理结果一致</td>
+<td>可选工具／过程规格</td>
+</tr>
+<tr>
+<td>观测与泛化</td>
+<td>同规则换视角、对象、场景或初态</td>
+<td>instance／case；原生粒度另保留</td>
+</tr>
+<tr>
+<td>预测／信息输出</td>
+<td>同一活动加入下一对象、接触时间、后续步骤的预测</td>
+<td>对应信息task kind与题型</td>
+</tr>
+</tbody>
+</table></div>
+<p>规则本身可以是研究设计的扩充。相同终态但不同必要过程，可以有不同的有效解集合；保存这个差异，不把它一律压成同一个ID，也不把所有规则变体称为全新任务家族。</p>
+<p>生成器从有适用条件的任务与规则组合产生候选，再检查定义、信息充分性和判分可行性。实际运行后的通过数另列。目录可保留完整的容易、中等与困难任务；难度分层是后续分析。</p>
+<h2 id="union-design-7">7. 比较表必须同时列多个尺度</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>比较尺度</th>
+<th>本计划怎么报</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源数</td>
+<td>benchmark／数据集／版本／方法分栏；保留衍生关系</td>
+</tr>
+<tr>
+<td>领域</td>
+<td>原生域＋共同域，列出联集带来的添加范围</td>
+</tr>
+<tr>
+<td>任务家族</td>
+<td>粗分类与细分类并列，所有前作使用同一层</td>
+</tr>
+<tr>
+<td>原生任务量</td>
+<td>忠实列原作者task／activity／schema数与scope</td>
+</tr>
+<tr>
+<td>共同base task</td>
+<td>跨来源对齐后的任务内核数；保留重叠关系</td>
+</tr>
+<tr>
+<td>扩充规格</td>
+<td>目标、规则、流程和组合变体数；与base分栏</td>
+</tr>
+<tr>
+<td>场景／对象</td>
+<td>layouts、配置、mesh、资产类别及来源</td>
+</tr>
+<tr>
+<td>测例／数据</td>
+<td>初态、episodes、QA、预测样本、视频和示范各自列</td>
+</tr>
+<tr>
+<td>实际评测</td>
+<td>支持的backend、完成测例、受测模型与运行量</td>
+</tr>
+</tbody>
+</table></div>
+<p>来源集成的增量、任务／规则扩充的增量与运行完成度，都应有各自的表和分布图。任务定义充分时，目录可先报语义规模；正式模型成绩报可运行集合与覆盖比例。</p>
+<h2 id="union-design-8">8. 搜集与分类的完成条件</h2>
+<p>目标是全面盘点，清单保持开放。每个survey分支保存查找、数据库、引用追查与官方task-list入口；逐笔标记已纳入、衍生版本、相关方法、待查与排除理由。</p>
+<p>当前250篇书目、68项详细比较与原5,020笔来源是起点。添加来源继续进同一目录；不能把已有书目数当作「搜索已完成」。对每个已纳入benchmark，分别记录「是否取得完整原生任务清单」和「该清单还有多少定义未分类」。</p>
+<p>本轮重新接起既有书目和比较表，并补抓官方VIMA、ARNOLD、COIN、CrossTask任务定义。这些来源拓展的是既有任务联集；原始人类视频和模拟运行不在这次读取动作中。</p>
+<h2 id="union-design-9">9. 现在的工作顺序与论文图表</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="数据表，可水平卷动"><table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>主要交付</th>
+<th>完成依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U0 全面来源总库</td>
+<td>原作、版本、角色、taxonomy、搜索与引用追查清单</td>
+<td>每支都有来源／待查表，未收齐者可见</td>
+</tr>
+<tr>
+<td>U1 原生任务联集</td>
+<td>每benchmark完整task list、native分类、goal／规则、资产入口</td>
+<td>task ID可追溯，缺失清单可量化</td>
+</tr>
+<tr>
+<td>U2 共同分类与分布</td>
+<td>benchmark×domain×family×材料／观测矩阵、多粒度计数</td>
+<td>显示共有／互补／衍生来源与映射依据</td>
+</tr>
+<tr>
+<td>U3 任务与规则扩充</td>
+<td>规格语法、适用条件、父任务、例子与扩充清单</td>
+<td>每个规格有修改说明和判分要求</td>
+</tr>
+<tr>
+<td>U4 平台集成</td>
+<td>各backend adapter、资产与运行子集</td>
+<td>按来源／家族报可运行比例；保持完整目录</td>
+</tr>
+<tr>
+<td>U5 分层评测</td>
+<td>各track基线、难度与泛化、规则消融</td>
+<td>在固定条件和有效测例上比较</td>
+</tr>
+<tr>
+<td>U6 论文／发布</td>
+<td>survey、完整联集、规则增量、平台与实验</td>
+<td>题名和主张对应实际交付与覆盖</td>
+</tr>
+</tbody>
+</table></div>
+<p>U0–U3是当前主线；已有工程组件支持后面的集成。论文先用「来源全景图、taxonomy分布、benchmark逐列比较、task联集与重叠、规则扩充谱系」说清楚大与广，再以运行实验支持可用性。</p>
+<h2 id="union-design-10">10. 既有工程结果放在哪里</h2>
+<p>50个Meta-World原生任务的运行器与基线，保留作为一个已实作backend的证据。120个合成联合测例、720次固定程序试验和92.5%结果，保留于工程附录，用于检查图像、工具、物理和判分的数据链。</p>
+<p>它们提供可复用的程序与测试，研究题目仍由前作联集、分类结果与扩充规格决定。下一个主要交付是更完整的benchmark／task目录和规则库。</p></section></div>
+  <div class="reader-actions"><a class="text-button" href="../downloads/survey-union/UNION_FIRST_DESIGN_V0_7.md" download>下载目前主设计</a><a class="text-button" href="../downloads/survey-union/extension_grammar.json" download>任务规则语法</a><a class="text-button" href="../downloads/current-report-zh-hant.pdf">403页完整PDF</a><button class="text-button print-page">打印本页</button></div>
+  <details class="union-legacy" id="historical-design-plans"><summary>历史设计与容量模型：v0.4／v0.5（保留原引用）</summary><p class="source-note">以下保留旧预算、配额和当时的工程顺序，供查阅与比较；目前主线以上方v0.7为准。</p><div class="prose"><section id="current-design-update">
 <p>更新：2026-09-25。主要目标维持 v0.4 的大规模、广覆盖、共用平台。本版加入新文献、可操作分类、真正的原生模拟结果，以及明确的场景／数据制作规格。2,000–3,000 个 G2 与相对规模／覆盖各至少 2×，目前仍是待达成目标。</p>
 <h2 id="iteration-section-1">1. 现在交付什么，论文还需证明什么</h2>
 <p>现已整理250篇书目，其中137篇有完整摘要审阅纪录；比较表涵盖68项前作。来源程序保留5,020笔异质纪录，已解析1,146份声明目标、索引598笔含明订成功评估或条件注册的来源。这是较完整的研究与工程底座，尚不是5,020种完成的新任务。</p>
@@ -266,7 +642,7 @@
 </tbody>
 </table></div>
 <p>主文至少包含：同单位前作表、来源到G2去重流程、D×F×K真实支撑图、代表材料／机体任务、固定panel全库结果、错误与恢复、difficulty calibration、human-observation和world-model的有无信息／模块消融。附录提供全部task specs、instance／split manifests、成功与失败例、来源及资产条件。</p>
-<p>第一篇benchmark论文的投稿门槛，是可以公开重建且支持主张的正式subset或全库。若届时只完成部分范围，题名、摘要与规模主张必须按实绩重写；目前不把研发预算写成论文结果。</p></section><div class="notice">以下为2026-09-22的v0.4设计快照；旧的零运行叙述已由上方实绩更新。保留原则、公式与既有引用位置。</div><section id="overall-design-spec">
+<p>第一篇benchmark论文的投稿门槛，是可以公开重建且支持主张的正式subset或全库。若届时只完成部分范围，题名、摘要与规模主张必须按实绩重写；目前不把研发预算写成论文结果。</p></section><section id="overall-design-spec">
 <p>更新：2026-09-22。研究范围仍是模拟。这是一份整体研发设计，没有把尚未实作的任务、场景或实验列为成果。</p>
 <p><strong>整个设计改成：完整来源任务库 → 范式任务库 → 广度约束下的场景实例 → 共用评测平台。</strong></p>
 <p>主目标同时要求「真正不同的任务多」、「实际覆盖的场域与机制广」和「一套入口能管理与评测」。2,000–3,000 个范式任务仍是初始研发目标；数量和覆盖要各自验收。</p>
@@ -749,10 +1125,9 @@ B_execution = 不同 (task, context, profile, backend contract) 运行绑定
     <div class="capacity-controls js-only"><label for="capacity-instances">每运行绑定的有效初态<select id="capacity-instances" data-capacity-input="instances"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label><label for="capacity-conditions">每实例的合法条件组合<select id="capacity-conditions" data-capacity-input="conditions"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option></select></label><label for="capacity-repeats">每固定测例的运行次数<select id="capacity-repeats" data-capacity-input="repeats"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option></select></label><label for="capacity-methods">完整兼容的方法数<select id="capacity-methods" data-capacity-input="methods"><option value="1">1</option><option value="4">4</option><option value="8" selected>8</option></select></label></div>
     <div class="capacity-results" aria-live="polite" aria-atomic="true"><div><strong data-capacity-output="instances">30,000</strong><span>G3 实例配置</span></div><div><strong data-capacity-output="cases">120,000</strong><span>G4 合法测例配置</span></div><div><strong data-capacity-output="per-method">360,000</strong><span>每个方法的运行量</span></div><div><strong data-capacity-output="total">2,880,000</strong><span>所有方法的总运行量</span></div></div>
     <p class="capacity-note">4 种条件可代表 2 种信息 × 2 种介入；只有合法且适用时才能相乘。假设所有方法能运行全部绑定。这些是预算，不是已完成的实验；实际成本由 pilot 量测。</p>
-  </section>
-    <div class="reader-actions"><button class="text-button copy-link">拷贝本页链接</button><button class="text-button print-page">打印本页</button><a class="text-button" href="../downloads/overall-design/OVERALL_DESIGN_V0_4.md" download>下载完整设计</a><a class="text-button" href="../downloads/overall-design/breadth_quota_template.csv" download>下载 12 场域配额表</a><a class="text-button" href="../downloads/overall-design/overall_design_plan.json" download>下载计划 JSON</a></div>
-    </main><aside class="on-this-page" aria-label="本页内容"><div class="sidebar-label">本页内容</div><a href="#iteration-section-1">1. 现在交付什么，论文还需证明什么</a><a href="#iteration-section-2">2. 「全部整理前作」在工程上应该怎么做</a><a href="#iteration-section-3">3. 多粒度计数和规模目标</a><a href="#iteration-section-4">4. 场景制作预算补上明确分层</a><a href="#iteration-section-5">5. 先例变多后，广度主张如何收敛到可证明的内容</a><a href="#iteration-section-6">6. 每种数据真的能问什么</a><a href="#iteration-section-7">7. T1–T8的合法适用性先于数量</a><a href="#iteration-section-8">8. 难度可以量化，但必须依contract和方法群</a><a href="#iteration-section-9">9. 在只有Mac的条件下如何推进</a><a href="#iteration-section-10">10. Milestone与论文图表</a><a href="#design-section-1">1. 哪些地方改，哪些保留</a><a href="#design-section-2">2. 用四层数据把整套系统串起来</a><a href="#design-section-3">3. 「大」和「广」设成两道共同门槛</a><a href="#design-section-4">4. 广度如何落到任务分配</a><a href="#design-section-5">5. 材料、机体与观测各自管理</a><a href="#design-section-6">6. 任务怎么建出来</a><a href="#design-section-7">7. 平台架构改成可替换的模块</a><a href="#design-section-8">8. 评测内核保留，改成全库与模块分层</a><a href="#design-section-9">9. 同时做大和做广后，预算怎么算</a><a href="#design-section-10">10. Milestones 重新对齐整体目标</a><a href="#design-section-11">11. 论文最后要怎么呈现</a><a href="#design-section-12">12. 目前进度与下一个具体产物</a><a href="#capacity-explorer">交互题量估算</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>从文献到任务、评测与实作的公开研究设计。</div>
-  <div class="footer-links"><a href="design.html">整体设计</a><a href="joint-pilot.html">自建联合数据</a><a href="execution.html">原生开发运行</a><a href="research.html">文献更新与分类</a><a href="../downloads/current-report-zh-hant.pdf">最新完整 PDF · v0.6</a><a href="../downloads/full-report-zh-hant.pdf">历史 PDF · v0.2</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
-  <p class="footer-note">设计 v0.4 · 来源盘点 2026-09-22 · 原文献快照 2026-09-21 · 开发证据 2026-09-29。2,000–3,000 G2 与任务／覆盖至少 2× 仍是未达成目标。5,020 笔来源纪录不等于独立任务；已记录 4,286 次原生开发运行，正式通用 release 尚未完成。</p></div></footer>
+  </section></details>
+  </main><aside class="on-this-page"><div class="sidebar-label">本页内容</div><a href="#union-design-1">1. 计划要完成的三件事</a><a href="#union-design-2">2. 从前作联集取得规模与广度</a><a href="#union-design-3">3. 收集必须覆盖哪些类型</a><a href="#union-design-4">4. 分类字段要足以回查任务</a><a href="#union-design-5">5. 任务目录与运行子集分开管理</a><a href="#union-design-6">6. 任务定义与规则怎么扩充</a><a href="#union-design-7">7. 比较表必须同时列多个尺度</a><a href="#union-design-8">8. 搜集与分类的完成条件</a><a href="#union-design-9">9. 现在的工作顺序与论文图表</a><a href="#union-design-10">10. 既有工程结果放在哪里</a><a href="#historical-design-plans">历史设计与容量模型</a></aside></div><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="survey-union.html">Benchmark总库</a><a href="design.html">目前主设计</a><a href="research.html">文献与分类</a><a href="../downloads/current-report-zh-hant.pdf">最新完整 PDF · v0.7</a><a href="../downloads/full-report-zh-hant.pdf">历史 PDF · v0.2</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">主设计v0.7 · 250篇书目、143条已登记评测来源、5,308条来源定义。完整搜集、共同分类与任务清单持续补齐；目录收录与模拟运行分开。原生与小型联合试作保留为工程附录。</p></div></footer>
   <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
   <div id="toast" class="toast" role="status" hidden></div></body></html>

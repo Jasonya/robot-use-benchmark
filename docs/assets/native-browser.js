@@ -31,6 +31,7 @@
     return p;
   };
   function sourceURL(record, file = record.p) {
+    if(file===record.p&&record.url)return record.url;
     const source = data.sources[record.s];
     const encoded = file.split('/').map(encodeURIComponent).join('/');
     const line = file === record.p && record.line ? '#L' + record.line : '';
@@ -55,8 +56,8 @@
     badge.className = 'entry-badge';
     badge.textContent = text.units[record.u] || record.u;
     const title = document.createElement('h3');
-    title.textContent = record.n;
-    article.append(badge, title, field(text.source, source.work), field(text.definition, record.p, 'meta'));
+    title.textContent = record.t || record.n;
+    article.append(badge, title, field('Native ID', record.n, 'meta'), field(text.source, source.work), field(text.definition, record.p, 'meta'));
     if (record.v) {
       const flag = document.createElement('p');
       flag.className = 'native-variant-note';

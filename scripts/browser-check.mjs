@@ -70,10 +70,13 @@ try{
   assert.ok(await noOverflow());
   assert.equal(await evaluate("typeof window.SEARCH_INDEX"),'undefined','Ordinary reading should not download the full search index.');
   await snapshot('home-traditional-desktop');
+  assert.equal(await evaluate("document.querySelector('.primary-nav a').getAttribute('href')"),'survey-union.html');
+  assert.equal(await evaluate("document.querySelector('#main-content').textContent.includes('92.5%')"),false);
+  await evaluate("document.getElementById('home-engineering-appendix').open=true;document.getElementById('home-legacy-demo').open=true");
   await evaluate("document.querySelector('[data-demo-goal=\"b\"]').click()");
   assert.equal(await evaluate("document.querySelector('#towel-fold-b').getAttribute('visibility')"),'visible');
   assert.equal(await evaluate("document.querySelector('#fold-pairs').textContent"),'B → A · C → D');
-  pass('Home and paired-goal interaction','Traditional Chinese homepage renders; the goal switch updates geometry and explanation.');
+  pass('Research-first homepage and preserved example','Homepage leads with survey and task union; the earlier goal demonstration is preserved inside the engineering appendix.');
 
   await evaluate("document.querySelector('.search-trigger').click()");
   await setValue('#global-search-input','记忆');
@@ -142,10 +145,13 @@ try{
   pass('Standalone search','Search URLs are directly shareable and searchable by stable IDs.');
 
   await go('zh-hant/design.html');
+  assert.ok(await evaluate("document.querySelector('#union-first-design').textContent.includes('目錄')"));
+  assert.equal(await evaluate("document.getElementById('historical-design-plans').open"),false);
   assert.ok(await evaluate("document.querySelector('#design-section-3').textContent.includes('共同門檻')"));
   assert.ok(await evaluate("document.querySelector('#overall-design-spec').textContent.includes('100 個不同 G2')"));
   assert.ok(await noOverflow());
   await snapshot('overall-design-desktop');
+  await evaluate("document.getElementById('historical-design-plans').open=true");
   await evaluate("document.getElementById('capacity-explorer').scrollIntoView({behavior:'instant',block:'center'})");
   assert.equal(await evaluate("document.querySelector('[data-capacity-output=\"total\"]').textContent"),'2,880,000');
   await setValue('#capacity-instances','20');
@@ -157,7 +163,43 @@ try{
   await setValue('#capacity-methods','1');
   assert.equal(await evaluate("document.querySelector('[data-capacity-output=\"total\"]').textContent"),'60,000');
   await snapshot('capacity-planner-desktop');
-  pass('Overall design and planning units','Both scale and breadth gates are visible; instances and conditions change workload while the example retains 2,400 independent G2 tasks.');
+  pass('Current design and historical planning units','Source collection, taxonomy, task union and rule extension lead the design; earlier capacity examples remain usable in the historical appendix.');
+
+  await go('zh-hant/survey-union.html');
+  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'143');
+  assert.equal(await evaluate("document.querySelectorAll('#union-taxonomy-table tbody tr').length"),12);
+  assert.equal(await evaluate("document.querySelectorAll('#union-sources-table tbody tr').length"),25);
+  assert.ok(await noOverflow());
+  await snapshot('survey-union-desktop');
+  await setValue('#union-q','VIMA');
+  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'1');
+  await setValue('#union-category','M');
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&!!document.getElementById('union-count').dataset.visibleCount");
+  assert.equal(await evaluate("document.getElementById('union-q').value"),'VIMA');
+  assert.equal(await evaluate("document.getElementById('union-category').value"),'M');
+  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'1');
+  await setValue('#union-q','');
+  await setValue('#union-category','');
+  await setValue('#union-pool','all');
+  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'250');
+  await setValue('#union-q','zz-unmatched-source');
+  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'0');
+  pass('Survey source registry and language filters','All250 papers remain available;143 registered evaluation sources are the default, with source/category filters and shareable Traditional/Simplified state.');
+
+  await go('zh-hant/native-tasks.html?source=vima');
+  assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 17 ')"));
+  await setValue('#native-source','arnold');
+  assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 8 ')"));
+  await setValue('#native-source','coin_video');
+  assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 180 ')"));
+  await setValue('#native-source','crosstask');
+  assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 83 ')"));
+  assert.ok(await evaluate("document.querySelector('#native-records .section-link').href.endsWith('crosstask_release.zip')"));
+  await setValue('#native-source','');
+  await setValue('#native-bucket','human_activity_definitions');
+  assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 263 ')"));
+  pass('Additional official task inventories','VIMA17, ARNOLD8, COIN180 and CrossTask83 appear in the shared source browser, with correct native types and definition links.');
 
   await go('zh-hant/readiness.html');
   assert.equal(await evaluate("document.querySelectorAll('[data-audit-gap]').length"),15);
@@ -264,7 +306,7 @@ try{
   assert.ok(await noOverflow());
   await snapshot('scale-plan-desktop');
   await go('zh-hant/native-tasks.html');
-  assert.equal(await evaluate('window.NATIVE_SOURCE_DATA.records.length'),5020);
+  assert.equal(await evaluate('window.NATIVE_SOURCE_DATA.records.length'),5308);
   assert.equal(await evaluate("document.querySelectorAll('[data-native-record]').length"),24);
   await setValue('#native-source','roboverse');
   assert.ok(await evaluate("document.querySelector('#native-count').textContent.includes('2,897')"));
@@ -276,7 +318,7 @@ try{
   assert.equal(await evaluate("document.getElementById('native-source').value"),'roboverse');
   assert.equal(await evaluate("document.getElementById('native-hide-config').checked"),true);
   assert.ok(await evaluate("document.querySelector('#native-count').textContent.includes('310')"));
-  pass('Native source browser and conservative variant filter','5,020 source records; RoboVerse has 2,897 groups and 310 remain after hiding only the 2,587 reviewed config-only derivations.');
+  pass('Native source browser and conservative variant filter','5,308 source records; original RoboVerse counts remain2,897/310 and only the2,587 tagged config derivations are hidden.');
   const nativeAnchor=await evaluate("window.NATIVE_SOURCE_DATA.records.find(record=>record.s==='behavior').id");
   await go('zh-hant/native-tasks.html#'+nativeAnchor);
   assert.equal(await evaluate(`document.getElementById(${JSON.stringify(nativeAnchor)}).querySelector('details').open`),true);
@@ -309,6 +351,7 @@ try{
   await go('zh-hans/design.html');
   assert.ok(await noOverflow());
   await snapshot('overall-design-mobile');
+  await evaluate("document.getElementById('historical-design-plans').open=true");
   await evaluate("document.getElementById('capacity-explorer').scrollIntoView({behavior:'instant',block:'center'})");
   assert.ok(await noOverflow());
   await snapshot('capacity-planner-mobile');
@@ -321,6 +364,9 @@ try{
   await snapshot('joint-pilot-mobile');
   await evaluate("document.getElementById('joint-case-viewer').scrollIntoView({behavior:'instant',block:'start'})");
   await snapshot('joint-pilot-viewer-mobile');
+  await go('zh-hans/survey-union.html?category=D');
+  assert.ok(await noOverflow());
+  await snapshot('survey-union-mobile');
   await go('zh-hant/compare.html?group=human_transfer');
   assert.ok(await noOverflow());
   await evaluate("document.getElementById('comparison-panel-scale').scrollIntoView({behavior:'instant',block:'start'})");
@@ -342,6 +388,8 @@ try{
   assert.ok(await noOverflow());
   await go('zh-hans/joint-pilot.html');
   assert.ok(await noOverflow());
+  await go('zh-hans/survey-union.html');
+  assert.ok(await noOverflow());
   await viewport(1024,900);
   await go('zh-hant/design.html');
   assert.ok(await noOverflow());
@@ -362,6 +410,9 @@ try{
   assert.ok(await evaluate("document.querySelector('#joint-initial-image').complete&&document.querySelector('#joint-initial-image').naturalWidth>0"));
   assert.equal(await evaluate("document.getElementById('joint-dispatch-count').textContent"),'1');
   assert.ok(await noOverflow());
+  await cdp.send('Page.navigate',{url:new URL('zh-hant/survey-union.html',BASE).href});
+  await waitFor("document.readyState==='complete'&&document.querySelectorAll('[data-union-row]').length===250");
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-union-row]')).filter(r=>getComputedStyle(r).display!=='none').length"),250);
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
   pass('Reading without JavaScript','All 180 task cards, four 70-row comparison tables and the joint pilot default case/results remain readable without scripts.');
 

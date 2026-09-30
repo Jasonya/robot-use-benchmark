@@ -6,8 +6,8 @@
 
 | Benchmark | 類型／範圍 | 領域 | 場景 | 任務種類（原作單位） | 實例／題數 | 資料量 |
 |---|---|---|---|---|---|---|
-| 我們 v0.5｜規劃目標 | 僅模擬；人類影片配對另有 track | 12 個共同應用場域；每域 ≥100 適用 G2、≥8 families、≥3 mechanisms | 製作預算：240任務相關layouts／48 styles／至少6,000有效配置；尚待建立驗收 | 2,000–3,000 個去重 G2 初始目標；至少最大可比基準 2×，必要時上調 | 純示例：2,400 G2 → 3,000 execution bindings → 30,000 G3 → 120,000 G4 | human-observation track 300–500 G2／≥8 場域；影片 pair 總量未訂 |
-| 我們｜目前開發實績 | 兩個分開的模擬track；人類影片到執行仍未驗證 | 1個合成桌面出貨工作流，部分倉儲語境；正式D×F×K覆蓋格子尚未驗收 | 原生750個task-bound初態／36個MJCF入口；聯合試作1個layout／15初態，不是15個場景 | 50個Meta-World原生任務（復用）＋1個自建聯合工作流候選；跨作去重G2仍TBD | 原生250測例×5＝1,250次；聯合120測例（40開發／80驗證）×6＝720次，另2次可解性annotation | 原生來源5,020筆另列；joint保存2,568個RGB影格、SQLite與動作；人類影片執行pairs仍0 |
+| 我們 v0.7｜來源聯集與規則擴充 | 僅模擬；人類影片配對另有 track | 全面收集前作的領域與任務，建立共同分類與互補聯集；分類可按來源擴充 | 復用各來源的scene／layout／資產，再按任務需求擴充；原240／48／6,000為歷史預算 | 完整既有任務聯集＋目標／規則／組合擴充；原2,000–3,000為容量參考，非上限 | base task、規則變體、場景／初態、觀測／介入測例与方法執行分欄 | 完整保留Ego／body camera／VLOG、人類／robot示範、程序與標註來源 |
+| 我們｜來源目錄與工程子集 | 來源含模擬／實體／人類影片；本計畫執行子集為模擬 | 來源總目錄143條評測資源；共同域映射續補。此列域格／能力格保留工程子集範圍 | 已接25個固定task來源；場景資產聯集待整理。工程另有1個合成layout／15初態 | 來源5,308條：2,062 robot任務候選、263人類程序，其餘註冊／協定另列；工程已跑50 native IDs | 原生250測例×5＝1,250次；聯合120測例（40開發／80驗證）×6＝720次，另2次可解性annotation | 250篇書目連到143條評測來源；新增VIMA17、ARNOLD8、COIN180、CrossTask83定義；human→robot執行仍0 |
 | BEHAVIOR-1K | 模擬；論文另有實體實驗 | 8 種原生場景類別：住宅、帶花園住宅、旅館、辦公室、雜貨店、大廳、餐廳、學校；學校含實驗室 | 50 個互動場景資源 | 1,000 個 everyday activities | 活動／場景可實例化；不把 50 個場景當成測例數 | 9,000+ 物件模型 |
 | RoboCasa365 | 模擬 | 廚房活動；60 種原生活動分組 | 2,500 個 pretraining 廚房（50 layouts × 50 styles）；另有 10 個 target 廚房 | 365 個 tasks；正式 target 評測子集 50 | 測例依 task、場景與初態生成；全庫固定測例總數未在本輪歸一 | 500k+ 示範；人類遙控及合成來源分開 |
 | VLABench | 模擬 | 日常操作、知識／常識與隱含意圖；100 是任務分類，不是領域數 | 隨機化操作情境；独立環境資產總數本輪未核 | 100 個 task categories | 每類可隨機化；固定全庫 case 數未核 | 2,000+ 物件；自動生成訓練示範 |
@@ -81,8 +81,8 @@
 
 | Benchmark | 材料 | 機體 | 觀測 | 評測 | 與本計畫的差異 |
 |---|---|---|---|---|---|
-| 我們 v0.5｜規劃目標 | 6 類物理模型；5 類非剛體各先提出 ≥20 適用 G2／≥3 families | 單臂、雙臂／靈巧、移動操作三組，各 ≥100 適用 G2；R6 擴展 | 文字、頭戴／身體、VLOG／剪輯、外部、多視角、robot 示範與歷史 | T5 執行＋T6恢復為主；T1–T8按合法資料條件啟用；macro＋micro＋分層難度 | 目標是較大的去重任務聯集、較廣有效覆蓋與统一執行證據；尚未證明領先。 |
-| 我們｜目前開發實績 | MuJoCo 原生剛體／關節接觸任務已跑；6 類材料目標的全庫支撐未完成 | 同為Sawyer單臂；原生state＋goal與joint RGB＋工具約定分開 | 原生39維state＋goal；joint RGB、合成訂單／庫存、工具回應與robot本體狀態 | 原生五方法；joint六固定程式／診斷控制，720完整工具鏈重播；物理、數位與聯合完成分列 | 已做出RGB—entity—SQLite—robot—聯合判分資料鏈；仍未證明G2規模、廣度或學習型agent優勢。 |
+| 我們 v0.7｜來源聯集與規則擴充 | 6 類物理模型；5 類非剛體各先提出 ≥20 適用 G2／≥3 families | 單臂、雙臂／靈巧、移動操作三組，各 ≥100 適用 G2；R6 擴展 | 文字、頭戴／身體、VLOG／剪輯、外部、多視角、robot 示範與歷史 | 先完成survey、來源task聯集與規則增量；再按T1–T8各自合法條件整合與評測 | 規模與廣度由完整前作聯集和任務／規則擴充累積；以多粒度對照量化增量。 |
+| 我們｜來源目錄與工程子集 | MuJoCo 原生剛體／關節接觸任務已跑；6 類材料目標的全庫支撐未完成 | 同為Sawyer單臂；原生state＋goal與joint RGB＋工具約定分開 | 原生39維state＋goal；joint RGB、合成訂單／庫存、工具回應與robot本體狀態 | 原生五方法；joint六固定程式／診斷控制，720完整工具鏈重播；物理、數位與聯合完成分列 | 已把75條先前漏接來源加入總目錄，補288條官方定義，並提供12個任務／規則擴充例。 |
 | BEHAVIOR-1K | 剛體、關節、布料、流體等；含狀態／物質抽象 | 移動操作等；依活動與機體配置 | robot 觀測＋活動目標；人類需求調查不是影片條件 | 日常活動完成、長流程、物件狀態 | 已有廣泛日常活動與多類場域；我們須證明共同分類下新增了哪些任務／有效格子。 |
 | RoboCasa365 | 廚房剛體、關節與設備／物料狀態；各物理效果按任務核對 | 操作／移動機體依配置 | robot 視覺＋語言；human demonstrations 指遙控資料，非等同觀察人做事的影片 | 操作、語義、長流程與記憶；50 task target protocol | 我們擬擴大應用場域與任務聯集；場景資產數目前尚無超越其 2,500 的證據。 |
 | VLABench | 以物件與機構操作為主；材料支撐逐題另核 | 操作機器人 | 語言、視覺及可用狀態；隱含意圖指令 | 知識轉移、多步推理、action policy 與語言模型 | 已有超出簡單指令取放的推理任務；我們需增加有效任務、場域與跨材料覆蓋。 |
@@ -171,23 +171,24 @@ Retain native units and split scope. No single numeric task-count ranking across
 
 ## 逐列原文、版本與計數注意事項
 
-### 我們 v0.5｜規劃目標
+### 我們 v0.7｜來源聯集與規則擴充
 
-上述都是目標／條件式示例；12 labels、120k G4、3k bindings不改報獨立任務數。240×48的全部組合不自動有效；實際場景規模優勢仍待驗證。
+目錄收集與本機可執行子集分開；保留完整來源，原配額不封頂。規則擴充有父任務與差異說明，執行與模型成績另驗收。
 
 預計以固定 agent panel、相同 contract 的成功率與不確定性校準；目前沒有實測難度分數。
 
-- 本計畫 v0.5 整合設計：https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html（沿用v0.4目標，加入v0.5場景／文獻／開發更新；目標與實績分開）
+- 本計畫v0.7主設計：https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html（Comprehensive survey, task union and task/rule extension; runtime subsets separate）
 
-### 我們｜目前開發實績
+### 我們｜來源目錄與工程子集
 
-joint只有1個工作流候選；120測例、720次程式和2次事後annotation不增加G2。完整RGB程式在80測例上92.5%，非VLM/VLA成績；原生4,286次歷史執行另列。
+來源、共同任務、規則變體與執行各有單位。143含版本／評測資料；5,308不是共同去重G2。120測例聯合試作保留為工程附錄，來源目錄不以本機先跑通為條件。
 
 原生五方法×50任務；joint按10個共享世界區塊作描述性bootstrap。6個固定程式不是6個學習agent，通用難度未校準。
 
 - 本計畫 v0.5 整合設計：https://jasonya.github.io/robot-use-benchmark/zh-hant/design.html（沿用v0.4目標，加入v0.5場景／文獻／開發更新；目標與實績分開）
 - 目前實際執行與完整結果：https://jasonya.github.io/robot-use-benchmark/zh-hant/execution.html（50 native task IDs; state-based development contract; not new canonical tasks）
 - 自建RGB、工具與物理聯合資料：https://jasonya.github.io/robot-use-benchmark/zh-hant/joint-pilot.html（1 workflow candidate, 120 cases, 720 frozen program trials +2 post-test annotations; local post-commit response-loss recovery only）
+- 目前Benchmark總庫、任務聯集與規則擴充：https://jasonya.github.io/robot-use-benchmark/zh-hant/survey-union.html（143 registered evaluation-source records, 250 papers, 5,308 native source records; not a completed systematic search or canonical task count）
 
 ### BEHAVIOR-1K
 

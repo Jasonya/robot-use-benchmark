@@ -28,6 +28,23 @@
   });
   storage.set('robot-use-language', config.locale);
 
+  // Older bookmarked sections remain accessible inside the historical appendix.
+  function revealHashAncestors(){
+    let id;
+    try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
+    const target=document.getElementById(id);
+    if(!target)return;
+    let changed=false;
+    let node=target.matches('details.union-legacy')?target:target.parentElement?.closest('details');
+    while(node){
+      if(!node.open){node.open=true;changed=true;}
+      node=node.parentElement?.closest('details');
+    }
+    if(changed)requestAnimationFrame(()=>target.scrollIntoView({behavior:'instant',block:'start'}));
+  }
+  window.addEventListener('hashchange',revealHashAncestors);
+  revealHashAncestors();
+
   const menu = $('.menu-button');
   menu?.addEventListener('click', () => {
     const open = $('.site-header').classList.toggle('menu-open');

@@ -9,6 +9,7 @@ import {renderReadinessPage} from './readiness-page.mjs';
 import {renderExecutionPage} from './execution-page.mjs';
 import {renderResearchPage} from './research-page.mjs';
 import {renderJointPilotPage} from './joint-pilot-page.mjs';
+import {renderSurveyUnionPage} from './survey-union-page.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -67,7 +68,7 @@ if (await exists(sourceBook)) {
   }
   await fs.mkdir(path.join(OUT, 'downloads'), { recursive: true });
   await fs.copyFile(path.join(PROJECT, 'handbook/ROBOT_USE_BENCHMARK_MASTER_REPORT.pdf'), path.join(OUT, 'downloads/full-report-zh-hant.pdf'));
-  const newestPdf=path.join(PROJECT,'handbook/current/ROBOT_USE_BENCHMARK_CURRENT_REPORT_V0_6.pdf');
+  const newestPdf=path.join(PROJECT,'handbook/current/ROBOT_USE_BENCHMARK_CURRENT_REPORT_V0_7.pdf');
   const currentPdf=await exists(newestPdf)?newestPdf:path.join(PROJECT,'handbook/current/ROBOT_USE_BENCHMARK_CURRENT_REPORT_V0_5.pdf');
   if(await exists(currentPdf))await fs.copyFile(currentPdf,path.join(OUT,'downloads/current-report-zh-hant.pdf'));
 }
@@ -109,12 +110,30 @@ const currentPDF=JSON.parse(await fs.readFile(path.join(CONTENT,'implementation/
 const JOINT_DIR=path.join(CONTENT,'joint_pilot');
 const [jointReport,jointDemos,jointDownload]=await Promise.all(
   ['pilot_report.json','demo_cases.json','download_info.json'].map(async n=>JSON.parse(await fs.readFile(path.join(JOINT_DIR,n),'utf8'))));
+const UNION_DIR=path.join(CONTENT,'survey_union');
+const [unionStats,unionRegistry,unionSources,unionAdditions,unionExtensions]=await Promise.all(
+  ['union_statistics.json','survey_registry.json','source_summaries.json','source_additions.json','extension_examples.json']
+    .map(async n=>JSON.parse(await fs.readFile(path.join(UNION_DIR,n),'utf8'))));
+const unionSpecHTML=await fs.readFile(path.join(UNION_DIR,'UNION_FIRST_DESIGN_V0_7.html'),'utf8');
+const browseSources=[...sourceReports,...unionSources.filter(s=>['vima','arnold','coin_video','crosstask'].includes(s.source_id)).map(s=>({
+  id:s.source_id,work:s.name,resolved_repo:s.repositories[0],commit:s.commits[0],role:'additional_task_source',
+  record_count:s.records,counts_by_unit:s.native_units
+}))];
+const newUnitLabels={native_task_template:'原生任務模板',native_task_class:'原生任務類別',instructional_activity_definition:'人類程序活動定義'};
+const browseRecords=[...sourceRecords,...unionAdditions.map(r=>({
+  ...r,anchor_id:'native-'+crypto.createHash('sha256').update(r.record_id).digest('hex').slice(0,16),
+  source_work:unionSources.find(s=>s.source_id===r.source_id).name,
+  native_unit_zh:newUnitLabels[r.native_unit]||r.native_unit,
+  native_aliases_or_variants:[],asset_reference_paths:[],native_metadata:{registration_line:r.definition_line},
+  additional_search:[r.native_domain,r.native_family].filter(Boolean).join(' ')
+}))];
 const sourceInfoById = Object.fromEntries(sourceReports.map(source => [source.id, source]));
 const assetHasher=crypto.createHash('sha256');
-assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,comparisonModel,readinessModel,executionModel,implementationModel,researchStats,iterationHTML,currentPDF,jointReport,jointDemos,jointDownload,sourceStats,sourceReports,sections,tasks,papers}));
+assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,comparisonModel,readinessModel,executionModel,implementationModel,researchStats,iterationHTML,currentPDF,jointReport,jointDemos,jointDownload,unionStats,unionRegistry,unionSources,unionExtensions,unionSpecHTML,sourceStats,sourceReports,sections,tasks,papers}));
 for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','scripts/readiness-page.mjs','scripts/execution-page.mjs','scripts/research-page.mjs','scripts/joint-pilot-page.mjs','static/assets/joint-pilot.js','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
+for(const name of ['scripts/survey-union-page.mjs','static/assets/survey-union.js','static/assets/survey-union.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 const assetRevision=assetHasher.digest('hex').slice(0,12);
 const sectionById = Object.fromEntries(sections.map(section => [section.id, section]));
 const taskById = Object.fromEntries(tasks.map(record => [record.scenario_id, record]));
@@ -139,7 +158,7 @@ const groupRoutes = {
   literature:'library.html', methods:'appendices/methods.html'
 };
 const summaries = {
-  c01:['大規模、廣覆蓋與共用評測平台仍是共同目標。','初始目標 2,000–3,000 個正規化任務；任務數與有效覆蓋各以至少最大可比基準 2 倍為目標。',`已進入實際開發執行：50 個原生任務、${executionModel.held_out_method_trials.toLocaleString('en-US')} 次新初態測試；全庫 G2 與覆蓋門檻尚未完成。`],
+  c01:['全面收集以前相關benchmark，整理其領域、任務與規則。','像Survey一樣分類並建立完整來源任務聯集，再擴充任務和規則。','來源目錄與可執行子集分開；目前主線為v0.7，工程試作保留附錄。'],
   c02:['文獻分類回答「研究測什麼」，任務規格回答「機器人要做什麼」。','以摺毛巾走過家族、任務、實例、測例與一次執行。','問答、預測、規劃和物理完成需要不同證據。'],
   c03:['Domain、family、task spec、instance、case、trial 分六層報告。','v0.4 新增 task–context 與 execution bindings，分開估計覆蓋和工程量。','同一任務跨場域、換機體或重跑，不會自動增加全球 G2 數量。'],
   c04:[`${papers.length} 篇來源分成十二個主分類；本次新增82篇完整摘要審閱。`,'文獻篇數比例不能直接當作領域缺口或出題比例。','書目、摘要閱讀、全文查核和程式重現的證據深度分開。'],
@@ -266,11 +285,11 @@ const pdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/cur
 const historicalPdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/full-report-zh-hant.pdf');
 function navHTML(route, locale) {
   const links = [
+    ['survey-union.html','Benchmark 總庫',route==='survey-union.html'],
     ['design.html','整體設計',route==='design.html'],
-    ['compare.html','Benchmark 比較',route==='compare.html'||route==='scale-plan.html'],
+    ['compare.html','詳細比較',route==='compare.html'||route==='scale-plan.html'],
     ['native-tasks.html','來源任務庫',route==='native-tasks.html'],
     ['chapters/index.html','章節閱讀',route.startsWith('chapters/')],
-    ['explore/tasks.html','情境種子',route.startsWith('explore/')],
     ['library.html','文獻地圖',route==='library.html'],
   ];
   return `<header class="site-header"><div class="wrap header-inner">
@@ -281,9 +300,9 @@ function navHTML(route, locale) {
   <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">${t('選單',locale)}</button></div></div></header>`;
 }
 function footerHTML(route, locale) {
-  return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('從文獻到任務、評測與實作的公開研究設計。',locale)}</div>
-  <div class="footer-links"><a href="${routeLink(route,'design.html',locale)}">${t('整體設計',locale)}</a><a href="${routeLink(route,'joint-pilot.html',locale)}">${t('自建聯合資料',locale)}</a><a href="${routeLink(route,'execution.html',locale)}">${t('原生開發執行',locale)}</a><a href="${routeLink(route,'research.html',locale)}">${t('文獻更新與分類',locale)}</a><a href="${pdfHref(route,locale)}">${t('最新完整 PDF · v0.6',locale)}</a><a href="${historicalPdfHref(route,locale)}">${t('歷史 PDF · v0.2',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
-  <p class="footer-note">${t(`設計 v${config.designVersion} · 來源盤點 ${config.designDate} · 原文獻快照 ${config.researchDate} · 開發證據 ${implementationModel.date}。2,000–3,000 G2 與任務／覆蓋至少 2× 仍是未達成目標。${sourceStats.source_records.toLocaleString('en-US')} 筆來源紀錄不等於獨立任務；已記錄 ${executionModel.recorded_trial_history_total.toLocaleString('en-US')} 次原生開發執行，正式通用 release 尚未完成。`,locale)}</p></div></footer>`;
+  return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。',locale)}</div>
+  <div class="footer-links"><a href="${routeLink(route,'survey-union.html',locale)}">${t('Benchmark總庫',locale)}</a><a href="${routeLink(route,'design.html',locale)}">${t('目前主設計',locale)}</a><a href="${routeLink(route,'research.html',locale)}">${t('文獻與分類',locale)}</a><a href="${pdfHref(route,locale)}">${t('最新完整 PDF · v0.7',locale)}</a><a href="${historicalPdfHref(route,locale)}">${t('歷史 PDF · v0.2',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">${t(`主設計v0.7 · ${unionStats.paper_records}篇書目、${unionStats.benchmark_or_eval_resource_records}條已登記評測來源、${unionStats.total_source_records.toLocaleString('en-US')}條來源定義。完整搜集、共同分類與任務清單持續補齊；目錄收錄與模擬執行分開。原生與小型聯合試作保留為工程附錄。`,locale)}</p></div></footer>`;
 }
 const strings = {
   copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
@@ -311,6 +330,7 @@ function shell({route,locale,title,description,body,kind='page'}) {
   ${LOCALES.map(lang=>`<link rel="alternate" hreflang="${lang==='zh-hant'?'zh-Hant':'zh-Hans'}" href="${config.siteUrl}/${lang}/${route}">`).join('')}
   <meta property="og:type" content="website"><meta property="og:title" content="${t(title,locale)} · Robot-use Benchmark"><meta property="og:description" content="${t(description,locale)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="${relative(current,'assets/favicon.svg')}" type="image/svg+xml"><link rel="stylesheet" href="${relative(current,'assets/site.css')}?v=${assetRevision}">
+  <link rel="stylesheet" href="${relative(current,'assets/survey-union.css')}?v=${assetRevision}">
 ${route==='compare.html'?`<link rel="stylesheet" href="${relative(current,'assets/comparison.css')}?v=${assetRevision}"><script defer src="${relative(current,'assets/comparison.js')}?v=${assetRevision}"></script>`:''}
   <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE=${jsonSafe(jsConfig)};</script>
   ${route==='native-tasks.html'?`<script defer src="${relative(current,'assets/native-source-data.js')}?v=${assetRevision}"></script><script defer src="${relative(current,'assets/native-browser.js')}?v=${assetRevision}"></script>`:''}<script defer src="${relative(current,'assets/site.js')}?v=${assetRevision}"></script></head>
@@ -323,10 +343,10 @@ function head(title,description,route,locale,extra='') {
   return `<div class="page-head">${breadcrumb(title,route,locale)}<div class="eyebrow">RESEARCH ATLAS</div><h1>${t(title,locale)}</h1><p class="lede">${t(description,locale)}</p>${extra}</div>`;
 }
 function scopeNotice(route,locale){
-  return `<div class="scope-notice"><b>${t('規模與廣度共同驗收；開發執行已有新證據',locale)}</b><p>${t(`全庫初始目標為 2,000–3,000 G2，任務數／有效覆蓋各以至少最大可比基準 2× 為目標。已完成50個Meta-World原生任務、${executionModel.held_out_method_trials.toLocaleString('en-US')}次新初態測試；9/29另有1個自建聯合工作流、120測例、720次固定程式執行。這些計數不等於新造或跨作去重後的G2。180個藍圖與原100–140預算保留為歷史種子／方案。`,locale)}</p><a href="${routeLink(route,'joint-pilot.html',locale)}">${t('自建影像、工具與物理聯合資料',locale)} →</a><br><a href="${routeLink(route,'execution.html',locale)}">${t('原生50任務的獨立結果',locale)} →</a><br><a href="${routeLink(route,'readiness.html',locale)}">${t('目前還缺哪些證據與實作',locale)} →</a></div>`;
+  return `<div class="scope-notice"><b>${t('目前主線：前作聯集與任務／規則擴充',locale)}</b><p>${t(`完整來源先收集、分類與連接。現有${unionStats.benchmark_or_eval_resource_records}條已登記評測來源、${unionStats.total_source_records.toLocaleString('en-US')}條原生來源；目錄收錄不以本機先跑通為條件。舊2,000–3,000任務和配額作容量參考，完整聯集與擴充規格決定實際規模。`,locale)}</p><a href="${routeLink(route,'survey-union.html',locale)}">${t('查看總庫、分布、任務清單與規則',locale)} →</a> · <a href="${routeLink(route,'design.html',locale)}#union-first-design">${t('閱讀v0.7主設計',locale)} →</a></div>`;
 }
 function currentExecutionNote(route,locale){
-  return `<section class="current-execution-note"><h2 id="current-native-execution">${t('目前實際進度',locale)}</h2><p>${t(`原生track已有50個Meta-World任務的MuJoCo執行器。Forward-consistent訓練池與測試共有${executionModel.distinct_forward_consistent_native_initial_cases}個原生初態；9/25測試250個新初態、五方法、${executionModel.held_out_method_trials.toLocaleString('en-US')}次執行。另保留早期接口與reset診斷，該track累計記錄${executionModel.recorded_trial_history_total.toLocaleString('en-US')}次開發執行。`,locale)}</p><p>${t('9/29另完成自建RGB＋SQLite＋robot聯合資料：1個工作流、120測例、720次原定固定程式執行，另2次事後可解性補充。兩批資料與輸入約定分開，沒有合併成新任務數。正式G2、跨域／材料／機體、人類影片執行與學習型聯合agent評測仍待完成。',locale)}</p><p><a href="${routeLink(route,'joint-pilot.html',locale)}">${t('自建聯合資料與實際結果',locale)} →</a> · <a href="${routeLink(route,'execution.html',locale)}">${t('原生方法結果與驗證紀錄',locale)} →</a></p></section>`;
+  return `<section class="current-execution-note"><h2 id="current-native-execution">${t('目前研究與整合進度',locale)}</h2><p>${t(`總目錄已接起250篇書目、143條已登記評測來源及5,308條原生來源。新增VIMA17個模板、ARNOLD8個任務類別、COIN180和CrossTask83個人類程序定義，下一步逐來源补齐原生清單、共同分類與規則。`,locale)}</p><p>${t('50個Meta-World任務和小型RGB／工具／robot試作保留作工程附錄，支援後续執行整合。目錄範圍由前作與擴充規格決定。',locale)}</p><p><a href="${routeLink(route,'survey-union.html',locale)}">${t('完整來源與任務聯集',locale)} →</a> · <a href="${routeLink(route,'execution.html',locale)}">${t('工程附錄：原生執行',locale)} →</a></p></section>`;
 }
 function designSections(numbers,locale,route,prefix){
   const $=cheerio.load(overallSpecHTML,{},false);const result=[];
@@ -365,37 +385,26 @@ function capacityExplorer(locale){
 function overallDesignPage(locale){
   const route='design.html';
   const spec=cheerio.load(overallSpecHTML,{},false);spec('h1').remove();
-  spec('h2').each((_,node)=>{
-    const num=(spec(node).text().match(/^(\d+)\./)||[])[1];
-    if(num)spec(node).attr('id',`design-section-${num}`);
-  });
+  spec('h2').each((_,node)=>{const num=(spec(node).text().match(/^(\d+)\./)||[])[1];if(num)spec(node).attr('id',`design-section-${num}`);});
   const content=transform(`<section id="overall-design-spec">${spec.html()}</section>`,locale,route,'overall');
-  const latest=cheerio.load(iterationHTML,{},false);latest('h1').remove();
-  latest('h2').each((i,node)=>latest(node).attr('id',`iteration-section-${i+1}`));
+  const latest=cheerio.load(iterationHTML,{},false);latest('h1').remove();latest('h2').each((i,node)=>latest(node).attr('id',`iteration-section-${i+1}`));
   const latestContent=transform(`<section id="current-design-update">${latest.html()}</section>`,locale,route,'iteration');
-  const $=cheerio.load(latestContent+content);
-  const headings=$('h2').toArray().map(node=>({id:$(node).attr('id'),title:$(node).text()}));
-  const downloads=relative(`${locale}/${route}`,'downloads/overall-design/');
-  const nav=chapterNav(route,locale);
-  const steps=[
-    ['01','完整來源库','原作、版本、原生 ID 與來源關係'],
-    ['02','獨立任務库','合併重複、保留真正不同的目標與流程'],
-    ['03','廣度與實例','跨場域、材料、機體建立有效情境'],
-    ['04','統一評測平台','共用入口、合法測例、判分與結果']
-  ];
-  const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content">
-    <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('整體設計',route,locale)}
-    <div class="eyebrow">OVERALL DESIGN · v0.5 UPDATE</div><h1>${t('任務多、涵蓋廣，放進同一套評測。',locale)}</h1>
-    <p class="lede">${t('整個 benchmark 改成大型任務庫、具體廣度配額與共用評測平台。每批擴張都同時檢查「多了哪些任務」和「補足哪些覆蓋」。',locale)}</p>
-    <div class="page-meta"><span>${implementationModel.date}</span><span class="pill status">${t('已有開發實績 · 全庫目標尚未達成',locale)}</span><span>${t('模擬環境',locale)}</span></div>
-    <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul><li>${t('全庫初始目標 2,000–3,000 種獨立任務；任務數與有效覆蓋各以至少最大可比基準 2 倍為目標。',locale)}</li><li>${t('12 個核心場域各提出 100 個有效任務綁定、8 個家族、3 類機制的最低支撐量。',locale)}</li><li>${t('同一任務換場域或機體，增加覆蓋、實例和實作量；全球 G2 只計一次。',locale)}</li></ul></div>
-    <ol class="design-flow" aria-label="${t('整體建置流程',locale)}">${steps.map(([id,title,text])=>`<li><small>${id}</small><b>${t(title,locale)}</b><span>${t(text,locale)}</span></li>`).join('')}</ol>
-    <div class="cta-row"><a class="button" href="#iteration-section-3">${t('看目標與共同門檻',locale)} ↓</a><a class="button secondary" href="${routeLink(route,'compare.html',locale)}">${t('前作 × 領域／場景／題數比較',locale)} →</a></div>
-    <div class="scope-notice"><b>${t('新版整合設計與完整證據',locale)}</b><p>${t('本頁先讀v0.5更新：新文獻、場景規模、實驗、資料與milestone。後段保留v0.4原則和容量模型，當時的狀態與現在分開。',locale)}</p><a href="${pdfHref(route,locale)}">${t(`下載${currentPDF.pages}頁最新整合PDF`,locale)} →</a></div>
-    <div class="prose">${latestContent}<div class="notice">${t('以下為2026-09-22的v0.4設計快照；舊的零執行敘述已由上方實績更新。保留原則、公式與既有引用位置。',locale)}</div>${content}</div>${capacityExplorer(locale)}
-    <div class="reader-actions"><button class="text-button copy-link">${t('複製本頁連結',locale)}</button><button class="text-button print-page">${t('列印本頁',locale)}</button><a class="text-button" href="${downloads}/OVERALL_DESIGN_V0_4.md" download>${t('下載完整設計',locale)}</a><a class="text-button" href="${downloads}/breadth_quota_template.csv" download>${t('下載 12 場域配額表',locale)}</a><a class="text-button" href="${downloads}/overall_design_plan.json" download>${t('下載計畫 JSON',locale)}</a></div>
-    </main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}<a href="#capacity-explorer">${t('互動題量估算',locale)}</a></aside></div>`;
-  return shell({route,locale,title:'整體設計 v0.5：大規模、廣覆蓋、統一評測',description:'全庫目標、12 場域配額、場景製作、機體與觀測、實驗、難度、預算與milestones集中說明。',body,kind:'design'});
+  const current=cheerio.load(unionSpecHTML,{},false);current('h1').remove();current('h2').each((i,node)=>current(node).attr('id',`union-design-${i+1}`));
+  const unionContent=transform(`<section id="union-first-design">${current.html()}</section>`,locale,route,'union-design');
+  const parsed=cheerio.load(unionContent);const headings=parsed('h2').toArray().map(n=>({id:parsed(n).attr('id'),title:parsed(n).text()}));
+  const nav=chapterNav(route,locale);const dl=relative(`${locale}/${route}`,'downloads/survey-union/');
+  const steps=[['01','全面來源','前作、版本、原生領域和task清單'],['02','Survey與聯集','共同分類、來源連結與多粒度規模'],['03','任務／規則擴充','目標、約束、程序和工作組合'],['04','分層整合與評測','目錄保持完整，執行子集另列']];
+  const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar">${nav}</aside><main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('目前主設計',route,locale)}
+  <div class="eyebrow">SURVEY → TASK UNION → EXTENSIONS · v0.7</div><h1>${t('完整前作聯集，加上可擴充的任務與規則。',locale)}</h1><p class="lede">${t('先全面收集既有benchmark，再像survey一樣整理領域、任務和規則。整合互補來源，擴充新的目標與流程；可執行子集是後續整合工作的進度。',locale)}</p>
+  <div class="page-meta"><span>2026-09-29</span><span class="pill green">${t('目前主設計 v0.7',locale)}</span><span>${t('來源含模擬、實體與人類影片；執行以模擬為主',locale)}</span></div>
+  <div class="chapter-summary"><div class="label">${t('研究主線',locale)}</div><ul><li>${t('完整蒐集前作，保留各benchmark的原生領域、任務定義、規則與版本。',locale)}</li><li>${t('以Survey分類與任務聯集取得更大、更廣的覆蓋，再逐層量化增量。',locale)}</li><li>${t('允許擴充任務目標、規則、程序與組合；目錄收錄不以本機先跑通為條件。',locale)}</li></ul></div>
+  <ol class="design-flow">${steps.map(([id,title,text])=>`<li><small>${id}</small><b>${t(title,locale)}</b><span>${t(text,locale)}</span></li>`).join('')}</ol>
+  <div class="cta-row"><a class="button" href="${routeLink(route,'survey-union.html',locale)}">${t('看Benchmark總庫與分類',locale)} →</a><a class="button secondary" href="#union-design-6">${t('任務與規則如何擴充',locale)} ↓</a></div>
+  <div class="prose">${unionContent}</div>
+  <div class="reader-actions"><a class="text-button" href="${dl}/UNION_FIRST_DESIGN_V0_7.md" download>${t('下载目前主設計',locale)}</a><a class="text-button" href="${dl}/extension_grammar.json" download>${t('任務規則語法',locale)}</a><a class="text-button" href="${pdfHref(route,locale)}">${t(`${currentPDF.pages}頁完整PDF`,locale)}</a><button class="text-button print-page">${t('列印本頁',locale)}</button></div>
+  <details class="union-legacy" id="historical-design-plans"><summary>${t('歷史設計與容量模型：v0.4／v0.5（保留原引用）',locale)}</summary><p class="source-note">${t('以下保留舊預算、配額和當時的工程順序，供查閱與比較；目前主線以上方v0.7為準。',locale)}</p><div class="prose">${latestContent}${content}</div>${capacityExplorer(locale)}</details>
+  </main><aside class="on-this-page"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}<a href="#historical-design-plans">${t('歷史設計與容量模型',locale)}</a></aside></div>`;
+  return shell({route,locale,title:'主設計v0.7：前作聯集、Survey分類與任務規則擴充',description:'以全面來源收集、任務分類、聯集和可擴充規則建立大而廣的benchmark；來源目錄與可執行子集分開。',body,kind:'design'});
 }
 function scalePlanPage(locale){
   const route='scale-plan.html';
@@ -416,12 +425,13 @@ function scalePlanPage(locale){
   </main><aside class="on-this-page" aria-label="${t('本頁內容',locale)}"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
   return shell({route,locale,title:'規模比較與來源查核',description:'保留 v0.3 規模提案與完整來源盤點，並連結 v0.4 的數量／廣度共同驗收設計。',body});
 }
-const nativeUnitLabels=Object.fromEntries(sourceRecords.map(r=>[r.native_unit,r.native_unit_zh]));
+const nativeUnitLabels=Object.fromEntries(browseRecords.map(r=>[r.native_unit,r.native_unit_zh]));
 const nativeBucketLabels={
   native_task_candidates:'原生任務候選（異質粒度）',
   integration_or_protocol:'整合框架／協定／生成配置',
   video_pairing:'影片配對／認知 schema',
-  documented_examples:'示範程式入口'
+  documented_examples:'示範程式入口',
+  human_activity_definitions:'人類程序活動（影片來源）'
 };
 strings.native={
   source:'來源',unit:'原生單位',definition:'定義路徑',aliases:'原生別名／層級對應',assets:'場景檔案引用',
@@ -437,19 +447,19 @@ function nativeSearchHints(record){
 }
 function nativePage(locale){
   const route='native-tasks.html';
-  const download=relative(`${locale}/${route}`,'downloads/scale-first/native_source_inventory.csv');
-  const sourceRows=sourceReports.map(source=>{
+  const download=relative(`${locale}/${route}`,'downloads/survey-union/task_source_bridge.csv');
+  const sourceRows=browseSources.map(source=>{
     const units=Object.entries(source.counts_by_unit).map(([key,n])=>`${translate(nativeUnitLabels[key]||key,locale)} ${n.toLocaleString('en-US')}`).join('；');
     return `<tr><td><a href="?source=${source.id}">${t(source.work,locale)}</a></td><td>${source.record_count.toLocaleString('en-US')}</td><td>${escape(units)}</td><td><a href="https://github.com/${source.resolved_repo}/tree/${source.commit}" target="_blank" rel="noopener noreferrer"><code>${source.commit.slice(0,10)}</code></a></td></tr>`;
   }).join('');
   const options=(values)=>values.map(([value,label])=>`<option value="${escape(value)}">${t(label,locale)}</option>`).join('');
-  const body=`<main class="wrap" id="main-content">${head('原生任務來源聯合庫','從完整來源庫建立可追溯的盤點，再做語義去重、資產綁定與驗證。這裡展示的是來源紀錄，不是已完成的 benchmark 任務。',route,locale,
-  `<div class="page-meta"><span class="pill green">${sourceStats.source_records.toLocaleString('en-US')} ${t('筆原生紀錄',locale)}</span><span>${sourceStats.source_repositories_pinned} ${t('個官方程式庫',locale)} / ${sourceStats.source_snapshots_pinned} ${t('個固定版本來源',locale)}</span><span>${config.sourceInventoryDate}</span><span class="pill status">${t('正式 G2 待歸一；驗證 0',locale)}</span></div>`)}
-  <div class="scope-notice"><b>${t('完整來源庫是 v0.4 設計的起點',locale)}</b><p>${t('全庫初始目標 2,000–3,000 個 G2，任務數與有效覆蓋共同驗收。原生 ID、活動目錄、schema、整合註冊與配置仍需正規化，不能直接相加當成獨立任務。',locale)}</p><a href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計與廣度配額',locale)} →</a></div>
+  const body=`<main class="wrap" id="main-content">${head('任務與程序來源聯合庫','完整保留前作的任務、活動、schema與來源關係，再做共同分類與規則擴充。可以先收錄來源定義，執行相容性另列。',route,locale,
+  `<div class="page-meta"><span class="pill green">${unionStats.total_source_records.toLocaleString('en-US')} ${t('筆原生紀錄',locale)}</span><span>${unionStats.source_repositories} ${t('個官方程式庫',locale)} / ${unionStats.source_snapshots} ${t('個固定版本來源',locale)}</span><span>${config.sourceInventoryDate}</span><span class="pill status">${t('來源收錄與執行進度分開',locale)}</span></div>`)}
+  <div class="scope-notice"><b>${t('主線是全面來源與任務聯集',locale)}</b><p>${t('原5,020條保留，新增VIMA17、ARNOLD8、COIN180與CrossTask83條定義，共5,308條。包含2,062個原生robot任務候選、263個人類活動，整合註冊／協定另列。',locale)}</p><a href="${routeLink(route,'survey-union.html',locale)}">${t('回到Survey總庫、分布與規則擴充',locale)} →</a></div>
   <details class="explainer" id="source-summary"><summary>${t('查看全部來源、提取數與固定版本',locale)}</summary><div class="table-scroll"><table><thead><tr><th>${t('來源',locale)}</th><th>${t('紀錄數',locale)}</th><th>${t('原生單位',locale)}</th><th>${t('固定 commit',locale)}</th></tr></thead><tbody>${sourceRows}</tbody></table></div></details>
   <div class="catalogue-layout native-layout"><aside class="filter-panel js-only" aria-label="${t('來源篩選',locale)}"><h2>${t('查找來源與任務定義',locale)}</h2><div class="filter-fields">
   <div class="filter-field"><label for="native-q">${t('關鍵字／原生 ID',locale)}</label><input id="native-q" data-native-filter="q" type="search" placeholder="${t('例如 fold、抽屜、PegInsertion',locale)}"></div>
-  <div class="filter-field"><label for="native-source">${t('來源版本',locale)}</label><select id="native-source" data-native-filter="source"><option value="">${t('全部來源',locale)}</option>${options(sourceReports.map(s=>[s.id,s.work]))}</select></div>
+  <div class="filter-field"><label for="native-source">${t('來源版本',locale)}</label><select id="native-source" data-native-filter="source"><option value="">${t('全部來源',locale)}</option>${options(browseSources.map(s=>[s.id,s.work]))}</select></div>
   <div class="filter-field"><label for="native-unit">${t('原生單位',locale)}</label><select id="native-unit" data-native-filter="unit"><option value="">${t('全部單位',locale)}</option>${options(Object.entries(nativeUnitLabels))}</select></div>
   <div class="filter-field"><label for="native-bucket">${t('來源型態',locale)}</label><select id="native-bucket" data-native-filter="bucket"><option value="">${t('全部型態',locale)}</option>${options(Object.entries(nativeBucketLabels))}</select></div>
   </div><label class="checkbox-label"><input type="checkbox" id="native-hide-config" data-native-filter="hide_config"> <span>${t('隱藏已標示的純配置衍生 class',locale)}</span></label><button class="button secondary small" id="native-reset">${t('清除篩選',locale)}</button>
@@ -458,13 +468,13 @@ function nativePage(locale){
   <noscript><p class="no-js-note">${t('互動篩選需要 JavaScript。上方來源表仍可閱讀，完整原生紀錄可下載 CSV；每列附固定原始定義連結。',locale)}</p></noscript>
   <div id="native-empty" class="empty-state" hidden><h3>${t('沒有符合的來源紀錄',locale)}</h3><p>${t('試試簡短關鍵字或清除部分篩選。',locale)}</p></div><div class="record-grid" id="native-records"></div>
   <div class="pagination js-only"><button id="native-prev">${t('上一頁',locale)}</button><span id="native-page"></span><button id="native-next">${t('下一頁',locale)}</button></div>
-  <p class="source-note">${t('這批卡片是2026-09-22的靜態提取快照，並非目前執行狀態。RoboCasa的365個目錄項與317個dataset registry項分開；WatchAct的14項是認知schema。新原生模擬結果由獨立執行紀錄提供。',locale)} <a href="${routeLink(route,'execution.html',locale)}">${t('查看最新執行證據',locale)} →</a></p></section></div></main>`;
-  return shell({route,locale,title:'原生任務來源聯合庫',description:`${sourceStats.source_records.toLocaleString('en-US')} 筆可追溯來源紀錄；依 benchmark、原生單位與配置展開篩選，附固定 commit 和來源定義。`,body,kind:'native'});
+  <p class="source-note">${t('這裡合併9/22與9/29的固定來源定義；卡片的收錄不依賴本機模擬。RoboCasa的365個目錄項與317個dataset項分開，WatchAct14項為認知schema；COIN／CrossTask是人類程序。執行證據由獨立附錄提供。',locale)} <a href="${routeLink(route,'execution.html',locale)}">${t('查看最新執行證據',locale)} →</a></p></section></div></main>`;
+  return shell({route,locale,title:'任務與程序來源聯合庫',description:`${unionStats.total_source_records.toLocaleString('en-US')} 筆可追溯來源紀錄；依 benchmark、原生單位與配置展開篩選，附固定 commit 和來源定義。`,body,kind:'native'});
 }
 function chapterNav(route,locale) {
   const chapterLinks=chapters.map(s=>`<a href="${routeLink(route,chapterRoute(s),locale)}"${route===chapterRoute(s)?' class="active" aria-current="page"':''}><span>${s.id.slice(1)}</span>${t(s.title,locale)}</a>`).join('');
-  const extras=[['joint-pilot.html','自建120聯合測例'],['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['research.html','文獻更新與分類'],['library.html',`${papers.length} 篇文獻`],['appendices/methods.html','來源與資料字典']];
-  return `<div class="sidebar-label">${t('設計與實際開發',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'execution.html',locale)}"${route==='execution.html'?' class="active" aria-current="page"':''}>${t('實際執行、模型與驗證',locale)}</a><a href="${routeLink(route,'readiness.html',locale)}"${route==='readiness.html'?' class="active" aria-current="page"':''}>${t('待完善事項與驗收',locale)}</a><a href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模方案與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
+  const extras=[['survey-union.html','Benchmark總庫與任務規則'],['joint-pilot.html','工程附錄：聯合流程試作'],['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['research.html','文獻更新與分類'],['library.html',`${papers.length} 篇文獻`],['appendices/methods.html','來源與資料字典']];
+  return `<div class="sidebar-label">${t('研究主線與來源總庫',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'execution.html',locale)}"${route==='execution.html'?' class="active" aria-current="page"':''}>${t('工程附錄：原生模型與驗證',locale)}</a><a href="${routeLink(route,'readiness.html',locale)}"${route==='readiness.html'?' class="active" aria-current="page"':''}>${t('待完善事項與驗收',locale)}</a><a href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模方案與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('完整原生來源盤點',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
 }
 function readingPage(section,locale) {
   const route=chapterRoute(section);
@@ -506,7 +516,7 @@ function readingPage(section,locale) {
   ${breadcrumb('章節閱讀',route,locale)}<div class="eyebrow">CHAPTER ${section.id.slice(1)} / 14</div><h1>${t(section.title,locale)}</h1>
   <div class="page-meta"><span>${t(`約 ${timeFor(section)} 分鐘`,locale)}</span><span>·</span><span>${t(`資料快照 ${config.researchDate}`,locale)}</span><span class="pill status">${t('設計階段 Q0',locale)}</span></div>
   <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul>${summaries[section.id].map(line=>`<li>${t(line,locale)}</li>`).join('')}</ul></div>
-  <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本章連結',locale)}</button><button class="text-button print-page">${t('列印本章',locale)}</button><a class="text-button" href="${pdfHref(route,locale)}">${t('最新完整 PDF · v0.6',locale)} ↗</a></div>
+  <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本章連結',locale)}</button><button class="text-button print-page">${t('列印本章',locale)}</button><a class="text-button" href="${pdfHref(route,locale)}">${t('最新完整 PDF · v0.7',locale)} ↗</a></div>
   <nav class="prev-next" aria-label="${t('前後章節',locale)}">${nextPrev}</nav></main>
   <aside class="on-this-page" aria-label="${t('本章內容',locale)}"><div class="sidebar-label">${t('本章內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}</aside></div>`;
   return shell({route,locale,title:section.title,description:descriptions[section.id],body,kind:'chapter'});
@@ -621,45 +631,17 @@ function towelSVG(){
 }
 function homePage(locale){
   const route='index.html';
-  const quickCards=[
-    ['01','任務種類要多，覆蓋也要廣','把全來源庫正規化，再補足各場域、家族、機制、材料與機體的缺口。兩道門檻一起驗收。','design.html#design-section-3','看目標與廣度配額'],
-    ['02','任務數和測試量分開算','同一任務在不同場域、機體建立實例，可以增加覆蓋和測試量；全球獨立任務只計一次。','design.html#capacity-explorer','互動估算題量'],
-    ['03','用共用平台確認完整完成','文字、影片、歷史和介入條件連到合法測例，保留完整執行、恢復與分項診斷。','design.html#design-section-8','了解如何評測']
-  ];
-  const routes=[
-    ['↗','第一次了解這個題目','先看新版的整體目標、任務來源、廣度配額和執行流程。','design.html','從整體設計開始'],
-    ['⌘','研究者與論文作者','直接比較先例、分類分布、難度設計與可驗證的研究主張。','chapters/04.html','進入文獻與比較'],
-    ['→','準備開始實作','讀六個案例、資料規格、算力估算與 milestone 驗收條件。','chapters/09.html','進入具體設計']
-  ];
-  const body=`<main id="main-content"><div class="wrap">
-  <section class="hero"><div><div class="eyebrow">${t('大規模 × 廣覆蓋 · v0.6 · All-in-one',locale)}</div><h1>${t('更多獨立任務，',locale)}<br><em>${t('更廣評測覆蓋。',locale)}</em></h1>
-  <p class="lede">${t('大型機器人任務庫、具體廣度配額與一套評測平台。全庫初始目標為 2,000–3,000 種獨立任務；任務數與有效覆蓋，各以至少最大可比基準 2 倍為目標。',locale)}</p>
-  <div class="cta-row"><a class="button" href="${routeLink(route,'design.html',locale)}">${t('閱讀整體設計',locale)} <span class="arrow">→</span></a><a class="button secondary" href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／題數比較',locale)}</a></div>
-  <p class="note">${t(`已盤點 ${sourceStats.source_repositories_pinned} 個官方程式庫、${sourceStats.source_snapshots_pinned} 個版本來源，共 ${sourceStats.source_records.toLocaleString('en-US')} 筆原生紀錄。`,locale)}<br>${t('已有原生開發執行與基線證據；來源仍待全庫 G2 去重，通用規模門檻尚未達成。',locale)}</p></div>
-  <div class="hero-visual"><div class="visual-top"><span>ONE SCENE. TWO GOALS.</span><span class="visual-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
-  <span class="demo-label">${t('用一條毛巾，理解這個 benchmark',locale)}</span><div class="demo-title">${t('示範變了，目標也跟著變。',locale)}</div>
-  <div class="goal-switch" role="group" aria-label="${t('切換示範目標',locale)}"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div>
-  <div class="towel-scene">${translate(towelSVG(),locale)}</div><div class="scene-caption"><span id="fold-pairs">D → A · C → B</span><span>${t('概念示意，非模擬結果',locale)}</span></div>
-  <p class="demo-message" id="demo-message" aria-live="polite">${t(strings.demoA,locale)}</p><a class="section-link" href="${routeLink(route,'chapters/09.html#detail-SC-H15',locale)}">${t('深入這個案例',locale)} →</a></div></section>
-  <div class="metrics-strip" aria-label="${t('規模目標與目前進度',locale)}"><a class="metric" href="${routeLink(route,'design.html#design-section-3',locale)}"><strong class="long">2,000–3,000</strong><span>${t('正規化 G2 任務初始目標',locale)}</span><small>${t('研發目標，尚未達成',locale)}</small></a><a class="metric" href="${routeLink(route,'design.html#design-section-3',locale)}"><strong>≥ 2×</strong><span>${t('任務數與有效覆蓋各自驗收',locale)}</span><small>${t('共同分類與 scope 後比較',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}"><strong>${sourceStats.source_records.toLocaleString('en-US')}</strong><span>${t('已提取原生來源紀錄',locale)}</span><small>${t('異質單位，未跨作去重',locale)}</small></a><a class="metric" href="${routeLink(route,'execution.html',locale)}"><strong>${executionModel.held_out_method_trials.toLocaleString('en-US')}</strong><span>${t('次原生新初態測試',locale)}</span><small>${t('50原生任務 × 5初態 × 5方法',locale)}</small></a></div>
-  <div class="scope-notice"><b>${t('9/29新增：影像、工具與物理執行的自建資料',locale)}</b><p>${t('120個合成聯合測例、15個初態、720次原定程式執行，另有2次可解性補充。完整RGB＋工具程式在80個新初態測例上，聯合成功率92.5%。這是固定程式試作，尚非VLM/VLA評測或新的120種G2。',locale)}</p><a href="${routeLink(route,'joint-pilot.html',locale)}">${t('看實際案例、完整紀錄與資料下載',locale)} →</a></div>
-  <div class="scope-notice"><b>${t('已有真實執行與學習基線',locale)}</b><p>${t('本機 MuJoCo／Meta-World 的五方法測試已保存完整動作與結果，並通過重播、reset與模型權重核驗。它屬原生state-based開發track；通用G2、更多材料／機體和人類影片執行仍在建置。',locale)}</p><a href="${routeLink(route,'execution.html',locale)}">${t('看實際結果、影片與完整50任務表',locale)} →</a></div>
-  <div class="scope-notice"><b>${t('廣度也有具體支撐量',locale)}</b><p>${t('12 個核心場域各提出至少 100 個有效任務綁定、8 個家族、3 類機制的目標。材料和機體另設配額；共用同一任務時，全球 G2 只計一次。原 180 個藍圖保留為種子，100–140 預算屬歷史方案。',locale)}</p><a href="#quick-start">${t('3 分鐘理解整體設計',locale)} →</a><br><a href="${routeLink(route,'readiness.html',locale)}">${t('查看還沒完善的地方與優先交付',locale)} →</a></div>
-  <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">THE SHORT VERSION</div><h2>${t('先掌握三個重點',locale)}</h2><p>${t('不需要先讀完論文，先知道這份設計想解決什麼。',locale)}</p></div><a class="section-link" href="${routeLink(route,'glossary.html',locale)}">${t('不熟悉術語？看小辭典',locale)} →</a></div>
-  <div class="card-grid">${quickCards.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div>
-  <div class="concept-band"><div><h3>${t('來源、任務、初態與執行各有單位。',locale)}</h3><p>${t('目前有原生開發初態與實際執行；它們還不能改報成完成跨作去重與全域驗收的通用G2。',locale)}</p></div><div class="scale-line"><b>${t('來源紀錄',locale)}<small>5,020</small></b><span class="arr">→</span><b>${t('通用任務',locale)}<small>G2 · TBD</small></b><span class="arr">→</span><b>${t('原生新初態',locale)}<small>${executionModel.held_out_initial_cases} cases</small></b><span class="arr">→</span><b>${t('本次測試執行',locale)}<small>${executionModel.held_out_method_trials.toLocaleString('en-US')} trials</small></b></div></div></section>
-  <section class="section"><div class="section-head"><div><div class="eyebrow">SEED DESIGNS</div><h2>${t('原有設計種子：12 個應用場域',locale)}</h2><p>${t('這是 v0.2 的 180 個情境種子；完整任務庫正由更大來源聯集擴展。場域新增要由真正的任務與場景證據支持。',locale)}</p></div><a class="section-link" href="${routeLink(route,'explore/tasks.html',locale)}">${t('探索情境種子',locale)} →</a></div>
-  <div class="domain-grid">${Object.entries(taxonomy.application_contexts).map(([id,v])=>`<a class="domain-card" href="${routeLink(route,'explore/tasks.html',locale)}?domain=${id}"><span class="code">${id}</span><b>${t(v.name,locale)}</b><span class="num">${tasks.filter(task=>task.application_context_id===id).length} →</span></a>`).join('')}</div>
-  <p class="note-inline">${t('8 個評測模組涵蓋理解、記憶、預測、規劃、執行、恢復、協作與世界模型。24 個額外 Ego 觀測題型另列。',locale)}</p></section>
-  <section class="section"><div class="section-head"><div><div class="eyebrow">CHOOSE YOUR READING PATH</div><h2>${t('選一個適合你的入口',locale)}</h2><p>${t('每章先給摘要，再保留完整推理、定義、表格與來源。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/index.html',locale)}">${t('查看 14 章完整目錄',locale)} →</a></div>
-  <div class="card-grid">${routes.map(([num,title,description,target,label])=>`<a class="overview-card" href="${routeLink(route,target,locale)}"><span class="card-icon">${num}</span><h3>${t(title,locale)}</h3><p>${t(description,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
-  <section class="section"><div class="section-head"><div><div class="eyebrow">FROM SCALE AND BREADTH TO EVIDENCE</div><h2>${t('每批任務，同時檢查數量與覆蓋。',locale)}</h2><p>${t('從全來源盤點向完整任務庫推進，場域、材料和機體一起擴展。',locale)}</p></div><a class="section-link" href="${routeLink(route,'chapters/13.html',locale)}">${t('查看新版 milestones',locale)} →</a></div>
-  <div class="roadmap-preview"><div class="roadmap-step current"><small>S0 · ${t('目前',locale)}</small><h3>${t('完整來源盤點',locale)}</h3><p>${t(`${sourceStats.source_records.toLocaleString('en-US')} 筆來源紀錄已提取，進入共同 G2 與來源去重審核。`,locale)}</p></div><div class="roadmap-step"><small>S1–S2</small><h3>${t('共同分類與閉環',locale)}</h3><p>${t('固定參照集、廣度配額與共同規則，驗證 backend 和判分。',locale)}</p></div><div class="roadmap-step"><small>S3–S4</small><h3>${t('規模與廣度一起擴',locale)}</h3><p>${t('250／500／1,000，每批檢查缺口，朝全庫與兩道 2× 目標推進。',locale)}</p></div><div class="roadmap-step"><small>S5–S6</small><h3>${t('全規模實驗與發布',locale)}</h3><p>${t('凍結完整適用集合，比較基線、覆蓋與泛化，公開可重現證據。',locale)}</p></div></div></section>
-  <div class="download-band"><div><h2>${t('一份PDF，讀懂現在的完整設計。',locale)}</h2><p>${t(`${currentPDF.pages}頁整合版先讀9/29自建資料與實驗，再查9/25設計、68項前作比較、250篇書目與原生實驗；原257頁仍以歷史標記保留。`,locale)}</p></div><a class="button" href="${pdfHref(route,locale)}" download>${t('最新完整 PDF · v0.6',locale)} <span class="arrow">↓</span></a></div>
+  const diagram=`<svg class="union-flow-svg" viewBox="0 0 480 330" role="img" aria-label="${t('多個benchmark經分類形成任務聯集，再擴充任務與規則',locale)}"><defs><marker id="union-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#44846b"/></marker></defs><g fill="#fff" stroke="#c4d9c7"><rect x="12" y="22" width="142" height="56" rx="12"/><rect x="169" y="22" width="142" height="56" rx="12"/><rect x="326" y="22" width="142" height="56" rx="12"/><rect x="59" y="133" width="362" height="64" rx="12"/><rect x="59" y="249" width="362" height="64" rx="12"/></g><g font-family="sans-serif" font-size="14" fill="#215a46" text-anchor="middle"><text x="83" y="47">${t('操作／材料',locale)}</text><text x="83" y="66">${t('既有任務',locale)}</text><text x="240" y="47">${t('導航／協作',locale)}</text><text x="240" y="66">${t('既有規則',locale)}</text><text x="397" y="47">${t('Ego／影片',locale)}</text><text x="397" y="66">${t('理解與預測',locale)}</text><text x="240" y="158">${t('Survey分類 → 完整任務聯集',locale)}</text><text x="240" y="181" font-size="12">${t('保留來源、領域、任務與多粒度數量',locale)}</text><text x="240" y="275">${t('擴充目標、規則、流程與組合',locale)}</text><text x="240" y="298" font-size="12">${t('綜合任務庫 ＋ 分層評測',locale)}</text></g><g fill="none" stroke="#44846b" stroke-width="1.8" marker-end="url(#union-arrow)"><path d="M83 79L160 132"/><path d="M240 79V132"/><path d="M397 79L320 132"/><path d="M240 198V247"/></g></svg>`;
+  const cards=[['01','全面收集前作','benchmark、含評測資料、task suite、官方清單和版本，都接到同一來源表。','survey-union.html','查看來源總庫'],['02','分類後建立任務聯集','像survey一樣整理領域、任務家族、材料、觀測和規則，保留互補的來源範圍。','survey-union.html#union-taxonomy','看分類與分布'],['03','擴充任務與規則','在父任務上增加目標、約束、必要順序、條件分支及組合工作，逐層報增量。','survey-union.html#union-extension-rules','看具體擴充例子']];
+  const body=`<main id="main-content"><div class="wrap"><section class="hero"><div><div class="eyebrow">SURVEY → TASK UNION → EXTENSIONS · v0.7</div><h1>${t('把前作收齊，',locale)}<br><em>${t('建立大而廣的任務庫。',locale)}</em></h1><p class="lede">${t('全面收集既有機器人與Ego相關benchmark，整理它們的領域、任務和規則。以完整聯集保留互補能力，再擴充任務定義，放進同一套分層評測。',locale)}</p><div class="cta-row"><a class="button" href="${routeLink(route,'survey-union.html',locale)}">${t('進入Benchmark總庫',locale)} →</a><a class="button secondary" href="${routeLink(route,'design.html',locale)}">${t('閱讀目前主設計',locale)}</a></div><p class="note">${t('來源目錄按研究範圍收集；目前能在Mac執行哪些子集，另列工程進度。',locale)}</p></div><div class="hero-visual"><div class="visual-top"><span>COLLECT · CLASSIFY · UNIFY · EXTEND</span></div>${diagram}<p class="demo-message">${t('大與廣來自前作聯集和任務／規則擴充；每個來源、原生任務與修改都保留出處。',locale)}</p></div></section>
+  <div class="metrics-strip"><a class="metric" href="${routeLink(route,'survey-union.html',locale)}"><strong>143</strong><span>${t('已登記benchmark／評測資源條目',locale)}</span><small>${t('含版本；全部250篇書目另可查',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}"><strong>5,308</strong><span>${t('已提取來源條目',locale)}</span><small>${t('任務、活動、註冊與協定分欄',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}?bucket=native_task_candidates"><strong>2,062</strong><span>${t('原生robot任務候選',locale)}</span><small>${t('跨來源共同映射持續',locale)}</small></a><a class="metric" href="${routeLink(route,'native-tasks.html',locale)}?bucket=human_activity_definitions"><strong>263</strong><span>${t('人類程序活動定義',locale)}</span><small>COIN 180 · CrossTask 83</small></a></div>
+  <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">THE MAIN RESEARCH</div><h2>${t('三個重點，就是這份研究的主線。',locale)}</h2><p>${t('完整來源總庫、Survey分類與任務聯集，再加上可擴充的任務和規則。',locale)}</p></div></div><div class="card-grid">${cards.map(([n,title,text,url,label])=>`<a class="overview-card" href="${routeLink(route,url,locale)}"><span class="card-icon">${n}</span><h3>${t(title,locale)}</h3><p>${t(text,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><div class="eyebrow">SOURCE COVERAGE &amp; TASK RULES</div><h2>${t('看前作覆蓋什麼，再看我們增加什麼。',locale)}</h2><p>${t('總庫提供benchmark×領域／任務／場景欄位；原68項詳細比較繼續保留，75條先前漏接來源已回到總目錄。',locale)}</p></div><a class="section-link" href="${routeLink(route,'compare.html',locale)}">${t('原68項詳細比較',locale)} →</a></div><div class="roadmap-preview">${[['U0','完整來源','保留版本、原文與待查清單。'],['U1','原生任務','逐來源取得task、activity、schema與規則。'],['U2','分類與聯集','共同分類、多粒度數量、互補與重疊。'],['U3','規格擴充','擴充目標、流程、約束和組合。']].map(([id,title,text])=>`<div class="roadmap-step"><small>${id}</small><h3>${t(title,locale)}</h3><p>${t(text,locale)}</p></div>`).join('')}</div></section>
+  <div class="download-band"><div><h2>${t('一份PDF，讀懂目前設計與全部資料。',locale)}</h2><p>${t(`${currentPDF.pages}頁整合版先讀前作聯集、分類與規則擴充；既有文獻、完整設計和工程實驗附在後面。`,locale)}</p></div><a class="button" href="${pdfHref(route,locale)}">${t('最新完整 PDF · v0.7',locale)} ↓</a></div>
+  <details class="explainer" id="home-engineering-appendix"><summary>${t('工程附錄與歷史設計種子',locale)}</summary><p>${t('原生執行器、小型聯合資料與180個情境種子，保留支援後續整合。',locale)}</p><p><a href="${routeLink(route,'execution.html',locale)}">${t('Meta-World原生執行',locale)}</a> · <a href="${routeLink(route,'joint-pilot.html',locale)}">${t('小型聯合流程試作',locale)}</a> · <a href="${routeLink(route,'explore/tasks.html',locale)}">${t('180個情境種子',locale)}</a></p><details id="home-legacy-demo"><summary>${t('歷史概念例：同一條毛巾的兩個目標',locale)}</summary><div class="goal-switch"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div><div class="towel-scene">${translate(towelSVG(),locale)}</div><p id="fold-pairs">D → A · C → B</p><p id="demo-message">${t(strings.demoA,locale)}</p></details></details>
   </div></main>`;
-  return shell({route,locale,title:'更多獨立任務，更廣評測覆蓋',description:'v0.4 整體設計：大型任務庫、12 場域廣度配額與統一評測，任務數和有效覆蓋共同驗收。',body,kind:'home'});
+  return shell({route,locale,title:'全面前作聯集，擴充任務與規則',description:'全面收集機器人與Ego相關benchmark，像survey一樣分類，再以來源任務聯集與規則擴充建立大而廣的綜合benchmark。',body,kind:'home'});
 }
-
 function referencePage(group,locale){
   const route=groupRoutes[group];
   const meta={
@@ -705,7 +687,8 @@ function searchPage(locale){
 }
 function searchData(locale){
   const result=[];
-  result.push({kind:'reference',title:translate('自建聯合資料：120測例與RGB工具執行',locale),path:'joint-pilot.html',summary:translate('合成影像、SQLite、機器人接觸操作與完整共同驗收。720次程式執行、80測例新初態結果及可下載資料。',locale),search:'joint multimodal tool use synthetic 自建 合成 多模態 多模态 工具 120 720 92.5 SQLite RGB data 資料 数据'});
+  result.push({kind:'reference',title:translate('Benchmark總庫：Survey分類、任務聯集與規則擴充',locale),path:'survey-union.html',summary:translate('143條已登記評測來源、250篇書目、5308條來源定義與12個擴充例。',locale),search:'survey taxonomy benchmark union task grammar 規則 规则 聯集 联集 分類 分类 全部 143 5308 VIMA ARNOLD COIN CrossTask'});
+  result.push({kind:'reference',title:translate('工程附錄：120測例與RGB工具執行',locale),path:'joint-pilot.html',summary:translate('合成影像、SQLite、機器人接觸操作與完整共同驗收。720次程式執行、80測例新初態結果及可下載資料。',locale),search:'joint multimodal tool use synthetic 自建 合成 多模態 多模态 工具 120 720 92.5 SQLite RGB data 資料 数据'});
   result.push({kind:'reference',title:translate('實際開發執行：50原生任務與五方法結果',locale),path:'execution.html',summary:translate('MuJoCo／Meta-World實際執行、新初態BC測試、reset修正、重播與完整結果。',locale),search:'execution simulation 實際 执行 執行 模擬 模拟 原生 1250 4286 Meta-World BC baseline 基線 基线 結果 结果'});
   result.push({kind:'reference',title:translate('文獻更新：250篇與Ego預測分類',locale),path:'research.html',summary:translate('新增82篇、68項前作比較、700搜尋候選的狀態、完整分類和Ego預測目標。',locale),search:'research literature 文獻 文献 分類 分类 prediction forecasting ego taxonomy 250 82 700'});
   for(const issue of readinessModel.issues){
@@ -736,9 +719,9 @@ function searchData(locale){
     const content=groups[group].map(s=>s.title+' '+plain(s.html)).join(' ');
     result.push({kind:'reference',title:translate(section.title,locale),path:groupRoutes[group],summary:translate(plain(section.html).slice(0,120),locale),search:tc(content)+' '+sc(tc(content))});
   }
-  result.push({kind:'reference',title:translate('整體設計 v0.4：大規模、廣覆蓋、統一評測',locale),path:'design.html',summary:translate('完整新版設計：2,000–3,000 G2、兩道 2× 目標、12 場域配額、材料／機體／影片、評測與互動預算。',locale),search:tc(plain(overallSpecHTML))+' '+sc(tc(plain(overallSpecHTML)))+' overall design all in one v0.4 2000 3000 2x'});
+  result.push({kind:'reference',title:translate('主設計v0.7：前作聯集、Survey分類與任務規則擴充',locale),path:'design.html',summary:translate('全面收集benchmark及其領域／任務，建立來源聯集，再擴充任務定義、規則與流程。目錄與執行子集分開。',locale),search:tc(plain(unionSpecHTML))+' '+sc(tc(plain(unionSpecHTML)))+' overall design survey task union rule grammar v0.7'});
   result.push({kind:'reference',title:translate('規模比較與來源查核',locale),path:'scale-plan.html',summary:translate('v0.3 規模提案與全來源盤點證據；整體設計已更新至 v0.4。',locale),search:'scale all in one 规模 規模 比較 比较 2000 3000 2x 來源 联合库'});
-  for(const record of sourceRecords){
+  for(const record of browseRecords){
     const summary=`${record.source_work} · ${record.native_unit_zh} · 靜態紀錄，未完成 G2 去重`;
     result.push({kind:'native',title:record.native_id,path:`native-tasks.html#${record.anchor_id}`,summary:translate(summary,locale),search:`${record.native_id} ${record.title} ${record.source_work} ${record.native_aliases_or_variants.join(' ')} ${nativeSearchHints(record)}`});
   }
@@ -768,20 +751,22 @@ for(const locale of LOCALES){
   await write(`${locale}/execution.html`,renderExecutionPage(locale,executionModel,implementationModel,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell}));
   await write(`${locale}/research.html`,renderResearchPage(locale,researchStats,papers,literatureAdditions,literatureLineage,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell}));
   await write(`${locale}/joint-pilot.html`,renderJointPilotPage(locale,jointReport,jointDemos,jointDownload,{t,escape,relative,routeLink,head,shell}));
+  await write(`${locale}/survey-union.html`,renderSurveyUnionPage(locale,unionStats,unionRegistry,unionSources,unionExtensions,{t,escape,relative,routeLink,head,shell}));
   await write(`${locale}/scale-plan.html`,scalePlanPage(locale));
   await write(`${locale}/native-tasks.html`,nativePage(locale));
   const data=searchData(locale);
   await write(`assets/search-${locale}.js`,`window.SEARCH_INDEX=${jsonSafe(data)};`);
 }
 const nativePayload={
-  sources:Object.fromEntries(sourceReports.map(source=>[source.id,{work:source.work,repo:source.resolved_repo,commit:source.commit,role:source.role,count:source.record_count}])),
-  records:sourceRecords.map(record=>({
+  sources:Object.fromEntries(browseSources.map(source=>[source.id,{work:source.work,repo:source.resolved_repo,commit:source.commit,role:source.role,count:source.record_count}])),
+  records:browseRecords.map(record=>({
     id:record.anchor_id,s:record.source_id,n:record.native_id,t:record.title,u:record.native_unit,b:record.inventory_bucket,p:record.definition_path,
     a:record.native_aliases_or_variants,ar:record.asset_reference_paths,
     v:record.native_metadata.configuration_only_derived_class===true,
     ds:record.native_metadata.dataset_registry_present,
     line:record.native_metadata.registration_line,
-    h:nativeSearchHints(record)
+    h:nativeSearchHints(record)+' '+(record.additional_search||''),
+    url:record.source_url
   }))
 };
 await write('assets/native-source-data.js',`window.NATIVE_SOURCE_DATA=${jsonSafe(nativePayload)};`);
@@ -816,24 +801,28 @@ for(const filename of ['README_ZH.md','pilot_report.json','method_results.csv','
   await write(`downloads/joint-pilot/${filename}`,await fs.readFile(path.join(JOINT_DIR,filename)));
 }
 await write('assets/joint-pilot-data.js',`window.JOINT_PILOT_DEMOS=${jsonSafe(jointDemos)};`);
+for(const filename of await fs.readdir(UNION_DIR)){
+  if(/\.(json|csv|md|pdf)$/.test(filename))await write(`downloads/survey-union/${filename}`,await fs.readFile(path.join(UNION_DIR,filename)));
+}
 const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
 const scaleRoot=rootHtml
   .replace('從看懂示範，到可靠完成任務。','更多獨立任務，更廣評測覆蓋。')
-  .replace('公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。','整合更新 v0.6：大規模、廣覆蓋、統一評測。<br>整合更新 v0.6：大规模、广覆盖、统一评测。<br>250篇文獻、68項前作比較；另有120個自建聯合測例與720次固定程式執行。2,000–3,000個通用G2與2×門檻仍待達成。')
+  .replace('公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。','主設計 v0.7：全面收集、Survey分類、任務聯集與規則擴充。<br>主设计 v0.7：全面收集、Survey分类、任务联集与规则扩充。<br>143條已登記評測來源、250篇書目、5,308條來源定義；完整收集與共同映射持續進行。')
   .replace('從重點導讀到完整文獻、情境和章節。','以規模與覆蓋優勢為主軸，附完整來源任務庫、文獻與章節。');
-await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · 整體設計 v0.4"><meta property="og:description" content="All-in-one 整體設計：大型任務庫、12 場域廣度配額與共用評測平台，任務數和有效覆蓋共同驗收。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
+await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · 主設計 v0.7"><meta property="og:description" content="全面前作盤點、Survey分類與任務聯集，再擴充目標、規則和流程；目錄與執行子集分開。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
 await write('404.html',`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找不到頁面 · Robot-use Benchmark</title><link rel="stylesheet" href="${config.siteUrl}/assets/site.css"></head><body><main class="wrap narrow" style="padding:90px 0"><div class="eyebrow">404</div><h1>這個頁面找不到了。<br>这个页面找不到了。</h1><p>可以回到首頁，從章節、情境或文獻重新找到內容。</p><div class="cta-row"><a class="button" href="${config.siteUrl}/zh-hant/">繁體首頁</a><a class="button secondary" href="${config.siteUrl}/zh-hans/">简体首页</a></div></main></body></html>`);
 await write('.nojekyll','');
 await write('robots.txt',`User-agent: *\nAllow: /\nSitemap: ${config.siteUrl}/sitemap.xml\n`);
 await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allPageRecords.map(p=>`<url><loc>${escape(config.siteUrl+'/'+p.file)}</loc><lastmod>${config.publicationDate||config.auditDate}</lastmod></url>`).join('')}</urlset>`);
 const manifest={
   siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,designDate:config.designDate,designVersion:config.designVersion,auditDate:config.auditDate,
-  iterationVersion:'0.6',literatureRefreshDate:researchStats.cutoff_date,
-  pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,tasks:tasks.length,families:families.length,probes:probes.length,metrics:metrics.length,comparisonPriorWorks:comparisonModel.prior_works,comparisonRows:comparisonModel.rows.length,nativeSourceRecords:sourceRecords.length,sourceRepositories:sourceStats.source_repositories_pinned,sourceSnapshots:sourceStats.source_snapshots_pinned,validatedCases:0,simulatorRuns:executionModel.recorded_trial_history_total,nativeHeldoutTestCases:executionModel.held_out_initial_cases,nativeHeldoutMethodTrials:executionModel.held_out_method_trials},
+  iterationVersion:'0.7',literatureRefreshDate:researchStats.cutoff_date,
+  pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,tasks:tasks.length,families:families.length,probes:probes.length,metrics:metrics.length,comparisonPriorWorks:comparisonModel.prior_works,comparisonRows:comparisonModel.rows.length,nativeSourceRecords:browseRecords.length,sourceRepositories:unionStats.source_repositories,sourceSnapshots:unionStats.source_snapshots,validatedCases:0,simulatorRuns:executionModel.recorded_trial_history_total,nativeHeldoutTestCases:executionModel.held_out_initial_cases,nativeHeldoutMethodTrials:executionModel.held_out_method_trials},
   sourceSections:sections.length,sourceSectionIds:sections.map(s=>s.id),assets:generated.filter(file=>!file.endsWith('.html')),
   pdf:'downloads/current-report-zh-hant.pdf',historicalPdf:'downloads/full-report-zh-hant.pdf',pdfPages:currentPDF.pages,pdfSha256:currentPDF.sha256,
   jointPilot:{workflowCandidates:1,cases:jointReport.total_cases,testCases:jointReport.test_cases,programTrials:jointReport.total_frozen_program_trials,supplementalAnnotations:jointReport.supplemental_annotation_trials,canonicalG2:null},
-  note:'Public research, native-development execution and a synthetic RGB/tool/robot pilot. Cases, trials and workflow candidates are not certified new canonical G2 tasks or a completed universal benchmark.'
+  surveyUnion:{sourceRecords:unionStats.total_source_records,registeredEvaluationSources:unionStats.benchmark_or_eval_resource_records,taskSourceSnapshots:unionStats.source_snapshots,robotTaskCandidates:unionStats.native_robot_task_candidates,humanActivityDefinitions:unionStats.human_activity_definitions,extensionExamples:unionExtensions.length,completeSearch:false},
+  note:'Main research: comprehensive source survey, taxonomy, task union and task/rule extensions. Runtime pilots are engineering appendices; collection and execution have separate counts.'
 };
 await fs.mkdir(path.join(ROOT,'verification'),{recursive:true});
 await fs.writeFile(path.join(ROOT,'verification/build-manifest.json'),JSON.stringify(manifest,null,2));

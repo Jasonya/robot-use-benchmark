@@ -13,6 +13,7 @@ export function renderExecutionPage(locale, model, progress, helpers) {
   const taskTable=`<div class="table-scroll execution-task-table"><table id="execution-native-task-table"><thead><tr><th>${t('原生任務',locale)}</th>${methods.map(id=>`<th>${t(labels[id],locale)}</th>`).join('')}</tr></thead><tbody>${tasks.map(task=>`<tr id="mw-${escape(task)}"><th scope="row">${escape(task)}</th>${methods.map(method=>`<td>${percent(lookup[task+'::'+method].native_success_ever_all_requested)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const nav=chapterNav(route,locale);
   const body=`<div class="reader-layout"><aside class="chapter-sidebar">${nav}</aside><main class="reader" id="main-content">
+    <div class="union-intent-note" data-engineering-appendix><b>${t('工程附錄：一個已實作backend的原生結果',locale)}</b><p>${t('完整任務目錄按前作來源收集、分類與擴充；執行子集另列進度。此頁保留既有Meta-World實驗，支援後續整合。',locale)}</p><a href="${routeLink(route,'survey-union.html',locale)}">${t('回到Benchmark總庫',locale)} →</a></div>
     <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('實際開發執行',route,locale)}
     <div class="eyebrow">NATIVE EXECUTION EVIDENCE</div><h1>${t('從規格，進到真正的模擬與驗證。',locale)}</h1>
     <p class="lede">${t('在本機執行 Meta-World／MuJoCo，保存初態、動作、結果與重播證據。這裡列出完整原生測試集合的結果，以及清楚的適用範圍。',locale)}</p>

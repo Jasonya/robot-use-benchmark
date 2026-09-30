@@ -31,6 +31,7 @@ export function renderJointPilotPage(locale,report,demos,download,helpers){
     <p class="source-note">${t('可以選「只更新資料庫」看數位成功但物理失敗；選回應遺失與「改key重試」，可看到料件送達但資料重複。這些是刻意設計的診斷控制，不是學習模型排名。',locale)}</p>
   </section>`;
   const body=`<main class="wrap joint-main" id="main-content">
+    <div class="union-intent-note" data-engineering-appendix><b>${t('工程附錄：合成資料鏈試作',locale)}</b><p>${t('目前主設計是全面收集前作、survey分類、任務聯集與任務／規則擴充。本頁保留已完成的小型工程實驗。',locale)}</p><a href="${routeLink(route,'survey-union.html',locale)}">${t('回到Benchmark總庫與研究主線',locale)} →</a></div>
     ${head('資料已接起來：影像、工具與機器人一起驗收','這是一批實際生成、執行和重播的合成資料。從訂單找料件、用RGB定位、推到指定區，再檢查SQLite與物理終態是否一致。',route,locale,`<div class="page-meta"><span>${report.date}</span><span class="pill green">${t('自建資料與重播已驗證',locale)}</span><span class="pill status">${t('固定程式試作 · 非VLM/VLA排名',locale)}</span></div>`)}
     <div class="joint-overview"><div><strong>${report.total_cases}</strong><span>${t('測例：40開發＋80新初態驗證',locale)}</span></div><div><strong>${report.total_initial_worlds}</strong><span>${t('實際初態；共用1個工作流／layout',locale)}</span></div><div><strong>${report.total_frozen_program_trials}</strong><span>${t('原定程式執行，成功與失敗都保留',locale)}</span></div><div><strong>${report.cases_with_completion_witness}</strong><span>${t('都有成功操作證據；含2次事後可解性補充',locale)}</span></div></div>
     <div class="scope-notice"><b>${t('這批數據證明了什麼',locale)}</b><p>${t('在只有本機Mac的條件下，已造出可重現的RGB—entity—資料庫—控制—判分完整鏈。資料是合成訂單和模擬料件，物理動作與SQL寫入確實執行過。場景只有兩種顏色的剛性方塊、固定相機和一隻Sawyer臂；没有真人影片或學習型agent成績。',locale)}</p><p>${t('120是測例數，不是120種新G2。大規模、廣覆蓋與2×目標仍待完成。',locale)}</p></div>
