@@ -58,6 +58,7 @@
     const title = document.createElement('h3');
     title.textContent = record.t || record.n;
     article.append(badge, title, field('Native ID', record.n, 'meta'), field(text.source, source.work), field(text.definition, record.p, 'meta'));
+    if(text.meaningByBucket?.[record.b])article.append(field(text.recordMeaning,text.meaningByBucket[record.b],'meta'));
     if (record.v) {
       const flag = document.createElement('p');
       flag.className = 'native-variant-note';

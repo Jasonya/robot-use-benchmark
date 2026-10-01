@@ -21,6 +21,7 @@ export function renderReadinessPage(locale, model, helpers) {
   const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${nav}</aside><main class="reader" id="main-content">
     <details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('待完善事項',route,locale)}
     <div class="eyebrow">DESIGN &amp; EVIDENCE REVIEW</div><h1>${t('還缺什麼，怎樣才算完成。',locale)}</h1>
+    <p class="counting-reference-note">${t('來源提取、任務環境規格與執行驗證各自記錄。143條來源名錄目前有27條連到部分索引，116條原生清單待補；環境定義總數與原始樣本總量尚未彙總。',locale)} <a href="${routeLink(route,'counting.html',locale)}">${t('看目前的計數與環境定義',locale)} →</a></p>
     <div class="union-intent-note"><b>${t('目前優先順序：來源、分類、任務聯集與規則擴充',locale)}</b><p>${t('v0.7以U0–U3為主線；目錄收集與執行子集分開。下方保留既有工程驗收表，完整來源與task清單的待補進度改由總庫列出。',locale)}</p><a href="${routeLink(route,'survey-union.html',locale)}#union-backlog">${t('查看目前主線的收集與分類待辦',locale)} →</a></div>
     <p class="lede">${t('已有原生模擬執行、學習基線、來源索引與開發規則；完整G2、廣度與通用release仍待完成。這裡把新證據和剩餘工作逐項列出。',locale)}</p>
     <div class="page-meta"><span>${implementation?.date||model.audit_date}</span><span class="pill status">${t('開發證據持續更新',locale)}</span><span>${t('主設計 v0.7 · 工程審核快照另列',locale)}</span></div>

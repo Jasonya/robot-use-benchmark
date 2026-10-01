@@ -1,0 +1,145 @@
+{
+  "version": "counting-contract-1.0",
+  "clarified_on": "2026-10-01",
+  "source_snapshot_date": "2026-09-29",
+  "scope": "Counting terminology for the source-union benchmark. Definitions can be collected before local execution; heterogeneous source indices are not automatically task environments.",
+  "unknown_totals": {
+    "task_environment_definitions": null,
+    "distinct_scene_layouts": null,
+    "complete_benchmark_cases": null,
+    "source_sample_totals_by_type": {
+      "videos": null,
+      "qa_pairs": null,
+      "episodes": null,
+      "trajectories": null
+    }
+  },
+  "definitions": [
+    {
+      "id": "source-entry",
+      "name": "來源名錄條目",
+      "definition": "登記一項benchmark、含評測的資料資源或其版本，保留原文及來源關係。",
+      "counting_rule": "143是這一層的名錄條目數，含版本／衍生資源；不表示143個完整資料集已下載或彼此獨立。"
+    },
+    {
+      "id": "source-index",
+      "name": "原作定義／設定索引",
+      "definition": "從原作清單、程式或資料檔提取的一筆可追溯條目，可是任務ID、活動定義、模板、註冊、配對或協定。",
+      "counting_rule": "5,308是此層的已提取索引總數。機器人任務條目、人類活動和其他設定是它的子類；索引數不代替環境數、樣本數或已執行數。"
+    },
+    {
+      "id": "task-environment",
+      "name": "任務環境定義",
+      "definition": "一份可交互評測規格，明訂世界與機體、觀測與動作、初態生成及狀態變化、任務目標、過程限制與判分規則。",
+      "counting_rule": "按完整規格與來源／別名關係識別後計數。只有名稱、task ID或生成器設定時先保留為索引。定義可以先收錄，是否已載入、執行或驗證另記。",
+      "required_components": [
+        "world_objects_and_robot",
+        "observation_and_action_interface",
+        "reset_and_state_transition_rules",
+        "task_goals_process_constraints_and_scoring",
+        "source_versions_and_identity_mapping"
+      ]
+    },
+    {
+      "id": "scene",
+      "name": "場景／layout",
+      "definition": "房間、工作站或場地的空間配置、設施與幾何資產。",
+      "counting_rule": "同一廚房可支援多個任務環境；更換目標或評分規則不會自動增加物理場景數。"
+    },
+    {
+      "id": "case",
+      "name": "測例",
+      "definition": "固定任務環境或評測規格，再指定一個有效初態、輸入／歷史、介入條件與評分約定。",
+      "counting_rule": "同一任務環境可產生多個有效測例。初態或觀測條件變化通常在這一層計數；必須實際建立並確認適用性，不能直接把任意參數乘積當已完成測例。"
+    },
+    {
+      "id": "sample",
+      "name": "原始資料樣本",
+      "definition": "原作提供的影片、QA pair、episode、示範或軌跡等資料單位。",
+      "counting_rule": "依樣本型別、版本、split與來源重疊分項統計；原作公布量、已取得量、已整合量分開。"
+    },
+    {
+      "id": "trial",
+      "name": "一次評測執行",
+      "definition": "某個方法在一個固定測例上執行一次。",
+      "counting_rule": "多個方法或重複執行會增加trial數，保留其與測例的關係。"
+    }
+  ],
+  "identity_rules": [
+    "更改必要目標、限制或判分語義，可形成有父規格的新任務環境版本；與原作是否等價需要對齊。",
+    "機體、觀測／動作接口或狀態變化模型不同時，記錄不同執行綁定及其共用task／scene關係。",
+    "同一規格的seed、初始位置、同義指令或註冊別名，不自動新增任務環境定義。",
+    "場景、task核心、規則變體、任務環境、測例與執行均有各自ID和數量，對前作使用相同粒度。",
+    "人類影片、活動清單與離線QA／預測保持其來源及評測型別；要映射到可交互任務環境時，另建立世界、介面、規則與判分。"
+  ],
+  "independent_status_axes": {
+    "definition_status": [
+      "indexed",
+      "source_linked",
+      "specification_complete",
+      "identity_reviewed"
+    ],
+    "execution_status": [
+      "untested",
+      "load_checked",
+      "trace_checked",
+      "scoring_checked"
+    ]
+  },
+  "examples": [
+    {
+      "id": "coin",
+      "paper_id": "P003",
+      "name": "COIN",
+      "source_id": "coin_video",
+      "indexed_records": 180,
+      "index_unit": "人類活動定義",
+      "reported_scale": "11,827 部影片，涵蓋 180 個活動",
+      "source_url": "https://arxiv.org/abs/1903.02874",
+      "acquisition_note": "本庫已核對annotation metadata；未下載原始影片。"
+    },
+    {
+      "id": "partnr",
+      "paper_id": "P143",
+      "name": "PARTNR",
+      "source_id": "partnr",
+      "indexed_records": 6,
+      "index_unit": "生成器設定",
+      "reported_scale": "原文概述 100,000 個自然語言任務；完整split另見原作",
+      "source_url": "https://arxiv.org/abs/2411.00081",
+      "acquisition_note": "本索引只提取生成設定；完整episode任務清單尚待納入。"
+    }
+  ],
+  "hypothetical_example": {
+    "label": "假設算例，非已建資料",
+    "scene_layouts": 1,
+    "task_environment_definitions": 3,
+    "task_names": [
+      "將杯子收進指定位置",
+      "把櫃門開到指定狀態",
+      "倒出指定水量"
+    ],
+    "default_valid_cases_per_definition": 100,
+    "valid_cases_per_definition_options": [
+      10,
+      100,
+      1000
+    ],
+    "measured_result": false
+  },
+  "references": [
+    {
+      "name": "Gymnasium Env：互動環境介面",
+      "url": "https://gymnasium.farama.org/api/env/",
+      "use": "reset、step、observation及action介面的背景；本頁計數口徑為本計畫約定。"
+    },
+    {
+      "name": "Meta-World：多任務機器人環境",
+      "url": "https://github.com/Farama-Foundation/Metaworld",
+      "use": "任務以環境介面提供的既有例子；不代表其每項任務都有獨立layout。"
+    }
+  ],
+  "catalogue_requires_local_execution": false,
+  "source_indices_relabelled_as_environments": false,
+  "complete_source_union_or_sample_integration_claimed": false
+}

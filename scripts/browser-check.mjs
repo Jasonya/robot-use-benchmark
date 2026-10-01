@@ -187,6 +187,28 @@ try{
   assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'0');
   pass('Survey source registry and language filters','All250 papers remain available;143 registered evaluation sources are the default, with source/category filters and shareable Traditional/Simplified state.');
 
+  await go('zh-hant/counting.html');
+  assert.ok(await noOverflow());
+  assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"indices\"] strong').textContent"),'5,308');
+  assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"environments\"]').dataset.countState"),'unknown');
+  assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"samples\"]').dataset.countState"),'unknown');
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-index-bucket]')).reduce((n,e)=>n+Number(e.dataset.count),0)"),5308);
+  await snapshot('counting-desktop');
+  await evaluate("document.getElementById('counting-example').scrollIntoView({behavior:'instant',block:'start'})");
+  assert.equal(await evaluate("document.querySelector('[data-example-count=\"cases\"]').textContent"),'300');
+  await setValue('#counting-cases-per-definition','1000');
+  assert.equal(await evaluate("document.querySelector('[data-example-count=\"cases\"]').textContent"),'3,000');
+  assert.equal(await evaluate("document.querySelector('[data-example-count=\"scenes\"]').textContent"),'1');
+  assert.equal(await evaluate("document.querySelector('[data-example-count=\"definitions\"]').textContent"),'3');
+  assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"indices\"] strong').textContent"),'5,308');
+  await snapshot('counting-hypothetical-example-desktop');
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&!!document.getElementById('counting-cases-per-definition')");
+  assert.equal(await evaluate("document.getElementById('counting-cases-per-definition').value"),'1000');
+  assert.equal(await evaluate("document.querySelector('[data-example-count=\"cases\"]').textContent"),'3,000');
+  assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"environments\"]').dataset.countState"),'unknown');
+  pass('Counting units and task-environment example','Source143/index5308 and unknown environment/sample totals remain separate; the hypothetical case calculator changes only example cases and preserves language state.');
+
   await go('zh-hant/native-tasks.html?source=vima');
   assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 17 ')"));
   await setValue('#native-source','arnold');
@@ -367,6 +389,12 @@ try{
   await go('zh-hans/survey-union.html?category=D');
   assert.ok(await noOverflow());
   await snapshot('survey-union-mobile');
+  await go('zh-hans/counting.html');
+  assert.ok(await noOverflow());
+  await snapshot('counting-mobile');
+  await evaluate("document.getElementById('counting-example').scrollIntoView({behavior:'instant',block:'start'})");
+  assert.ok(await noOverflow());
+  await snapshot('counting-example-mobile');
   await go('zh-hant/compare.html?group=human_transfer');
   assert.ok(await noOverflow());
   await evaluate("document.getElementById('comparison-panel-scale').scrollIntoView({behavior:'instant',block:'start'})");
@@ -389,6 +417,8 @@ try{
   await go('zh-hans/joint-pilot.html');
   assert.ok(await noOverflow());
   await go('zh-hans/survey-union.html');
+  assert.ok(await noOverflow());
+  await go('zh-hans/counting.html');
   assert.ok(await noOverflow());
   await viewport(1024,900);
   await go('zh-hant/design.html');
@@ -413,6 +443,11 @@ try{
   await cdp.send('Page.navigate',{url:new URL('zh-hant/survey-union.html',BASE).href});
   await waitFor("document.readyState==='complete'&&document.querySelectorAll('[data-union-row]').length===250");
   assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-union-row]')).filter(r=>getComputedStyle(r).display!=='none').length"),250);
+  await cdp.send('Page.navigate',{url:new URL('zh-hant/counting.html',BASE).href});
+  await waitFor("document.readyState==='complete'&&!!document.querySelector('[data-counting-demo]')");
+  assert.equal(await evaluate("document.querySelector('[data-example-count=\"cases\"]').textContent"),'300');
+  assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"environments\"]').dataset.countState"),'unknown');
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.case-count-control')).display"),'none');
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
   pass('Reading without JavaScript','All 180 task cards, four 70-row comparison tables and the joint pilot default case/results remain readable without scripts.');
 

@@ -1,5 +1,7 @@
 # Robot-use Benchmark：前作總庫與任務規則擴充
 
+本次網頁更新（2026-10-01，v0.7.1）加入 `counting.html`：把來源名錄、定義／設定索引、任務環境定義、場景、測例與原始樣本分開。5,308保留為索引數；全庫環境定義和樣本總量明示待整理／未統計。原v0.7 PDF保留9/29快照，計數澄清另有Markdown／JSON下載。
+
 主設計v0.7：全面收集既有benchmark，像survey一樣整理其領域、任務和規則，建立完整來源聯集，再擴充任務定義。公開網址：https://jasonya.github.io/robot-use-benchmark/ 。
 
 - `survey-union.html`：143條已登記評測來源、全部250篇書目、Survey分布、原生來源清單與12個規則擴充例。

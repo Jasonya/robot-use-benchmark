@@ -164,6 +164,20 @@ const sourceIds=new Set(bridge.map(r=>r.record_id));
 assert.equal(extensions.length,12);
 assert.ok(extensions.every(r=>r.parent_source_ids.every(id=>sourceIds.has(id))));
 assert.ok(extensions.every(r=>r.status==='authored_extension_specification_not_executed'));
+const counting=JSON.parse(await fs.readFile(path.join(out,'downloads/counting/counting_contract.json'),'utf8'));
+assert.equal(counting.unknown_totals.task_environment_definitions,null);
+assert.equal(counting.unknown_totals.distinct_scene_layouts,null);
+assert.ok(Object.values(counting.unknown_totals.source_sample_totals_by_type).every(n=>n===null));
+assert.equal(counting.catalogue_requires_local_execution,false);
+assert.equal(counting.source_indices_relabelled_as_environments,false);
+assert.equal(counting.hypothetical_example.measured_result,false);
+assert.equal(counting.hypothetical_example.scene_layouts,1);
+assert.equal(counting.hypothetical_example.task_environment_definitions,3);
+for(const example of counting.examples){
+  const source=registry.find(r=>r.paper_id===example.paper_id);
+  assert.ok(source);
+  assert.equal(source.source_records,example.indexed_records);
+}
 for(const [source,count]of Object.entries({vima:17,arnold:8,coin_video:180,crosstask:83})){
   assert.equal(bridge.filter(r=>r.source_id===source).length,count);
   assert.equal(nativeData.records.filter(r=>r.s===source).length,count);
@@ -253,6 +267,23 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(unionPage.$('#union-sources-table tbody tr').length,25);
   assert.equal(unionPage.$('#union-coin-domains tbody tr').length,12);
   assert.equal(unionPage.$('#union-extension-rules details').length,12);
+  const countingPage=pages.get(path.join(out,locale,'counting.html'));
+  assert.ok(countingPage);
+  assert.equal(countingPage.$('#count-definitions article').length,counting.definitions.length);
+  for(const route of ['index.html','survey-union.html','counting.html']){
+    const page=pages.get(path.join(out,locale,route));
+    assert.equal(page.$('[data-counting-metric="sources"] strong').text(),'143');
+    assert.equal(page.$('[data-counting-metric="indices"] strong').text(),'5,308');
+    assert.equal(page.$('[data-counting-metric="environments"]').attr('data-count-state'),'unknown');
+    assert.equal(page.$('[data-counting-metric="samples"]').attr('data-count-state'),'unknown');
+    const subtotals=page.$('[data-index-bucket]').toArray().map(n=>Number(page.$(n).attr('data-count')));
+    assert.equal(subtotals.reduce((a,b)=>a+b,0),union.total_source_records);
+    assert.deepEqual(subtotals,[2062,263,2983]);
+  }
+  assert.equal(countingPage.$('[data-example-count="cases"]').text(),'300');
+  assert.equal(countingPage.$('[data-count-example="partnr"] td strong').first().text(),'6');
+  assert.ok(countingPage.$('[data-count-example="partnr"] td').first().text().includes('生成器'));
+  assert.ok(unionPage.$('#union-registry-table thead').text().includes(locale==='zh-hant'?'本庫已提取索引':'本库已提取索引'));
   const home=pages.get(path.join(out,locale,'index.html'));
   assert.ok(home.$('.hero').text().includes('Survey')||home.$('.hero').text().includes('SURVEY'));
   assert.ok(!home.$('#main-content').text().includes('92.5%'));
@@ -268,7 +299,7 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.ok(comparison.includes('v0.4')&&comparison.includes('2,000–3,000'));
 }
 await fs.mkdir(path.join(root,'verification'),{recursive:true});
-const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,surveyUnion:{registeredSources:143,papers:250,sourceRecords:5308,addedDefinitions:288,ruleExamples:12,catalogueRequiresLocalExecution:false},jointPilot:{role:'engineering_appendix',cases:jointCases.length,programTrials:jointTrials.length,supplementalAnnotations:joint.supplemental_annotation_trials},scopeVersion:config.iterationVersion,designScope:'Main research: prior benchmark survey, task union and task/rule extensions. Catalogue collection and executable subsets are separate. Earlier native and joint experiments remain engineering appendices.',issues};
+const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,surveyUnion:{registeredSources:143,papers:250,sourceRecords:5308,addedDefinitions:288,ruleExamples:12,catalogueRequiresLocalExecution:false},counting:{contract:counting.version,sourceIndices:5308,taskEnvironmentDefinitions:null,rawSampleTotals:null,exampleIsHypothetical:true},jointPilot:{role:'engineering_appendix',cases:jointCases.length,programTrials:jointTrials.length,supplementalAnnotations:joint.supplemental_annotation_trials},scopeVersion:config.iterationVersion,designScope:'Main research: prior benchmark survey, task union and task/rule extensions. Catalogue collection and executable subsets are separate. Earlier native and joint experiments remain engineering appendices.',issues};
 await fs.writeFile(path.join(root,'verification/static-checks.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify({...report,issues:issues.slice(0,20)},null,2));
 assert.equal(issues.length,0,`${issues.length} static site issues`);
