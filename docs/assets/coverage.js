@@ -4,6 +4,8 @@
   const rows=[...table.querySelectorAll('tbody > tr')];
   const q=document.querySelector('#coverage-q');
   const method=document.querySelector('#coverage-method');
+  const domain=document.querySelector('#coverage-domain-filter');
+  const type=document.querySelector('#coverage-type');
   const status=document.querySelector('#coverage-count');
   const pageStatus=document.querySelector('#coverage-page-status');
   const previous=document.querySelector('#coverage-prev');
@@ -18,6 +20,8 @@
     const params=new URLSearchParams(location.search);
     q.value=params.get('q')||'';
     method.value=params.get('method')||'';
+    if(domain)domain.value=params.get('domain')||'';
+    if(type)type.value=params.get('type')||'';
     page=Math.max(1,parseInt(params.get('page')||'1',10)||1);
     showAll=params.get('all')==='1';
   };
@@ -25,7 +29,10 @@
     const terms=q.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
     return rows.filter(row=>{
       const methods=row.dataset.methods.split(' ').filter(Boolean);
+      const domains=(row.dataset.domains||'').split(' ').filter(Boolean);
       return terms.every(term=>row.dataset.search.toLocaleLowerCase().includes(term)) &&
+        (!domain?.value||(domain.value==='unspecified'?!domains.length:domains.includes(domain.value))) &&
+        (!type?.value||row.dataset.type===type.value) &&
         (!method.value || (method.value==='pending'?!methods.length:methods.includes(method.value)));
     });
   };
@@ -48,6 +55,8 @@
       const params=new URLSearchParams();
       if(q.value.trim())params.set('q',q.value.trim());
       if(method.value)params.set('method',method.value);
+      if(domain?.value)params.set('domain',domain.value);
+      if(type?.value)params.set('type',type.value);
       if(page>1&&!showAll)params.set('page',String(page));
       if(showAll)params.set('all','1');
       const hash=location.hash.startsWith('#source-')&&!keepSourceHash?'':location.hash;
@@ -59,7 +68,7 @@
     if(!location.hash.startsWith('#source-'))return;
     const target=document.getElementById(decodeURIComponent(location.hash.slice(1)));
     if(!target||!rows.includes(target))return;
-    q.value='';method.value='';
+    q.value='';method.value='';if(domain)domain.value='';if(type)type.value='';
     page=Math.floor(rows.indexOf(target)/pageSize)+1;
     render(true,true);
     await document.fonts.ready;
@@ -67,7 +76,9 @@
   }
   q.addEventListener('input',()=>{page=1;render();});
   method.addEventListener('change',()=>{page=1;render();});
-  document.querySelector('#coverage-reset').addEventListener('click',()=>{q.value='';method.value='';page=1;showAll=false;render();});
+  domain?.addEventListener('change',()=>{page=1;render();});
+  type?.addEventListener('change',()=>{page=1;render();});
+  document.querySelector('#coverage-reset').addEventListener('click',()=>{q.value='';method.value='';if(domain)domain.value='';if(type)type.value='';page=1;showAll=false;render();});
   previous.addEventListener('click',()=>{page--;render();document.querySelector('.coverage-table-scroll').scrollIntoView({behavior:'instant',block:'start'});});
   next.addEventListener('click',()=>{page++;render();document.querySelector('.coverage-table-scroll').scrollIntoView({behavior:'instant',block:'start'});});
   allButton.addEventListener('click',()=>{showAll=!showAll;render();});

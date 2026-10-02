@@ -1,0 +1,582 @@
+[
+  {
+    "paper_id": "P207",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoCoT-Bench，arXiv 2605.19559v1。",
+    "scope_read": "來源/scene graph審核、12subtasks全表、3172QA、SCR與judge驗證。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家生活",
+      "烹飪與飲食",
+      "組裝與拆解"
+    ],
+    "role": "影片推理與證據benchmark",
+    "environment": "Ego4D、EPIC、MECCANO、Charades-Ego、HD-EPIC及自錄；351clips不是351獨立環境。",
+    "tasks": "4研究groups/12subtasks，從object grounding到state回顧、預測、progress與goal tracking。",
+    "cases": "3,172四選一QA、351video clips；參考reasoning與時空證據同屬一題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "reasoning subtasks",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3172,
+        "unit": "QA pairs",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 351,
+        "unit": "video clips",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "答案exact match；Qwen-Max judge給reasoning0–5。SCR＝答對但reasoning≤2的比例，分母僅答對題。",
+      "judge與人類在2,800responses比較QWK/一致率；它衡量輸出解釋與證據一致，不證明模型內部思考忠實。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "人類或模型判讀"
+    ],
+    "split": "主文是benchmark evaluation；精確train/dev manifest未列。MCQ、rationale與evidence非不同題庫。",
+    "lineage": "父影片及新增人工修訂STSG；五公共父庫與自錄不代表六份互不重疊世界經驗。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "§3.2、Metrics、Reasoning Quality",
+        "supports": "351/3172/12、SCR分母及judge核對"
+      }
+    ],
+    "unresolved": [
+      "Table1寫Open/Close而metrics說全部四選一；以主實驗協定為準並保留差異。"
+    ],
+    "reuse": "可加入答案與證據一致性的評測；不要把rationale judge直接叫物理成功驗證。",
+    "reviewed_pdf_sha256": "98ac34ca6c5e5e85367bbc76844e70d30939b29b4c58188ffdbe431af5e9b237",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P208",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DYAD，arXiv 2609.09023v1。",
+    "scope_read": "單helper政策、三reference tasks、原始/有效/eligible counts、participant splits與oracle限制。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "組裝與拆解",
+      "人機協作"
+    ],
+    "role": "協作與協助預測benchmark",
+    "environment": "同一gearbox組裝工作站、20performers與同一trainedhelper；6pilot sessions不納正式20。",
+    "tasks": "3endpoint：causal8步辨識、介入前verbal/physical mode預測、oracle context下回應生成；不是完整robot助手。",
+    "cases": "20sessions/5h58m、528step intervals、611requests、851有效assistance events；mode eligible829，response376＝120dev+256test。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "reference endpoints",
+        "pages": [
+          4,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 829,
+        "unit": "eligible pre-onset mode events",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 256,
+        "unit": "held-out response pairs",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 851,
+        "unit": "valid assistance records",
+        "pages": [
+          4,
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "mode macro-F1/AUPRC，participant bootstrap；step segmentF1/edit/mAP/MoF；response rubric judge+BERTScore。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度",
+      "人類或模型判讀"
+    ],
+    "split": "mode participant五fold每fold12/4/4、3秒觀測到onset前0.5秒；step5val/15test；response120/256。當次trigger禁止入model。",
+    "lineage": "human-human assistance demonstration；851events中有效outcome極不平衡，作者不測outcome prediction。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "Tables IV–VIII、Reference tasks",
+        "supports": "851→829、376→256、3endpoint與oracle"
+      }
+    ],
+    "unresolved": [
+      "沒有non-intervention negatives，不能宣稱會判斷何時需要幫忙；mode是一位helper政策不是普世最佳協助。"
+    ],
+    "reuse": "可加協作規則，但需另外建need detection negatives及可執行robot feasibility。",
+    "reviewed_pdf_sha256": "698811f9c48df7ba4dfef3eab17ed4c8336186b171cbc82e4ea597e06349fdf0",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P209",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HUI360，arXiv 2608.11051v1。",
+    "scope_read": "9場所/30setup、原始與裁切時數、SSUP重標、physical interaction定義及anticipation協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "公共服務",
+      "人機協作"
+    ],
+    "role": "人機互動預測benchmark",
+    "environment": "HUI360有9真實場所、30robot placements/setups；SSUP-A兩public-space field sessions另列。",
+    "tasks": "預測是否將發生與平台的物理interaction；不是廣義社交意圖。不同anticipation horizons重評同tracks。",
+    "cases": "HUI360 68recordings/71.3h原始→1,937episodes/11.3h有效人像片段，4,310tracks含375interaction。SSUP-A 27,698tracks為重標舊資料。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 9,
+        "unit": "real locations",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 30,
+        "unit": "robot setups within locations",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1937,
+        "unit": "HUI360 extracted episodes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4310,
+        "unit": "HUI360 person tracks",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "AUROC主、F1/AP另報；跨location、跨dataset、0.33–2秒horizons及input-frequency robustness。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "HUI360 locations1–7train、8–9test；SSUP第一/二場次train/test。近onset窗口排除，negative以最近距離proxy挑選。",
+    "lineage": "新HUI360＋既有SSUP-HRI重標；1Mannotations不是1M獨立interaction。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          8
+        ],
+        "locator": "TableII、Problem statement、Experiments、Limitations",
+        "supports": "9/30/1937/4310、split與物理interaction邊界"
+      }
+    ],
+    "unresolved": [
+      "本文normalization用全HUI360均值/標準差，若嚴格train-only協定需修正；最終eligible test窗口量需manifest。"
+    ],
+    "reuse": "擴到公共空間互動預測，場地與擺位可獨立記錄；自動contact proxy應保留人工修正。",
+    "reviewed_pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P210",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoCo Challenge，arXiv 2603.15469v1。",
+    "scope_read": "三scenario、sim/real差異、兩種demo、single model與weighted score。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      12
+    ],
+    "domains": [
+      "工業製造",
+      "組裝與拆解",
+      "人機協作"
+    ],
+    "role": "協作組裝benchmark",
+    "environment": "IsaacSim工作站與Galaxea R1 Lite實機；simulation人類參與由初始化partial state模擬。",
+    "tasks": "1gearbox workflow的3scenario：從零組裝、partial state續作、error recovery。real只3planet gears，sim含sun/ring更多parts。",
+    "cases": "sim>300automatically generated demos，real另>300teleop demos；精確官方eval回合數在已讀protocol未報。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "assembly scenarios per track",
+        "pages": [
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 300,
+        "unit": "sim demonstrations",
+        "qualifier": ">300",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 300,
+        "unit": "real demonstrations",
+        "qualifier": ">300；不同資料",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "single model需處理三scenario；assembled-parts/recovery分數以0.4/0.2/0.4加權。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "私有工作站上統一random lighting/texture/colors；real track任務規格有縮減，不能視為完全同題sim-real transfer。",
+    "lineage": "同gearbox assembly的起始狀態/恢復規則擴充；與人類實時協作要分開。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "§2.1–2.2",
+        "supports": "3scenario、兩份>300、weighted score與real簡化"
+      }
+    ],
+    "unresolved": [
+      "完整task/case IDs及官方評測分母待competition config；結論的300+泛稱不能覆蓋兩份不同demo。"
+    ],
+    "reuse": "可借從零/續作/修復三類規則；不同backend的task目標改動要版本化。",
+    "reviewed_pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P211",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "AssemblyGrid v1，arXiv 2609.16075v1。",
+    "scope_read": "decentralized資訊、9scenario全表、instance/seed區分、production metrics及held-out protocol；未逐式讀57頁全部附錄。",
+    "pages_read": [
+      1,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      54,
+      56
+    ],
+    "domains": [
+      "工業製造",
+      "多機器人協作"
+    ],
+    "role": "多機器人生產調度benchmark",
+    "environment": "抽象grid生產模擬，geometry/reach/workspace限制；不模擬robot-specific接觸physics。",
+    "tasks": "Flow/Coalition/Concurrency三workload families×easy/medium/hard＝9official scenarios，程度為family內配置，不保證每policy單調。",
+    "cases": "每scenario50held-out instances；3algorithms×9scenarios×10trainingseeds＝270training runs，每個final checkpoint同50test instances。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "workload families",
+        "pages": [
+          12,
+          13
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "official scenarios",
+        "pages": [
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每scenario held-out instances",
+        "pages": [
+          20
+        ]
+      },
+      {
+        "field": "data",
+        "value": 270,
+        "unit": "MARL training runs",
+        "pages": [
+          20
+        ]
+      }
+    ],
+    "evaluation": [
+      "主要delivered products/throughput，admitted completion與offered-demand fulfilment分母不同；候選admission/coalition/blocking為diagnostics。",
+      "finite-batch timeout的makespan未定，不把未完成當正常完成時間；RL與nonlearning的不確定性分別按trainingseeds與instances。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "train/val/finaltest generationseeds分離，主測unseen realizations而非新topology；finalcheckpoint，無事後best選擇。",
+    "lineage": "local support-fraction cue為合法interface；centralized privileged reference與decentralizedpolicy分組。",
+    "evidence": [
+      {
+        "pages": [
+          11,
+          12,
+          14,
+          15,
+          16,
+          20,
+          22
+        ],
+        "locator": "Tables3–5、§3.4–3.5、§4.1",
+        "supports": "9/50/270、production分母、資訊和seed"
+      }
+    ],
+    "unresolved": [
+      "robot-specificphysics、newtopology、failure/communication interventions明列未納v1實驗；不要稱完整工廠機器人控制。"
+    ],
+    "reuse": "補生產規劃與協作資源約束；可借明確區分instance、executionseed、trainingseed的計數方式。",
+    "reviewed_pdf_sha256": "8661b2c5550168645f05f00d371e18fbdb54c431355ebf45b56a117ba5934f2d",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P212",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ARB4WM，arXiv 2606.16605v1。",
+    "scope_read": "20tasks完整列表、5objectives、20eval runs、nAUC真實分母與defense metrics。",
+    "pages_read": [
+      1,
+      2,
+      8,
+      9,
+      12
+    ],
+    "domains": [
+      "跨域控制",
+      "桌面物件操作",
+      "移動與平衡"
+    ],
+    "role": "世界模型與魯棒性benchmark",
+    "environment": "10MetaWorld＋10DMC任務，作者稱industrial proxy；未提供真實industrial scene。",
+    "tasks": "20host tasks在5white-box objectives、各optimizer/temporal exposure下重評。",
+    "cases": "每setting20evaluation runs，seed20–39；4Dreamer-family agents，不能把agent數乘入獨立題庫。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "existing host control tasks",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "adversarial loss objectives",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "每setting evaluation runs",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "MetaWorld SR、DMC return；nAUC公式除benchmark常數1或1000，不是各policy clean score，雖文中稱clean-normalized。defense recovery另用clean−attack分母。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "只在eval perturb pixels，不改dynamics/reward/parameters；cross-model transfer只是另subsetDMC Reacher Easy。",
+    "lineage": "MetaWorld/DMC task復用加新攻擊protocol；hosttask和規則variants分開。",
+    "related_paper_ids": [
+      "P063"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          8,
+          9,
+          12
+        ],
+        "locator": "§5.1–5.3、Eq14–17、transfer experiment",
+        "supports": "20/5/20、nAUC固定尺度及subset"
+      }
+    ],
+    "unresolved": [
+      "all-setting unique episode IDs未報；攻擊強度不是可跨任務直接相加的難度刻度。"
+    ],
+    "reuse": "可擴充感測失真規則，固定合法attacker access和預算；不要把視覺攻擊當材料或安全有效性驗證。",
+    "reviewed_pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P214",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "COIN（Chain Of Interaction），arXiv 2604.16886v1；不同於P003 COIN影片資料。",
+    "scope_read": "90tasks分層、ManiSkill3規格、1000demo、六metrics、10trials及不同model inputs。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      15
+    ],
+    "domains": [
+      "桌面物件操作",
+      "工具使用",
+      "跨域控制"
+    ],
+    "role": "互動推理與操作benchmark",
+    "environment": "ManiSkill3桌面Panda，PartNet/Sketchfab等assets；3reasoning domains是能力類別，不是生活用途。",
+    "tasks": "20Primitive＋20Composition＋50interactive reasoning＝90task definitions；含partialobservability下互動取得資訊。",
+    "cases": "Primitive每task50demo＝1,000trajectories、5views；主SR平均10trials，views不把traj變五倍。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "task definitions across three suites",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "Primitive demonstrations",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "SR evaluation trials",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "SR/類別SR、VQA、trajectory/gripper穩定、Composition/Primitive success ratio；六metrics分母不同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "VLA在Primitive fine-tune、validationSR選checkpoint；model用1/3views不同，Voxposer有GTobjectlist，需保留資訊條件。",
+    "lineage": "ManiSkill3資產與task擴充；expertVQA看示範不等於執行時在線推理成績。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          15
+        ],
+        "locator": "§3–4、human evaluation appendix",
+        "supports": "90/1000/10、sixmetrics、subset及modelinputs"
+      }
+    ],
+    "unresolved": [
+      "人類只10task代表subset、3people×2trials；不可把40%sim/100%real當全50task人類上限。"
+    ],
+    "reuse": "可借Primitive→composition→interactivegoal的父子關係；我們的規模優勢需超出這種單桌面推理範圍。",
+    "reviewed_pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c",
+    "reviewed_on": "2026-10-02"
+  }
+]

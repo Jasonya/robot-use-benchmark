@@ -1,0 +1,706 @@
+[
+  {
+    "paper_id": "P038",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "OpenEQA，CVPR 2024正式PDF。",
+    "scope_read": "EM／Active定義、資料來源與生成、題數及LLM-Match協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "辦公活動"
+    ],
+    "role": "具身問答與探索",
+    "environment": "蒐集階段100個ScanNet scenes＋87個HM3D scans；這是生成候選history範圍，非已验证題目引用的152個history IDs。",
+    "tasks": "7問答類別；兩種設定EM-EQA／A-EQA。Active只允許導航探索，未包括開櫃等操作。",
+    "cases": "正式1,636題＝1,079 ScanNet＋557 HM3D；A-EQA重用這557題，不能加成2,193獨立QA。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 187,
+        "unit": "蒐集候選scenes／scans",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "問答類別",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1636,
+        "unit": "EM-EQA題",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 557,
+        "unit": "重用於A-EQA的題子集",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "LLM-Match給1–5分再正規化；不是字串match或MC accuracy。",
+      "Active另按路徑長度折算效率；object localization有多個合理reference答案。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審",
+      "數值誤差與相似度"
+    ],
+    "split": "來源ScanNet val/test、HM3D val場景；相同QA跨EM與Active，只改可用資訊／探索權限。",
+    "lineage": "ScanNet／HM3D＋Habitat。與本庫固定manifest的152 history IDs口徑不同，187候選不等於187已取得互動環境。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "圖2、§2.1–2.5",
+        "supports": "1,636／557／187、共享QA、評分"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "LLM-Match validation",
+        "supports": "judge與人工對照"
+      }
+    ],
+    "unresolved": [
+      "Active公開資產／執行入口和本文可評557題的可重現範圍需另核；已取得QA metadata不代表所有素材到位。"
+    ],
+    "reuse": "是同一問題在記憶與可探索環境兩種設定的明確先例；應以共享query而非雙倍題數表示。",
+    "reviewed_pdf_sha256": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P039",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboVQA，arXiv 2311.00899v1。",
+    "scope_read": "資料蒐集、10種QA擴充、VQA人工判分與三種planning介入評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      10
+    ],
+    "domains": [
+      "辦公活動",
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "具身問答與探索",
+    "environment": "3棟辦公樓，robot／人手／人持夾具3種embodiment。",
+    "tasks": "2,722 unique長指令、26,798 unique中程指令；字串去重不是共同語義任務去重。10種QA包含規劃、完成檢測、affordance、過去描述／未來預測。",
+    "cases": "5,246長程episodes、92,948中程episodes、238小時；VQA val/test各約1,000筆，來自各50 episodes。另100個離線planning episodes／854步、10個live teleop任務及1個自主5步任務。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 3,
+        "unit": "辦公樓",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2722,
+        "unit": "unique長程指令字串",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26798,
+        "unit": "unique中程指令字串",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 5246,
+        "unit": "長程episodes",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "離線planning episodes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 854,
+        "unit": "離線planning steps",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "VQA先查已人工判定的答案快取，未見答案交人工判correct/incorrect。",
+      "planning分cognitive／physical intervention rate；人類救援使所有任務完成，不能把完成率當自主成功率。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "人工或模型評審",
+      "數值誤差與相似度"
+    ],
+    "split": "episodes互斥但scenes可重疊；robot-only與human+robot測試分開。",
+    "lineage": "自身多機體蒐集；SayCan固定60任務是外部baseline範圍，不是RoboVQA任務總量。",
+    "evidence": [
+      {
+        "pages": [
+          2
+        ],
+        "locator": "§II Data、圖1",
+        "supports": "場域、指令／episodes／QA區別"
+      },
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§IV、圖5",
+        "supports": "人工判分、100/10/1評測量與介入"
+      }
+    ],
+    "unresolved": [
+      "完整release QA精確行數與文字語義去重量尚未重算。"
+    ],
+    "reuse": "是大廣度robot／human資料與高低階分離評測的直接比較對象；數萬指令已大於先前任意5,000配額。",
+    "reviewed_pdf_sha256": "0d6f31eb8631105b7abfd15b617c7477404b7e7694955c0a3108fcff05d658bf",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P040",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboBench，arXiv 2510.17801v2（2026-07-05），已核官方網站與ECCV2026資料。",
+    "scope_read": "5維度／25端點、資料表、人機標註、Q1–Q3評分及下游控制驗證。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      18,
+      22
+    ],
+    "domains": [
+      "居家生活",
+      "桌面物件操作",
+      "室內導航"
+    ],
+    "role": "綜合具身認知評測",
+    "environment": "多來源robot影片與自錄配置；未報可相加的去重物理layout總量。",
+    "tasks": "5維度、14能力群、25評測端點；不同於25個生活工作任務。",
+    "cases": "6,092 questions／4,336 unique items；含1,895 MC與Q1/Q2/Q3各1,973／842／1,192，加190navigation。相同item衍生多種問題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 25,
+        "unit": "認知評測端點",
+        "pages": [
+          2,
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6092,
+        "unit": "questions",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4336,
+        "unit": "unique items",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "感知／affordance／failure用MC accuracy；Q3 binary accuracy。",
+      "Q1用MLLM評node correctness與milestone completion；Q2用MLLM評skill/object/parameter。所稱world-simulator是模型判斷，不是剛體物理模擬執行。",
+      "另以CALVIN／LIBERO控制結果查關聯，屬下游驗證子集。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "人工或模型評審"
+    ],
+    "split": "QA與下游CALVIN ABC→D、LIBERO-Long10任務／各50trials分開；模型全對題會被篩掉，難度帶有選模依赖。",
+    "lineage": "多robot來源及RoboMIND失敗軌跡；planning failure有人工注入，execution failure來自真rollouts，證據不能混。",
+    "related_paper_ids": [
+      "P064",
+      "P065",
+      "P109"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          8
+        ],
+        "locator": "表2、Quality Control",
+        "supports": "6,092／4,336與資料構造"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "§4 Evaluation Metrics",
+        "supports": "MLLM world-simulator評分"
+      },
+      {
+        "pages": [
+          22
+        ],
+        "locator": "Downstream Evaluation",
+        "supports": "控制關聯驗證的子集範圍"
+      }
+    ],
+    "unresolved": [
+      "來源unique item跨上游重用尚未逐ID去重；v1 unique items為4,333，不套用到v2。"
+    ],
+    "reuse": "最直接的all-in-one具身認知比較對象之一；我們需清楚提出場域／任務聯集與可驗證規則的新增部分。",
+    "reviewed_pdf_sha256": "b34e12bf6f096b03930eb63d6e6580345d4fc1330c8c54c7f9660c501b7ff204",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P041",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoCross，arXiv 2508.10729v2。",
+    "scope_read": "domain選擇、五個上游資料、QA數、Close/Open評分與finetuning split。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      7,
+      10
+    ],
+    "domains": [
+      "醫療與手術",
+      "工業維修",
+      "運動與身體技能",
+      "動物行為"
+    ],
+    "role": "影片問答與推理",
+    "environment": "4個domain來自5資料集，不是4個環境；含內視鏡工具視角，不全是人類頭戴相機。",
+    "tasks": "identification／localization／prediction／counting四類，15細分題型。",
+    "cases": "957 QA、798 clips；OpenQA與CloseQA為同一問題兩種格式，不是1,914個獨立題。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "原作domains",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "細分QA類型",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 957,
+        "unit": "QA",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 798,
+        "unit": "clips",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "CloseQA：4選1 accuracy；OpenQA：Qwen-Max檢查语義正確與reference。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "人工或模型評審"
+    ],
+    "split": "主zero-shot全題；SFT／RL pilot將原QA再70:30分train/test，其分數不能與全題zero-shot當相同測集。",
+    "lineage": "EgoSurgery、CholecTrack20、ENIGMA-51、ExtremeSportFPV、EgoPet的衍生QA。",
+    "related_paper_ids": [
+      "P025"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§3.1–3.3",
+        "supports": "domains、上游、957／798"
+      },
+      {
+        "pages": [
+          7,
+          10
+        ],
+        "locator": "pilot與OpenQA protocol",
+        "supports": "split與judge"
+      }
+    ],
+    "unresolved": [
+      "上述五個上游是否全部在現有書目中獨立登記需補查。"
+    ],
+    "reuse": "直接提示家務之外的缺域；跨domain來源聯集已有前例，要把多樣性貢獻做得可量化。",
+    "reviewed_pdf_sha256": "f4c3606509844a990b9b1c2fc3df05bdab0cff9a08af8fa5446cc9080f49e743",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P042",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboSpatial，arXiv 2411.16537v5（2026-02-18）。",
+    "scope_read": "關係與frame定義、生成規則、表2、Val/Home評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家生活",
+      "辦公活動",
+      "桌面物件操作"
+    ],
+    "role": "空間理解與affordance",
+    "environment": "訓練4,916 indoor scans＋190 tabletop scenes；validation40 scans＋77 scenes；來源重用而非新掃描5K個robot場景。",
+    "tasks": "context／compatibility／configuration三類空間關係，ego／world／object三種reference frame。",
+    "cases": "約3M是生成訓練QA/relations；正式Val 6,000題，每關係2,000；新錄Home另350人工題。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4916,
+        "unit": "train indoor scans",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 190,
+        "unit": "train tabletop scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6000,
+        "unit": "RoboSpatial-Val QA",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 350,
+        "unit": "RoboSpatial-Home QA",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "yes/no accuracy；座標預測以3D點是否落在reference convex hull判正確。",
+      "compatibility以bbox放置無重疊且各軸10cm餘量的幾何規則構造，不等於真實可操作性。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "Val scans完全未在training中；另有indoor↔tabletop泛化与OOD Home。",
+    "lineage": "ScanNet、Matterport3D、3RScan經EmbodiedScan取幾何；桌面用HOPE、GraspNet-1B；BLINK／SpatialBench是外部eval。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§3、表2、§4.1.2–4.1.4",
+        "supports": "生成假設、環境split、6K／350與metric"
+      }
+    ],
+    "unresolved": [
+      "源scan之跨庫重建重複量及bbox規則邊界誤差需原生ID／幾何審核。"
+    ],
+    "reuse": "是規則自動擴題與多reference-frame評測的直接先例；可擴大題量，但需保留train與eval區別。",
+    "reviewed_pdf_sha256": "58a5b655a8d69265586b817547ebe08770c6d88ea05ea17d50c2fb56ead76c22",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P045",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ManipBench，arXiv 2505.09698v2。",
+    "scope_read": "三種資料来源、五種操作類別、MCQ建立及實體驗證。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      27
+    ],
+    "domains": [
+      "桌面物件操作",
+      "衣物與柔性物操作",
+      "工具使用"
+    ],
+    "role": "空間理解與affordance",
+    "environment": "DROID／Bridge原始場景、自錄布料工作站、SIMPLER／RLBench／SoftGym與新增IsaacSim ball場景。",
+    "tasks": "pick-place、articulated、deformable、tool、dynamic五種操作類別；布料10理解維度；另外7個真實機器人驗證任務。",
+    "cases": "12,617 MCQ＝9,180公共robot資料題＋2,662布料題＋其餘simulation題；公共資料Q1 6,120、Q2 3,060，來自同episode的augmentation不算新任務。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "操作類別",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "額外真機驗證任務",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 12617,
+        "unit": "MCQ",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2662,
+        "unit": "布料MCQ子集",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "MC accuracy；Q2要pick與place兩子題都對才算joint correct，第二題提供GT pick。",
+      "MCQ所稱pick-place success不等於實際robot rollout success；另列UR5物理驗證。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "MCQ benchmark與7真機任務分開；新組合未在MCQ中共現，並非保證所有物件個別都未見。",
+    "lineage": "多既有資料／simulation衍生＋自錄布料；有question augmentation共享母episode。",
+    "related_paper_ids": [
+      "P062",
+      "P085",
+      "P104"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          27
+        ],
+        "locator": "§4–6、附錄Q2評分",
+        "supports": "12,617、來源、GT條件與真機子集"
+      }
+    ],
+    "unresolved": [
+      "各simulation來源精確母episode數與跨題同源關係需manifest匯入。"
+    ],
+    "reuse": "直接對應多來源robot操作→多模態題庫；需比它更廣的工作用途與更完整規則，而非只加QA格式。",
+    "reviewed_pdf_sha256": "7cd33f53355500d085efdd4c1c80dd05509e3d3b24c6ec7232519a9481e53d53",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P058",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPAT3Dv2，arXiv 2403.05046v1。",
+    "scope_read": "原版／新增資料、seen/unseen切分、10段進度評分及HRI定位。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "桌面物件操作",
+      "人機協作"
+    ],
+    "role": "動作與軌跡預測",
+    "environment": "原版5 seen＋6 unseen scenes；新增9 seen＋2 unseen，合計22場景（由原文分量推算）。",
+    "tasks": "從RGB预测人手3D action target；cobot接近／避讓是應用展示，非22個操作goal。",
+    "cases": "本輪已讀原作未取得精確clip總量；各test clip按進度10等份評測，不能乘10當獨立軌跡。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 22,
+        "unit": "原版＋新增scenes",
+        "qualifier": "5+6+9+2推算",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "厘米級target prediction error，early／late分列；3個訓練seed取平均。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "保留T1/T2訓練與D1/D2測試來源、seen/unseen；train clips最多25frames，test不限制。",
+    "lineage": "EgoPAT3D擴充並修正部分GT；原baseline也因此改進，需固定版本後比較。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§IV-A、表I–II",
+        "supports": "22场景推算、切分、進度與seed單位"
+      }
+    ],
+    "unresolved": [
+      "新增與原版各split精確clip ID總量仍須發布資料核對。"
+    ],
+    "reuse": "可加入人類手部目標提前量／距離誤差軸，不能拿10個觀測比例冒充10種任務。",
+    "reviewed_pdf_sha256": "7496f4c315189a824e5c490ba688d26788d161a66d4cbc6f93caf2d64665979c",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P061",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Interact with me / JPL-Social，arXiv 2412.16698v3。",
+    "scope_read": "JPL擴充、3組標籤、訓練augmentation、主要實驗。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "domains": [
+      "社交與溝通",
+      "人機協作"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "沿用JPL人機互動影片；未報新增scene總數。",
+    "tasks": "intent 3類、attitude 2類、action 10類；attitude是依action規則產生的標籤，不是獨立量測心理狀態。",
+    "cases": "200母影片→290 person-level tracks；crop/flip/keypoint noise擴增只增加訓練樣本，不增加290個來源個案。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 200,
+        "unit": "母影片",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 290,
+        "unit": "person tracks（全部split）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "互動動作類別",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "三任務各報accuracy及F1；主表觀測首1秒30frames，另變更窗口；模型latency另列。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "本輪已讀段落未取得正式train/test track ID分配；不得把290直接稱test題。",
+    "lineage": "JPL video-level標註擴成人物track；同影片多個人共享情境。",
+    "evidence": [
+      {
+        "pages": [
+          3
+        ],
+        "locator": "表I、JPL-Social annotation",
+        "supports": "200→290與標籤依赖"
+      },
+      {
+        "pages": [
+          5
+        ],
+        "locator": "表II、§V-D",
+        "supports": "F1／accuracy與1秒觀測"
+      }
+    ],
+    "unresolved": [
+      "同母影片track是否跨split及split數須源code核對。"
+    ],
+    "reuse": "補互動意圖與社交預測；需註明人設標籤規則及與動作標籤的依赖。",
+    "reviewed_pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642",
+    "reviewed_on": "2026-10-02"
+  }
+]

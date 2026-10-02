@@ -1,0 +1,839 @@
+[
+  {
+    "paper_id": "P178",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboRecover，arXiv 2609.28952v1。",
+    "scope_read": "scenario構造、replay驗證、filter、train/test及RSR；未逐行重現程式。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      13
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "role": "失敗與恢復benchmark",
+    "environment": "RoboTwin和LIBERO兩個既有模擬後端，透過action prefix重播取得失敗狀態。",
+    "tasks": "原任務上的恢復情境；4階段×4偏差類型只有9個有資料的測試組，不能算16個完整任務家族。",
+    "cases": "2,000 recovery scenarios；兩個後端各800train/200test，合計1,600/400。訓練與測試task names有重疊。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 2000,
+        "unit": "recovery scenarios（含train）",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 400,
+        "unit": "held-out recovery scenarios",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "測試集有資料的stage-type groups",
+        "pages": [
+          5,
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "Overall RSR以scenario平均；9組macro另報。reference policies×5回合形成20次篩選，只留10–90%可恢復率，難度依篩選模型而定。",
+      "重播驗證位置差<2mm、末5幀SSIM>0.99；策略從恢復點初始化，不能讀取前綴歷史。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "每後端800/200；同task不同scenario可跨split，不宣稱語義task完全未見。",
+    "lineage": "RoboTwin與LIBERO原任務；natural、action-perturbed與human-constructed三種失敗構造。",
+    "related_paper_ids": [
+      "P074",
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "Benchmark Construction、Protocol、Metrics",
+        "supports": "2000/400、9組、20次篩選與重播條件"
+      }
+    ],
+    "unresolved": [
+      "每個被測policy對每scenario的重複次數需核最終執行manifest；篩選成功率不可當新policy成績。"
+    ],
+    "reuse": "可擴充既有task的恢復規則，但增加的是恢復cases；不自動增加生活domain或原始目標數。",
+    "reviewed_pdf_sha256": "63986a4660ca344bb479e10ce0aa378f0c5b8a2ce86623d7725c5474f9a51faf",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P179",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "REBOOT，arXiv 2609.22591v1。",
+    "scope_read": "assembly清單、精度層級、expert/recovery資料、初態與實驗協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "組裝與拆解",
+      "工業製造"
+    ],
+    "role": "精密組裝與恢復benchmark",
+    "environment": "真實雙臂WidowX/Trossen工作站；NIST Assembly Task Board #1。",
+    "tasks": "表2為9物件×安裝/移除＝18tasks；精度、對稱性及5操作phase是task屬性。",
+    "cases": "18×(60 expert+60 recovery)＝2,160 demonstrations。§protocol寫每task/policy20rollouts，主分析卻用15×18×3＝810，保留差異。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "assembly/disassembly tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2160,
+        "unit": "expert+recovery demonstration episodes",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 810,
+        "unit": "主分析總evaluation rollouts",
+        "qualifier": "15×18×3；與protocol 20次不一致",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "逐task物理完成率，另按clearance、symmetry、phase及failure分析；初始物件3–6cm範圍變化，goal board固定。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "expert/recovery及模型設定受控比較；recovery demonstrations刻意重現先前觀察到的policy失敗。",
+    "lineage": "沿用標準assembly board；9物件不是9獨立工作環境。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "Table 2、Dataset、Evaluation",
+        "supports": "18/2160、精度與15/20次衝突"
+      }
+    ],
+    "unresolved": [
+      "p7的10 connector types與表2的9物件、20與15rollouts需要release核對；failure清單是否含slip也有版本差異。"
+    ],
+    "reuse": "補精密插接、對稱性與failure phase；組裝和拆解可保留相反目標關係。",
+    "reviewed_pdf_sha256": "1f5401dfe2a8209a83cb96780a43fbfa0938f8a743eb8285be793fbdd60cf6f5",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P180",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SafeManip，arXiv 2605.12386v3。",
+    "scope_read": "8類/10模板、ManipVerse、事件監測、90host tasks及各policy協定。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      14,
+      15
+    ],
+    "domains": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "role": "安全與過程規則benchmark",
+    "environment": "RoboCasa365及LIBERO；主RoboCasa多task實驗在pretraining scenes，target-scene實驗另列。",
+    "tasks": "50 RoboCasa+40 LIBERO＝90 host task entries；8 safety categories、10 LTLf templates，只綁定適用task。",
+    "cases": "每policy/task50episodes，RoboCasa單設定2,500、LIBERO單設定2,000；不同訓練variant不是新題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "兩來源host task entries",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "安全規則templates",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每policy/task evaluation episodes",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "native SR；每trigger violation V/N與unsafe exposure U/N，分母是觸發事件，非episode數。恢復後monitor可重新啟動。",
+      "LIBERO只有部分規則適用；支援10模板不代表每task實測10種違規。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同host/checkpoint/target設定分開，不能把pretrain-scene與target-scene結果直接比。",
+    "lineage": "重用RoboCasa365/LIBERO並增加ManipVerse predicate與DFA監測；和SafeVLA是不同評測規則。",
+    "related_paper_ids": [
+      "P071",
+      "P064",
+      "P166"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          14,
+          15
+        ],
+        "locator": "Table 2、ManipVerse、Experimental Setup、Appendix",
+        "supports": "90/10/50、事件分母與pretraining場景"
+      }
+    ],
+    "unresolved": [
+      "資料hours與原RoboCasa365文章版本有差異；需固定release，不能反改原作數值。"
+    ],
+    "reuse": "任務聯集之外，另存task可適用的規則；安全規則數和語義task數各有自己的分母。",
+    "reviewed_pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P181",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboFolDeX，arXiv 2609.10243v2。",
+    "scope_read": "資料來源、四track、完整摺疊流程、30實機回合及FoldScore。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "衣物與紡織",
+      "居家生活"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "多個真實robot平台/場景，10+embodiments；精確獨立工作站數未報。",
+    "tasks": "資料20+tasks；主摺疊評測4類衣物Shirt/Skirt/Pants/Towel，涵蓋取出、翻整、攤平、摺疊和堆疊。",
+    "cases": "2,000+hours實機資料；主評測每衣物類別30trials，完整workflow須無人工介入。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "real-robot data hours",
+        "qualifier": "下限／2,000+",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "資料task種類",
+        "qualifier": "20+，非全數主評測",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "每衣物類別物理trials",
+        "pages": [
+          5,
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "SR、成功回合時間、0–5neatness由至少2評者一致評分。FoldScore組合品質35%、可靠性35%、速度30%。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人類或模型判讀",
+      "數值誤差與相似度"
+    ],
+    "split": "recovery、cross-task、cross-scene、cross-embodiment四tracks；場景泛化不能只用主4類成績代表。",
+    "lineage": "多robot原始收集與統一格式；長workflow可切subtasks，切片不能再視為獨立長示範。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "Dataset、Benchmark、FoldScore",
+        "supports": "2000+hours、20+tasks、4類/30與判分"
+      }
+    ],
+    "unresolved": [
+      "2,000+hours對應的unique episode IDs及工作站去重需要資料manifest；複合分數權重不是通用難度尺。"
+    ],
+    "reuse": "提供完整衣物處理流程、人工外觀品質與自動成功率並列的設計。",
+    "reviewed_pdf_sha256": "b7760baa843b43e164d224d5132fc13f534cb5e4bd834d7276340ee3f7d65553",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P182",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SoftVTBench，arXiv 2608.18701v1。",
+    "scope_read": "40setting、rigid twins、ID/OOD抽樣、FEM evaluator與DSR。",
+    "pages_read": [
+      1,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      13
+    ],
+    "domains": [
+      "桌面物件操作",
+      "易損物品處理"
+    ],
+    "role": "柔性物與觸覺操作benchmark",
+    "environment": "IsaacSim/IsaacLab/TacEx；10軟物件＋10對應rigid twins，>50props是assets。",
+    "tasks": "4suites各10task settings＝40；主要skill固定pick-and-place，物件/位置變化不等於40個獨立動作家族。",
+    "cases": "4,000 expert demonstrations；ID每suite500＝2,000episodes。OOD每soft suite/config900，兩suite共1,800；9個單factor條件不是完整交叉乘積。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 40,
+        "unit": "object/spatial ×soft/rigid task settings",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4000,
+        "unit": "expert demonstrations",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2000,
+        "unit": "ID evaluation episodes",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1800,
+        "unit": "OOD evaluation episodes／configuration",
+        "pages": [
+          8,
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "Task SR另報；DSR要求完成task且全程peak deformation≤τ，τ由穩定抓持90th percentile預先校準。FEM states僅給evaluator。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "held-out初態；OOD light/mass/Young modulus各3級、單factor控制。以同seed/初態作對照。",
+    "lineage": "LIBERO風格spatial layouts與matchedrigid assets；touch rendering是模擬訊號。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "locator": "Suites、Data、Protocol、Metrics",
+        "supports": "40/4000/2000/1800、evaluator privileged state與DSR"
+      }
+    ],
+    "unresolved": [
+      "τ是benchmark容忍度而非材料真實損壞點；continuous/binary gripper設定要控制。"
+    ],
+    "reuse": "同task加入材料保護規則的清楚範例；不能用不動來獲取低形變高分。",
+    "reviewed_pdf_sha256": "1f353c40268ba3a98d5a2f51892e92c042f89ea87c7ccbe49c10c3ce956fe827",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P183",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "WireCraft，arXiv 2606.18097v1。",
+    "scope_read": "三類DLO tasks、兩種physics、robot/data流程、success與real對照。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      23,
+      25
+    ],
+    "domains": [
+      "工業製造",
+      "組裝與拆解"
+    ],
+    "role": "線材操作benchmark",
+    "environment": "IsaacLab/IsaacSim；chain或FEM wire、UR5/Franka/Trossen三robot；可生成配置，無固定環境總數。",
+    "tasks": "3families：connector insertion、clip routing、channel seating；insertion選4connector shapes，其他代表場景仍有限。",
+    "cases": "script、RL、sim teleop、real資料；已讀協定未報全庫固定cases。real Ethernet每metric/setting10rollouts。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "industrial DLO task families",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "real Ethernet每metric/setting rollouts",
+        "pages": [
+          23,
+          25
+        ]
+      }
+    ],
+    "evaluation": [
+      "reach為held plug距socket≤2cm，insert另要求真正插入；channel>80%wire length入槽。",
+      "最佳checkpoint依eval reach挑選，屬best-observed成績；不可假稱獨立validation selection。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "7種real/sim資料mixtures以同40K checkpoint比較；額外65K結果不納主公平比較。",
+    "lineage": "同一3family經不同physics/embodiment重現；不可把backend數相乘當新語義task。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          23,
+          25
+        ],
+        "locator": "Task Suite、Table 1、Experiments、Real Evaluation",
+        "supports": "3families、success差異、10trials與selection"
+      }
+    ],
+    "unresolved": [
+      "文章寫接受後release，未據此宣稱目前資產已取得；全庫demo/case manifest待查。"
+    ],
+    "reuse": "補線材穿引、插接與保持槽內的幾何判分，標示物理近似與場景覆蓋邊界。",
+    "reviewed_pdf_sha256": "7f2bbb231c2ff416c001d7c06e6efc0d68691404f48ed4e22afde76e1ff48e9a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P184",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DLO-Lab，arXiv 2606.04206v1。",
+    "scope_read": "10tasks、differentiable physics、演算法資訊條件、success appendix。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      18,
+      19
+    ],
+    "domains": [
+      "工具使用",
+      "工業製造",
+      "桌面物件操作"
+    ],
+    "role": "線材操作與物理benchmark",
+    "environment": "Taichi/Genesis的rod與rigid/MPM coupling；近點kinematic抓持簡化，不是完整摩擦抓持。",
+    "tasks": "10tasks：8固定horizon與2長流程Letter Art/Wiring Ring；主要實驗state-based，不全是視覺策略。",
+    "cases": "main optimization/RL比較3seeds、預算內最高return。附錄RL每task15trajectories，GD單一optimized，CMA-ES選best checkpoint的top15。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "DLO task definitions",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主固定horizon評測tasks",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "附錄RL每task evaluation trajectories",
+        "pages": [
+          18,
+          19
+        ]
+      }
+    ],
+    "evaluation": [
+      "return與goal success；RL/GD/CMA-ES的資訊、樣本挑選與動力學梯度存取不同，不能視為統一closed-loop protocol。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "主比較沒有一套統一held-out visual split；VLM長流程與SmolVLA4task子集另列。",
+    "lineage": "物理模組及task設計；letter/rope shapes是幾何目標，非完整日常領域。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          18,
+          19
+        ],
+        "locator": "Simulator、Tasks、Main Results、Appendix Success Rate",
+        "supports": "10/8、資訊條件與15trials挑選差異"
+      }
+    ],
+    "unresolved": [
+      "需release IDs才能建立所有randomized cases；不同algorithm native evaluation不可直接相加。"
+    ],
+    "reuse": "可借線材task定義，但做all-in-one比較需要先統一觀測、重置、預算與selection。",
+    "reviewed_pdf_sha256": "91128b16d310632077dd23caa908483ba75b8851a77808b98368fbce1dcea0b0",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P185",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RGBench，arXiv 2511.06434v2。",
+    "scope_read": "garment來源、三primitive、real/sim pair、distance及performance benchmarking。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      13,
+      15
+    ],
+    "domains": [
+      "衣物與紡織"
+    ],
+    "role": "柔性物模擬器評測",
+    "environment": "配對真實dual-Piper/Jaka工作站與garment simulation；direct-vertex與robot-URDF modes分開。",
+    "tasks": "3manipulation primitives：Grasp/Fling/Fold；9garment types的real GT比較，主表是其中子集。",
+    "cases": "6,000+garment assets＝4,000+industry＋2,000+ClothesNet；非6,000eval tasks。已讀段落未報全部paired trajectory數。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 6000,
+        "unit": "garment assets",
+        "qualifier": "6,000+",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "manipulation primitives",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 9,
+        "unit": "real comparison garment types",
+        "pages": [
+          5,
+          13
+        ]
+      }
+    ],
+    "evaluation": [
+      "真實/模擬點雲的Chamfer與Hausdorff L1，r2s/s2r分開；runtime/memory/mesh vertices另測simulation engine。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "人工配對動作及材料/形狀參數；主要評測simulation fidelity，不是policy完成率。",
+    "lineage": "ClothesNet重用；BCM外部驗證不是新獨立資料源。",
+    "related_paper_ids": [
+      "P087",
+      "P167"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          13,
+          15
+        ],
+        "locator": "Dataset、Task/Mode、Metrics、Appendix",
+        "supports": "6000+/3/9、fidelity與L1"
+      }
+    ],
+    "unresolved": [
+      "全部paired trajectory IDs及industry assets再分發範圍需release核；不要用mesh數充題數。"
+    ],
+    "reuse": "補benchmark的模擬有效性檢驗；這個評分層與policy task success有不同目的。",
+    "reviewed_pdf_sha256": "abc60e4860b3f9e166eeb0391fbf21186ec162cf7ffa413ed321ba8851b61970",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P192",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Phys-Liquid，arXiv 2511.11077v1。",
+    "scope_read": "渲染組成、100sequences、90/10切分、reconstruction與real驗證。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      11
+    ],
+    "domains": [
+      "實驗室操作",
+      "液體處理"
+    ],
+    "role": "液體感知benchmark",
+    "environment": "Blender/Mantaflow的5lab scenes、20containers、8lights、5colors、6orthographic views。",
+    "tasks": "單/多視角液體形狀與體積重建，未直接評robot pouring控制。",
+    "cases": "100simulation sequences×81timesteps＝8,100液體meshes；97,200images含RGB和mask兩種，不能全叫獨立RGB題。90/10sequence split。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 5,
+        "unit": "lab scenes",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100,
+        "unit": "simulation configuration sequences",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "held-out sequences",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 97200,
+        "unit": "RGB與mask image files合計",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "2D IoU、3D CD/Volume IoU/F-score、dimension RMSE、scale MAPE；部分baseline只比50張random test images。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "以整條temporal sequence切90/10，避免相鄰frames跨split；real 10containers驗證不等於10固定interaction tasks。",
+    "lineage": "simulation-generated感知資料；不同視角與mask共享同一物理狀態。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          11
+        ],
+        "locator": "Dataset Construction、Table 1、Experiments",
+        "supports": "5/100/97200、90/10及50image子集"
+      }
+    ],
+    "unresolved": [
+      "p4文字Three scenes與Lab1–Lab5衝突，以Table1和資料組成5為據；完整real case IDs未報。"
+    ],
+    "reuse": "可作液體觀測模組與量測參考；仍需另建可執行倒液任務及物理終態判分。",
+    "reviewed_pdf_sha256": "827b09bcc3b8968cc32b21f332b5b31286c3784578fc04a00435cb0dd6b6700b",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P196",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Deform360，arXiv 2607.05390v1。",
+    "scope_read": "198objects、capture/重建、1980episodes、多層generalization及2D/3D metrics。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      27
+    ],
+    "domains": [
+      "衣物與紡織",
+      "液體與柔性材料",
+      "桌面物件操作"
+    ],
+    "role": "柔性物資料與世界模型benchmark",
+    "environment": "一套41camera環繞capture rig；41視角不是41環境。人類持UMI tactile grippers操作。",
+    "tasks": "3D重建/重模擬、future prediction、episode及object generalization；198objects不是198語義task。",
+    "cases": "198物件＝28線材+98片材+72體積柔性物；每物件5single+5bimanual，共1,980episodes。清理後74,850videos、23.3M多視角frames。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 198,
+        "unit": "deformable objects",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1980,
+        "unit": "physical interaction episodes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 74850,
+        "unit": "同步/品質filter後view videos",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 215.7,
+        "unit": "累加多視角video hours",
+        "qualifier": "單視角行為20,483秒約5.69h，非215.7h獨立行為",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "3D Chamfer/track MSE；2D PSNR/SSIM/LPIPS；接觸accuracy/F1使用36個同步過濾視角。"
+    ],
+    "evaluation_types": [
+      "数值誤差與相似度",
+      "答案或標籤比對"
+    ],
+    "split": "分episode內future frames、同物件未見episodes、未見objects三種；不同方法適用不同設定，不能共用一個排行分母。",
+    "lineage": "3DGS＋tracking＋normal-pressure tactile重建；收集刻意避免slip，未提供完整shear/slip涵蓋。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          9,
+          10,
+          11,
+          12,
+          13,
+          27
+        ],
+        "locator": "Dataset Statistics、World Models、Tables 3–5、Tactile Appendix",
+        "supports": "198/1980/74850、view hours與generalization"
+      }
+    ],
+    "unresolved": [
+      "各generalization split的精確train/test ID數需release protocol；未宣稱所有198物件已完成real-robot closed-loop task驗證。"
+    ],
+    "reuse": "補材料與動力學覆蓋，亦示範為何要將episode、view影片、frame和hours各自計數。",
+    "reviewed_pdf_sha256": "3f23966cb31f3614a8b27aba9ae558ef4684e812dd86ef6cd072d1788c6faf95",
+    "reviewed_on": "2026-10-02"
+  }
+]

@@ -1,0 +1,799 @@
+[
+  {
+    "paper_id": "P001",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1712.02310v1。",
+    "scope_read": "正文資料蒐集、標註、benchmark 與探索實驗章節；未逐行審閱模型訓練附錄。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "居家生活"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "網路生活影片中的自然場景；沒有可直接計數的模擬 layout 清單。365 是外部場景分類器類別，不能當環境數。",
+    "tasks": "30 個物件接觸二元分類；8 類手部／人物狀態分類及未來狀態預測。這些是感知標籤與評測問題，不是30個機器人操作任務。",
+    "cases": "114K 影片、219K 抽樣影格的手部狀態標註；原作分 uploader 做50/25/25切分。156K 影格另用於未來手位置探索實驗。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 114000,
+        "unit": "影片",
+        "qualifier": "原文114K，約數",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 30,
+        "unit": "物件接觸標籤",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "手部／人物狀態類別",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 219000,
+        "unit": "抽樣標註影格",
+        "qualifier": "原文219K，非全部有一致標籤",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "物件接觸：逐類 AP／mAP。",
+      "手狀態：分類 accuracy，現在及未來6／12／30／60影格分開。",
+      "未來手位置的156K影格探索實驗不等於正式的獨立機器人 benchmark。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "依 YouTube uploader 分50% train／25% validation／25% test，避免同一上傳者跨 split。",
+    "lineage": "影片自行蒐集自 YouTube；與 COCO、Charades 的類別交集不表示共用全部資料。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          5
+        ],
+        "locator": "資料流程與§5.1–5.2",
+        "supports": "影片量、標註單位、切分"
+      },
+      {
+        "pages": [
+          7,
+          8
+        ],
+        "locator": "§7、表2–3、§8",
+        "supports": "主要評測與探索性未來手位置任務的區別"
+      }
+    ],
+    "unresolved": [
+      "影片可下載現況、精確公開split檔案數尚未逐檔核對。"
+    ],
+    "reuse": "可提供生活操作與接觸／預測題型；轉成機器人控制題仍需資產、狀態及成功條件。",
+    "reviewed_pdf_sha256": "914ea812883827c588beaafa23c52688332eff8824bb54128a2a9ec92331d3ac",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P003",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1903.02874v1。",
+    "scope_read": "資料定義、階層分類、標註規模、切分與評測章節。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "照護與個人活動",
+      "交通工具與維修",
+      "工藝與修繕",
+      "休閒活動"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "YouTube 教學影片；原作12 domains是活動分類，未提供12個物理環境。",
+    "tasks": "原作階層為12 domains、180人類程序任務、778步驟定義。180個活動可作任務候選，不能直接當已實作的robot task。",
+    "cases": "11,827影片、46,354步驟片段、476小時；影片split為9,030 train及2,797 test。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 12,
+        "unit": "原作活動領域",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 180,
+        "unit": "人類程序任務",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 778,
+        "unit": "步驟定義",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 11827,
+        "unit": "影片",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 46354,
+        "unit": "時間標註步驟片段",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2797,
+        "unit": "test影片",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "步驟時段定位，以 temporal IoU 0.1–0.5 的 mAP／mAR 衡量。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "9,030 train／2,797 test；不可把46,354步驟片段全稱為test題。",
+    "lineage": "YouTube 影片與人類程序階層；與其他網路教學資料可能影片重疊，尚無逐video ID跨庫去重。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "資料階層、步驟標註與統計",
+        "supports": "12／180／778／11,827／46,354的不同單位"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "實驗與evaluation metrics",
+        "supports": "步驟定位評測"
+      }
+    ],
+    "unresolved": [
+      "完整12個原作domain到共同領域的逐條映射需保留原生label清單。",
+      "跨資料集YouTube ID重疊未核。"
+    ],
+    "reuse": "可引入來源有據的180項程序及778步驟；需另審機器人可行性與每一步的判分。",
+    "reviewed_pdf_sha256": "4625e83e6d9eaecd1acdfb5c39fa7132bbe4c4c6a58e541473c24c9f738f6762",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P004",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1903.08225v2。",
+    "scope_read": "資料建立、主要／相關任務定義、原作主評測，追讀附錄評分。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      14
+    ],
+    "domains": [
+      "餐飲與料理",
+      "交通工具與維修",
+      "工藝與修繕"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "wikiHow程序及YouTube影片；沒有原生物理場景ID總數。",
+    "tasks": "83個程序＝18個主要評測任務＋65個相關支援任務；主實驗不能寫成83個同地位測試任務。",
+    "cases": "約4.7K影片；正文列主要任務212小時、相關任務161小時。每輪主要任務test為1,850影片。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 83,
+        "unit": "全部程序",
+        "pages": [
+          2,
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "主要評測程序",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 65,
+        "unit": "相關訓練程序",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4700,
+        "unit": "影片",
+        "qualifier": "約4.7K",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1850,
+        "unit": "每輪test影片",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "主指標step recall：每步只預測一個位置，落在GT時間段才正確。",
+      "20次隨機切分的平均；附錄另報mAP，不能把附錄指標冒充唯一主指標。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每個主要任務每輪30訓練影片；固定每任務20驗證影片不進train/test；其餘1,850影片測試；重複20次。",
+    "lineage": "wikiHow中篩選程序，YouTube蒐集影片；相關任務篩除以影片重疊判定的近重複。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "資料章與§6.1 Metrics and setup",
+        "supports": "18＋65、test量、step recall及重複切分"
+      },
+      {
+        "pages": [
+          14
+        ],
+        "locator": "附錄評測",
+        "supports": "mAP是補充評分"
+      }
+    ],
+    "unresolved": [
+      "前文376小時與正文212＋161小時口徑不完全一致，暫保留原文各自約數。",
+      "4.7K總量尚未以發布清單精確重算。"
+    ],
+    "reuse": "18個評測程序與65個支援程序分開引入；程序步驟可以映射機器人規格，但影片切分不能直接沿用作實體控制題。",
+    "reviewed_pdf_sha256": "1613d28f8d75e86ceedd8b6f2a9c2a4bbf29e5ee8485026bfc7be29826ae7632",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P005",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1703.09788v3。",
+    "scope_read": "YouCook2資料、標註、split、程序分段與proposal評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      8
+    ],
+    "domains": [
+      "餐飲與料理"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "自然料理影片；非4個物理場景。Africa／Americas／Asia／Europe是料理來源分類。",
+    "tasks": "89道食譜；benchmark要求定位程序步驟及描述。食譜、步驟、影片為不同層次。",
+    "cases": "2,000影片、176小時；每道食譜按67／23／10%分train／val／test。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 89,
+        "unit": "食譜",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "影片",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 176,
+        "unit": "小時",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "程序分段：Jaccard及mean IoU。",
+      "proposal：IoU 0.5下precision／recall／F1，與整體程序分段分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每食譜67／23／10%；本文百分比不自行換算成精確發布ID數。",
+    "lineage": "YouTube教學影片；与其他料理影片庫的原始video重疊需逐ID核對。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "YouCook2資料與annotation章",
+        "supports": "食譜、影片、時數、split"
+      },
+      {
+        "pages": [
+          7,
+          8
+        ],
+        "locator": "程序分段與proposal實驗",
+        "supports": "Jaccard／IoU／F1的適用端點"
+      }
+    ],
+    "unresolved": [
+      "發布版本精確split ID數及素材可得性尚未逐檔核。"
+    ],
+    "reuse": "可提供料理程序與步驟語言；不能直接把2,000影片列為2,000robot任務。",
+    "reviewed_pdf_sha256": "4ef636404bea37184e1fa056fa2a71a92705a1b3bc4ee58917a11806de17fbe3",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P006",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "核對CVPR 2014正式PDF標題與正文。",
+    "scope_read": "Breakfast資料、動作階層、資料切分及語法式識別實驗。",
+    "pages_read": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "domains": [
+      "餐飲與料理"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "18個真實廚房；每處3–5台相機，視角不增加廚房數。",
+    "tasks": "10個料理活動、48個coarse action units；活動與動作單元分開。",
+    "cases": "52參與者、約77小時、超過400萬影格；11,267個action-unit samples包含約3,600個silence samples。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 18,
+        "unit": "真實廚房",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "料理活動",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 48,
+        "unit": "粗粒度動作單元",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 11267,
+        "unit": "動作單元樣本（含靜默）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 52,
+        "unit": "參與者",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "動作序列unit accuracy及逐frame recognition accuracy；grammar解析與flat grammar比較。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "4組參與者輪替訓練與測試；不能把多視角同次活動當獨立受試者。",
+    "lineage": "自行錄製；文中ADL等外部對照數字不是Breakfast規模。",
+    "evidence": [
+      {
+        "pages": [
+          3
+        ],
+        "locator": "Dataset章",
+        "supports": "18廚房／10活動／48units／11,267samples"
+      },
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "Evaluation與表3",
+        "supports": "序列與影格評分"
+      }
+    ],
+    "unresolved": [
+      "後續常用發布版本的影片／片段數與本文單位可能不同，不能直接混寫。"
+    ],
+    "reuse": "可引入早餐程序及分層步驟；18廚房是影片錄製環境，非可下載互動layout。",
+    "reviewed_pdf_sha256": "79ea90c0870d5e1e29b880a953555fe8d9dbd2b825f0f46e13d28d51c33e138f",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P007",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF標題相符；arXiv 1804.09626v2。",
+    "scope_read": "短文3頁全文，聚焦配對蒐集、來源重疊及評測。",
+    "pages_read": [
+      1,
+      2,
+      3
+    ],
+    "domains": [
+      "居家生活"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "112個家、112位演員；第一／第三人稱依相同腳本重演，非同步錄製的精確配準視角。",
+    "tasks": "157個activity classes；監督及zero-shot第一人稱動作識別。",
+    "cases": "6,167 train影片＋1,693 test影片＝7,860視角影片；兩種視角各34.4小時；68,536動作標註。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 112,
+        "unit": "錄製住宅",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 157,
+        "unit": "活動類別",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 7860,
+        "unit": "視角影片",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1693,
+        "unit": "test視角影片",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 68536,
+        "unit": "動作標註",
+        "pages": [
+          2
+        ]
+      }
+    ],
+    "evaluation": [
+      "video-level mAP；監督與zero-shot設定分別報告。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "參與者不跨train/test；視角影片數不直接改稱獨立活動episode。",
+    "lineage": "78.7%腳本取自Charades train，另增1,000腳本；與Charades有明確腳本來源關係。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2
+        ],
+        "locator": "Dataset與資料表",
+        "supports": "重演配對、112家、split、動作數"
+      },
+      {
+        "pages": [
+          2,
+          3
+        ],
+        "locator": "表1–2",
+        "supports": "mAP及zero-shot端點"
+      }
+    ],
+    "unresolved": [
+      "逐配對ID與上游Charades腳本ID尚未在本庫去重。"
+    ],
+    "reuse": "適合跨視角語義轉移；不能把配對當作同步3D重建或robot軌跡監督。",
+    "reviewed_pdf_sha256": "138cfb582bdf3ab17fb6aa3ad7f3dd09505f4410e6c31fd486f2aaf1c35beaf1",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P008",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "核對ECCV 2018正式PDF；採本文EGTEA Gaze+數字。",
+    "scope_read": "資料與benchmark章、凝視與動作識別評測。",
+    "pages_read": [
+      1,
+      9,
+      10,
+      11
+    ],
+    "domains": [
+      "餐飲與料理"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "自然廚房料理錄製；本文未在已讀段落提供獨立廚房總ID數。",
+    "tasks": "7個meal preparation tasks、106個action classes；凝視估計和動作識別為兩個端點。",
+    "cases": "本文報29小時、86 sessions、32人、10,321動作樣本；首split為8,299 train／2,022 test。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "料理任務",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "task",
+        "value": 106,
+        "unit": "動作類別",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 86,
+        "unit": "錄製sessions",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 10321,
+        "unit": "動作樣本",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2022,
+        "unit": "首split test動作樣本",
+        "pages": [
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "凝視估計：precision／recall／F1，忽略無追蹤與saccade影格。",
+      "動作识別：mean class accuracy，clip與video層次分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "首split 8,299／2,022；評分時fixation採8影格聚合，保留原協定。",
+    "lineage": "EGTEA相關後續版本常報28小時或10,325片段；本筆不以別篇的數字覆蓋所讀PDF。",
+    "evidence": [
+      {
+        "pages": [
+          9
+        ],
+        "locator": "§4.1 Dataset and Benchmark",
+        "supports": "7／106／86／10,321及split"
+      },
+      {
+        "pages": [
+          9,
+          10,
+          11
+        ],
+        "locator": "Evaluation與結果表",
+        "supports": "凝視與動作端點、評分"
+      }
+    ],
+    "unresolved": [
+      "公開資產版本與後續10,325片段口徑需另核對。"
+    ],
+    "reuse": "適合視線、動作與料理先後關係題；sessions不是互動環境數。",
+    "reviewed_pdf_sha256": "aa3d3ec1981ea4b1b430c3712e3f56d851ac8173cfc5a9db797478cf4d4e3454",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P009",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF標題相符；arXiv 1804.02748v2，2018版。",
+    "scope_read": "資料蒐集與詞彙、split、物件偵測、動作識別及anticipation完整評測章節。",
+    "pages_read": [
+      1,
+      3,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "domains": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "32位參與者／32個廚房；S2保留4位參與者的未見廚房。",
+    "tasks": "3個端點：active-object detection、action recognition、action anticipation；§3.4詞彙125 verbs／331 nouns，詞彙數不是機器人任務數。",
+    "cases": "55小時、39,596動作片段、454,255物件框；同一片段可支援不同端點，不能把三種端點直接乘成獨立題。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 32,
+        "unit": "錄製廚房",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "benchmark端點",
+        "pages": [
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "field": "task",
+        "value": 125,
+        "unit": "動詞類別",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 331,
+        "unit": "名詞類別",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "data",
+        "value": 39596,
+        "unit": "動作片段",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 454255,
+        "unit": "物件框",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "偵測：mAP，IoU 0.05／0.5／0.75。",
+      "識別與anticipation：verb／noun／action各報top-1、top-5及per-class precision／recall。",
+      "anticipation觀測1秒，截止於動作開始前1秒；與看到整段動作的recognition分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "S1已見廚房按完整sequence約80/20切分；S2保留4位參與者／廚房。各端點可評類別又有最少訓練樣本門檻。",
+    "lineage": "為EPIC-KITCHENS-100、VISOR、EPIC Fields等後續來源的上游家族；不得把共用影片／廚房重複相加。",
+    "related_paper_ids": [
+      "P010",
+      "P011",
+      "P024"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          10,
+          11
+        ],
+        "locator": "Dataset、§3.4、Evaluation protocols",
+        "supports": "資料規模、原生词彙及廚房切分"
+      },
+      {
+        "pages": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "locator": "§4.1–4.3，表6–8",
+        "supports": "三端點及時間／評分約定"
+      }
+    ],
+    "unresolved": [
+      "各原生split精確可下載ID數未以本版manifest重算。",
+      "表中與正文不同聚合詞彙口徑應保留版本，不能混加。"
+    ],
+    "reuse": "可引入物件、操作與短期預測題型；原生語言動作類別需另對齊正式robot goal與判分。",
+    "reviewed_pdf_sha256": "2b7fe522827a041638ef2d3b27c9508ace434bd504e22c3e3d43894ea144b7a7",
+    "reviewed_on": "2026-10-02"
+  }
+]

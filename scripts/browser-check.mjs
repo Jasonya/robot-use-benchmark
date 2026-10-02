@@ -72,8 +72,8 @@ try{
   await snapshot('home-traditional-desktop');
   assert.equal(await evaluate("document.querySelector('.primary-nav a').getAttribute('href')"),'coverage.html');
   assert.equal(await evaluate("document.querySelectorAll('[data-coverage-metric]').length"),5);
-  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('[data-target-count]')).map(e=>Number(e.dataset.targetCount))"),[12,1000,5000,1000000,4]);
-  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('[data-current-count]')).map(e=>Number(e.dataset.currentCount))"),[12,284,2103,114288,4]);
+  assert.equal(await evaluate("document.querySelectorAll('[data-target-count]').length"),0);
+  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('[data-current-count]')).map(e=>Number(e.dataset.currentCount))"),[18,284,2096,114288,4]);
   assert.equal(await evaluate("document.querySelector('#main-content').textContent.includes('92.5%')"),false);
   await evaluate("document.getElementById('home-engineering-appendix').open=true;document.getElementById('home-legacy-demo').open=true");
   await evaluate("document.querySelector('[data-demo-goal=\"b\"]').click()");
@@ -82,12 +82,12 @@ try{
   pass('Research-first homepage and preserved example','Homepage leads with survey and task union; the earlier goal demonstration is preserved inside the engineering appendix.');
 
   await go('zh-hant/coverage.html');
-  assert.equal(await evaluate("document.querySelectorAll('[data-coverage-source]').length"),143);
-  assert.equal(await evaluate("document.getElementById('coverage-count').dataset.matched"),'143');
+  assert.equal(await evaluate("document.querySelectorAll('[data-coverage-source]').length"),183);
+  assert.equal(await evaluate("document.getElementById('coverage-count').dataset.matched"),'183');
   assert.equal(await evaluate("document.getElementById('coverage-count').dataset.shown"),'12');
   assert.equal(await evaluate("document.querySelectorAll('#coverage-whole-table tbody tr').length"),5);
-  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('#coverage-whole-table [data-number-role=\"target\"]')).map(e=>Number(e.dataset.numberValue))"),[12,1000,5000,1000000,4]);
-  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('#coverage-whole-table [data-number-role=\"current\"]')).map(e=>Number(e.dataset.numberValue))"),[12,284,2103,114288,4]);
+  assert.equal(await evaluate("document.querySelectorAll('#coverage-whole-table [data-number-role=\"target\"][data-target-status=\"not_set\"]').length"),5);
+  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('#coverage-whole-table [data-number-role=\"current\"]')).map(e=>Number(e.dataset.numberValue))"),[18,284,2096,114288,4]);
   assert.equal(await evaluate("document.querySelectorAll('#number-environment-breakdown tbody tr').length"),5);
   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('#number-case-breakdown tbody tr')).map(r=>Number(r.lastElementChild.textContent.replaceAll(',','')))"),[111652,1000,1636]);
   assert.ok(await evaluate("!!document.querySelector('a[href*=\"case_registry.csv.gz\"][download]')"));
@@ -100,12 +100,12 @@ try{
   assert.equal(await evaluate("document.getElementById('coverage-count').dataset.matched"),'1');
   assert.equal(await evaluate("document.querySelectorAll('#source-p003 td:nth-of-type(4) > .coverage-count-list').length"),0);
   assert.ok(await evaluate("document.querySelector('#source-p003 .coverage-data').textContent.includes('11,827')"));
-  await setValue('#coverage-q','OpenEQA');
+  await setValue('#coverage-q','P038');
   await setValue('#coverage-method','judge');
   assert.equal(await evaluate("document.getElementById('coverage-count').dataset.matched"),'1');
   await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
   await waitFor("location.pathname.includes('/zh-hans/')&&document.readyState==='complete'&&!!document.getElementById('coverage-count').dataset.matched");
-  assert.equal(await evaluate("document.getElementById('coverage-q').value"),'OpenEQA');
+  assert.equal(await evaluate("document.getElementById('coverage-q').value"),'P038');
   assert.equal(await evaluate("document.getElementById('coverage-method').value"),'judge');
   assert.equal(await evaluate("document.getElementById('coverage-count').dataset.matched"),'1');
   await setValue('#coverage-method','state_process');
@@ -115,8 +115,8 @@ try{
   await evaluate("document.getElementById('coverage-next').click()");
   assert.equal(await evaluate("new URLSearchParams(location.search).get('page')"),'2');
   await evaluate("document.getElementById('coverage-all').click()");
-  assert.equal(await evaluate("document.getElementById('coverage-count').dataset.shown"),'143');
-  pass('Coverage counts, filters and native units','143 sources and five summary fields; COIN videos stay in the data disclosure; scoring filters, empty results, pagination and script switching preserve state.');
+  assert.equal(await evaluate("document.getElementById('coverage-count').dataset.shown"),'183');
+  pass('Coverage counts, filters and native units','183 reviewed sources and five scoped summary fields; COIN videos stay in the data disclosure; scoring filters, empty results, pagination and script switching preserve state.');
   await go('zh-hant/coverage.html#source-p038');
   await waitFor("!document.getElementById('source-p038').hidden&&document.getElementById('source-p038').getBoundingClientRect().top>=70&&document.getElementById('source-p038').getBoundingClientRect().top<400");
   await setValue('#coverage-q','COIN');
@@ -130,10 +130,10 @@ try{
   assert.ok(await evaluate("document.getElementById('number-version-crosswalk').textContent.includes('111,652')"));
   await go('zh-hant/chapters/11.html');
   assert.equal(await evaluate("document.getElementById('archive-c11').open"),false);
-  assert.ok(await evaluate("document.querySelector('[data-active-numbers]').textContent.includes('1,000,000')"));
+  assert.ok(await evaluate("document.querySelector('[data-active-numbers]').textContent.includes('v0.10')"));
   await go('zh-hant/chapters/11.html#c11');
   assert.equal(await evaluate("document.getElementById('archive-c11').open"),true);
-  pass('Numeric contract and archived versions','Targets and counted inventories share the same values; the version crosswalk opens directly and retired chapter budgets stay folded until requested.');
+  pass('Numeric contract and archived versions','Quotas are withdrawn; reviewed-source scope and acquired ID inventories are explicit; the version crosswalk opens directly and retired chapter budgets stay folded until requested.');
   await go('zh-hant/index.html');
   await evaluate("document.querySelector('.search-trigger').click()");
   await setValue('#global-search-input','记忆');
@@ -227,7 +227,7 @@ try{
 
   await go('zh-hant/design.html');
   assert.ok(await evaluate("document.getElementById('coverage-design').textContent.includes('五個主欄位')"));
-  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('#design-number-table [data-number-role=\"target\"]')).map(e=>Number(e.dataset.numberValue))"),[12,1000,5000,1000000,4]);
+  assert.equal(await evaluate("document.querySelectorAll('#design-number-table [data-number-role=\"target\"][data-target-status=\"not_set\"]').length"),5);
   assert.equal(await evaluate("document.getElementById('previous-union-design').open"),false);
   assert.ok(await evaluate("document.querySelector('#union-first-design').textContent.includes('目錄')"));
   assert.equal(await evaluate("document.getElementById('historical-design-plans').open"),false);
@@ -250,7 +250,7 @@ try{
   pass('Current design and historical planning units','Source collection, taxonomy, task union and rule extension lead the design; earlier capacity examples remain usable in the historical appendix.');
 
   await go('zh-hant/survey-union.html');
-  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'143');
+  assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'183');
   assert.equal(await evaluate("document.querySelectorAll('#union-taxonomy-table tbody tr').length"),12);
   assert.equal(await evaluate("document.querySelectorAll('#union-sources-table tbody tr').length"),27);
   assert.ok(await noOverflow());
@@ -269,7 +269,7 @@ try{
   assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'250');
   await setValue('#union-q','zz-unmatched-source');
   assert.equal(await evaluate("document.getElementById('union-count').dataset.visibleCount"),'0');
-  pass('Survey source registry and language filters','All250 papers remain available;143 registered evaluation sources are the default, with source/category filters and shareable Traditional/Simplified state.');
+  pass('Survey source registry and language filters','All250 papers remain available;183 reviewed sources are the default, with source/category filters and shareable Traditional/Simplified state.');
 
   await go('zh-hant/counting.html');
   assert.ok(await noOverflow());
@@ -291,7 +291,7 @@ try{
   assert.equal(await evaluate("document.getElementById('counting-cases-per-definition').value"),'1000');
   assert.equal(await evaluate("document.querySelector('[data-example-count=\"cases\"]').textContent"),'3,000');
   assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"environments\"]').dataset.countState"),'unknown');
-  pass('Counting units and task-environment example','Source143/index5349 and unknown environment/sample totals remain separate; the hypothetical case calculator changes only example cases and preserves language state.');
+  pass('Counting units and task-environment example','Source183/index5349 and unknown environment/sample totals remain separate; the hypothetical case calculator changes only example cases and preserves language state.');
 
   await go('zh-hant/native-tasks.html?source=vima');
   assert.ok(await evaluate("document.getElementById('native-count').textContent.includes('/ 17 ')"));
@@ -554,8 +554,8 @@ try{
   assert.equal(await evaluate("document.querySelectorAll('[data-g-definition]').length"),6);
   assert.equal(await evaluate("document.querySelectorAll('[data-t-definition]').length"),8);
   await cdp.send('Page.navigate',{url:new URL('zh-hant/coverage.html',BASE).href});
-  await waitFor("document.readyState==='complete'&&document.querySelectorAll('[data-coverage-source]').length===143");
-  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-coverage-source]')).filter(r=>getComputedStyle(r).display!=='none').length"),143);
+  await waitFor("document.readyState==='complete'&&document.querySelectorAll('[data-coverage-source]').length===183");
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-coverage-source]')).filter(r=>getComputedStyle(r).display!=='none').length"),183);
   assert.equal(await evaluate("document.querySelectorAll('#coverage-whole-table tbody tr').length"),5);
   assert.ok(await noOverflow());
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});

@@ -1,0 +1,798 @@
+[
+  {
+    "paper_id": "P062",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RLBench，arXiv 1909.12271v1；100任務為2019原文，不覆蓋後續repo新增。",
+    "scope_read": "原生task／variation／episode定義、scene、成功條件與few-shot協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活",
+      "工具使用"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "共用1個Panda桌面scene，載入各task資產；API的TaskEnvironment不等於獨立房間。",
+    "tasks": "原文100手寫task，每task多variation（如目標色彩／物件），每variation再抽初態episode。",
+    "cases": "episode／demo可隨機生成，原文沒有固定全庫題數；few-shot原版10%任務meta-test，1／5／20 demonstrations是每任務支援樣本預算。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 1,
+        "unit": "共用桌面scene",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "原版task definitions",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "原版meta-test tasks",
+        "qualifier": "100的10%",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "task-specific success conditions，完成才給+1 sparse reward；few-shot在新episode報success。",
+      "demo生成器通過驗證不代表學習策略已成功。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "原版90% tasks train、10% unseen tasks test；每次測試不能先知未見task規則。",
+    "lineage": "V-REP／PyRep／OMPL；大量後續benchmark重用其task、資產和成功predicate。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§IV-A–E、圖4、§V",
+        "supports": "三種粒度、1scene、task判分與few-shot"
+      }
+    ],
+    "unresolved": [
+      "後續版本的task總量與常用18-task子集要另附commit，不能用來改寫2019原文。"
+    ],
+    "reuse": "可直接作任務來源與擴充規則底座；task、variation、episode原作已有清楚先例。",
+    "reviewed_pdf_sha256": "fbb04509bea7bf6aa9b97b07c46d95e5c1a900987599693b3fae3fd84377db76",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P063",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Meta-World，arXiv 1910.10897v2（2021）。",
+    "scope_read": "50任務定義、觀測／動作／reward及MT／ML協定。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      12
+    ],
+    "domains": [
+      "桌面物件操作",
+      "工具使用"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "50個task environment配置，共用Sawyer桌面；不能解讀為50種生活場域。",
+    "tasks": "50個非參數性操作類型；原文又把位置／goal參數化實例稱task，需保留兩種含義。",
+    "cases": "MT10含10環境×50參數配置＝500；MT50為50×50＝2,500訓練task instances。這不是500／2,500個新語義任務，也不是正式test QA。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 50,
+        "unit": "操作task types",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2500,
+        "unit": "MT50訓練參數化instances",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "ML10／ML45保留test任務",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "各task成功predicate／目標距離門檻，success與dense reward分開。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "MT同已見任務學習；ML10／ML45各有5保留task適應；ML1只在同一task變換50train／50test goal。",
+    "lineage": "MuJoCo、Multiworld及Gym介面；後續MetaWorld+等為其擴充，不可把上游再次全加。",
+    "related_paper_ids": [
+      "P106"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§4.1–4.3",
+        "supports": "原作task双義、50／2,500、泛化split與success"
+      }
+    ],
+    "unresolved": [
+      "不同v1／v2／後續release成功predicate細節與本地歷史pilot須以commit分開。"
+    ],
+    "reuse": "提供桌面操作任務底座；位置擴樣容易，生活用途拓寬有限。",
+    "reviewed_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P064",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LIBERO，arXiv 2306.03310v2。",
+    "scope_read": "任務生成、PDDL goals、4 suites、lifelong指標及pretraining切分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9,
+      10
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "Robosuite場景配置；layout／objects由PDDL定義，本文已讀段落未報去重layout總數。",
+    "tasks": "130＝Spatial10＋Object10＋Goal10＋LIBERO100；LIBERO100內90短程預訓練＋10長程。LIBERO-Long不是再額外增加10。",
+    "cases": "各task有human demos与隨機初態評估；可生成不代表固定無限題庫已发布。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 130,
+        "unit": "task definitions",
+        "pages": [
+          1,
+          2,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "task suites",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "LIBERO100內pretraining tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "LIBERO100內long tasks",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "全部goal predicates為真才成功；以success計forward transfer、negative backward transfer、AUC。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "lifelong順序學task，過往資料限制；90→Long10预训练與Spatial/Object/Goal控制變因是不同協定。",
+    "lineage": "明確由Ego4D語言behavior templates生成task instructions，實作建於Robosuite；已是人類程序到robot benchmark的先例。",
+    "related_paper_ids": [
+      "P013",
+      "P069",
+      "P105",
+      "P165"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5
+        ],
+        "locator": "§4.1–4.2、圖2",
+        "supports": "Ego4D→PDDL→130及suite包含關係"
+      },
+      {
+        "pages": [
+          6
+        ],
+        "locator": "Metrics",
+        "supports": "success/FWT/NBT/AUC"
+      }
+    ],
+    "unresolved": [
+      "各發布demo／init-state精確ID數需對照版本，不從別篇約5K反推。"
+    ],
+    "reuse": "與本研究來源聯集主線高度相關；新貢獻需超過同類模板生成與桌面範圍。",
+    "reviewed_pdf_sha256": "ff7d943e2eb37760df684f3ae2931a5a35ef8ea465bd387e62afe49507b8e414",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P065",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "CALVIN，arXiv 2112.03227v4。",
+    "scope_read": "4環境、34task與全部success criteria、play資料及MTLC／長鏈評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7
+    ],
+    "domains": [
+      "桌面物件操作"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "A/B/C/D四個配置；共用桌面、robot及camera位置，但滑門／抽屜／開關位置與材質不同。",
+    "tasks": "34原子任務，包括方塊轉動／推移／抬起、收納、堆疊、開關門與燈。",
+    "cases": "24小時play、約2.4M steps／40M可重標窗口是資料潛量；正式long-horizon 1,000條5步鏈；單步每task10個rollouts。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "桌面配置",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 34,
+        "unit": "原子tasks",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "5步instruction chains",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 340,
+        "unit": "單步評測rollouts／一設定",
+        "qualifier": "34×10",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "task completion依起終状態变化，不只終點距離；長鏈只成功才轉下一subgoal，報鏈長／成功情況。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "single／multi／zero-shot multi環境；ABC→D為未見配置但語義任務已在train出現，語句另保留未見表達。",
+    "lineage": "PyBullet自建play環境；多後續VLA評測重用同1,000 chains，不能算各自新增題庫。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§III、圖6、LH-MTLC",
+        "supports": "4／34／1,000及state-change predicate"
+      }
+    ],
+    "unresolved": [
+      "模型成績比較必須固定語言／初態鏈版本及可用sensor。"
+    ],
+    "reuse": "可借序列可行性、過程状态與長鏈測試；34原子任務和5,000子步次數不能混算。",
+    "reviewed_pdf_sha256": "c8ad4741782fa8fb773377fbf61b8772b86574f255599a229d3f6ad4d878c60e",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P066",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ManiSkill，arXiv 2107.14483v5。",
+    "scope_read": "原生task／environment定義、4 skills、物件split、demo及評分。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "原作environment以一個物件資產為單位；表1為52門櫃、35抽屜櫃、36椅、39桶，櫃體可能含多door/drawer，不能當162獨立房間。",
+    "tasks": "4 skills：OpenCabinetDoor、OpenCabinetDrawer、PushChair、MoveBucket；涵蓋單／雙臂mobile manipulation。",
+    "cases": "約36K成功demonstrations、1.5M frames；測試物件每skill10個，cabinet target有多門／多抽屜。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "skills",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 162,
+        "unit": "按4類相加的資產條目",
+        "qualifier": "52+35+36+39，非跨類去重",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 36000,
+        "unit": "成功demo trajectories",
+        "qualifier": "約數",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "預定test environment instances的mean success；task-specific終態／穩定性判定；training restrictions分track。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "同物件category下train/test object互斥；單個scene參數變化另為environment instance。",
+    "lineage": "SAPIEN＋PartNet-Mobility類資產；ManiSkill2繼承這4項，不可視作全部新任務。",
+    "related_paper_ids": [
+      "P067",
+      "P068"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5
+        ],
+        "locator": "表1、§2.1–2.2",
+        "supports": "4skills、object環境單位"
+      },
+      {
+        "pages": [
+          6,
+          7
+        ],
+        "locator": "§2.4與evaluation protocol",
+        "supports": "demo與success"
+      }
+    ],
+    "unresolved": [
+      "門櫃／抽屜櫃底層asset ID是否重疊需manifest核。"
+    ],
+    "reuse": "資產拓撲泛化與物件級environment是重要細節；需轉譯成共同欄位但不抹平原生定義。",
+    "reviewed_pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P067",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ManiSkill2，arXiv 2302.04659v1／ICLR2023。",
+    "scope_read": "20families內容、精密裝配規則、rigid-soft平台、評測與部分task-specific附錄。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      19,
+      22
+    ],
+    "domains": [
+      "桌面物件操作",
+      "組裝與拆解",
+      "居家生活",
+      "柔性物與流體操作"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "SAPIEN／MPM配置及2,000+ object models；object assets非同量房屋。",
+    "tasks": "20 families：6 soft、3精密插入、5 pick-place、5關節／mobile、1 AvoidObstacles；繼承ManiSkill1的4項。",
+    "cases": "4M+ demonstration frames為訓練資料。test依task不同：如PickSingleYCB每物件5/10 episodes、cabinet兩階段各250等，不能指定所有task同一題數。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "task families",
+        "pages": [
+          1,
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "soft-body families",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2000,
+        "unit": "object models",
+        "qualifier": "超過",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4000000,
+        "unit": "demonstration frames",
+        "qualifier": "超過",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "task-specific真物理成功；插入必須實際進孔，非靠近goal pose。",
+      "原文同AssemblingKits基線在pose accuracy可99%、真插入成功只18%，說明難度高度依賴規則。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "按物件train/test及challenge stage，控制器可轉換但要保留其action約定。",
+    "lineage": "繼承ManiSkill1；任務靈感來自MetaWorld／RLBench／Ravens，但更改孔洞幾何與成功判準，屬有實質規則差異的衍生。",
+    "related_paper_ids": [
+      "P066",
+      "P063",
+      "P062",
+      "P076"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§2.1",
+        "supports": "20任務家族及來源差異"
+      },
+      {
+        "pages": [
+          8,
+          19,
+          22
+        ],
+        "locator": "§5.1與task附錄",
+        "supports": "不同判分／case預算"
+      }
+    ],
+    "unresolved": [
+      "全20家族不同階段test episodes總量要從eval manifest按版本重算。"
+    ],
+    "reuse": "直接支持『同名任務可擴充規則』主張；更严格成功條件必须以獨立規則版本記錄。",
+    "reviewed_pdf_sha256": "89fb794345d860ee696ca2f4d7a75059b15352b615794eeadb0e6075426136f0",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P068",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ManiSkill3，arXiv 2410.00425v2；新版標題以Demonstrating GPU Parallelized…開頭。",
+    "scope_read": "12種類型、平台與task生成、性能和learning評测段落。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      8,
+      21,
+      22,
+      28
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活",
+      "室內導航",
+      "戶外移動",
+      "組裝與拆解",
+      "柔性物與流體操作"
+    ],
+    "role": "模擬平台與任務套件",
+    "environment": "GPU異質並行模擬；1024平行instances／cameras是運行規模，非1024不同生活場景。",
+    "tasks": "原作12 task categories包含tabletop/mobile、room-scale、locomotion、bimanual、multi-agent、drawing/cleaning、dexterous、tactile、classic control、digital twins、soft-body；這12類不是12生活domain。",
+    "cases": "擴展中的環境註冊表與demo來源，無單一固定全庫test題數；例如SIMPLER轉接4種環境。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "技術task categories",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 20,
+        "unit": "robot models",
+        "qualifier": "超過",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "SIMPLER轉接環境",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "task success／return、sample efficiency與wall-clock分開；渲染FPS／VRAM是系統性能，非任務成功率。",
+      "本文GPU rasterization與IsaacLab ray tracing比較非完全同畫質，原作有明示。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "不同RL／IL／VLA／sim2real設定各有來源；應固定demo數、生成方式與控制器。",
+    "lineage": "ManiSkill2平台與任務延伸，另接SIMPLER等；不能把platform release當完全獨立benchmark family。",
+    "related_paper_ids": [
+      "P066",
+      "P067",
+      "P104"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§III-A/B",
+        "supports": "12類與性能範圍"
+      },
+      {
+        "pages": [
+          7,
+          8,
+          22
+        ],
+        "locator": "§IV與VLA附錄",
+        "supports": "learning評測、demo與轉接來源"
+      }
+    ],
+    "unresolved": [
+      "目前API註冊task總量隨版本變動，需固定commit再盤點；本文不提供永續固定總數。"
+    ],
+    "reuse": "可作執行底座；廣泛技術支援不等同每種生活用途已有完整任務與cases。",
+    "reviewed_pdf_sha256": "0482cef460af5ca0dd09d2b1d0f499b996287d9dadec31b13ca60377a49ee80c",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P069",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "robosuite，arXiv 2009.12293v3，討論v1.5。",
+    "scope_read": "平台、robots/controllers、全部9 benchmark descriptions與標準評測。",
+    "pages_read": [
+      1,
+      7,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "domains": [
+      "桌面物件操作",
+      "組裝與拆解",
+      "表面清潔"
+    ],
+    "role": "模擬平台與任務套件",
+    "environment": "9標準task環境，共用可配置arena／robot；10robot模型不是10場域。",
+    "tasks": "Lift、Stack、PickPlace、NutAssembly、Door、Wipe、TwoArmLift、TwoArmPegInHole、TwoArmHandover。",
+    "cases": "程序隨機初始化，未固定全庫題量；基線9環境×robot/controller組合，5 seeds是訓練重複，不增加task。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "標準benchmark環境",
+        "pages": [
+          13,
+          14,
+          15,
+          16
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 10,
+        "unit": "robot models",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "標準SAC實驗報normalized episode return，500step horizon；task success條件依具體任務，不能把return當百分比成功率。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "原作比較Panda/Sawyer與OSC/joint velocity，建議固定Panda OSC；未提出全域held-out task split。",
+    "lineage": "MuJoCo模組平台；LIBERO、RoboCasa、MimicGen等重用，平台與下游bench不可當完全独立環境源。",
+    "related_paper_ids": [
+      "P064",
+      "P070"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "locator": "§3.1–3.2、圖4",
+        "supports": "9任務完整清單與評分"
+      }
+    ],
+    "unresolved": [
+      "repo v1.5可用的其餘task是否超過本文9個標準評測需分清，不以註冊class數覆蓋論文結果。"
+    ],
+    "reuse": "提供共通模擬／控制器／task介面；平台功能與benchmark實績分開。",
+    "reviewed_pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P070",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboCasa，arXiv 2406.02523v1。",
+    "scope_read": "場景、資產、100tasks組成、MimicGen數據與正式eval子集。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "10 floor plans×12 styles＝120 scenes；只能把10稱平面layout數。額外AI textures不新增layout。",
+    "tasks": "100＝25 atomic（8skills）＋75 composite（20料理活動標籤下生成並實作）。",
+    "cases": "atomic有1,250 human demos；生成實驗72K（24tasks，排除navigation）另28K組成100K發布集。主要eval每task50 trials，分5個固定場景。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "floor plans",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 120,
+        "unit": "layout-style scenes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 75,
+        "unit": "composite tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100000,
+        "unit": "generated trajectories",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "物理task success；按skill、資料規模、未見物件／style分列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "eval只用未見物件實例；5場景中2種style未見。MimicGen有成功rejection sampling，訓練資料成功不代表policy成功。",
+    "lineage": "Robosuite底座、Objaverse／Luma資產、MimicGen擴樣；後續RoboCasa365是同家族延伸。",
+    "related_paper_ids": [
+      "P069",
+      "P071"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§III-B/C、§IV、§V-A",
+        "supports": "10 vs120、25+75、100K及eval範圍"
+      }
+    ],
+    "unresolved": [
+      "本庫先前收集的60個來源場景條目來自不同repo版本，不能與此PDF120 scenes混寫，更不能叫60獨立layouts。"
+    ],
+    "reuse": "支持生活工作组合擴充；域仍主要在廚房，須報真實layout與style層次。",
+    "reviewed_pdf_sha256": "7aca93ca3f157e32a46e02d675b3b2c24e3073a7807c038f7f566b73db87bde3",
+    "reviewed_on": "2026-10-02"
+  }
+]

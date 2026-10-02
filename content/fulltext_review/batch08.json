@@ -1,0 +1,1009 @@
+[
+  {
+    "paper_id": "P085",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SoftGym，arXiv 2011.07215v2。",
+    "scope_read": "6 Medium／4 Hard任務、action抽象、oracle資訊及eval切分。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      14
+    ],
+    "domains": [
+      "衣物與柔性物操作",
+      "柔性物與流體操作"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "FleX程序物理環境；主Medium/Hard直接控制picker或杯子，非完整手臂；SoftGym-Robot另列。",
+    "tasks": "10任務＝6 Medium（transport/pour water、straighten rope、spread/fold/drop cloth）＋4 Hard（pour amount、fold crumpled、drop-fold、rope configuration）。",
+    "cases": "主實驗每task預抽1,000 variations＝800train＋200eval；CEM只抽10個eval variations，不能稱所有方法測同量。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "Medium+Hard tasks",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "有廣泛baseline的Medium tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 200,
+        "unit": "每task評測variations",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "按task用覆蓋面積、粒子距離、水量／spill等；以do-nothing與upper bound正規化，可能小於0。",
+      "5 seeds報median／四分位，不是binary success rate。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "初態variations800/200；DynamicsOracle／StateOracle／RGB資訊權限不同，不能混為同難度。",
+    "lineage": "FleX與抽象pickers；後續布料task和數據生成器大量重用。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          7
+        ],
+        "locator": "§4–6.1",
+        "supports": "10 vs6、抽象動作、800/200及normalization"
+      }
+    ],
+    "unresolved": [
+      "SoftGym-Robot在本文註明待NVIDIA許可發布；目前取得狀態須另核，不能由API假定可用。"
+    ],
+    "reuse": "柔性物task與連續指標來源；加上機體、抓持及穩定性規則才適合與robot控制任務比較。",
+    "reviewed_pdf_sha256": "0e0bd8b74b7d8b3aa1a203694debf47d425adbfe2eab8bf4555b198525e89903",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P086",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DeformableRavens，arXiv 2012.03385v4。",
+    "scope_read": "12任務全表、deformable primitive、資料與checkpoint選擇、真機cable實驗。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      13,
+      14
+    ],
+    "domains": [
+      "衣物與柔性物操作",
+      "包裝與倉儲"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "共用UR5桌面，PyBullet繩索／布料／袋子；理想nearest-vertex抓持。",
+    "tasks": "12＝5 cable、3 fabric、4 bag；有goal image和無goal圖兩種設定，bag含打開→裝物→搬運。",
+    "cases": "每task1,000成功demo；每checkpoint20eval episodes、通常3訓練runs，bag-color僅1run。表格選10checkpoints最大值。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "deformable tasks",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 12000,
+        "unit": "scripted成功demo",
+        "qualifier": "12×1,000",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "每checkpoint每run eval episodes",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "cable位置／凸包面積、cloth coverage、bag containment/transport依task分開。",
+      "真機cable另10episodes、最多10actions、mask IoU>0.25判成功。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "held-out random seeds；依eval最大checkpoint報分有選擇效應，不能當獨立test後只評一次。",
+    "lineage": "Ravens延伸；成功demo經過濾，script成功率與policy測試不是同一分母。",
+    "related_paper_ids": [
+      "P076"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "表I–II、§V–VIII",
+        "supports": "12任務、eval选择、真機IoU"
+      }
+    ],
+    "unresolved": [
+      "各task指標中連續coverage與binary success混合，跨任務總分需保留原生定義。"
+    ],
+    "reuse": "拓展袋子、繩索與布料多階段規則；要額外防止袋外掛物等達標漏洞。",
+    "reviewed_pdf_sha256": "7227984ec317cff8190a29c2f53794d0e399fbbb7ed78c8ee21c7b27f78d65f8",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P087",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "GarmentLab，arXiv 2411.01200v3。",
+    "scope_read": "資產與5種物理互動、20task、實驗子集、split及5秒success。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      16,
+      17,
+      20
+    ],
+    "domains": [
+      "衣物與柔性物操作",
+      "洗衣服務",
+      "照護與個人活動",
+      "居家生活"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "20scene與9,000+object models資產庫；PhysX多物理方法，scene/asset數不等於實評數。",
+    "tasks": "20tasks歸5interaction groups：garment-garment/fluid/FEM/rigid/avatar；含摺、展、掛、吹乾、洗、收納、穿衣。",
+    "cases": "不同task初態／garment取樣；正文baseline以大件fold/unfold/hang、小件place/hang及若干RL子集為主，沒有统一全20task題數。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 20,
+        "unit": "scene資產",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "tasks",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "物理互動groups",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 11,
+        "unit": "garment categories",
+        "pages": [
+          2,
+          17
+        ]
+      }
+    ],
+    "evaluation": [
+      "達task-specific判準後維持至少5秒；fold用IoU、unfold用coverage，其他物理互動有專用容差。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "objects70/15/15；另novel state／scene；主實驗並非全部20task同程度跑分。",
+    "lineage": "ClothesNet、ShapeNet、PartNet/YCB、PartNet-Mobility、Omniverse/actorcore等資產；RoboVerse遷移其子集。",
+    "related_paper_ids": [
+      "P082"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          5,
+          6
+        ],
+        "locator": "資產概述、表2–3",
+        "supports": "20scene、20task與來源"
+      },
+      {
+        "pages": [
+          9,
+          17
+        ],
+        "locator": "§7、附錄B",
+        "supports": "實測子集、split、5秒成功"
+      }
+    ],
+    "unresolved": [
+      "摺衣輪廓IoU無法單獨檢查層次／拓撲正確；需更細規則。",
+      "完整20task有效case數待manifest。"
+    ],
+    "reuse": "柔性物與日常服務廣度的重要來源；應保留materials與state/evaluator可用程度。",
+    "reviewed_pdf_sha256": "8b0cea58cae1f425754a11a328f6082eafc8066dd93300c8255ba4ae17ffa999",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P092",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ICRA2024 Cloth Competition dataset，arXiv 2508.16749v2。",
+    "scope_read": "固定unfold primitive、硬體／grasp execution、coverage metric、資料及比賽規模。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      11
+    ],
+    "domains": [
+      "衣物與柔性物操作",
+      "洗衣服務"
+    ],
+    "role": "真實操作benchmark",
+    "environment": "雙UR5e＋單stereo camera標準工作站；訓練在lab、比賽在會場，cloth初態無法精確複製。",
+    "tasks": "1個核心任務：懸掛布料選grasp後stretch展開；34garment items不是34task。",
+    "cases": "679episodes＝503訓練嘗試＋176競賽trial；11隊各16次（8衣物×2），同題型由不同方法執行。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "核心unfold grasp-selection任務",
+        "pages": [
+          6,
+          7
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 34,
+        "unit": "cloth items",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 679,
+        "unit": "recorded unfolding episodes",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 176,
+        "unit": "11方法競賽trials",
+        "pages": [
+          8,
+          11
+        ]
+      }
+    ],
+    "evaluation": [
+      "主metric projected coverage／最大面積；另grasp success及成功抓取條件下coverage。",
+      "30秒grasp計算上限為建議，非由679樣本推導的固定速度門檻。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "503與176來源／用途分開；訓練也含失敗抓取；176是實驗運行，不是176獨立任務。",
+    "lineage": "部分毛巾來自Household Cloth Object Set，與其它cloth benchmarks資產可能重用。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          11
+        ],
+        "locator": "§3.2–3.4、§4.2、Competition Results",
+        "supports": "固定primitive、679/503/176與指標"
+      }
+    ],
+    "unresolved": [
+      "場地與初態差異無法完全消除；本庫無法只靠既有影片重跑physical grasp。"
+    ],
+    "reuse": "可借真實garment多樣性與grasp/coverage分離；不宜把單次展開當完整摺衣／收納任務。",
+    "reviewed_pdf_sha256": "c44a1dff77f6fe471123e7e70b03b6735ed494e18190396a44c5c4232962b274",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P093",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "MoDeSuite，arXiv 2507.21796v1。",
+    "scope_read": "兩種mobile robot、8task逐項定義、source繼承及learning評測。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "衣物與柔性物操作",
+      "室內導航",
+      "居家生活"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "IsaacSim／PhysX；Ridgeback-Franka與Spot arm，走廊／桌面配置。",
+    "tasks": "8＝新5elastic（Place/Bend/Transport/Drag/Lift）＋3既有cloth-like（Cover/Uncover/Curtain）；需base與arm協同。",
+    "cases": "RL5獨立runs，success在20eval trials計算；非每task20個語義新任務。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "mobile deformable tasks",
+        "pages": [
+          1,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "新增elastic tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "評測trials／設定",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "依task幾何位置、跨越／覆蓋與無碰撞條件報success；episode return和stability penalty另列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同機體／state/RGB輸入分開；本文無單一全庫train/test IDs總量。",
+    "lineage": "3cloth tasks從前作擴充mobile base control；FEM與PBD為不同材料物理，不是新生活domain。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "Framework、Task Suite、Experiments",
+        "supports": "5+3、robot與20trial metric"
+      }
+    ],
+    "unresolved": [
+      "原3task來源與精確scene/config IDs需從引用30及code進一步對齊。"
+    ],
+    "reuse": "可補『移動時攜帶／拖拉柔性物』而非純桌面摺布；規則包含通過障礙與穩定。",
+    "reviewed_pdf_sha256": "7487d599b51f5e6b76f91382e89b71c431f6314db66766625b35dda08d345dca",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P094",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "R2R/VLN，arXiv 1711.07280v3。",
+    "scope_read": "navigation graph、路徑／指令蒐集、scene split與stop成功定義。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "室內導航",
+      "居家生活",
+      "辦公活動"
+    ],
+    "role": "導航benchmark",
+    "environment": "90個Matterport3D建築scene；panorama graph離散移動，非真輪式動力學。",
+    "tasks": "1個指令導航task family；7,189 route goals、21,567語言指令（通常每path3條）。",
+    "cases": "train14,025／val-seen1,020／val-unseen2,349／test4,173 instructions。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "building scenes",
+        "pages": [
+          2,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7189,
+        "unit": "navigation paths",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 21567,
+        "unit": "instruction instances（全部split）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4173,
+        "unit": "test instructions",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "navigation error；主success要求stop後距goal<3m；oracle stop另列。原文不要求全程遵循原path。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "61train scenes／11val-unseen／18test；不能把全部21,567叫test。",
+    "lineage": "Matterport3D上游；RxR、RoboVerse、VLN-CE等重用同scene，場景數不可加總。",
+    "related_paper_ids": [
+      "P095",
+      "P082"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§4.2–4.4、Dataset Splits",
+        "supports": "90／7189／21567／4173及成功條件"
+      }
+    ],
+    "unresolved": [
+      "下游continuous變體的可導航幾何／case過濾需要另版本。"
+    ],
+    "reuse": "可引入route-following與語言多樣性；路徑數和導航task family是不同粒度。",
+    "reviewed_pdf_sha256": "b7589865ee573d4753ee9e25bdc494cbbb199e6ec17d0a349091aed0fd86c420",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P095",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RxR，arXiv 2010.07954v1。",
+    "scope_read": "path採樣、90scene重用、多語註記、split與path-adherence metrics。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9
+    ],
+    "domains": [
+      "室內導航",
+      "居家生活",
+      "辦公活動"
+    ],
+    "role": "導航benchmark",
+    "environment": "同Matterport3D90個室內場景；不是比R2R又新增90。",
+    "tasks": "16,522 paths；English/Hindi/Telugu三語，同一path有多語／多描述與guide/follower traces。",
+    "cases": "126,069 instructions；path split11,089train／1,232val-seen／1,517val-unseen／2,684test。這些是path數，不能當同數instruction。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "Matterport3D scenes",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 16522,
+        "unit": "paths",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 126069,
+        "unit": "instructions（全部split）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2684,
+        "unit": "test paths",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "PL、NE、SR、SPL、NDTW、SDTW；原作主重NDTW/SDTW以獎勵遵循指定路徑，與R2R只到終點不同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "沿R2R／Matterport場景split；test-standard/test-challenge隱藏；3語每語約14K paths有交集。",
+    "lineage": "原始scene共用R2R，path另採樣；與R2R多任務訓練的追加資料不能再算新test。",
+    "related_paper_ids": [
+      "P094"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "Path Statistics、表2、Evaluation",
+        "supports": "16,522／126,069、split與NDTW"
+      }
+    ],
+    "unresolved": [
+      "各language及test子split指令ID量需manifest核。"
+    ],
+    "reuse": "證明同導航family可以擴語言與過程規則；規則差異應明確保留。",
+    "reviewed_pdf_sha256": "8a964d95106ff267f934acf705a6b0be304a193f84745fe0ad55f51133d61bd8",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P096",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ALFRED，arXiv 1912.01734v2。",
+    "scope_read": "7task types、參數／demo／directive層級、scene及split表、success與partial goal評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      8
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "室內導航"
+    ],
+    "role": "室內長流程操作",
+    "environment": "AI2-THOR120 rooms＝kitchen/bathroom/bedroom/living各30；不是120房屋。",
+    "tasks": "7types：pick-place、stack-place、pick-two、clean-place、heat-place、cool-place、examine-in-light；2,685 task parameter combinations。",
+    "cases": "8,055 expert episodes、概述25,743 directives；表2split為21,023／820／821／1,533／1,529（合25,726），原文存在17差異。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 120,
+        "unit": "rooms",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "task types",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2685,
+        "unit": "task parameter combinations",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 8055,
+        "unit": "expert demonstration episodes",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 25743,
+        "unit": "概述language directives",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1529,
+        "unit": "表2 test-unseen directives",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "全部goal condition成功／部分goal-condition比例；另以action length折算效率。",
+      "subgoal評測可先強制走expert歷史，不能與end-to-end成功混同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "108train rooms，4val-unseen，8test-unseen；seen folds是train場景子集。",
+    "lineage": "AI2-THOR2.0＋PDDL planner；TEACh沿同floorplans/splits，兩者場景不可重加。",
+    "related_paper_ids": [
+      "P097"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§3.1、圖2、表2（layout text已核）",
+        "supports": "7/2685/8055/120與directive差異"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "Evaluation",
+        "supports": "goal/partial/trajectory-weighted"
+      }
+    ],
+    "unresolved": [
+      "25,743概述與表2合計25,726需release IDs釐清，不靜默選方便的數字。"
+    ],
+    "reuse": "提供家务状态变更／工具切割／熱冷清潔程序；符號動作語義不等於低階接觸控制。",
+    "reviewed_pdf_sha256": "84b314c06de82f5a1ff853676d391e05394a2e517986b03faadcbca325c9ee0b",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P097",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "TEACh，arXiv 2110.00534v3。",
+    "scope_read": "TDL與12task、session→EDH、三種benchmark、全部split與success。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      21
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "人機協作"
+    ],
+    "role": "對話協作與任務完成",
+    "environment": "AI2-THOR；表2成功收集池覆蓋109 rooms，重用ALFRED場景與unseen split。",
+    "tasks": "12task types、438參數variants（收集池）；3端點EDH／TfD／TATC，最後一種要同時建模Commander/Follower。",
+    "cases": "正文3,047可replay sessions；表3分量合3,045。EDH表3總11,176＝5475train+608val-seen+2157val-unseen+666test-seen+2270test-unseen。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 109,
+        "unit": "表2收集池rooms",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "task types",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 438,
+        "unit": "收集池parameter variants",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 11176,
+        "unit": "表3 EDH instances（全部split）",
+        "qualifier": "分量相加",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2270,
+        "unit": "test-unseen EDH instances",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "EDH完成全部expected state changes為success，GC給部分分；trajectory length weighting另列。",
+      "TATC與TfD重用session母資料，不是三倍獨立任務量。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "seen/unseen場景；train/val/test按session；舊版EDH因只保留推進任務的state changes而縮減。",
+    "lineage": "同AI2-THOR與ALFRED场景，語言／session新human-human收集；TDL支持量詞、階層與共享object約束。",
+    "related_paper_ids": [
+      "P096"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§3–4、表2–3",
+        "supports": "109/12/438、session/EDH及TDL判分"
+      }
+    ],
+    "unresolved": [
+      "本文3,047與split3,045差2；表1還留早期3,215，必須以版本manifest查明。"
+    ],
+    "reuse": "對話工具、澄清、任務階層與量詞規則有可復用形式；收集成功與可重播數需分開。",
+    "reviewed_pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P098",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Habitat2.0/HAB，arXiv 2106.14405v2。",
+    "scope_read": "ReplicaCAD構造、Pick基本任務、3種HAB任務與評估假設。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      29
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "室內導航"
+    ],
+    "role": "室內長流程操作",
+    "environment": "ReplicaCAD111 layouts建立於單一apartment backdrop；正文105新layout variations與原始配置分量需分清，非111獨立住宅。",
+    "tasks": "HAB3families：TidyHouse、PrepareGroceries、SetTable；另Pick基礎實驗。任務goal為object起終3D位置，不是自然語言理解。",
+    "cases": "程序clutter/goal episodes；Pick有500 unseen-layout eval樣本；技能附錄另100eval episodes，不能混作HAB全庫題數。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 111,
+        "unit": "ReplicaCAD layouts",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "HAB long-range families",
+        "pages": [
+          10,
+          11
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "Pick unseen-layout eval episodes",
+        "pages": [
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "goal成功與分階段成功；操作次數用作難度proxy；模擬速度SPS另列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "未見layout/object配置；抽象抓持與kinematic base控制，並非完整wheel/contact dynamics。",
+    "lineage": "Replica FRL apartment→ReplicaCAD、YCB clutter；Habitat3/後續rearrangement套件會重用。",
+    "related_paper_ids": [
+      "P142"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          4,
+          5
+        ],
+        "locator": "ReplicaCAD章",
+        "supports": "111與單apartment來源"
+      },
+      {
+        "pages": [
+          10,
+          11
+        ],
+        "locator": "§6.1",
+        "supports": "HAB3families與GeometricGoal"
+      }
+    ],
+    "unresolved": [
+      "HAB每family全套eval episode IDs與111layout正式manifest仍待匯入。"
+    ],
+    "reuse": "可借home-scale長流程與open/close前後置條件；環境分量與感測先驗需精確報。",
+    "reviewed_pdf_sha256": "92f9c30479fe4203f656c218fa228c7e5fd71f23a9821b3afa47e06dbe5ab317",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P099",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HomeRobot，arXiv 2306.11565v2。",
+    "scope_read": "HSSD實際子集、OVMM四stage、scene/objects切分、sim/real成功定義。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      17,
+      18,
+      19,
+      20,
+      24,
+      27
+    ],
+    "domains": [
+      "居家生活",
+      "室內導航"
+    ],
+    "role": "室內長流程操作",
+    "environment": "HSSD原庫200+，本文實驗只用60scenes＝38train/12val/10test；real為1個3-room apartment。",
+    "tasks": "1個OVMM family：find object→pick→find receptacle→place；129物件類別與21receptacle類，不是129/21個新任務。",
+    "cases": "2,535物件模型；sim程序產生object/start/goal cases，已讀段未給單一全庫題量。real兩baseline各20experiments。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 60,
+        "unit": "實際benchmark HSSD scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "test scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "OVMM task family",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2535,
+        "unit": "objects",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "real experiments／baseline",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "四stage全過為success、partial success作tie-break；sim Place需靜穩50steps。",
+      "sim Pick是0.8m內magic snap，real Pick要實抓；兩者判準不同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "未見scene及未見object instances，另seen/unseen categories；sim1250step、real300step budget。",
+    "lineage": "HSSD＋AI2-THOR/ABO/GSO objects，與PARTNR HSSD衍生共享環境家族。",
+    "related_paper_ids": [
+      "P143"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§3.1–3.2",
+        "supports": "200+源庫vs60實用、objects與20real"
+      },
+      {
+        "pages": [
+          18
+        ],
+        "locator": "附錄C",
+        "supports": "四stage及magic snap/穩定判準"
+      }
+    ],
+    "unresolved": [
+      "HSSD不同專案的branch/scene ID對照需查；不能把HomeRobot60與PARTNR60直接算120houses。"
+    ],
+    "reuse": "可提供open-vocabulary尋物與搬運；需在共同庫標記抓持抽象層級。",
+    "reviewed_pdf_sha256": "518b6ba6f64a2c51a1bda3b92902e6ad0d2cbf5567d6d07e93207a28155d61e3",
+    "reviewed_on": "2026-10-02"
+  }
+]

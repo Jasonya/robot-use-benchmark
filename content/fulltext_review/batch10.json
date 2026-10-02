@@ -1,0 +1,433 @@
+[
+  {
+    "paper_id": "P108",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboArena，arXiv 2506.18123v2。",
+    "scope_read": "分散式A/B協定、偏好排名模型、DROID平台與完整實驗分母。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "桌面物件操作",
+      "工具使用"
+    ],
+    "role": "分散式真實評測",
+    "environment": "7個學術機構使用DROID平台，evaluators自行選scene/task；沒有固定封閉的環境總數。",
+    "tasks": "開放指令集合，涵蓋數百task instructions；不是固定17task，17是外部窄基準比較。",
+    "cases": "超過600次pairwise評估；為建立oracle ranking，額外跑其餘5policies，全計4,284 policy rollouts。不能稱4,284獨立題。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 7,
+        "unit": "參與機構（非scene）",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4284,
+        "unit": "跨7policies的實測rollouts",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "双盲pairwise preference＋progress；擴充Bradley–Terry估計policy排名與task effects，另產生有影片證據的質性報告。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審"
+    ],
+    "split": "連續累積開放評測；沒有一般train/test固定題庫；同一次A/B需相同task條件。",
+    "lineage": "DROID共同硬體/資料；RoboReward重用其真實成功／失敗rollouts。與RobotArena∞是不同工作。",
+    "related_paper_ids": [
+      "P111",
+      "P114"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          8
+        ],
+        "locator": "§3.1–3.2、§5.1–5.2",
+        "supports": "A/B、task-aware排名、4,284分母"
+      }
+    ],
+    "unresolved": [
+      "精確去重scene與語義task總量需要evaluation database，不從hundreds推成確定數。"
+    ],
+    "reuse": "可作開放題庫／偏好排名的評測方法參考；規模必須標明是rollouts還是task。",
+    "reviewed_pdf_sha256": "0f793633ba5767b6e93f01056dcd5c3357dabcaf70844cd0a157a364fa843698",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P109",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "REFLECT/RoboFail，arXiv 2306.15724v4。",
+    "scope_read": "資料規模與錯誤taxonomy、說明／定位／修正三種評測及GT資訊。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "AI2-THOR simulation與UR5e toy kitchen；sim用GT物件／狀態辨識，real靠感知。",
+    "tasks": "10simulation tasks、11real tasks；規劃失敗與執行失敗兩大群。",
+    "cases": "100sim failure cases（每task10）＋30real failure demonstrations；沒有把正常train影片混入失敗case總量。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "simulation task types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 11,
+        "unit": "real task types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "simulation failure cases",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "real failure demonstrations",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "Exp：人工判說明正確且有用；Loc：時間落在標註區間；Co-plan：执行修正後goal state成功。",
+      "real結果表主要報Exp/Loc，不能把sim約80% Co-plan當real自主恢復率。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審",
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "方法zero-shot failure reasoning；GT perception與action primitives降低sim難度。",
+    "lineage": "sim手動注入failures，real由teleop模擬失敗政策；並非全為自主機器人自然犯錯。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§4–5、圖4、表1–2",
+        "supports": "100/30、來源方式與三種證據"
+      }
+    ],
+    "unresolved": [
+      "sim/real語義task重疊未去重；完整raw failure時間／場景ID仍待匯入。"
+    ],
+    "reuse": "可借規劃與執行失敗taxonomy，明確分『指出錯誤』『提出修正』『真的恢復』。",
+    "reviewed_pdf_sha256": "6018e97d117acefc2b31a0df616b29eb479b95035bf47ea2fd5882a6631ae6c3",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P111",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboReward，arXiv 2601.00675v2。",
+    "scope_read": "OXE/RoboArena來源、counterfactual/clipping生成、5級rubric、完整split與人工驗證附錄。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      22,
+      27
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活",
+      "工具使用"
+    ],
+    "role": "獎勵與完成度評測",
+    "environment": "多OXE來源與RoboArena實拍；14embodiments是機體種類，非14生活環境。",
+    "tasks": "給task description＋rollout video預測1–5progress；反事實重寫指令和截短影片擴增負例，不自動新增實體失敗任務。",
+    "cases": "45,072train／6,232val／2,831人類驗證test；合54,135 episode-reward pairs。RoboArena test子集1,000。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 2831,
+        "unit": "人工驗證RoboRewardBench test pairs",
+        "pages": [
+          3,
+          27
+        ]
+      },
+      {
+        "field": "data",
+        "value": 45072,
+        "unit": "train episode-reward pairs",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 6232,
+        "unit": "validation pairs",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 54135,
+        "unit": "全部split pairs",
+        "pages": [
+          22
+        ]
+      }
+    ],
+    "evaluation": [
+      "主metric progress label MAE，總體採group-wise平均；不同子資料來源分列，另以RL下游驗證。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "按original task description分組互斥；同一影片的counterfactual/clips需跟父episode分組，字串互斥不證明語義互斥。",
+    "lineage": "OXE成功demo及RoboArena自然成功／失敗；生成標籤是弱監督，test另人工逐例確認。",
+    "related_paper_ids": [
+      "P108"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          7,
+          8,
+          22,
+          27
+        ],
+        "locator": "§4.2–4.3、Data Sources、附錄A.3",
+        "supports": "兩種擴增、54,135／2,831及人類審核"
+      },
+      {
+        "pages": [
+          6,
+          9
+        ],
+        "locator": "MAE與benchmark results",
+        "supports": "分組MAE"
+      }
+    ],
+    "unresolved": [
+      "跨OXE子集的母episode重複與semantic task去重仍需ID核。"
+    ],
+    "reuse": "是有效擴充任務／評分規則的重要來源；應區分重標問題與新物理軌跡。",
+    "reviewed_pdf_sha256": "601200a96f8e30137cd3166d6d330ff9ff2ceb0de6a4c43949d808e6e9c0d29a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P112",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoOops，arXiv 2410.05343，PDF標題相符。",
+    "scope_read": "5程序完整清單、6種執行錯誤、50影片、cross-validation與三端點。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      15
+    ],
+    "domains": [
+      "實驗室操作",
+      "工藝與修繕",
+      "組裝與拆解"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "固定坐姿工作站，原物件／工具／程序文字位置固定；4名學生佩戴ego camera。",
+    "tasks": "5task：電路、混色、離子反應、積木、紙板工藝；6執行錯誤類型，未涵蓋所有順序／漏步錯誤。",
+    "cases": "50videos、538segments、95execution mistakes；每fold30train/10val/10test，5-fold。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "程序tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "錯誤taxonomy類型",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 50,
+        "unit": "videos",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 538,
+        "unit": "segments",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 95,
+        "unit": "標註execution mistakes（全庫）",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "端到端step alignment＋mistake/correction mAP@tIoU0.1/0.2/0.3；GT segments分類是oracle子問題。",
+      "alignment另F1/precision/recall/MoF。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每fold各task一正常一错误test影片；作者稱group-kfold控制worker，精確ID仍需查。",
+    "lineage": "自錄多領域程序；一半刻意錯、一半盡量正常但也有自然失誤。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          6,
+          7
+        ],
+        "locator": "§3、表2–3、§5",
+        "supports": "5/50/538/95、split与GT/full差異"
+      }
+    ],
+    "unresolved": [
+      "4名参与者與5-fold worker grouping的精確分配需manifest查。"
+    ],
+    "reuse": "補料理以外程序錯誤；規則由文字指定，不能僅憑視覺常識判定。",
+    "reviewed_pdf_sha256": "fcf3b48c7dea45c46f41391de07a874453ef74d8762655f4104e34d8dfa9bb23",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P113",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "REPAIR-Bench，arXiv 2606.29937v1。",
+    "scope_read": "RFM-HRI來源、排除樣本、3端點、各split、時間與偏好評分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "醫療支援",
+      "人機協作"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "lab與hospital的crash-cart guidance互動；不是完整醫療操作或手術任務。",
+    "tasks": "3端點：失敗時刻、失敗類型、使用者偏好恢復策略；4誘發failure conditions＋success。",
+    "cases": "來源214trials/41人；排30後正式analysis184trials/38人。不能將214全部寫成已用評測樣本。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "評測端點",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 214,
+        "unit": "來源interaction trials",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 184,
+        "unit": "過濾後usable trials（含各split）",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "視覺failure classification F1等；localization秒級absolute error與tIoU F1。",
+      "recovery用Hit/precision/recall/F1@k，GT是人的偏好，未證明機器人執行恢復成功。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "visual tasks約75/25 participant分組；recovery文本60/20/20隨機split，不能宣稱三端點都participant-disjoint。visual任务刻意不給語音。",
+    "lineage": "RFM-HRI舊資料新增標註与preference；failure offset以機器人錯誤回應結束作標記，不是物理抓取失敗時刻。",
+    "evidence": [
+      {
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "locator": "Dataset／Sample Exclusions／Task1",
+        "supports": "214→184、38人與失敗時間定義"
+      },
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "Tasks2/3與Metrics",
+        "supports": "不同split、偏好top-k"
+      }
+    ],
+    "unresolved": [
+      "前處理階數/cutoff不同段落敘述不一，重現需code確認；source214與41×5亦不完全一致。"
+    ],
+    "reuse": "補user-centered interaction recovery；必須和物理任務恢復及其成功證據分開。",
+    "reviewed_pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd",
+    "reviewed_on": "2026-10-02"
+  }
+]

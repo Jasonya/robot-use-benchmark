@@ -1,0 +1,890 @@
+[
+  {
+    "paper_id": "P024",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EPIC Fields正文標題相符，arXiv 2306.08731。",
+    "scope_read": "重建覆蓋、三個benchmark、難度與frame切分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      22
+    ],
+    "domains": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "3D場景與世界建模",
+    "environment": "EPIC100的45個廚房；671影片成功重建，沒有新增671個獨立layout。",
+    "tasks": "D-NVS新視角合成、UDOS動態／半靜態物件分割、VOS；不是671個操作任務。",
+    "cases": "18,790,333已註冊camera-pose影格；D-NVS只取50影片（14.7小時、2.86M註冊影格）。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 45,
+        "unit": "上游錄製廚房",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 671,
+        "unit": "重建影片",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 18790333,
+        "unit": "camera-pose影格",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "D-NVS來源影片",
+        "pages": [
+          5,
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "D-NVS：PSNR，前景／背景分列；UDOS：segmentation mAP；VOS沿VISOR。",
+      "難度依in-action/out-of-action及與train frame的時間距離；hard、medium排除附近1秒train frame。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "每影片val/test交替抽樣；UDOS無監督可看全影片，不是D-NVS同一可見輸入。",
+    "lineage": "EPIC100＋VISOR的相機與幾何擴充，來源影片／mask共用。",
+    "related_paper_ids": [
+      "P010",
+      "P011"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          5,
+          6,
+          7,
+          8,
+          22
+        ],
+        "locator": "§3、§4、split附錄",
+        "supports": "45／671／50、評分與難度構造"
+      }
+    ],
+    "unresolved": [
+      "50個benchmark video-scenes與原廚房一對多關係待逐ID匯入。"
+    ],
+    "reuse": "提供3D／視角／動態物件評測；重建相機軌跡不是robot action軌跡。",
+    "reviewed_pdf_sha256": "c7c08e1c9614782d2dcddaeeec95b253c5d9f756ff2c4d30b712bcac6a90eebd",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P025",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPet，arXiv 2404.09991v1。",
+    "scope_read": "資料、3種預測端點、各自標註與指標。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "domains": [
+      "動物行為",
+      "戶外移動"
+    ],
+    "role": "動作與軌跡預測",
+    "environment": "動物網路影片無去重場景總量；VPP額外robot測試有office、park、beach三處。",
+    "tasks": "VIP互動辨識／17種互動對象；LP預測未來4秒40個位置；VPP預測terrain latent的過去／未來。",
+    "cases": "6,646片段、84小時；VIP 1,449標註片段＝754train+695test；LP 6,126train／249val；VPP另20分鐘robot測試。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 6646,
+        "unit": "動物影片片段",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 695,
+        "unit": "VIP test片段",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 249,
+        "unit": "LP validation片段",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 3,
+        "unit": "VPP機器人測試地點",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "VIP：accuracy／AUROC及object top-1/top-3；LP：ATE／RPE的RMSE；VPP：latent MSE。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "三端點分開train/test或val；LP為SLAM pseudo-GT且有人工篩選，非mocap真值。",
+    "lineage": "TikTok／YouTube新整理；VPP訓練另用既有robot資料，不能把動物影片數算為robot控制題。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          6,
+          7,
+          10
+        ],
+        "locator": "§3.2、§4、表3",
+        "supports": "片段量、robot子集與metric"
+      }
+    ],
+    "unresolved": [
+      "正文819原影片與482＋338的平台分量不一致，待manifest釐清。"
+    ],
+    "reuse": "補充低視角移動與人以外的具身感知；與操作benchmark應分層比較。",
+    "reviewed_pdf_sha256": "8be645841806230228c292995eb6538540f9be6d228b916b37e53fefeeca59ca",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P026",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoHOS，arXiv 2208.03826v1。",
+    "scope_read": "來源、手物標籤定義、OOD測試與主要分割評估。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "桌面物件操作"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "Ego4D、EPIC、THU-READ及自錄GoPro多來源；無共同scene ID總數。",
+    "tasks": "左／右手、左／右／雙手接觸物分割；直接／間接接觸有標註，但本文主要評估直接接觸。",
+    "cases": "原作總量11,243影像；OOD另500影格來自30個YouTube影片，主分割實驗預設在此測試。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 11243,
+        "unit": "分割標註影像",
+        "pages": [
+          1,
+          5,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "OOD test影像",
+        "pages": [
+          2,
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "mIoU；binary hand、left/right hand、hand+arm、held-object等標籤定義分開比較。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "以原作validation選checkpoint，500-image OOD為另列測試；不能把源影片數當測試題數。",
+    "lineage": "直接重用Ego4D、EPIC影格；跨庫去重需frame時間戳。",
+    "related_paper_ids": [
+      "P009",
+      "P010",
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§3、表1",
+        "supports": "資料與標籤"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "§6",
+        "supports": "500 OOD影格及mIoU"
+      }
+    ],
+    "unresolved": [
+      "正文来源分量7,458+2,121+806+350未加總為11,243；subjects/activity的表格與敘述亦互換，暫不採這兩項總数。"
+    ],
+    "reuse": "可作接觸判定與視覺狀態監督；11,243不是11,243項可執行操作。",
+    "reviewed_pdf_sha256": "94b61333b3477ef582a94281cc28852c750d6fbe096ddfe90c9434ca39101f07",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P027",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPCA，arXiv 2309.02423v1。",
+    "scope_read": "One4All來源統一、採樣、表2與原生識別評測；附錄類別合併。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      8,
+      14
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "桌面物件操作"
+    ],
+    "role": "跨資料集整合與評测方法",
+    "environment": "來源影片混合，不提供新的可計數互動環境。",
+    "tasks": "EPIC100、EGTEA、Ego4D-AR、Something-Else合併語義；pretrain394類、test204類，聯集401類含zero-shot。",
+    "cases": "表2列pretrain20K／30K／50K；test3K／5K／10K為巢狀子集，不能相加成18K獨立題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 394,
+        "unit": "pretrain統一類別",
+        "pages": [
+          5,
+          14
+        ]
+      },
+      {
+        "field": "task",
+        "value": 204,
+        "unit": "test統一類別",
+        "pages": [
+          5,
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10000,
+        "unit": "最大One4All-T子集",
+        "pages": [
+          5,
+          14
+        ]
+      }
+    ],
+    "evaluation": [
+      "top-1 verb/action accuracy；另用語義、手／物位置、手姿、camera motion、模糊程度分析分布。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "上游train與val/test分開抽；不同規模套件彼此包含。",
+    "lineage": "本身就是多來源語義合併與平衡採樣先例；沒有將所有源任務轉成robot控制。",
+    "related_paper_ids": [
+      "P008",
+      "P010",
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          14
+        ],
+        "locator": "表2、附錄Dataset Construction",
+        "supports": "394／204／401及巢狀規模"
+      },
+      {
+        "pages": [
+          8
+        ],
+        "locator": "§5.1",
+        "supports": "原生評分"
+      }
+    ],
+    "unresolved": [
+      "§3.4提5K／10K／20K但表2及附錄為3K／5K／10K；採表2口徑並保留衝突。"
+    ],
+    "reuse": "對任務聯集、分布分析、平衡採樣直接相關；須辨識此類前作，不能只與單域benchmark比規模。",
+    "reviewed_pdf_sha256": "b1562d6e36e0c788642711c6bcd038ed83e381ad8f9ae62cc5e341ee516c0a39",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P028",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoSchema，arXiv 2308.09126v1。",
+    "scope_read": "資料生成與人工過濾、temporal certificate定義、評测與datasheet精確量。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      9,
+      14
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "工藝與修繕",
+      "園藝與戶外"
+    ],
+    "role": "影片問答與推理",
+    "environment": "Ego4D影片子集，未另外提供去重後環境數。",
+    "tasks": "長影片五選一QA；temporal certificate量必要證據時長，不能把3分鐘輸入長度直接當難度。",
+    "cases": "5,063題，每題一段3分鐘影片；約250小時為衍生片段量。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 5063,
+        "unit": "五選一QA",
+        "pages": [
+          14
+        ]
+      }
+    ],
+    "evaluation": [
+      "選項accuracy；人類時間／影格受限條件另列。",
+      "QA人工過濾要求至少30秒certificate，與完整3分鐘影片長度區分。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "本文定位zero-shot診斷評測；公開標籤子集與完整隱藏評測需依發布版本另外核對。",
+    "lineage": "Ego4D非重疊3分鐘片段產題，與其他Ego4D衍生QA仍可能共用上游影片。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§3.1–3.2",
+        "supports": "來源、過濾、certificate"
+      },
+      {
+        "pages": [
+          14
+        ],
+        "locator": "Datasheet Composition",
+        "supports": "精確5,063題"
+      }
+    ],
+    "unresolved": [
+      "本庫未逐ID對齊所有Ego4D衍生benchmark。"
+    ],
+    "reuse": "可借certificate、人類驗證和blind基線衡量時間推理難度；不評機器人實際完成。",
+    "reviewed_pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P029",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoThink，arXiv 2311.15596v2。",
+    "scope_read": "人工QA蒐集、700題統計、六能力十二維度、judge協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      13,
+      14
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "工藝與修繕",
+      "戶外移動"
+    ],
+    "role": "影片問答與推理",
+    "environment": "595個Ego4D母影片；scene統計是語義場景如kitchen，不能當相同數量的獨立物理房間。",
+    "tasks": "6能力／12細分維度：物件、活動、定位、推理、forecasting、planning；輸入為單張影像。",
+    "cases": "700影像QA，無重複選圖；每維度至少50題，activity與forecasting各100。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "能力類別",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "細分題型",
+        "pages": [
+          5,
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 700,
+        "unit": "影像QA",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 595,
+        "unit": "母影片",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "GPT-4依問題、答案、reference打0／0.5／1分；是模型評審分數，不是精確答案匹配accuracy。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審"
+    ],
+    "split": "zero-shot評測；無一般train/val/test訓練配額。人工審核QA與後續模型judge分開。",
+    "lineage": "抽Ego4D影格，最多同video兩張；能力分類不等同生活domain分類。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          14
+        ],
+        "locator": "§3.2、表4",
+        "supports": "700／595及題型"
+      },
+      {
+        "pages": [
+          6
+        ],
+        "locator": "Single-answer grading",
+        "supports": "0/0.5/1 judge"
+      }
+    ],
+    "unresolved": [
+      "跨庫母影片重疊及judge版本穩定性需實作端固定。"
+    ],
+    "reuse": "可借主觀／開放答案rubric；planning問答不能當作控制成功證據。",
+    "reviewed_pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P030",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPlan-Bench，arXiv 2312.06722v3。",
+    "scope_read": "資料來源、goal到QA、統計、選項評分、instruction-tuning資料區別。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      14
+    ],
+    "domains": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "影片問答與推理",
+    "environment": "原作報419 scenes（影片觀測場景），非419個已建模robot layouts。",
+    "tasks": "下一步planning QA；表2合計3,269 task goals與3,185候選action plans，兩者不等同題數。",
+    "cases": "4,939評測QA＝3,355 val＋1,584 test；50K EgoPlan-IT是另外訓練集，非50K測試題。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 419,
+        "unit": "原作觀測scenes",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3269,
+        "unit": "表2 task goals",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4939,
+        "unit": "評測QA（val+test）",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1584,
+        "unit": "test QA",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "MC accuracy；部分開放模型以候選答案條件likelihood排序，需保留不同推論介面。",
+      "觀測只可到下一動作開始前；歷史狀態不能洩漏GT下一步。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "EgoPlan-Val／EgoPlan-Test；EgoPlan-IT僅用EPIC來源，以Ego4D子集查跨資料泛化。",
+    "lineage": "EPIC-KITCHENS與Ego4D的衍生QA；不可與上游影片或EgoPlan2直接加成獨立新活動。",
+    "related_paper_ids": [
+      "P010",
+      "P013",
+      "P031"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§3.4、表2、§5.1",
+        "supports": "精確QA、goal、train/eval區別"
+      }
+    ],
+    "unresolved": [
+      "正文3,296 goals與表2的3,269相差27；採表2數字且保留差異。",
+      "419 scenes的跨影片物理等價關係未核。"
+    ],
+    "reuse": "提供goal／歷史／當前觀測→下一步的可用題型；不同goal文字仍須做語義等價審核。",
+    "reviewed_pdf_sha256": "c15ca6dd2823dc0af2a6f55ce15cae49463268b814075cc9260e0d79ba751373",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P031",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPlan-Bench2，arXiv 2412.04447v2。",
+    "scope_read": "4 domains／24 scenarios清單、goal過濾、觀測選取、MC評分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "零售與購物",
+      "工藝與修繕",
+      "實驗室操作",
+      "園藝與戶外",
+      "交通與移動",
+      "休閒活動",
+      "照護與個人活動"
+    ],
+    "role": "影片問答與推理",
+    "environment": "24個語義scenario類別，非24個物理scene；來源1,113個Ego4D影片。",
+    "tasks": "4原生domains（Work／Daily life／Hobbies／Recreation）；保留4–20步的goal；284 goal verbs不是284個正式任務。",
+    "cases": "1,321道四選一QA；比第一版題少但原作場域更廣，兩種尺度要分開。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "原生life domains",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "語義scenario類別",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1113,
+        "unit": "來源影片",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1321,
+        "unit": "四選一QA",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "直接匹配A/B/C/D計accuracy；原作不引入第三方LLM judge。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "評測用QA；原作觀測篩選以排除單張即可答與已洩漏動作的影格。",
+    "lineage": "Ego4D更新版衍生；與第一版方法相承，但不是在同一題集上直接擴成更大數量。",
+    "related_paper_ids": [
+      "P013",
+      "P030"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          1,
+          5
+        ],
+        "locator": "概述與§III.A",
+        "supports": "1,321／1,113／4／24"
+      },
+      {
+        "pages": [
+          6,
+          7
+        ],
+        "locator": "Construction與Evaluation",
+        "supports": "4–20步與判分"
+      }
+    ],
+    "unresolved": [
+      "task-goal語義去重與跨EgoPlan版本同源query重疊未逐ID核。"
+    ],
+    "reuse": "其24 scenario清單是廣度候選的重要依據；不能拿少量QA即宣稱域內所有任務已覆蓋。",
+    "reviewed_pdf_sha256": "86d13b4d204df0eee1eec14c5a5dde9f3cdc465b7e5b96009d4d8b7f4c48f353",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P032",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoTaskQA，arXiv 2210.03929v1。",
+    "scope_read": "LEMMA狀態／因果標註、QA生成、兩種split與metric。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "社交與溝通"
+    ],
+    "role": "影片問答與推理",
+    "environment": "LEMMA多代理家務影片；沒有新的獨立場景全集。",
+    "tasks": "3個scope（world／intent／multi-agent）×4問法（描述／預測／解釋／反事實）；屬QA taxonomy，不是12個生活工作。",
+    "cases": "從368K程式生成候選挑出40K balanced QA，基於約2K ego clips及30K状態／人物註記blocks。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "QA reasoning types",
+        "pages": [
+          1,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 40000,
+        "unit": "balanced QA",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 368000,
+        "unit": "生成候選QA（非正式題庫）",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "在answer vocabulary上分類，報accuracy；按scope／type／semantic與open/binary分列。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "normal以QA按3:1:1分train/val/test；indirect以多步間接指涉作泛化測試，不可當場景互斥split。",
+    "lineage": "直接擴充LEMMA標註；因果trace由前／後置條件規則生成，belief標註由多數人工票決。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3與benchmark splits",
+        "supports": "40K vs368K、來源、規則及split"
+      }
+    ],
+    "unresolved": [
+      "40K題的video父ID與上游LEMMA環境重用未匯入。"
+    ],
+    "reuse": "提供規則、前置條件、因果與多代理信念的具體擴充；反事實QA不等於模擬器已驗證反事實軌跡。",
+    "reviewed_pdf_sha256": "9a06fc9a9cfb5e7102f62ff34137fd261251eb9bd7c19ec19b07d4b8f36b5e87",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P033",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoLife，arXiv 2503.03803v3（2026-02-09）。",
+    "scope_read": "蒐集、QA流程、正式題庫與當版跑分範圍。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "社交與溝通",
+      "休閒活動"
+    ],
+    "role": "長期記憶與生活助理",
+    "environment": "1個自建EgoHouse、6人共同生活7天；15台外部相機不是15個環境。",
+    "tasks": "5題型：EntityLog、EventRecall、HabitInsight、RelationMap、TaskMaster。",
+    "cases": "約300小時原始／266小時保留影片；正式EgoLifeQA 3,000題（每人500）。本版§5快速實驗只用Jake的500題；EgoIT-99K為訓練資料。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 1,
+        "unit": "EgoHouse",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "QA types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3000,
+        "unit": "正式QA",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "本文快速實驗實評QA",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 266,
+        "unit": "保留影片小時",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "multiple-choice accuracy；依certificate長度、題型、audio／identity設定分析。",
+      "比較captioner時，最終QA由共同GPT-4o回答；這與將GPT當評分judge不同。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "來源為連续一週個人經歷；99K／D1模型訓練與QA證據时间應另外追蹤。",
+    "lineage": "新錄EgoHouse；EgoIT-99K含其他ego來源，不能把訓練集99K稱本benchmark新增test量。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          5
+        ],
+        "locator": "表1–2與§3.5",
+        "supports": "1屋／266h／3,000題"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "§5 Implementation Details",
+        "supports": "實評Jake 500題與共同回答器"
+      }
+    ],
+    "unresolved": [
+      "完整3,000題是否有同設定的發布成績，須另查後續版本。"
+    ],
+    "reuse": "補多日記憶、習慣與人際關係；需要保留個人／共同事件重疊而非把6人同步影片全當獨立時長。",
+    "reviewed_pdf_sha256": "62089719b6879f1f7f10401989959c9a7e0531aa411284d10c9a713f0634c49a",
+    "reviewed_on": "2026-10-02"
+  }
+]

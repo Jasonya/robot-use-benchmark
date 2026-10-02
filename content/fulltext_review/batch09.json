@@ -1,0 +1,689 @@
+[
+  {
+    "paper_id": "P100",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "BEHAVIOR-1K，arXiv 2403.09227v1。",
+    "scope_read": "人類需求survey、1K activity來源、scene/object表、BDDL與Transition Machine、baseline範圍。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      20,
+      24
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "零售與購物",
+      "辦公活動",
+      "園藝與戶外",
+      "衣物與柔性物操作",
+      "表面清潔"
+    ],
+    "role": "室內長流程操作",
+    "environment": "50scenes／373rooms／8scene types；包含house、garden、restaurant、office等；不能把rooms和scenes相加。",
+    "tasks": "1,000 BDDL activities＝人類需求排序選909＋沿用BEHAVIOR100的91項；2,090是survey候選池，不是已實作任務。",
+    "cases": "程序生成滿足initial predicates的配置；原文baseline只實測CollectTrash、StoreDecoration、CleanTable三活動，非1,000活動全模型成績。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 50,
+        "unit": "scenes",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 373,
+        "unit": "rooms（包含於50scene）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "domain",
+        "value": 8,
+        "unit": "原作scene types",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1000,
+        "unit": "BDDL activities",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "原文baseline活動",
+        "pages": [
+          6,
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "success、goal score Q、時間、導航距離、擾動物件量。",
+      "低階RL與assistive grasp/teleport primitive分開；高分primitive不能代稱低階policy已解題。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "原文3活動實驗；初態生成規格與實驗seed／rollout需另外記錄。",
+    "lineage": "BEHAVIOR100的延伸；ATUS等time-use survey及WikiHow為活動來源。OmniGibson混用物理與temperature/烘焙等heuristic transition，非所有現象都是精密物理。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§2、表1",
+        "supports": "909+91、50/373/8"
+      },
+      {
+        "pages": [
+          6,
+          7
+        ],
+        "locator": "§5–6、表2",
+        "supports": "Transition Machine與僅3活動baseline"
+      }
+    ],
+    "unresolved": [
+      "全1K activities的去重semantic goal、可用資產及可解性應逐規格核，不用1K宣稱1K模型可評結果。"
+    ],
+    "reuse": "全庫廣度與生活活動規格的核心比較基準；新庫要提出超過其已有activity和規則的具體聯集。",
+    "reviewed_pdf_sha256": "ab4033f3e8a8187ad2cfdf11f1979d33996ecce1e81fa3d62af33a92bbb17a2b",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P101",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Embodied Agent Interface，arXiv 2410.07166v3。",
+    "scope_read": "4 modules完整I/O与metric、表2、BEHAVIOR100／VirtualHome標註與符號實作。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      21,
+      89,
+      90,
+      102,
+      103
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "辦公活動"
+    ],
+    "role": "符號規劃與評測介面",
+    "environment": "VirtualHome與EvalGibson兩後端；EvalGibson為BEHAVIOR100建立的符號transition simulator，不是BEHAVIOR1K全物理執行。",
+    "tasks": "4 modules：goal interpretation、subgoal decomposition、action sequencing、transition modeling。VirtualHome表2為26task names／338instructions；BEHAVIOR100為100。",
+    "cases": "338＋100＝438 instruction instances；801/673 goals是組成標籤，平均4,164.4 goal options不是4,164題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "能力modules",
+        "pages": [
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "VirtualHome表2task names",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "BEHAVIOR100 tasks",
+        "pages": [
+          7,
+          89
+        ]
+      },
+      {
+        "field": "case",
+        "value": 438,
+        "unit": "instruction instances",
+        "qualifier": "338+100",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "goal／transition以logic F1；trajectory feasibility、goal satisfaction、partial goal success；PDDL planner成功另列。",
+      "模組評測其餘部分用GT／BFS／planner補齊，非端到端全系統分數；只實作LTL部分語法，globally/until尚未實作。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "zero-shot接口評估；固定單module與pipeline分析分開。",
+    "lineage": "BEHAVIOR100 VR demos、RobotHow/VirtualHome；重新標註抽象／具體goal以避免無關終態污染。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "表1–2、§2–3",
+        "supports": "modules、438、評分、符號後端"
+      },
+      {
+        "pages": [
+          89,
+          90
+        ],
+        "locator": "附錄M.2–M.4",
+        "supports": "BEHAVIOR100與RobotHow來源及action goals"
+      }
+    ],
+    "unresolved": [
+      "附錄稱VirtualHome30categories而表2為26names，待label清單對齊。"
+    ],
+    "reuse": "是統一任務語言、規則及模組評測的直接前作；應避免重造G/T軸而不交代與此接口差異。",
+    "reviewed_pdf_sha256": "d10c7fee3594c88ff9f6a061a68b64a380a82d36c6652f3b08c42179044e2a9f",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P102",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "NavVerse，arXiv 2607.19695v1。",
+    "scope_read": "200scene構造、3task、10K episodes、物理導航與metric／難度。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      12,
+      13
+    ],
+    "domains": [
+      "室內導航",
+      "戶外移動",
+      "配送與公共場館"
+    ],
+    "role": "導航benchmark",
+    "environment": "100 indoor GRScenes＋50 outdoor城市＋50 indoor-outdoor組合；混合scene重用前兩組幾何，不是200獨立底層環境。",
+    "tasks": "ObjNav／PlaceNav／VLN三類；PlaceNav沒有純室內split，不能機械做3×3完整coverage。",
+    "cases": "4,027 ObjNav＋2,973 PlaceNav＋3,000VLN＝10,000episodes（全生成benchmark）；與evaluation subset量分開。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 200,
+        "unit": "含組合的scene entries",
+        "pages": [
+          3,
+          12
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "navigation task types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10000,
+        "unit": "生成episodes（全benchmark）",
+        "qualifier": "4027+2973+3000",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "SR、SPL、coverage efficiency、collision rate、obstacle distance、navigable surface ratio；Spot goal tolerance1.6m。",
+      "難度按各task自身path length的1/3、2/3分位，不是跨benchmark通用難度。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "indoor90/10、outdoor40/10，mixed沿outdoor split；共享PID waypoint follower。",
+    "lineage": "GRUtopia/GRScenes＋Virtual Community城市、Google tiles、Objaverse；mixed環境需追父scene。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          8,
+          12
+        ],
+        "locator": "§3.3、Difficulty、附錄Inventory",
+        "supports": "10K、200組成、split及metrics"
+      }
+    ],
+    "unresolved": [
+      "各task evaluation split的精確case ID量與mixed scene父ID需要manifest匯入。"
+    ],
+    "reuse": "補室內到戶外的連續導航與工作用途；可用組合環境擴題，但須報重用關係。",
+    "reviewed_pdf_sha256": "9e578a0112fb1c6b3969bc02b262c7f35fa90e3321692f5dfa0ad033fef1fc68",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P103",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Follow-Bench，arXiv 2509.10796v4。",
+    "scope_read": "16scenario、配置表、8planners、100trials與安全/舒適metric。",
+    "pages_read": [
+      1,
+      6,
+      7,
+      8,
+      9,
+      10,
+      20
+    ],
+    "domains": [
+      "人機協作",
+      "室內導航",
+      "戶外移動"
+    ],
+    "role": "社交導航benchmark",
+    "environment": "CPU 2D simulator；16scenario types分target trajectories、4crowd模式、4layouts；非16個真實場所。",
+    "tasks": "1核心family＝跟隨指定人，變更跟隨角／距離、密度、狹窄通道及遮擋。",
+    "cases": "各configuration100個隨機trial；表V包含多種人數／寬度／距離，不能簡化為16×100而漏掉配置。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 16,
+        "unit": "scenario types",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "person-following family",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每configuration trials",
+        "pages": [
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "無碰撞且重新找到target才成功；TVR、目標personal-zone時間、侵入他人空間、jerk、路徑等。",
+      "10Hz同步sim clock計jerk，wall-clock planner耗時另外量。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度",
+      "人工或模型評審"
+    ],
+    "split": "motion-planning測試假設可見人位置完美；真人主觀偏好另經real interviews，不冒充sim幾何metric。",
+    "lineage": "既有2D人群simulator／ORCA/SFM扩充；不是端到端camera跟人辨識benchmark。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "locator": "§III、表IV–V",
+        "supports": "16、100、perception假設與物理指標"
+      }
+    ],
+    "unresolved": [
+      "全部配置去重後的trial總量需按發布config列舉。"
+    ],
+    "reuse": "補持續陪伴與社交距離規則；任務完成、安全與舒適分開比。",
+    "reviewed_pdf_sha256": "d0c3862a5ceea33af287b35df24c711ee5e923e829b298b2688ed9c280e18ace",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P104",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SIMPLER，arXiv 2405.05941。",
+    "scope_read": "real-to-sim目標、MMRV/Pearson、兩機體場景、visual matching與主比較。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      18,
+      20
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "role": "轉移與評測有效性",
+    "environment": "2個real robot setups：Google Robot與WidowX/Bridge；4 robot texture版本是視覺補償，不是4個新環境。",
+    "tasks": "Google圖6四組（pick、move-near、open/close drawer、open+place）；WidowX圖7四組放置／堆疊，含grasp子項。原作按group而非唯一語義task計。",
+    "cases": "各task有專用real/sim trial安排；Octo多3policy seeds、Google4texture variants，用來降低評估方差，不作新題總量。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 2,
+        "unit": "real robot setups",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "圖6–7主要task groups",
+        "qualifier": "4+4，drawer開/關合组",
+        "pages": [
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task success；比較sim/real policy排名用Mean Maximum Rank Violation與Pearson r。",
+      "validated subset的相關性不保證所有新domain也有相同sim-real關係。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "train on real、evaluate in sim；visual matching與variant aggregation是不同評測策略。",
+    "lineage": "Google/Bridge真實資料＋SAPIEN，另IsaacSim驗證；ManiSkill3等重用SIMPLER子集。",
+    "related_paper_ids": [
+      "P068"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          6,
+          7,
+          8
+        ],
+        "locator": "§III–VI、圖6–7",
+        "supports": "兩setup、task groups、MMRV與資訊條件"
+      }
+    ],
+    "unresolved": [
+      "每task原生trial manifest未完全匯入，不虛構統一全庫題量。"
+    ],
+    "reuse": "為模擬benchmark有效性提供比較方法；沒有真機資源時只能先做sim範圍，不能宣稱完成sim-real驗證。",
+    "reviewed_pdf_sha256": "6a9481f3c0fc43fa6736e5f5fc8ddb72ebf05aad7dbd0ff31721e4d6bffec9e5",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P105",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LIBERO-Plus，arXiv 2510.13626v3。",
+    "scope_read": "7擾動因素、10,030生成設定、難度分級、額外train資料與評分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      16
+    ],
+    "domains": [
+      "桌面物件操作"
+    ],
+    "role": "穩健性與分布外評測",
+    "environment": "LIBERO场景擾動：layout、camera、robot初態、語言、light、texture、noise；不是10K新生活場景。",
+    "tasks": "7factors／21components；原作稱10,030tasks，多為原LIBERO語義任務的擾動配置。",
+    "cases": "10,030benchmark settings；額外>20K成功訓練trajectories分開。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 10030,
+        "unit": "擾動task settings",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "擾動factors",
+        "pages": [
+          2,
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "擾動components",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "物理success／success drop，依factor平均；5級難度由4個参考模型實測accuracy分層。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "原LIBERO訓練到擾動測試，另外有泛化資料post-training；難度依賴校準模型，不能當永久內在難度。",
+    "lineage": "直接衍生LIBERO；10,030不等於10,030互異goal family。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          8,
+          9
+        ],
+        "locator": "§2.1、§6、表2",
+        "supports": "10,030、7/21、5級模型校準與>20Ktrain"
+      }
+    ],
+    "unresolved": [
+      "10,030各父task、擾動config和split的逐條去重仍待manifest。"
+    ],
+    "reuse": "已有萬級評測設定的規模先例；我們若比task數必須先使用共同語義粒度。",
+    "reviewed_pdf_sha256": "661de08e0ed1bb4bb4774177cac9fafa94f06b5385fa2f4107a1927b9a4aada7",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P106",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Meta-World+，arXiv 2505.11289v2。",
+    "scope_read": "50task原庫、reward版本修正、MT25/ML25、eval統計協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      7,
+      16
+    ],
+    "domains": [
+      "桌面物件操作"
+    ],
+    "role": "穩健性與分布外評測",
+    "environment": "沿用Meta-World Sawyer task environments，非新增50不同環境。",
+    "tasks": "50原生task types；新增MT25/ML25中等規模suite及custom task sets。",
+    "cases": "multi-task每task50goal episodes；meta每goal適應10episodes後測3episodes；10訓練seed不當新task。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 50,
+        "unit": "沿用的task types",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 25,
+        "unit": "新增中型suite訓練task量",
+        "pages": [
+          7,
+          16
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "MT每task eval episodes",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "mean success的IQM、95%CI，10seeds；v1/v2 dense reward尺度與設計不同，原文指出歷史成績不可直接混比。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "保留MT/ML角色區別；MT25/ML25自原50選，非另外增加25語義任務。",
+    "lineage": "Meta-World版本整理與標準化；最應避免把同benchmark歷史版本當獨立資料源。",
+    "related_paper_ids": [
+      "P063"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          7,
+          16
+        ],
+        "locator": "§4–5、Task Set Construction",
+        "supports": "50/25、reward版本、50episode及IQM"
+      }
+    ],
+    "unresolved": [
+      "本庫歷史pilot的Meta-World commit及reward版本須維持標記，不套用新版baseline成績。"
+    ],
+    "reuse": "提供版本治理與可比較統計方法；對避免舊網頁數字混淆尤其重要。",
+    "reviewed_pdf_sha256": "60d7c336669aaab9834d2e8a6156b410b5cfa28c0c7fe3da0b1da6881af9fc33",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P107",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "COLOSSEUM，arXiv 2402.08191v2。",
+    "scope_read": "20task選取、14擾動、適用性、235test sets及real鏡像。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      9,
+      18
+    ],
+    "domains": [
+      "桌面物件操作",
+      "工具使用",
+      "居家生活"
+    ],
+    "role": "穩健性與分布外評測",
+    "environment": "RLBench/PyRep場景，外觀、camera、質量與friction擾動；不是20,371獨立房屋。",
+    "tasks": "20基本操作tasks、14perturbation factors；原文20,371 unique task instances為生成配置規模。",
+    "cases": "正式235test sets×25episodes＝5,875episodes／model；train20tasks×100demos＝2,000。real另4task鏡像。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "base tasks",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "perturbation factors",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20371,
+        "unit": "生成task instances",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 5875,
+        "unit": "主protocol eval episodes",
+        "qualifier": "235×25",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "task-averaged success與相對無擾動success drop；不適用某factor的task不進該factor分母。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "train不加擾動但保留RLBench原variation；eval固定variation再隨機pose；主結果1train seed+1eval seed。",
+    "lineage": "RLBench子集擴充，YCB distractors；20×14全笛卡兒積不合法（無receiver／compound shape等限制）。",
+    "related_paper_ids": [
+      "P062"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          7
+        ],
+        "locator": "§III、Challenge、§IV-D",
+        "supports": "20/14/20,371 vs5,875與適用性"
+      }
+    ],
+    "unresolved": [
+      "20,371生成配置與235固定test set之逐ID對應需manifest匯入。"
+    ],
+    "reuse": "強調只有適用且可執行的擾動才計為case；支持擴規則但不能盲乘。",
+    "reviewed_pdf_sha256": "ae71956329278bc299039eaa133876b4b132772081418a26c733c4810169edf2",
+    "reviewed_on": "2026-10-02"
+  }
+]

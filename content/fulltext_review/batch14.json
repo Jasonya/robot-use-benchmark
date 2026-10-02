@@ -1,0 +1,786 @@
+[
+  {
+    "paper_id": "P169",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "X2Real，arXiv 2609.27449v1。",
+    "scope_read": "44task架構、training/eval分離、資產/DSL、DAG metrics、desktop/mobile與sim-real驗證。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      13,
+      14,
+      23,
+      24,
+      27,
+      28,
+      29
+    ],
+    "domains": [
+      "桌面物件操作",
+      "室內導航",
+      "工具使用",
+      "居家生活"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "Mana/IsaacLab場景；多embodiments与green-booth訓練配置，appearance/task/embodiment分別擾動。",
+    "tasks": "44simulation tasks／10能力維度；含3mobile tasks與3challenge tasks，能力數不是生活domain數。",
+    "cases": "近300小時訓練軌跡；desktop各300demo、mobile各1,000、3challenging總>20K trajectories；mobile eval每task每ID/OOD40episodes。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 44,
+        "unit": "simulation tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "能力維度",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "mobile tasks",
+        "pages": [
+          29
+        ]
+      },
+      {
+        "field": "case",
+        "value": 40,
+        "unit": "mobile每task每condition episodes",
+        "pages": [
+          29
+        ]
+      }
+    ],
+    "evaluation": [
+      "DAG依赖達成、無failure且sink nodes完成才success；latched node進度加權10分；層級macro平均避免大類壟斷。",
+      "sim-real本文overall r為success0.74/progress0.84，精密task更弱，不用一般task子集高r外推全部。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "green-booth demonstrations與OOD背景/task/robot配置分離；模型不取得frame-level subtask標籤。",
+    "lineage": "Mana基於IsaacLab/Arena，資產來自多3D庫與AIG3D；不等同建立完整新生活任務ontology。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          6,
+          23,
+          27,
+          29
+        ],
+        "locator": "Overview、Data、Metrics、Sim-real、Model Evaluation",
+        "supports": "44/10、資料範圍、DAG、40mobile episodes"
+      }
+    ],
+    "unresolved": [
+      "desktop完整eval case IDs與3challenge是否納同一overall分母需release設定核。"
+    ],
+    "reuse": "統一runtime、DAG過程與收集/評測分離可借；主張泛化應按能力與實測subset支持。",
+    "reviewed_pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P170",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "MotionForge，arXiv 2609.25689v1。",
+    "scope_read": "40semantic families、motion taxonomy、實時協定、生成validation及ID/OOD50seeds。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "工業製造",
+      "包裝與倉儲",
+      "桌面物件操作",
+      "人機協作"
+    ],
+    "role": "動態操作benchmark",
+    "environment": "4scene families：Factory Conveyor、Circular Motion、Home Tabletop、Embodied Interaction；5K背景variation非5Klayouts。",
+    "tasks": "40semantic tasks、11motion patterns；17long/23short，僅改速度的variants合併為同family。",
+    "cases": "約20K產生demo中選每task50＝2Ktrain；每task每ID/OOD condition50固定seeds，7policies另算rollouts。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "scene families",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 40,
+        "unit": "semantic task families",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 17,
+        "unit": "long-horizon families",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task每condition eval episodes",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "macro task success；policy推論時環境仍以120Hz進行，latency對成功有實際影響。",
+      "LH依8秒+2skills或20秒門檻定義，作者明示長不一定更難。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "object/background/light/speed單factor與joint OOD；保留不支援最高speed的task例外。",
+    "lineage": "generated scenes＋共用oracle skills；task質檢要求oracle>50%為生成合格條件，不是learning-policy成績。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "表I、§III–V",
+        "supports": "40/11/17、latency、50seed及qualifying oracle"
+      }
+    ],
+    "unresolved": [
+      "不同硬體的native inference latency不可無條件比較，需固定evaluation hardware/runtime。"
+    ],
+    "reuse": "補傳送帶、拋接與動態速度規則；可區分場景生成量與語義task量。",
+    "reviewed_pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P171",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Bench2Dex，arXiv 2609.15726v1。",
+    "scope_read": "12hands、26task-embodiment settings、tactile界面、stable success及4channel協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10
+    ],
+    "domains": [
+      "桌面物件操作",
+      "工具使用",
+      "組裝與拆解"
+    ],
+    "role": "靈巧手操作benchmark",
+    "environment": "IsaacLab bimanual配置；12hand morphologies、6views，無獨立房屋總數。",
+    "tasks": "26task-embodiment settings，不能先乘12手型為312已完成tasks。",
+    "cases": "約1.3Kteleop demonstrations；4policy×26settings×4channels×50rollouts＝20,800evaluation executions。每policy每channel1,300。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "task-embodiment settings",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 12,
+        "unit": "dexterous-hand morphologies",
+        "pages": [
+          2,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 20800,
+        "unit": "跨4policy的evaluation rollouts",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每policy/task/channel rollouts",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "terminal predicate需穩持預設0.5s；LSCR記錄依賴合法的階段；success time只在成功episode量。",
+      "baseline只用RGB/關節，觸覺資料支援不等於已證實tactile policy收益；觸覺為幾何depth proxy。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "None/Equi/Inv對齊anchor，Full獨立抽樣，不假定逐case困難單調。",
+    "lineage": "已有hand meshes＋統一tactile registry；未對齊真實觸覺hardware。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8,
+          10
+        ],
+        "locator": "§3–4",
+        "supports": "26/12/20800、stable success、RGB-only baselines與tactile限制"
+      }
+    ],
+    "unresolved": [
+      "26設定的unique semantic task去重與tactile-conditioned baseline尚不等同完成。"
+    ],
+    "reuse": "可借跨手型／觸覺訊號規格與穩定判分；不要把支援的感測軸當實評完成量。",
+    "reviewed_pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P172",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LabUtopia，arXiv 2505.22634v2。",
+    "scope_read": "LabSim/LabScene、scene與儀器來源、5levels、success協定及實驗範圍。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "約100expert-reviewed lab scene assets，另程序填入儀器；物件類別/scene數不得相加。",
+    "tasks": "摘要30distinct tasks、結論>30，§4另稱>50；5levels從atomic到mobile，但level3主要是generalization條件，並非全是新語義task。",
+    "cases": "各level有demo/rollout實驗，本文已讀段未報统一case總量；表2列10atomic及6短流程，long流程另3例。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 100,
+        "unit": "基礎lab scene assets",
+        "qualifier": "約數",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 30,
+        "unit": "摘要聲稱distinct tasks",
+        "qualifier": "與§4 >50不一致，未定為全庫唯一值",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "benchmark levels",
+        "pages": [
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task完成後goal tolerance需維持2秒；success rate與long流程stage分開。",
+      "chemical engine由知識庫＋LLM推state變化，不等同第一原理化學物理。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "novel shape/material/layout設定；全在simulation，real transfer留未來。",
+    "lineage": "designer scene assets、PubChem資料與IsaacSim；procedure模板需逐task核，不從約100场景×50tasks直接乘題量。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          10
+        ],
+        "locator": "§3–6",
+        "supports": "100scene、30/>50衝突、2秒success與全sim"
+      }
+    ],
+    "unresolved": [
+      "最終task registry究竟30或>50，以及scene/instrument各精確IDs，需code版本確認。"
+    ],
+    "reuse": "補實驗室用途與流程；其階層是設計/泛化混合，需用共同task粒度對齊。",
+    "reviewed_pdf_sha256": "b0b27a506f9ec028871b09e93a5a3aead74e382739b65fa5092af90ab062e862",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P173",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LabDex，arXiv 2608.18618v1。",
+    "scope_read": "層級資料、real/sim平台、atomic/composite/workflow完整表及success。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      11,
+      12,
+      13
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "FR3/XHand實際工作站與配對simulation；3camera views非3場景。",
+    "tasks": "概述7atomic categories、30+atomic、10+composite、1workflow；實驗明列26atomic、表3九composite、1七步workflow。附錄定義composite10項。",
+    "cases": "概述8K+demo/1M+steps；real預設每task200train、sim50；每task每model50eval trials。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "atomic operation categories",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "實驗atomic task instances",
+        "pages": [
+          5,
+          11
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "附錄列出compositional definitions",
+        "qualifier": "依完整清單列舉",
+        "pages": [
+          12,
+          13
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "long workflow",
+        "pages": [
+          13
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task每model eval trials",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "goal穩定2秒；atomic SR，composite/workflow全成功、各atomic成功與平均已完成步數。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "初態在訓練範圍內隨機；novel objects/distractors另實驗，非主eval全部OOD。",
+    "lineage": "real teleop關鍵姿態映射sim，長流程可切atomic；不能把完整軌跡與各段全部當独立新樣本。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          11,
+          12,
+          13
+        ],
+        "locator": "Dataset/Protocol、表2–5/9、task appendix",
+        "supports": "層級與實測量、50trials、完整task清單"
+      }
+    ],
+    "unresolved": [
+      "30+/10+概要與26/10完整清單之差異需最終manifest確認；real/sim資料量需分開。"
+    ],
+    "reuse": "是同SOP分不同粒度與執行平台的例子；原子step、composite、workflow必須保留父子關係。",
+    "reviewed_pdf_sha256": "0d4be91ff766826af94f01245c225e27a15cfb88fae60183c9393f1af17ee41c",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P174",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Labimus v0，arXiv 2606.31037v2。",
+    "scope_read": "SOP→DSL、6atomic/7步流程、3評分tier、4conditions與v0驗證邊界。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      9,
+      10,
+      11,
+      12,
+      14
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "Tianyi humanoid於fume-hood工作站；digital twin與procedural layouts，>30functional assets。",
+    "tasks": "6atomic operations＋1個7step solid-weighing workflow；Tier2重評原task精度，不能算兩個新操作。",
+    "cases": "v0只實測4atomic＋1precision條件；每task-condition50episodes×3seeds＝150trials；其餘與整個Tier3仍未實驗。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "atomic definitions",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "7-step workflow definition",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "case",
+        "value": 150,
+        "unit": "每task-condition實驗trials",
+        "pages": [
+          12
+        ]
+      }
+    ],
+    "evaluation": [
+      "success、precision pass、conditional precision among successes、weighted step progress；S−P量成功與精度差距。",
+      "SOP的mass/position門檻是這個模擬規格，不代表已完成真實實驗室有效性驗證。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "100teleop demos/task，標準test布局已有分布移動，另light/texture/combined；3×4是設計矩陣，不是v0全部實測。",
+    "lineage": "ArtVIP資產＋IsaacSim；SOP解析會排除無physical effect的純觀察/記錄步，故完整科學程序仍有缺口。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          9,
+          11,
+          12,
+          14
+        ],
+        "locator": "SOP Pipeline、表2、Metrics、Limitations",
+        "supports": "6+1、重評tier、150trials与未完成Tier3"
+      }
+    ],
+    "unresolved": [
+      "未完成tool pickup/scoop-weigh/Tier3驗證；real-world validation明列未來。"
+    ],
+    "reuse": "可借SOP權重、數量精度及conditional metric；要如實標示設計完整度與實驗完成度。",
+    "reviewed_pdf_sha256": "103d1eb5ee800d0306734bab26f9242f067cff584fb84c9929cd3ea3869e7e3a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P175",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Pipette，arXiv 2606.12936v3；新版題名為Success-Verified Simulation Augmentation。",
+    "scope_read": "12tasks全表、資產庫、structured task註冊、augmentation验证與100episode協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      11,
+      12,
+      17
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "IsaacSim/IsaacLab場景；3robots、12tools、26equipment、55consumables、9instruments為資產分量。",
+    "tasks": "12wet-lab tasks＝4sample/culture、4lid/hatch、4placement；pipette-to-petri positioning不等同已量測真正移液量。",
+    "cases": "每task30human train demos＋成功篩選augmented；每model每task100eval episodes，即單資料設定1,200。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "wet-lab tasks",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1200,
+        "unit": "每policy每資料設定eval episodes",
+        "qualifier": "12×100",
+        "pages": [
+          17
+        ]
+      },
+      {
+        "field": "data",
+        "value": 360,
+        "unit": "raw human training trajectories",
+        "qualifier": "12×30",
+        "pages": [
+          17
+        ]
+      }
+    ],
+    "evaluation": [
+      "依task pose/joint/geometric thresholds及持續時間判success；macro task SR。",
+      "語言parser只草擬配置，prim/threshold/evaluator仍需人驗證；success-verified augmentation不是新task。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "3models×raw/augmented條件，Panda為主但flask-shaker用AgileX；同task內固定機體比較。",
+    "lineage": "existing/generated USD assets、Hunyuan；replay重新渲染並同步state/action，不只是改像素。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          7,
+          17
+        ],
+        "locator": "Asset/Task Registration、表3、附錄E.1",
+        "supports": "12、30/100、機體例外與驗證"
+      }
+    ],
+    "unresolved": [
+      "all-asset唯一ID與各task primitives的實際精度需原生配置；某lid為virtual button觸發，不能當直接靈巧開蓋。"
+    ],
+    "reuse": "可補biomedical wet-lab器材用途與scene/task登記；須區分設備操作與完成真正生物實驗。",
+    "reviewed_pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P176",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "AutoBio，arXiv 2505.14030v3。",
+    "scope_read": "特殊儀器physics/render、16task與9實測subset、100episode與mixed metric。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "MuJoCo/Blender，single/dual-arm工作站；Aloha及UR5e不同end-effectors。",
+    "tasks": "16定義分3difficulty levels；實驗每level3項，共9tasks，非全部16。",
+    "cases": "9tasks各100demo＝900train、792K+frames；每task100eval episodes、3runs。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "task definitions",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "實驗task子集",
+        "qualifier": "3levels×3tasks",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 900,
+        "unit": "train demonstrations",
+        "qualifier": "9×100",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task eval episodes／run",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "大多binary success；thermal mixer panel用relative progress，平均表不全是success percentage。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "20/100demo資料規模比較；held-out初態參數泛化；render兩版本共享軌跡。",
+    "lineage": "實驗室asset digitization；quasi-static liquid不模擬波/倒水，DexHand主要只控制thumb作簡化gripper。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "Physics plugins、§4–5、表3",
+        "supports": "16vs9、900/100、液體/hand簡化"
+      }
+    ],
+    "unresolved": [
+      "16task的全部IDs与模型可用support需最終code核；不要把9task成績外推全16。"
+    ],
+    "reuse": "補螺紋、旋鈕、顯示面板與精度規則；光學外觀逼真不能替代完整材料動力學。",
+    "reviewed_pdf_sha256": "987d557fe26642e96a1d4c9b3021c3d373717d4a5bc3f9eae48b5bc9de84df91",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P177",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "H2RBench（policy transfer），arXiv 2609.24778v2；非P151video-generation H2R-Bench。",
+    "scope_read": "4task全表、fixed robot/human scaling、real-to-sim、90rollout及transfer metrics。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      17
+    ],
+    "domains": [
+      "桌面物件操作",
+      "組裝與拆解"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "4個real-to-sim task環境，PolaRiS/Marble/IsaacLab，real human由第三人稱multi-view錄製。",
+    "tasks": "4families：mug-to-plate、bowl stacking、donut insertion、sequential blocks-to-box。",
+    "cases": "robot demo budgets40/100/100/100；human上限100/300/300/300；每method/task90randomized rollouts across3seeds。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "manipulation task families",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 340,
+        "unit": "固定robot demonstration預算",
+        "qualifier": "40+100+100+100",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "human demonstration上限預算",
+        "qualifier": "100+300+300+300",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 90,
+        "unit": "每method/task eval rollouts",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "final/mean-stage SR；human增益用Δlogit；sim/real分別訓練policy，再以r/ρ/MMRV比排名。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "fixed robot data、只增加human demos；sim與real是不同pipeline驗證，不是同一policy直接sim2real。",
+    "lineage": "PolaRiS、TRELLIS、GELLO、四種既有H2R方法；與human-only預訓練資料庫不同。",
+    "related_paper_ids": [
+      "P151",
+      "P104",
+      "P119"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3–5、表2",
+        "supports": "4、340/1000、90与雙pipeline比較"
+      }
+    ],
+    "unresolved": [
+      "各human/robot pair是否一對一不應由demo預算推定；完整IDs需原生release。"
+    ],
+    "reuse": "提供人類資料規模增益的受控比較，無需靠多拿robot data製造規模優勢。",
+    "reviewed_pdf_sha256": "dd841fb3a72307c335d2c7268ac813f8209a448dd2242d6e49db90da7a0169d1",
+    "reviewed_on": "2026-10-02"
+  }
+]

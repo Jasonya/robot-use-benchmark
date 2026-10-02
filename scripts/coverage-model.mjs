@@ -167,7 +167,7 @@ export function buildCoverageModel({plan, registry, comparison, typed, supplemen
 }
 
 export function coverageCSV(rows) {
-  const keys = ['benchmark','paper_id','field','value','value_kind','native_term','unit','scope','source_version','source','locator','notes'];
+  const keys = ['benchmark','paper_id','field','value','value_kind','qualifier','native_term','unit','scope','source_version','source','locator','notes'];
   const escapeCSV = value => `"${String(value ?? '').replaceAll('"','""')}"`;
   const records = rows.flatMap(row => row.counts.map(c => ({
     ...c,

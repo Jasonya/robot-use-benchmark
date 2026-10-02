@@ -3,21 +3,10 @@ import assert from 'node:assert/strict';
 export function validateNumbers(contract, inventory) {
   const fields=contract.primary_fields;
   assert.deepEqual(fields.map(f=>f.id),['domain','environment','task','case','evaluation']);
-  assert.deepEqual(fields.map(f=>f.target),[12,1000,5000,1000000,4]);
+  assert.ok(fields.every(f=>f.target===null),'Retired quotas must not remain active');
   const sum=(rows,key)=>rows.reduce((n,r)=>n+r[key],0);
-  assert.equal(contract.domain_quotas.length,12);
-  assert.equal(sum(contract.domain_quotas,'environments'),1000);
-  assert.equal(sum(contract.domain_quotas,'base_tasks'),2000);
-  assert.equal(sum(contract.domain_quotas,'rule_specs'),3000);
-  assert.equal(sum(contract.domain_quotas,'task_specs'),5000);
-  assert.equal(sum(contract.domain_quotas,'case_budget'),1000000);
-  assert.ok(contract.domain_quotas.every(r=>r.base_tasks+r.rule_specs===r.task_specs));
-  assert.equal(sum(contract.task_target_components.extension_components,'specs'),3000);
-  assert.equal(sum(contract.case_target_components,'total'),1000000);
-  assert.ok(contract.case_target_components.every(r=>r.train+r.validation+r.test===r.total));
-  assert.equal(sum(contract.case_target_components,'train'),800000);
-  assert.equal(sum(contract.case_target_components,'validation'),100000);
-  assert.equal(sum(contract.case_target_components,'test'),100000);
+  assert.equal(contract.domain_quotas.length,0);
+  assert.equal(contract.case_target_components.length,0);
   for(const field of fields)assert.ok(Number.isInteger(field.current_value??inventory[field.current_key]));
   assert.equal(inventory.source_task_and_information_records,inventory.robot_task_source_definitions+inventory.openeqa_information_categories_separate);
   assert.equal(sum(inventory.case_definitions_by_source_split,'count'),inventory.case_definition_records);
@@ -123,45 +112,18 @@ export function sourceBridgeCSV(records){
 
 export function quantityReportMarkdown(numbers){
   const {contract,inventory}=numbers;
-  const fmt=v=>Number(v).toLocaleString('en-US');
   return [
-    '# v0.9：本版規劃目標與目前清單實數','',`更新：${contract.effective_on}。唯一有效目標版本：${contract.version}。`,'',
-    contract.planning_scope,'',contract.current_scope,'',
-    '| 項目 | 本版規劃目標 | 目前清單實數 | 完成階段／界線 |','|---|---:|---:|---|',
-    ...quantityRows(numbers).map(f=>`| ${f.label} | ${fmt(f.target)} ${f.target_unit} | ${fmt(f.current)} ${f.current_unit} | ${f.current_limit} |`),'',
-    '目前114,288筆題目定義均通過原生ID、必需欄位、環境／觀測引用與判分程序引用的結構檢查；沒有宣稱已取得全體視覺素材、完成全資產載入或跑完模型。目標與實數的完成階段不同，不直接畫完成百分比。','',
-    '## 環境實數怎麼來','',
-    '| 原作來源 | 已列場景定義 |','|---|---:|',
-    ...Object.entries(inventory.environment_counts).map(([k,v])=>`| ${k} | ${fmt(v)} |`),
-    `| 合計 | ${fmt(inventory.source_named_environment_definitions)} |`,'',
-    '同一原作layout或底層場景別名不因樣式、D_eval或另一adapter重複加總；尚不宣稱全庫幾何等價審核已完成。OpenEQA的152個history輸入ID不混入此284個場景定義。','',
-    '## 任務實數與目標拆分','',
-    '目前：原2,062條robot來源定義＋CALVIN34條＝2,096；另加入OpenEQA7個資訊題型，共2,103筆來源任務／題型條目。263个人類活動是示範／程序來源，另列。這些條目還不是共同去重後的任務規格。','',
-    '目標：2,000個對齊後基本任務＋3,000份有效規則擴充＝5,000份規格。','',
-    '| 規則規格預算 | 份數 |','|---|---:|',
-    ...contract.task_target_components.extension_components.map(r=>`| ${r.name} | ${fmt(r.specs)} |`),'',
-    '## 題目實數與split','',
-    '| 來源 | 原生split | 類型 | 已取得定義數 |','|---|---|---|---:|',
-    ...inventory.case_definitions_by_source_split.map(r=>`| ${r.source_id} | ${r.native_split} | ${r.case_kind} | ${fmt(r.count)} |`),
-    `| 合計 | 保留原生split | 分類型報分 | ${fmt(inventory.case_definition_records)} |`,'',
-    'PARTNR的train_mini、train_2k、val_mini、ci及未驗證池均未重加；公開repo沒有test檔。OpenEQA按question_id計一次，不按評測模式或影格數倍增。','',
-    '## 100萬題規劃預算','',
-    '| 類型 | 訓練／開發 | 驗證 | 測試 | 合計 |','|---|---:|---:|---:|---:|',
-    ...contract.case_target_components.map(r=>`| ${r.name} | ${fmt(r.train)} | ${fmt(r.validation)} | ${fmt(r.test)} | ${fmt(r.total)} |`),'',
-    contract.split_policy,'',
-    '## 十二域配額：規劃量，不是現有分布','',
-    '| 領域 | 場景 | 基本任務 | 規則規格 | 任務規格合計 | 題目預算 |','|---|---:|---:|---:|---:|---:|',
-    ...contract.domain_quotas.map(r=>`| ${r.name} | ${fmt(r.environments)} | ${fmt(r.base_tasks)} | ${fmt(r.rule_specs)} | ${fmt(r.task_specs)} | ${fmt(r.case_budget)} |`),'',
-    contract.quota_policy,'',
-    '## 舊版數字怎麼處理','',
-    '| 舊數字 | 原範圍 | 本版處理 |','|---|---|---|',
+    '# 固定來源ID清單：v0.10說明','',
+    'v0.9的建設配額已撤回。此檔保留先前取得的ID清單數；完整183來源逐篇比較與18用途分類見 ../coverage/COVERAGE_REPORT.md。','',
+    '| 項目 | 已取得清單 | 界線 |','|---|---:|---|',
+    ...quantityRows(numbers).map(f=>`| ${f.label} | ${f.current.toLocaleString('en-US')} ${f.current_unit} | ${f.current_limit} |`),'',
+    '284是命名場景條目；未完成跨來源幾何去重。2,096robot任務、7資訊題型、263人類活動各自計數；不是共同去重後的任務總量。','',
+    '| 題目來源 | 原生split | 元資料筆數 |','|---|---|---|',
+    ...inventory.case_definitions_by_source_split.map(r=>`| ${r.source_id} | ${r.native_split} | ${r.count.toLocaleString('en-US')} |`),'',
+    '114,288筆含train/val，不是已整合的114,288道測試題。原生ID、必需欄位、輸入及判分引用已作結構檢查；完整視覺素材、3D資產和runtime未全部驗證。','',
+    '完整case_registry.csv.gz/jsonl.gz及source_pins保留下載。本輪沒有新增模型試驗；既有試作仍為工程附錄。','',
+    '| 舊數字 | 原範圍 | 現在處理 |','|---|---|---|',
     ...contract.version_crosswalk.map(r=>`| ${r.old} | ${r.old_scope} | ${r.current} |`),'',
-    '## 清單與重算','',
-    '- domain_registry.json：12領域定義及來源支持。','- environment_registry.csv/json：284個命名場景定義。',
-    '- task_registry.csv/json：2,096條robot來源任務；information_task_types.json另列7類資訊題型。',
-    '- case_registry.csv.gz/jsonl.gz：114,288筆原生題目ID、split、input/label hash、來源及判分引用；不重新發布原始問題、指令或影像。',
-    '- source_receipts.json/source_pins.json：固定來源版本、取得日期及SHA256。',
-    '- audit/quantified/build_numeric_inventory.py：來源解析和結構驗證。','',
-    '新實際模型試驗為0；已存在的Meta-World及小型聯合試作仍在工程附錄，未混入此清單。',''
+    '全庫環境／任務聯集和整合可評題數尚未確認，未知值不填0，也不先設配額。',''
   ].join('\n');
 }

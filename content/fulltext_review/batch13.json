@@ -1,0 +1,641 @@
+[
+  {
+    "paper_id": "P151",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "H2R-Bench（video generation），arXiv 2608.13049v1。",
+    "scope_read": "source-relative定義、120→240cases、6家族、native interface與五metric。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      11,
+      14
+    ],
+    "domains": [
+      "桌面物件操作",
+      "工具使用",
+      "衣物與柔性物操作",
+      "柔性物與流體操作"
+    ],
+    "role": "世界模型與影片生成評測",
+    "environment": "EgoDex test來源影片，沒有配對可執行robot simulator環境。",
+    "tasks": "6物理變化families：rigid、mechanism、insertion、deformable、bulk、surface；目標2種embodiment。",
+    "cases": "120段5秒source clips×2embodiments＝240transfer cases；每family20source。11generators的輸出影片數不是新題數。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "manipulation families",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 120,
+        "unit": "source clips",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 240,
+        "unit": "video-transfer cases",
+        "pages": [
+          4,
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "M1goal/M2events/M3contact/M4embodiment由3個MLLM按0–4rubric評；M5為video quality。",
+      "每metric25sampled frames；H2RCore加權contact與embodiment共60%，屬影片證據評分，非實際控制成功。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審",
+      "數值誤差與相似度"
+    ],
+    "split": "EgoDex test衍生；video-conditioned與frame-conditioned介面分組，不能不控制輸入資訊比較。",
+    "lineage": "EgoDex來源；與H2RBench human-transfer及RoboWM-Bench不同任務，不能因名稱相似合併。",
+    "related_paper_ids": [
+      "P119",
+      "P152",
+      "P177"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "Construction、Transfer-Aware Evaluation、表2",
+        "supports": "120/240、6families與judge"
+      }
+    ],
+    "unresolved": [
+      "contact的影片可見正確不能保證力／深度／可達性，仍缺物理execution證據。"
+    ],
+    "reuse": "可加入human→robot影片轉移端點；應作世界模型章，與可執行操作題數分開。",
+    "reviewed_pdf_sha256": "ec3fb6258fea92eda2ba4240561afd8f307606a133031b63ad12d666306af015",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P152",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboWM-Bench，arXiv 2604.19092v2。",
+    "scope_read": "video→action兩路、task suite、主表與sim附錄、10初態與execution成功。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      14,
+      15
+    ],
+    "domains": [
+      "桌面物件操作",
+      "餐飲與料理",
+      "衣物與柔性物操作"
+    ],
+    "role": "世界模型與影片生成評測",
+    "environment": "LeHome/IsaacSim原生與real-to-sim桌面；固定camera、隨機物件初態。",
+    "tasks": "主表8human-hand及8robot-task條件，附錄另6simulation-native條件；含同名重用，不直接加成22語義task。",
+    "cases": "每task10個共同initial configurations；Cosmos-finetune每task50trajectories是額外訓練。bimanual附錄又為另條件。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主表human-hand task條件",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主表robot task條件",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "附錄sim-native task條件",
+        "pages": [
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "每task共享initial configurations",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "generated video經HaMeR retargeting或IDM轉action，再進simulation；key nodes全通過且達goal才Task SR，另Step SR。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "固定初態／種子跨model；human與robot影片使用不同action extraction pipeline，pipeline誤差須分開分析。",
+    "lineage": "LeHome底座與real reconstruction，PAI-Bench作同影片視覺分數對照。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          14
+        ],
+        "locator": "§3.2–4.1、表1/3、Limitations",
+        "supports": "兩路action、8/8/6、10初態與joint判準"
+      }
+    ],
+    "unresolved": [
+      "全部task條件與語義去重清單需release manifest；retargeting/IDM失誤會影響world model分數。"
+    ],
+    "reuse": "提供生成影片到物理可執行性的橋梁，但需把影片模型和action extractor責任拆解。",
+    "reviewed_pdf_sha256": "4450ceffa72850511da6c91b3ce6f73bc070d372104dc8f60ce6fbf8f84ed566",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P164",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "The Imitator Game，arXiv 2608.22301v1。",
+    "scope_read": "L0–L3保留/變更條件、IG-10K規模、六domains、sim/real及Arena協定。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      20
+    ],
+    "domains": [
+      "居家生活",
+      "零售與購物",
+      "餐飲與料理",
+      "包裝與倉儲",
+      "醫療支援",
+      "實驗室操作"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "200+ paired task-scene variants；同human clip可對多level robot場景，非全新independent demonstration。",
+    "tasks": "50+base tasks，6生活/工作domains（分量12+7+17+4+6+7=53）；實驗10tasks（5seen+5unseen）×4levels。",
+    "cases": "11,720real paired episodes＋10Ksim pairs（sim重用human clip）；每task-level sim10trials、real5trials。15/30/45task訓練套件相互包含。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 6,
+        "unit": "用途domains",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 53,
+        "unit": "按domain分量推算base tasks",
+        "qualifier": "原作概述50+，表2约50",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "主評測task types",
+        "pages": [
+          7,
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 11720,
+        "unit": "real paired episodes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 10000,
+        "unit": "sim paired episodes",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "sim SR與ordered subgoal SR；人類SUCCESS/PARTIAL/FAIL、0–10imitation quality、pairwise preference。",
+      "L0動作近似、L1布局改變、L2物件替代、L3功能替代；level是demo-execution pair屬性，不是task固定難度。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人工或模型評審"
+    ],
+    "split": "sim/real分開訓練與比較；same domain/setting/task/level/episode才做A/B，少數task不定義L3。",
+    "lineage": "ManiSkill3、手工waypoints、VR真機pairs；與RH20T等比較，但多level共用源human clip。",
+    "related_paper_ids": [
+      "P068",
+      "P129"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8,
+          20
+        ],
+        "locator": "IG-10K、Arena、Setup與Pairwise protocol",
+        "supports": "scale、6domains、10task實測與配對限制"
+      }
+    ],
+    "unresolved": [
+      "53分域與表2『50 tasks』的版本口徑須manifest確認；不可把4levels機械乘所有task。"
+    ],
+    "reuse": "是意圖／功能替代及多域human-robot資料近鄰；我們須納入其6用途群與可替代規則。",
+    "reviewed_pdf_sha256": "f38c19c22603063351fd35a218cc5a1477609c973c0a79cbe972a2bb78f01e1b",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P165",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LIBERO-Recover，arXiv 2609.05178v3。",
+    "scope_read": "failure對normal variation的區分、2178scenario生成、恢復資料與RSR/RD/RC。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "LIBERO自然rollout失敗的state snapshots；不是2178不同room layouts。",
+    "tasks": "130上游tasks、4recovery levels；LIBERO100再拆90/10報告，不能另加兩suite。",
+    "cases": "2,178recovery scenarios；413training failure scenes有3,184human recovery trajectories，訓練使用場景排出最終eval。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 130,
+        "unit": "上游tasks",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "recovery levels",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2178,
+        "unit": "recovery scenarios",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3184,
+        "unit": "recovery training trajectories",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "Recovery Success Rate完成原goal；Recovery Degradation比較failure前後；RC=1−task-level success率標準差。",
+      "RC公式實際是跨task變異，不完全等同文中所說同task不同failure的穩定性。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "六policy產failure，Qwen定位/分類；自然failure分布不平衡。eval每task10trials、520step，需固定scenario/perturbation解讀。",
+    "lineage": "LIBERO延伸；失敗條件要execution-induced且需改plan但仍可恢復，不能把任何位置變化都叫failure。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "§2–4、圖4",
+        "supports": "2178/130、failure規則、train/eval與metric"
+      }
+    ],
+    "unresolved": [
+      "recoverability對每scenario的完整驗證證據、2178與training排除先後、eval task詞義需manifest查。"
+    ],
+    "reuse": "可引入真實policy失敗狀態而非純人工擾動；恢復題需要前史與可恢復證據。",
+    "reviewed_pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P166",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SafeVLA-Bench，arXiv 2606.00773v2（2026-09-30）。",
+    "scope_read": "STL庫、8scored families、適用性registry、58tasks/27entries及指標定義。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      34,
+      46
+    ],
+    "domains": [
+      "桌面物件操作",
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "role": "安全與約束評測",
+    "environment": "LIBERO＋RoboCasa365兩host，事後instrumentation保留原生觀測/動作/初態/success。",
+    "tasks": "58tasks＝LIBERO四10-task suites＋RoboCasa365 atomic-seen18tasks；8safety families歸scene/object/robot三group。",
+    "cases": "LIBERO每model-suite200episodes（10×20），RC每task50；24distinct policies、27policy-host entries不是27benchmarks。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 58,
+        "unit": "host task types",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "scored safety clause families",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 200,
+        "unit": "LIBERO每policy-suite episodes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "RC每policy-task episodes",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "native SR、Safety、Success-but-Unsafe、Violation Severity Index；VSI是spec-normalized worst violation depth。",
+      "有意義且signals可用才套STL，額外diagnostics不影響Safety；代理threshold不是物理安全認證。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "固定seeds配對；RC policies有兩個独立seed groups，跨組unpaired；不跨host直接排總榜。",
+    "lineage": "對既有LIBERO/RC trajectories加规则評分；不是新生成58個目標任務。",
+    "related_paper_ids": [
+      "P064",
+      "P071",
+      "P116"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          34
+        ],
+        "locator": "§3–4、表2/26",
+        "supports": "8/58、applicability、episode分母與VSI"
+      }
+    ],
+    "unresolved": [
+      "缺人類近距離、實際spill/thermal等signals；composite全程排除某clause可能漏掉部分phase。"
+    ],
+    "reuse": "本庫規則擴充應借其適用性registry與success/safety分離，而不是每task強乘所有評估方式。",
+    "reviewed_pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P167",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DexGarmentLab，arXiv 2505.11032v3。",
+    "scope_read": "15task場景、物理抓持修正、14實測task、100demo/50episode、real驗證。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      18,
+      20,
+      32
+    ],
+    "domains": [
+      "衣物與柔性物操作",
+      "洗衣服務",
+      "照護與個人活動"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "雙UR10e＋ShadowHand，15task scene設定；>2500garments/8類不是2500不同task。",
+    "tasks": "15定義含fling/fold/hang/wear/store；主simulation實驗14task（wear glove未在主表），不能報全15同程度測完。",
+    "cases": "每實測task100generated demonstrations；每task50episodes與3seeds；real4task各3garments×5初態＝15trials。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "task definitions",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "主simulation eval tasks",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2500,
+        "unit": "garment models",
+        "qualifier": "超過",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task評測episodes／seed設定",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "real每task trials",
+        "pages": [
+          10
+        ]
+      }
+    ],
+    "evaluation": [
+      "task-specific成功與mean/std；demo生成成功率和policy成功率分開。",
+      "以friction/adhesion取代GarmentLab attach blocks，兩者同名摺衣控制難度並不相同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "garment形狀/初態/位置變化；文中2%test training data是模型離線切分，不等於50episode物理eval。",
+    "lineage": "ClothesNet與UniGarmentManip/GarmentLab相關資產和方法；更改抓持物理具實質差異。",
+    "related_paper_ids": [
+      "P087"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          8,
+          10,
+          18
+        ],
+        "locator": "§3.2–3.4、§6、表2–5",
+        "supports": "15vs14、phys不同、demo/eval分母"
+      }
+    ],
+    "unresolved": [
+      "各task成功predicate與garment ID split仍需完整config清單，不能只以模型shape庫算coverage。"
+    ],
+    "reuse": "靈巧雙手與穿衣／收納廣度的重要來源；應追實際物理規則差異。",
+    "reviewed_pdf_sha256": "447ce546d76be47536883a64aac1e9fc7ea1f214433bc6915d9acce2eab57f65",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P168",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HRIBench perception（USC2025），arXiv 2506.20566v1。",
+    "scope_read": "5domain來源、1000VQA、非語言線索、自錄/復用與accuracy-latency表。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "domains": [
+      "人機協作",
+      "社交與溝通",
+      "室內導航"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "Kuri/Quori自錄非語言互動＋既有公開資料；5domains是能力群，非5物理環境。",
+    "tasks": "nonverbal、verbal intent、human-robot-object relation、social navigation、person identification五種。",
+    "cases": "每domain200VQA，總1000；overall accuracy/latency排除person identification，因此總體比較用其餘800題範圍。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "感知domains",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "VQA",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 800,
+        "unit": "overall表格對應四domain題範圍",
+        "qualifier": "4×200，identification排除",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "逐題accuracy與latency秒；unsupported/refused identity標N/A，不能填0後和其他模型無條件平均。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "主為VLM zero-shot評測；各domain人類baseline由不同expert完成。",
+    "lineage": "HandMeThat加視覺、CoMaD、MuSoHu、YouTube影片與自錄gestures；不是2026interaction-centric HRIBench。",
+    "related_paper_ids": [
+      "P147"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "Domains來源、表1",
+        "supports": "5/1000、上游、overall排除與latency"
+      }
+    ],
+    "unresolved": [
+      "不同question形式random accuracy不同，不能全統一25%random；上游素材和case IDs未匯入。"
+    ],
+    "reuse": "提供HRI感知與即時性題型；選合宜導航路徑的VQA不等於實體導航執行。",
+    "reviewed_pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7",
+    "reviewed_on": "2026-10-02"
+  }
+]

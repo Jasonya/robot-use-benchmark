@@ -1,0 +1,870 @@
+[
+  {
+    "paper_id": "P015",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Assembly101正文標題相符，arXiv 2203.14712。",
+    "scope_read": "蒐集、粗細動作統計、split及四端點實驗。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      15
+    ],
+    "domains": [
+      "組裝與拆解"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "固定多視角錄製配置；8外部＋4ego相機不是12個環境。",
+    "tasks": "101種take-apart玩具，15玩具類別；202粗動作、1,380細動作標籤；4端點為識別、預測、分段、錯誤偵測。",
+    "cases": "362次拆裝sequence，產生4,321視角影片、513視角小時；1,013,523細片段及104,759粗片段含多視角重複。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 101,
+        "unit": "玩具型號",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 202,
+        "unit": "粗動作類別",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1380,
+        "unit": "細動作類別",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 362,
+        "unit": "獨立拆裝sequences",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4321,
+        "unit": "視角影片",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1013523,
+        "unit": "細動作視角片段",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "識別top-1；提前1秒預測用class-mean top-5 recall。",
+      "分段MoF／edit／F1@10,25,50；錯誤／corrective分類precision與recall，early模式只看半段。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "60/15/25%；有seen／unseen玩具，25玩具跨split；視角與片段應繼承原sequence。",
+    "lineage": "自行蒐集；多視角是同次拆裝，不能用4,321宣稱同量獨立任務。其細標籤與3D手pose專用表又有不同子集。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5
+        ],
+        "locator": "§4與表1–4",
+        "supports": "sequence／視角／粗細標籤"
+      },
+      {
+        "pages": [
+          6,
+          8
+        ],
+        "locator": "§5.1、5.7",
+        "supports": "指標與錯誤觀測條件"
+      }
+    ],
+    "unresolved": [
+      "資料表中姿態專用1,456標籤與一般1,380標籤的完整映射待manifest核對。"
+    ],
+    "reuse": "可引入裝配依赖、順序變化、犯錯與糾正；應保留玩具、步驟、觀測端點三層單位。",
+    "reviewed_pdf_sha256": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P016",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "IKEA ASM，arXiv 2007.00394v2。",
+    "scope_read": "資料與split、動作／分割／追蹤／姿態評分段落。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "組裝與拆解",
+      "居家生活"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "5個真實環境，桌上／地上共10相機配置；3台同步RGB相機。",
+    "tasks": "4種家具（side table、coffee table、TV bench、drawer）與原子装配動作；不是1,113個任務。",
+    "cases": "371次assembly，1,113 RGB視角影片及371 depth影片；本文16,764動作標註；254 train／117 test assembly scans。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 5,
+        "unit": "錄製環境",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "家具種類",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 371,
+        "unit": "assembly scans",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1113,
+        "unit": "RGB視角影片",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 117,
+        "unit": "test assembly scans",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "動作frame accuracy、macro-recall、mAP。",
+      "零件分割與MOT分開；追蹤MOTA、IDF1、IDs等。",
+      "3D姿態用MPJPE／PA-MPJPE、PCK@150mm。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "按環境保留family room與office測試；作者明示此主split不保證subject同時互斥，另提供其他切分腳本。",
+    "lineage": "自行錄製；空間標註僅1%影格人工，餘下有pseudo-GT；不可把全部影格稱人工標註。",
+    "evidence": [
+      {
+        "pages": [
+          4
+        ],
+        "locator": "Dataset statistics、Data split",
+        "supports": "5環境／371次裝配／254+117"
+      },
+      {
+        "pages": [
+          5,
+          6,
+          8
+        ],
+        "locator": "§4.1–4.5",
+        "supports": "多端点评分"
+      }
+    ],
+    "unresolved": [
+      "原子動作label完整清單与不同年份發布版本尚未逐ID對齊。"
+    ],
+    "reuse": "家具裝配與部件追蹤來源；環境泛化與受試者泛化要分開報。",
+    "reviewed_pdf_sha256": "5869f1542aa7372df85b6b4006127599aba58b0364d546d963dff8a3876080af",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P017",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HOI4D，arXiv 2203.01577v4。",
+    "scope_read": "資料概述與三個benchmark完整定義／主要評分。",
+    "pages_read": [
+      1,
+      2,
+      7,
+      8
+    ],
+    "domains": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "610個室內rooms（錄製環境）；4個參與者，不是610個已接入互動模擬器。",
+    "tasks": "16物件類別、800實例；3端點：category-level pose tracking、4D segmentation、action segmentation。pose實驗只取4剛體＋1關節類別。",
+    "cases": "4,000 sequences、2.4M RGB-D影格；4D分割專用376影片／14語義類別，不能把全資料量當每個端點實測量。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 610,
+        "unit": "錄製rooms",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 800,
+        "unit": "物件實例",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "物件類別",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4000,
+        "unit": "sequences",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 376,
+        "unit": "4D分割影片子集（含train/test）",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "pose：5°5cm accuracy、旋轉／平移誤差；以擾動GT pose初始化。",
+      "4D分割mIoU；動作分段Acc、edit、F1@10/25/50。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "4D sequence隨機7:3 train/test；不等同未見房間或受試者切分。",
+    "lineage": "自行蒐集RGB-D及模型；NOCS／H2O／GTEA是外部對照，不屬本庫量。",
+    "evidence": [
+      {
+        "pages": [
+          1
+        ],
+        "locator": "Abstract",
+        "supports": "610／800／16／4,000"
+      },
+      {
+        "pages": [
+          7,
+          8
+        ],
+        "locator": "§6.1–6.3",
+        "supports": "端點子集與metric"
+      }
+    ],
+    "unresolved": [
+      "610 rooms的逐ID清單與可用重建品質未匯入。"
+    ],
+    "reuse": "補充物件／材質／房間變化和3D感知；原文明示未覆蓋雙手操作。",
+    "reviewed_pdf_sha256": "82c5f0bf505f59eed426c1efa03f12a4155a5e18416ff03477d9e25c301be74f",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P018",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HOT3D，arXiv 2411.19167v2。",
+    "scope_read": "資料、有效標註與subject切分、手／物追蹤、分割與3D lifting。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "辦公活動",
+      "桌面物件操作"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "同一mocap lab中的4種情境佈置：inspection、kitchen、office、living room；不是4處獨立真實住宅。",
+    "tasks": "33剛體物件；手pose、物件6DoF pose、in-hand分割、3D位置lifting。",
+    "cases": "833分鐘、1.5M多視角timestamps／3.7M images；其中1.16M timestamps有效完整。HOT3D-Clips為3,832 clips＝2,804 train＋1,028 test。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 1,
+        "unit": "mocap lab",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "情境佈置類型",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 33,
+        "unit": "剛體物件模型",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3832,
+        "unit": "curated clips（train+test）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1028,
+        "unit": "test clips",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "手部MKPE毫米誤差；物件pose以對稱性處理後平移／旋轉門檻recall。",
+      "in-hand mask mIoU；lifting用位置門檻recall。物件pose實驗提供GT mask，並非端到端自由偵測。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "13名受試者train、6名test，test GT走伺服器；部分評測每30影格取一。",
+    "lineage": "新錄Aria／Quest3資料。EgoHOS與UmeTrack為跨資料對照；部分baseline的400K Aria訓練圖是私有資料，不可算HOT3D公開題。",
+    "related_paper_ids": [
+      "P026"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4
+        ],
+        "locator": "§3 HOT3D dataset",
+        "supports": "同lab、33模型、valid mask、clips split"
+      },
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§4.1–4.4",
+        "supports": "評分、GT輸入與抽樣"
+      }
+    ],
+    "unresolved": [
+      "正文425 recordings與198 Aria＋226 Quest3相差1，需manifest釐清。"
+    ],
+    "reuse": "提供可靠3D接觸／姿態參考；可控場景多樣性與感測視角多樣性應分開。",
+    "reviewed_pdf_sha256": "cbe0c55d8c952c673dbff8633b5f23eb87963f7cf09429416eb2f1ac58236232",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P019",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoBody，arXiv 2112.07642v3。",
+    "scope_read": "互動分類、capture、資料與split、3DHPS metric。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "domains": [
+      "社交與溝通",
+      "運動與身體技能"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "15個室內scene，有掃描mesh；每次兩人互動，一人佩戴HoloLens2。",
+    "tasks": "5種社會互動分類用於蒐集；主benchmark為interactee的3D人體形狀／姿態估計，不是5個機器人任務。",
+    "cases": "125 sequences／36人；219,731多視角timestamps、199,111 ego影格；可見interactee子集175,611影格，其中62,155 test。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 15,
+        "unit": "室內scene",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 125,
+        "unit": "sequences",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 175611,
+        "unit": "EgoSet-interactee影格",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "case",
+        "value": 62155,
+        "unit": "interactee test影格",
+        "pages": [
+          10
+        ]
+      }
+    ],
+    "evaluation": [
+      "MPJPE、vertex-to-vertex error；pelvis translation alignment與Procrustes alignment分开。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "subject不重疊；interactee train／val／test＝90,124／23,332／62,155。",
+    "lineage": "自行蒐集；同時有MVSet、EgoSet、可見interactee三個相依子集，不能相加。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          9,
+          10
+        ],
+        "locator": "表2、§4",
+        "supports": "互動／環境及split"
+      },
+      {
+        "pages": [
+          11
+        ],
+        "locator": "§5.1",
+        "supports": "pose與mesh評分"
+      }
+    ],
+    "unresolved": [
+      "掃描資產是否可直接用於互動模擬未驗證。"
+    ],
+    "reuse": "補社交互動、遮擋與人體觀測；不提供完成生活工作的robot action evaluator。",
+    "reviewed_pdf_sha256": "2e3713a6294f2f6db2fb815fc25f0ce080ce1fec87b663ccac54ff669c7de501",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P020",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoHumans，arXiv 2305.16487v2。",
+    "scope_read": "資料統計、test切分、tracking評測與主端點定義。",
+    "pages_read": [
+      1,
+      2,
+      6
+    ],
+    "domains": [
+      "運動與身體技能",
+      "社交與溝通"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "6個地點＝3室內＋3室外；7個活動sequence，20人，多人同時戴Aria。",
+    "tasks": "籃球、擊劍、羽球、網球、排球、追逐、搭城堡；主要3D多人追蹤，並提供2D/3D姿態與mesh。",
+    "cases": "125K ego RGB、250K灰階、446K外部圖像；正式ego train77,260／test47,740 images。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 6,
+        "unit": "錄製地點",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "活動sequences／類型",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 47740,
+        "unit": "test ego影像",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "CLEAR追蹤指標（MOTA、FP、FN、IDs）、IDF1、HOTA；因主要使用off-the-shelf detector，以IDF1作主要tracking指標。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "train/test地點不重疊；同步多人的多視角不能視為獨立活動。",
+    "lineage": "新蒐集多視角；COCO用於模型訓練對照，不算本benchmark題數。",
+    "evidence": [
+      {
+        "pages": [
+          6
+        ],
+        "locator": "§5.1 Data Statistics與Metrics",
+        "supports": "環境、影格split與主要metric"
+      }
+    ],
+    "unresolved": [
+      "各附加pose／mesh端點是否有獨立正式leaderboard與有效ID需另查。"
+    ],
+    "reuse": "拓展戶外多人互動感知；不能直接宣稱涵蓋同量可執行robot工作任務。",
+    "reviewed_pdf_sha256": "7d7f42b85231561ddb1a646fefbdec9fe97bc1e02455d7603006aa7ceac3de30",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P021",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoExoLearn，arXiv 2403.16182v3。",
+    "scope_read": "資料／來源、四大benchmark、association、anticipation／planning、skill，及專用split附錄。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      11,
+      12,
+      14,
+      16
+    ],
+    "domains": [
+      "餐飲與料理",
+      "實驗室操作"
+    ],
+    "role": "跨視角程序學習",
+    "environment": "4個廚房＋3個lab；ego示範跟做與exo教程非同步、非同一環境。",
+    "tasks": "8程序＝5日常＋3實驗室；4大benchmark含association、action understanding、skill ranking、captioning；39粗步驟，planning取27類；anticipation取19 verbs／31 nouns。",
+    "cases": "432 ego影片96.5小時＋315 exo影片23.5小時；34,239有效skill比較對，從40,191候選對篩選。ego anticipation test約17.3K片段。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 7,
+        "unit": "ego錄製場地（4廚房+3lab）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "程序任務",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 747,
+        "unit": "ego+exo影片",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 34239,
+        "unit": "有效skill比較對（含所有split）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 17300,
+        "unit": "ego anticipation test片段",
+        "qualifier": "原文17.3K，約數",
+        "pages": [
+          12
+        ]
+      }
+    ],
+    "evaluation": [
+      "association：20候選top-1；anticipation：1秒前class-mean top-5 recall。",
+      "planning：8步ED@K、5條預測序列；skill：pairwise ranking accuracy；supervised recognition：macro mAP。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "端點採專用過濾集；保留ego→exo、exo→ego、UDA、distillation、co-training不同資訊條件。",
+    "lineage": "日常exo取網路影片，lab exo由資深人員錄製；動詞／名詞taxonomy借Ego4D再擴充，不表示影片皆來自Ego4D。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§3與§4.2",
+        "supports": "7場地、8程序、影片／比較對及來源"
+      },
+      {
+        "pages": [
+          7,
+          8,
+          12
+        ],
+        "locator": "表4–5、附錄S6.2.3",
+        "supports": "預測／planning／skill評分與過濾量"
+      }
+    ],
+    "unresolved": [
+      "captioning及segmentation專用metric／完整case ID仍需資料端核對。",
+      "附錄planning兩組split重複寫egocentric，保留原文歧義，未擅改。"
+    ],
+    "reuse": "對示範到robot的跨視角程序轉移很相關；實驗室程序補生活操作庫缺域。",
+    "reviewed_pdf_sha256": "bca30af05c678a221e17c8ff0fa92006870fc0b46f569e824b52c98aefc8a15b",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P022",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "CaptainCook4D，arXiv 2312.14556v4。",
+    "scope_read": "採集、錯誤taxonomy、三大benchmark定義及評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      38
+    ],
+    "domains": [
+      "餐飲與料理"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "10個真實廚房，8名參與者；Hololens2與GoPro同步。",
+    "tasks": "24個WikiHow食譜、7種錯誤：準備、測量、技術、時間、溫度、缺步、順序；錯誤類別不另算7生活domain。",
+    "cases": "384 recordings、94.5小時、5.3K步驟標註及10K細動作標註；細動作只在約20%資料標註。錯誤有刻意誘發及自然發生。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "錄製廚房",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 24,
+        "unit": "食譜",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "錯誤類別",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 384,
+        "unit": "recordings",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "錯誤辨識accuracy／precision／recall／F1／AUC；step與recording split分開。",
+      "multi-step localization及RobustMSL用mAP、R@K、temporal IoU；只正常資料訓練、正常／錯誤資料測試分列。",
+      "procedure learning沿EgoProceL採步驟precision／recall／IoU。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "error recognition有step／recording split；MSL有不同泛化split，不能把step split成績當跨錄影泛化。",
+    "lineage": "新錄影片，程序取WikiHow；procedure基線與評分沿EgoProceL，不是重用其全部素材。",
+    "related_paper_ids": [
+      "P023",
+      "P015"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§3與圖2–4",
+        "supports": "24／10／7及錯誤構造"
+      },
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "locator": "§4.1–4.3",
+        "supports": "端點、split与評分"
+      }
+    ],
+    "unresolved": [
+      "各原生split精確ID數尚未匯入；錯誤組合空間只被部分採樣。"
+    ],
+    "reuse": "可具體借用規則違反與near-failure定義；觀測到错误不等於機器人已能執行恢復。",
+    "reviewed_pdf_sha256": "03be2a06a5c5cc778808214ae9232f3156dfd3ba60c07140d93d1a20222cc0ae",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P023",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "My View is the Best View / EgoProceL，arXiv 2207.10883v1。",
+    "scope_read": "資料選取與聯集、procedure問題、key-step排序、评測協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10
+    ],
+    "domains": [
+      "餐飲與料理",
+      "組裝與拆解",
+      "工藝與修繕",
+      "園藝與戶外"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "來源資料場景混合；沒有共同去重的獨立環境總數。",
+    "tasks": "16個程序，平均8.7 key-steps；含料理、玩具機車、搭帳篷、PC組裝／拆解。",
+    "cases": "62小時、130人；原作本文未在已讀統計表給單一可評test題總數。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "程序任務",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 62,
+        "unit": "影片小時",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 130,
+        "unit": "參與者",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "Hungarian matching後按每個key-step計frame precision／recall／F1／IoU再平均，避免背景與長步驟壟斷分數。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "採task-specific self-supervised procedure learning設定；K是模型key-step數超參數，不是資料集總任務量。",
+    "lineage": "明確重用CMU-MMAC、EGTEA Gaze+、MECCANO、EPIC-Tents，再增自錄PC裝拆；不是全新獨立62小時。",
+    "related_paper_ids": [
+      "P008"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5
+        ],
+        "locator": "§3、表1",
+        "supports": "16任務及上游重用"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "§4.3、§5.1",
+        "supports": "排序與macro-style評分"
+      }
+    ],
+    "unresolved": [
+      "所有影片ID、跨上游重複量和各task可評片段數需manifest核對。"
+    ],
+    "reuse": "是從既有程序資料聯集再補缺域的直接先例；我們須說明新增任務／規則，不能把聯集本身當全部新貢獻。",
+    "reviewed_pdf_sha256": "533531617781659b6d42cbb81529f76f79277cb3cf1d05dad3504547b4ecdf9a",
+    "reviewed_on": "2026-10-02"
+  }
+]

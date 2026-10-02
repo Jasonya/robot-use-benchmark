@@ -1,0 +1,629 @@
+[
+  {
+    "paper_id": "P114",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RobotArena∞，arXiv 2510.23571v3；與RoboArena分列。",
+    "scope_read": "real-to-sim來源、VLM評分與human BT ranking、BridgeSim規模及real驗證範圍。",
+    "pages_read": [
+      1,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      25
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "role": "轉移與評測有效性",
+    "environment": "BridgeSim70環境；另DROIDSim、RH20TSim。總量僅概述hundreds，不能用70代稱三套全庫。",
+    "tasks": "由真實demo生成task＋digital twin，再擾動初態/texture；未給共同語義task類別總數。",
+    "cases": "BridgeSim上8,749pairwise comparisons；是對policy影片的偏好標註，不是8,749不同task。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 70,
+        "unit": "BridgeSim環境",
+        "pages": [
+          9,
+          25
+        ]
+      },
+      {
+        "field": "data",
+        "value": 8749,
+        "unit": "BridgeSim人類pairwise comparisons",
+        "pages": [
+          8,
+          25
+        ]
+      }
+    ],
+    "evaluation": [
+      "Gemini結合video＋privileged sim states評progress，取最後30%frames平均；human pairwise BT ranking另列。",
+      "real/sim相關驗證只展示1個carrot-to-plate任務的3policy，不能外推全庫已校準。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審"
+    ],
+    "split": "Bridge/DROID/RH20T來源與policy訓練來源分in/out；同場景pairwise保持相同初態。",
+    "lineage": "真實Bridge、DROID、RH20T衍生；不同於RoboArena在真機直接分散評估。",
+    "related_paper_ids": [
+      "P108",
+      "P129",
+      "P104"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          9,
+          25
+        ],
+        "locator": "§4–5、Human Evaluation附錄",
+        "supports": "70／8,749、VLM state輸入与1任務real校準"
+      }
+    ],
+    "unresolved": [
+      "DROIDSim／RH20TSim精確場景ID量與跨來源等價未匯入。"
+    ],
+    "reuse": "提供多來源real-to-sim與偏好評分途徑；要區分生成場景、物理成功checker和VLM judge。",
+    "reviewed_pdf_sha256": "d08b1e9db69b3e2efbb9e51be4044370272927d0d53c97807368bfdb42892ba9",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P115",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboMME-Interference，arXiv 2606.22338v3。",
+    "scope_read": "9/16task選擇、history干擾規則、完整系統網格與50episode評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "domains": [
+      "桌面物件操作"
+    ],
+    "role": "長期記憶與生活助理",
+    "environment": "沿RoboMME配置，新增跨session history；不是新物理環境。",
+    "tasks": "16原task中選9個有可分離demo的families：4程序、3object、2spatial memory；其餘7不適用。",
+    "cases": "9×50＝450基底test episodes；history條件no-history及k=0/1/3/7；11memory systems＋無memory baseline造成25,200核心rollouts，非同量獨立題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "適用的原task families",
+        "pages": [
+          2,
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 450,
+        "unit": "基底test episodes",
+        "qualifier": "9×50",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 25200,
+        "unit": "核心grid policy rollouts",
+        "qualifier": "450×(11×5+1)，由協定推算",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "成功率與Wilson95%CI；隨干擾增加的退化曲線；retrieval改進另列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不重訓released checkpoint，僅變history；每distractor32stored frames且來自不同family，避免混入相互矛盾資訊。",
+    "lineage": "RoboMME的9-family子集加history規則；非全新9task。",
+    "evidence": [
+      {
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "locator": "§3–5、表1–3",
+        "supports": "9/16、450、history條件與系統網格"
+      }
+    ],
+    "unresolved": [
+      "原始RoboMME benchmark須獨立登記檢查；跨history條件query IDs應保留父關係。"
+    ],
+    "reuse": "展示規則擴充可增加可評条件而不改語義task數；記憶干擾可做本庫共通延伸。",
+    "reviewed_pdf_sha256": "95baa91cdd2a1d6c0791a31627a8daee1d9e9ff70d58d60e76f53e4e3d142c40",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P116",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "OopsieVerse，arXiv 2606.31993v1。",
+    "scope_read": "DamageSim三類傷害、32實作/21task設計、demo及safe-success評分。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家生活",
+      "餐飲與料理",
+      "表面清潔"
+    ],
+    "role": "安全與約束評測",
+    "environment": "OmniGibson與RoboCasa/Robosuite兩後端；熱／流體傷害只在支援相應物理的後端可用。",
+    "tasks": "32task instantiations對應21unique task designs；不是32不同語義任務。",
+    "cases": "5示範task共90demonstrations，health feedback有/無各半；IL每task30rollouts。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "unique task designs",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 32,
+        "unit": "跨simulator task instantiations",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 90,
+        "unit": "5task demos",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "IL每task評測rollouts",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "task completion與safe completion分開；後者需goal成功且所有tracked object health維持>95。",
+      "damage由力、溫度、液體接觸的參數模型計算，不能等同已校準的真實損害機率。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同collection/curation/RL/VLA設定分開；5task IL子集不代表全32皆同程度實驗。",
+    "lineage": "BEHAVIOR1K與RoboCasa任務加damage觀測／reward／termination；共享goal與backend instantiations。",
+    "related_paper_ids": [
+      "P100",
+      "P070",
+      "P069"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§IV、§V-A、圖4–5",
+        "supports": "32/21、90/30及safe-success"
+      }
+    ],
+    "unresolved": [
+      "damage threshold跨材料／跨後端的物理標定程度須另驗證。"
+    ],
+    "reuse": "為同一goal增加保護物件／低破壞條件的直接先例，規則差異應獨立可查。",
+    "reviewed_pdf_sha256": "cbef5a184d84ac4490de9dbbfde077c3b9a7905c1d6bc581e739540b078af3d2",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P119",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoDex，arXiv 2505.11709v3／ICLR2026。",
+    "scope_read": "194tasks資料、reset類別、48D action表示、兩benchmark、1%split與best-of-K。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "桌面物件操作",
+      "衣物與柔性物操作",
+      "組裝與拆解",
+      "居家生活"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "tabletop錄製；原文明示場景多樣性不是重點，沒有獨立layout總數。",
+    "tasks": "194human manipulation tasks；3種reset類型；正式兩端點為未來手軌跡及給future goal圖的inverse dynamics。",
+    "cases": "338,000episodes、829小時、約90Mframes；每task抽1%為held-out，不把90Mframes等同90Mtest題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 194,
+        "unit": "人類操作tasks",
+        "pages": [
+          2,
+          4,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "軌跡benchmark端點",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 338000,
+        "unit": "human episodes",
+        "pages": [
+          2,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 829,
+        "unit": "影片小時",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "12個wrist/fingertip keypoints的平均／終點Euclidean error，best-of-K（1/5/10），分H=1/2/3秒。",
+      "人手預測誤差不是robot任務完成率；給future image的inverse dynamics資訊更強。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "主test為每task1%同分布；未見task另附錄，不可把主結果稱OOD。",
+    "lineage": "新Apple headset錄製；部分task来自FurnitureBench等類型，但非同robot轨跡。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3–4",
+        "supports": "194/338K/829、兩端點、1%與best-K"
+      }
+    ],
+    "unresolved": [
+      "精確split episodes及同session相依關係需manifest；ARKit confidence為追蹤品質非真物理成功。"
+    ],
+    "reuse": "大量靈巧行為、工具與衣物候選；轉成robot benchmark需具體goal/初態與evaluator對應。",
+    "reviewed_pdf_sha256": "7ea269e5885392e65a7e206c2d6b5792022ec499367a070c2c269cbcf187e2b8",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P123",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "WatchAct，arXiv 2606.26443v1。",
+    "scope_read": "14task完整taxonomy、3K個案、video-sim配對、4項驗證與plan/physical/end-to-end協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      14,
+      15
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活",
+      "人機協作"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "LIBERO配對真實桌面影片；11桌面regions＋6container regions只是命名區域，非17個環境。",
+    "tasks": "14task scenarios歸4認知domains；event、procedure、implicit intent、episodic，含模仿、反轉、恢復舊位置、續作、修錯、條件分支。",
+    "cases": "3,000 video-language-simulator bundles；policy實驗每task10trials，與全部3K的plan reasoning範圍分開。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "task scenarios",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "認知capability groups",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3000,
+        "unit": "paired video-simulator instances",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "policy每task評測trials",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "Plan SR在symbolic executor；Task SR在物理simulation；PR完成子goal比例。",
+      "順序唯一task直接比oracle，允多解的task比symbolic終態；oracle-plan execution與integrated pipeline分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "LIBERO-finetuned policies轉到paired tasks；新物件/指令in/out-domain另列，固定每command300steps。",
+    "lineage": "LIBERO擴新物件／predicate；LLM先產spec再照spec拍人類video，不是從任意網路video全自動轉robot。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          14,
+          15
+        ],
+        "locator": "表2、§3.3–4.1、Evaluation Protocol",
+        "supports": "14/3K、來源與分離評測"
+      }
+    ],
+    "unresolved": [
+      "physical評測每task10trials中task指類型或instance的manifest需核，不先乘成3萬或宣稱3K全測。"
+    ],
+    "reuse": "最接近『影片→任務規格→可執行場景』的前作；還受限於Pick/Place/Open/Close，排除pour/wipe/cut/stir。",
+    "reviewed_pdf_sha256": "42a137d5b56c9e1dd7d421cba16f8f06fe42cace6418e7338136400df3e7954c",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P124",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboReel，arXiv 2609.08209v2。",
+    "scope_read": "10task、4suites、配對蒐集、附錄完整統計、success predicate和eval banks。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      21,
+      24,
+      25,
+      27,
+      29
+    ],
+    "domains": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "1個實際桌面rig與ManiSkill3/SAPIEN配對場景，4人類camera views；calibration與distractors另分setting。",
+    "tasks": "10task（推/抓方塊、抽屜、鍋蓋、烤麵包機、碗盤、籃子、玩具收納、堆杯）；4suites ND/WD/ED/PD，不是40語義task。",
+    "cases": "正文2,000ND/WD human demos；附錄含PD共3,000human demos＝12,000視角mp4，另2,000robot trajectories。每結果cell3runs×20＝60rollouts。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "task types",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "evaluation suites",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3000,
+        "unit": "含ND/WD/PD的human demos",
+        "pages": [
+          24,
+          25
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "paired robot trajectories",
+        "pages": [
+          24,
+          25
+        ]
+      },
+      {
+        "field": "case",
+        "value": 60,
+        "unit": "每model/task/setting結果cell rollouts",
+        "pages": [
+          29
+        ]
+      }
+    ],
+    "evaluation": [
+      "simulation goal predicates；比如drawer只需關至少一半、toaster80%行程，不能與更嚴格同名task直接比。",
+      "表格報3runs mean/SEM；SeeDo僅5項支援task，N/A不是0。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "每task-condition100 human demos取80train/20eval；oracle-filtered initial-state banks固定初態。",
+    "lineage": "PartNet-Mobility＋SAM3D real twin；explicit/latent/keypoint三種LfO代表比較，借不同既有policy。正文稱接受後發布，素材取得待核。",
+    "related_paper_ids": [
+      "P068",
+      "P129"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          24,
+          25
+        ],
+        "locator": "§3、表5–6",
+        "supports": "10/4、2K正文vs3K含PD"
+      },
+      {
+        "pages": [
+          27,
+          29
+        ],
+        "locator": "表7、附錄D.4",
+        "supports": "success尺度、60rollouts、80/20與banks"
+      }
+    ],
+    "unresolved": [
+      "100seed與每bank300entry在同段並列，需原生manifest釐清最終bank量；發布可得性尚未驗證。"
+    ],
+    "reuse": "可借真實human→sim配對及同條件多方法對比；不應把camera/views檔案量作新增題量。",
+    "reviewed_pdf_sha256": "4f0b2629e1e663390e169e7ae24496406246958dbec7bb20f3973de31a9e34ff",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P129",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RH20T正式PDF標題相符，arXiv 2307.00595。",
+    "scope_read": "147task來源、7硬體配置、pairing階層、110K數據与實際few-shot實驗。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "桌面物件操作",
+      "工具使用",
+      "組裝與拆解",
+      "居家生活",
+      "人機協作"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "7robot configurations、>50table covers；covers不是不同場景layout。",
+    "tasks": "147tasks＝48選自RLBench＋29MetaWorld＋70自定義；42verbs是skill標籤，不是147完全獨立新設計。",
+    "cases": ">110K robot sequences與等量human sequences；hierarchy可配出數百萬pairs但不是同量獨立影片。本文ACT主實驗只在1個block-to-weight任務，每configuration20trials。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 147,
+        "unit": "task definitions",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 42,
+        "unit": "skill verbs",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 110000,
+        "unit": "robot sequences",
+        "qualifier": "超過；另等量human sequences",
+        "pages": [
+          2,
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "主實驗每configuration trials",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "人類收集時0–9quality、成功/失敗約10:1；ACT實驗分reach/grasp/place success，60秒上限。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人工或模型評審"
+    ],
+    "split": "新環境含新camera/tablecover/robot；pretrain335同task＋195相近task，fine-tune75demo起，再縮小資料。",
+    "lineage": "RLBench與MetaWorld任務規格被實拍移植；新實拍数据是新素材，但goal定義有上游來源。",
+    "related_paper_ids": [
+      "P062",
+      "P063"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§III-A/B、§IV",
+        "supports": "48+29+70、110K與主實驗1task/20trials"
+      }
+    ],
+    "unresolved": [
+      "paired影片之精確實例對應與跨機體可比性需原生metadata匯入。",
+      "DROID原作表I將RH20T依unique multi-view trajectories記為約13K，與RH20T原作110K口徑不同；保留兩種出處，未完成原始manifest去重。"
+    ],
+    "reuse": "是從前作選task再擴新task、兼有人類影片與robot軌跡的重要前例。",
+    "reviewed_pdf_sha256": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+    "reviewed_on": "2026-10-02"
+  }
+]

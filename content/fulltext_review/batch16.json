@@ -1,0 +1,857 @@
+[
+  {
+    "paper_id": "P197",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoSim / MultiEgoView，arXiv 2502.18373v1。",
+    "scope_read": "資料構成、四場景、body-camera位置、35活動、切分與body pose metrics。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "戶外活動",
+      "人體動作與身體感知"
+    ],
+    "role": "身體攝影機資料與感知benchmark",
+    "environment": "24locations分布於4virtual scenes；real資料在其中一個掃描courtyard收集。6個body cameras是視角。",
+    "tasks": "主要實驗為全身3D pose estimation；real演出35種BABEL活動，非35robot執行目標。",
+    "cases": "synthetic 119.4行為hours/77.4M六視角images；real約5h、13participants。5秒segments數未報。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "virtual scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "locations within scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 35,
+        "unit": "real human activity types",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 119.4,
+        "unit": "synthetic motion hours（6views）",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "global/PA MPJPE、translation/rotation/joint-angle error、jerk。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "synthetic依BABEL60/20/20；real random80/20與cross-participant10/3另列。",
+    "lineage": "AMASS/BABEL/BEDLAM motion/labels/assets；同一motion多bodyviews與多場景重渲染，非獨立動作資料。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§4、§6",
+        "supports": "4/24/35、119.4h及兩種real splits"
+      }
+    ],
+    "unresolved": [
+      "精確train/test片段IDs、重渲染motion去重需manifest；動作辨識/定位雖可支援，主實驗未全評。"
+    ],
+    "reuse": "支援頭、腰、手腕、膝攝影機的感知來源；加入視角泛化，不能當物理task completion。",
+    "reviewed_pdf_sha256": "db15f931833027b80e416c0bdb47bd3c7695ef3cce6733988110484295f4f7d2",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P198",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "TACO，arXiv 2401.08399v2。",
+    "scope_read": "capture/annotation、131triplets、資料與generalization splits、三benchmark與metrics。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "工具使用",
+      "桌面物件操作"
+    ],
+    "role": "雙手工具互動理解與預測benchmark",
+    "environment": "12third-person+1ego相機的capture工作站；作者明列缺乏scene diversity。",
+    "tasks": "3研究端點：compositional action recognition、motion forecasting、cooperative grasp synthesis；15actions、131tool-action-object triplets。",
+    "cases": "約2.5K motion sequences、5.2M多視角frames；196物件meshes/20categories/14participants。不是5.2M獨立互動題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "benchmark endpoints",
+        "pages": [
+          6,
+          7,
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 131,
+        "unit": "tool-category/action/target-category triplets",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "action labels",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2500,
+        "unit": "motion sequences",
+        "qualifier": "約2.5K",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "recognition Top1/5；forecast10frames→10frames的joint/translation/rotation error；grasp penetration/contact/collision/FID，非執行成功率。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "train:S1:S2:S3:S4＝4:1:1:1.5:2.5，分已見、geometry、interaction、compound；另60/40sequence的annotation驗證不可混成主split。",
+    "lineage": "自己的multi-view capture；DexYCB交叉資料驗證；marker removal使用inpainting。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "Statistics、§5.1–5.4",
+        "supports": "131/15、ratio與三類判分"
+      }
+    ],
+    "unresolved": [
+      "完整各split精確sequence數需manifest；不含articulated objects，不能外推完整工具環境。"
+    ],
+    "reuse": "把動作、物件組合和研究端點分層記錄，支援工具互動的組合泛化設計。",
+    "reviewed_pdf_sha256": "2cd9fef96e133851d367c485aad1578b4979baef4d9b57037a1a246476735efd",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P199",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "OpenEgo，arXiv 2509.05513v1。",
+    "scope_read": "六來源表、hand/primitive統一、實際0.1%子集實驗和held-out metric。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "domains": [
+      "居家生活",
+      "工具使用",
+      "桌面物件操作"
+    ],
+    "role": "整合型人類影片資料與預測benchmark",
+    "environment": "作者列10kitchens與610indoor rooms／600+environments；是多來源合併，未證明全庫去重。",
+    "tasks": "290 source task labels＝六來源原生task數相加；不等於290正規化機器人目標。",
+    "cases": "1,107h、344.5Krecordings、119.6Mframes；實驗只train在0.1%子集，10%demonstrations held-out，精確eval IDs/分母需核。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 290,
+        "unit": "六來源task labels合計",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1107,
+        "unit": "來源video hours合計",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 344500,
+        "unit": "source recordings",
+        "qualifier": "344.5K約數",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "AED/FED/DTW只算可見hand joints；8/16/32/64frames horizons。未測robot physical task success。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "作者稱demonstration-level holdout10%，但0.1%子集與holdout母集合關係需ID核。",
+    "lineage": "CaptainCook4D、HOI4D、HoloAssist、EgoDex、HOT3D、HO-Cap；語言多自動生成且部分人工核，新增的是統一label/format。",
+    "related_paper_ids": [
+      "P018",
+      "P017",
+      "P022",
+      "P141",
+      "P119"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "locator": "Table1、§3–4、Limitations",
+        "supports": "來源相加、290/1107、0.1%與trajectory endpoint"
+      }
+    ],
+    "unresolved": [
+      "跨來源環境/task去重未完成；data aggregation不可與父來源再次加總。"
+    ],
+    "reuse": "最直接的整合資料前作之一；我們必須清楚提出超出統一格式的task聯集與評測規則。",
+    "reviewed_pdf_sha256": "84068f8b5d7e8add70826aacda59a02d425f56125bcf3f1c450fe966db7f7e65",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P200",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SABER，arXiv 2605.09613v1。",
+    "scope_read": "零售資料三streams、native/retarget区别、訓練mixtures、RoboBenchMart10tasks與100rollouts。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "domains": [
+      "零售與購物",
+      "包裝與倉儲"
+    ],
+    "role": "零售示範資料與技能轉移",
+    "environment": "多真實超市的頭戴/360°影片；camera capture無robot。精確店面數未報；下游是RoboBenchMart模擬。",
+    "tasks": "影片列12核心retail活動；下游10tasks＝fridge2、board-to-board3、floor2、basket3，主要搬放與開關。",
+    "cases": "100+h影片導出44.8Ksupervision samples＝25Klatent+18.6Khand+1.2Kbody，streams共享capture。每task100eval rollouts。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 44800,
+        "unit": "三supervision streams samples",
+        "qualifier": "約數；不是unique physical episodes",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "RoboBenchMart downstream tasks",
+        "pages": [
+          13
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task evaluation rollouts",
+        "pages": [
+          13
+        ]
+      }
+    ],
+    "evaluation": [
+      "success同時要求joint velocity<0.2、target到位、未擾動非target；非fridge tasks另報0/1⁄3/2⁄3/1進度。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "下游訓練含2.5Ktask-aligned RoboBenchMart demos＋4.8Krobot anchor；不是human-only零樣本轉移。",
+    "lineage": "三stream由相同人類capture生成，RoboBenchMart為下游父benchmark；不要重新計一次新10task。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          10,
+          11,
+          12,
+          13
+        ],
+        "locator": "Dataset、Mixture、§6.1",
+        "supports": "capture/44.8K/10/100、success規則"
+      }
+    ],
+    "unresolved": [
+      "不同stream的episode交集及各超市scene IDs未報；checkpoint選擇與held-out sampling需code核。"
+    ],
+    "reuse": "補商店補貨/拿取/購物用途；可轉移資料與可执行環境需要分別取得。",
+    "reviewed_pdf_sha256": "e4556b7aadaed076ac2792ec2c15b91853acad3f5eac7403898badc1396e8f98",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P201",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoSAT，arXiv 2606.24422v1。",
+    "scope_read": "interaction curation、stream prefix、六題型、QA數及confidence/answerability分析。",
+    "pages_read": [
+      1,
+      3,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      22,
+      28
+    ],
+    "domains": [
+      "居家生活",
+      "工具使用",
+      "跨域人類活動"
+    ],
+    "role": "串流理解與預測benchmark",
+    "environment": "Ego4D的56scenario labels；不是56有資產的機器人環境。",
+    "tasks": "present narration/state switch、short/multi-step anticipation、short/multi-step retrieval，共6題型。",
+    "cases": "1,997video sessions、約165h、約4,800QA；同一query的MC與open-ended版本不算獨立證據。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 56,
+        "unit": "Ego4D scenario labels",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1997,
+        "unit": "video sessions",
+        "pages": [
+          9,
+          10
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4800,
+        "unit": "QA pairs",
+        "qualifier": "約數",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "QA task types",
+        "pages": [
+          11
+        ]
+      }
+    ],
+    "evaluation": [
+      "MCQ accuracy、interaction precision/recall、state switch兩端都正確；confidence slope與predictable/unpredictable分組。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每query嚴格截到當下prefix；online cache方法與每題prefix重處理成本不同；SFT cross-scenario另比較。",
+    "lineage": "Ego4D原影片/interaction labels加新queries；不重新計成獨立165h影片。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          9,
+          10,
+          11,
+          13,
+          14,
+          28
+        ],
+        "locator": "Benchmark Construction、Protocol、Diagnostics、SFT transfer",
+        "supports": "56/1997/4800、六題型與causal prefix"
+      }
+    ],
+    "unresolved": [
+      "約4,800的精確query及SFT/evaluation split IDs待release核；future answer多解性不能當單純模型錯誤。"
+    ],
+    "reuse": "預測題需記可預測性與合法觀測截止時間，不能讓未來frame洩漏。",
+    "reviewed_pdf_sha256": "3cdd4d6866e119e6133a58a10ad4eff1ec3dd77fc61f49704b61835d9c312199",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P202",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoMonth，arXiv 2608.13113v1。",
+    "scope_read": "收集/篩選、14題型全表、738clips/301h、人工QA、macro/micro與sampling。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      19
+    ],
+    "domains": [
+      "居家生活",
+      "教育與辦公",
+      "交通與移動",
+      "零售與購物",
+      "休閒與運動",
+      "烹飪與飲食"
+    ],
+    "role": "長期記憶影片benchmark",
+    "environment": "20participants各20–120天生活紀錄；室內外場景無可去重實體場所總數。",
+    "tasks": "14QA types、3認知層級；6activity用途類別。層級是作者設計，不是已校準的機器人難度。",
+    "cases": "738clips、18,072minutes≈301h、1,443四選一人工QA；原始30人400+h篩到20人300+h。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "memory QA types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "domain",
+        "value": 6,
+        "unit": "作者activity categories",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1443,
+        "unit": "human-authored MCQs",
+        "pages": [
+          6,
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 738,
+        "unit": "video clips",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "14類macro平均與全部QA micro；直接答案比對，無LLM judge。人類評測3annotators，κ0.78。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "benchmark zero-shot evaluation，非training dataset；固定sampling但model frame上限不同。",
+    "lineage": "新收集長期生活影片，與EgoLife是不同capture來源；一人多日仍屬群聚資料。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3、Table1–2、§4.1",
+        "supports": "20/738/1443/14、macro/micro"
+      }
+    ],
+    "unresolved": [
+      "跨日task所需實際視覺覆蓋與每model frame cap要並列；人格推論題不等於客觀人格ground truth。"
+    ],
+    "reuse": "擴到長期生活記憶與跨日狀態，預算應固定並用participant群聚估計不確定性。",
+    "reviewed_pdf_sha256": "6747ddc4c6f9303ea3e7ed2e427b1e8707235e60cd4cf05e45abfd4d13cdffc1",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P203",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EGOSTREAM，arXiv 2605.31557v2。",
+    "scope_read": "五父來源、人工filter、AVW與7recall regimes、8528擴充和stream protocol。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "居家生活",
+      "工具使用",
+      "跨域人類活動"
+    ],
+    "role": "串流記憶benchmark",
+    "environment": "Ego4D VQA、EgoLife、EgoTempo、Multi-Hop EgoQA、HD-EPIC五來源；無新增可執行場景。",
+    "tasks": "7記憶題型：detail/spatial/temporal/event/social/causal/prospective；7recall時間區間另是條件。",
+    "cases": "2,634candidate→2,335human-verified→2,250final QA；依Answer Validity Window擴成8,528question-recall evaluations。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "primary memory dimensions",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2250,
+        "unit": "base validated questions",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 8528,
+        "unit": "question × applicable recall evaluations",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "4-way accuracy，依語義/recall報；每frame processing time及受限memory，固定backbone比較不同memory managers。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "query到時才揭露；memory construction須query-agnostic，不能無界保存原frames再重讀；不是所有題都可乘7。",
+    "lineage": "五來源QA與evidence重用/改寫；baseQA與多recall conditions有父子關係。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§3.1–3.4",
+        "supports": "2250→8528、AVW、query-agnostic constraints"
+      }
+    ],
+    "unresolved": [
+      "無global scene union；同一QA的多recall測例需群聚统计，不能算8528獨立語義問題。"
+    ],
+    "reuse": "示範正當擴題：保留base question，新增不同合法歷史條件，並明示擴充規則和依賴。",
+    "reviewed_pdf_sha256": "2b7fad2f7b3b003fe66a26ce10fe8f4c0b2950ae9a0a072a3f9215790a59ef17",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P204",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "S-EMBER，arXiv 2607.02689v2。",
+    "scope_read": "新capture、2090scenario labels/33活動、9448QA、多長度答案、joint grounding與judge驗證。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      14
+    ],
+    "domains": [
+      "居家生活",
+      "零售與購物",
+      "烹飪與飲食",
+      "戶外活動"
+    ],
+    "role": "串流記憶與證據定位benchmark",
+    "environment": "613使用者Ray-Ban Meta capture；2,090fine-grained scenario labels合併33activity categories，非2090實體scene資產。",
+    "tasks": "8memory QA categories；answer generation與temporal grounding兩endpoint。",
+    "cases": "3,141videos、388h、9,448QA；每題三種verbosity參考答案，不把答案條數當三倍题數。另5-way MC版本。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 2090,
+        "unit": "fine-grained scenario labels",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "question categories",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 9448,
+        "unit": "QA pairs",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3141,
+        "unit": "unique video clips",
+        "pages": [
+          4,
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "free-form overall/clean accuracy用judge；MC exact match；temporal mIoU/Recall@1；GQ@τ要求答對且定位正確。judge另600正負pair驗證。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度",
+      "人類或模型判讀"
+    ],
+    "split": "visual-only且prefix cutoff；open models固定128frames、closed native limits另列，非完全同觀測預算。",
+    "lineage": "新生活capture；questions由當下trigger往回問；影片scenario標籤不提供可執行robot state。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          14
+        ],
+        "locator": "§3–5、Judge validation",
+        "supports": "3141/9448/2090、8categories及joint metric"
+      }
+    ],
+    "unresolved": [
+      "全部實體場所數未報；GQ判分可靠性取決judge與grounding，需保留分項成績。"
+    ],
+    "reuse": "我們可採用答案與證據的聯合判分，但不能讓多verbosity或MC改寫虛增獨立題。",
+    "reviewed_pdf_sha256": "a19dd911977b7b7ad2651673df90d5ea20fbd44471297b335afdb6e3a0884e04",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P205",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "CapMem，arXiv 2609.17688v1。",
+    "scope_read": "75videos七來源、4用途/16scenario、QA filter、CleanQA、frame-aligned controls與部分API評測。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      8,
+      16,
+      18,
+      22
+    ],
+    "domains": [
+      "居家生活",
+      "戶外活動",
+      "工具使用",
+      "寵物照護"
+    ],
+    "role": "caption記憶benchmark",
+    "environment": "4application domains、16scenario labels、75公共ego videos；無實體scene union。",
+    "tasks": "CleanQA/DirectVideoQA/CaptionQA是同題三種資訊條件；50question templates與5diagnostic分析維度不等於50task goals。",
+    "cases": "2,109candidate→1,000final MCQs、33.7h；Ego4D佔56videos/742QA。Gemini VideoQA只跑786題，其他主設定1,000。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "作者application domains",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 16,
+        "unit": "scenario labels",
+        "pages": [
+          3,
+          18
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "final MCQs",
+        "pages": [
+          4,
+          18
+        ]
+      },
+      {
+        "field": "case",
+        "value": 786,
+        "unit": "Gemini DirectVideoQA已評子集",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "MC accuracy、token/runtime成本、visual tags/evidence位置/影片長度分項；CleanQA 15–35%gate是方法篩選規則。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "無額外train；full-caption1fps看全片而direct有frame cap，另6Qwen frame-aligned及cross-captioner受控實驗。",
+    "lineage": "Ego4D/EgoLife/EgoPet/EPIC/HoloAssist/ENIGMA-51/CASTLE2024；只release annotations/metadata，不重發原影片。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          8,
+          18
+        ],
+        "locator": "Scope、Construction、Protocol、Limitations、QC",
+        "supports": "4/16/1000/786、父來源及input-budget confound"
+      }
+    ],
+    "unresolved": [
+      "作者標明只涵部分wearable用途；blindgate低於/高於門檻的解釋需謹慎，不能直接證明污染。"
+    ],
+    "reuse": "可借相同問題在不同記憶表示下的受控比較；先對齊看過的frames再比較caption收益。",
+    "reviewed_pdf_sha256": "f65b30af25bbaa68d3825316d901fac09df58f2fe57b133428750addc1aeec4e",
+    "reviewed_on": "2026-10-02"
+  },
+  {
+    "paper_id": "P206",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EmbodiedMemory-Bench / EMem-Bench，arXiv 2609.28236v1。",
+    "scope_read": "四family、AI2THOR/ProcTHOR場景生成、2554驗證episodes、sim success及source/split設計。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      15,
+      18,
+      27
+    ],
+    "domains": [
+      "居家生活",
+      "室內導航"
+    ],
+    "role": "可執行具身記憶benchmark",
+    "environment": "1,118source scenes；AI2-THOR單房間組成virtualhome并保存狀態、ProcTHOR multi-room篩選。不是1118全部新建獨立house。",
+    "tasks": "4families：Passive Observation、Dynamic Tracking、Interaction Failure、Experience Generalization；125visible object types/83target/33receptacle是資產類別。",
+    "cases": "2,554episodes＝1,036+1,052+263+203；143候選被排除。四history介入條件同用800episodes而非新增3200unique basecases。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 1118,
+        "unit": "benchmark source scenes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "memory task families",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2554,
+        "unit": "validated executable episodes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 800,
+        "unit": "history介入paired base episodes",
+        "pages": [
+          27
+        ]
+      }
+    ],
+    "evaluation": [
+      "執行action到sim目標終態的SR，四family等權macro避免1036/1052大類壟斷；另history介入成對比較。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "訓練與eval scenes/trajectories分離，parent trajectories先split再展開turns；target task在history之後才給。",
+    "lineage": "AI2-THOR/ProcTHOR、PDDL distractor、LLM生成experience後必須ground與重播驗證；這是episode而非2554獨立語義families。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          18,
+          27
+        ],
+        "locator": "§3、Construction、Supervision、History interventions",
+        "supports": "1118/4/2554、split-before-expansion與800paired"
+      }
+    ],
+    "unresolved": [
+      "scene IDs跨host重用與完整episode manifest需原生release核；同history多condition需保留pair ID。"
+    ],
+    "reuse": "和我們『既有環境＋新任務/規則』非常接近；差异要用更廣用途與來源聯集證明，不能只比episode數。",
+    "reviewed_pdf_sha256": "14adce97c24c0e4080ec7f707206f2dcc6ff9155bacf63b0d6cf84287eba4580",
+    "reviewed_on": "2026-10-02"
+  }
+]

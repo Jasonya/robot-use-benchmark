@@ -1,3 +1,30 @@
+# Robot-use Benchmark：逐篇來源審閱與任務聯集
+
+目前版本 **v0.10（2026-10-02）**：先閱讀原作，再分類與比較，最後建立任務聯集及規則擴充。
+
+- 現有250篇書目完成初篩；原143來源加40個補入來源，共183份有關鍵章節閱讀紀錄。其餘67篇方法／原作實驗／survey參考保留篩查理由。
+- 672筆數量摘錄附原文單位、PDF頁碼、版本與SHA256；每份來源都有領域、環境、任務、題數、判分、split、重用關係和限制。
+- 來源用途分為18類，22份標為跨域／未指定；四類判分分項記錄。分類不代表全庫已可執行，亦未經第二位獨立編碼者驗證。
+- 既有ID清單仍為284場景條目、2,096robot任務條目、另7資訊題型及263人類活動、114,288筆題目元資料（含train）。不同單位不能相加成已去重的全庫規模。
+
+v0.9先訂的1,000場景／5,000任務／100萬題配額已撤回；目標欄為null，未把未知值填0。來源審閱不等於逐題複核、全資產取得或模型執行；尚未窮盡全球相關文獻。
+
+入口為 `zh-hant/coverage.html`、`zh-hans/coverage.html`；全文為 `source-report.html`。本輪繁／簡PDF與Markdown、JSON、CSV在 `downloads/source-review/`，原始PDF只保存在忽略的本機cache，不重新發布。
+
+審閱輸入：`content/fulltext_review/batch*.json`、`screening.json`、`codebook.json`。`scripts/source-review-model.mjs`驗證身份、頁碼、覆蓋、分類和數量單位，建立網站与下載表。取得PDF或自動命中關鍵字不會自動標成讀過。
+
+```sh
+npm ci
+npm run build
+npm run verify
+npm run serve
+```
+
+`docs/`為GitHub Pages發布目錄；push main後自動建置、驗證、發布。瀏覽器檢查：`ROBOT_TEST_URL=http://127.0.0.1:8798/robot-use-benchmark/ node scripts/browser-check.mjs`（需Chrome）。
+
+<details>
+<summary>歷史版本紀錄：以下配額和「當時有效」說明已退役</summary>
+
 # Robot-use Benchmark：本版規劃目標與目前清單實數
 
 **目前有效版本 v0.9（2026-10-02）**。同一份 `content/quantified/numbers_contract.json` 產生首頁、Coverage、設計和下載報告的目標；實數来自逐筆ID清單及 `inventory_summary.json`。
@@ -53,3 +80,5 @@ npm run serve
 建置使用repo內的內容快照與PDF，可獨立checkout。`scripts/browser-check.mjs`使用Chrome檢查繁簡、搜尋、表格、來源篩選、影片、手機和無JavaScript閱讀。`ROBOT_TEST_URL`可指定本機或公開網址。
 
 固定版本來源的收集／總庫重建程式在[audit/survey_union/](audit/survey_union/README.md)。機器人runtime及其歷史驗證在[benchmark/](benchmark/README.md)。`docs/`是Pages發布目錄；push main後自動建置、驗證與發布。
+
+</details>
