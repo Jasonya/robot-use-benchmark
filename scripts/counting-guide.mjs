@@ -48,6 +48,7 @@ export function renderCountingPage(locale,stats,contract,helpers){
   const definitions=contract.definitions.map(d=>`<article class="count-definition" id="${d.id}"><h3>${t(d.name,locale)}</h3><p>${t(d.definition,locale)}</p><p class="counting-note">${t(d.counting_rule,locale)}</p></article>`).join('');
   const body=`<main class="wrap counting-main" id="main-content">
     ${head('5,308是來源索引。環境、場景與樣本分開算。','把來源名錄、原作索引、任務環境定義、場景、測例與一次執行分成不同層級；G／T代號的完整定義也集中在本頁。',route,locale,`<div class="page-meta"><span>${t('計數說明：2026-10-01',locale)}</span><span>${t('G／T速查：2026-10-02',locale)}</span><span>${t('來源數字快照：2026-09-29',locale)}</span></div>`)}
+    <div class="coverage-reader-note"><b>${t('這一頁現在作為計數細節附錄',locale)}</b><p>${t('新版主表只保留領域、環境、任務、題數與評估方式。「環境」主欄統一列場景／layout；下方任務環境定義是連接場景與任務的完整技術規格。',locale)}</p><a href="${routeLink(route,'coverage.html',locale)}">${t('先看五欄Coverage總覽',locale)} →</a></div>
     <nav class="symbol-guide-links counting-jump-links" aria-label="${t('計數與代號快速導覽',locale)}"><a href="#symbols-g">${t('G0–G5：計數層級',locale)}</a><a href="#symbols-t">${t('T1–T8：評測模組',locale)}</a><a href="#task-environment">${t('任務環境定義',locale)}</a><a href="#real-source-examples">${t('索引與樣本實例',locale)}</a></nav>
     ${renderCountingOverview(locale,stats,helpers,{route})}
     <section class="counting-section" id="real-source-examples"><h2>${t('同一個來源，索引數與樣本數可以差很多',locale)}</h2>

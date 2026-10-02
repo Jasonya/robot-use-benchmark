@@ -1,4 +1,16 @@
-# Robot-use Benchmark：前作總庫與任務規則擴充
+# Robot-use Benchmark：五個欄位統整Coverage
+
+2026-10-02 v0.8：入口統一為**領域、環境、任務、題數、評估方式**。`coverage.html`把143筆前作比較與全庫狀態放在同一頁；首頁顯示五項統計，詳細家族、G／T代號和歷史配額移到附錄。原作量、已收集量與整合後可評量保留不同範圍。
+
+本次核對28個原始概述，新增35筆有單位、範圍與出處的數量紀錄。原有68項比較、143筆來源、5,308條索引、實驗和歷史PDF保留。判分方式以四類工作分類整理，不宣稱全庫評分器或來源任務聯集已完成。
+
+- `coverage.html`：主要入口；全庫總覽、143筆前作、領域分布、四類判分與三步完成條件。
+- `downloads/coverage/benchmark_summary.csv`：每benchmark一列的比較表。
+- `downloads/coverage/count_ledger.csv`：每筆數量的單位、scope、版本和出處。
+- `downloads/coverage/COVERAGE_REPORT.md`、`coverage_snapshot.json`：完整統整報告及可再處理資料。
+- `content/coverage/`保存口徑及人工整理輸入，`scripts/coverage-model.mjs`在建置時從原資料推導總表。
+
+以下保留先前版本說明，原v0.7來源聯集仍是研究方法基礎。
 
 2026-10-02 v0.7.2：新增G0–G5／T1–T8集中速查，第二章加上就近說明，14章中的代號可直接點到定義。G是計數粒度、T是評測模組；編號為本計畫約定。
 

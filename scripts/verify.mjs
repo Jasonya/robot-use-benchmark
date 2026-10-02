@@ -152,6 +152,42 @@ const union=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-union/u
 const registry=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-union/survey_registry.json'),'utf8'));
 const bridge=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-union/task_source_bridge.json'),'utf8'));
 const extensions=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-union/extension_examples.json'),'utf8'));
+const coverage=JSON.parse(await fs.readFile(path.join(out,'downloads/coverage/coverage_snapshot.json'),'utf8'));
+const originalCounts=JSON.parse(await fs.readFile(path.join(out,'downloads/benchmark-comparison/typed_count_records.json'),'utf8')).rows;
+assert.deepEqual(new Set(coverage.rows.map(r=>r.paper_id)),new Set(registry.filter(r=>r.benchmark_source_registered).map(r=>r.paper_id)));
+assert.equal(coverage.rows.length,143);
+assert.equal(coverage.plan.fields.length,5);
+assert.equal(coverage.plan.evaluation_methods.length,4);
+assert.equal(coverage.statistics.native_robot_task_records,2062);
+assert.equal(coverage.statistics.human_activity_records,263);
+assert.equal(coverage.statistics.common_task_union,null);
+assert.equal(coverage.statistics.canonical_environment_union,null);
+assert.equal(coverage.statistics.integrated_cases_by_type,null);
+const coverageCounts=coverage.rows.flatMap(r=>r.counts);
+assert.equal(new Set(coverageCounts.map(c=>c.record_id)).size,coverageCounts.length);
+assert.ok(coverageCounts.every(c=>Number.isFinite(c.value)&&c.evidence.length>0&&c.eligible_for_global_sum===false));
+for(const original of originalCounts.filter(r=>r.value!==null&&r.unit!=='canonical_g2')){
+  const current=coverageCounts.find(c=>c.record_id===original.record_id);
+  assert.ok(current,`Lost source number ${original.record_id}`);
+  for(const key of ['value','value_kind','unit','scope','source_version'])assert.equal(current[key],original[key]);
+}
+const coverageRow=id=>coverage.rows.find(r=>r.paper_id===id||r.detailed_comparison_id===id);
+assert.ok(coverageRow('P003').counts.some(c=>c.field==='data'&&c.value===11827));
+assert.equal(coverageRow('P003').counts.filter(c=>c.field==='case').length,0,'COIN videos are not fixed test questions');
+assert.ok(coverageRow('P075').counts.some(c=>c.field==='data'&&c.value===600000),'VIMA expert trajectories remain data');
+assert.equal(coverageRow('P075').counts.filter(c=>c.field==='case').length,0);
+assert.ok(coverageRow('P042').counts.some(c=>c.field==='data'&&c.unit==='scan'&&c.value===5000));
+assert.equal(coverageRow('P042').counts.filter(c=>c.field==='environment').length,0,'3D scans are not deduplicated environments');
+assert.ok(coverageRow('P017').counts.some(c=>c.field==='environment'&&c.unit==='recording_room'&&c.value===610));
+assert.ok(coverageRow('P108').counts.some(c=>c.field==='data'&&c.unit==='paired_evaluation_episode'));
+assert.ok(coverageRow('alfred').counts.some(c=>c.field==='data'&&c.value===8055));
+assert.ok(coverageRow('egotaskqa').counts.some(c=>c.field==='case'&&c.value===40000));
+assert.ok(coverageRow('egotaskqa').counts.some(c=>c.field==='data'&&c.value===368000));
+assert.deepEqual(coverageRow('partnr').counts.filter(c=>c.field==='case').map(c=>[c.scope,c.value]),[['training',100000],['validation',1000],['test',1000]]);
+assert.ok(coverageRow('P038').evaluation_methods.includes('judge'));
+assert.ok(coverageRow('P151').evaluation_methods.every(id=>id!=='state_process'),'Video goal appearance is not robot execution');
+assert.ok(coverage.domains.every(d=>d.mapped_task_count===null));
+assert.ok((await fs.readFile(path.join(out,'downloads/coverage/benchmark_summary.csv'),'utf8')).includes('BEHAVIOR-1K'));
 assert.equal(registry.length,250);
 assert.equal(registry.filter(r=>r.benchmark_source_registered).length,143);
 assert.equal(bridge.length,5308);
@@ -266,7 +302,9 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(overall.$('#historical-design-plans').attr('open'),undefined);
   assert.ok(overall.$('#iteration-section-4').text().includes('場景')||overall.$('#iteration-section-4').text().includes('场景'));
   assert.equal(overall.$('[data-capacity-output="total"]').text(),'2,880,000');
-  assert.equal(overall.$('.primary-nav a').first().attr('href'),'survey-union.html');
+  assert.equal(overall.$('.primary-nav a').first().attr('href'),'coverage.html');
+  assert.ok(overall.$('#coverage-design').length);
+  assert.equal(overall.$('#previous-union-design').attr('open'),undefined);
   const unionPage=pages.get(path.join(out,locale,'survey-union.html'));
   assert.equal(unionPage.$('#union-registry-table tbody tr').length,250);
   assert.equal(unionPage.$('#union-taxonomy-table tbody tr').length,12);
@@ -292,7 +330,7 @@ for(const locale of ['zh-hant','zh-hans']){
     assert.equal(page.$('code .definition-symbol,pre .definition-symbol,a .definition-symbol').length,0);
   }
   assert.equal(countingPage.$('#count-definitions article').length,counting.definitions.length);
-  for(const route of ['index.html','survey-union.html','counting.html']){
+  for(const route of ['survey-union.html','counting.html']){
     const page=pages.get(path.join(out,locale,route));
     assert.equal(page.$('[data-counting-metric="sources"] strong').text(),'143');
     assert.equal(page.$('[data-counting-metric="indices"] strong').text(),'5,308');
@@ -307,6 +345,15 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.ok(countingPage.$('[data-count-example="partnr"] td').first().text().includes('生成器'));
   assert.ok(unionPage.$('#union-registry-table thead').text().includes(locale==='zh-hant'?'本庫已提取索引':'本库已提取索引'));
   const home=pages.get(path.join(out,locale,'index.html'));
+  assert.equal(home.$('[data-coverage-metric]').length,5);
+  assert.equal(home.$('[data-counting-metric]').length,0,'Detailed counting axes no longer lead the homepage');
+  const coveragePage=pages.get(path.join(out,locale,'coverage.html'));
+  assert.ok(coveragePage);
+  assert.equal(coveragePage.$('#coverage-whole-table tbody tr').length,5);
+  assert.equal(coveragePage.$('#coverage-benchmarks tbody tr').length,143);
+  assert.equal(coveragePage.$('#coverage-domain-table tbody tr').length,12);
+  assert.equal(coveragePage.$('.coverage-evaluation-grid article').length,4);
+  assert.ok(coveragePage.$('a[href="../downloads/coverage/benchmark_summary.csv"]').length);
   assert.ok(home.$('.hero').text().includes('Survey')||home.$('.hero').text().includes('SURVEY'));
   assert.ok(!home.$('#main-content').text().includes('92.5%'));
   assert.equal(home.$('a[href="joint-pilot.html"]').closest('#home-engineering-appendix').length,1);
