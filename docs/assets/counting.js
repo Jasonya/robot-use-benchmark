@@ -1,4 +1,13 @@
 (() => {
+  function showDefinition(){
+    let id;
+    try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
+    if(!/^(?:g[0-5]|t[1-8]|symbols-(?:guide|g|t|environment))$/.test(id))return;
+    const target=document.getElementById(id);
+    if(target)requestAnimationFrame(()=>target.scrollIntoView({behavior:'instant',block:'start'}));
+  }
+  document.fonts.ready.then(showDefinition);
+  window.addEventListener('hashchange',showDefinition);
   const host=document.querySelector('[data-counting-demo]');
   const input=document.getElementById('counting-cases-per-definition');
   if(!host||!input)return;

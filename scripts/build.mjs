@@ -11,6 +11,7 @@ import {renderResearchPage} from './research-page.mjs';
 import {renderJointPilotPage} from './joint-pilot-page.mjs';
 import {renderSurveyUnionPage} from './survey-union-page.mjs';
 import {indexUnitLabels,renderCountingOverview,renderEnvironmentNote,renderCountingPage} from './counting-guide.mjs';
+import {linkDefinitionSymbols,renderSymbolReaderNote} from './symbol-guide.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -118,6 +119,7 @@ const [unionStats,unionRegistry,unionSources,unionAdditions,unionExtensions]=awa
 const unionSpecHTML=await fs.readFile(path.join(UNION_DIR,'UNION_FIRST_DESIGN_V0_7.html'),'utf8');
 const COUNTING_DIR=path.join(CONTENT,'counting');
 const countingContract=JSON.parse(await fs.readFile(path.join(COUNTING_DIR,'counting_contract.json'),'utf8'));
+const symbolGuide=JSON.parse(await fs.readFile(path.join(COUNTING_DIR,'symbol_guide.json'),'utf8'));
 const browseSources=[...sourceReports,...unionSources.filter(s=>['vima','arnold','coin_video','crosstask'].includes(s.source_id)).map(s=>({
   id:s.source_id,work:s.name,resolved_repo:s.repositories[0],commit:s.commits[0],role:'additional_task_source',
   record_count:s.records,counts_by_unit:s.native_units
@@ -134,11 +136,13 @@ const sourceInfoById = Object.fromEntries(sourceReports.map(source => [source.id
 const assetHasher=crypto.createHash('sha256');
 assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,comparisonModel,readinessModel,executionModel,implementationModel,researchStats,iterationHTML,currentPDF,jointReport,jointDemos,jointDownload,unionStats,unionRegistry,unionSources,unionExtensions,unionSpecHTML,sourceStats,sourceReports,sections,tasks,papers}));
 assetHasher.update(JSON.stringify(countingContract));
+assetHasher.update(JSON.stringify(symbolGuide));
 for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','scripts/readiness-page.mjs','scripts/execution-page.mjs','scripts/research-page.mjs','scripts/joint-pilot-page.mjs','static/assets/joint-pilot.js','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
 for(const name of ['scripts/survey-union-page.mjs','static/assets/survey-union.js','static/assets/survey-union.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 for(const name of ['scripts/counting-guide.mjs','static/assets/counting.js','static/assets/counting.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
+assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/symbol-guide.mjs')));
 const assetRevision=assetHasher.digest('hex').slice(0,12);
 const sectionById = Object.fromEntries(sections.map(section => [section.id, section]));
 const taskById = Object.fromEntries(tasks.map(record => [record.scenario_id, record]));
@@ -294,7 +298,7 @@ function navHTML(route, locale) {
     ['design.html','整體設計',route==='design.html'],
     ['compare.html','詳細比較',route==='compare.html'||route==='scale-plan.html'],
     ['native-tasks.html','原作索引',route==='native-tasks.html'],
-    ['counting.html','計數與環境',route==='counting.html'],
+    ['counting.html','計數與代號',route==='counting.html'],
     ['library.html','文獻地圖',route==='library.html'],
   ];
   return `<header class="site-header"><div class="wrap header-inner">
@@ -489,7 +493,7 @@ function nativePage(locale){
 }
 function chapterNav(route,locale) {
   const chapterLinks=chapters.map(s=>`<a href="${routeLink(route,chapterRoute(s),locale)}"${route===chapterRoute(s)?' class="active" aria-current="page"':''}><span>${s.id.slice(1)}</span>${t(s.title,locale)}</a>`).join('');
-  const extras=[['counting.html','來源、環境與樣本怎麼算'],['survey-union.html','Benchmark總庫與任務規則'],['joint-pilot.html','工程附錄：聯合流程試作'],['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['research.html','文獻更新與分類'],['library.html',`${papers.length} 篇文獻`],['appendices/methods.html','來源與資料字典']];
+  const extras=[['counting.html#symbols-guide','G／T代號速查'],['counting.html','來源、環境與樣本怎麼算'],['survey-union.html','Benchmark總庫與任務規則'],['joint-pilot.html','工程附錄：聯合流程試作'],['explore/families.html','48 個任務家族'],['explore/tasks.html','180 個情境藍圖'],['explore/probes.html','24 個 Ego 題型'],['explore/metrics.html','40 個指標'],['appendices/axes.html','完整分類軸'],['appendices/comparison.html','原生規模比較'],['research.html','文獻更新與分類'],['library.html',`${papers.length} 篇文獻`],['appendices/methods.html','來源與資料字典']];
   return `<div class="sidebar-label">${t('研究主線與來源總庫',locale)}</div><a href="${routeLink(route,'design.html',locale)}"${route==='design.html'?' class="active" aria-current="page"':''}>${t('整體設計、廣度與目標',locale)}</a><a href="${routeLink(route,'execution.html',locale)}"${route==='execution.html'?' class="active" aria-current="page"':''}>${t('工程附錄：原生模型與驗證',locale)}</a><a href="${routeLink(route,'readiness.html',locale)}"${route==='readiness.html'?' class="active" aria-current="page"':''}>${t('待完善事項與驗收',locale)}</a><a href="${routeLink(route,'compare.html',locale)}">${t('Benchmark × 領域／場景／題數',locale)}</a><a href="${routeLink(route,'scale-plan.html',locale)}"${route==='scale-plan.html'?' class="active"':''}>${t('規模方案與來源查核',locale)}</a><a href="${routeLink(route,'native-tasks.html',locale)}"${route==='native-tasks.html'?' class="active"':''}>${t('原作任務與設定索引',locale)}</a><div class="sidebar-divider"></div><div class="sidebar-label">${t('研究與設計章節',locale)}</div>${chapterLinks}<div class="sidebar-divider"></div><div class="sidebar-label">${t('深入資料庫',locale)}</div>${extras.map(([target,label])=>`<a href="${routeLink(route,target,locale)}"${route===target?' class="active" aria-current="page"':''}>${t(label,locale)}</a>`).join('')}`;
 }
 function readingPage(section,locale) {
@@ -522,6 +526,13 @@ function readingPage(section,locale) {
     const legacy=content.replace(`id="${section.id}"`,`id="legacy-${section.id}"`);
     content=`<section id="${section.id}">${currentNote}${current}<details class="legacy-content"><summary>${t('查看 v0.2 原始預算／排程（歷史方案）',locale)}</summary>${legacy}</details></section>`;
   }
+  if(['c02','c03','c06','c08'].includes(section.id)){
+    content=renderSymbolReaderNote(locale,route,{t,routeLink})+content;
+  }
+  if(section.id==='c03'){
+    content=`<p class="source-note">${t('本章的G定義用於粒度對照；原稿表內的0、168篇等數字是2026-09-21快照。最新来源、任務環境與樣本計數請見計數說明頁。G不是開發完成階段或難度級別。',locale)} <a href="${routeLink(route,'counting.html',locale)}">${t('目前計數與G／T定義',locale)} →</a></p>`+content;
+  }
+  content=linkDefinitionSymbols(content,locale,symbolGuide,taxonomy.tracks,{t,escape,routeLink,route});
   const $=cheerio.load(content);
   const headings=$('h2,h3').toArray().map(n=>({id:$(n).attr('id'),title:$(n).text()}));
   const index=chapters.indexOf(section);
@@ -708,6 +719,8 @@ function searchPage(locale){
 }
 function searchData(locale){
   const result=[];
+  for(const g of symbolGuide.granularity_levels)result.push({kind:'reference',title:translate(g.id+' · '+g.name,locale),path:'counting.html#'+g.id.toLowerCase(),summary:translate(g.question+' '+g.definition,locale),search:g.id+' granularity G 計數 计数 粒度 '+tc(g.name+' '+g.definition)+' '+sc(tc(g.name+' '+g.definition))});
+  for(const [id,track]of Object.entries(taxonomy.tracks))result.push({kind:'reference',title:translate(id+' · '+track.name,locale),path:'counting.html#'+id.toLowerCase(),summary:translate(symbolGuide.track_examples[id],locale),search:id+' track T 模組 模块 評測 评测 '+tc(track.name+' '+track.output)+' '+sc(tc(track.name+' '+track.output))});
   result.push({kind:'reference',title:translate('來源、任務環境、場景、測例與樣本：計數說明',locale),path:'counting.html',summary:translate('143是名錄、5308是索引；全庫環境定義和样本總量待整理。附COIN/PARTNR對照與1場景3任務環境算例。',locale),search:'counting environment source record dataset sample 來源 来源 紀錄 记录 索引 候選 候选 環境 环境 場景 场景 測例 测例 樣本 样本 數據 数据 5308 143 11827 100000'});
   result.push({kind:'reference',title:translate('Benchmark總庫：Survey分類、任務聯集與規則擴充',locale),path:'survey-union.html',summary:translate('143條已登記評測來源、250篇書目、5308條定義／設定索引與12個擴充例；環境／樣本總數待整理。',locale),search:'survey taxonomy benchmark union task grammar 規則 规则 聯集 联集 分類 分类 全部 143 5308 VIMA ARNOLD COIN CrossTask'});
   result.push({kind:'reference',title:translate('工程附錄：120測例與RGB工具執行',locale),path:'joint-pilot.html',summary:translate('合成影像、SQLite、機器人接觸操作與完整共同驗收。720次程式執行、80測例新初態結果及可下載資料。',locale),search:'joint multimodal tool use synthetic 自建 合成 多模態 多模态 工具 120 720 92.5 SQLite RGB data 資料 数据'});
@@ -774,7 +787,7 @@ for(const locale of LOCALES){
   await write(`${locale}/research.html`,renderResearchPage(locale,researchStats,papers,literatureAdditions,literatureLineage,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell}));
   await write(`${locale}/joint-pilot.html`,renderJointPilotPage(locale,jointReport,jointDemos,jointDownload,{t,escape,relative,routeLink,head,shell}));
   await write(`${locale}/survey-union.html`,renderSurveyUnionPage(locale,unionStats,unionRegistry,unionSources,unionExtensions,{t,escape,relative,routeLink,head,shell}));
-  await write(`${locale}/counting.html`,renderCountingPage(locale,unionStats,countingContract,{t,escape,relative,routeLink,head,shell}));
+  await write(`${locale}/counting.html`,renderCountingPage(locale,unionStats,countingContract,{t,escape,relative,routeLink,head,shell,symbolGuide,tracks:taxonomy.tracks}));
   await write(`${locale}/scale-plan.html`,scalePlanPage(locale));
   await write(`${locale}/native-tasks.html`,nativePage(locale));
   const data=searchData(locale);
@@ -827,7 +840,23 @@ await write('assets/joint-pilot-data.js',`window.JOINT_PILOT_DEMOS=${jsonSafe(jo
 for(const filename of await fs.readdir(UNION_DIR)){
   if(/\.(json|csv|md|pdf)$/.test(filename))await write(`downloads/survey-union/${filename}`,await fs.readFile(path.join(UNION_DIR,filename)));
 }
-for(const filename of ['COUNTING_GUIDE.md','counting_contract.json'])await write(`downloads/counting/${filename}`,await fs.readFile(path.join(COUNTING_DIR,filename)));
+for(const filename of ['COUNTING_GUIDE.md','counting_contract.json','symbol_guide.json'])await write(`downloads/counting/${filename}`,await fs.readFile(path.join(COUNTING_DIR,filename)));
+await write('downloads/counting/symbol_definitions.json',JSON.stringify({...symbolGuide,tracks:taxonomy.tracks},null,2));
+const symbolMarkdown=[
+  '# G與T：計數粒度與評測模組速查','',symbolGuide.origin,'',
+  '**G：在數哪一層。T：在測哪種能力。**','',
+  '## G0–G5','',symbolGuide.g_meaning,'',
+  '| 編號／單位 | 定義 | 摺毛巾例子 |','|---|---|---|',
+  ...symbolGuide.granularity_levels.map(g=>`| ${g.id} ${g.name} | ${g.definition} | ${g.example} |`),'',
+  symbolGuide.g0_g1_relationship,'','## T1–T8','',symbolGuide.t_meaning,'',
+  '| 模組 | 例子 | 輸出 |','|---|---|---|',
+  ...Object.entries(taxonomy.tracks).map(([id,track])=>`| ${id} ${track.name} | ${symbolGuide.track_examples[id]} | ${track.output} |`),'',
+  symbolGuide.module_applicability,'','## 與任務環境、Q狀態的關係','',
+  symbolGuide.environment_relationship,'',symbolGuide.readiness_note,'',
+  'T編號不表示必須依序執行；G與T都不是難度分級。','',
+  `完整入口：${config.siteUrl}/zh-hant/counting.html#symbols-guide`,''
+].join('\n');
+await write('downloads/counting/G_T_GUIDE.md',symbolMarkdown);
 const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
 const scaleRoot=rootHtml
   .replace('從看懂示範，到可靠完成任務。','更多獨立任務，更廣評測覆蓋。')
@@ -847,6 +876,7 @@ const manifest={
   jointPilot:{workflowCandidates:1,cases:jointReport.total_cases,testCases:jointReport.test_cases,programTrials:jointReport.total_frozen_program_trials,supplementalAnnotations:jointReport.supplemental_annotation_trials,canonicalG2:null},
   surveyUnion:{sourceRecords:unionStats.total_source_records,registeredEvaluationSources:unionStats.benchmark_or_eval_resource_records,taskSourceSnapshots:unionStats.source_snapshots,robotTaskCandidates:unionStats.native_robot_task_candidates,humanActivityDefinitions:unionStats.human_activity_definitions,extensionExamples:unionExtensions.length,completeSearch:false},
   counting:{version:countingContract.version,taskEnvironmentDefinitions:null,sceneLayouts:null,sourceSampleTotals:null,extractedSourceIndices:unionStats.total_source_records,definitionsRequireLocalExecution:false},
+  symbols:{version:symbolGuide.version,gLevels:symbolGuide.granularity_levels.length,tModules:Object.keys(taxonomy.tracks).length,schemeOrigin:'project_defined'},
   note:'Main research: comprehensive source survey, taxonomy, task union and task/rule extensions. Runtime pilots are engineering appendices; collection and execution have separate counts.'
 };
 await fs.mkdir(path.join(ROOT,'verification'),{recursive:true});

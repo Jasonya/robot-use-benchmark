@@ -47,7 +47,8 @@ export function renderCountingPage(locale,stats,contract,helpers){
   const demo=contract.hypothetical_example;
   const definitions=contract.definitions.map(d=>`<article class="count-definition" id="${d.id}"><h3>${t(d.name,locale)}</h3><p>${t(d.definition,locale)}</p><p class="counting-note">${t(d.counting_rule,locale)}</p></article>`).join('');
   const body=`<main class="wrap counting-main" id="main-content">
-    ${head('5,308是來源索引。環境、場景與樣本分開算。','把來源名錄、原作索引、任務環境定義、場景、測例與一次執行分成不同層級；先收集完整來源，再逐步整理任務環境。',route,locale,`<div class="page-meta"><span>${t('計數說明更新：2026-10-01',locale)}</span><span>${t('來源數字快照：2026-09-29',locale)}</span></div>`)}
+    ${head('5,308是來源索引。環境、場景與樣本分開算。','把來源名錄、原作索引、任務環境定義、場景、測例與一次執行分成不同層級；G／T代號的完整定義也集中在本頁。',route,locale,`<div class="page-meta"><span>${t('計數說明：2026-10-01',locale)}</span><span>${t('G／T速查：2026-10-02',locale)}</span><span>${t('來源數字快照：2026-09-29',locale)}</span></div>`)}
+    <nav class="symbol-guide-links counting-jump-links" aria-label="${t('計數與代號快速導覽',locale)}"><a href="#symbols-g">${t('G0–G5：計數層級',locale)}</a><a href="#symbols-t">${t('T1–T8：評測模組',locale)}</a><a href="#task-environment">${t('任務環境定義',locale)}</a><a href="#real-source-examples">${t('索引與樣本實例',locale)}</a></nav>
     ${renderCountingOverview(locale,stats,helpers,{route})}
     <section class="counting-section" id="real-source-examples"><h2>${t('同一個來源，索引數與樣本數可以差很多',locale)}</h2>
       <div class="table-scroll"><table id="counting-source-examples"><thead><tr><th>${t('原作',locale)}</th><th>${t('本庫目前計入5,308的內容',locale)}</th><th>${t('原作公布的規模',locale)}</th><th>${t('本庫取得／整理狀態',locale)}</th></tr></thead><tbody>${examples}</tbody></table></div>
@@ -55,6 +56,7 @@ export function renderCountingPage(locale,stats,contract,helpers){
       <p><a href="${routeLink(route,'survey-union.html',locale)}#union-catalogue">${t('回到來源總表核對原作單位與提取進度',locale)} →</a></p>
     </section>
     <section class="counting-section" id="count-definitions"><h2>${t('這幾個名詞，各自定義什麼',locale)}</h2><div class="count-definition-grid">${definitions}</div></section>
+    ${renderSymbolGuide(locale,helpers.symbolGuide,helpers.tracks,{t,escape,relative,routeLink})}
     <section class="counting-section" id="environment-spec"><h2>${t('什麼時候能登記為任務環境定義',locale)}</h2>
       <p>${t('這是本計畫採用的整理約定。可以把原作任務及其可交互世界封裝成task environment，並保留下面四組規格：',locale)}</p>
       <ol class="environment-components"><li><b>${t('世界與機體',locale)}</b>：${t('场景／layout、物件、材料與機器人，或可追溯的原作定義。',locale)}</li><li><b>${t('觀測與動作',locale)}</b>：${t('模型能看什麼、能操作什麼，以及介面與控制約定。',locale)}</li><li><b>${t('狀態規則',locale)}</b>：${t('如何初始化、有效初態範圍、動作造成哪些狀態變化。',locale)}</li><li><b>${t('任務與判分',locale)}</b>：${t('目標、必要過程、限制、完成條件與評分。',locale)}</li></ol>
@@ -76,5 +78,6 @@ export function renderCountingPage(locale,stats,contract,helpers){
       <p class="source-note">${t('環境介面的背景可參考',locale)} ${contract.references.map(r=>`<a href="${escape(r.url)}" target="_blank" rel="noopener noreferrer">${t(r.name,locale)}</a>`).join(' · ')}。${t('本頁的資料分層與計數規則是本計畫的明訂約定。',locale)}</p>
     </section>
   </main><script defer src="${relative(`${locale}/${route}`,'assets/counting.js')}"></script>`;
-  return shell({route,locale,title:'來源、環境、場景、測例與資料量：計數說明',description:'143是來源名錄、5308是部分來源的定義／設定索引。任務環境定義與樣本總量待整理；附COIN、PARTNR對照及1場景／3任務環境的互動算例。',body,kind:'counting'});
+  return shell({route,locale,title:'計數與代號：G0–G5、T1–T8與任務環境',description:'G是計數粒度，T是評測模組；附完整定義、摺毛巾例子與章節跳轉。143來源名錄與5308索引、任務環境、場景和樣本分開計數。',body,kind:'counting'});
 }
+import {renderSymbolGuide} from './symbol-guide.mjs';

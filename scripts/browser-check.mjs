@@ -139,6 +139,30 @@ try{
   await snapshot('chapter-desktop');
   pass('Full chapter reading','Chapter summary, source content, sticky navigation and wide-table containment render.');
 
+  await go('zh-hant/chapters/02.html');
+  assert.equal(await evaluate("document.querySelectorAll('[data-symbol-reader-note]').length"),1);
+  assert.ok(await noOverflow());
+  await snapshot('chapter02-symbols-desktop');
+  await evaluate("document.querySelector('[data-definition-symbol=\"G2\"]').click()");
+  await waitFor("location.pathname.endsWith('/counting.html')&&location.hash==='#g2'&&document.readyState==='complete'");
+  await waitFor("document.getElementById('g2').getBoundingClientRect().top>=70&&document.getElementById('g2').getBoundingClientRect().top<400");
+  assert.ok(await evaluate("document.getElementById('g2').textContent.includes('任務規格')"));
+  assert.equal(await evaluate("document.querySelectorAll('[data-g-definition]').length"),6);
+  await go('zh-hant/chapters/02.html');
+  await evaluate("document.querySelector('[data-definition-symbol=\"T5\"]').click()");
+  await waitFor("location.pathname.endsWith('/counting.html')&&location.hash==='#t5'&&document.readyState==='complete'");
+  await waitFor("document.getElementById('t5').getBoundingClientRect().top>=70&&document.getElementById('t5').getBoundingClientRect().top<400");
+  assert.equal(await evaluate("document.querySelectorAll('[data-t-definition]').length"),8);
+  assert.ok(await evaluate("document.getElementById('t5').textContent.includes('閉迴路任務執行')"));
+  await snapshot('t-module-definitions-desktop');
+  await evaluate("document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').click()");
+  await waitFor("location.pathname.includes('/zh-hans/')&&location.hash==='#t5'&&document.readyState==='complete'");
+  assert.ok(await noOverflow());
+  await evaluate("document.querySelector('#t5 a').click()");
+  await waitFor("location.pathname.endsWith('/explore/metrics.html')&&document.readyState==='complete'");
+  assert.equal(await evaluate("document.getElementById('filter-track').value"),'T5');
+  pass('G/T definitions and chapter links','Chapter02 G2 and T5 link to complete definitions; the T5 anchor survives script switching and opens the matching metrics filter.');
+
   await go('zh-hans/search.html?q=SC-H15');
   await waitFor("document.querySelectorAll('#site-search-results .search-result').length>0",45000);
   assert.ok(await evaluate("document.querySelectorAll('#site-search-results .search-result').length>0"));
@@ -392,6 +416,13 @@ try{
   await go('zh-hans/counting.html');
   assert.ok(await noOverflow());
   await snapshot('counting-mobile');
+  await go('zh-hans/chapters/02.html');
+  assert.ok(await noOverflow());
+  await snapshot('chapter02-symbols-mobile');
+  await go('zh-hans/counting.html#symbols-t');
+  await waitFor("document.getElementById('symbols-t').getBoundingClientRect().top>=70&&document.getElementById('symbols-t').getBoundingClientRect().top<400");
+  assert.ok(await noOverflow());
+  await snapshot('t-module-definitions-mobile');
   await evaluate("document.getElementById('counting-example').scrollIntoView({behavior:'instant',block:'start'})");
   assert.ok(await noOverflow());
   await snapshot('counting-example-mobile');
@@ -448,6 +479,8 @@ try{
   assert.equal(await evaluate("document.querySelector('[data-example-count=\"cases\"]').textContent"),'300');
   assert.equal(await evaluate("document.querySelector('[data-counting-metric=\"environments\"]').dataset.countState"),'unknown');
   assert.equal(await evaluate("getComputedStyle(document.querySelector('.case-count-control')).display"),'none');
+  assert.equal(await evaluate("document.querySelectorAll('[data-g-definition]').length"),6);
+  assert.equal(await evaluate("document.querySelectorAll('[data-t-definition]').length"),8);
   await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
   pass('Reading without JavaScript','All 180 task cards, four 70-row comparison tables and the joint pilot default case/results remain readable without scripts.');
 

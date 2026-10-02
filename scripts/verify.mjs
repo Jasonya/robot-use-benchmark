@@ -165,6 +165,12 @@ assert.equal(extensions.length,12);
 assert.ok(extensions.every(r=>r.parent_source_ids.every(id=>sourceIds.has(id))));
 assert.ok(extensions.every(r=>r.status==='authored_extension_specification_not_executed'));
 const counting=JSON.parse(await fs.readFile(path.join(out,'downloads/counting/counting_contract.json'),'utf8'));
+const symbols=JSON.parse(await fs.readFile(path.join(out,'downloads/counting/symbol_definitions.json'),'utf8'));
+const sourceTaxonomy=JSON.parse(await fs.readFile(path.join(root,'content/taxonomy.json'),'utf8'));
+assert.deepEqual(symbols.granularity_levels.map(g=>g.id),['G0','G1','G2','G3','G4','G5']);
+assert.deepEqual(symbols.tracks,sourceTaxonomy.tracks);
+assert.equal(symbols.g_is_difficulty_or_progress,false);
+assert.equal(symbols.t_is_required_execution_order,false);
 assert.equal(counting.unknown_totals.task_environment_definitions,null);
 assert.equal(counting.unknown_totals.distinct_scene_layouts,null);
 assert.ok(Object.values(counting.unknown_totals.source_sample_totals_by_type).every(n=>n===null));
@@ -269,6 +275,22 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(unionPage.$('#union-extension-rules details').length,12);
   const countingPage=pages.get(path.join(out,locale,'counting.html'));
   assert.ok(countingPage);
+  assert.equal(countingPage.$('[data-g-definition]').length,6);
+  assert.equal(countingPage.$('[data-t-definition]').length,8);
+  for(const code of ['G0','G1','G2','G3','G4','G5','T1','T2','T3','T4','T5','T6','T7','T8']){
+    assert.ok(countingPage.$('#'+code.toLowerCase()).length);
+  }
+  const chapterTwo=pages.get(path.join(out,locale,'chapters/02.html'));
+  assert.equal(chapterTwo.$('[data-symbol-reader-note]').length,1);
+  for(const code of ['G0','G1','G2','G3','G4','G5','T3','T5','T6']){
+    const links=chapterTwo.$(`[data-definition-symbol="${code}"]`);
+    assert.ok(links.length);
+    assert.ok(links.toArray().every(n=>chapterTwo.$(n).attr('href')===`../counting.html#${code.toLowerCase()}`));
+  }
+  for(let i=1;i<=14;i++){
+    const page=pages.get(path.join(out,locale,`chapters/${String(i).padStart(2,'0')}.html`));
+    assert.equal(page.$('code .definition-symbol,pre .definition-symbol,a .definition-symbol').length,0);
+  }
   assert.equal(countingPage.$('#count-definitions article').length,counting.definitions.length);
   for(const route of ['index.html','survey-union.html','counting.html']){
     const page=pages.get(path.join(out,locale,route));
