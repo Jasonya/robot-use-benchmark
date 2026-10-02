@@ -35,7 +35,7 @@
     const target=document.getElementById(id);
     if(!target)return;
     let changed=false;
-    let node=target.matches('details.union-legacy')?target:target.parentElement?.closest('details');
+    let node=target.matches('details')?target:target.parentElement?.closest('details');
     while(node){
       if(!node.open){node.open=true;changed=true;}
       node=node.parentElement?.closest('details');

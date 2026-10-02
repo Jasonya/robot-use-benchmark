@@ -4,6 +4,10 @@ import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import * as cheerio from 'cheerio';
+import {createReadStream} from 'node:fs';
+import {createGunzip} from 'node:zlib';
+import {createInterface} from 'node:readline';
+import {validateNumbers,quantityRows} from './quantified-model.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const out=path.join(root,'docs');
 const config=JSON.parse(await fs.readFile(path.join(root,'site.config.json'),'utf8'));
@@ -153,12 +157,59 @@ const registry=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-unio
 const bridge=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-union/task_source_bridge.json'),'utf8'));
 const extensions=JSON.parse(await fs.readFile(path.join(out,'downloads/survey-union/extension_examples.json'),'utf8'));
 const coverage=JSON.parse(await fs.readFile(path.join(out,'downloads/coverage/coverage_snapshot.json'),'utf8'));
+const inventory=JSON.parse(await fs.readFile(path.join(out,'downloads/quantified/inventory_summary.json'),'utf8'));
+const numberContract=JSON.parse(await fs.readFile(path.join(out,'downloads/quantified/numbers_contract.json'),'utf8'));
+const numeric=validateNumbers(numberContract,inventory);
+assert.deepEqual(quantityRows(numeric).map(r=>r.current),[12,284,2103,114288,4]);
+const envRegistry=JSON.parse(await fs.readFile(path.join(out,'downloads/quantified/environment_registry.json'),'utf8'));
+const taskRegistry=JSON.parse(await fs.readFile(path.join(out,'downloads/quantified/task_registry.json'),'utf8'));
+const infoTasks=JSON.parse(await fs.readFile(path.join(out,'downloads/quantified/information_task_types.json'),'utf8'));
+assert.equal(envRegistry.length,284);
+const environmentIds=new Set(envRegistry.map(r=>r.environment_id));
+assert.equal(environmentIds.size,284);
+assert.ok(envRegistry.every(r=>r.source_url&&r.source_version&&r.definition_sha256.length===64));
+assert.ok(![...environmentIds].some(id=>/D_eval|style|openeqa/.test(id)));
+assert.equal(taskRegistry.length,2096);
+assert.equal(new Set(taskRegistry.map(r=>r.record_id)).size,2096);
+assert.ok(taskRegistry.every(r=>r.domain_assignment.status&&r.paper_ids.length&&r.source_url));
+assert.equal(infoTasks.length,7);
+const infoTaskIds=new Set(infoTasks.map(r=>r.record_id));
+const caseIds=new Set();const caseBreakdown={};const caseScenes=new Set();
+for(const [filename,record]of Object.entries(inventory.files)){
+  const bytes=await fs.readFile(path.join(out,'downloads/quantified',filename));
+  assert.equal(bytes.length,record.bytes);
+  assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),record.sha256);
+}
+for await(const line of createInterface({input:createReadStream(path.join(out,'downloads/quantified/case_registry.jsonl.gz')).pipe(createGunzip()),crlfDelay:Infinity})){
+  const r=JSON.parse(line);
+  assert.ok(r.case_id&&!caseIds.has(r.case_id));
+  caseIds.add(r.case_id);
+  const key=r.source_id+'::'+r.native_split;
+  caseBreakdown[key]=(caseBreakdown[key]||0)+1;
+  assert.ok(r.source_version&&r.native_locator&&r.task_ref&&r.evaluator_ref);
+  assert.ok(/^[a-f0-9]{64}$/.test(r.input_sha256)&&/^[a-f0-9]{64}$/.test(r.label_sha256));
+  assert.equal(r.definition_check,'passed');
+  assert.equal(r.complete_local_inputs,false);
+  assert.equal(r.runtime_verified,false);
+  assert.ok(!('question'in r)&&!('answer'in r)&&!('instruction'in r),'Public index contains references/hashes, not full source text');
+  if(r.case_kind==='robot_episode'){assert.ok(environmentIds.has(r.environment_id));caseScenes.add(r.environment_id);}
+  else{assert.equal(r.case_kind,'qa');assert.ok(infoTaskIds.has(r.task_ref));assert.equal(r.environment_id,'');}
+}
+assert.equal(caseIds.size,114288);
+assert.deepEqual(caseBreakdown,{'partnr::train':111652,'partnr::val':1000,'openeqa::native_benchmark_unsplit':1636});
+assert.equal(caseScenes.size,49);
+assert.equal(inventory.new_case_complete_local_input_count,0);
+assert.equal(inventory.new_case_runtime_trials,0);
+assert.equal(inventory.predicate_names_resolve_to_source,true);
+const priorBridge=JSON.parse(await fs.readFile(path.join(out,'downloads/archive/survey-union-2026-09-29/task_source_bridge.json'),'utf8'));
+assert.equal(priorBridge.length,5308);
+assert.ok(priorBridge.every(r=>bridge.some(n=>n.record_id===r.record_id)));
 const originalCounts=JSON.parse(await fs.readFile(path.join(out,'downloads/benchmark-comparison/typed_count_records.json'),'utf8')).rows;
 assert.deepEqual(new Set(coverage.rows.map(r=>r.paper_id)),new Set(registry.filter(r=>r.benchmark_source_registered).map(r=>r.paper_id)));
 assert.equal(coverage.rows.length,143);
 assert.equal(coverage.plan.fields.length,5);
 assert.equal(coverage.plan.evaluation_methods.length,4);
-assert.equal(coverage.statistics.native_robot_task_records,2062);
+assert.equal(coverage.statistics.native_robot_task_records,2096);
 assert.equal(coverage.statistics.human_activity_records,263);
 assert.equal(coverage.statistics.common_task_union,null);
 assert.equal(coverage.statistics.canonical_environment_union,null);
@@ -183,16 +234,22 @@ assert.ok(coverageRow('P108').counts.some(c=>c.field==='data'&&c.unit==='paired_
 assert.ok(coverageRow('alfred').counts.some(c=>c.field==='data'&&c.value===8055));
 assert.ok(coverageRow('egotaskqa').counts.some(c=>c.field==='case'&&c.value===40000));
 assert.ok(coverageRow('egotaskqa').counts.some(c=>c.field==='data'&&c.value===368000));
-assert.deepEqual(coverageRow('partnr').counts.filter(c=>c.field==='case').map(c=>[c.scope,c.value]),[['training',100000],['validation',1000],['test',1000]]);
+assert.deepEqual(coverageRow('partnr').counts.filter(c=>c.field==='case').map(c=>[c.scope,c.value]),[['training',111652],['validation',1000]]);
+assert.ok(coverageRow('partnr').counts.some(c=>c.field==='history'&&c.value===100000));
+assert.equal(coverageRow('P038').counts.filter(c=>c.field==='case').length,1);
+assert.equal(coverageRow('P038').counts.find(c=>c.field==='case').value,1636);
+assert.ok(coverageRow('P038').counts.some(c=>c.field==='history'&&c.value===1600));
 assert.ok(coverageRow('P038').evaluation_methods.includes('judge'));
 assert.ok(coverageRow('P151').evaluation_methods.every(id=>id!=='state_process'),'Video goal appearance is not robot execution');
 assert.ok(coverage.domains.every(d=>d.mapped_task_count===null));
 assert.ok((await fs.readFile(path.join(out,'downloads/coverage/benchmark_summary.csv'),'utf8')).includes('BEHAVIOR-1K'));
 assert.equal(registry.length,250);
 assert.equal(registry.filter(r=>r.benchmark_source_registered).length,143);
-assert.equal(bridge.length,5308);
-assert.equal(new Set(bridge.map(r=>r.record_id)).size,5308);
-assert.equal(union.newly_extracted_source_records,288);
+assert.equal(bridge.length,5349);
+assert.equal(new Set(bridge.map(r=>r.record_id)).size,5349);
+assert.equal(union.newly_extracted_source_records,41);
+assert.equal(union.information_task_definitions,7);
+assert.equal(union.benchmark_source_records_with_task_inventory,29);
 assert.equal(union.catalogue_requires_local_simulation,false);
 assert.equal(union.pilot_role,'engineering_appendix_only');
 assert.equal(union.complete_search_claimed,false);
@@ -220,7 +277,7 @@ for(const example of counting.examples){
   assert.ok(source);
   assert.equal(source.source_records,example.indexed_records);
 }
-for(const [source,count]of Object.entries({vima:17,arnold:8,coin_video:180,crosstask:83})){
+for(const [source,count]of Object.entries({vima:17,arnold:8,coin_video:180,crosstask:83,calvin:34,openeqa:7})){
   assert.equal(bridge.filter(r=>r.source_id===source).length,count);
   assert.equal(nativeData.records.filter(r=>r.s===source).length,count);
 }
@@ -308,7 +365,7 @@ for(const locale of ['zh-hant','zh-hans']){
   const unionPage=pages.get(path.join(out,locale,'survey-union.html'));
   assert.equal(unionPage.$('#union-registry-table tbody tr').length,250);
   assert.equal(unionPage.$('#union-taxonomy-table tbody tr').length,12);
-  assert.equal(unionPage.$('#union-sources-table tbody tr').length,25);
+  assert.equal(unionPage.$('#union-sources-table tbody tr').length,27);
   assert.equal(unionPage.$('#union-coin-domains tbody tr').length,12);
   assert.equal(unionPage.$('#union-extension-rules details').length,12);
   const countingPage=pages.get(path.join(out,locale,'counting.html'));
@@ -333,12 +390,12 @@ for(const locale of ['zh-hant','zh-hans']){
   for(const route of ['survey-union.html','counting.html']){
     const page=pages.get(path.join(out,locale,route));
     assert.equal(page.$('[data-counting-metric="sources"] strong').text(),'143');
-    assert.equal(page.$('[data-counting-metric="indices"] strong').text(),'5,308');
+    assert.equal(page.$('[data-counting-metric="indices"] strong').text(),'5,349');
     assert.equal(page.$('[data-counting-metric="environments"]').attr('data-count-state'),'unknown');
     assert.equal(page.$('[data-counting-metric="samples"]').attr('data-count-state'),'unknown');
     const subtotals=page.$('[data-index-bucket]').toArray().map(n=>Number(page.$(n).attr('data-count')));
     assert.equal(subtotals.reduce((a,b)=>a+b,0),union.total_source_records);
-    assert.deepEqual(subtotals,[2062,263,2983]);
+    assert.deepEqual(subtotals,[2096,263,2990]);
   }
   assert.equal(countingPage.$('[data-example-count="cases"]').text(),'300');
   assert.equal(countingPage.$('[data-count-example="partnr"] td strong').first().text(),'6');
@@ -353,6 +410,16 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(coveragePage.$('#coverage-benchmarks tbody tr').length,143);
   assert.equal(coveragePage.$('#coverage-domain-table tbody tr').length,12);
   assert.equal(coveragePage.$('.coverage-evaluation-grid article').length,4);
+  for(const [route,selector]of [['coverage.html','#coverage-whole-table'],['design.html','#design-number-table']]){
+    const p=pages.get(path.join(out,locale,route)).$;
+    assert.deepEqual(p(`${selector} [data-number-role="target"]`).toArray().map(n=>Number(p(n).attr('data-number-value'))),[12,1000,5000,1000000,4]);
+    assert.deepEqual(p(`${selector} [data-number-role="current"]`).toArray().map(n=>Number(p(n).attr('data-number-value'))),[12,284,2103,114288,4]);
+  }
+  assert.deepEqual(home.$('[data-target-count]').toArray().map(n=>Number(home.$(n).attr('data-target-count'))),[12,1000,5000,1000000,4]);
+  assert.deepEqual(home.$('[data-current-count]').toArray().map(n=>Number(home.$(n).attr('data-current-count'))),[12,284,2103,114288,4]);
+  assert.equal(coveragePage.$('#number-environment-breakdown tbody tr').length,5);
+  assert.equal(coveragePage.$('#number-case-breakdown tbody tr').length,3);
+  assert.equal(coveragePage.$('#number-version-crosswalk tbody tr').length,numberContract.version_crosswalk.length);
   assert.ok(coveragePage.$('a[href="../downloads/coverage/benchmark_summary.csv"]').length);
   assert.ok(home.$('.hero').text().includes('Survey')||home.$('.hero').text().includes('SURVEY'));
   assert.ok(!home.$('#main-content').text().includes('92.5%'));
@@ -364,11 +431,13 @@ for(const locale of ['zh-hant','zh-hans']){
   const budget=pages.get(path.join(out,locale,'chapters/11.html')).$;
   assert.ok(budget('#c11').text().includes('2,000–3,000'));
   assert.equal(budget('details.legacy-content').length,1);
+  assert.equal(budget('#archive-c11').attr('open'),undefined);
+  assert.equal(budget('[data-active-numbers]').length,1);
   const comparison=pages.get(path.join(out,locale,'chapters/05.html')).$.text();
   assert.ok(comparison.includes('v0.4')&&comparison.includes('2,000–3,000'));
 }
 await fs.mkdir(path.join(root,'verification'),{recursive:true});
-const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,surveyUnion:{registeredSources:143,papers:250,sourceRecords:5308,addedDefinitions:288,ruleExamples:12,catalogueRequiresLocalExecution:false},counting:{contract:counting.version,sourceIndices:5308,taskEnvironmentDefinitions:null,rawSampleTotals:null,exampleIsHypothetical:true},jointPilot:{role:'engineering_appendix',cases:jointCases.length,programTrials:jointTrials.length,supplementalAnnotations:joint.supplemental_annotation_trials},scopeVersion:config.iterationVersion,designScope:'Main research: prior benchmark survey, task union and task/rule extensions. Catalogue collection and executable subsets are separate. Earlier native and joint experiments remain engineering appendices.',issues};
+const report={status:issues.length?'failed':'passed',htmlPages:pages.size,localizedPages:manifest.pages.length,linksAndAssetsChecked:checked,recordCounts:expected,nativeSourceRecords:nativeData.records.length,sourceSectionsPreserved:requiredSectionIds.length,surveyUnion:{registeredSources:143,papers:250,sourceRecords:bridge.length,addedDefinitions:union.newly_extracted_source_records,ruleExamples:12,catalogueRequiresLocalExecution:false},counting:{contract:counting.version,sourceIndices:bridge.length,taskEnvironmentDefinitions:null,rawSampleTotals:null,exampleIsHypothetical:true},quantified:{version:numberContract.version,targets:quantityRows(numeric).map(r=>r.target),current:quantityRows(numeric).map(r=>r.current),checkedCaseDefinitions:caseIds.size,caseDefinitionIssues:0,newModelTrials:0},jointPilot:{role:'engineering_appendix',cases:jointCases.length,programTrials:jointTrials.length,supplementalAnnotations:joint.supplemental_annotation_trials},scopeVersion:config.iterationVersion,designScope:'Main research: prior benchmark survey, task union and task/rule extensions. Catalogue collection and executable subsets are separate. Earlier native and joint experiments remain engineering appendices.',issues};
 await fs.writeFile(path.join(root,'verification/static-checks.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify({...report,issues:issues.slice(0,20)},null,2));
 assert.equal(issues.length,0,`${issues.length} static site issues`);

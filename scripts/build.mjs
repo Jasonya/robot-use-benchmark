@@ -14,6 +14,7 @@ import {indexUnitLabels,renderCountingOverview,renderEnvironmentNote,renderCount
 import {linkDefinitionSymbols,renderSymbolReaderNote} from './symbol-guide.mjs';
 import {buildCoverageModel,coverageCSV,coverageRowsCSV,coverageMarkdown} from './coverage-model.mjs';
 import {renderCoveragePage,renderCoverageOverview,renderCoverageNotice,renderCoverageDesign} from './coverage-page.mjs';
+import {validateNumbers,quantityRows,applySourceOverlay,currentQuantityRecords,sourceBridgeCSV,quantityReportMarkdown} from './quantified-model.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -115,13 +116,29 @@ const JOINT_DIR=path.join(CONTENT,'joint_pilot');
 const [jointReport,jointDemos,jointDownload]=await Promise.all(
   ['pilot_report.json','demo_cases.json','download_info.json'].map(async n=>JSON.parse(await fs.readFile(path.join(JOINT_DIR,n),'utf8'))));
 const UNION_DIR=path.join(CONTENT,'survey_union');
-const [unionStats,unionRegistry,unionSources,unionAdditions,unionExtensions]=await Promise.all(
+let [unionStats,unionRegistry,unionSources,unionAdditions,unionExtensions]=await Promise.all(
   ['union_statistics.json','survey_registry.json','source_summaries.json','source_additions.json','extension_examples.json']
     .map(async n=>JSON.parse(await fs.readFile(path.join(UNION_DIR,n),'utf8'))));
 const unionSpecHTML=await fs.readFile(path.join(UNION_DIR,'UNION_FIRST_DESIGN_V0_7.html'),'utf8');
 const COUNTING_DIR=path.join(CONTENT,'counting');
 const countingContract=JSON.parse(await fs.readFile(path.join(COUNTING_DIR,'counting_contract.json'),'utf8'));
 const symbolGuide=JSON.parse(await fs.readFile(path.join(COUNTING_DIR,'symbol_guide.json'),'utf8'));
+const QUANTIFIED_DIR=path.join(CONTENT,'quantified');
+const [numberContract,numberInventory,numberAdditions,numberSourcePins,numberEnvironments,numberCaseExamples,numberEvaluators]=await Promise.all(
+  ['numbers_contract.json','inventory_summary.json','source_additions.json','source_pins.json','environment_registry.json','case_examples.json','evaluator_registry.json']
+    .map(async name=>JSON.parse(await fs.readFile(path.join(QUANTIFIED_DIR,name),'utf8'))));
+const numbers=validateNumbers(numberContract,numberInventory);
+numbers.environments=numberEnvironments;numbers.caseExamples=numberCaseExamples;numbers.evaluators=numberEvaluators;
+const unionArchive={stats:structuredClone(unionStats),registry:structuredClone(unionRegistry),sources:structuredClone(unionSources),additions:structuredClone(unionAdditions)};
+const effectiveUnion=applySourceOverlay({stats:unionStats,registry:unionRegistry,sources:unionSources,additions:unionAdditions},numbers,numberAdditions,numberSourcePins);
+unionStats=effectiveUnion.stats;unionRegistry=effectiveUnion.registry;unionSources=effectiveUnion.sources;unionAdditions=effectiveUnion.additions;
+countingContract.version='counting-contract-0.9';
+countingContract.clarified_on=numberContract.effective_on;
+countingContract.source_snapshot_date=numberContract.effective_on;
+const activeIndexTotal=unionStats.total_source_records.toLocaleString('en-US');
+countingContract.definitions.find(d=>d.id==='source-index').counting_rule=`${activeIndexTotal}是本版已提取索引總數，包含robot任務、資訊題型、人類活動及其他設定；不代替場景、共同任務或題目總量。`;
+countingContract.examples.find(e=>e.id==='partnr').reported_scale='原文概述100k tasks；本版公開檔案111,652 train＋1,000 val定義，未取得test檔。';
+countingContract.examples.find(e=>e.id==='partnr').acquisition_note='6條仍是生成器設定索引；另取得112,652筆題目元資料，素材與執行未完成。';
 const COVERAGE_DIR=path.join(CONTENT,'coverage');
 const [coveragePlan,coverageSupplement,coverageScoring,coverageReviews,typedCounts,coverageDisplayNotes]=await Promise.all([
   fs.readFile(path.join(COVERAGE_DIR,'coverage_plan.json'),'utf8').then(JSON.parse),
@@ -131,12 +148,12 @@ const [coveragePlan,coverageSupplement,coverageScoring,coverageReviews,typedCoun
   fs.readFile(path.join(COMPARISON_DIR,'typed_count_records.json'),'utf8').then(JSON.parse),
   fs.readFile(path.join(COVERAGE_DIR,'source_display_notes.json'),'utf8').then(JSON.parse)
 ]);
-const coverageModel=buildCoverageModel({plan:coveragePlan,registry:unionRegistry,comparison:comparisonModel,typed:typedCounts,supplement:coverageSupplement,scoring:coverageScoring,reviews:coverageReviews,displayNotes:coverageDisplayNotes,unionStats,taxonomy,tasks,families});
-const browseSources=[...sourceReports,...unionSources.filter(s=>['vima','arnold','coin_video','crosstask'].includes(s.source_id)).map(s=>({
+const coverageModel=buildCoverageModel({plan:coveragePlan,registry:unionRegistry,comparison:comparisonModel,typed:typedCounts,supplement:[...coverageSupplement,...currentQuantityRecords(numbers,numberSourcePins)],scoring:coverageScoring,reviews:coverageReviews,displayNotes:coverageDisplayNotes,unionStats,taxonomy,tasks,families,numbers});
+const browseSources=[...sourceReports,...unionSources.filter(s=>['vima','arnold','coin_video','crosstask','calvin','openeqa'].includes(s.source_id)).map(s=>({
   id:s.source_id,work:s.name,resolved_repo:s.repositories[0],commit:s.commits[0],role:'additional_task_source',
   record_count:s.records,counts_by_unit:s.native_units
 }))];
-const newUnitLabels={native_task_template:'原生任務模板',native_task_class:'原生任務類別',instructional_activity_definition:'人類程序活動定義'};
+const newUnitLabels={native_task_template:'原生任務模板',native_task_class:'原生任務類別',instructional_activity_definition:'人類程序活動定義',native_task_definition:'原作任務定義',information_task_schema:'資訊題型定義'};
 const browseRecords=[...sourceRecords,...unionAdditions.map(r=>({
   ...r,anchor_id:'native-'+crypto.createHash('sha256').update(r.record_id).digest('hex').slice(0,16),
   source_work:unionSources.find(s=>s.source_id===r.source_id).name,
@@ -150,13 +167,14 @@ assetHasher.update(JSON.stringify({config,scalePlan,overallPlan,overallSpecHTML,
 assetHasher.update(JSON.stringify(countingContract));
 assetHasher.update(JSON.stringify(symbolGuide));
 assetHasher.update(JSON.stringify(coverageModel));
+assetHasher.update(JSON.stringify(numbers));
 for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','scripts/readiness-page.mjs','scripts/execution-page.mjs','scripts/research-page.mjs','scripts/joint-pilot-page.mjs','static/assets/joint-pilot.js','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
 for(const name of ['scripts/survey-union-page.mjs','static/assets/survey-union.js','static/assets/survey-union.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 for(const name of ['scripts/counting-guide.mjs','static/assets/counting.js','static/assets/counting.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/symbol-guide.mjs')));
-for(const name of ['scripts/coverage-model.mjs','scripts/coverage-page.mjs','static/assets/coverage.js','static/assets/coverage.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
+for(const name of ['scripts/coverage-model.mjs','scripts/coverage-page.mjs','scripts/quantified-model.mjs','static/assets/coverage.js','static/assets/coverage.css'])assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 const assetRevision=assetHasher.digest('hex').slice(0,12);
 const sectionById = Object.fromEntries(sections.map(section => [section.id, section]));
 const taskById = Object.fromEntries(tasks.map(record => [record.scenario_id, record]));
@@ -181,7 +199,7 @@ const groupRoutes = {
   literature:'library.html', methods:'appendices/methods.html'
 };
 const summaries = {
-  c01:['全面收集以前相關benchmark，整理其領域、任務與規則。','像Survey一樣分類並建立完整來源任務聯集，再擴充任務和規則。','來源目錄與可執行子集分開；v0.8以五個主欄位統整Coverage。'],
+  c01:['全面收集以前相關benchmark，整理其領域、任務與規則。','像Survey一樣分類並建立完整來源任務聯集，再擴充任務和規則。','目標與清單實數以最新量化表為準；來源目錄與可執行子集分開。'],
   c02:['文獻分類回答「研究測什麼」，任務規格回答「機器人要做什麼」。','以摺毛巾走過家族、任務、實例、測例與一次執行。','問答、預測、規劃和物理完成需要不同證據。'],
   c03:['主表統一看領域、環境、任務、題數與評估方式。','本章保留詳細計數粒度，查閱時再使用G代號。','同一任務換初態或重跑，需分清任務、測例與執行量。'],
   c04:[`${papers.length} 篇來源分成十二個主分類；本次新增82篇完整摘要審閱。`,'文獻篇數比例不能直接當作領域缺口或出題比例。','書目、摘要閱讀、全文查核和程式重現的證據深度分開。'],
@@ -324,7 +342,7 @@ function navHTML(route, locale) {
 function footerHTML(route, locale) {
   return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。',locale)}</div>
   <div class="footer-links"><a href="${routeLink(route,'coverage.html',locale)}">${t('覆蓋總覽與前作比較',locale)}</a><a href="${routeLink(route,'design.html',locale)}">${t('目前主設計',locale)}</a><a href="${routeLink(route,'research.html',locale)}">${t('文獻與分類',locale)}</a><a href="${routeLink(route,'counting.html',locale)}">${t('計數細節與舊代號',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
-  <p class="footer-note">${t(`v0.8 Coverage統整：領域、環境、任務、題數、評估方式。${unionStats.benchmark_or_eval_resource_records}筆前作來源與全庫狀態集中比較；共同任務、場景及測例聯集仍在整理。原始來源、詳細分類與工程紀錄保留可查。`,locale)}</p></div></footer>`;
+  <p class="footer-note">${t(`v${config.designVersion} 量化目標與清單實數：領域、環境、任務、題數、評估方式。${unionStats.benchmark_or_eval_resource_records}筆前作來源與全庫狀態集中比較；共同任務、場景及測例聯集仍在整理。原始來源、詳細分類與工程紀錄保留可查。`,locale)}</p></div></footer>`;
 }
 const strings = {
   copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
@@ -346,6 +364,8 @@ function shell({route,locale,title,description,body,kind='page'}) {
   const current = `${locale}/${route}`;
   const canonical = `${config.siteUrl}/${current}`;
   const jsConfig={locale,route,title:translate(title,locale),kind,localeRoot:relative(current,`${locale}/index.html`).replace(/index\.html$/,''),searchIndexURL:relative(current,`assets/search-${locale}.js`)+`?v=${assetRevision}`,text:translateObject(strings,locale)};
+  const referenceRoute=/^(chapters\/\d+|appendices\/|explore\/)/.test(route)||['scale-plan.html','counting.html','compare.html','readiness.html','execution.html','joint-pilot.html'].includes(route);
+  if(referenceRoute&&!body.includes('data-active-numbers='))body=body.replace(/(<main\b[^>]*id="main-content"[^>]*>)/,`$1${numberVersionNotice(route,locale)}`);
   allPageRecords.push({route,locale,title:translate(title,locale),file:current});
   return `<!doctype html><html lang="${locale==='zh-hant'?'zh-Hant':'zh-Hans'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${t(title,locale)} · Robot-use Benchmark</title>
   <meta name="description" content="${t(description,locale)}"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="${canonical}">
@@ -367,10 +387,14 @@ function head(title,description,route,locale,extra='') {
   return `<div class="page-head">${breadcrumb(title,route,locale)}<div class="eyebrow">RESEARCH ATLAS</div><h1>${t(title,locale)}</h1><p class="lede">${t(description,locale)}</p>${extra}</div>`;
 }
 function scopeNotice(route,locale){
-  return renderCoverageNotice(locale,route,{t,routeLink});
+  return numberVersionNotice(route,locale);
+}
+function numberVersionNotice(route,locale){
+  const goals=quantityRows(numbers).map(f=>`${f.target.toLocaleString('en-US')} ${f.target_unit}`).join(' · ');
+  return `<aside class="coverage-reader-note number-version-note" data-active-numbers="${escape(numberContract.version)}"><b>${t(`当前有效目標：v${config.designVersion}`,locale)}</b><p>${t(goals+'（規劃目標）',locale)}</p><p>${t('本頁保留原稿、詳細定義或專項實驗；舊配額與舊清單快照不作目前全庫數字。實驗結果只適用原批次。',locale)}</p><a href="${routeLink(route,'coverage.html#whole',locale)}">${t('查本版目標、清單實數與版本對照',locale)} →</a></aside>`;
 }
 function currentExecutionNote(route,locale){
-  return `<section class="current-execution-note"><h2 id="current-native-execution">${t('目前研究與整合進度',locale)}</h2><p>${t(`總目錄已接起250篇書目、143條已登記評測來源及5,308條原作索引。新增VIMA17個模板、ARNOLD8個任務類別、COIN180和CrossTask83個人類程序定義，下一步逐來源补齐原生清單、共同分類與規則。`,locale)}</p><p>${t('50個Meta-World任務和小型RGB／工具／robot試作保留作工程附錄，支援後续執行整合。目錄範圍由前作與擴充規格決定。',locale)}</p><p><a href="${routeLink(route,'survey-union.html',locale)}">${t('完整來源與任務聯集',locale)} →</a> · <a href="${routeLink(route,'execution.html',locale)}">${t('工程附錄：原生執行',locale)} →</a></p></section>`;
+  return `<section class="current-execution-note"><h2 id="current-native-execution">${t('目前量化目標與清單',locale)}</h2>${renderCoverageOverview(locale,coverageModel,{t,routeLink},{route,compact:true})}<p>${t('50個Meta-World任務與小型聯合試作的成績仍保留在工程附錄，不混成本版全庫成績。',locale)}</p><p><a href="${routeLink(route,'coverage.html',locale)}">${t('本版量化表與完整清單',locale)} →</a> · <a href="${routeLink(route,'execution.html',locale)}">${t('工程附錄：原生執行',locale)} →</a></p></section>`;
 }
 function designSections(numbers,locale,route,prefix){
   const $=cheerio.load(overallSpecHTML,{},false);const result=[];
@@ -419,17 +443,17 @@ function overallDesignPage(locale){
   const nav=chapterNav(route,locale);const dl=relative(`${locale}/${route}`,'downloads/survey-union/');
   const steps=[['01','前作五欄','領域、環境、任務、題數、評估方式'],['02','全庫聯集','對齊來源、場景重用、任務與規則'],['03','題目與判分','建立有效測例，報實際可評範圍']];
   const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar">${nav}</aside><main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節與資料庫',locale)}</summary>${nav}</details>${breadcrumb('目前主設計',route,locale)}
-  <div class="eyebrow">COVERAGE · v0.8</div><h1>${t('五個欄位，交代整個benchmark。',locale)}</h1><p class="lede">${t('全面收集既有benchmark，先把前作規模放在同一張表，再建立我們的任務聯集與規則擴充。主要閱讀入口統一呈現領域、環境、任務、題數及評估方式。',locale)}</p>
-  <div class="page-meta"><span>2026-10-02</span><span class="pill green">${t('Coverage統整 v0.8',locale)}</span><span>${t('來源含模擬、實體與人類影片；執行以模擬為主',locale)}</span></div>
+  <div class="eyebrow">COVERAGE · v${config.designVersion}</div><h1>${t('五個欄位，交代整個benchmark。',locale)}</h1><p class="lede">${t('全面收集既有benchmark，先把前作規模放在同一張表，再建立我們的任務聯集與規則擴充。主要閱讀入口統一呈現領域、環境、任務、題數及評估方式。',locale)}</p>
+  <div class="page-meta"><span>2026-10-02</span><span class="pill green">${t(`量化版本 v${config.designVersion}`,locale)}</span><span>${t('來源含模擬、實體與人類影片；執行以模擬為主',locale)}</span></div>
   <div class="chapter-summary"><div class="label">${t('研究主線',locale)}</div><ul><li>${t('前作比較表：每個benchmark有多少環境、任務、題目，怎麼判分，出處在哪。',locale)}</li><li>${t('全庫總覽：呈現已收集、待對齊與整合後可評的量。',locale)}</li><li>${t('家族、規則、材料、機體、觀測與執行紀錄放在詳細資料，主表保持五欄。',locale)}</li></ul></div>
   <ol class="design-flow">${steps.map(([id,title,text])=>`<li><small>${id}</small><b>${t(title,locale)}</b><span>${t(text,locale)}</span></li>`).join('')}</ol>
   <div class="cta-row"><a class="button" href="${routeLink(route,'coverage.html',locale)}">${t('看全庫總覽與前作五欄表',locale)} →</a><a class="button secondary" href="#coverage-design">${t('看完成條件',locale)} ↓</a></div>
   <div class="prose">${renderCoverageDesign(locale,coverageModel,{t,routeLink},route)}</div>
   <div class="reader-actions"><a class="text-button" href="${relative(`${locale}/${route}`,'downloads/coverage/COVERAGE_REPORT.md')}" download>${t('下載新版Coverage整理',locale)}</a><a class="text-button" href="${dl}/extension_grammar.json" download>${t('任務規則細節',locale)}</a><button class="text-button print-page">${t('列印本頁',locale)}</button></div>
-  <details class="union-legacy" id="previous-union-design"><summary>${t('來源聯集與規則擴充方法原稿：v0.7',locale)}</summary><p class="source-note">${t('保留研究來源與完整方法。閱讀和統計欄位以上方v0.8 Coverage整理為準。',locale)}</p><div class="prose">${unionContent}</div><p><a href="${dl}/UNION_FIRST_DESIGN_V0_7.md">${t('下載原稿',locale)}</a> · <a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p></details>
+  <details class="union-legacy" id="previous-union-design"><summary>${t('來源聯集與規則擴充方法原稿：v0.7',locale)}</summary><p class="source-note">${t(`保留研究來源與完整方法；量化目標以上方v${config.designVersion}為準。`,locale)}</p><div class="prose">${unionContent}</div><p><a href="${dl}/UNION_FIRST_DESIGN_V0_7.md">${t('下載原稿',locale)}</a> · <a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p></details>
   <details class="union-legacy" id="historical-design-plans"><summary>${t('歷史設計與容量模型：v0.4／v0.5（保留原引用）',locale)}</summary><p class="source-note">${t('以下保留舊預算、配額和當時的工程順序。舊數字不是目前完整聯集的總量或上限。',locale)}</p><div class="prose">${latestContent}${content}</div>${capacityExplorer(locale)}</details>
   </main><aside class="on-this-page"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}<a href="#historical-design-plans">${t('歷史設計與容量模型',locale)}</a></aside></div>`;
-  return shell({route,locale,title:'主設計v0.8：五個欄位統整Coverage',description:'前作比較與全庫聯集用領域、環境、任務、題數和評估方式呈現；詳細規則與舊分類放入附錄。',body,kind:'design'});
+  return shell({route,locale,title:`主設計v${config.designVersion}：本版目標與目前實數`,description:'前作比較與全庫聯集用領域、環境、任務、題數和評估方式呈現；詳細規則與舊分類放入附錄。',body,kind:'design'});
 }
 function scalePlanPage(locale){
   const route='scale-plan.html';
@@ -456,7 +480,8 @@ const nativeBucketLabels={
   integration_or_protocol:'整合框架／協定／生成配置',
   video_pairing:'影片配對／認知 schema',
   documented_examples:'示範程式入口',
-  human_activity_definitions:'人類活動／流程定義（影片來源）'
+  human_activity_definitions:'人類活動／流程定義（影片來源）',
+  information_task_definitions:'資訊任務／問答題型定義'
 };
 strings.native={
   source:'來源',unit:'原生單位',definition:'定義路徑',aliases:'原生別名／層級對應',assets:'場景檔案引用',
@@ -470,7 +495,8 @@ strings.native={
     human_activity_definitions:'人類活動類別與流程來源，可對應多部影片；任務環境另建對應。',
     integration_or_protocol:'框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。',
     video_pairing:'影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。',
-    documented_examples:'示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。'
+    documented_examples:'示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。',
+    information_task_definitions:'原作的資訊任務或問題類型；題目實數另外按question_id或case_id計數。'
   }
 };
 function nativeSearchHints(record){
@@ -486,9 +512,9 @@ function nativePage(locale){
     return `<tr><td><a href="?source=${source.id}">${t(source.work,locale)}</a></td><td>${source.record_count.toLocaleString('en-US')}</td><td>${escape(units)}</td><td><a href="https://github.com/${source.resolved_repo}/tree/${source.commit}" target="_blank" rel="noopener noreferrer"><code>${source.commit.slice(0,10)}</code></a></td></tr>`;
   }).join('');
   const options=(values)=>values.map(([value,label])=>`<option value="${escape(value)}">${t(label,locale)}</option>`).join('');
-  const body=`<main class="wrap" id="main-content">${head('原作任務、活動與設定索引','每張卡片是一筆從原作提取的索引，可追到任務、活動、模板或設定。5,308是這些索引的總數；任務環境數、原始樣本量及執行進度分開統計。',route,locale,
+  const body=`<main class="wrap" id="main-content">${head('原作任務、活動與設定索引',`每張卡片是一筆原作索引。本版共${activeIndexTotal}條，包含任務、資訊題型、活動與設定；場景及題目定義另有ID清單，不從索引數推算。`,route,locale,
   `<div class="page-meta"><span class="pill green">${unionStats.total_source_records.toLocaleString('en-US')} ${t('條已提取索引',locale)}</span><span>${unionStats.source_repositories} ${t('個官方程式庫',locale)} / ${unionStats.source_snapshots} ${t('個固定版本來源',locale)}</span><span>${config.sourceInventoryDate}</span><span class="pill status">${t('來源收錄與執行進度分開',locale)}</span></div>`)}
-  <div class="counting-definition-note"><b>${t('這裡統計原作索引，完整環境與樣本數另外整理',locale)}</b><p>${t('5,308條索引中包含2,062條原作robot任務、263條人類活動，以及2,983條框架註冊、設定、協定等條目。「候選」是舊欄位名稱，表示本庫仍待共同對齊；原作任務本身可以已經正式發布。',locale)}</p><p>${t('例如PARTNR在這裡是6個生成器設定，原文的任務規模是10萬；COIN在這裡是180個活動定義，原作有11,827部影片。',locale)}</p><a href="${routeLink(route,'counting.html',locale)}">${t('看來源、任務環境、場景與樣本的完整定義',locale)} →</a></div>
+  <div class="counting-definition-note"><b>${t(`本版索引：${activeIndexTotal}條，不等於任務或題數`,locale)}</b><p>${t(`${unionStats.native_robot_task_candidates.toLocaleString('en-US')}條robot任務、${unionStats.information_task_definitions}個資訊題型、${unionStats.human_activity_definitions}條人類活動，以及${(unionStats.total_source_records-unionStats.native_robot_task_candidates-unionStats.information_task_definitions-unionStats.human_activity_definitions).toLocaleString('en-US')}條框架／設定等索引。「候選」表示本庫仍待共同對齊，並非原作尚未發布。`,locale)}</p><p>${t(`PARTNR在這份索引仍是6個生成器設定；另取得的題目定義會按case_id計到${numberInventory.case_definition_records.toLocaleString('en-US')}題清單，不與索引數混用。`,locale)}</p><a href="${routeLink(route,'coverage.html#numbers-breakdown',locale)}">${t('看本版目標與逐筆實數',locale)} →</a></div>
   <details class="explainer" id="source-summary"><summary>${t('查看來源、索引數與固定版本',locale)}</summary><div class="table-scroll"><table><thead><tr><th>${t('來源',locale)}</th><th>${t('索引數',locale)}</th><th>${t('索引單位',locale)}</th><th>${t('固定 commit',locale)}</th></tr></thead><tbody>${sourceRows}</tbody></table></div></details>
   <div class="catalogue-layout native-layout"><aside class="filter-panel js-only" aria-label="${t('來源篩選',locale)}"><h2>${t('查找原作任務與設定',locale)}</h2><div class="filter-fields">
   <div class="filter-field"><label for="native-q">${t('關鍵字／原作 ID',locale)}</label><input id="native-q" data-native-filter="q" type="search" placeholder="${t('例如 fold、抽屜、PegInsertion',locale)}"></div>
@@ -501,7 +527,7 @@ function nativePage(locale){
   <noscript><p class="no-js-note">${t('互動篩選需要 JavaScript。上方來源表仍可閱讀，完整索引可下載 CSV；每列附固定原始定義連結。',locale)}</p></noscript>
   <div id="native-empty" class="empty-state" hidden><h3>${t('沒有符合的索引條目',locale)}</h3><p>${t('試試簡短關鍵字或清除部分篩選。',locale)}</p></div><div class="record-grid" id="native-records"></div>
   <div class="pagination js-only"><button id="native-prev">${t('上一頁',locale)}</button><span id="native-page"></span><button id="native-next">${t('下一頁',locale)}</button></div>
-  <p class="source-note">${t('這裡合併9/22與9/29的固定來源定義；卡片的收錄不依賴本機模擬。RoboCasa的365個目錄項與317個dataset項分開，WatchAct14項為認知schema；COIN／CrossTask是人類程序。執行證據由獨立附錄提供。',locale)} <a href="${routeLink(route,'execution.html',locale)}">${t('查看最新執行證據',locale)} →</a></p></section></div></main>`;
+  <p class="source-note">${t('這裡合併各批固定來源，包含10/02新增的CALVIN與OpenEQA定義；卡片的收錄不依賴本機模擬。RoboCasa的365個目錄項與317個dataset項分開，WatchAct14項為認知schema；COIN／CrossTask是人類程序。執行證據由獨立附錄提供。',locale)} <a href="${routeLink(route,'execution.html',locale)}">${t('查看最新執行證據',locale)} →</a></p></section></div></main>`;
   return shell({route,locale,title:'原作任務、活動與設定索引',description:`${unionStats.total_source_records.toLocaleString('en-US')} 條可追溯原作索引；依來源、索引單位和設定類型篩選。環境數與原始樣本數分開統計。`,body,kind:'native'});
 }
 function chapterNav(route,locale) {
@@ -517,7 +543,7 @@ function readingPage(section,locale) {
     draft('tr').each((_,row)=>{
       const cells=draft(row).children('td');const first=cells.first().text();
       if(first.includes('我們：核心預算')){
-        cells.eq(0).text('我們：v0.4 規模與廣度目標');
+        cells.eq(0).text('我們：v0.4 歷史目標（已退役）');
         cells.eq(1).text('2,000–3,000 個 G2；任務數與有效覆蓋各至少最大可比基準 2 倍');
         cells.eq(2).text('正規化任務的研發目標');
         cells.eq(3).text('尚未達成；以共同 ontology、scope、來源去重與驗證後的實績比較');
@@ -546,6 +572,11 @@ function readingPage(section,locale) {
     content=`<p class="source-note">${t('本章的G定義用於粒度對照；原稿表內的0、168篇等數字是2026-09-21快照。最新来源、任務環境與樣本計數請見計數說明頁。G不是開發完成階段或難度級別。',locale)} <a href="${routeLink(route,'counting.html',locale)}">${t('目前計數與G／T定義',locale)} →</a></p>`+content;
   }
   content=linkDefinitionSymbols(content,locale,symbolGuide,taxonomy.tracks,{t,escape,routeLink,route});
+  if(['c03','c06','c11','c13','c14'].includes(section.id)){
+    const archived=cheerio.load(content,{},false);
+    archived('[data-active-numbers]').remove();
+    content=`${numberVersionNotice(route,locale)}<details class="legacy-numeric-chapter" id="archive-${section.id}"><summary>${t('展開歷史原稿、舊配額與原始計數',locale)}</summary><p>${t('以下保留其原版本內容；本版唯一目標與實數在上方量化表連結。',locale)}</p>${archived.html()}</details>`;
+  }
   const $=cheerio.load(content);
   const headings=$('h2,h3').toArray().map(n=>({id:$(n).attr('id'),title:$(n).text()}));
   const index=chapters.indexOf(section);
@@ -554,7 +585,7 @@ function readingPage(section,locale) {
   const body=`<div class="reading-progress" aria-hidden="true"></div><div class="reader-layout"><aside class="chapter-sidebar" aria-label="${t('章節導覽',locale)}">${navigation}</aside>
   <main class="reader" id="main-content"><details class="mobile-chapter-nav"><summary>${t('章節目錄與附錄',locale)}</summary>${navigation}</details>
   ${breadcrumb('章節閱讀',route,locale)}<div class="eyebrow">CHAPTER ${section.id.slice(1)} / 14</div><h1>${t(section.title,locale)}</h1>
-  <div class="page-meta"><span>${t(`約 ${timeFor(section)} 分鐘`,locale)}</span><span>·</span><span>${t(`資料快照 ${config.researchDate}`,locale)}</span><span class="pill status">${t('設計階段 Q0',locale)}</span></div>
+  <div class="page-meta"><span>${t(`約 ${timeFor(section)} 分鐘`,locale)}</span><span>·</span><span>${t(`原稿快照 ${config.researchDate}`,locale)}</span><span class="pill status">${t('歷史設計原稿',locale)}</span></div>
   <div class="chapter-summary"><div class="label">${t('先掌握這三件事',locale)}</div><ul>${summaries[section.id].map(line=>`<li>${t(line,locale)}</li>`).join('')}</ul></div>
   <div class="prose">${content}</div><div class="reader-actions"><button class="text-button copy-link">${t('複製本章連結',locale)}</button><button class="text-button print-page">${t('列印本章',locale)}</button><a class="text-button" href="${pdfHref(route,locale)}">${t('完整報告 PDF · 9/29快照',locale)} ↗</a></div>
   <nav class="prev-next" aria-label="${t('前後章節',locale)}">${nextPrev}</nav></main>
@@ -568,7 +599,7 @@ function chapterTiles(route,locale) {
 function chaptersPage(locale) {
   const route='chapters/index.html';
   const cards=[
-    ['01','第一次接觸這個計畫','先看研究目標與摺毛巾例子，再認識「題數」的不同層級。','chapters/01.html'],
+    ['01','第一次接觸這個計畫','先看本版五項目標、清單實數與來源拆分。','coverage.html'],
     ['04','我要評估研究新穎性','從文獻地圖、最近 benchmark 和公平比較開始。','chapters/04.html'],
     ['09','我要開始做 benchmark','先看詳細案例，再讀規模、工程與 milestones。','chapters/09.html']
   ];
@@ -673,9 +704,9 @@ function homePage(locale){
   const route='index.html';
   const diagram=`<svg class="union-flow-svg" viewBox="0 0 480 330" role="img" aria-label="${t('多個benchmark經分類形成任務聯集，再擴充任務與規則',locale)}"><defs><marker id="union-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#44846b"/></marker></defs><g fill="#fff" stroke="#c4d9c7"><rect x="12" y="22" width="142" height="56" rx="12"/><rect x="169" y="22" width="142" height="56" rx="12"/><rect x="326" y="22" width="142" height="56" rx="12"/><rect x="59" y="133" width="362" height="64" rx="12"/><rect x="59" y="249" width="362" height="64" rx="12"/></g><g font-family="sans-serif" font-size="14" fill="#215a46" text-anchor="middle"><text x="83" y="47">${t('操作／材料',locale)}</text><text x="83" y="66">${t('既有任務',locale)}</text><text x="240" y="47">${t('導航／協作',locale)}</text><text x="240" y="66">${t('既有規則',locale)}</text><text x="397" y="47">${t('Ego／影片',locale)}</text><text x="397" y="66">${t('理解與預測',locale)}</text><text x="240" y="158">${t('Survey分類 → 完整任務聯集',locale)}</text><text x="240" y="181" font-size="12">${t('領域、環境、任務、題數、評估方式',locale)}</text><text x="240" y="275">${t('擴充目標、規則、流程與組合',locale)}</text><text x="240" y="298" font-size="12">${t('綜合任務庫 ＋ 統一比較',locale)}</text></g><g fill="none" stroke="#44846b" stroke-width="1.8" marker-end="url(#union-arrow)"><path d="M83 79L160 132"/><path d="M240 79V132"/><path d="M397 79L320 132"/><path d="M240 198V247"/></g></svg>`;
   const cards=[['01','先比較所有前作','每列一個benchmark，看環境、任務、題數、判分方式及出處。','coverage.html#benchmarks','看143筆前作比較'],['02','再看整合後的全庫','同一頁交代領域、環境、任務、題數、評估方式；明示哪些總數還在整理。','coverage.html#whole','看全庫總覽'],['03','需要細節再展開','原生任務、家族、規則、觀測與執行紀錄保留可查，支援後續整合。','native-tasks.html','查任務來源與定義']];
-  const body=`<main id="main-content"><div class="wrap"><section class="hero"><div><div class="eyebrow">COVERAGE · v0.8</div><h1>${t('前作有多少，',locale)}<br><em>${t('整合後有多少。',locale)}</em></h1><p class="lede">${t('把機器人與Ego相關benchmark整理成一個大而廣的任務庫。只用領域、環境、任務、題數、評估方式五個欄位，說清楚前作規模和整合進度。',locale)}</p><div class="cta-row"><a class="button" href="${routeLink(route,'coverage.html',locale)}">${t('看Coverage總覽與前作比較',locale)} →</a><a class="button secondary" href="${routeLink(route,'design.html',locale)}">${t('看整體設計',locale)}</a></div><p class="note">${t('原作公布量、已收集量與整合後可評量分開。來源聯集與任務／規則擴充仍是研究主線。',locale)}</p></div><div class="hero-visual"><div class="visual-top"><span>COLLECT · CLASSIFY · UNIFY · EXTEND</span></div>${diagram}<p class="demo-message">${t('保留各前作的互補任務，再擴充目標、規則和流程；詳細分類留在資料內。',locale)}</p></div></section>
+  const body=`<main id="main-content"><div class="wrap"><section class="hero"><div><div class="eyebrow">COVERAGE · v${config.designVersion}</div><h1>${t('前作有多少，',locale)}<br><em>${t('整合後有多少。',locale)}</em></h1><p class="lede">${t('把機器人與Ego相關benchmark整理成一個大而廣的任務庫。只用領域、環境、任務、題數、評估方式五個欄位，說清楚前作規模和整合進度。',locale)}</p><div class="cta-row"><a class="button" href="${routeLink(route,'coverage.html',locale)}">${t('看Coverage總覽與前作比較',locale)} →</a><a class="button secondary" href="${routeLink(route,'design.html',locale)}">${t('看整體設計',locale)}</a></div><p class="note">${t('原作公布量、已收集量與整合後可評量分開。來源聯集與任務／規則擴充仍是研究主線。',locale)}</p></div><div class="hero-visual"><div class="visual-top"><span>COLLECT · CLASSIFY · UNIFY · EXTEND</span></div>${diagram}<p class="demo-message">${t('保留各前作的互補任務，再擴充目標、規則和流程；詳細分類留在資料內。',locale)}</p></div></section>
   ${renderCoverageOverview(locale,coverageModel,{t,routeLink},{route,compact:true})}
-  <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">ONE COVERAGE VIEW</div><h2>${t('先看兩張表，再深入資料。',locale)}</h2><p>${t('不用先學G、T或其他代號，也能看懂規模、差異與待補內容。',locale)}</p></div></div><div class="card-grid">${cards.map(([n,title,text,url,label])=>`<a class="overview-card" href="${routeLink(route,url,locale)}"><span class="card-icon">${n}</span><h3>${t(title,locale)}</h3><p>${t(text,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
+  <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">ONE COVERAGE VIEW</div><h2>${t('先看兩張表，再深入資料。',locale)}</h2><p>${t('先看目標與實數，再按需要查來源和舊版對照。',locale)}</p></div></div><div class="card-grid">${cards.map(([n,title,text,url,label])=>`<a class="overview-card" href="${routeLink(route,url,locale)}"><span class="card-icon">${n}</span><h3>${t(title,locale)}</h3><p>${t(text,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
   <section class="section"><div class="section-head"><div><div class="eyebrow">COMPLETE THE UNION</div><h2>${t('接下來的工作集中在三件事。',locale)}</h2><p>${t('補齊前作數量與來源，產生任務聯集，再建立測例與判分。',locale)}</p></div><a class="section-link" href="${routeLink(route,'coverage.html#coverage-work',locale)}">${t('看完成條件',locale)} →</a></div><ol class="coverage-milestones">${coveragePlan.milestones.map(m=>`<li><b>${t(m.name,locale)}</b><p>${t(m.deliverable,locale)}</p></li>`).join('')}</ol></section>
   <div class="download-band"><div><h2>${t('下載統一口徑的前作比較表。',locale)}</h2><p>${t('一列一個benchmark，數字附單位、版本、範圍與出處。完整整理報告也在Coverage頁提供。',locale)}</p></div><a class="button" href="${relative(`${locale}/${route}`,'downloads/coverage/benchmark_summary.csv')}">${t('前作總表 CSV',locale)} ↓</a></div>
   <details class="explainer" id="home-engineering-appendix"><summary>${t('詳細分類、工程附錄與歷史完整報告',locale)}</summary><p>${t('原生執行器、小型聯合資料與180個情境種子，保留支援後續整合。',locale)}</p><p><a href="${routeLink(route,'execution.html',locale)}">${t('Meta-World原生執行',locale)}</a> · <a href="${routeLink(route,'joint-pilot.html',locale)}">${t('小型聯合流程試作',locale)}</a> · <a href="${routeLink(route,'explore/tasks.html',locale)}">${t('180個情境種子',locale)}</a> · <a href="${routeLink(route,'counting.html',locale)}">${t('計數與代號細節',locale)}</a> · <a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p><details id="home-legacy-demo"><summary>${t('歷史概念例：同一條毛巾的兩個目標',locale)}</summary><div class="goal-switch"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div><div class="towel-scene">${translate(towelSVG(),locale)}</div><p id="fold-pairs">D → A · C → B</p><p id="demo-message">${t(strings.demoA,locale)}</p></details></details>
@@ -699,7 +730,7 @@ function referencePage(group,locale){
 }
 const glossary=[
   ['source-entry','來源名錄條目','登記一個benchmark、評測資料資源或其版本；一條名錄可連到多個任務或設定索引。','counting.html#source-entry'],
-  ['source-index','原作定義／設定索引','從原作清單或程式提取的一筆任務、活動、模板、註冊或協定。5,308是這一層的數量。','counting.html#source-index'],
+  ['source-index','原作定義／設定索引',`從原作清單或程式提取的一筆任務、活動、模板、註冊或協定。本版${activeIndexTotal}是這一層的數量。`,'counting.html#source-index'],
   ['task-environment','任務環境定義','把世界／機體、觀測／動作、狀態規則、任務目標及判分連成完整規格。定義可以先收錄，執行另驗證。','counting.html#task-environment'],
   ['scene','場景／layout','房間或工作站的空間與幾何配置。同一場景可以支援多個不同任務環境。','counting.html#scene'],
   ['sample','原始資料樣本','影片、QA、episode或軌跡等原作資料單位，按型別與split分項統計。原作量、已取得量、已整合量分開。','counting.html#sample'],
@@ -708,7 +739,7 @@ const glossary=[
   ['ontology','任務概念結構','定義場域、家族、物件、目標、過程與證據之間的關係，讓出題規格一致。','chapters/02.html'],
   ['domain','應用場域（G0）','任務發生的應用背景，例如住家或工坊。同一個摺疊家族可在多個場域出現。','chapters/03.html'],
   ['family','任務家族（G1）','按共通語義結構分組，例如「開啟、存入並關閉」。換個抽屜不一定是新家族。','explore/families.html'],
-  ['blueprint','情境藍圖（B0）','尚未實作的具體出題構想，包含初態、目標與驗收條件。本計畫目前有 180 個。','explore/tasks.html'],
+  ['blueprint','情境藍圖（B0）','尚未實作的具體出題構想，包含初態、目標與驗收條件。v0.2保留180個歷史藍圖，不算本版任務規格或題數實績。','explore/tasks.html'],
   ['spec','正式任務規格（G2）','明訂目標邏輯、指涉、必要過程與機構要求。共同去重後的數量目前仍待定。','chapters/03.html'],
   ['instance','任務實例（G3）','把任務綁定到實際資產、物件、物理參數與初始狀態。文件中有名稱不代表已有實例。','chapters/03.html'],
   ['case','測例（G4）','一個有合法輸入、條件、答案與評分器的測試題。QA 與機器人控制必須標示不同型態。','chapters/03.html'],
@@ -736,8 +767,8 @@ function searchData(locale){
   for(const row of coverageModel.rows)result.push({kind:'reference',title:translate('Coverage｜'+row.name,locale),path:`coverage.html#source-${row.paper_id.toLowerCase()}`,summary:translate(row.tasks+'；'+row.environments,locale),search:tc([row.name,row.title,row.domains,row.tasks,row.native_evaluation].join(' '))+' '+sc(tc([row.name,row.title,row.domains,row.tasks,row.native_evaluation].join(' ')))+' coverage count 覆蓋 覆盖 數量 数量'});
   for(const g of symbolGuide.granularity_levels)result.push({kind:'reference',title:translate(g.id+' · '+g.name,locale),path:'counting.html#'+g.id.toLowerCase(),summary:translate(g.question+' '+g.definition,locale),search:g.id+' granularity G 計數 计数 粒度 '+tc(g.name+' '+g.definition)+' '+sc(tc(g.name+' '+g.definition))});
   for(const [id,track]of Object.entries(taxonomy.tracks))result.push({kind:'reference',title:translate(id+' · '+track.name,locale),path:'counting.html#'+id.toLowerCase(),summary:translate(symbolGuide.track_examples[id],locale),search:id+' track T 模組 模块 評測 评测 '+tc(track.name+' '+track.output)+' '+sc(tc(track.name+' '+track.output))});
-  result.push({kind:'reference',title:translate('來源、任務環境、場景、測例與樣本：計數說明',locale),path:'counting.html',summary:translate('143是名錄、5308是索引；全庫環境定義和样本總量待整理。附COIN/PARTNR對照與1場景3任務環境算例。',locale),search:'counting environment source record dataset sample 來源 来源 紀錄 记录 索引 候選 候选 環境 环境 場景 场景 測例 测例 樣本 样本 數據 数据 5308 143 11827 100000'});
-  result.push({kind:'reference',title:translate('Benchmark總庫：Survey分類、任務聯集與規則擴充',locale),path:'survey-union.html',summary:translate('143條已登記評測來源、250篇書目、5308條定義／設定索引與12個擴充例；環境／樣本總數待整理。',locale),search:'survey taxonomy benchmark union task grammar 規則 规则 聯集 联集 分類 分类 全部 143 5308 VIMA ARNOLD COIN CrossTask'});
+  result.push({kind:'reference',title:translate('來源、任務環境、場景、測例與樣本：計數說明',locale),path:'counting.html',summary:translate(`143是來源名錄，${activeIndexTotal}是原作索引；本版目標與清單實數另見Coverage量化表。`,locale),search:'counting environment source record dataset sample 來源 来源 紀錄 记录 索引 候選 候选 環境 环境 場景 场景 測例 测例 樣本 样本 數據 数据 5308 143 11827 100000'});
+  result.push({kind:'reference',title:translate('Benchmark總庫：Survey分類、任務聯集與規則擴充',locale),path:'survey-union.html',summary:translate(`${unionStats.benchmark_or_eval_resource_records}條來源、${activeIndexTotal}條原作索引；場景與題目ID清單已在本版量化表提供。`,locale),search:'survey taxonomy benchmark union task grammar 規則 规则 聯集 联集 分類 分类 全部 143 5308 VIMA ARNOLD COIN CrossTask'});
   result.push({kind:'reference',title:translate('工程附錄：120測例與RGB工具執行',locale),path:'joint-pilot.html',summary:translate('合成影像、SQLite、機器人接觸操作與完整共同驗收。720次程式執行、80測例新初態結果及可下載資料。',locale),search:'joint multimodal tool use synthetic 自建 合成 多模態 多模态 工具 120 720 92.5 SQLite RGB data 資料 数据'});
   result.push({kind:'reference',title:translate('實際開發執行：50原生任務與五方法結果',locale),path:'execution.html',summary:translate('MuJoCo／Meta-World實際執行、新初態BC測試、reset修正、重播與完整結果。',locale),search:'execution simulation 實際 执行 執行 模擬 模拟 原生 1250 4286 Meta-World BC baseline 基線 基线 結果 结果'});
   result.push({kind:'reference',title:translate('文獻更新：250篇與Ego預測分類',locale),path:'research.html',summary:translate('新增82篇、68項前作比較、700搜尋候選的狀態、完整分類和Ego預測目標。',locale),search:'research literature 文獻 文献 分類 分类 prediction forecasting ego taxonomy 250 82 700'});
@@ -769,7 +800,7 @@ function searchData(locale){
     const content=groups[group].map(s=>s.title+' '+plain(s.html)).join(' ');
     result.push({kind:'reference',title:translate(section.title,locale),path:groupRoutes[group],summary:translate(plain(section.html).slice(0,120),locale),search:tc(content)+' '+sc(tc(content))});
   }
-  result.push({kind:'reference',title:translate('主設計v0.8：Coverage五欄與任務聯集',locale),path:'design.html',summary:translate('全面收集benchmark及其領域／任務，建立來源聯集，再擴充任務定義、規則與流程。目錄與執行子集分開。',locale),search:tc(plain(unionSpecHTML))+' '+sc(tc(plain(unionSpecHTML)))+' overall design survey task union rule grammar v0.7'});
+  result.push({kind:'reference',title:translate(`主設計v${config.designVersion}：具體數量目標與實數`,locale),path:'design.html',summary:translate('全面收集benchmark及其領域／任務，建立來源聯集，再擴充任務定義、規則與流程。目錄與執行子集分開。',locale),search:tc(plain(unionSpecHTML))+' '+sc(tc(plain(unionSpecHTML)))+' overall design survey task union rule grammar v0.7'});
   result.push({kind:'reference',title:translate('規模比較與來源查核',locale),path:'scale-plan.html',summary:translate('v0.3 規模提案與全來源盤點證據；整體設計已更新至 v0.4。',locale),search:'scale all in one 规模 規模 比較 比较 2000 3000 2x 來源 联合库'});
   for(const record of browseRecords){
     const summary=`${record.source_work} · ${record.native_unit_zh} · 靜態紀錄，未完成 G2 去重`;
@@ -854,8 +885,27 @@ for(const filename of ['README_ZH.md','pilot_report.json','method_results.csv','
 }
 await write('assets/joint-pilot-data.js',`window.JOINT_PILOT_DEMOS=${jsonSafe(jointDemos)};`);
 for(const filename of await fs.readdir(UNION_DIR)){
-  if(/\.(json|csv|md|pdf)$/.test(filename))await write(`downloads/survey-union/${filename}`,await fs.readFile(path.join(UNION_DIR,filename)));
+  if(/\.(json|csv|md|pdf)$/.test(filename)){
+    const payload=await fs.readFile(path.join(UNION_DIR,filename));
+    await write(`downloads/survey-union/${filename}`,payload);
+    if(['union_statistics.json','survey_registry.json','source_summaries.json','task_source_bridge.json','task_source_bridge.csv'].includes(filename))await write(`downloads/archive/survey-union-2026-09-29/${filename}`,payload);
+  }
 }
+const baselineBridge=JSON.parse(await fs.readFile(path.join(UNION_DIR,'task_source_bridge.json'),'utf8'));
+const activeBridge=[...baselineBridge,...numberAdditions];
+await write('downloads/survey-union/union_statistics.json',JSON.stringify(unionStats,null,2));
+await write('downloads/survey-union/survey_registry.json',JSON.stringify(unionRegistry,null,2));
+await write('downloads/survey-union/survey_registry.csv',sourceBridgeCSV(unionRegistry));
+await write('downloads/survey-union/source_summaries.json',JSON.stringify(unionSources,null,2));
+await write('downloads/survey-union/source_summaries.csv',sourceBridgeCSV(unionSources));
+await write('downloads/survey-union/source_additions.json',JSON.stringify(unionAdditions,null,2));
+await write('downloads/survey-union/task_source_bridge.json',JSON.stringify(activeBridge,null,2));
+await write('downloads/survey-union/task_source_bridge.csv',sourceBridgeCSV(activeBridge));
+for(const filename of await fs.readdir(QUANTIFIED_DIR)){
+  if(/\.(json|csv|gz|md|pdf)$/.test(filename))await write(`downloads/quantified/${filename}`,await fs.readFile(path.join(QUANTIFIED_DIR,filename)));
+}
+await write('downloads/quantified/NUMBERS_REPORT.md',quantityReportMarkdown(numbers));
+await write('downloads/quantified/target_current_counts.json',JSON.stringify({version:numberContract.version,date:numberContract.effective_on,fields:quantityRows(numbers)},null,2));
 for(const filename of await fs.readdir(COVERAGE_DIR)){
   if(/\.(json|md|csv)$/.test(filename))await write(`downloads/coverage/${filename}`,await fs.readFile(path.join(COVERAGE_DIR,filename)));
 }
@@ -864,6 +914,16 @@ await write('downloads/coverage/benchmark_summary.csv',coverageRowsCSV(coverageM
 await write('downloads/coverage/count_ledger.csv',coverageCSV(coverageModel.rows));
 await write('downloads/coverage/COVERAGE_REPORT.md',coverageMarkdown(coverageModel));
 for(const filename of ['COUNTING_GUIDE.md','counting_contract.json','symbol_guide.json'])await write(`downloads/counting/${filename}`,await fs.readFile(path.join(COUNTING_DIR,filename)));
+await write('downloads/counting/counting_contract.json',JSON.stringify(countingContract,null,2));
+await write('downloads/counting/COUNTING_GUIDE.md',[
+  `# 計數細節附錄 · v${config.designVersion}`,'',
+  '目前目標與清單實數請看 NUMBERS_REPORT.md；本文件解釋單位，不提供另一組目標。','',
+  `目前原作索引${activeIndexTotal}條＝${unionStats.native_robot_task_candidates}條robot任務＋${unionStats.information_task_definitions}個資訊題型＋${unionStats.human_activity_definitions}條人類活動＋${unionStats.total_source_records-unionStats.native_robot_task_candidates-unionStats.information_task_definitions-unionStats.human_activity_definitions}條其他設定。`,'',
+  ...countingContract.definitions.flatMap(d=>[`## ${d.name}`,'',d.definition,'',d.counting_rule,'']),
+  '## G／T與歷史算例','',
+  'G／T仍是詳細計數／能力模組的整理代號；本版主要數字以領域、場景、任務、題目與判分方式呈現。1場景、3任務環境、300測例僅是假設算例，不計入任何實數。','',
+  `本版數字：${config.siteUrl}/zh-hant/coverage.html`,''
+].join('\n'));
 await write('downloads/counting/symbol_definitions.json',JSON.stringify({...symbolGuide,tracks:taxonomy.tracks},null,2));
 const symbolMarkdown=[
   '# G與T：計數粒度與評測模組速查','',symbolGuide.origin,'',
@@ -883,9 +943,9 @@ await write('downloads/counting/G_T_GUIDE.md',symbolMarkdown);
 const rootHtml=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robot-use Benchmark · 公開研究網站</title><meta name="description" content="繁體與簡體中文的機器人評測研究網站，從重點導讀到完整文獻、情境和章節。"><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"><link rel="alternate" hreflang="zh-Hant" href="${config.siteUrl}/zh-hant/"><link rel="alternate" hreflang="zh-Hans" href="${config.siteUrl}/zh-hans/"><script>(()=>{let saved;try{saved=localStorage.getItem('robot-use-language')}catch{}const lang=['zh-hant','zh-hans'].includes(saved)?saved:/zh-(cn|sg|hans)/i.test(navigator.language)?'zh-hans':'zh-hant';location.replace(lang+'/index.html'+location.search+location.hash)})();</script></head><body><main class="wrap narrow" style="padding:80px 0"><div class="eyebrow">ROBOT-USE BENCHMARK</div><h1>從看懂示範，到可靠完成任務。</h1><p>公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。</p><div class="cta-row"><a class="button" href="zh-hant/index.html" lang="zh-Hant">繁體中文 →</a><a class="button secondary" href="zh-hans/index.html" lang="zh-Hans">简体中文 →</a></div></main></body></html>`;
 const scaleRoot=rootHtml
   .replace('從看懂示範，到可靠完成任務。','更多獨立任務，更廣評測覆蓋。')
-  .replace('公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。','Coverage v0.8：領域、環境、任務、題數、評估方式。<br>Coverage v0.8：领域、环境、任务、题数、评估方式。<br>143筆前作比較與全庫整合狀態，集中在同一入口。')
+  .replace('公開研究設計、168 篇文獻與 180 個情境藍圖。<br>公开研究设计、168 篇文献与 180 个情境蓝图。',`Coverage v${config.designVersion}：本版規劃目標＋目前清單實數。<br>Coverage v${config.designVersion}：本版规划目标＋目前清单实数。<br>${quantityRows(numbers).map(f=>f.target.toLocaleString('en-US')+' '+f.label).join(' · ')}（規劃目標）`)
   .replace('從重點導讀到完整文獻、情境和章節。','以規模與覆蓋優勢為主軸，附完整來源任務庫、文獻與章節。');
-await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · Coverage v0.8"><meta property="og:description" content="全面前作盤點、Survey分類與任務聯集，再擴充目標、規則和流程；目錄與執行子集分開。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
+await write('index.html',scaleRoot.replace('</head>',`<link rel="canonical" href="${config.siteUrl}/"><meta property="og:type" content="website"><meta property="og:title" content="Robot-use Benchmark · Coverage v${config.designVersion}"><meta property="og:description" content="全面前作盤點、Survey分類與任務聯集，再擴充目標、規則和流程；目錄與執行子集分開。"><meta property="og:url" content="${config.siteUrl}/"><meta property="og:image" content="${config.siteUrl}/assets/social-card.png"><meta name="twitter:card" content="summary_large_image"></head>`));
 await write('404.html',`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找不到頁面 · Robot-use Benchmark</title><link rel="stylesheet" href="${config.siteUrl}/assets/site.css"></head><body><main class="wrap narrow" style="padding:90px 0"><div class="eyebrow">404</div><h1>這個頁面找不到了。<br>这个页面找不到了。</h1><p>可以回到首頁，從章節、情境或文獻重新找到內容。</p><div class="cta-row"><a class="button" href="${config.siteUrl}/zh-hant/">繁體首頁</a><a class="button secondary" href="${config.siteUrl}/zh-hans/">简体首页</a></div></main></body></html>`);
 await write('.nojekyll','');
 await write('robots.txt',`User-agent: *\nAllow: /\nSitemap: ${config.siteUrl}/sitemap.xml\n`);
@@ -893,7 +953,7 @@ await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="
 const manifest={
   siteUrl:config.siteUrl,repository:config.repository,languages:LOCALES,researchDate:config.researchDate,designDate:config.designDate,designVersion:config.designVersion,auditDate:config.auditDate,
   iterationVersion:config.iterationVersion,literatureRefreshDate:researchStats.cutoff_date,
-  pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,tasks:tasks.length,families:families.length,probes:probes.length,metrics:metrics.length,comparisonPriorWorks:comparisonModel.prior_works,comparisonRows:comparisonModel.rows.length,nativeSourceRecords:browseRecords.length,sourceRepositories:unionStats.source_repositories,sourceSnapshots:unionStats.source_snapshots,validatedCases:0,simulatorRuns:executionModel.recorded_trial_history_total,nativeHeldoutTestCases:executionModel.held_out_initial_cases,nativeHeldoutMethodTrials:executionModel.held_out_method_trials},
+  pages:allPageRecords,counts:{chapters:chapters.length,papers:papers.length,legacyScenarioBlueprints:tasks.length,legacyFamilyLabels:families.length,legacyObservationProbeBlueprints:probes.length,legacyMetricDefinitions:metrics.length,sourceTaskDefinitionRecords:numberInventory.source_task_and_information_records,sourceSceneDefinitions:numberInventory.source_named_environment_definitions,sourceCaseDefinitionMetadata:numberInventory.case_definition_records,comparisonPriorWorks:comparisonModel.prior_works,comparisonRows:comparisonModel.rows.length,nativeSourceRecords:browseRecords.length,sourceRepositories:unionStats.source_repositories,sourceSnapshots:unionStats.source_snapshots,legacyBlueprintValidatedCases:0,nativeDevelopmentTrials:executionModel.recorded_trial_history_total,nativeHeldoutTestCases:executionModel.held_out_initial_cases,nativeHeldoutMethodTrials:executionModel.held_out_method_trials},
   sourceSections:sections.length,sourceSectionIds:sections.map(s=>s.id),assets:generated.filter(file=>!file.endsWith('.html')),
   pdf:'downloads/current-report-zh-hant.pdf',historicalPdf:'downloads/full-report-zh-hant.pdf',pdfPages:currentPDF.pages,pdfSha256:currentPDF.sha256,
   jointPilot:{workflowCandidates:1,cases:jointReport.total_cases,testCases:jointReport.test_cases,programTrials:jointReport.total_frozen_program_trials,supplementalAnnotations:jointReport.supplemental_annotation_trials,canonicalG2:null},
@@ -901,6 +961,7 @@ const manifest={
   counting:{version:countingContract.version,taskEnvironmentDefinitions:null,sceneLayouts:null,sourceSampleTotals:null,extractedSourceIndices:unionStats.total_source_records,definitionsRequireLocalExecution:false},
   symbols:{version:symbolGuide.version,gLevels:symbolGuide.granularity_levels.length,tModules:Object.keys(taxonomy.tracks).length,schemeOrigin:'project_defined'},
   coverage:coverageModel.statistics,
+  quantified:{version:numberContract.version,targets:quantityRows(numbers).map(f=>({field:f.id,value:f.target,unit:f.target_unit})),current:quantityRows(numbers).map(f=>({field:f.id,value:f.current,unit:f.current_unit})),caseFiles:numberInventory.files,completeLocalCaseInputs:numberInventory.new_case_complete_local_input_count,newModelTrials:numberInventory.new_case_runtime_trials},
   note:'Main research: comprehensive source survey, taxonomy, task union and task/rule extensions. Runtime pilots are engineering appendices; collection and execution have separate counts.'
 };
 await fs.mkdir(path.join(ROOT,'verification'),{recursive:true});

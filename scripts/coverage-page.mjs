@@ -1,4 +1,5 @@
 import {formatCount, countScopeLabels} from './coverage-model.mjs';
+import {quantityRows} from './quantified-model.mjs';
 
 const nativeCountNames={
   'everyday activities':'日常活動','interactive scenes':'互動場景','tasks':'任務',
@@ -30,28 +31,46 @@ const readable=value=>String(value??'')
   .replace(/\bG4\b/g,'測例')
   .replace(/\bG5\b/g,'執行紀錄');
 
-function overviewRows(model) {
-  const s=model.statistics;
-  return [
-    ['domain','領域',`${s.domain_labels} 類`,`現有應用領域分類；${s.domain_labels_with_explicit_source_overview}類有前作概述明確標記。`,`${s.domain_unmapped_sources}筆來源尚未做共同域映射；逐任務分布續補。`],
-    ['environment','環境','待整合',`${s.sources_with_environment_count}筆來源已有場景／錄製環境數量摘錄。`,'先分清可交互場景與觀測來源，再處理資產重用和版本。'],
-    ['task','任務',`${s.native_robot_task_records.toLocaleString('en-US')} 條`,`已收集的原作robot任務條目；另${s.human_activity_records}條人類活動。`,'跨來源任務聯集及規則變體尚待對齊；這不是去重總量。'],
-    ['case','題數','待整合',`${s.sources_with_case_count}筆來源已有題目／episode等原生數量。`,'QA、控制、預測分項計數；原始影片、示範和重跑次數另列。'],
-    ['evaluation','評估方式',`${s.evaluation_method_groups} 類`,`${s.sources_with_scoring_classification}筆來源已按評測概述整理判分方式。`,'保留每項原作metric；分類完成不表示全庫判分器已實作。']
-  ];
+const number=v=>Number(v).toLocaleString('en-US');
+
+function numberTable(locale,model,{t},id='coverage-whole-table'){
+  return `<div class="table-scroll"><table id="${id}" class="number-contract-table"><thead><tr><th>${t('項目',locale)}</th><th>${t('本版規劃目標',locale)}</th><th>${t('目前清單實數',locale)}</th><th>${t('實數代表什麼',locale)}</th></tr></thead><tbody>${quantityRows(model.numbers).map(f=>`<tr data-number-field="${f.id}"${id==='coverage-whole-table'?` id="${['domain','evaluation'].includes(f.id)?`coverage-${f.id}-summary`:`coverage-${f.id}`}"`:''}><th scope="row">${t(f.label,locale)}</th><td data-number-role="target" data-number-value="${f.target}"><b>${number(f.target)}</b> ${t(f.target_unit,locale)}</td><td data-number-role="current" data-number-value="${f.current}"><b>${number(f.current)}</b> ${t(f.current_unit,locale)}</td><td>${t(f.current_limit,locale)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function quantityBreakdown(locale,model,{t,relative},route){
+  const n=model.numbers;const dl=relative(`${locale}/${route}`,'downloads/quantified/');
+  const labels={behavior:'BEHAVIOR-1K',robocasa:'RoboCasa365',ai2thor_alfred:'ALFRED／AI2-THOR',calvin:'CALVIN',hssd_partnr:'PARTNR／HSSD'};
+  return `<section id="numbers-breakdown" class="section"><h2>${t('實數如何重算：每個數字都有清單',locale)}</h2>
+    <div class="number-evidence-grid"><article><h3>${t(`${number(n.inventory.source_named_environment_definitions)}個場景定義`,locale)}</h3><div class="table-scroll"><table id="number-environment-breakdown"><thead><tr><th>${t('來源',locale)}</th><th>${t('場景定義',locale)}</th></tr></thead><tbody>${Object.entries(n.inventory.environment_counts).map(([id,count])=>`<tr><td>${t(labels[id],locale)}</td><td>${number(count)}</td></tr>`).join('')}</tbody></table></div><p>${t('按原作命名場景ID計數，沒有把樣式或D_eval變體另加。全資產載入與幾何等價審核仍需完成。',locale)}</p><a href="${dl}/environment_registry.csv" download>${t('下載完整場景ID與來源',locale)} ↓</a></article>
+    <article><h3>${t(`${number(n.inventory.source_task_and_information_records)}筆來源任務／題型`,locale)}</h3><p>${t(`${number(n.inventory.previous_robot_task_source_definitions)}條既有robot定義＋CALVIN${n.inventory.new_calvin_task_definitions}條＝${number(n.inventory.robot_task_source_definitions)}；另有OpenEQA${n.inventory.openeqa_information_categories_separate}個資訊題型。它們是來源條目，還不是共同去重後的任務規格。`,locale)}</p><p>${t(`${n.inventory.human_activity_definitions_separate}個人類程序活動仍另列，沒有混入此數。每條任務均保留來源及未定／跨域標記。`,locale)}</p><p><a href="${dl}/task_registry.csv" download>${t('機器人任務清單',locale)} ↓</a> · <a href="${dl}/information_task_types.json" download>${t('資訊題型清單',locale)} ↓</a></p></article></div>
+    <h3>${t(`${number(n.inventory.case_definition_records)}筆題目定義：保留原生split`,locale)}</h3><div class="table-scroll"><table id="number-case-breakdown"><thead><tr><th>${t('來源',locale)}</th><th>${t('原生split',locale)}</th><th>${t('題目型別',locale)}</th><th>${t('定義數',locale)}</th></tr></thead><tbody>${n.inventory.case_definitions_by_source_split.map(r=>`<tr><td>${r.source_id==='partnr'?'PARTNR':'OpenEQA'}</td><td>${t(r.native_split==='native_benchmark_unsplit'?'原作benchmark未細分':r.native_split,locale)}</td><td>${t(r.case_kind==='robot_episode'?'交互episode定義':'QA問題與答案',locale)}</td><td>${number(r.count)}</td></tr>`).join('')}</tbody></table></div>
+    <p>${t('所有列均通過ID、必要欄位、環境／觀測引用及判分程序引用的結構檢查。原始3D資產與歷史影像未全部取得，本次新增模型試驗為0；這裡不把元資料稱為已跑完的評測。',locale)}</p>
+    <p><a href="${dl}/case_registry.csv.gz" download>${t('全部題目ID、split、來源與hash（CSV.gz）',locale)} ↓</a> · <a href="${dl}/case_registry.jsonl.gz" download>JSONL.gz ↓</a> · <a href="${dl}/inventory_summary.json">${t('重算摘要',locale)}</a></p></section>`;
+}
+
+function numberBudgets(locale,model,{t},route){
+  const c=model.numbers.contract;
+  return `<section class="section" id="numbers-budget"><h2>${t('目標如何拆分：以下都是規劃配額',locale)}</h2><p>${t('5,000份任務規格＝2,000個來源基本任務＋3,000份有效規則擴充。規則必須改變目標、必要過程或限制，單純換顏色、視角、初態或同義句不計新規格。',locale)}</p>
+    <div class="table-scroll"><table id="number-case-budget"><thead><tr><th>${t('題目預算',locale)}</th><th>${t('訓練／開發',locale)}</th><th>${t('驗證',locale)}</th><th>${t('測試',locale)}</th><th>${t('合計',locale)}</th></tr></thead><tbody>${c.case_target_components.map(r=>`<tr><th>${t(r.name,locale)}</th><td>${number(r.train)}</td><td>${number(r.validation)}</td><td>${number(r.test)}</td><td>${number(r.total)}</td></tr>`).join('')}</tbody></table></div><p class="source-note">${t(c.split_policy,locale)}</p>
+    <details class="coverage-appendix" id="number-domain-budget"><summary>${t('展開12領域的場景、任務與題目配額',locale)}</summary><p>${t(c.quota_policy,locale)}</p><div class="table-scroll"><table><thead><tr>${['領域','場景','來源基本任務','規則規格','任務合計','題目預算'].map(x=>`<th>${t(x,locale)}</th>`).join('')}</tr></thead><tbody>${c.domain_quotas.map(r=>`<tr><th>${t(r.name,locale)}</th><td>${number(r.environments)}</td><td>${number(r.base_tasks)}</td><td>${number(r.rule_specs)}</td><td>${number(r.task_specs)}</td><td>${number(r.case_budget)}</td></tr>`).join('')}</tbody></table></div></details></section>`;
+}
+
+function numberVersions(locale,model,{t}){
+  return `<details class="coverage-appendix number-versions" id="numbers-versions"><summary>${t('舊版數字已退役或換了範圍：逐項對照',locale)}</summary><p>${t(model.numbers.contract.old_version_policy,locale)}</p><div class="table-scroll"><table id="number-version-crosswalk"><thead><tr><th>${t('舊數字',locale)}</th><th>${t('原範圍',locale)}</th><th>${t('本版怎麼處理',locale)}</th></tr></thead><tbody>${model.numbers.contract.version_crosswalk.map(r=>`<tr><td>${t(r.old,locale)}</td><td>${t(r.old_scope,locale)}</td><td>${t(r.current,locale)}</td></tr>`).join('')}</tbody></table></div></details>`;
 }
 
 export function renderCoverageOverview(locale,model,helpers,{route='coverage.html',compact=false}={}){
   const {t,routeLink}=helpers;
   return `<section class="coverage-overview" aria-label="${t('全庫五項統計',locale)}">
-    <div class="coverage-cards">${overviewRows(model).map(([id,name,value,note])=>`<a class="coverage-card" data-coverage-metric="${id}" href="${routeLink(route,`coverage.html#coverage-${id}`,locale)}"><span>${t(name,locale)}</span><strong>${t(value,locale)}</strong><small>${t(note,locale)}</small></a>`).join('')}</div>
-    <p class="coverage-scope">${t('上方是我們已整理的狀態；下方前作表列原作者公布或已取得版本的規模。尚未完成整合的總數直接標示待整合。',locale)}${compact?` <a href="${routeLink(route,'coverage.html#benchmarks',locale)}">${t('看全部前作的環境、任務與題數',locale)} →</a>`:''}</p>
+    <p class="number-version-label">${t(model.numbers.contract.version.replace('numbers-','v')+' 唯一有效目標 · 規劃目標／目前清單實數',locale)}</p>
+    <div class="coverage-cards">${quantityRows(model.numbers).map(f=>`<a class="coverage-card number-card" data-coverage-metric="${f.id}" href="${routeLink(route,`coverage.html#coverage-${f.id}`,locale)}"><span>${t(f.label,locale)}</span><small>${t('規劃目標',locale)}</small><strong data-target-count="${f.target}">${number(f.target)}</strong><small>${t(f.target_unit,locale)}</small><div class="number-current"><span>${t('目前清單',locale)}</span><b data-current-count="${f.current}">${number(f.current)}</b><small>${t(f.current_unit,locale)}</small></div></a>`).join('')}</div>
+    <p class="coverage-scope">${t('目標是待建規模；實數是已取得的定義／元資料。它們的完成階段不同，不直接當成完成百分比。素材取得、共同去重與模型實測另外驗收。',locale)}${compact?` <a href="${routeLink(route,'coverage.html#numbers-breakdown',locale)}">${t('看清單、拆分及舊版對照',locale)} →</a>`:''}</p>
   </section>`;
 }
 
 export function renderCoverageNotice(locale,route,helpers){
   const {t,routeLink}=helpers;
-  return `<div class="coverage-reader-note"><b>${t('最新閱讀入口：五個欄位看完整體coverage',locale)}</b><p>${t('領域、環境、任務、題數、評估方式集中在同一頁。這裡保留原始分類、代號或歷史細節，供深入查閱。',locale)}</p><a href="${routeLink(route,'coverage.html',locale)}">${t('開啟全庫總覽與前作比較',locale)} →</a></div>`;
+  return `<div class="coverage-reader-note"><b>${t('目前數量以v0.9量化表為準',locale)}</b><p>${t('新版把本版規劃目標與目前清單實數分開。此處的原始分類、代號和歷史預算保留查閱，不與新版目標混加。',locale)}</p><a href="${routeLink(route,'coverage.html#whole',locale)}">${t('開啟唯一有效目標及目前實數',locale)} →</a></div>`;
 }
 
 export function renderCoverageDesign(locale,model,helpers,route='design.html'){
@@ -59,9 +78,12 @@ export function renderCoverageDesign(locale,model,helpers,route='design.html'){
   return `<section id="coverage-design">
     <h2>${t('研究只用五個主欄位交代規模與覆蓋',locale)}</h2>
     <p>${t(model.plan.purpose,locale)}</p>
+    ${numberTable(locale,model,{t},'design-number-table')}
     <div class="table-scroll"><table class="coverage-definition-table"><thead><tr><th>${t('欄位',locale)}</th><th>${t('要回答的問題',locale)}</th><th>${t('整理完成的條件',locale)}</th></tr></thead><tbody>${model.plan.fields.map(f=>`<tr><th>${t(f.name,locale)}</th><td>${t(f.question,locale)}</td><td>${t(f.completion,locale)}</td></tr>`).join('')}</tbody></table></div>
     <p>${t('主要成果只有兩張表：一張逐一列前作；一張報全庫聯集。任務家族、規則、材料、機體、觀測及執行次數留在各筆詳細資料，不要求讀者先學多組代號。',locale)}</p>
     <p>${t(model.plan.target_rule,locale)}</p>
+    ${numberBudgets(locale,model,{t},route)}
+    ${numberVersions(locale,model,{t})}
     <ol class="coverage-milestones">${model.plan.milestones.map(m=>`<li><b>${t(m.name,locale)}</b><p>${t(m.deliverable,locale)}</p><p class="source-note">${t('完成條件：'+m.acceptance,locale)}</p></li>`).join('')}</ol>
     <p><a class="button" href="${routeLink(route,'coverage.html#benchmarks',locale)}">${t('看前作比較和目前確認數量',locale)} →</a></p>
   </section>`;
@@ -108,13 +130,15 @@ export function renderCoveragePage(locale,model,helpers){
     return `<tr><th scope="row">${t(d.name,locale)}</th><td>${d.source_overview_direct}</td><td>${d.source_overview_partial}</td><td>${examples.length?examples.map(r=>`<a href="#source-${r.paper_id.toLowerCase()}">${t(r.name,locale)}</a>`).join('、'):t('目前沒有明確來源標記，續補',locale)}</td></tr>`;
   }).join('');
   const body=`<main class="wrap coverage-page" id="main-content">
-    ${head('Coverage 總覽：前作有多少，整合後有多少','只用領域、環境、任務、題數、評估方式五個欄位。先讀全庫狀態，再逐一查前作；詳細分類和代號留在附錄。',route,locale,`<p class="page-meta"><span>${t('統整更新 '+model.date,locale)}</span><span>${t(`${s.registered_sources}筆已登記前作／評測來源`,locale)}</span><span>${t(`${s.reviewed_primary_sources_this_pass}個原始概述本次重新核對`,locale)}</span></p>`)}
-    <nav class="coverage-jump" aria-label="${t('本頁閱讀入口',locale)}"><a href="#whole">${t('全庫總覽',locale)}</a><a href="#benchmarks">${t('前作比較表',locale)}</a><a href="#coverage-domain">${t('領域分布',locale)}</a><a href="#coverage-evaluation">${t('四種判分方式',locale)}</a><a href="#coverage-work">${t('接下來完成什麼',locale)}</a></nav>
+    ${head('本版目標與目前實數：五項都有數字','規劃目標與已取得清單分欄。每個實數可查到ID、來源版本和驗證紀錄；舊配額與不同單位不混入本版總量。',route,locale,`<p class="page-meta"><span class="pill green">${t(model.numbers.contract.version.replace('numbers-','v')+' 有效目標',locale)}</span><span>${t('清單截止 '+model.numbers.contract.effective_on,locale)}</span><span>${t(`${s.registered_sources}筆已登記來源`,locale)}</span></p>`)}
+    <nav class="coverage-jump" aria-label="${t('本頁閱讀入口',locale)}"><a href="#whole">${t('目標／實數',locale)}</a><a href="#numbers-breakdown">${t('實數清單',locale)}</a><a href="#numbers-budget">${t('目標拆分',locale)}</a><a href="#benchmarks">${t('前作比較',locale)}</a><a href="#numbers-versions">${t('舊版對照',locale)}</a></nav>
     ${renderCoverageOverview(locale,model,helpers,{route})}
-    <section class="section" id="whole"><h2>${t('整體現在到哪裡',locale)}</h2><p>${t('「原作公布多少」、「本庫收集多少」和「整合後能評多少」在同一表中說清楚；不拿早期規劃配額代替已完成量。',locale)}</p>
-    <div class="table-scroll"><table id="coverage-whole-table"><thead><tr><th>${t('統計項目',locale)}</th><th>${t('目前確認',locale)}</th><th>${t('完整聯集還缺什麼',locale)}</th></tr></thead><tbody>${overviewRows(model).map(([id,name,value,note,remaining])=>`<tr id="${['domain','evaluation'].includes(id)?`coverage-${id}-summary`:`coverage-${id}`}"><th scope="row">${t(name,locale)}</th><td><b>${t(value,locale)}</b> · ${t(note,locale)}</td><td>${t(remaining,locale)}</td></tr>`).join('')}</tbody></table></div>
+    <section class="section" id="whole"><h2>${t('唯一有效量化表：目標和实數分開看',locale)}</h2><p>${t('本版目标是一组明确的建设预算；右栏为现有清单实数，附实际单位与完成阶段。两者不可直接换算完成百分比。',locale)}</p>
+    ${numberTable(locale,model,helpers)}
     <p class="source-note">${t(`${s.registered_sources}筆是來源名錄，含版本與衍生資源。${s.sources_with_task_list}筆已有原生清單索引，${s.sources_awaiting_task_list}筆仍待取得；資料收錄可以先進行，不受本機是否能模擬限制。`,locale)}</p></section>
-    <section class="section" id="benchmarks"><h2>${t('每個 benchmark 的環境、任務、題數與評估方式',locale)}</h2><p>${t('每列保留原作單位與範圍。全集、訓練、測試、已取得版本互不混加；沒有數量依據的項目保留待查。影片或示範量可在「另有原始資料量」展開。',locale)}</p>
+    ${quantityBreakdown(locale,model,helpers,route)}
+    ${numberBudgets(locale,model,helpers,route)}
+    <section class="section" id="benchmarks"><h2>${t('每個 benchmark 的環境、任務、題數與評估方式',locale)}</h2><p>${t('每列保留原作單位與範圍。已核到新資料檔的来源使用固定版本實數，舊概述收在「來源與口徑」；全集、訓練、測試和mini子集不重複相加。其他來源尚未取得的數值保持待查。',locale)}</p>
     <div class="coverage-controls js-only"><label for="coverage-q">${t('搜尋benchmark、領域或工作',locale)}<input type="search" id="coverage-q" placeholder="${t('例如 BEHAVIOR、Ego、裝配、问答',locale)}"></label><label for="coverage-method">${t('判分方式',locale)}<select id="coverage-method"><option value="">${t('全部方式',locale)}</option>${model.plan.evaluation_methods.map(m=>`<option value="${m.id}">${t(m.name,locale)}</option>`).join('')}<option value="pending">${t('待核',locale)}</option></select></label><button class="button secondary" id="coverage-reset">${t('清除篩選',locale)}</button></div>
     <div class="result-bar"><p id="coverage-count" role="status" aria-live="polite">${t(`${s.registered_sources}筆來源`,locale)}</p><a href="${downloads}/benchmark_summary.csv" download>${t('下載前作總表 CSV',locale)} ↓</a></div>
     <div class="table-scroll coverage-table-scroll" tabindex="0" role="region" aria-label="${t('前作比較表，可左右捲動',locale)}"><table id="coverage-benchmarks"><caption>${t('原作公布／固定版本的規模；不是我們已整合完成的總量',locale)}</caption><thead><tr>${['Benchmark','領域','環境／場景','任務／原生類型','題數與資料','評估方式','查核'].map(x=>`<th scope="col">${t(x,locale)}</th>`).join('')}</tr></thead><tbody>${sourceRows}</tbody></table></div>
@@ -126,8 +150,9 @@ export function renderCoveragePage(locale,model,helpers){
     <p class="source-note">${t(model.notes.source_domain_scope,locale)} ${t('來源可以跨領域，各列不能相加當作不同benchmark數。原作超出現有12類的用途，保留原生描述，之後補入分類。',locale)}</p></section>
     <section class="section" id="coverage-evaluation"><h2>${t('評估方式：統整為四種怎麼判分的方法',locale)}</h2><p>${t('理解、記憶、預測、規劃或實際操作，都能回到下列判分方式。同一來源可用多種方式，具體metric仍各自報告。',locale)}</p><div class="coverage-evaluation-grid">${model.plan.evaluation_methods.map(m=>`<article><h3>${t(m.name,locale)}</h3><p>${t(m.examples,locale)}</p><p><b>${t('判分依據：',locale)}</b>${t(m.evidence,locale)}</p><small>${t(m.metrics,locale)}</small><p><a href="?method=${m.id}#benchmarks">${t('看使用此方式的來源分類',locale)} →</a></p></article>`).join('')}</div><p class="source-note">${t('四類是這次統整的報告口徑；人工與模型裁判分別留紀錄。它不表示全庫所有評分器都已完成。',locale)}</p></section>
     <section class="section" id="coverage-work"><h2>${t('接下來只沿這三步補齊',locale)}</h2><ol class="coverage-milestones">${model.plan.milestones.map(m=>`<li><b>${t(m.name,locale)}</b><p>${t(m.deliverable,locale)}</p><p class="source-note">${t('完成條件：'+m.acceptance,locale)}</p></li>`).join('')}</ol><p>${t(model.plan.target_rule,locale)}</p><p>${t(model.plan.scale_rule,locale)}</p></section>
+    ${numberVersions(locale,model,helpers)}
     <details class="coverage-appendix"><summary>${t('詳細口徑、原生分類與舊代號',locale)}</summary><div class="table-scroll"><table><thead><tr><th>${t('主欄位',locale)}</th><th>${t('定義與細節',locale)}</th></tr></thead><tbody>${model.plan.fields.map(f=>`<tr><th>${t(f.name,locale)}</th><td>${t(f.definition+' '+f.detail,locale)}</td></tr>`).join('')}</tbody></table></div><p>${t('既有48家族、180情境和G／T定義保留作詳細參考；它們沒有被當作全庫已完成量。',locale)}</p><p><a href="${routeLink(route,'counting.html',locale)}">${t('計數及代號附錄',locale)}</a> · <a href="${routeLink(route,'survey-union.html',locale)}">${t('完整來源名錄與原生清單',locale)}</a> · <a href="${routeLink(route,'compare.html',locale)}">${t('68項原詳細比較',locale)}</a></p></details>
-    <div class="reader-actions"><a href="${downloads}/COVERAGE_REPORT.md" download>${t('下載完整整理報告',locale)}</a><a href="${downloads}/count_ledger.csv" download>${t('逐筆數量與出處 CSV',locale)}</a><a href="${downloads}/coverage_snapshot.json" download>${t('全庫 JSON',locale)}</a><button class="text-button print-page">${t('列印本頁',locale)}</button></div>
+    <div class="reader-actions"><a href="${relative(`${locale}/${route}`,'downloads/quantified/NUMBERS_REPORT.md')}" download>${t('下載本版數字與舊版對照',locale)}</a><a href="${downloads}/COVERAGE_REPORT.md" download>${t('完整前作報告',locale)}</a><a href="${downloads}/count_ledger.csv" download>${t('數量出處 CSV',locale)}</a><a href="${downloads}/coverage_snapshot.json" download>${t('全庫 JSON',locale)}</a><button class="text-button print-page">${t('列印本頁',locale)}</button></div>
     <script defer src="${relative(`${locale}/${route}`,'assets/coverage.js')}?v=${helpers.assetRevision||model.date}"></script>
   </main>`;
   return shell({route,locale,title:'Coverage總覽：領域、環境、任務、題數與評估方式',description:'用五個主欄位、兩張主表比較143筆前作來源，呈現整體收集與任務聯集狀態；保留原作單位和查核證據。',body,kind:'coverage'});

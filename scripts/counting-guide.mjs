@@ -13,7 +13,9 @@ export const indexUnitLabels={
   video_task_schema:'影片／任務題型',
   human_sim_task_mapping:'人類／模擬任務對應',
   native_task_template:'任務模板',
-  instructional_activity_definition:'人類活動定義'
+  instructional_activity_definition:'人類活動定義',
+  native_task_definition:'原作任務定義',
+  information_task_schema:'資訊題型定義'
 };
 
 export function renderCountingOverview(locale,stats,helpers,{route,breakdown=true}){
@@ -29,7 +31,7 @@ export function renderCountingOverview(locale,stats,helpers,{route,breakdown=tru
     </div>
     <p class="counting-progress" data-extraction-progress>${t(`來源提取進度：${stats.benchmark_or_eval_resource_records}條名錄中，${stats.benchmark_source_records_with_task_inventory}條已有部分索引可查，${stats.benchmark_source_records_awaiting_task_inventory}條仍待補原生清單。已有索引的來源，也需繼續核對清單完整性。`,locale)}</p>
     <p class="counting-note">${t('「待整理／未統計」表示全庫統計尚未完成，不是已知為0；既有可執行子集另有實驗紀錄。',locale)}</p>
-    ${breakdown?`<div class="index-breakdown" data-index-breakdown data-total="${stats.total_source_records}"><p><b>${t(`5,308條索引裡包含：`,locale)}</b></p><div class="index-subsets"><div data-index-bucket="robot" data-count="${stats.native_robot_task_candidates}"><strong>${stats.native_robot_task_candidates.toLocaleString('en-US')}</strong><span>${t('原作robot任務條目',locale)}</span><small>${t('待統一規格與對齊；原欄位稱「候選」',locale)}</small></div><div data-index-bucket="human" data-count="${stats.human_activity_definitions}"><strong>${stats.human_activity_definitions}</strong><span>${t('人類活動／流程定義',locale)}</span><small>${t('COIN與CrossTask的活動類別',locale)}</small></div><div data-index-bucket="other" data-count="${others}"><strong>${others.toLocaleString('en-US')}</strong><span>${t('其他定義與設定索引',locale)}</span><small>${t('框架註冊、協定、配對與示範入口',locale)}</small></div></div><p class="counting-note">${t('這三類已包含在5,308裡；它們是原作索引的分類。原始樣本數和任務環境數分別統計，不從索引總數推算。',locale)}</p></div>`:''}
+    ${breakdown?`<div class="index-breakdown" data-index-breakdown data-total="${stats.total_source_records}"><p><b>${t(`${stats.total_source_records.toLocaleString('en-US')}條索引裡包含：`,locale)}</b></p><div class="index-subsets"><div data-index-bucket="robot" data-count="${stats.native_robot_task_candidates}"><strong>${stats.native_robot_task_candidates.toLocaleString('en-US')}</strong><span>${t('原作robot任務條目',locale)}</span><small>${t('待統一規格與對齊；原欄位稱「候選」',locale)}</small></div><div data-index-bucket="human" data-count="${stats.human_activity_definitions}"><strong>${stats.human_activity_definitions}</strong><span>${t('人類活動／流程定義',locale)}</span><small>${t('COIN與CrossTask的活動類別',locale)}</small></div><div data-index-bucket="other" data-count="${others}"><strong>${others.toLocaleString('en-US')}</strong><span>${t('其他定義與設定索引',locale)}</span><small>${t('框架註冊、協定、配對與示範入口',locale)}</small></div></div><p class="counting-note">${t(`以上已包含在${stats.total_source_records.toLocaleString('en-US')}索引總數裡；原始樣本與題目定義另外計數。其他索引也包含本版新增的資訊題型。`,locale)}</p></div>`:''}
 ${route!=='counting.html'?`<p><a class="section-link" href="${link('')}">${t('來源、環境、場景、測例到底怎麼算？',locale)} →</a></p>`:''}
   </section>`;
 }
@@ -47,12 +49,12 @@ export function renderCountingPage(locale,stats,contract,helpers){
   const demo=contract.hypothetical_example;
   const definitions=contract.definitions.map(d=>`<article class="count-definition" id="${d.id}"><h3>${t(d.name,locale)}</h3><p>${t(d.definition,locale)}</p><p class="counting-note">${t(d.counting_rule,locale)}</p></article>`).join('');
   const body=`<main class="wrap counting-main" id="main-content">
-    ${head('5,308是來源索引。環境、場景與樣本分開算。','把來源名錄、原作索引、任務環境定義、場景、測例與一次執行分成不同層級；G／T代號的完整定義也集中在本頁。',route,locale,`<div class="page-meta"><span>${t('計數說明：2026-10-01',locale)}</span><span>${t('G／T速查：2026-10-02',locale)}</span><span>${t('來源數字快照：2026-09-29',locale)}</span></div>`)}
+    ${head(`${stats.total_source_records.toLocaleString('en-US')}是來源索引；本頁為計數細節附錄。`,'把來源名錄、原作索引、任務環境定義、場景、測例與一次執行分成不同層級；G／T代號的完整定義也集中在本頁。',route,locale,`<div class="page-meta"><span>${t('計數說明：2026-10-01',locale)}</span><span>${t('G／T速查：2026-10-02',locale)}</span><span>${t(`來源清單快照：${stats.date}`,locale)}</span></div>`)}
     <div class="coverage-reader-note"><b>${t('這一頁現在作為計數細節附錄',locale)}</b><p>${t('新版主表只保留領域、環境、任務、題數與評估方式。「環境」主欄統一列場景／layout；下方任務環境定義是連接場景與任務的完整技術規格。',locale)}</p><a href="${routeLink(route,'coverage.html',locale)}">${t('先看五欄Coverage總覽',locale)} →</a></div>
     <nav class="symbol-guide-links counting-jump-links" aria-label="${t('計數與代號快速導覽',locale)}"><a href="#symbols-g">${t('G0–G5：計數層級',locale)}</a><a href="#symbols-t">${t('T1–T8：評測模組',locale)}</a><a href="#task-environment">${t('任務環境定義',locale)}</a><a href="#real-source-examples">${t('索引與樣本實例',locale)}</a></nav>
     ${renderCountingOverview(locale,stats,helpers,{route})}
     <section class="counting-section" id="real-source-examples"><h2>${t('同一個來源，索引數與樣本數可以差很多',locale)}</h2>
-      <div class="table-scroll"><table id="counting-source-examples"><thead><tr><th>${t('原作',locale)}</th><th>${t('本庫目前計入5,308的內容',locale)}</th><th>${t('原作公布的規模',locale)}</th><th>${t('本庫取得／整理狀態',locale)}</th></tr></thead><tbody>${examples}</tbody></table></div>
+      <div class="table-scroll"><table id="counting-source-examples"><thead><tr><th>${t('原作',locale)}</th><th>${t('本庫索引中登記的內容',locale)}</th><th>${t('原作公布的規模',locale)}</th><th>${t('本庫取得／整理狀態',locale)}</th></tr></thead><tbody>${examples}</tbody></table></div>
       <p>${t('例如PARTNR的6條是生成器設定索引，不是原作只有6個任務。右欄的原作規模也不代表我們已下載或整合全部樣本；完整前作任務聯集仍在整理。',locale)}</p>
       <p><a href="${routeLink(route,'survey-union.html',locale)}#union-catalogue">${t('回到來源總表核對原作單位與提取進度',locale)} →</a></p>
     </section>
@@ -79,6 +81,6 @@ export function renderCountingPage(locale,stats,contract,helpers){
       <p class="source-note">${t('環境介面的背景可參考',locale)} ${contract.references.map(r=>`<a href="${escape(r.url)}" target="_blank" rel="noopener noreferrer">${t(r.name,locale)}</a>`).join(' · ')}。${t('本頁的資料分層與計數規則是本計畫的明訂約定。',locale)}</p>
     </section>
   </main><script defer src="${relative(`${locale}/${route}`,'assets/counting.js')}"></script>`;
-  return shell({route,locale,title:'計數與代號：G0–G5、T1–T8與任務環境',description:'G是計數粒度，T是評測模組；附完整定義、摺毛巾例子與章節跳轉。143來源名錄與5308索引、任務環境、場景和樣本分開計數。',body,kind:'counting'});
+  return shell({route,locale,title:'計數與代號：G0–G5、T1–T8與任務環境',description:`G／T舊代號與環境計數細節。${stats.total_source_records.toLocaleString('en-US')}索引與本版目標／清單實數分開，主入口見Coverage量化表。`,body,kind:'counting'});
 }
 import {renderSymbolGuide} from './symbol-guide.mjs';

@@ -38,7 +38,7 @@ export function formatCount(record) {
   const prefix = {at_least: '≥ ', more_than: '> ', approximate: '約 '}[record.value_kind] || '';
   return prefix + Number(record.value).toLocaleString('en-US');
 }
-export function buildCoverageModel({plan, registry, comparison, typed, supplement, scoring, reviews, displayNotes, unionStats, taxonomy, tasks, families}) {
+export function buildCoverageModel({plan, registry, comparison, typed, supplement, scoring, reviews, displayNotes, unionStats, taxonomy, tasks, families,numbers}) {
   const registered = registry.filter(r => r.benchmark_source_registered);
   const byComparison = Object.fromEntries(comparison.rows.filter(r => r.group !== 'ours').map(r => [r.id, r]));
   const recordIds = new Set();
@@ -51,7 +51,8 @@ export function buildCoverageModel({plan, registry, comparison, typed, supplemen
       ...r,
       paper_id: source.paper_id,
       benchmark: source.name,
-      field: fieldFor(r),
+      field: numbers&&recordIsHistoricalForCurrentInventory(r)?'history':fieldFor(r),
+      record_status: numbers&&recordIsHistoricalForCurrentInventory(r)?'historical_source_scope':'active_source_fact',
       eligible_for_global_sum: false
     }));
     for (const count of counts) {
@@ -76,9 +77,9 @@ export function buildCoverageModel({plan, registry, comparison, typed, supplemen
       task_list_complete: source.task_list_complete_for_whole_work === true,
       task_list_scope: source.source_scope_note,
       domains: previous?.domain || displayNotes?.domains[source.paper_id] || source.declared_domains || source.scope_note || '領域待對齊',
-      environments: previous?.scenes || source.scenes || (source.category==='V'?'影片觀測來源；錄製環境總數待整理。':'原作場景總數待查'),
+      environments: (numbers&&['P143','P038'].includes(source.paper_id)?source.scenes:null) || previous?.scenes || source.scenes || (source.category==='V'?'影片觀測來源；錄製環境總數待整理。':'原作場景總數待查'),
       tasks: previous?.tasks || source.native_tasks || '原作任務總數待查',
-      cases: caseTextOverrides[source.detailed_comparison_id] || caseTextOverrides[source.paper_id] || previous?.cases || source.cases || '固定題目／split總數待查',
+      cases: (numbers&&['P143','P038'].includes(source.paper_id)?source.cases:null) || caseTextOverrides[source.detailed_comparison_id] || caseTextOverrides[source.paper_id] || previous?.cases || source.cases || '固定題目／split總數待查',
       native_evaluation: scoring.source_notes[source.paper_id] || previous?.evaluation || '判分方式待核；目前保留來源研究用途。',
       evaluation_methods: evaluationMethods,
       evaluation_classification_status: evaluationMethods.length ? 'source_overview_interpretation' : 'pending',
@@ -125,6 +126,7 @@ export function buildCoverageModel({plan, registry, comparison, typed, supplemen
     primary_review_date: plan.date,
     scope: '143 registered evaluation-source records; coverage report reorganized with retained native units and split scopes, not a completed task union.',
     plan,
+    numbers,
     statistics: {
       registered_sources: rows.length,
       earlier_detailed_sources: Object.keys(byComparison).length,
@@ -195,6 +197,7 @@ export function coverageMarkdown(model) {
   const clean = value => String(value ?? '').replaceAll('|','／').replace(/\s+/g,' ').trim();
   const field = (row, kind) => row.counts.filter(c=>c.field===kind).map(c=>`${formatCount(c)} ${c.native_term}（${countScopeLabels[c.scope] || c.scope}）`).join('；') || ({environment:row.environments,task:row.tasks,case:row.cases}[kind] || '待查／未整理');
   const methodNames = Object.fromEntries(model.plan.evaluation_methods.map(m=>[m.id,m.name]));
+  if(model.numbers)return quantityReportMarkdown(model.numbers)+'\n## 全部前作比較：各自來源版本及單位\n\n| Benchmark | 領域 | 環境 | 任務 | 題數／評測記錄 | 原始資料 | 判分分類 |\n|---|---|---|---|---|---|---|\n'+model.rows.map(r=>`| [${clean(r.name)}](${r.source_url}) | ${clean(r.domains)} | ${clean(field(r,'environment'))} | ${clean(field(r,'task'))} | ${clean(field(r,'case'))} | ${clean(field(r,'data'))} | ${r.evaluation_methods.map(id=>methodNames[id]).join('／') || '待核'} |`).join('\n')+'\n';
   return [
     '# Coverage 統整：五個欄位、兩張主表','',`版本 ${model.version}；整理 ${model.date}；來源庫快照 ${model.source_snapshot}。`,'',
     model.plan.purpose,'',
@@ -226,3 +229,4 @@ export function coverageMarkdown(model) {
     '完整CSV／JSON逐筆保留版本、split、出處和查核狀態。G／T、家族、規則和執行次數為詳細資料，不再作主要閱讀門檻。',''
   ].join('\n');
 }
+import {recordIsHistoricalForCurrentInventory,quantityReportMarkdown} from './quantified-model.mjs';

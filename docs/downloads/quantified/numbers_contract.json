@@ -1,0 +1,114 @@
+{
+  "version": "numbers-0.9",
+  "effective_on": "2026-10-02",
+  "status": "active_planning_targets_separate_from_counted_inventory",
+  "user_confirmed_display": "本版規劃目標＋目前實數，兩欄分開",
+  "planning_scope": "第一個完整版本的數量目標；不是已完成量，也不是永久限制來源總庫的上限。",
+  "current_scope": "目前能由逐筆ID、固定來源版本和查核紀錄重算的清單量；整合、素材取得與執行驗證分開。",
+  "primary_fields": [
+    {
+      "id": "domain",
+      "label": "領域",
+      "target": 12,
+      "target_unit": "應用領域",
+      "target_basis": "沿用已定義的12個生活／工作場域，為每域配置來源、環境、任务與題目。",
+      "current_key": "domains",
+      "current_unit": "已寫出的領域定義",
+      "current_limit": "來源概述支持與逐任務綁定分開；12個定義不代表12域已全面實測。",
+      "acceptance": "每條來源、環境和任務都有主領域或明確的跨域／未定標記及來源支援。"
+    },
+    {
+      "id": "environment",
+      "label": "環境",
+      "target": 1000,
+      "target_unit": "場景／layout",
+      "target_basis": "首版按12域分配1,000個場景定義；優先复用來源，再補缺域的配置。樣式和初態不自動增加layout數。",
+      "current_key": "source_named_environment_definitions",
+      "current_unit": "原作命名場景定義",
+      "current_limit": "有ID、定義和資產／生成入口；尚未完成所有幾何等價審核及完整資產載入。",
+      "acceptance": "場景ID、固定版本、資產或生成規則與重用關係完整；同一底層場景的別名只算一次。"
+    },
+    {
+      "id": "task",
+      "label": "任務",
+      "target": 5000,
+      "target_unit": "任務規格",
+      "target_basis": "2,000個對齊後來源基本任務＋3,000份有效規則擴充；基本任務與規則版本分欄。",
+      "current_key": "source_task_and_information_records",
+      "current_unit": "來源任務／資訊題型條目",
+      "current_limit": "2,096條機器人任務＋7個OpenEQA資訊題型；是來源ID清單，還不是5,000目標所要求的共同規格。263個人類活動另列。",
+      "acceptance": "每份規格有父來源、完整目標／指涉／過程／限制／判分語義；等價、衍生或未決關係可查。僅改顏色、位置、視角或同義文字不增加任務規格。"
+    },
+    {
+      "id": "case",
+      "label": "題數",
+      "target": 1000000,
+      "target_unit": "有ID的評測測例",
+      "target_basis": "控制500,000、問答／理解300,000、預測200,000。這是出題與整合預算；逐題驗證後才計為完成。",
+      "current_key": "case_definition_records",
+      "current_unit": "已取得題目定義／元資料",
+      "current_limit": "已具指令／問題、來源、原生split、輸入引用與答案／目標程序；視覺素材及3D資產未完整取得，本版尚未跑模型成績。",
+      "acceptance": "每題有唯一ID、來源、任務、split、合法輸入與判分；正式可評數還需素材和判分介面可用。影片、未選候選池及重跑次數不直接計成題數。"
+    },
+    {
+      "id": "evaluation",
+      "label": "評估方式",
+      "target": 4,
+      "target_unit": "判分方式",
+      "target_basis": "標準答案比對、數值誤差與相似度、環境狀態與過程檢查、人工或模型評審。",
+      "current_value": 4,
+      "current_unit": "已定義的判分類別",
+      "current_limit": "原作具體評分器逐一掛接；4類定義不等於4個已完成全庫驗證的通用評分器。",
+      "acceptance": "每個測例連到具體metric／程式或rubric、必要證據和適用版本；不同判分方式不混成無意義的單一平均。"
+    }
+  ],
+  "task_target_components": {
+    "source_base_tasks": 2000,
+    "rule_extension_specs": 3000,
+    "total_specs": 5000,
+    "extension_components": [
+      {"name": "終態與工作組合", "specs": 1000},
+      {"name": "過程與必要順序", "specs": 700},
+      {"name": "資源與限制", "specs": 500},
+      {"name": "條件分支與歷史指涉", "specs": 400},
+      {"name": "協作、交接與數位工具規則", "specs": 400}
+    ],
+    "note": "以上是待建立及去重的規格配額，不是把來源數乘以運算子數宣稱已完成。"
+  },
+  "case_target_components": [
+    {"kind": "robot_control", "name": "控制", "train": 400000, "validation": 50000, "test": 50000, "total": 500000},
+    {"kind": "qa_understanding", "name": "問答／理解", "train": 240000, "validation": 30000, "test": 30000, "total": 300000},
+    {"kind": "prediction", "name": "預測", "train": 160000, "validation": 20000, "test": 20000, "total": 200000}
+  ],
+  "split_policy": "80／10／10是本版容量預算。實際切分先按來源、場景、session和衍生關係分組，保留原作split；不得為湊數把同源樣本或訓練資料放入測試。",
+  "domain_quotas": [
+    {"domain_id":"D01","name":"居家生活空間","environments":200,"base_tasks":400,"rule_specs":600,"task_specs":1000,"case_budget":200000},
+    {"domain_id":"D02","name":"餐飲服務場所","environments":100,"base_tasks":200,"rule_specs":300,"task_specs":500,"case_budget":100000},
+    {"domain_id":"D03","name":"零售門店","environments":75,"base_tasks":160,"rule_specs":240,"task_specs":400,"case_budget":80000},
+    {"domain_id":"D04","name":"倉儲與配送場所","environments":100,"base_tasks":240,"rule_specs":360,"task_specs":600,"case_budget":120000},
+    {"domain_id":"D05","name":"辦公與行政空間","environments":75,"base_tasks":120,"rule_specs":180,"task_specs":300,"case_budget":60000},
+    {"domain_id":"D06","name":"工坊、製造與維修場所","environments":100,"base_tasks":260,"rule_specs":390,"task_specs":650,"case_budget":130000},
+    {"domain_id":"D07","name":"實驗室例行物件操作","environments":50,"base_tasks":120,"rule_specs":180,"task_specs":300,"case_budget":60000},
+    {"domain_id":"D08","name":"旅宿與洗衣服務","environments":50,"base_tasks":100,"rule_specs":150,"task_specs":250,"case_budget":50000},
+    {"domain_id":"D09","name":"建築設施維護服務","environments":75,"base_tasks":100,"rule_specs":150,"task_specs":250,"case_budget":50000},
+    {"domain_id":"D10","name":"園藝與戶外作業場域","environments":50,"base_tasks":100,"rule_specs":150,"task_specs":250,"case_budget":50000},
+    {"domain_id":"D11","name":"輔助生活服務場域","environments":75,"base_tasks":100,"rule_specs":150,"task_specs":250,"case_budget":50000},
+    {"domain_id":"D12","name":"公共場館與活動場域","environments":50,"base_tasks":100,"rule_specs":150,"task_specs":250,"case_budget":50000}
+  ],
+  "quota_policy": "每個預算項目只歸一個主領域，其他領域作次標籤；配額是本版編輯規劃，不是按文獻篇數推算的現有分布，也不表示每個任務都適用每種評測。",
+  "single_source_of_truth": "主頁、Coverage、整體設計、報告及下載資料的目標與清單數都由此契約及inventory_summary.json產生。",
+  "no_completion_percent_from_incompatible_units": true,
+  "old_version_policy": "v0.8及更早的目標、配額與清單快照只作歷史資料；不得與本版目標相加。前作論文與原始資料檔的數字差異，必須附各自版本與單位。",
+  "version_crosswalk": [
+    {"old":"8–10 labels／30–40 groups／100–140 blueprints","old_scope":"早期核心預算","current":"已退役；本版主目標為12域、1,000場景、5,000規格、100萬題、4方式。"},
+    {"old":"48家族／180情境／24 Ego題型","old_scope":"v0.2設計細節","current":"保留在歷史附錄；不作本版任務或題數實績。"},
+    {"old":"2,000–3,000 G2","old_scope":"v0.3–v0.5任務研發目標","current":"由本版5,000任務規格目標取代，另明列2,000來源基本任務與3,000規則規格。"},
+    {"old":"240 layouts／48 styles／6,000 configurations","old_scope":"舊環境容量模型","current":"由1,000場景／layout目標取代；樣式、配置和初態不再混入layout主數。"},
+    {"old":"13筆來源有環境數、21筆來源有題數","old_scope":"v0.8查核進度","current":"這是來源篇數；本版環境和題數主欄改為逐筆ID清單實數。"},
+    {"old":"2,062 robot任務條目／5,308來源索引","old_scope":"9/29來源清單","current":"新增CALVIN 34條機器人任務與OpenEQA 7個資訊題型；本版2,096機器人任務＋7資訊題型＝2,103來源條目。含其他設定的完整索引更新為5,349；都不等於共同規格完成量。"},
+    {"old":"PARTNR 100,000 train＋1,000 val＋1,000 test","old_scope":"先前論文／概述數量轉錄","current":"本版按固定HF檔案實數計train 111,652、val 1,000；該版本沒有公開test檔，不額外加入1,000。原文概述保留為歷史口徑。"},
+    {"old":"PARTNR 60 houses","old_scope":"論文整體範圍","current":"本版公開HSSD-partnr分支有50個場景定義，所取train／val題目實際引用49個；不能宣稱已取得隱藏test的10個房屋。"},
+    {"old":"OpenEQA >1,600題／>180環境","old_scope":"原始論文概述","current":"固定open-eqa-v0.json實數1,636題、152個episode_history資源ID；history ID不改名為互動場景。"},
+    {"old":"4,286原生試驗／720聯合試驗／92.5%","old_scope":"既有工程子集","current":"保留工程附錄；不作本版題庫規模、難度或全庫模型成績。"}
+  ]
+}
