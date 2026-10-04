@@ -15,12 +15,15 @@
   const words=hans?{source:'笔来源',show:'显示',all:'显示全部',pages:'恢复分页'}:{source:'筆來源',show:'顯示',all:'顯示全部',pages:'恢復分頁'};
   let page=1;
   let showAll=false;
+  let classificationCohort=false;
+  const cohortNotice=document.querySelector('#coverage-cohort');
   const pageSize=12;
   const restore=()=>{
     const params=new URLSearchParams(location.search);
     q.value=params.get('q')||'';
     method.value=params.get('method')||'';
-    if(domain)domain.value=params.get('domain')||'';
+    classificationCohort=params.get('cohort')==='domain-review'||params.get('domain')==='unspecified';
+    if(domain)domain.value=params.get('domain')==='unspecified'?'':params.get('domain')||'';
     if(type)type.value=params.get('type')||'';
     page=Math.max(1,parseInt(params.get('page')||'1',10)||1);
     showAll=params.get('all')==='1';
@@ -31,7 +34,8 @@
       const methods=row.dataset.methods.split(' ').filter(Boolean);
       const domains=(row.dataset.domains||'').split(' ').filter(Boolean);
       return terms.every(term=>row.dataset.search.toLocaleLowerCase().includes(term)) &&
-        (!domain?.value||(domain.value==='unspecified'?!domains.length:domains.includes(domain.value))) &&
+        (!classificationCohort||row.dataset.reclassified==='1') &&
+        (!domain?.value||domains.includes(domain.value)) &&
         (!type?.value||row.dataset.type===type.value) &&
         (!method.value || (method.value==='pending'?!methods.length:methods.includes(method.value)));
     });
@@ -51,12 +55,14 @@
     next.disabled=showAll||page===pages;
     allButton.textContent=showAll?words.pages:words.all;
     document.querySelector('#coverage-empty').hidden=filtered.length!==0;
+    if(cohortNotice)cohortNotice.hidden=!classificationCohort;
     if(update){
       const params=new URLSearchParams();
       if(q.value.trim())params.set('q',q.value.trim());
       if(method.value)params.set('method',method.value);
       if(domain?.value)params.set('domain',domain.value);
       if(type?.value)params.set('type',type.value);
+      if(classificationCohort)params.set('cohort','domain-review');
       if(page>1&&!showAll)params.set('page',String(page));
       if(showAll)params.set('all','1');
       const hash=location.hash.startsWith('#source-')&&!keepSourceHash?'':location.hash;
@@ -68,7 +74,7 @@
     if(!location.hash.startsWith('#source-'))return;
     const target=document.getElementById(decodeURIComponent(location.hash.slice(1)));
     if(!target||!rows.includes(target))return;
-    q.value='';method.value='';if(domain)domain.value='';if(type)type.value='';
+    q.value='';method.value='';if(domain)domain.value='';if(type)type.value='';classificationCohort=false;
     page=Math.floor(rows.indexOf(target)/pageSize)+1;
     render(true,true);
     await document.fonts.ready;
@@ -78,7 +84,8 @@
   method.addEventListener('change',()=>{page=1;render();});
   domain?.addEventListener('change',()=>{page=1;render();});
   type?.addEventListener('change',()=>{page=1;render();});
-  document.querySelector('#coverage-reset').addEventListener('click',()=>{q.value='';method.value='';if(domain)domain.value='';if(type)type.value='';page=1;showAll=false;render();});
+  document.querySelector('#coverage-reset').addEventListener('click',()=>{q.value='';method.value='';if(domain)domain.value='';if(type)type.value='';classificationCohort=false;page=1;showAll=false;render();});
+  document.querySelector('#coverage-clear-cohort')?.addEventListener('click',()=>{classificationCohort=false;page=1;render();});
   previous.addEventListener('click',()=>{page--;render();document.querySelector('.coverage-table-scroll').scrollIntoView({behavior:'instant',block:'start'});});
   next.addEventListener('click',()=>{page++;render();document.querySelector('.coverage-table-scroll').scrollIntoView({behavior:'instant',block:'start'});});
   allButton.addEventListener('click',()=>{showAll=!showAll;render();});
@@ -86,5 +93,5 @@
   addEventListener('popstate',()=>{restore();render(false);revealHash();});
   addEventListener('beforeprint',()=>{const selected=new Set(matching());rows.forEach(row=>row.hidden=!selected.has(row));status.textContent=`${selected.size} ${words.source}`;});
   addEventListener('afterprint',()=>render(false));
-  restore();render(false);revealHash();
+  restore();render(new URLSearchParams(location.search).get('domain')==='unspecified');revealHash();
 })();

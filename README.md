@@ -1,17 +1,17 @@
 # Robot-use Benchmark：逐篇來源審閱與任務聯集
 
-目前版本 **v0.10（2026-10-02）**：先閱讀原作，再分類與比較，最後建立任務聯集及規則擴充。
+目前版本 **v0.11（用途歸納更新2026-10-04）**：先閱讀原作，再分類與比較，最後建立任務聯集及規則擴充。
 
 - 現有250篇書目完成初篩；原143來源加40個補入來源，共183份有關鍵章節閱讀紀錄。其餘67篇方法／原作實驗／survey參考保留篩查理由。
 - 672筆數量摘錄附原文單位、PDF頁碼、版本與SHA256；每份來源都有領域、環境、任務、題數、判分、split、重用關係和限制。
-- 來源用途分為18類，22份標為跨域／未指定；四類判分分項記錄。分類不代表全庫已可執行，亦未經第二位獨立編碼者驗證。
+- 183/183份來源均已歸類，原22份缺口已補齊；共有21類用途、431筆來源—用途對應。依任務、對象、場景與目標判定，附逐篇理由與頁碼。新增通用作業、協助交接、穿戴互動三類；分類與實際執行仍分別記錄。
 - 既有ID清單仍為284場景條目、2,096robot任務條目、另7資訊題型及263人類活動、114,288筆題目元資料（含train）。不同單位不能相加成已去重的全庫規模。
 
 v0.9先訂的1,000場景／5,000任務／100萬題配額已撤回；目標欄為null，未把未知值填0。來源審閱不等於逐題複核、全資產取得或模型執行；尚未窮盡全球相關文獻。
 
 入口為 `zh-hant/coverage.html`、`zh-hans/coverage.html`；全文為 `source-report.html`。本輪繁／簡PDF與Markdown、JSON、CSV在 `downloads/source-review/`，原始PDF只保存在忽略的本機cache，不重新發布。
 
-審閱輸入：`content/fulltext_review/batch*.json`、`screening.json`、`codebook.json`。`scripts/source-review-model.mjs`驗證身份、頁碼、覆蓋、分類和數量單位，建立網站与下載表。取得PDF或自動命中關鍵字不會自動標成讀過。
+審閱輸入：`content/fulltext_review/batch*.json`、`screening.json`、`codebook.json`、`domain_assignments.json`。`scripts/source-review-model.mjs`驗證身份、頁碼、183份用途判定及每個標籤的任務證據，以及數量單位，建立網站与下載表。取得PDF或自動命中關鍵字不會自動標成讀過。
 
 ```sh
 npm ci
@@ -21,6 +21,8 @@ npm run serve
 ```
 
 `docs/`為GitHub Pages發布目錄；push main後自動建置、驗證、發布。瀏覽器檢查：`ROBOT_TEST_URL=http://127.0.0.1:8798/robot-use-benchmark/ node scripts/browser-check.mjs`（需Chrome）。
+
+用途歸納方法和原22份對照表在 `coverage.html#domain-method` 與 `coverage.html#domain-reclassifications`。舊 `domain=unspecified` 連結會顯示這22份已完成歸類的來源。v0.10的18類／22未歸類快照及109頁PDF已移至歷史檔案。
 
 <details>
 <summary>歷史版本紀錄：以下配額和「當時有效」說明已退役</summary>

@@ -59,6 +59,7 @@ for locale in ["zh-hant","zh-hans"]:
     records.append(record)
     print(json.dumps(record),flush=True)
 (ROOT/"content/fulltext_review/report_assets.json").write_text(json.dumps({
-    "version":"source-review-0.10","generated_at":datetime.now(timezone.utc).isoformat(),
+    "version":json.loads((ROOT/"content/fulltext_review/codebook.json").read_text())["version"],
+    "generated_at":datetime.now(timezone.utc).isoformat(),
     "scope":"Authored primary-section notes, screening, distribution and integration plan; not copies of original papers.",
     "assets":records},ensure_ascii=False,indent=2)+"\n")

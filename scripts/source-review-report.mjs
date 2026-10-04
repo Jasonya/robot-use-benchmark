@@ -4,7 +4,7 @@ import {sourceReviewMarkdown} from './source-review-model.mjs';
 export function renderSourceReport(locale,model,{t,shell}) {
   const lines=sourceReviewMarkdown(model).split('\n');
   const output=[];
-  const inline=text=>t(text,locale).replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1">$1</a>');
+  const inline=text=>t(text,locale).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1">$1</a>');
   for(let i=0;i<lines.length;i++){
     const line=lines[i];
     if(!line.trim())continue;
@@ -25,5 +25,5 @@ export function renderSourceReport(locale,model,{t,shell}) {
       i--;output.push(`<ul>${items.join('')}</ul>`);
     }else output.push(`<p>${inline(line)}</p>`);
   }
-  return shell({route:'source-report.html',locale,title:'v0.10完整來源審閱報告',description:'250篇初篩、183份逐篇閱讀、672筆數量出處、來源分布和benchmark整合設計。',body:`<main class="wrap source-report" id="main-content">${output.join('\n')}</main>`,kind:'source-report'});
+  return shell({route:'source-report.html',locale,title:`${model.fulltext.version.replace('source-review-','v')}完整來源審閱與用途歸納報告`,description:'183份來源全部歸類，附逐篇用途依據、數量出處、來源分布和benchmark整合設計。',body:`<main class="wrap source-report" id="main-content">${output.join('\n')}</main>`,kind:'source-report'});
 }

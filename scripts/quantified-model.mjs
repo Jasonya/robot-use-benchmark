@@ -113,8 +113,8 @@ export function sourceBridgeCSV(records){
 export function quantityReportMarkdown(numbers){
   const {contract,inventory}=numbers;
   return [
-    '# 固定來源ID清單：v0.10說明','',
-    'v0.9的建設配額已撤回。此檔保留先前取得的ID清單數；完整183來源逐篇比較與18用途分類見 ../coverage/COVERAGE_REPORT.md。','',
+    '# 固定來源ID清單：v0.11說明','',
+    'v0.9的建設配額已撤回。此檔保留先前取得的ID清單數；完整183來源逐篇比較與21用途分類見 ../coverage/COVERAGE_REPORT.md。','',
     '| 項目 | 已取得清單 | 界線 |','|---|---:|---|',
     ...quantityRows(numbers).map(f=>`| ${f.label} | ${f.current.toLocaleString('en-US')} ${f.current_unit} | ${f.current_limit} |`),'',
     '284是命名場景條目；未完成跨來源幾何去重。2,096robot任務、7資訊題型、263人類活動各自計數；不是共同去重後的任務總量。','',
