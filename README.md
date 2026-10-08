@@ -24,6 +24,12 @@ npm run serve
 
 用途歸納方法和原22份對照表在 `coverage.html#domain-method` 與 `coverage.html#domain-reclassifications`。舊 `domain=unspecified` 連結會顯示這22份已完成歸類的來源。v0.10的18類／22未歸類快照及109頁PDF已移至歷史檔案。
 
+2026-10-08 新增 **標準化蒐集流程 0.1**：`collection-pipeline.html` 提供八步流程、六種共同紀錄、任務與環境對齊、資料形態、切分及評測驗收。來源用途分類仍為 v0.11，來源和任務總量沒有因格式匯入而增加；10/04 的118頁PDF保留原快照。
+
+規格和可跑的匯入器在 [benchmark/collection/PIPELINE_SPEC.md](benchmark/collection/PIPELINE_SPEC.md)。本次將183份來源、21個領域、284個場景、2,096個robot任務、7個資訊題型、263個人類活動、114,288筆case元資料與3個evaluator索引轉成共同 catalog。117,145筆紀錄通過結構、身份、引用、輸入hash與原始payload保留檢查；10項資料契約測試通過。跨來源語義去重、完整素材、共同split與可執行評測不在本次完成範圍。
+
+六種JSONL.gz、schema、範例、輸入manifest與報告在 `downloads/collection-pipeline/`。匯入程式只讀已有固定快照，不下載新的原始素材、不呼叫模型。輸出使用新的空目錄，驗收成功才寫 `SUCCESS.json`；可透過 `.preview/collection-venv/bin/python -m unittest discover -s benchmark/collection -p 'test_catalog.py' -v` 執行契約檢查。
+
 <details>
 <summary>歷史版本紀錄：以下配額和「當時有效」說明已退役</summary>
 

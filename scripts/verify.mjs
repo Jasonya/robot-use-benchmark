@@ -59,7 +59,31 @@ const expected={
   'explore/tasks.html':180,'explore/families.html':48,'explore/probes.html':24,
   'explore/metrics.html':40,'library.html':250
 };
+const pipelineRoot=path.join(root,'benchmark/collection');
+const pipelineDownloads=path.join(out,'downloads/collection-pipeline');
+const pipelineReport=JSON.parse(await fs.readFile(path.join(pipelineDownloads,'import-report.json'),'utf8'));
+const pipelineInputs=JSON.parse(await fs.readFile(path.join(pipelineDownloads,'input_manifest.json'),'utf8'));
+const sha=buffer=>crypto.createHash('sha256').update(buffer).digest('hex');
+assert.equal(pipelineReport.adapter_sha256,sha(await fs.readFile(path.join(pipelineRoot,'run_snapshot.py'))));
+assert.equal(pipelineReport.schema_sha256,sha(await fs.readFile(path.join(pipelineRoot,'catalog_record.schema.json'))));
+for(const input of pipelineInputs)assert.equal(sha(await fs.readFile(path.join(root,input.path))),input.sha256,`Stale pipeline input: ${input.path}`);
+for(const[name,record]of Object.entries(pipelineReport.outputs))
+  assert.equal(sha(await fs.readFile(path.join(pipelineDownloads,name))),record.sha256,`Changed pipeline export: ${name}`);
+for(const name of ['PIPELINE_SPEC.md','catalog_record.schema.json','run_snapshot.py','test_catalog.py','references.json','requirements.txt'])
+  assert.deepEqual(await fs.readFile(path.join(pipelineDownloads,name)),await fs.readFile(path.join(pipelineRoot,name)),`Stale pipeline download: ${name}`);
+assert.deepEqual(pipelineReport.counts,{domain:21,source:183,environment:284,task:2366,evaluator:3,case:114288});
+assert.deepEqual(pipelineReport.task_kinds,{robot_task_definition:2096,information_task_type:7,human_activity_definition:263});
+assert.equal(pipelineReport.evaluation_release_eligible_cases_in_this_import,0);
+assert.equal(pipelineReport.canonical_task_union_count,null);
+assert.equal(pipelineReport.validation.schema_valid_records,117145);
 for(const locale of ['zh-hant','zh-hans']){
+  const pipelinePage=pages.get(path.join(out,locale,'collection-pipeline.html'));
+  assert.ok(pipelinePage);
+  assert.equal(pipelinePage.$('#pipeline-counts tbody tr').length,8);
+  assert.deepEqual(pipelinePage.$('[data-import-count]').toArray().map(n=>Number(pipelinePage.$(n).attr('data-import-count'))),[183,21,284,2096,7,263,114288,3]);
+  assert.equal(pipelinePage.$('.pipeline-flow a').length,8);
+  assert.ok(pipelinePage.$('.primary-nav a[href="collection-pipeline.html"]').length);
+  assert.ok(pipelinePage.$('#pipeline-06').length);
   for(const[route,count]of Object.entries(expected)){
     const{$}=pages.get(path.join(out,locale,route));
     assert.equal($('[data-entry]').length,count,`${locale}/${route} count`);

@@ -17,6 +17,7 @@ import {renderCoveragePage,renderCoverageOverview,renderCoverageNotice,renderCov
 import {validateNumbers,quantityRows,applySourceOverlay,currentQuantityRecords,sourceBridgeCSV,quantityReportMarkdown} from './quantified-model.mjs';
 import {loadSourceReview,applyFulltextReview,sourceReviewCSV,sourceReviewMarkdown,domainClassificationCSV} from './source-review-model.mjs';
 import {renderSourceReport} from './source-review-report.mjs';
+import {renderCollectionPipeline} from './collection-pipeline-page.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -153,6 +154,14 @@ const [coveragePlan,coverageSupplement,coverageScoring,coverageReviews,typedCoun
 const coverageModel=buildCoverageModel({plan:coveragePlan,registry:unionRegistry,comparison:comparisonModel,typed:typedCounts,supplement:[...coverageSupplement,...currentQuantityRecords(numbers,numberSourcePins)],scoring:coverageScoring,reviews:coverageReviews,displayNotes:coverageDisplayNotes,unionStats,taxonomy,tasks,families,numbers});
 const fulltextReview=await loadSourceReview(ROOT,papers);
 applyFulltextReview(coverageModel,fulltextReview,unionRegistry,unionStats);
+const PIPELINE_DIR=path.join(ROOT,'benchmark/collection');
+const PIPELINE_DOWNLOADS=path.join(ROOT,'static/downloads/collection-pipeline');
+const [pipelineMarkdown,pipelineReport,pipelineReferences]=await Promise.all([
+  fs.readFile(path.join(PIPELINE_DIR,'PIPELINE_SPEC.md'),'utf8'),
+  fs.readFile(path.join(PIPELINE_DOWNLOADS,'import-report.json'),'utf8').then(JSON.parse),
+  fs.readFile(path.join(PIPELINE_DIR,'references.json'),'utf8').then(JSON.parse)
+]);
+const pipelineModel={markdown:pipelineMarkdown,report:pipelineReport,references:pipelineReferences};
 const browseSources=[...sourceReports,...unionSources.filter(s=>['vima','arnold','coin_video','crosstask','calvin','openeqa'].includes(s.source_id)).map(s=>({
   id:s.source_id,work:s.name,resolved_repo:s.repositories[0],commit:s.commits[0],role:'additional_task_source',
   record_count:s.records,counts_by_unit:s.native_units
@@ -172,6 +181,8 @@ assetHasher.update(JSON.stringify(countingContract));
 assetHasher.update(JSON.stringify(symbolGuide));
 assetHasher.update(JSON.stringify(coverageModel));
 assetHasher.update(JSON.stringify(numbers));
+assetHasher.update(JSON.stringify(pipelineModel));
+assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-page.mjs')));
 for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','scripts/readiness-page.mjs','scripts/execution-page.mjs','scripts/research-page.mjs','scripts/joint-pilot-page.mjs','static/assets/joint-pilot.js','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
@@ -334,6 +345,7 @@ function navHTML(route, locale) {
     ['native-tasks.html','任務清單',route==='native-tasks.html'],
     ['survey-union.html','來源名錄',route==='survey-union.html'],
     ['design.html','整體設計',route==='design.html'],
+    ['collection-pipeline.html','資料流程',route==='collection-pipeline.html'],
     ['library.html','文獻',route==='library.html'],
   ];
   return `<header class="site-header"><div class="wrap header-inner">
@@ -766,6 +778,7 @@ function searchPage(locale){
 }
 function searchData(locale){
   const result=[];
+  result.push({kind:'reference',title:translate('標準化蒐集與整合流程',locale),path:'collection-pipeline.html',summary:translate('八步流程、共同資料格式、來源版本、任務與環境對齊、切分及可重跑匯入。',locale),search:'standardized pipeline collection schema data format adapter provenance lineage RLDS LeRobot Ego4D Croissant 標準化 标准化 蒐集 收集 整合 資料流程 数据流程'});
   result.push({kind:'reference',title:translate('Coverage總覽：領域、環境、任務、題數、評估方式',locale),path:'coverage.html',summary:translate('183份原作關鍵章節審閱；五欄比較與原文頁碼、來源重用、待核紀錄。',locale),search:'coverage whole domain environment task count audit evaluation 覆蓋 覆盖 整體 整体 領域 领域 環境 环境 任務 任务 題數 题数 評估 评估 審核 审核 143 2062'});
   for(const row of coverageModel.rows)result.push({kind:'reference',title:translate('Coverage｜'+row.name,locale),path:`coverage.html#source-${row.paper_id.toLowerCase()}`,summary:translate(row.tasks+'；'+row.environments,locale),search:tc([row.name,row.title,row.domains,row.tasks,row.native_evaluation].join(' '))+' '+sc(tc([row.name,row.title,row.domains,row.tasks,row.native_evaluation].join(' ')))+' coverage count 覆蓋 覆盖 數量 数量'});
   for(const g of symbolGuide.granularity_levels)result.push({kind:'reference',title:translate(g.id+' · '+g.name,locale),path:'counting.html#'+g.id.toLowerCase(),summary:translate(g.question+' '+g.definition,locale),search:g.id+' granularity G 計數 计数 粒度 '+tc(g.name+' '+g.definition)+' '+sc(tc(g.name+' '+g.definition))});
@@ -832,6 +845,7 @@ for(const locale of LOCALES){
   await write(`${locale}/design.html`,overallDesignPage(locale));
   await write(`${locale}/coverage.html`,renderCoveragePage(locale,coverageModel,{t,escape,translate,relative,routeLink,head,shell,assetRevision}));
   await write(`${locale}/source-report.html`,renderSourceReport(locale,coverageModel,{t,shell}));
+  await write(`${locale}/collection-pipeline.html`,renderCollectionPipeline(locale,pipelineModel,{t,escape,shell,head}));
   await write(`${locale}/compare.html`,renderComparisonPage(locale,comparisonModel,{t,escape,translate,relative,routeLink,head,shell,auditStatistics:comparisonStats}));
   await write(`${locale}/readiness.html`,renderReadinessPage(locale,readinessModel,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell,implementation:implementationModel}));
   await write(`${locale}/execution.html`,renderExecutionPage(locale,executionModel,implementationModel,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell}));

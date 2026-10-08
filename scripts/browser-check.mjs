@@ -81,6 +81,26 @@ try{
   assert.equal(await evaluate("document.querySelector('#fold-pairs').textContent"),'B → A · C → D');
   pass('Research-first homepage and preserved example','Homepage leads with survey and task union; the earlier goal demonstration is preserved inside the engineering appendix.');
 
+  await go('zh-hant/collection-pipeline.html');
+  assert.ok(await noOverflow());
+  assert.equal(await evaluate("document.querySelectorAll('.pipeline-flow a').length"),8);
+  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('[data-import-count]')).map(e=>Number(e.dataset.importCount))"),[183,21,284,2096,7,263,114288,3]);
+  await evaluate("document.querySelector('.pipeline-flow a[href=\"#pipeline-06\"]').click()");
+  await waitFor("location.hash==='#pipeline-06'");
+  assert.equal(await evaluate("new URL(document.querySelector('.language-switch a[data-locale=\"zh-hans\"]').href).pathname"),new URL('zh-hans/collection-pipeline.html',BASE).pathname);
+  await snapshot('collection-pipeline-desktop');
+  pass('Collection pipeline and scoped counts','Eight stages, task/scene semantics, source-metadata counts and downloads have a dedicated entry.');
+  await viewport(390,844,true);
+  await go('zh-hans/collection-pipeline.html');
+  assert.equal(await evaluate("document.documentElement.lang"),'zh-Hans');
+  assert.ok(await noOverflow());
+  assert.ok(await evaluate("document.getElementById('pipeline-06').textContent.includes('语义对齐')"));
+  await evaluate("document.querySelector('.pipeline-toc summary').click()");
+  assert.equal(await evaluate("document.querySelector('.pipeline-toc').open"),false);
+  await snapshot('collection-pipeline-simplified-mobile');
+  pass('Collection pipeline simplified mobile','Language, collapsible contents and narrow viewport preserve readable pipeline documentation.');
+  await viewport(1440,1100);
+
   await go('zh-hant/coverage.html');
   assert.equal(await evaluate("document.querySelectorAll('[data-coverage-source]').length"),183);
   assert.equal(await evaluate("document.getElementById('coverage-count').dataset.matched"),'183');

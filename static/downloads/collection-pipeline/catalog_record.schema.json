@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:robot-use:collection-catalog:0.1",
+  "title": "Lossless source-catalog interchange; not an executable evaluation release",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entity_type", "id", "identity", "source_refs", "provenance", "data", "native", "native_sha256", "release_tier", "evaluation_release_eligible"],
+  "properties": {
+    "schema_version": {"const": "collection-catalog-0.1"},
+    "entity_type": {"enum": ["source", "domain", "environment", "task", "case", "evaluator"]},
+    "id": {"type": "string", "pattern": "^(source|domain|environment|task|case|evaluator):[0-9a-f]{64}$"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "native_id", "revision", "partition"],
+      "properties": {
+        "namespace": {"$ref": "#/$defs/nonempty"},
+        "native_id": {"$ref": "#/$defs/nonempty"},
+        "revision": {"$ref": "#/$defs/nonempty"},
+        "partition": {"type": "string"}
+      }
+    },
+    "source_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^source:[0-9a-f]{64}$"}},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot_path", "snapshot_sha256", "locator", "adapter_version"],
+      "properties": {
+        "snapshot_path": {"$ref": "#/$defs/nonempty"},
+        "snapshot_sha256": {"$ref": "#/$defs/sha256"},
+        "locator": {"$ref": "#/$defs/nonempty"},
+        "adapter_version": {"const": "existing-snapshot-0.1"}
+      }
+    },
+    "data": {"type": "object"},
+    "native": {"type": "object"},
+    "native_sha256": {"$ref": "#/$defs/sha256"},
+    "release_tier": {"const": "catalog"},
+    "evaluation_release_eligible": {"const": false}
+  },
+  "$defs": {
+    "nonempty": {"type": "string", "minLength": 1},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nullable_ref": {"type": ["string", "null"], "pattern": "^[a-z]+:[0-9a-f]{64}$"},
+    "domain_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^domain:[0-9a-f]{64}$"}},
+    "methods": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["answer", "distance", "state_process", "judge"]}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"entity_type": {"const": "source"}}},
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "paper_id", "title", "source_url", "reviewed_pdf_url", "reviewed_pdf_sha256", "reviewed_pdf_pages", "domain_refs", "domain_assignment", "evaluation_methods", "native_counts", "review_scope", "pages_read", "resources_status"],
+            "properties": {
+              "name": {"$ref": "#/$defs/nonempty"},
+              "paper_id": {"$ref": "#/$defs/nonempty"},
+              "title": {"$ref": "#/$defs/nonempty"},
+              "source_url": {"$ref": "#/$defs/nonempty"},
+              "reviewed_pdf_url": {"$ref": "#/$defs/nonempty"},
+              "reviewed_pdf_sha256": {"$ref": "#/$defs/sha256"},
+              "reviewed_pdf_pages": {"type": "integer", "minimum": 1},
+              "domain_refs": {"$ref": "#/$defs/domain_refs", "minItems": 1},
+              "domain_assignment": {"type": "object"},
+              "evaluation_methods": {"$ref": "#/$defs/methods"},
+              "native_counts": {"type": "array", "items": {"type": "object"}},
+              "review_scope": {"$ref": "#/$defs/nonempty"},
+              "pages_read": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}},
+              "resources_status": {"const": "dataset_media_and_assets_not_verified_by_this_import"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"entity_type": {"const": "domain"}}},
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "definition", "taxonomy_version", "scope_kind"],
+            "properties": {
+              "name": {"$ref": "#/$defs/nonempty"},
+              "definition": {"$ref": "#/$defs/nonempty"},
+              "taxonomy_version": {"$ref": "#/$defs/nonempty"},
+              "scope_kind": {"$ref": "#/$defs/nonempty"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"entity_type": {"const": "environment"}}},
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["environment_kind", "native_unit", "definition_ref", "canonical_environment_id", "mapping_status", "asset_status", "runtime_status"],
+            "properties": {
+              "environment_kind": {"const": "simulation_scene_definition"},
+              "native_unit": {"const": "source_named_scene_definition"},
+              "definition_ref": {"$ref": "#/$defs/nonempty"},
+              "canonical_environment_id": {"type": "null"},
+              "mapping_status": {"const": "cross_source_equivalence_pending"},
+              "asset_status": {"const": "full_asset_closure_not_verified"},
+              "runtime_status": {"const": "not_run_by_this_import"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"entity_type": {"const": "task"}}},
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "task_kind", "native_unit", "definition_ref", "domain_refs", "domain_mapping_status", "canonical_task_id", "mapping_status", "goal_program_status"],
+            "properties": {
+              "title": {"$ref": "#/$defs/nonempty"},
+              "task_kind": {"enum": ["robot_task_definition", "information_task_type", "human_activity_definition"]},
+              "native_unit": {"$ref": "#/$defs/nonempty"},
+              "definition_ref": {"$ref": "#/$defs/nonempty"},
+              "domain_refs": {"$ref": "#/$defs/domain_refs", "maxItems": 0},
+              "domain_mapping_status": {"const": "task_level_review_pending"},
+              "canonical_task_id": {"type": "null"},
+              "mapping_status": {"const": "cross_source_equivalence_pending"},
+              "goal_program_status": {"const": "native_reference_preserved_formal_alignment_pending"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"entity_type": {"const": "evaluator"}}},
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["methods", "source_files", "implementation_status"],
+            "properties": {
+              "methods": {"$ref": "#/$defs/methods"},
+              "source_files": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+              "implementation_status": {"const": "source_indexed_not_executed_by_this_import"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"entity_type": {"const": "case"}}},
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["case_kind", "native_split", "unified_split", "environment_ref", "environment_link_status", "task_ref", "task_link_kind", "native_task_ref", "observation_ref", "evaluator_ref", "input_sha256", "label_sha256", "source_record_sha256", "native_definition_check", "input_status", "protocol_status", "leakage_audit_status", "runtime_status"],
+            "properties": {
+              "case_kind": {"enum": ["robot_episode", "qa"]},
+              "native_split": {"$ref": "#/$defs/nonempty"},
+              "unified_split": {"type": "null"},
+              "environment_ref": {"$ref": "#/$defs/nullable_ref"},
+              "environment_link_status": {"enum": ["native_scene_id_resolved", "observation_context_only_interactive_scene_unbound"]},
+              "task_ref": {"$ref": "#/$defs/nullable_ref"},
+              "task_link_kind": {"enum": ["information_task_type", "native_goal_program_not_canonical_task"]},
+              "native_task_ref": {"$ref": "#/$defs/nonempty"},
+              "observation_ref": {"$ref": "#/$defs/nonempty"},
+              "evaluator_ref": {"type": "string", "pattern": "^evaluator:[0-9a-f]{64}$"},
+              "input_sha256": {"$ref": "#/$defs/sha256"},
+              "label_sha256": {"$ref": "#/$defs/sha256"},
+              "source_record_sha256": {"$ref": "#/$defs/sha256"},
+              "native_definition_check": {"$ref": "#/$defs/nonempty"},
+              "input_status": {"const": "not_complete_in_imported_snapshot"},
+              "protocol_status": {"const": "not_frozen_by_this_import"},
+              "leakage_audit_status": {"const": "cross_source_audit_pending"},
+              "runtime_status": {"const": "not_run_by_this_import"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}
