@@ -84,6 +84,26 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.equal(pipelinePage.$('.pipeline-flow a').length,8);
   assert.ok(pipelinePage.$('.primary-nav a[href="collection-pipeline.html"]').length);
   assert.ok(pipelinePage.$('#pipeline-06').length);
+  assert.equal(pipelinePage.$('[data-pipeline-figure]').length,3);
+  assert.equal(pipelinePage.$('.pipeline-legend[aria-label]').length,3);
+  for(const name of ['pipeline-flow','pipeline-relations','pipeline-example'])for(const variant of ['', '-mobile']){
+    const filename=`${name}-${locale}${variant}.svg`;
+    const source=await fs.readFile(path.join(pipelineRoot,'figures',filename),'utf8');
+    const published=await fs.readFile(path.join(pipelineDownloads,'figures',filename),'utf8');
+    assert.equal(published,source,`Stale figure: ${filename}`);
+    const svg=cheerio.load(source,{xmlMode:true});
+    assert.equal(svg('svg').attr('role'),'img');
+    assert.ok(svg('svg > title').text().length);
+    assert.ok(svg('svg > desc').text().length);
+    assert.ok(svg('path[marker-end]').length);
+    assert.ok(svg('text').length>10);
+    assert.ok(svg('text').toArray().every(el=>!svg(el).text().includes('undefined')));
+  }
+  const example=JSON.parse(await fs.readFile(path.join(pipelineDownloads,'calvin-walkthrough.json'),'utf8'));
+  assert.equal(example.task.identity.native_id,'open_drawer');
+  assert.equal(example.task.native.checker_signature_name,'move_door_rel');
+  assert.deepEqual(example.task.data.domain_refs,[]);
+  assert.equal(example.task.evaluation_release_eligible,false);
   for(const[route,count]of Object.entries(expected)){
     const{$}=pages.get(path.join(out,locale,route));
     assert.equal($('[data-entry]').length,count,`${locale}/${route} count`);

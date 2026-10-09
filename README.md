@@ -30,6 +30,8 @@ npm run serve
 
 六種JSONL.gz、schema、範例、輸入manifest與報告在 `downloads/collection-pipeline/`。匯入程式只讀已有固定快照，不下載新的原始素材、不呼叫模型。輸出使用新的空目錄，驗收成功才寫 `SUCCESS.json`；可透過 `.preview/collection-venv/bin/python -m unittest discover -s benchmark/collection -p 'test_catalog.py' -v` 執行契約檢查。
 
+2026-10-09 新增三張流程圖：資料流程與兩種發布、領域／環境／任務／測例關係、CALVIN `open_drawer` 原作紀錄到標準目錄的轉換。圖中有實線／虛線、狀態圖例與範圍說明；提供繁簡版的橫式及手機直式 SVG、放大與下載，列印使用橫式。圖片由現有驗證報告及已匯入的真實紀錄生成，沒有改動分類、計數或可評測狀態。圖檔位於 `benchmark/collection/figures/` 及 `downloads/collection-pipeline/figures/`，頁面另可展開真實 JSON 與下載 `calvin-walkthrough.json`。
+
 <details>
 <summary>歷史版本紀錄：以下配額和「當時有效」說明已退役</summary>
 

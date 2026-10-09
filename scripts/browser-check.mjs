@@ -59,6 +59,11 @@ try{
     const image=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
     await fs.writeFile(path.join(screenshots,name+'.png'),Buffer.from(image.data,'base64'));
   }
+  async function snapshotElement(selector,name){
+    const rect=await evaluate(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1};})()`);
+    const image=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:rect});
+    await fs.writeFile(path.join(screenshots,name+'.png'),Buffer.from(image.data,'base64'));
+  }
   function pass(name,detail){checks.push({name,status:'passed',detail});console.log('PASS',name);}
   const setValue=async(selector,value)=>evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));return true;})()`);
   const visibleCount=()=>evaluate(`Array.from(document.querySelectorAll('[data-entry]')).filter(e=>!e.hidden).length`);
@@ -83,6 +88,13 @@ try{
 
   await go('zh-hant/collection-pipeline.html');
   assert.ok(await noOverflow());
+  await waitFor("Array.from(document.querySelectorAll('.pipeline-figure img')).every(img=>img.complete&&img.naturalWidth>0)");
+  assert.equal(await evaluate("document.querySelectorAll('[data-pipeline-figure]').length"),3);
+  assert.equal(await evaluate("document.querySelectorAll('.pipeline-legend[aria-label]').length"),3);
+  for(const name of ['flow','relations','example'])await snapshotElement(`#pipeline-figure-${name}`,`pipeline-figure-${name}-desktop`);
+  await evaluate("document.querySelector('.pipeline-record-example summary').click()");
+  assert.ok(await evaluate("document.querySelector('.pipeline-record-example code').textContent.includes('move_door_rel')"));
+  await evaluate("document.querySelector('.pipeline-stage-links summary').click()");
   assert.equal(await evaluate("document.querySelectorAll('.pipeline-flow a').length"),8);
   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('[data-import-count]')).map(e=>Number(e.dataset.importCount))"),[183,21,284,2096,7,263,114288,3]);
   await evaluate("document.querySelector('.pipeline-flow a[href=\"#pipeline-06\"]').click()");
@@ -92,6 +104,9 @@ try{
   pass('Collection pipeline and scoped counts','Eight stages, task/scene semantics, source-metadata counts and downloads have a dedicated entry.');
   await viewport(390,844,true);
   await go('zh-hans/collection-pipeline.html');
+  await waitFor("Array.from(document.querySelectorAll('.pipeline-figure img')).every(img=>img.complete&&img.naturalWidth>0)");
+  assert.ok(await evaluate("Array.from(document.querySelectorAll('.pipeline-figure img')).every(img=>img.currentSrc.includes('-mobile.svg'))"));
+  for(const name of ['flow','relations','example'])await snapshotElement(`#pipeline-figure-${name}`,`pipeline-figure-${name}-mobile`);
   assert.equal(await evaluate("document.documentElement.lang"),'zh-Hans');
   assert.ok(await noOverflow());
   assert.ok(await evaluate("document.getElementById('pipeline-06').textContent.includes('语义对齐')"));
@@ -99,6 +114,9 @@ try{
   assert.equal(await evaluate("document.querySelector('.pipeline-toc').open"),false);
   await snapshot('collection-pipeline-simplified-mobile');
   pass('Collection pipeline simplified mobile','Language, collapsible contents and narrow viewport preserve readable pipeline documentation.');
+  await cdp.send('Emulation.setEmulatedMedia',{media:'print'});
+  await waitFor("Array.from(document.querySelectorAll('.pipeline-figure img')).every(img=>img.complete&&img.naturalWidth>0&&!img.currentSrc.includes('-mobile.svg'))");
+  await cdp.send('Emulation.setEmulatedMedia',{media:''});
   await viewport(1440,1100);
 
   await go('zh-hant/coverage.html');

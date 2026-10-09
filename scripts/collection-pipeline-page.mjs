@@ -1,3 +1,5 @@
+import {renderPipelineFigure} from './collection-pipeline-figures.mjs';
+
 // Render only our authored pipeline document; code and identifiers are not translated.
 export function renderCollectionPipeline(locale, model, {t, escape, shell, head}) {
   const {markdown, report, references} = model;
@@ -11,7 +13,23 @@ export function renderCollectionPipeline(locale, model, {t, escape, shell, head}
   for (let i=0; i<lines.length; i++) {
     const line=lines[i];
     if (!line.trim() || line.startsWith('# ')) continue;
-    if (line.startsWith('```')) {
+    const figureMatch=line.match(/^!\[.*\]\(figures\/(pipeline-[a-z]+)-zh-hant\.svg\)$/);
+    if (figureMatch) {
+      const figure=model.figures.find(item=>item.file===figureMatch[1]);
+      if(!figure)throw new Error(`Unknown pipeline figure: ${figureMatch[1]}`);
+      // The first figure is placed above the chapter contents for quick reading.
+      if(figure.id!=='flow')output.push(renderPipelineFigure(figure,locale,{t}));
+      if(figure.id==='example'){
+        const task=model.walkthrough.task;
+        const excerpt={
+          entity_type:task.entity_type,identity:task.identity,
+          data:{title:task.data.title,domain_refs:task.data.domain_refs,canonical_task_id:task.data.canonical_task_id},
+          native:{native_id:task.native.native_id,checker_signature_name:task.native.checker_signature_name,definition_line:task.native.definition_line},
+          provenance:task.provenance,release_tier:task.release_tier,evaluation_release_eligible:task.evaluation_release_eligible,
+        };
+        output.push(`<details class="pipeline-record-example"><summary>${t('展開：圖中真實 JSON 欄位',locale)}</summary><p>${t('以下是已匯入紀錄的欄位節錄；完整紀錄與來源另外提供。',locale)}</p><pre><code>${escape(JSON.stringify(excerpt,null,2))}</code></pre><p><a href="../downloads/collection-pipeline/calvin-walkthrough.json" download>${t('下載完整範例及來源證據',locale)}</a> · <a href="${escape(task.native.source_url)}" target="_blank" rel="noopener noreferrer">${t('原作固定版本的任務定義',locale)} ↗</a></p></details>`);
+      }
+    } else if (line.startsWith('```')) {
       const code=[];
       while (++i<lines.length && !lines[i].startsWith('```')) code.push(lines[i]);
       output.push(`<pre tabindex="0"><code>${escape(code.join('\n'))}</code></pre>`);
@@ -64,10 +82,12 @@ export function renderCollectionPipeline(locale, model, {t, escape, shell, head}
   const route='collection-pipeline.html';
   const body=`<main class="wrap source-report collection-pipeline" id="main-content">
     ${head('標準化蒐集與整合流程','把不同 benchmark 的來源、環境、任務、題目及判分整理成可追溯、可重跑的共同目錄。',route,locale)}
-    <p class="pipeline-version">${t('流程規格 0.1 · 2026-10-08｜來源分類 v0.11｜原有用途與規模實數不變',locale)}</p>
-    <nav class="pipeline-flow" aria-label="${t('資料流程',locale)}">${flow.map(([label,id],index)=>`<a href="#pipeline-${id}"><small>${String(index+1).padStart(2,'0')}</small>${t(label,locale)}</a>`).join('')}</nav>
+    <p class="pipeline-version">${t('圖解 0.1 · 2026-10-09｜流程規格 0.1 · 10/08｜來源分類 v0.11',locale)}</p>
+    <nav class="pipeline-visual-guide" id="pipeline-visual-guide" aria-label="${t('三張圖導覽',locale)}">${model.figures.map(figure=>`<a href="#pipeline-figure-${figure.id}">${t(figure.title,locale)}</a>`).join('')}</nav>
+    ${renderPipelineFigure(model.figures.find(figure=>figure.id==='flow'),locale,{t})}
+    <details class="pipeline-stage-links"><summary>${t('依八個步驟跳到詳細說明',locale)}</summary><nav class="pipeline-flow" aria-label="${t('資料流程',locale)}">${flow.map(([label,id],index)=>`<a href="#pipeline-${id}"><small>${String(index+1).padStart(2,'0')}</small>${t(label,locale)}</a>`).join('')}</nav></details>
     <p class="pipeline-lede">${t('格式一致 → 語義對齊 → 可評測發布，各有自己的通過條件。對外仍只看領域、環境、任務、題數、評估方式。',locale)}</p>
-    <details class="pipeline-toc" open><summary>${t('依問題深入閱讀',locale)}</summary><nav>${contents.map(({id,label})=>`<a href="#${id}">${t(label,locale)}</a>`).join('')}<a href="#pipeline-import">${t('本次驗證實數與下載',locale)}</a><a href="#pipeline-references">${t('官方格式文件',locale)}</a></nav></details>
+    <details class="pipeline-toc" open><summary>${t('依問題深入閱讀',locale)}</summary><nav>${model.figures.map(figure=>`<a href="#pipeline-figure-${figure.id}">${t(figure.title,locale)}</a>`).join('')}${contents.map(({id,label})=>`<a href="#${id}">${t(label,locale)}</a>`).join('')}<a href="#pipeline-import">${t('本次驗證實數與下載',locale)}</a><a href="#pipeline-references">${t('官方格式文件',locale)}</a></nav></details>
     <article>${output.join('\n')}</article>
     <section id="pipeline-import"><h2>${t('本次驗證實數與下載',locale)}</h2>
       <p>${t(`共 ${report.validation.schema_valid_records.toLocaleString('en-US')} 筆目錄紀錄通過 schema、唯一身份、外鍵、輸入 hash 及原始 payload 保留檢查。這是原有資料的格式匯入，沒有新增模型實驗或已去重任務。`,locale)}</p>
