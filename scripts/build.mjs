@@ -19,6 +19,7 @@ import {loadSourceReview,applyFulltextReview,sourceReviewCSV,sourceReviewMarkdow
 import {renderSourceReport} from './source-review-report.mjs';
 import {renderCollectionPipeline} from './collection-pipeline-page.mjs';
 import {loadPipelineWalkthrough,buildPipelineFigures} from './collection-pipeline-figures.mjs';
+import {loadWorkedExamples,workedExamplesMarkdown} from './collection-pipeline-examples.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -166,6 +167,8 @@ const pipelineModel={markdown:pipelineMarkdown,report:pipelineReport,references:
 pipelineModel.bibliographyCount=fulltextReview.statistics.bibliography_screened;
 pipelineModel.walkthrough=await loadPipelineWalkthrough(PIPELINE_DOWNLOADS);
 pipelineModel.figures=buildPipelineFigures(pipelineModel,{translate,escape});
+const workedExampleEvidence=JSON.parse(await fs.readFile(path.join(PIPELINE_DIR,'worked_example_evidence.json'),'utf8'));
+pipelineModel.workedExamples=await loadWorkedExamples(PIPELINE_DOWNLOADS,pipelineModel.walkthrough,workedExampleEvidence);
 const browseSources=[...sourceReports,...unionSources.filter(s=>['vima','arnold','coin_video','crosstask','calvin','openeqa'].includes(s.source_id)).map(s=>({
   id:s.source_id,work:s.name,resolved_repo:s.repositories[0],commit:s.commits[0],role:'additional_task_source',
   record_count:s.records,counts_by_unit:s.native_units
@@ -188,6 +191,8 @@ assetHasher.update(JSON.stringify(numbers));
 assetHasher.update(JSON.stringify(pipelineModel));
 assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-page.mjs')));
 assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-figures.mjs')));
+assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-examples.mjs')));
+assetHasher.update(await fs.readFile(path.join(ROOT,'static/assets/pipeline-examples.js')));
 for(const name of ['scripts/build.mjs','scripts/comparison-page.mjs','scripts/readiness-page.mjs','scripts/execution-page.mjs','scripts/research-page.mjs','scripts/joint-pilot-page.mjs','static/assets/joint-pilot.js','static/assets/site.css','static/assets/site.js','static/assets/native-browser.js','static/assets/comparison.js','static/assets/comparison.css']){
   assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 }
@@ -397,6 +402,7 @@ function shell({route,locale,title,description,body,kind='page'}) {
   <link rel="stylesheet" href="${relative(current,'assets/counting.css')}?v=${assetRevision}">
   <link rel="stylesheet" href="${relative(current,'assets/coverage.css')}?v=${assetRevision}">
 ${route==='compare.html'?`<link rel="stylesheet" href="${relative(current,'assets/comparison.css')}?v=${assetRevision}"><script defer src="${relative(current,'assets/comparison.js')}?v=${assetRevision}"></script>`:''}
+${route==='collection-pipeline.html'?`<script defer src="${relative(current,'assets/pipeline-examples.js')}?v=${assetRevision}"></script>`:''}
   <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE=${jsonSafe(jsConfig)};</script>
   ${route==='native-tasks.html'?`<script defer src="${relative(current,'assets/native-source-data.js')}?v=${assetRevision}"></script><script defer src="${relative(current,'assets/native-browser.js')}?v=${assetRevision}"></script>`:''}<script defer src="${relative(current,'assets/site.js')}?v=${assetRevision}"></script></head>
   <body><a class="skip-link" href="#main-content">${t('跳至主要內容',locale)}</a>${navHTML(route,locale)}${body}${footerHTML(route,locale)}
@@ -846,6 +852,11 @@ for(const figure of pipelineModel.figures)for(const locale of LOCALES)for(const 
   await fs.writeFile(path.join(PIPELINE_DIR,'figures',name),svg);
 }
 await write('downloads/collection-pipeline/calvin-walkthrough.json',JSON.stringify(pipelineModel.walkthrough,null,2)+'\n');
+const workedMarkdown=workedExamplesMarkdown(pipelineModel);
+await write('downloads/collection-pipeline/WORKED_EXAMPLES.md',workedMarkdown);
+await fs.writeFile(path.join(PIPELINE_DIR,'WORKED_EXAMPLES.md'),workedMarkdown);
+await write('downloads/collection-pipeline/worked-examples.json',JSON.stringify(pipelineModel.workedExamples,null,2)+'\n');
+await write('downloads/collection-pipeline/worked_example_evidence.json',JSON.stringify(workedExampleEvidence,null,2)+'\n');
 await write('assets/favicon.svg',`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#146e5b"/><g fill="#e7f1d6"><rect x="15" y="16" width="13" height="13" rx="2"/><rect x="36" y="16" width="13" height="13" rx="2"/><rect x="15" y="37" width="13" height="13" rx="2"/><rect x="36" y="37" width="13" height="13" rx="2"/></g><path d="M28 22h8M22 29v8M42 29v8M28 43h8" stroke="#e7f1d6" stroke-width="3"/></svg>`);
 for(const locale of LOCALES){
   await write(`${locale}/index.html`,homePage(locale));

@@ -76,6 +76,17 @@ assert.deepEqual(pipelineReport.task_kinds,{robot_task_definition:2096,informati
 assert.equal(pipelineReport.evaluation_release_eligible_cases_in_this_import,0);
 assert.equal(pipelineReport.canonical_task_union_count,null);
 assert.equal(pipelineReport.validation.schema_valid_records,117145);
+const workedExamples=JSON.parse(await fs.readFile(path.join(pipelineDownloads,'worked-examples.json'),'utf8'));
+const workedEvidence=JSON.parse(await fs.readFile(path.join(pipelineRoot,'worked_example_evidence.json'),'utf8'));
+assert.deepEqual(workedExamples.evidence,workedEvidence);
+assert.deepEqual(workedExamples.examples.map(example=>example.id),['calvin','openeqa']);
+assert.ok(workedExamples.examples.every(example=>example.steps.length===8));
+assert.deepEqual(workedExamples.examples[0].steps.map(step=>step.number),[1,2,3,4,5,6,7,8]);
+assert.equal(workedExamples.records.openeqa_case.data.source_record_sha256,workedEvidence.openeqa.source_record_sha256);
+assert.equal(workedExamples.records.openeqa_case.data.environment_ref,null);
+assert.equal(workedExamples.records.openeqa_case.evaluation_release_eligible,false);
+assert.equal(workedExamples.records.calvin_task.evaluation_release_eligible,false);
+assert.deepEqual(await fs.readFile(path.join(pipelineRoot,'WORKED_EXAMPLES.md')),await fs.readFile(path.join(pipelineDownloads,'WORKED_EXAMPLES.md')));
 for(const locale of ['zh-hant','zh-hans']){
   const pipelinePage=pages.get(path.join(out,locale,'collection-pipeline.html'));
   assert.ok(pipelinePage);
@@ -86,6 +97,11 @@ for(const locale of ['zh-hant','zh-hans']){
   assert.ok(pipelinePage.$('#pipeline-06').length);
   assert.equal(pipelinePage.$('[data-pipeline-figure]').length,3);
   assert.equal(pipelinePage.$('.pipeline-legend[aria-label]').length,3);
+  assert.equal(pipelinePage.$('[data-walkthrough-case]').length,2);
+  assert.equal(pipelinePage.$('[data-walkthrough-step]').length,16);
+  assert.equal(pipelinePage.$('[data-walk-step]').length,8);
+  assert.equal(pipelinePage.$('[data-walk-case]').length,2);
+  assert.ok(pipelinePage.$('script[src*="pipeline-examples.js"]').length);
   for(const name of ['pipeline-flow','pipeline-relations','pipeline-example'])for(const variant of ['', '-mobile']){
     const filename=`${name}-${locale}${variant}.svg`;
     const source=await fs.readFile(path.join(pipelineRoot,'figures',filename),'utf8');

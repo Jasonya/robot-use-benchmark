@@ -32,6 +32,8 @@ npm run serve
 
 2026-10-09 新增三張流程圖：資料流程與兩種發布、領域／環境／任務／測例關係、CALVIN `open_drawer` 原作紀錄到標準目錄的轉換。圖中有實線／虛線、狀態圖例與範圍說明；提供繁簡版的橫式及手機直式 SVG、放大與下載，列印使用橫式。圖片由現有驗證報告及已匯入的真實紀錄生成，沒有改動分類、計數或可評測狀態。圖檔位於 `benchmark/collection/figures/` 及 `downloads/collection-pipeline/figures/`，頁面另可展開真實 JSON 與下載 `calvin-walkthrough.json`。
 
+2026-10-09 補上「用兩個案例走八步」：CALVIN 開抽屜與 OpenEQA 電視上方物體辨識題。每步呈現輸入、處理、輸出、理由與實際進度，可切換案例比較同一步、上一／下一步、用網址保存進度；繁簡切換、手機、列印及無 JavaScript 閱讀均保留完整內容。CALVIN 的0.12門檻與 OpenEQA 題目／參考答案均從既有固定來源核對；算例只是教學數值，不是機器人、模型或裁判實測。完整講解在 `benchmark/collection/WORKED_EXAMPLES.md`，來源補註在 `worked_example_evidence.json`，網站下載 `worked-examples.json` 保留逐步內容與實際紀錄。分類、原生清單與可評測題數未改動。
+
 <details>
 <summary>歷史版本紀錄：以下配額和「當時有效」說明已退役</summary>
 
