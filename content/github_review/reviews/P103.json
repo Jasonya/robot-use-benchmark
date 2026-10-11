@@ -1,0 +1,61 @@
+{
+  "paper_id": "P103",
+  "summary": "正確的Follow-Bench是MedlarTea的機器人跟隨規劃庫；社交距離、搜尋、無碰撞分開記錄，不能混同另一個LLM指令遵循同名benchmark。",
+  "reading_order": [
+    {
+      "repo": "MedlarTea/follow-bench",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          105
+        ],
+        [
+          171,
+          208
+        ]
+      ],
+      "why": "場景、人數/寬度/跟隨條件、計量單位與上游元件",
+      "commit": "202d1645015f44b965a474211d5ef2bc67a00fe3"
+    },
+    {
+      "repo": "MedlarTea/follow-bench",
+      "path": "socialRPF/example/robot_person_following/evaluate_scripts/evaluate_iso.py",
+      "ranges": [
+        [
+          1,
+          162
+        ]
+      ],
+      "why": "逐步log schema、碰撞/可見率/搜尋/舒適度確切計算",
+      "commit": "202d1645015f44b965a474211d5ef2bc67a00fe3"
+    }
+  ],
+  "identity_note": "官方project頁的Benchmark Code按鈕仍為空href；另以完整題名、來源owner自述Hanjing YE（原第一作者）與mobile navigation/person-following身分核對MedlarTea/follow-bench。",
+  "discovery_evidence": [
+    {
+      "url": "https://api.github.com/users/MedlarTea",
+      "sha256": "01691504db02fc518794feec3aa307f1c6eb0eef5f3c6cf3359805ba1ef0dfa3",
+      "supports": "owner name matches original first author"
+    },
+    {
+      "url": "https://follow-bench.github.io/",
+      "sha256": "1e19a40c136cef1fd634ce57712df352270727cf330a24b23a1a2fb93523660f",
+      "supports": "exact paper title; code buttons empty"
+    }
+  ],
+  "environment": "內含ir-sim模擬器與socialRPF規劃器；走廊、交叉口、門口、雜物場地及動態人群。人數、寬度、障礙、跟隨距離和隨機初態是場景設定。",
+  "tasks": "跟隨特定人的後方或側方、失去視線後搜尋；README每設定100 seeds是原規劃，不表示本次已有100次新結果。seed改人物／佈局時是新instance，policy-only重跑另計trial。",
+  "data": "env_basic_info.json存step_time、robot/target半徑；object_info.json實際按JSONL逐行讀count、target_visible、robot/target/obstacles/humans。robot位置為索引1:3，速度4:6，碰撞旗標6，需保留schema與單位。",
+  "evaluation": "無碰撞與搜尋成功分開；連續失蹤>max_search_steps才search失敗。可見率分母max_steps，路徑按差分，zone時間按step_time累加。avg_velocity直接mean速度分量，並非速度模長；private-zone計算扣target_radius，與人群半徑異質情況須核對。",
+  "standardization": {
+    "profile": "social_person_following_simulation",
+    "reuse": "佈局/人群/目標軌跡配置、原log與多項距離/舒適度/搜尋metrics。",
+    "transform": "case記target identity、follow位置/距離、seed、max_steps與step_time；evaluator保留碰撞與搜尋各分母，不把單一無碰撞當完成全部任務。",
+    "missing": "完整場景包／log對齊、速度與社交區域計量修訂審核、真實ROS部署repo認領、各planner同預算驗證。"
+  },
+  "version_note": "原2025paper有2026-05v4；此repo5月建立，site仍有舊6planner與paper8planner敘述差異。ir-sim/RDA-planner為上游元件，不能當獨立新benchmark。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

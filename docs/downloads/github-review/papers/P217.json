@@ -1,0 +1,206 @@
+{
+  "paper_id": "P217",
+  "name": "TRS + RVG",
+  "title": "Reliable Egocentric Action Anticipation via Temporal Reliability Suppression and Compositional Graph Decoding",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.13293",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P217",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "TRS+RVG在既有EGTEA/EPIC feature pipeline上研究缺幀/噪聲魯棒預測；原文特別說明其EPIC標籤和split與官方榜單不同。未確認官方code。",
+    "environment": "既有EGTEA Gaze+、EPIC-KITCHENS影片/預抽TSN features；新增的是feature corruption與解碼協定，不產生新物理場景。",
+    "tasks": "下一verb–noun joint action預測；TRS處理temporal可靠度、RVG用training-label compatibility graph重排組合。19×51=969候選scores不是969種實際觀測task。",
+    "data": "原文EGTEA19verbs/51nouns/106actions、processed split1共10321clips；EPIC pipeline125verb/352noun indexes且public-train videos再90/10 video-disjoint分割，明說不能與official97/300榜單直接比較。input為10個1024D TSN tokens，非直接對raw pixels加噪。",
+    "evaluation": "joint top1要求verb與noun同對；AvgC跨corruption平均、RR=100×AvgC/clean accuracy應連同絕對accuracy看。PMI graph只用training labels，weight由EGTEAval校準後移到EPIC；高強度mask/drop等作用於6/10tokens，缺code還需核定具體indices與seed。",
+    "standardization": {
+      "profile": "corruption_robust_egocentric_action_anticipation",
+      "reuse": "原文corruption定義、training-only graph、native feature label space及group metrics。",
+      "transform": "source關聯原EPIC/EGTEA；case固定feature提取器/hash、clip/observed timestamps、corruption mask/seed與label vocabulary；official和within-pipeline兩種結果分表。",
+      "missing": "官方repo/features/split ID與graph資料、精確corruptor/scorer、missing/zero-denominator處理與同協定基線。"
+    },
+    "version_note": "已讀2609.13293v1 p6–7；本文processed EPIC index space與官方taxonomy不同，不把其125/352當EPIC官方類別數。cachedTRS/RVG題名搜尋未確認code。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.13293",
+      "pdf_sha256": "13aaaf69bfbfa5c99ef154700c56eb0f34385c23b6bb5503a53965250a5e7e6a",
+      "paper_pages_read": [
+        6,
+        7
+      ],
+      "search_receipts": [
+        "audit/.cache/github_review/search/P217.json"
+      ]
+    },
+    "reading_order": [],
+    "review_sha256": "3252a307c7e60900bdb34554253cfaa9d301a979ef1de6b9f59dc9897221ba12"
+  },
+  "repository_binding_review_sha256": "3252a307c7e60900bdb34554253cfaa9d301a979ef1de6b9f59dc9897221ba12",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P217",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Reliable Egocentric Action Anticipation via Temporal Reliability Suppression and Compositional Graph Decoding；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      6,
+      7
+    ],
+    "role": "穩健性與分布外評測",
+    "domains": [
+      "餐飲與烹飪"
+    ],
+    "environment": "EGTEA/EPIC原資料；破壞TSNfeaturetokens，不是重新收集真實sensorfailures。",
+    "tasks": "actionanticipation下六maincorruptions；額外standaloneblur是severitytransfer。",
+    "cases": "EGTEA processed split10,321clips；EK100自訂trainingvideos90/10切，不可和官方leaderboard直接比。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "main temporal corruption conditions",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "jointverb+nounTop1、平均corruptedaccuracy及RelativeRobustness=AvgC/clean。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "compatibilitygraph只trainlabels、λEGTEAval選；EKpipeline125verbs/352nouns不同官方97/300。",
+    "lineage": "既有影片加新corruptionprotocol，不新增生活domains或原始action庫。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          6,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "本文自訂indexspace與officialsplit不同；clean低時RR可能誤導，須同報absoluteaccuracy。"
+    ],
+    "reuse": "可以新增robustness規則cases並保持原task引用，清楚標記feature-level擾動。",
+    "reviewed_pdf_sha256": "13aaaf69bfbfa5c99ef154700c56eb0f34385c23b6bb5503a53965250a5e7e6a",
+    "reviewed_on": "2026-10-02",
+    "name": "TRS + RVG",
+    "year": 2026,
+    "title": "Reliable Egocentric Action Anticipation via Temporal Reliability Suppression and Compositional Graph Decoding",
+    "source_url": "https://arxiv.org/abs/2609.13293",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理"
+    ],
+    "domain_names": [
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P217",
+      "domain_ids": [
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P217",
+          "domain_ids": [
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "actionanticipation下六maincorruptions；額外standaloneblur是severitytransfer。",
+            "EGTEA/EPIC原資料；破壞TSNfeaturetokens，不是重新收集真實sensorfailures。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "13aaaf69bfbfa5c99ef154700c56eb0f34385c23b6bb5503a53965250a5e7e6a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "13aaaf69bfbfa5c99ef154700c56eb0f34385c23b6bb5503a53965250a5e7e6a",
+      "previous_domain_ids": [
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P217",
+      "name": "TRS + RVG",
+      "expected_title": "Reliable Egocentric Action Anticipation via Temporal Reliability Suppression and Compositional Graph Decoding",
+      "source_url": "https://arxiv.org/abs/2609.13293",
+      "pdf_url": "https://arxiv.org/pdf/2609.13293",
+      "retrieved_at": "2026-10-02T22:14:17.310797+00:00",
+      "pdf_sha256": "13aaaf69bfbfa5c99ef154700c56eb0f34385c23b6bb5503a53965250a5e7e6a",
+      "text_sha256": "8007036762bf075ab8f4d667e0fdd8a90e31fc563f8bf235889e3508e5d7afec",
+      "pdf_bytes": 3274565,
+      "pages": 16,
+      "text_characters": 44365,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.13293v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.13293v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "main temporal corruption conditions",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P217:1",
+        "paper_id": "P217",
+        "benchmark": "TRS + RVG",
+        "native_term": "main temporal corruption conditions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.13293v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.13293v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

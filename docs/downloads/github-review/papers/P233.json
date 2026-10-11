@@ -1,0 +1,566 @@
+{
+  "paper_id": "P233",
+  "name": "OCT / HOI forecasting",
+  "title": "Joint Hand Motion and Interaction Hotspots Prediction from Egocentric Videos",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2204.01696",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P233",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "OCT／HOI-Forecast 以既有廚房 Ego 影片自動建立訓練 labels，另外人工標註評測軌跡與接觸熱區。已核對 labels、時間窗及實際評分入口，並記下目前程式的 ADE／FDE 命名對調與熱圖配對條件，供標準化時保留原始口徑。",
+    "environment": "EPIC-KITCHENS-55／100 與 EGTEA Gaze+ 的人類廚房影片；EK100 延伸 EK55，與 Diff-IP2D 等工作共享影片或 labels。不是新增模擬場景。",
+    "tasks": "兩個相關輸出：未來左右手 2D 軌跡與 next-active object 接觸熱區。典型 4 Hz、2.5 秒歷史／1 秒未來；label 有邊界點+4 future 點，epoch eval 去掉第一點。任務輸出維度與多次生成 samples 不計為新情境。",
+    "data": "訓練 labels 自動產生，評測 hand trajectory／hotspot 人工標註；uid、participant／video、frame indices、RULSTM split 必須一起保留。README 600 MB 是含 feature／partition／labels 的檔案大小，不是題數。未取得完整 labels，不能從目錄片段宣稱已整合全量。",
+    "evaluation": "原生 compute_ade／compute_fde 正確區分平均／末點，但 evaluate_traj_stochastic 把 compute_fde 放入 ade_list、compute_ade 放入 fde_list，造成輸出名稱對調；實際 epoch 確實呼叫這個 wrapper。invalid GT 座標誤差乘零、時間長度分母仍保留。hotspot 在 32×32 Gaussian heatmap 計 SIM／AUC-J／NSS，NaN 個別剔除；zip 兩個 dict values 依 insertion order 配對，未按 uid join。另列的 F1 選當次資料最優 threshold，不是固定閾值分數。",
+    "standardization": {
+      "profile": "egocentric_hand_trajectory_and_interaction_hotspot",
+      "reuse": "重用人工 eval uid／labels、native splits、可追溯自動標註來源。；保留原生 wrapper 輸出及其實際定義，將任何更正以新 evaluator version 登記。",
+      "transform": "先以 uid join 預測和 GT，再檢查 expected-case coverage、順序、shape、有效手及 frame boundary。；canonical metric 明列公式、單位、mask 分母、sampling 次數和熱圖 kernel；原 native 名稱附別名映射，不靜默改名後混報。；兩個任務共享 clip/case lineage，多次 stochastic sample 僅增加 trial，不新增獨立資料。",
+      "missing": "本次未執行上游模型或重現 README 分數。；完整資料獲取、生成標註程式的全流程及 licensed raw video 尚未整合；runtime adapter 需用小型有答案 fixture 查驗原生／更正版差異。"
+    },
+    "version_note": "本次核對的是固定官方 commit。文中指出可直接驗讀的程式語義；不將未執行的靜態差異擴張成對論文分數的判定。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            142
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 142,
+        "sha256": "e136ba1058576f49cc7a9e48371e3e26d7eb7b0e62a02e96cb1a9d79a1b3505c",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/README.md",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/README.md#L1-L142",
+        "why": "分離 automatic training labels／manual evaluation、父資料與兩種評測命令。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "datasets/datasetopts.py",
+        "ranges": [
+          [
+            5,
+            66
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 76,
+        "sha256": "5025edae286a371f773cf9543d587ce0e8c1df237cd05f445f58d34824d8e47b",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/datasets/datasetopts.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/datasets/datasetopts.py#L5-L66",
+        "why": "固定 4 Hz、2.5 s history、1 s future、RULSTM splits。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "datasets/ho_utils.py",
+        "ranges": [
+          [
+            12,
+            86
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 97,
+        "sha256": "599c1dc0aa332b110daced7446488698cd61f993cce37c8da3f63afc55c687b6",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/datasets/ho_utils.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/datasets/ho_utils.py#L12-L86",
+        "why": "查核 normalized 2D、首個邊界點、缺失手 sentinel 與有效 mask。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "datasets/holoaders.py",
+        "ranges": [
+          [
+            189,
+            251
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 286,
+        "sha256": "edc827ea81e4ffa5c21d92e4d4921b12166615736e220c73359e7ffbabc5a55c",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/datasets/holoaders.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/datasets/holoaders.py#L189-L251",
+        "why": "核對 uid／native split、label type 與 history/future frame alignment assertion。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "traineval.py",
+        "ranges": [
+          [
+            19,
+            109
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "488a4d8275c69bffad334a49c98abca4e19292a2f1601c833b69ea9fb1dcb7af",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/traineval.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/traineval.py#L19-L109",
+        "why": "區分 traj validation 與 affordance eval loader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "netscripts/epoch_feat.py",
+        "ranges": [
+          [
+            72,
+            133
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 133,
+        "sha256": "dd9c50304d06996e891974bfd3b0db7b8f88d0de36e7435b1c4a8b145032e80c",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/netscripts/epoch_feat.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/netscripts/epoch_feat.py#L72-L133",
+        "why": "追蹤去掉首 GT 點、多次抽樣、dict 與 evaluator 的實際呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "evaluation/traj_eval.py",
+        "ranges": [
+          [
+            5,
+            121
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 125,
+        "sha256": "9d0b5ec3a8f9d6bf6d27f320adcb90543498c0e077479ad18940b14ca4ea672e",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/evaluation/traj_eval.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/evaluation/traj_eval.py#L5-L121",
+        "why": "核對 ADE／FDE 函式、stochastic wrapper 的對調與有效座標分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "stevenlsw/hoi-forecast",
+        "requested_repo": "stevenlsw/hoi-forecast",
+        "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+        "ref": null,
+        "path": "evaluation/affordance_eval.py",
+        "ranges": [
+          [
+            8,
+            32
+          ],
+          [
+            46,
+            76
+          ],
+          [
+            79,
+            227
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 227,
+        "sha256": "0c11b6514dbfedef8e044d61c3d12c2ec056727bd2c9f23fc1fa3c68824d9801",
+        "url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/evaluation/affordance_eval.py",
+        "reading_url": "https://github.com/stevenlsw/hoi-forecast/blob/fbc85a17cda21c29974994abcdb055e943f98dcc/evaluation/affordance_eval.py#L8-L32",
+        "why": "核對 Gaussian heatmap、SIM/AUC-J/NSS、key 對齊、NaN 與最佳 threshold。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "66cce0cbf803fd0ebc378b9fdff686d316cebf1098b55b9e8c2933125d56ae3b"
+  },
+  "repository_binding_review_sha256": "66cce0cbf803fd0ebc378b9fdff686d316cebf1098b55b9e8c2933125d56ae3b",
+  "repository_bindings": [
+    {
+      "requested_repo": "stevenlsw/hoi-forecast",
+      "resolved_repo": "stevenlsw/hoi-forecast",
+      "aliases_in_this_review": [
+        "stevenlsw/hoi-forecast"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "fbc85a17cda21c29974994abcdb055e943f98dcc",
+          "reviewed_files": [
+            "README.md",
+            "datasets/datasetopts.py",
+            "datasets/ho_utils.py",
+            "datasets/holoaders.py",
+            "evaluation/affordance_eval.py",
+            "evaluation/traj_eval.py",
+            "netscripts/epoch_feat.py",
+            "traineval.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/stevenlsw/hoi-forecast",
+          "link_label": "Code",
+          "project_url": "https://stevenlsw.github.io/hoi-forecast",
+          "page_sha256": "6a329d9105039d82758a28924ed376c70098e6ef2f4929995f491ebc7b2bb0e7"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/stevenlsw/hoi-forecast",
+          "link_label": "",
+          "project_url": "https://stevenlsw.github.io/hoi-forecast",
+          "page_sha256": "6a329d9105039d82758a28924ed376c70098e6ef2f4929995f491ebc7b2bb0e7"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P233",
+          "review_file": "content/github_review/reviews/P233.json",
+          "review_sha256": "66cce0cbf803fd0ebc378b9fdff686d316cebf1098b55b9e8c2933125d56ae3b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P233",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Joint Hand Motion and Interaction Hotspots Prediction from Egocentric Videos；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EPIC55/100及EGTEA原影片，EK100擴充EK55。",
+    "tasks": "handtrajectory與objectcontacthotspot聯合預測。",
+    "cases": "EK55train8523/evaltrajectory1894/hotspot241；EK10024148/3513/401；EGTEA1880/442/69。三種數字分别是訓練、軌跡評測與hotspot評測。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 1894,
+        "unit": "EK55 evaluation hand trajectories",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3513,
+        "unit": "EK100 evaluation hand trajectories",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 442,
+        "unit": "EGTEA evaluation hand trajectories",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 69,
+        "unit": "EGTEA evaluation hotspots",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "trajectory取20samples最小error；contactpoints全部轉heatmap評，不是20次獨立case。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "評原validation，正式actiontest不用於此derivedtask；hotspot只人工審核challengingsubset。",
+    "lineage": "autoannotations＋人工filteredhotspots，後被多篇forecast論文重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "不同target只覆蓋各自subset，1894不能全視為1894jointlabelcases。"
+    ],
+    "reuse": "是hand/hotspot聯合規則的基礎來源；保留每個target的可用label分母。",
+    "reviewed_pdf_sha256": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+    "reviewed_on": "2026-10-02",
+    "name": "OCT / HOI forecasting",
+    "year": 2022,
+    "title": "Joint Hand Motion and Interaction Hotspots Prediction from Egocentric Videos",
+    "source_url": "https://arxiv.org/abs/2204.01696",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "food",
+      "wearable"
+    ],
+    "review_tags": [
+      "餐飲與料理"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P233",
+      "domain_ids": [
+        "food",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P233",
+          "domain_ids": [
+            "food"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "handtrajectory與objectcontacthotspot聯合預測。",
+            "EPIC55/100及EGTEA原影片，EK100擴充EK55。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17"
+        },
+        {
+          "paper_id": "P233",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "手部軌跡及與物件接觸位置的聯合預測。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+      "previous_domain_ids": [
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P233",
+      "name": "OCT / HOI forecasting",
+      "expected_title": "Joint Hand Motion and Interaction Hotspots Prediction from Egocentric Videos",
+      "source_url": "https://arxiv.org/abs/2204.01696",
+      "pdf_url": "https://arxiv.org/pdf/2204.01696",
+      "retrieved_at": "2026-10-02T22:14:32.846410+00:00",
+      "pdf_sha256": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+      "text_sha256": "866b33d9fe2c6bcdea4a9acff4a7e747bfab013bc2e486d434cd4f10791d3f15",
+      "pdf_bytes": 4051114,
+      "pages": 15,
+      "text_characters": 107791,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": null,
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2204.01696"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 1894,
+        "unit": "EK55 evaluation hand trajectories",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P233:1",
+        "paper_id": "P233",
+        "benchmark": "OCT / HOI forecasting",
+        "native_term": "EK55 evaluation hand trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2204.01696",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3513,
+        "unit": "EK100 evaluation hand trajectories",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P233:2",
+        "paper_id": "P233",
+        "benchmark": "OCT / HOI forecasting",
+        "native_term": "EK100 evaluation hand trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2204.01696",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 442,
+        "unit": "EGTEA evaluation hand trajectories",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P233:3",
+        "paper_id": "P233",
+        "benchmark": "OCT / HOI forecasting",
+        "native_term": "EGTEA evaluation hand trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2204.01696",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 69,
+        "unit": "EGTEA evaluation hotspots",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P233:4",
+        "paper_id": "P233",
+        "benchmark": "OCT / HOI forecasting",
+        "native_term": "EGTEA evaluation hotspots",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "c866b4f79af2ef6de72a2ee55996af607cd4a69c977889bb3c3f67b0242fad17",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2204.01696",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "stevenlsw/hoi-forecast"
+  ],
+  "external_repositories": []
+}

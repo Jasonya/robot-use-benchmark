@@ -1,0 +1,474 @@
+{
+  "paper_id": "P230",
+  "name": "EgoH4",
+  "title": "The Invisible EgoHand: 3D Hand Forecasting through EgoBody Pose Estimation",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2504.08654",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P230",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoH4 評測由頭部／影像與可見 2D 手位置推估及預測 3D 手部，特別區分視野內外。已核對資料模組、20+10 幀切分與 metric 實作；這是 EgoExo4D 上的新評測任務，不是新採集的一批影片。",
+    "environment": "EgoExo4D 的 Aria 頭部相機、相機姿態及人體／手部標註。機器人控制與物理成功不在本來源評測範圍內；場景應沿用父 take。",
+    "tasks": "3D 手軌跡及手姿態 forecasting，並可分離觀測段 reconstruction；native 30 幀中前 20 幀觀測、後 10 幀未來，按可見／視野外比例分組。全身 57 joints 是移除重複 wrist 後的輸出維度，不是 57 個任務。",
+    "data": "論文報告約 156K train／34K test sequences；公開 config 的 test.split=val，並 concatenate manual body dataset 與 manual hand+auto body dataset。窗口 size=30、slice=1、frame interval=3，需保存 take_uid／start_frame 和標註類型，避免把交疊片段或不同標註視為獨立原片。",
+    "evaluation": "原生 evaluator 分 body／wrist／hand／full，計 obs/fut ADE、末幀 FDE、10 個未來 timestep 和 in-/out-of-view 子群；不以單一 success 評分。calc_jpe 先乘 visibility，再以 jpe!=0 篩選，會連真正零誤差也排除。該固定版本以絕對座標 L2 計手部誤差，沒有在所讀 test_step 執行 wrist-relative 對齊；比較論文相對 MPJPE 欄時必須核對。",
+    "standardization": {
+      "profile": "egocentric_visible_and_out_of_view_3d_hand_forecasting",
+      "reuse": "重用 parent take／sequence indexing、可見性標註、原生 20+10 與分組 evaluator。；以各分項原生誤差作基準；0…1 視野外比例是 case 屬性，不直接標成難度分數。",
+      "transform": "canonical case 固定 observation boundary、camera／pose 座標、joint order、3D／2D masks 及 annotation provenance。；保留 native evaluator；修正零誤差 mask 或新增 wrist-relative metric 時另建協定與相同 fixture 對照。；test dataset 所稱 test 對應父資料 val，標準格式同時保留兩個 split 名稱。",
+      "missing": "本次只查核列出的公開來源段落，未取得完整資料或執行 diffusion。；body／hand concatenation 之重疊 take 與實際數量需要用下載後的 annotation manifest 核對。"
+    },
+    "version_note": "固定目前官方 commit；trainer 註解有 17-joint 遺留文字，但實際使用 57 joints。future condition 於 decoder 被排除，不能因 sample 接收 GT-shaped tensor 就直接判定資料洩漏。",
+    "runtime_executed": false,
+    "discovery_evidence": [
+      {
+        "kind": "paper",
+        "url": "https://arxiv.org/abs/2504.08654",
+        "checked_sections": [
+          "摘要與表 1，156K／34K sequences；第 7 頁相對 MPJPE 註記。"
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 46,
+        "sha256": "f8a4fc1d406df2fa30f99dae4a8e27e6a5f45d1a7d039de9b4c711f9de990534",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/README.md",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/README.md#L1-L46",
+        "why": "確認官方論文、執行入口與 checkpoint 來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "config/data_module/egoexo.yaml",
+        "ranges": [
+          [
+            1,
+            47
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 47,
+        "sha256": "041255f0cbcecc8ae12fee2d1a33f439e4bde66693b621a5a7ab042519200a0c",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/config/data_module/egoexo.yaml",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/config/data_module/egoexo.yaml#L1-L47",
+        "why": "核對原生 split、30-frame window、interval=3 與正規化界限。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "config/trainer/egoh4.yaml",
+        "ranges": [
+          [
+            1,
+            39
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 39,
+        "sha256": "7ee750d4c231ab61fde846b698523d9ad78aa11891ac96db746b6c91a66c4438",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/config/trainer/egoh4.yaml",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/config/trainer/egoh4.yaml#L1-L39",
+        "why": "查核模型維度及 30 timestep 設定；註解與實際維度不可混讀。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "datamodule/lit_egoexo4d_data_module.py",
+        "ranges": [
+          [
+            14,
+            44
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 44,
+        "sha256": "dbd7e495da63bb6f41d7af36ca86e37f4e44894fadaf3e721b87f6a373cfabaa",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/datamodule/lit_egoexo4d_data_module.py",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/datamodule/lit_egoexo4d_data_module.py#L14-L44",
+        "why": "確認測試實際用 EgoExo4D val、body／hand loader concatenation。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "datamodule/dataset/egoexo4d_hand_body_pose_dataset.py",
+        "ranges": [
+          [
+            15,
+            127
+          ],
+          [
+            296,
+            383
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 383,
+        "sha256": "b8edc6840f3a8fb67594e8866bdf04e9ecf19b9c86b7f34a2922ca552e4cd361",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/datamodule/dataset/egoexo4d_hand_body_pose_dataset.py",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/datamodule/dataset/egoexo4d_hand_body_pose_dataset.py#L15-L127",
+        "why": "追蹤 take、連續窗口、out-of-view 分組、17+42 關節、mask 與只載前 20 幀影像。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "models/lit_EgoH4Trainer.py",
+        "ranges": [
+          [
+            273,
+            436
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 446,
+        "sha256": "a19e68c0cd149d462269bbd488cb9d2417db250c0e57b703198cdc35badbb2ee",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/models/lit_EgoH4Trainer.py",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/models/lit_EgoH4Trainer.py#L273-L436",
+        "why": "檢查 57 關節、觀測／未來分開、per-timestep 誤差及零誤差過濾。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "models/transformer_cond_diffusion_model.py",
+        "ranges": [
+          [
+            314,
+            345
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 575,
+        "sha256": "9fdc77693c12a6edabacb845519e4ba587b8105701e9d7c12432e98680f061c9",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/models/transformer_cond_diffusion_model.py",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/models/transformer_cond_diffusion_model.py#L314-L345",
+        "why": "確認 sample 只用 x_start.shape 建噪聲，不把 GT 座標直接當預測。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EgoH4",
+        "requested_repo": "masashi-hatano/EgoH4",
+        "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+        "ref": null,
+        "path": "models/transformer_module.py",
+        "ranges": [
+          [
+            236,
+            283
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 308,
+        "sha256": "9b3ec2a163a89130abb481705508d862e40fe4475783c91c545ac66eb8b8c225",
+        "url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/models/transformer_module.py",
+        "reading_url": "https://github.com/masashi-hatano/EgoH4/blob/baa8ae87ce50dbff4471e2cce180bb187ce0e900/models/transformer_module.py#L236-L283",
+        "why": "確認 future token 只讀 noisy pose channels、沒有讀 future condition。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "2f91a07a117365dfda46ccb5a7d0588713b285866157136da0ac30bc7b81cbea"
+  },
+  "repository_binding_review_sha256": "2f91a07a117365dfda46ccb5a7d0588713b285866157136da0ac30bc7b81cbea",
+  "repository_bindings": [
+    {
+      "requested_repo": "masashi-hatano/EgoH4",
+      "resolved_repo": "masashi-hatano/EgoH4",
+      "aliases_in_this_review": [
+        "masashi-hatano/egoh4"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+          "reviewed_files": [
+            "README.md",
+            "config/data_module/egoexo.yaml",
+            "config/trainer/egoh4.yaml",
+            "datamodule/dataset/egoexo4d_hand_body_pose_dataset.py",
+            "datamodule/lit_egoexo4d_data_module.py",
+            "models/lit_EgoH4Trainer.py",
+            "models/transformer_cond_diffusion_model.py",
+            "models/transformer_module.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/masashi-hatano/EgoH4",
+          "link_label": "Code",
+          "project_url": "https://masashi-hatano.github.io/EgoH4",
+          "page_sha256": "21991286259f42051a20bbbd5f651bc0061b84e83f10c277bbfae290067934f0"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P230",
+          "review_file": "content/github_review/reviews/P230.json",
+          "review_sha256": "2f91a07a117365dfda46ccb5a7d0588713b285866157136da0ac30bc7b81cbea",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P230",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "The Invisible EgoHand: 3D Hand Forecasting through EgoBody Pose Estimation；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EgoExo4Dbody/handannotations合併，原場景重用。",
+    "tasks": "in-view/out-of-viewhandtrajectory/poseforecast，body作constraint。",
+    "cases": "156Ktrain/34Ktest是按hand-side的sequencecounts；同片左右手不可當獨立scene。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 156000,
+        "unit": "hand-side training sequences（約數）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 34000,
+        "unit": "hand-side test sequences（約數）",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "ADE/FDE、MPJPE/lastframeMPJPE，單一generatedsample，沒有best-ofK放大。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "officialtrain/valastrain/test，2sobs→1sforecast10fps；GT2Dhands作input，autobody只train。",
+    "lineage": "EgoExo4Dbody與handsubset；metric對不同validjoints適用分母不同。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "要核hand-side數轉uniqueclip的關係；不能將156K+34K稱190K獨立humanactivities。"
+    ],
+    "reuse": "加入遮擋/視野外預測的規則對照，並標明ground-truth感知input優勢。",
+    "reviewed_pdf_sha256": "16c00d83861cf54090431f84a857bd58983670d1635fa09e3cb8a8b6fc048006",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoH4",
+    "year": 2025,
+    "title": "The Invisible EgoHand: 3D Hand Forecasting through EgoBody Pose Estimation",
+    "source_url": "https://arxiv.org/abs/2504.08654",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "wearable"
+    ],
+    "review_tags": [
+      "跨域人類活動",
+      "人體動作與身體感知"
+    ],
+    "domain_names": [
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P230",
+      "summary": "包含視野外雙手的姿態與動作預測，歸入AR／VR等穿戴動作介面。",
+      "evidence": [
+        {
+          "paper_id": "P230",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2
+          ],
+          "locator": "Introduction、task formulation",
+          "observed_tasks": [
+            "in-view／out-of-view手部軌跡與關節預測",
+            "AR／VR、HRI與assistive technology"
+          ],
+          "reasoning": "由目標輸出與原作應用動機歸納，視野外只是評測條件，不是用途缺失。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "16c00d83861cf54090431f84a857bd58983670d1635fa09e3cb8a8b6fc048006"
+        }
+      ],
+      "domain_ids": [
+        "wearable"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "16c00d83861cf54090431f84a857bd58983670d1635fa09e3cb8a8b6fc048006",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P230",
+      "name": "EgoH4",
+      "expected_title": "The Invisible EgoHand: 3D Hand Forecasting through EgoBody Pose Estimation",
+      "source_url": "https://arxiv.org/abs/2504.08654",
+      "pdf_url": "https://arxiv.org/pdf/2504.08654",
+      "retrieved_at": "2026-10-02T22:14:28.063227+00:00",
+      "pdf_sha256": "16c00d83861cf54090431f84a857bd58983670d1635fa09e3cb8a8b6fc048006",
+      "text_sha256": "db6cfd9f5a642a66514deeb008ef3ed5043205911a39ce51243ddcb2f80d8734",
+      "pdf_bytes": 2919272,
+      "pages": 12,
+      "text_characters": 88489,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2504.08654v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2504.08654v1"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 156000,
+        "unit": "hand-side training sequences（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P230:1",
+        "paper_id": "P230",
+        "benchmark": "EgoH4",
+        "native_term": "hand-side training sequences（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2504.08654v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2504.08654v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 34000,
+        "unit": "hand-side test sequences（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P230:2",
+        "paper_id": "P230",
+        "benchmark": "EgoH4",
+        "native_term": "hand-side test sequences（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2504.08654v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2504.08654v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "masashi-hatano/EgoH4"
+  ],
+  "external_repositories": []
+}

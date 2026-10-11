@@ -1,0 +1,516 @@
+{
+  "paper_id": "P037",
+  "name": "EgoEnv",
+  "title": "EgoEnv: Human-centric environment representations from egocentric video",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2207.11365",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P037",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoEnv 同時有 HM3D 模擬 walkthrough 與真實影片理解用途；已核讀 episode/scene ID、四方位狀態標註與具體評測，不能把128維特徵當任務。",
+    "environment": "模擬 scene_id 屬 HM3D，episode_id 是初態與訪問目標形成的導航歷程。下游另用 HouseTours／Ego4D 真實影片；RoomPred instance 可區分同類多房間，屬來源內 metadata，不是全球唯一環境 ID。",
+    "tasks": "區域性物件存在／距離與相對 pose 學習，遷移到 RoomPred/NLQ。四方位、23 object classes、512 timestep 是張量軸；不代表 4×23×512 個獨立任務。",
+    "data": "episode_list.pth 連 state/{type}/{scene_id}_{episode_id}.pth；labels/dists 為 T×4×object，distance=-1 表示未出現。val walkthrough 均勻預選4 query，train 隨機 query／memory window。下游特徵每秒一筆 T×128；HouseTours 原 YouTube clip 與 Ego4D video/clip/time 必須保留父來源。",
+    "evaluation": "CardinalObjectStateTask 在每方向對多物件算 average_precision_score，再平均方向；distance argmax accuracy 僅 dists!=-1 的位置。訓練 BCE+masked CE 是 loss，不是實體導航成功；RoomPred/NLQ 的完整下游 metrics 不由這個 local-state evaluator 取代。",
+    "standardization": {
+      "profile": "sim_walkthrough_and_video_environment",
+      "reuse": "真實 scene/episode 分離、四方位物件／距離 schema、RoomPred 的 room instance 和 AP/masked accuracy。",
+      "transform": "HM3D source→scene→episode→query 建關聯，HouseTours/Ego4D 新標註另連 parent video/time；case 留 query/memory indices、可用歷史、pose/angle、missing-distance。128維 feature 作加工 artifact，不計為新題。",
+      "missing": "尚未取得 HM3D、導航軌跡、真實影片或執行。README 只提供50條 sample metadata，完整訓練需生成；需核驗 SCENE_SPLITS、room-instance 身份和下游評分，才能報可用環境／cases。"
+    },
+    "version_note": "檔案釘選 Habitat-sim0.2.2 與 Habitat-lab 特定提交；同樣 HM3D 名稱不等於其他 benchmark 的相同 split/episode。程式庫書目年份文字需仍以論文來源核對，不據README單行覆寫主書目。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/ego-env",
+        "requested_repo": "facebookresearch/ego-env",
+        "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            92
+          ],
+          [
+            104,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 145,
+        "sha256": "56b985f1512f20b251cbff700dc0be0e5917f321a988d85f9aa4472bbd12d125",
+        "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/README.md",
+        "reading_url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/README.md#L1-L92",
+        "why": "模擬生成、版本、metadata 與下游角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/ego-env",
+        "requested_repo": "facebookresearch/ego-env",
+        "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+        "ref": null,
+        "path": "DATASETS.md",
+        "ranges": [
+          [
+            1,
+            48
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 48,
+        "sha256": "ad264881ff45c00dda7945e21aced63a5ded6d675c8e4b527597908477679b3a",
+        "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/DATASETS.md",
+        "reading_url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/DATASETS.md#L1-L48",
+        "why": "HouseTours/Ego4D 來源、時間與 room instance",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/ego-env",
+        "requested_repo": "facebookresearch/ego-env",
+        "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+        "ref": null,
+        "path": "state_prediction/data/dataset.py",
+        "ranges": [
+          [
+            16,
+            24
+          ],
+          [
+            28,
+            34
+          ],
+          [
+            46,
+            58
+          ],
+          [
+            64,
+            94
+          ],
+          [
+            97,
+            103
+          ],
+          [
+            108,
+            114
+          ],
+          [
+            117,
+            131
+          ],
+          [
+            137,
+            149
+          ],
+          [
+            178,
+            184
+          ],
+          [
+            196,
+            202
+          ],
+          [
+            210,
+            234
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 234,
+        "sha256": "854304729257d72da98f4f1b8737785d06b0933303a2a7071e32ecf7491b4aef",
+        "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/state_prediction/data/dataset.py",
+        "reading_url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/state_prediction/data/dataset.py#L16-L24",
+        "why": "scene/episode、query 抽樣與 label mask",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/ego-env",
+        "requested_repo": "facebookresearch/ego-env",
+        "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+        "ref": null,
+        "path": "state_prediction/task.py",
+        "ranges": [
+          [
+            9,
+            17
+          ],
+          [
+            21,
+            29
+          ],
+          [
+            45,
+            57
+          ],
+          [
+            97,
+            105
+          ],
+          [
+            118,
+            126
+          ],
+          [
+            132,
+            140
+          ],
+          [
+            158,
+            177
+          ],
+          [
+            179,
+            203
+          ],
+          [
+            208,
+            216
+          ],
+          [
+            218,
+            242
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 242,
+        "sha256": "14e7516c7328ffb7c188ed6cd66d8026737447643cab247e7fb63097bafe3c59",
+        "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/state_prediction/task.py",
+        "reading_url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/state_prediction/task.py#L9-L17",
+        "why": "方向 AP、距離 accuracy 與訓練 loss",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "542b25dfd703d27756c32ac16c119ac659ced7204733c0d9e24420433907f6ef"
+  },
+  "repository_binding_review_sha256": "542b25dfd703d27756c32ac16c119ac659ced7204733c0d9e24420433907f6ef",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/ego-env",
+      "resolved_repo": "facebookresearch/ego-env",
+      "aliases_in_this_review": [
+        "facebookresearch/ego-env"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+          "reviewed_files": [
+            "DATASETS.md",
+            "README.md",
+            "state_prediction/data/dataset.py",
+            "state_prediction/task.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/ego-env",
+          "link_label": "[code]",
+          "project_url": "https://vision.cs.utexas.edu/projects/ego-env/",
+          "page_sha256": "bc09ddbfb19e7a035edc79bd05502ffa6b711488850a8e678c6f1a36dceff0ec"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/ego-env/blob/main/DATASETS.md",
+          "link_label": "here",
+          "project_url": "https://vision.cs.utexas.edu/projects/ego-env/",
+          "page_sha256": "bc09ddbfb19e7a035edc79bd05502ffa6b711488850a8e678c6f1a36dceff0ec"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P037",
+          "review_file": "content/github_review/reviews/P037.json",
+          "review_sha256": "542b25dfd703d27756c32ac16c119ac659ced7204733c0d9e24420433907f6ef",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P037",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoEnv: Human-centric environment representations from egocentric video；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      6,
+      7,
+      8
+    ],
+    "role": "空間理解與affordance",
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "environment": "pretraining 900 HM3D scenes；HouseTours選886houses，MP3D90scenes；各自保留source單位。",
+    "tasks": "room prediction與NLQ兩端點；21real room classes，MP3D9classes不是新的生活domain。",
+    "cases": "約15K合成walkthroughs×512steps；HouseTours約32h、MP3D146walkthroughs；QA精確總量未核。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 900,
+        "unit": "HM3D pretraining scenes",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 886,
+        "unit": "選用HouseTours houses",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "environment understanding endpoints",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 146,
+        "unit": "MP3D video walkthroughs",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "room分類、NLQ temporal localization；local-state AP另測。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "HouseTours按house切，Ego4D/MP3D用原split；video memory可讀query附近全片，非嚴格在線。",
+    "lineage": "新增HouseTours labels、Ego4D NLQ沿用，HM3D/MP3D資產重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          6,
+          7,
+          8
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "Ego4D段落稱1,259scenes，需核是video/session或實體place；不納跨來源環境總和。"
+    ],
+    "reuse": "補house-tour與室內環境理解；source錄影場所與sim資產必須分開。",
+    "reviewed_pdf_sha256": "30fca03c8d8d57b800a30c4d921db35c49f8d6339b1679c30268654e7783ba47",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoEnv",
+    "year": 2022,
+    "title": "EgoEnv: Human-centric environment representations from egocentric video",
+    "source_url": "https://arxiv.org/abs/2207.11365",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "室內導航"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P037",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P037",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "room prediction與NLQ兩端點；21real room classes，MP3D9classes不是新的生活domain。",
+            "pretraining 900 HM3D scenes；HouseTours選886houses，MP3D90scenes；各自保留source單位。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "30fca03c8d8d57b800a30c4d921db35c49f8d6339b1679c30268654e7783ba47"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "30fca03c8d8d57b800a30c4d921db35c49f8d6339b1679c30268654e7783ba47",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P037",
+      "name": "EgoEnv",
+      "expected_title": "EgoEnv: Human-centric environment representations from egocentric video",
+      "source_url": "https://arxiv.org/abs/2207.11365",
+      "pdf_url": "https://arxiv.org/pdf/2207.11365",
+      "retrieved_at": "2026-10-02T22:13:14.009672+00:00",
+      "pdf_sha256": "30fca03c8d8d57b800a30c4d921db35c49f8d6339b1679c30268654e7783ba47",
+      "text_sha256": "486a536d9d11d86154d334c185eb45182cf2bd25c3b27a6a7227b28c5523c7a7",
+      "pdf_bytes": 7107955,
+      "pages": 30,
+      "text_characters": 132593,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2207.11365v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2207.11365v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 900,
+        "unit": "HM3D pretraining scenes",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P037:1",
+        "paper_id": "P037",
+        "benchmark": "EgoEnv",
+        "native_term": "HM3D pretraining scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.11365v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.11365v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 886,
+        "unit": "選用HouseTours houses",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P037:2",
+        "paper_id": "P037",
+        "benchmark": "EgoEnv",
+        "native_term": "選用HouseTours houses",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.11365v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.11365v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "environment understanding endpoints",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P037:3",
+        "paper_id": "P037",
+        "benchmark": "EgoEnv",
+        "native_term": "environment understanding endpoints",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.11365v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.11365v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 146,
+        "unit": "MP3D video walkthroughs",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P037:4",
+        "paper_id": "P037",
+        "benchmark": "EgoEnv",
+        "native_term": "MP3D video walkthroughs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.11365v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.11365v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/ego-env"
+  ],
+  "external_repositories": []
+}

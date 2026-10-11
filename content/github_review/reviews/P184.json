@@ -1,0 +1,619 @@
+{
+  "paper_id": "P184",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+  "identity_note": "arXiv:2606.04206v1 → dlo-lab-26.github.io第一方[Code] → UMass-Embodied-AGI/DLO-Lab；README列相同六位作者與2606.04206。專案頁另一個zzyunzhi/template只是網頁模板，不納入benchmark source。",
+  "summary": "已核讀8-task registry、原生RL/DiffRL action與時間約定、coiling/lifting/wrapping的具體reward、trajectory aggregation，以及LeRobot匯出／讀取。原生episodic return、存活到horizon的diagnostic success及論文影片人工success三者不同；生成示範的過濾也只排除absorbing，不證明任務完成。",
+  "reading_order": [
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "README.md",
+      "ranges": [
+        [
+          3,
+          39
+        ],
+        [
+          68,
+          81
+        ],
+        [
+          154,
+          209
+        ]
+      ],
+      "why": "確認論文、外部assets、八task與本版新增資料匯出流程。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/registry.py",
+      "ranges": [
+        [
+          16,
+          50
+        ]
+      ],
+      "why": "實際唯一task→Train_Env subclass清單。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/base.py",
+      "ranges": [
+        [
+          30,
+          108
+        ],
+        [
+          298,
+          353
+        ],
+        [
+          418,
+          439
+        ]
+      ],
+      "why": "scene dt／substeps、RL觀測/action sizing、DiffRL的3D vertex控制。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/env_coiling.py",
+      "ranges": [
+        [
+          42,
+          80
+        ],
+        [
+          111,
+          134
+        ],
+        [
+          149,
+          204
+        ],
+        [
+          326,
+          351
+        ],
+        [
+          353,
+          469
+        ]
+      ],
+      "why": "60節點scene、指定grasp vertex、exp-distance reward、NaN failure、sum/final return與observation。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/env_lifting.py",
+      "ranges": [
+        [
+          188,
+          272
+        ]
+      ],
+      "why": "兩環高度／rope距離與gripper近距離penalty；differentiable loss不等於負reward。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/env_wrapping.py",
+      "ranges": [
+        [
+          211,
+          262
+        ],
+        [
+          341,
+          414
+        ]
+      ],
+      "why": "封閉rope winding number、15mm柱半徑距離penalty及不同優化loss。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/utils/controller.py",
+      "ranges": [
+        [
+          501,
+          580
+        ]
+      ],
+      "why": "Pink IK的translation公尺、rotation預設degrees與world target更新。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/trajopt/cmaes.py",
+      "ranges": [
+        [
+          90,
+          123
+        ],
+        [
+          292,
+          334
+        ]
+      ],
+      "why": "由eval_traj取得cum/final reward，依use_last_state_reward選CMA最佳軌跡。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/rl/rudinppo.py",
+      "ranges": [
+        [
+          299,
+          358
+        ]
+      ],
+      "why": "PPO使用undiscounted return；success_rate欄其實只是episode_length==horizon。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/config.py",
+      "ranges": [
+        [
+          10,
+          30
+        ],
+        [
+          100,
+          153
+        ]
+      ],
+      "why": "16D state／12D action／18D joints及單臂padding、相機欄位。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/generate_dataset.py",
+      "ranges": [
+        [
+          77,
+          126
+        ],
+        [
+          135,
+          211
+        ],
+        [
+          335,
+          417
+        ],
+        [
+          570,
+          608
+        ]
+      ],
+      "why": "run_config reader、post-step資料擷取、failed filter、T+1紀錄與action時序。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/export.py",
+      "ranges": [
+        [
+          54,
+          132
+        ],
+        [
+          388,
+          440
+        ],
+        [
+          610,
+          630
+        ]
+      ],
+      "why": "實際parquet schema、影片template、v3 metadata與train-only split。"
+    },
+    {
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/filter_dataset.py",
+      "ranges": [
+        [
+          40,
+          73
+        ],
+        [
+          197,
+          255
+        ]
+      ],
+      "why": "單一consolidated parquet reader與episode/frame/video重編號。"
+    }
+  ],
+  "environment": "Genesis衍生的Taichi differentiable rod simulator，ROD material可設E/G、segment radius/mass、接觸friction與塑性；場景配Franka、cones/posts、rings等。coiling具體為60個rod vertices、間距0.02 m、radius0.01 m與固定cone，control_idx=[1]在reset直接attached_to_gripper，不能視為已包含自由抓取成功。scene dt=0.001 s、substeps=5；一次policy action跨steps_interval個scene steps，須另保留此數與split，不以影片fps推控制頻率。",
+  "tasks": "registry正好8個固定horizon任務：coiling、gathering、lifting、separation、slingshot、unknotting、wiring_post、wrapping。論文第6頁另列Letter Art與Wiring-ring，屬DLO agent的長時程分解實驗，未在此8-task registry中，分開建task來源／協定。grasp候選、rod nodes、posts、robot arms與rollout次數都不是task數；未取得固定case manifest，案例總數不填虛構值。",
+  "data": "RL privileged observation按(rope vertices+additional objects)×6+grasp points×14，包含位置／速度、末端pose及arm joints；RL action每control point 6D，先乘_act_magnitude、clip、L2限制，再拆xyz／rotation，Pink controller預設translation=m、rotation=degrees。DiffRL只有每point3D translation並從rope vertex反傳，不能共享同一action schema。資料匯出另統一為observation.state float32[16]、action[12]、action.joint[18]，單臂左側zero padding；action排列[right_xyz,left_xyz,right_rot,left_rot]。相機front/wrist_right/wrist_left，單臂wrist_left為黑圖，不是第三個真實視角。timestamp=step_idx×scene.dt×n_substeps_per_step；初frame有zero action，之後capture在step之後，末frame action/action.joint又複製前frame，必須保留原對齊。匯出data/chunk-000/file-000.parquet、meta/info.json/stats.json/tasks.parquet、meta/episodes/...與videos/chunk-*/observation.images.<cam>/episode_*.mp4，split只宣告train。filter reader只讀consolidated file-000；需保持其前置條件。",
+  "evaluation": "coiling reward=exp(−0.1Σv||v−(0,0,0.15)||)，是距離proxy而非繞圈成功。lifting reward=5×兩環高度和+rope相對抬高項−0.5×rope到兩環最近距離−100×末端距環小於0.08 m的penalty；loss_criterion另外含stretch loss，不能當相同分數。wrapping以xy-plane角度和／2π的絕對winding、與1圈的平方誤差及到三柱最近距離超出0.015 m的penalty計reward。coiling eval_traj累加substep reward，另回final_reward及forward_time，NaN/failed final用survival_ratio−100；CMA可選cum或final做最佳化。PPO儲存undiscounted return及末reward，diagnostic success_rate=(episode_length==n_outer_steps)，只是未提前失效。論文主表報固定budget內最大episodic return、3 seeds；附錄影片人工success用每RL方法15條、GD1條、CMA最佳checkpoint的top15條。這些不是同一個自動success metric。",
+  "standardization": {
+    "profile": "differentiable_dlo_tasks_and_generated_robot_episodes",
+    "reuse": "8-task registry、具體reward/loss、scene／material／control-point參數、macro/micro-step約定、LeRobot欄位與frame/video reader。",
+    "transform": "source保存此Genesis衍生commit及外部dependency／asset來源；environment按DLO拓樸、材料、fixture、robot/grasp attachment建立；task保存原goal文字與reward program。case保存seed、randomization、grasp indices、horizon、algorithm、sampling budget及checkpoint；evaluator分cum_return/final_reward、simulation-survival及人工task success。資料另記arm_present／camera_present mask、原raw action及縮放後物理action、前後state/action對齊，task名稱去重不靠生成episode數。",
+    "missing": "assets與Mushroom-RL/Pink等依賴的完整pin／驗證；論文影片success rubric／標註及top15選擇名冊；完整task checker覆蓋；LeRobot產生資料的action-time與SHAC格式驗證；data generation僅依absorbing過濾且在n_envs>1時用obs0選action後tile給各env，不能直接視為獨立閉迴路成功示範。"
+  },
+  "version_note": "固定2026-10-08的4af05620，晚於June2026 PDF，包含新的LeRobot輸出及registry整理；未宣稱與論文原始程式完全一致。envs/README稱reward非負／loss近似負reward是設計指南，具體lifting/wrapping程式有penalty與不同loss，標準化以實作為準。README的SharePoint資產與Mushroom-RL fork未下載；未執行模擬／policy。",
+  "integration_issues": [
+    "PPO字面success_rate是存活率，生成器saved successful也是註解；不可寫入本庫task-success欄。",
+    "RL每point6D且rotation預設degrees；DiffRL每point3D，export另有16/12/18D與padding，需分profile。",
+    "八個固定tasks與兩個agent長時程tasks、cum/final return／人工success、資料post-step對齊及多env動作broadcast均需保持可追溯。"
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/github_review/P184-discovery.json",
+      "sha256": "0d92807e843f520ff15d3a5acdc5d44fa3463aaf9986cc90268fe5be1284dbff",
+      "json_pointers": [
+        "/candidates/0",
+        "/candidates/1",
+        "/paper_url",
+        "/pdf_sha256",
+        "/title"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/183/projects"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/README.md",
+      "sha256": "8b90975525574e0d021195247989613d884bf685110e4ee1cdbd30cd6f39f58c",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "README.md",
+      "git_blob_sha": "35d3bb885b93be6e260eb0eb7c1c87b918646ed2",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/README.md",
+      "read_ranges": [
+        [
+          1,
+          213
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/envs/README.md",
+      "sha256": "c217310ccddef0832a75dd0adc70daa95e14d040fdd9615becd8e05228778af1",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/README.md",
+      "git_blob_sha": "71ad716d04c0ac37e09b0825a7817d89460e2c6e",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/README.md",
+      "read_ranges": [
+        [
+          1,
+          180
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/envs/registry.py",
+      "sha256": "45c81141fcaaf1eed8c5b198f6b43839d857f4d7de82d2f222d4e01c5d899a6d",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/registry.py",
+      "git_blob_sha": "dc3b370c609937f1d48fa69ec3e60fe2b88392cb",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/registry.py",
+      "read_ranges": [
+        [
+          1,
+          50
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/tree.json",
+      "sha256": "76cbb9bfd0add9b392ba9becfbc0bff375c51f91ab4332a534e8c687897023f3",
+      "kind": "pinned_repository_tree",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "url": "https://api.github.com/repos/UMass-Embodied-AGI/DLO-Lab/git/trees/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8?recursive=1",
+      "json_pointers": [
+        "/tree/103",
+        "/tree/107",
+        "/tree/12",
+        "/tree/13",
+        "/tree/14",
+        "/tree/15",
+        "/tree/16",
+        "/tree/17",
+        "/tree/18",
+        "/tree/19",
+        "/tree/20",
+        "/tree/21",
+        "/tree/22",
+        "/tree/23",
+        "/tree/24",
+        "/tree/31",
+        "/tree/32",
+        "/tree/33",
+        "/tree/34",
+        "/tree/35",
+        "/tree/36",
+        "/tree/37",
+        "/tree/38",
+        "/tree/39",
+        "/tree/40",
+        "/tree/41",
+        "/tree/44",
+        "/tree/67",
+        "/truncated"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/envs/base.py",
+      "sha256": "7b79c79a185488831a304eea0c281d3fa4069a8a4c3cb559007c420293ca4f72",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/base.py",
+      "git_blob_sha": "e1fa4c92684e046b1f0db258a2bd3683e9685855",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/base.py",
+      "read_ranges": [
+        [
+          30,
+          108
+        ],
+        [
+          298,
+          353
+        ],
+        [
+          381,
+          440
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/envs/env_coiling.py",
+      "sha256": "317f9955143123755bf6cebc83a338e5b25334ce101ae87db46f29ec4515f643",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/env_coiling.py",
+      "git_blob_sha": "28ad735d87b2610751905a5a665fab54a81ed588",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_coiling.py",
+      "read_ranges": [
+        [
+          1,
+          16
+        ],
+        [
+          17,
+          83
+        ],
+        [
+          96,
+          134
+        ],
+        [
+          149,
+          205
+        ],
+        [
+          206,
+          243
+        ],
+        [
+          298,
+          351
+        ],
+        [
+          353,
+          470
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/envs/env_lifting.py",
+      "sha256": "3bb2291b9aa47e952d90034950fb031c8f64a42d74e57eacfb5371bace3b9ac9",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/env_lifting.py",
+      "git_blob_sha": "d923529cc3f2c030ea6b13d588b80039ea124f91",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_lifting.py",
+      "read_ranges": [
+        [
+          188,
+          273
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/envs/env_wrapping.py",
+      "sha256": "43f01621a6ef4373ee7cead1bc7b532309423f3531d101dc96397c717c17e037",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/envs/env_wrapping.py",
+      "git_blob_sha": "d44b439ae84aa0b24b5b211383024f7b9669928a",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_wrapping.py",
+      "read_ranges": [
+        [
+          211,
+          264
+        ],
+        [
+          341,
+          415
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P184/pages.json",
+      "sha256": "77146f3d30274301873714d03143c4e6130951f2da707be8d255faa722c35301",
+      "kind": "pinned_pdf_text",
+      "pdf_pages": [
+        6,
+        7,
+        18
+      ],
+      "json_pointers": [
+        "/17/text",
+        "/5/text",
+        "/6/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P184/paper.pdf",
+      "pdf_sha256": "91128b16d310632077dd23caa908483ba75b8851a77808b98368fbce1dcea0b0"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/datagen/generate_dataset.py",
+      "sha256": "efe6faeea6de747968e67b86fbd00ce5e899c5098caf50dfea749d7c49896c5a",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/generate_dataset.py",
+      "git_blob_sha": "6ea729cd3a2390da85a4b2b3900ef4eebd1b37ab",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/generate_dataset.py",
+      "read_ranges": [
+        [
+          1,
+          65
+        ],
+        [
+          77,
+          218
+        ],
+        [
+          286,
+          434
+        ],
+        [
+          435,
+          501
+        ],
+        [
+          566,
+          615
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/UMass-Embodied-AGI__DLO-Lab/files/experiments/datagen/filter_dataset.py",
+      "sha256": "89b5539de5847b7be4291d71ab14f6a0e77fe4b92398d2a4075d1a8aa5a760a1",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/filter_dataset.py",
+      "git_blob_sha": "2150051b81e1ed0eda981a0facdf2353d26219b0",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/filter_dataset.py",
+      "read_ranges": [
+        [
+          40,
+          75
+        ],
+        [
+          176,
+          257
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/UMass-Embodied-AGI__DLO-Lab/experiments/datagen/config.py",
+      "sha256": "8a844f5aaf58ca634f744d32b4b838f5cd2c0aedbf69d6bacc25e25600e6a76f",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/config.py",
+      "git_blob_sha": "2dbd621b5bbf3da16c23c240598a4b98f72dcdd5",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/config.py",
+      "read_ranges": [
+        [
+          1,
+          153
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/UMass-Embodied-AGI__DLO-Lab/experiments/datagen/export.py",
+      "sha256": "a911d0f0d101a862d7697ea0f35d58c94782e79b171f737a960b173bad8ec3aa",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/datagen/export.py",
+      "git_blob_sha": "1515c827be29936f7640bbcd58ee6a2cb1357725",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/export.py",
+      "read_ranges": [
+        [
+          54,
+          134
+        ],
+        [
+          388,
+          447
+        ],
+        [
+          610,
+          635
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/UMass-Embodied-AGI__DLO-Lab/experiments/trajopt/cmaes.py",
+      "sha256": "398c3c7441ac648280d3029cdaf5ce699386904a4c51a2fa791cc5c0b7a9145e",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/trajopt/cmaes.py",
+      "git_blob_sha": "751355e4ff5ec1cd5b4ca0bac7e3dd2fb1ecf533",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/trajopt/cmaes.py",
+      "read_ranges": [
+        [
+          90,
+          124
+        ],
+        [
+          292,
+          345
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/UMass-Embodied-AGI__DLO-Lab/experiments/rl/rudinppo.py",
+      "sha256": "506aab4ffe6a62ef48e26bcdf82b6ec0cd397f30797f8a011fa0ebff4bd6e55e",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/rl/rudinppo.py",
+      "git_blob_sha": "fd1e70cc6620c3715042abdf55aa85392d64e3ed",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/rl/rudinppo.py",
+      "read_ranges": [
+        [
+          299,
+          363
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/UMass-Embodied-AGI__DLO-Lab/experiments/utils/controller.py",
+      "sha256": "2bacebff2f39a07db0b810bc5110e590e0ac0e6c73881e95fcf2390a2f9f293e",
+      "kind": "pinned_repository_file",
+      "repo": "UMass-Embodied-AGI/DLO-Lab",
+      "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+      "path": "experiments/utils/controller.py",
+      "git_blob_sha": "f640ec772774cd1ff4b47892860408cd33b1cff9",
+      "url": "https://raw.githubusercontent.com/UMass-Embodied-AGI/DLO-Lab/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/utils/controller.py",
+      "read_ranges": [
+        [
+          501,
+          581
+        ]
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

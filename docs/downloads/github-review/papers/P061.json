@@ -1,0 +1,592 @@
+{
+  "paper_id": "P061",
+  "name": "Interact with me",
+  "title": "Interact with me: Joint Egocentric Forecasting of Intent to Interact, Attitude and Social Actions",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2412.16698",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "social",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P061",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "SocialEgoNet 是 JPL-Social 的官方分類實作；已追到人物 JSON、133點姿態圖與 weighted F1/accuracy。attitude 只評有互動真值的人物，且訓練程式把 test 目錄兼作 validation，整合不能忽略這兩個協定限制。",
+    "identity_note": "本地 arXiv:2412.16698v3（2025-05-08）第1頁直接連 biantongfei/SocialEgoNet。README 列 ICME2025、同一 arXiv ID 與五位作者；上方連結標題使用 joint prediction/self-centred 字樣，正式引用仍是 Joint Egocentric Forecasting of Intent to Interact, Attitude and Social Actions，屬同一作品。JPL-Social 是既有 JPL-Interaction 的人物層級擴充標註，不是新拍攝的獨立影片庫。",
+    "environment": "JPL-Interaction 的人形觀察者／機器人第一視角社交影片，背景與照明有變化。論文 §III 報告200段影片、16位受試者、6種場景設定、320×240與30FPS；JPL-Social 對可見人物建立290條person tracks。影片、人物tracks、姿態影格和場景數不能互換。",
+    "tasks": "預測 intent、attitude、action。constants 的 intent=[Interacting,Interested,Not_Interested]；attitude=[Positive,Negative,Not_Interacting]，前兩者是論文的兩種有效態度，2是非互動狀態；action=[Handshake,Hug,Pet,Wave,Punch,Throw,Point,Gaze,Leave,No_Response]。論文新增Gaze/No_Response並以人物為標註單位，並非十種機器人可執行指令。",
+    "data": "一個人物JSON描述 video_name/person_id、frame_size=[w,h]、偵測／互動起訖、三項class與frames；實際reader取 frames[*].{frame_id,keypoints}，keypoints=[133,3]為像素x/y及confidence。x/y轉為2*(xy/[w,h]-0.5)，score保留；輸出固定[30,133,3]。以frames[0].frame_id作起點，時間缺口及不足30幀以最近姿態補齊，不套confidence門檻，也不回傳補幀mask。walk_frame、interact_start_frame、gaze、box與contact_class沒有被此reader用作模型輸入。README誤寫key points，實際必須是keypoints；檔案／人物來源ID須另行保留以免只剩feature張量。",
+    "evaluation": "scripts/test.py 對每項logits做softmax/argmax，彙總所有test樣本後計 sklearn f1_score(average=\"weighted\")×100 與accuracy×100。attitude先依真值!=2排除非互動人物，仍保留3個輸出logits；誤預測Not_Interacting仍會計錯，不能依預測intent過濾。論文表II的83.15%是三項accuracy的算術平均，其分母並不相同，也不是三項同時正確率。公開測試程式沒有計算latency或三項平均；論文latency另外區分姿態抽取成本。",
+    "standardization": {
+      "profile": "person_track_social_forecasting",
+      "reuse": "人物JSON與video/person識別、三組label字典、姿態圖邊、分身體部位特徵及具體weighted F1／accuracy算法。",
+      "transform": "case以父影片+person_id+觀測錨點定位，task分開intent/attitude/action，保留attitude=2的訓練類與評分排除規則；保存像素原值、正規化公式、confidence及補幀來源。evaluation記錄每項有效樣本數，合併指標明列算術平均。",
+      "missing": "需取得並固定外部人物JSON及train/test清單，核對同影片／受試者是否跨split及augmentation來源；建立真正獨立validation協定、確認首次偵測錨點與論文觀測窗口一致，再做執行驗證。"
+    },
+    "version_note": "固定d81ad122080ca734a866dfcf3c4bd4db60078390（2026-02-26）。train.py 的validation與test都讀test/，每epoch評一次同一目錄，結束後保存最後模型；不能宣稱獨立validation或由此推斷論文實驗的split。config資料路徑是../JPL_Social/，與README「放於專案內」須對齊工作目錄。僅讀程式／論文，未下載Google Drive資料或載入repo內權重。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P061-discovery.json",
+        "json_pointers": [
+          "/title",
+          "/pdf_sha256",
+          "/candidates/0",
+          "/code_contexts/0"
+        ],
+        "sha256": "971e416d54c52ca2a61349d80a93f9a466d688c83e4740ef266dfcc0072d89d8"
+      }
+    ],
+    "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+    "runtime_executed": false,
+    "source_manifest_sha256": "a0547899d7a2b61bb3c10b3e9945a202af144846684d7bc61c07cb82ec76c198",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            21
+          ],
+          [
+            28,
+            82
+          ],
+          [
+            85,
+            111
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 121,
+        "sha256": "62e6836587c14c2487ad8a53f0a5c56089008a9d9698111ef4fa9258d9d690ea",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/README.md",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/README.md#L1-L21",
+        "why": "確認 exact paper、父資料／下載入口、metadata 與命令。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "scripts/constants.py",
+        "ranges": [
+          [
+            22,
+            54
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 54,
+        "sha256": "87ae60bf86b4c68ba51ed5d82e059fbb7a444f36fa517a39ff7f7ec3849c3718",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/constants.py",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/constants.py#L22-L54",
+        "why": "核對三組類別順序、133點與30FPS及各身體區域圖邊。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "scripts/data.py",
+        "ranges": [
+          [
+            11,
+            66
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 66,
+        "sha256": "fa89a231621828af6518c1dbdaf0968ac94b4fefed82c8e17bca25820e47b4be",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/data.py",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/data.py#L11-L66",
+        "why": "讀人物JSON、首次偵測錨點、補幀、座標公式及attitude真值過濾。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "scripts/DataLoader.py",
+        "ranges": [
+          [
+            5,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 55,
+        "sha256": "508d473c8f4884d1ab934b82fc144a7af168d07956c0401f0bf750a3ef750d22",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/DataLoader.py",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/DataLoader.py#L5-L55",
+        "why": "確認23身體／68臉／42手部點分圖，x/y/score三個node特徵。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "config/test.yaml",
+        "ranges": [
+          [
+            1,
+            14
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 14,
+        "sha256": "4da5f0296f11dc49f4357fa55f9d0d90f77d35b2b3c67cb987f392fa9fe193bd",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/config/test.yaml",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/config/test.yaml#L1-L14",
+        "why": "確認30幀、測試batch128及相對資料路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "config/train.yaml",
+        "ranges": [
+          [
+            1,
+            17
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 17,
+        "sha256": "fdb47454524fbc500e1dadec530da9ecdd0901dcb7b4843eb41eb27c797b6b43",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/config/train.yaml",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/config/train.yaml#L1-L17",
+        "why": "確認訓練40epochs與相同人物序列設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "scripts/Models.py",
+        "ranges": [
+          [
+            6,
+            35
+          ],
+          [
+            75,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 95,
+        "sha256": "a787995623a1908813c2979b4bb6334b17723e9ce75ff22823abcbf0a7e580ac",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/Models.py",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/Models.py#L6-L35",
+        "why": "核對attitude仍有3個logits與chain輸出，避免誤當純二分類模型。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "scripts/test.py",
+        "ranges": [
+          [
+            19,
+            43
+          ],
+          [
+            46,
+            69
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 73,
+        "sha256": "694ced70273dd31bd10e131d9a4066779315f15d76905cd201df62dcbf676660",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/test.py",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/test.py#L19-L43",
+        "why": "核對weighted F1／accuracy百分比、依真值排除attitude=2及完整test目錄彙整。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "biantongfei/SocialEgoNet",
+        "requested_repo": "biantongfei/SocialEgoNet",
+        "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+        "ref": null,
+        "path": "scripts/train.py",
+        "ranges": [
+          [
+            28,
+            42
+          ],
+          [
+            58,
+            91
+          ],
+          [
+            107,
+            128
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 132,
+        "sha256": "f5d87133ad1754ad9a05a7a840093cd4e986221d789fd857dd40bb1386f02d87",
+        "url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/train.py",
+        "reading_url": "https://github.com/biantongfei/SocialEgoNet/blob/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/train.py#L28-L42",
+        "why": "核對validation/test共用目錄、訓練保留第三attitude類及最後權重輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c19e22a64b2012dcf74f96514f99f5d52292ed9feb8919a5e8b37b71b87b43f2"
+  },
+  "repository_binding_review_sha256": "c19e22a64b2012dcf74f96514f99f5d52292ed9feb8919a5e8b37b71b87b43f2",
+  "repository_bindings": [
+    {
+      "requested_repo": "biantongfei/SocialEgoNet",
+      "resolved_repo": "biantongfei/SocialEgoNet",
+      "aliases_in_this_review": [
+        "biantongfei/socialegonet"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+          "reviewed_files": [
+            "README.md",
+            "config/test.yaml",
+            "config/train.yaml",
+            "scripts/DataLoader.py",
+            "scripts/Models.py",
+            "scripts/constants.py",
+            "scripts/data.py",
+            "scripts/test.py",
+            "scripts/train.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/biantongfei/SocialEgoNet",
+          "pdf_page": 1,
+          "pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P061",
+          "review_file": "content/github_review/reviews/P061.json",
+          "review_sha256": "c19e22a64b2012dcf74f96514f99f5d52292ed9feb8919a5e8b37b71b87b43f2",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "社交與溝通",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P061",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Interact with me / JPL-Social，arXiv 2412.16698v3。",
+    "scope_read": "JPL擴充、3組標籤、訓練augmentation、主要實驗。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "domains": [
+      "社交與溝通",
+      "協助、交接與陪伴"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "沿用JPL人機互動影片；未報新增scene總數。",
+    "tasks": "intent 3類、attitude 2類、action 10類；attitude是依action規則產生的標籤，不是獨立量測心理狀態。",
+    "cases": "200母影片→290 person-level tracks；crop/flip/keypoint noise擴增只增加訓練樣本，不增加290個來源個案。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 200,
+        "unit": "母影片",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 290,
+        "unit": "person tracks（全部split）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "互動動作類別",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "三任務各報accuracy及F1；主表觀測首1秒30frames，另變更窗口；模型latency另列。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "本輪已讀段落未取得正式train/test track ID分配；不得把290直接稱test題。",
+    "lineage": "JPL video-level標註擴成人物track；同影片多個人共享情境。",
+    "evidence": [
+      {
+        "pages": [
+          3
+        ],
+        "locator": "表I、JPL-Social annotation",
+        "supports": "200→290與標籤依赖"
+      },
+      {
+        "pages": [
+          5
+        ],
+        "locator": "表II、§V-D",
+        "supports": "F1／accuracy與1秒觀測"
+      }
+    ],
+    "unresolved": [
+      "同母影片track是否跨split及split數須源code核對。"
+    ],
+    "reuse": "補互動意圖與社交預測；需註明人設標籤規則及與動作標籤的依赖。",
+    "reviewed_pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642",
+    "reviewed_on": "2026-10-02",
+    "name": "Interact with me",
+    "year": 2024,
+    "title": "Interact with me: Joint Egocentric Forecasting of Intent to Interact, Attitude and Social Actions",
+    "source_url": "https://arxiv.org/abs/2412.16698",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "social",
+      "assistance"
+    ],
+    "review_tags": [
+      "社交與溝通",
+      "人機協作"
+    ],
+    "domain_names": [
+      "社交與溝通",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P061",
+      "domain_ids": [
+        "social",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P061",
+          "domain_ids": [
+            "social"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "intent 3類、attitude 2類、action 10類；attitude是依action規則產生的標籤，不是獨立量測心理狀態。",
+            "沿用JPL人機互動影片；未報新增scene總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642"
+        },
+        {
+          "paper_id": "P061",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "人機接觸情境中的意圖、態度與動作辨識。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642",
+      "previous_domain_ids": [
+        "social"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P061",
+      "name": "Interact with me",
+      "expected_title": "Interact with me: Joint Egocentric Forecasting of Intent to Interact, Attitude and Social Actions",
+      "source_url": "https://arxiv.org/abs/2412.16698",
+      "pdf_url": "https://arxiv.org/pdf/2412.16698",
+      "retrieved_at": "2026-10-02T21:33:32.186605+00:00",
+      "pdf_sha256": "35eabf84ae2cfa183887ab3924f91d9f15fa53aac29576e56407b4eee8da3642",
+      "text_sha256": "e8d92e249289af573a4a04736a69d02f1b06caf940a5de683bdabab89490cc74",
+      "pdf_bytes": 3305562,
+      "pages": 6,
+      "text_characters": 45658,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2412.16698v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2412.16698v3"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 200,
+        "unit": "母影片",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P061:1",
+        "paper_id": "P061",
+        "benchmark": "Interact with me",
+        "native_term": "母影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.16698v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.16698v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 290,
+        "unit": "person tracks（全部split）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P061:2",
+        "paper_id": "P061",
+        "benchmark": "Interact with me",
+        "native_term": "person tracks（全部split）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.16698v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.16698v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "互動動作類別",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P061:3",
+        "paper_id": "P061",
+        "benchmark": "Interact with me",
+        "native_term": "互動動作類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.16698v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.16698v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "biantongfei/SocialEgoNet"
+  ],
+  "external_repositories": []
+}

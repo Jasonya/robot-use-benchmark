@@ -1,0 +1,46 @@
+{
+  "paper_id": "P168",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "2025 HRIBench是人類感知VQA，不是2026同名協作模擬。官方README明列1000題但只公開4/5類；GitHub存模型輸出logs，未包含完整影像題庫與grader。",
+  "reading_order": [
+    {
+      "repo": "interaction-lab/HRIBench",
+      "commit": "b993469d3c03c2943a74a3fe178ec33d96afc901",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          40
+        ]
+      ],
+      "why": "精確2506.20566身分、5×200題及公開限制"
+    },
+    {
+      "repo": "interaction-lab/HRIBench",
+      "commit": "b993469d3c03c2943a74a3fe178ec33d96afc901",
+      "path": "HROI/answers_of_InternVL2_5-1B.json",
+      "ranges": [],
+      "why": "原始結果中3個demo及summary；未逐條人工核讀整份結果",
+      "json_pointers": [
+        "/demo_0",
+        "/demo_1",
+        "/demo_199",
+        "/summary"
+      ]
+    }
+  ],
+  "environment": "真實HRI影像與其他公開dataset場景；五類是感知評估領域，不是五個獨立物理場景。",
+  "tasks": "Non_Verbal、Ins_Follow、HROI、Social_Nav、Id_Rec各200VQA，共1000為原作聲明；README只宣佈前4類可下載，Id_Rec仍未公開，因此宣佈可取範圍為800題，本次未下載影像題庫。",
+  "data": "每case應有driod.txt(prompt/options)、correct_answer.json、wrong_answers.json與processed_frame.png。GitHub結果按demo_ID保存choices/correct_answer/response/time_taken，另有summary；所讀HROI結果檔201頂層key中200是demo、1是summary，不能算201題。demo_0的choice標籤有重複，匯入須驗證選項順序/唯一性。",
+  "evaluation": "此結果summary預存17/200=0.085 accuracy與0.478秒average time，僅作已公佈log例子，非本次跑分；沒有從response解析到correct的grader實作。各模型latency需要硬體/API/計時範圍一致才可比。",
+  "standardization": {
+    "profile": "human_perception_multiple_choice_vqa",
+    "reuse": "5種題型、原生資料目錄約定、帶time_taken的模型輸出schema。",
+    "transform": "case_id由source+native category+demo_ID組成；原影像/合法person-reference/options與GT分開；result的200demo和模型trial不倍增任務；保留800公開/1000聲明/本次取得影像0三種口徑。",
+    "missing": "Google Drive題庫實際取得、缺第五類、README重複圖片路徑說明釐清、選項ID驗證、response grader與latency協定。"
+  },
+  "version_note": "固定b993469，README指2506.20566及Shi等2025作者；與P147的2607.13056保持不同source，不能靠HRIBench名稱合併。",
+  "runtime_executed": false,
+  "identity_note": "P168: Real-Time Human Perception in HRI (ISER2025)；P147: Interaction-Centric Human-Robot Collaboration (2026)。"
+}

@@ -1,0 +1,335 @@
+{
+  "paper_id": "P059",
+  "name": "EMAG",
+  "title": "EMAG: Ego-motion Aware and Generalizable 2D Hand Forecasting from Egocentric Videos",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2405.20030",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P059",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EMAG 是重用 Ego4D／EPIC-Kitchens-55 的雙手位置預測方法。已讀資料與 ADE/FDE 計算程式，但公開設定、讀取器與 trainer 的欄位／時間維度不一致；不可標成可直接執行的跨資料集評測。",
+    "identity_note": "README 自稱 ECCVW 2024 官方實作，列 Hatano、Hachiuma、Saito，與 arXiv:2405.20030 論文及其指定作者頁一致；作者頁 Code 連至 masashi-hatano/EMAG。論文也引用 SORT、hoi-forecast、EGO4D/forecasting 作為相關工具／比較方法，不能把它們替代成本論文的實作。",
+    "environment": "論文在 EPIC-Kitchens-55 廚房影片及 Ego4D 多種人類活動上做同資料集／跨資料集預測；資料屬人類第一視角影像，沒有機器人可執行動作介面。已讀程式入口使用 Ego4D schema，EPIC 另有設定但沒有獨立 loader／轉換腳本。",
+    "tasks": "論文 §4.2 用八張 4 FPS 觀測，預測未來一秒四時點的左右手 2D 位置，並以未來 ego-motion 為輔助訓練目標。跨資料集的方向（EPIC→Ego4D 或反向）及 train/val 必須各自保留；活動類別分析不是新增機器人任務。",
+    "data": "讀 annotations/fho_hands_{mode}.json 的 /clips/*/{video_uid,clip_uid,frames}，由 frames/*/{pre_45,pre_30,pre_15,pre_frame,contact_frame}/boxes 的 left_hand/right_hand 建立 [2,5,2] 座標與 [2,5] mask；以來源 w/h 正規化。排除設定 delete 清單、pre_45.clip_frame≤interval×8 或全零 mask。輸入 image_frame/{clip_uid}/{frame:06d}.png、optical_flow/{clip_uid}/npy/*.npy、fundamental/{clip_uid}/*.npy，另讀 hand-objects/interval={interval}/{clip_uid}/{pre45}.pkl 的 bboxes_obj/bboxes_hand/attention_mask。回傳 frames、flows、bboxes、ego_feat、future_hands、future_egos、hands_mask、egos_mask 與影格 h/w；八個觀測索引終於 pre45-interval。影格步長不能直接當秒；pickle 與影像均未下載／反序列化。",
+    "evaluation": "論文 §4.3 定義影像高度256 px尺度的 ADE（所有未來時點、左右手）與 FDE（末時點、左右手）。實作 test_step 固定四時點、套 hands_mask，scaling_original 按 meta 中的來源 w/h 還原像素；calculate_L2_loss 排除 GT=(0,0)，分別累積左右手所有有效時點與第四時點的 L2 距離，test_epoch_end 只輸出四個分手平均。沒有此處的左右手合併報表，也沒有保證來源 PNG 高度為256的轉換步驟；原始解析度不同會改變分數。",
+    "standardization": {
+      "profile": "egocentric_2d_hand_forecasting",
+      "reuse": "原生 clip_uid、觀測錨點、標註時點與有效性 mask，左右手／物件框引用及分手位移算法。",
+      "transform": "case 以父資料集版本+split+clip_uid+錨點定位；保留 2D x/y、來源影格尺寸與秒／幀對照，明列四步 horizon、兩手缺失規則與影像高度256的評分尺度。跨資料集保留訓練來源與評測來源，不合併其原生 case。",
+      "missing": "須補齊影像、flow、手物框與 ego-motion 前處理來源／版本及 EPIC 格式轉換；修復 ego_feat/egos_input key、五標註時點對四輸出時點的契約與缺少的 model_config.loss 設定，確認兩手合併、解析度及遮罩後才可執行驗證。"
+    },
+    "version_note": "固定 0386bd9de2bd2ec3504e5b645a095c46e9a565ca（2025-03-25），與 2024 論文區分。loader 傳 ego_feat，trainer 卻讀 egos_input；loader 保留五時點且沒有裁切，test_step reshape 明定四時點；兩份設定皆未定義 trainer 初始化所讀的 model_config.loss。論文稱 homography，檔案路徑／變數稱 fundamental/fmat，未取得矩陣資產前不能宣稱兩者等價。非截斷 tree 未列 EPIC 專用 loader 或前處理釋出。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P059-discovery.json",
+        "json_pointers": [
+          "/title",
+          "/pdf_sha256",
+          "/candidates/3",
+          "/code_contexts/0"
+        ],
+        "sha256": "84dc9ef3fb6d29764c17fbf0358c4d8b5998524c1fc8a3cdfba470539b26ba13"
+      }
+    ],
+    "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+    "runtime_executed": false,
+    "source_manifest_sha256": "6ba9dfc3515c4957624bd28a220605bdbb558d5ead77a6635d36c199e28df1b8",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            4,
+            20
+          ],
+          [
+            32,
+            52
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 52,
+        "sha256": "9ab79a24752c60731847c4a8b52ccc898d758e2e7de53517e056069b431ee625",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/README.md",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/README.md#L4-L20",
+        "why": "確認完整作品／作者及公開訓練、評測入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "configs/config_ego4d.yaml",
+        "ranges": [
+          [
+            1,
+            96
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 96,
+        "sha256": "4f56f8e63ef3e4026479a282f90564da1f1e50bc71e9af9b80c8a66cf2eb4b8d",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_ego4d.yaml",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_ego4d.yaml#L1-L96",
+        "why": "核對預設 val split、八幀輸入／四步輸出、間隔、外部路徑及排除影片。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "configs/config_epic.yaml",
+        "ranges": [
+          [
+            1,
+            15
+          ],
+          [
+            42,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 90,
+        "sha256": "b89e76b8c3e8495c847d71f695882b670a64e9903b4e48210ddc4330f9e36025",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_epic.yaml",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_epic.yaml#L1-L15",
+        "why": "確認 EPIC 間隔16與另一套 normalization，不把兩資料設定視為等價。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "datamodule/ego4d_dataset.py",
+        "ranges": [
+          [
+            35,
+            62
+          ],
+          [
+            77,
+            171
+          ],
+          [
+            179,
+            239
+          ],
+          [
+            241,
+            290
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 290,
+        "sha256": "5f0fc211cac95a1144f82a8f78081623eb4f2cb27bfa04adf9f98137136340df",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/ego4d_dataset.py",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/ego4d_dataset.py#L35-L62",
+        "why": "追 JSON 標註、五時點遮罩、RGB/flow/3×3矩陣與 pickle bounding boxes 的實際欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "datamodule/lit_ego4d_data_module.py",
+        "ranges": [
+          [
+            33,
+            51
+          ],
+          [
+            53,
+            110
+          ],
+          [
+            128,
+            134
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 134,
+        "sha256": "45248586cbde072f4f88b706ce39670c7caddcc1839495b3d22d0b40a0993e4d",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/lit_ego4d_data_module.py",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/lit_ego4d_data_module.py#L33-L51",
+        "why": "確認 test_type=val 且只實例化 Ego4D 讀取器。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "lit_main.py",
+        "ranges": [
+          [
+            12,
+            38
+          ],
+          [
+            63,
+            76
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 81,
+        "sha256": "c82e3ad3a9ad354c279e47afb8cc483885c9c9b68ad2a3180335518e9d65f3c5",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/lit_main.py",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/lit_main.py#L12-L38",
+        "why": "核對實際預設設定、checkpoint 與 test 呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "models/lit_EMAGTrainer.py",
+        "ranges": [
+          [
+            15,
+            31
+          ],
+          [
+            74,
+            98
+          ],
+          [
+            243,
+            316
+          ],
+          [
+            334,
+            359
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 359,
+        "sha256": "b28727273377f7048c2eca2ec0cfc783129145eb69156c76ef9caaf3cfb58369",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/models/lit_EMAGTrainer.py",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/models/lit_EMAGTrainer.py#L15-L31",
+        "why": "核對輸入契約、四時點 reshape、遮罩及每隻手平均／最終歐氏距離。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "masashi-hatano/EMAG",
+        "requested_repo": "masashi-hatano/EMAG",
+        "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+        "ref": null,
+        "path": "utils/util.py",
+        "ranges": [
+          [
+            4,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 28,
+        "sha256": "959987b7e4ef8021908737b9a5383273f4c8ec3288deed37bb37c79fa73feda7",
+        "url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/utils/util.py",
+        "reading_url": "https://github.com/masashi-hatano/EMAG/blob/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/utils/util.py#L4-L28",
+        "why": "確認從正規化座標回復到來源影格 h/w，並未自行縮到高256。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7b0cf3916faf41ecf12568526b7eeeaf650dddddacb2f029b74ac1db68b32f60"
+  },
+  "repository_binding_review_sha256": "7b0cf3916faf41ecf12568526b7eeeaf650dddddacb2f029b74ac1db68b32f60",
+  "repository_bindings": [
+    {
+      "requested_repo": "masashi-hatano/EMAG",
+      "resolved_repo": "masashi-hatano/EMAG",
+      "aliases_in_this_review": [
+        "masashi-hatano/emag"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+          "reviewed_files": [
+            "README.md",
+            "configs/config_ego4d.yaml",
+            "configs/config_epic.yaml",
+            "datamodule/ego4d_dataset.py",
+            "datamodule/lit_ego4d_data_module.py",
+            "lit_main.py",
+            "models/lit_EMAGTrainer.py",
+            "utils/util.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/masashi-hatano/EMAG",
+          "link_label": "Code",
+          "project_url": "https://masashi-hatano.github.io/EMAG/",
+          "page_sha256": "e77370fcc5c5d3fb183050fee452758a167da1decb39f6b773f5dc5424304048"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P059",
+          "review_file": "content/github_review/reviews/P059.json",
+          "review_sha256": "7b0cf3916faf41ecf12568526b7eeeaf650dddddacb2f029b74ac1db68b32f60",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "masashi-hatano/EMAG"
+  ],
+  "external_repositories": []
+}

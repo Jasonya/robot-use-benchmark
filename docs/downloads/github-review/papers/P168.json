@@ -1,0 +1,401 @@
+{
+  "paper_id": "P168",
+  "name": "HRIBench (perception, 2025)",
+  "title": "HRIBench: Benchmarking Vision-Language Models for Real-Time Human Perception in Human-Robot Interaction",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2506.20566",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "social",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P168",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "2025 HRIBench是人類感知VQA，不是2026同名協作模擬。官方README明列1000題但只公開4/5類；GitHub存模型輸出logs，未包含完整影像題庫與grader。",
+    "environment": "真實HRI影像與其他公開dataset場景；五類是感知評估領域，不是五個獨立物理場景。",
+    "tasks": "Non_Verbal、Ins_Follow、HROI、Social_Nav、Id_Rec各200VQA，共1000為原作聲明；README只宣佈前4類可下載，Id_Rec仍未公開，因此宣佈可取範圍為800題，本次未下載影像題庫。",
+    "data": "每case應有driod.txt(prompt/options)、correct_answer.json、wrong_answers.json與processed_frame.png。GitHub結果按demo_ID保存choices/correct_answer/response/time_taken，另有summary；所讀HROI結果檔201頂層key中200是demo、1是summary，不能算201題。demo_0的choice標籤有重複，匯入須驗證選項順序/唯一性。",
+    "evaluation": "此結果summary預存17/200=0.085 accuracy與0.478秒average time，僅作已公佈log例子，非本次跑分；沒有從response解析到correct的grader實作。各模型latency需要硬體/API/計時範圍一致才可比。",
+    "standardization": {
+      "profile": "human_perception_multiple_choice_vqa",
+      "reuse": "5種題型、原生資料目錄約定、帶time_taken的模型輸出schema。",
+      "transform": "case_id由source+native category+demo_ID組成；原影像/合法person-reference/options與GT分開；result的200demo和模型trial不倍增任務；保留800公開/1000聲明/本次取得影像0三種口徑。",
+      "missing": "Google Drive題庫實際取得、缺第五類、README重複圖片路徑說明釐清、選項ID驗證、response grader與latency協定。"
+    },
+    "version_note": "固定b993469，README指2506.20566及Shi等2025作者；與P147的2607.13056保持不同source，不能靠HRIBench名稱合併。",
+    "runtime_executed": false,
+    "identity_note": "P168: Real-Time Human Perception in HRI (ISER2025)；P147: Interaction-Centric Human-Robot Collaboration (2026)。",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "interaction-lab/HRIBench",
+        "requested_repo": "interaction-lab/HRIBench",
+        "commit": "b993469d3c03c2943a74a3fe178ec33d96afc901",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            40
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 40,
+        "sha256": "6738baa24d933c741a6ff40b87556788018609c24cd205b3a273ec986e2cbfeb",
+        "url": "https://github.com/interaction-lab/HRIBench/blob/b993469d3c03c2943a74a3fe178ec33d96afc901/README.md",
+        "reading_url": "https://github.com/interaction-lab/HRIBench/blob/b993469d3c03c2943a74a3fe178ec33d96afc901/README.md#L1-L40",
+        "why": "精確2506.20566身分、5×200題及公開限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "interaction-lab/HRIBench",
+        "requested_repo": "interaction-lab/HRIBench",
+        "commit": "b993469d3c03c2943a74a3fe178ec33d96afc901",
+        "ref": null,
+        "path": "HROI/answers_of_InternVL2_5-1B.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/demo_0",
+          "/demo_1",
+          "/demo_199",
+          "/summary"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/demo_0",
+            "selected_value_sha256": "2d46bf651d269d6c1682109423d24297f19001e7c4be457c5cf6b5ccf2695768"
+          },
+          {
+            "pointer": "/demo_1",
+            "selected_value_sha256": "d0d6ad94417617d1e9b863f5dccc5a8b578bbbcd6361d2b5cb996f278de8c0a9"
+          },
+          {
+            "pointer": "/demo_199",
+            "selected_value_sha256": "8e934df85e18e3de0b9d46712b9c16273b6309ee24946cd9e00212380d2261b0"
+          },
+          {
+            "pointer": "/summary",
+            "selected_value_sha256": "dba5bc24f66d8745bbeba9c6faf0f5e759fd1a650b05be4d6a2b0cf463d3cccf"
+          }
+        ],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 7203,
+        "sha256": "9125decc3a085c56fe0936b1cb2cb118513a703e5ad6115bac5f2dd1d49e55ca",
+        "url": "https://github.com/interaction-lab/HRIBench/blob/b993469d3c03c2943a74a3fe178ec33d96afc901/HROI/answers_of_InternVL2_5-1B.json",
+        "reading_url": "https://github.com/interaction-lab/HRIBench/blob/b993469d3c03c2943a74a3fe178ec33d96afc901/HROI/answers_of_InternVL2_5-1B.json",
+        "why": "原始結果中3個demo及summary；未逐條人工核讀整份結果",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "1209bbf357536d0137e5416e68f9564cd12c52212d853fa959befa7a598a2a2f"
+  },
+  "repository_binding_review_sha256": "1209bbf357536d0137e5416e68f9564cd12c52212d853fa959befa7a598a2a2f",
+  "repository_bindings": [
+    {
+      "requested_repo": "interaction-lab/HRIBench",
+      "resolved_repo": "interaction-lab/HRIBench",
+      "aliases_in_this_review": [
+        "interaction-lab/hribench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b993469d3c03c2943a74a3fe178ec33d96afc901",
+          "reviewed_files": [
+            "HROI/answers_of_InternVL2_5-1B.json",
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/interaction-lab/HRIBench",
+          "pdf_page": 1,
+          "pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7",
+          "basis": "pdf_extracted_text"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P168",
+          "review_file": "content/github_review/reviews/P168.json",
+          "review_sha256": "1209bbf357536d0137e5416e68f9564cd12c52212d853fa959befa7a598a2a2f",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "社交與溝通",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P168",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HRIBench perception（USC2025），arXiv 2506.20566v1。",
+    "scope_read": "5domain來源、1000VQA、非語言線索、自錄/復用與accuracy-latency表。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "domains": [
+      "社交與溝通",
+      "協助、交接與陪伴"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "Kuri/Quori自錄非語言互動＋既有公開資料；5domains是能力群，非5物理環境。",
+    "tasks": "nonverbal、verbal intent、human-robot-object relation、social navigation、person identification五種。",
+    "cases": "每domain200VQA，總1000；overall accuracy/latency排除person identification，因此總體比較用其餘800題範圍。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "感知domains",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "VQA",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 800,
+        "unit": "overall表格對應四domain題範圍",
+        "qualifier": "4×200，identification排除",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "逐題accuracy與latency秒；unsupported/refused identity標N/A，不能填0後和其他模型無條件平均。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "主為VLM zero-shot評測；各domain人類baseline由不同expert完成。",
+    "lineage": "HandMeThat加視覺、CoMaD、MuSoHu、YouTube影片與自錄gestures；不是2026interaction-centric HRIBench。",
+    "related_paper_ids": [
+      "P147"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "Domains來源、表1",
+        "supports": "5/1000、上游、overall排除與latency"
+      }
+    ],
+    "unresolved": [
+      "不同question形式random accuracy不同，不能全統一25%random；上游素材和case IDs未匯入。"
+    ],
+    "reuse": "提供HRI感知與即時性題型；選合宜導航路徑的VQA不等於實體導航執行。",
+    "reviewed_pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7",
+    "reviewed_on": "2026-10-02",
+    "name": "HRIBench (perception, 2025)",
+    "year": 2025,
+    "title": "HRIBench: Benchmarking Vision-Language Models for Real-Time Human Perception in Human-Robot Interaction",
+    "source_url": "https://arxiv.org/abs/2506.20566",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "social",
+      "assistance"
+    ],
+    "review_tags": [
+      "人機協作",
+      "社交與溝通",
+      "室內導航"
+    ],
+    "domain_names": [
+      "社交與溝通",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P168",
+      "domain_ids": [
+        "social",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P168",
+          "domain_ids": [
+            "social"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "nonverbal、verbal intent、human-robot-object relation、social navigation、person identification五種。",
+            "Kuri/Quori自錄非語言互動＋既有公開資料；5domains是能力群，非5物理環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7"
+        },
+        {
+          "paper_id": "P168",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "非語言／語言意圖、人機物關係及社交導航。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7",
+      "previous_domain_ids": [
+        "social"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P168",
+      "name": "HRIBench (perception, 2025)",
+      "expected_title": "HRIBench: Benchmarking Vision-Language Models for Real-Time Human Perception in Human-Robot Interaction",
+      "source_url": "https://arxiv.org/abs/2506.20566",
+      "pdf_url": "https://arxiv.org/pdf/2506.20566",
+      "retrieved_at": "2026-10-02T21:34:34.433539+00:00",
+      "pdf_sha256": "7148bb0244bccd22b8b8050d609fa6304f05059d5224f76470c5b87616428af7",
+      "text_sha256": "81aef82eeb20e974f1ad444a35fb62e988063169dea2725a02ec873141390bec",
+      "pdf_bytes": 4209667,
+      "pages": 10,
+      "text_characters": 28208,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2506.20566v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2506.20566v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "感知domains",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P168:1",
+        "paper_id": "P168",
+        "benchmark": "HRIBench (perception, 2025)",
+        "native_term": "感知domains",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.20566v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.20566v1",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "VQA",
+        "pages": [
+          1,
+          2
+        ],
+        "record_id": "review10:P168:2",
+        "paper_id": "P168",
+        "benchmark": "HRIBench (perception, 2025)",
+        "native_term": "VQA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.20566v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.20566v1",
+            "locator": "PDF pp. 1, 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 800,
+        "unit": "overall表格對應四domain題範圍",
+        "qualifier": "4×200，identification排除",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P168:3",
+        "paper_id": "P168",
+        "benchmark": "HRIBench (perception, 2025)",
+        "native_term": "overall表格對應四domain題範圍",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.20566v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.20566v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "interaction-lab/HRIBench"
+  ],
+  "external_repositories": []
+}

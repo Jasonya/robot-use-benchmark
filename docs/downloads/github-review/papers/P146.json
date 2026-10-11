@@ -1,0 +1,453 @@
+{
+  "paper_id": "P146",
+  "name": "DexH2R",
+  "title": "DexH2R: A Benchmark for Dynamic Dexterous Grasping in Human-to-Robot Handover",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2506.23152",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P146",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "DexH2R提供人到機器人的動態交接資料與抓取/接近策略。所讀DP評測將進入最終抓取插值記為成功，不能直接解讀為真實物件已穩定交接。",
+    "environment": "真實多視角人類交接，Kinect/RealSense/ZCam合計18視角；人類MANO與Shadow Hand qpos、物件mesh/point cloud及逐時刻物件pose。相機數不當作環境數。",
+    "tasks": "動態靈巧抓取、人到機器人的接近與交接；subject/object/sequence形成資料階層，grasp pose preparation和approaching motion是方法/子流程。",
+    "data": "原資料按subject zip；sequence含calibration、mano、obj_pose、qpos和real_obj_pcd。depth原始int16需按文件轉uint16；DP loader又將image/depth除255，需區分原始物理深度與模型輸入。Zarr包含agent_pos/action/final_grasp/traj_index等；先建隨機val_mask後被索引區間覆寫，應保存實際mask_start/end。",
+    "evaluation": "compute_pose_distance最後只回傳平移距離×100(cm)，算出的旋轉差未加入。接近門檻、非零物件變化與最少frame觸發Is_interpolate，dp_success_rate取此旗標。安全率扣除GT穿透基線後判斷是否零穿透；名為max_pener_depth的量在累加後除總frame，不能直接稱最大深度。這是靜態程式判讀，未跑策略。",
+    "standardization": {
+      "profile": "dynamic_human_robot_handover",
+      "reuse": "多相機標定、原生split、物件與手姿態、DP輸入及指標公式。",
+      "transform": "environment綁定拍攝/標定與robot；task描述交接條件；case保留subject/object/sequence與完整初態；將接近、抓取穩定、交接完成分別定義evaluator。",
+      "missing": "資料/mesh資產取得、depth尺度驗證、穿透函數及最末trajectory匯總完整查核、實際穩定抓取/交接checker與重現。"
+    },
+    "version_note": "固定43c5e5c；README仍用wang-youzhuo舊owner和空DiffusionPolicy連結，所讀為4DVLab當前固定版。只核讀列出的DP核心片段，未宣稱CVAE/MotionNet全部核讀。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "4DVLab/DexH2R",
+        "requested_repo": "4DVLab/DexH2R",
+        "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 111,
+        "sha256": "356fff06251c56633f9c08861f5030243063106e4ad1263db359494793f4f706",
+        "url": "https://github.com/4DVLab/DexH2R/blob/43c5e5c948396e9ab4ea2040b445b70e36046459/README.md",
+        "reading_url": "https://github.com/4DVLab/DexH2R/blob/43c5e5c948396e9ab4ea2040b445b70e36046459/README.md#L1-L85",
+        "why": "論文身分、18視角、subject/object/sequence及相機標定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "4DVLab/DexH2R",
+        "requested_repo": "4DVLab/DexH2R",
+        "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+        "ref": null,
+        "path": "DiffusionPolicy/DP/diffusion_policy/dataset/eval_dp_dataset.py",
+        "ranges": [
+          [
+            14,
+            58
+          ],
+          [
+            86,
+            121
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 129,
+        "sha256": "d12598a15e66de84586e81f2f0a30fe152b233e6379aa1a2e77ac5dcb0584c80",
+        "url": "https://github.com/4DVLab/DexH2R/blob/43c5e5c948396e9ab4ea2040b445b70e36046459/DiffusionPolicy/DP/diffusion_policy/dataset/eval_dp_dataset.py",
+        "reading_url": "https://github.com/4DVLab/DexH2R/blob/43c5e5c948396e9ab4ea2040b445b70e36046459/DiffusionPolicy/DP/diffusion_policy/dataset/eval_dp_dataset.py#L14-L58",
+        "why": "Zarr欄位、明確episode切片與RGB/depth預處理",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "4DVLab/DexH2R",
+        "requested_repo": "4DVLab/DexH2R",
+        "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+        "ref": null,
+        "path": "DiffusionPolicy/DP/diffusion_policy/workspace/eval_dp_baseline_workspace.py",
+        "ranges": [
+          [
+            123,
+            129
+          ],
+          [
+            349,
+            377
+          ],
+          [
+            401,
+            423
+          ],
+          [
+            575,
+            607
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 633,
+        "sha256": "b62d4ab56e775d69922a751d1de5c725c7a623f3feb29d338c7ac4437daf762f",
+        "url": "https://github.com/4DVLab/DexH2R/blob/43c5e5c948396e9ab4ea2040b445b70e36046459/DiffusionPolicy/DP/diffusion_policy/workspace/eval_dp_baseline_workspace.py",
+        "reading_url": "https://github.com/4DVLab/DexH2R/blob/43c5e5c948396e9ab4ea2040b445b70e36046459/DiffusionPolicy/DP/diffusion_policy/workspace/eval_dp_baseline_workspace.py#L123-L129",
+        "why": "平移距離、插值觸發、穿透修正與輸出metrics",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a1093d20c872833c803c9af3f801731fea7126b3eb4494d8d911f04d76b34f99"
+  },
+  "repository_binding_review_sha256": "a1093d20c872833c803c9af3f801731fea7126b3eb4494d8d911f04d76b34f99",
+  "repository_bindings": [
+    {
+      "requested_repo": "4DVLab/DexH2R",
+      "resolved_repo": "4DVLab/DexH2R",
+      "aliases_in_this_review": [
+        "4dvlab/dexh2r"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+          "reviewed_files": [
+            "DiffusionPolicy/DP/diffusion_policy/dataset/eval_dp_dataset.py",
+            "DiffusionPolicy/DP/diffusion_policy/workspace/eval_dp_baseline_workspace.py",
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/4DVLab/DexH2R",
+          "link_label": "Code",
+          "project_url": "https://dexh2r.github.io/",
+          "page_sha256": "7a101197b61ee11989189bf14ad466509c5ab81901c84a082b048e1e54b919c5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P146",
+          "review_file": "content/github_review/reviews/P146.json",
+          "review_sha256": "a1093d20c872833c803c9af3f801731fea7126b3eb4494d8d911f04d76b34f99",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P146",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DexH2R，arXiv 2506.23152v3。",
+    "scope_read": "data/rig、handover動態定義、完整split、pose與trajectory指標。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "協助、交接與陪伴"
+    ],
+    "role": "靈巧手操作benchmark",
+    "environment": "UR10e＋ShadowHand固定capture setup，18視角（含2wrist ego），不是18環境。",
+    "tasks": "1核心human→robot handover family；56物件／39人，包含動態接近與終態抓握。",
+    "cases": "4,282trials、456Kframes、79,911成功grasp poses；2,888train／591val／803test trajectories。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "dynamic handover family",
+        "pages": [
+          3,
+          6
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 56,
+        "unit": "objects",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4282,
+        "unit": "handover trials",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 803,
+        "unit": "test trajectories",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 79911,
+        "unit": "successful grasp poses",
+        "pages": [
+          3,
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "grasp succ1/succ6外力穩定、penetration、diversity；approach success、trajectory length、inference frames、safety率。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "test含新object/newsubject、newobject/seensubject、seenobject/newsubject三群；不是803獨立任務語義。",
+    "lineage": "真實teleoperation human-object-robot互動，grasp模型另用DexGraspNet預訓練。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          7
+        ],
+        "locator": "Dataset、表1、§5.1–5.3/表2",
+        "supports": "4282/803/56、視角及metric"
+      }
+    ],
+    "unresolved": [
+      "每test子群細分ID與final pose對母trajectory的多對一關係待manifest。"
+    ],
+    "reuse": "補人機交接、動態手型／接觸安全，區分pose、trajectory及物理handover完成。",
+    "reviewed_pdf_sha256": "c48a1c58f5201ee324223c711cba95a429ea7446bc43e4d59f452e829eda1709",
+    "reviewed_on": "2026-10-02",
+    "name": "DexH2R",
+    "year": 2025,
+    "title": "DexH2R: A Benchmark for Dynamic Dexterous Grasping in Human-to-Robot Handover",
+    "source_url": "https://arxiv.org/abs/2506.23152",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "assistance"
+    ],
+    "review_tags": [
+      "人機協作",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P146",
+      "summary": "核心就是把人手中的物件交給機器人，歸入協助與交接用途。",
+      "evidence": [
+        {
+          "paper_id": "P146",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            3
+          ],
+          "locator": "摘要、Fig.1、handover定義",
+          "observed_tasks": [
+            "human-to-robot handover",
+            "動態接近、接收抓握與姿態對齊"
+          ],
+          "reasoning": "動態抓握是技術，接收人的物品是可歸納的服務用途。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "c48a1c58f5201ee324223c711cba95a429ea7446bc43e4d59f452e829eda1709"
+        }
+      ],
+      "domain_ids": [
+        "assistance"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c48a1c58f5201ee324223c711cba95a429ea7446bc43e4d59f452e829eda1709",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P146",
+      "name": "DexH2R",
+      "expected_title": "DexH2R: A Benchmark for Dynamic Dexterous Grasping in Human-to-Robot Handover",
+      "source_url": "https://arxiv.org/abs/2506.23152",
+      "pdf_url": "https://arxiv.org/pdf/2506.23152",
+      "retrieved_at": "2026-10-02T21:34:28.879266+00:00",
+      "pdf_sha256": "c48a1c58f5201ee324223c711cba95a429ea7446bc43e4d59f452e829eda1709",
+      "text_sha256": "a6c0e1df7fc56fb125381cd32ae63fc018a008a8e971f03f85364cb84dd7b522",
+      "pdf_bytes": 15266202,
+      "pages": 11,
+      "text_characters": 68205,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2506.23152v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2506.23152v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "dynamic handover family",
+        "pages": [
+          3,
+          6
+        ],
+        "record_id": "review10:P146:1",
+        "paper_id": "P146",
+        "benchmark": "DexH2R",
+        "native_term": "dynamic handover family",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.23152v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.23152v3",
+            "locator": "PDF pp. 3, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 56,
+        "unit": "objects",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P146:2",
+        "paper_id": "P146",
+        "benchmark": "DexH2R",
+        "native_term": "objects",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.23152v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.23152v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4282,
+        "unit": "handover trials",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P146:3",
+        "paper_id": "P146",
+        "benchmark": "DexH2R",
+        "native_term": "handover trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.23152v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.23152v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 803,
+        "unit": "test trajectories",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P146:4",
+        "paper_id": "P146",
+        "benchmark": "DexH2R",
+        "native_term": "test trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.23152v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.23152v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 79911,
+        "unit": "successful grasp poses",
+        "pages": [
+          3,
+          7
+        ],
+        "record_id": "review10:P146:5",
+        "paper_id": "P146",
+        "benchmark": "DexH2R",
+        "native_term": "successful grasp poses",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.23152v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.23152v3",
+            "locator": "PDF pp. 3, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "4DVLab/DexH2R"
+  ],
+  "external_repositories": []
+}

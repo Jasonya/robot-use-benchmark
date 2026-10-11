@@ -1,0 +1,84 @@
+{
+  "paper_id": "P097",
+  "summary": "TEACh需要保留game→EDH/TfD instance的關係；兩種題目檢查不同目標。現有CLI有靜態可見的漏題／變數問題，不能下載後直接宣稱可評測。",
+  "reading_order": [
+    {
+      "repo": "alexa/teach",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          95
+        ]
+      ],
+      "why": "精確論文、授權分件與2022資料修訂",
+      "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+    },
+    {
+      "repo": "alexa/teach",
+      "path": "src/teach/meta_data_files/task_definitions/101__toast.json",
+      "ranges": [
+        [
+          1,
+          23
+        ]
+      ],
+      "why": "原生component與可機器檢查的吐司條件",
+      "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+    },
+    {
+      "repo": "alexa/teach",
+      "path": "src/teach/dataset/task_THOR.py",
+      "ranges": [
+        [
+          22,
+          48
+        ],
+        [
+          1057,
+          1197
+        ]
+      ],
+      "why": "任務component/relation與遞迴成功聚合",
+      "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+    },
+    {
+      "repo": "alexa/teach",
+      "path": "src/teach/eval/compute_metrics.py",
+      "ranges": [
+        [
+          1,
+          202
+        ]
+      ],
+      "why": "EDH/TfD差異、初態未滿足條件與PLW/SR聚合",
+      "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+    },
+    {
+      "repo": "alexa/teach",
+      "path": "src/teach/cli/eval.py",
+      "ranges": [
+        [
+          23,
+          130
+        ]
+      ],
+      "why": "預期instance集合、步數/API失敗限制、漏題處理問題",
+      "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+    }
+  ],
+  "environment": "AI2-THOR家務場景，Commander與Driver/Follower不同視角和角色；game可派生多個EDH或TfD片段，不能各自算新屋子。",
+  "tasks": "EDH依對話／操作歷史完成後續指定狀態改變，TfD依完整任務參數檢查終態。task definition有components、數量determiner及relations；Toast要求BreadSliced且isCooked=1。",
+  "data": "game_id、instance_id、driver_actions_future、state_changes、expected_init_goal_conditions_*，輸出game含初／終態objects及custom_object_metadata。dialog acts是後加da_metadata；答案狀態不能當一般模型輸入。",
+  "evaluation": "EDH從state_changes建checker；TfD取原task_id並套task_params。check_episode_progress合成component/relation的成功與條件數。GC分母扣除初態已滿足部分；PLW依future動作長度。cli/eval.py有未定義edh_instance_files紀錄行，且缺輸出題建立error紀錄後未加入traj_stats；需修正並保留原版差異，否則可能阻斷／漏計分母。這是靜態閱讀發現，未執行重現。",
+  "standardization": {
+    "profile": "dialogue_conditioned_household_state_change",
+    "reuse": "game/instance/task參數、角色視角、歷史、state-change和task checker。",
+    "transform": "EDH/TfD各自protocol，case連game父來源與歷史截止；state/reference隔離；evaluator保存初／終條件數、完整預期ID、失敗原因和step/API預算。",
+    "missing": "資料修訂版閉合、原始重播與instance有效性、CLI修正驗證、缺輸出／零分母政策、原生對照跑通。"
+  },
+  "version_note": "2022-12修訂只保留有助主任務的EDH狀態變化，刪無相關變化instances與2個valid_unseen game；不能混用早期paper數字與當前檔案。軟體／影像／其他資料授權分開。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

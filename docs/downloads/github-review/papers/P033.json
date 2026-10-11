@@ -1,0 +1,621 @@
+{
+  "paper_id": "P033",
+  "name": "EgoLife",
+  "title": "EgoLife: Towards Egocentric Life Assistant",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2503.03803",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "leisure",
+    "social"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P033",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoLife、EgoIT、EgoGPT、EgoRAG 是資料／訓練集／模型／方法的不同角色。已核讀 EgoRAG 的 QA schema、記憶查詢、證據與精確選項評分。",
+    "environment": "六位參與者一週的真實生活觀測，包含 Aria、外部相機與 mmWave；本次核心程式處理人物/日期/影片的記憶序列，不代表所有感測 modality 都已進入每道題。",
+    "tasks": "長期記憶、人物／事件／習慣等 QA，以 query_time 和過去證據答四選一。EgoIT-99K 是九個既有 ego 資料的 instruction tuning 混合，不是新增 99K EgoLife 測試題。",
+    "data": "QA 有 ID、query_time 的 DAY/time 字串、type、need_audio/need_name、question、choice_a–d、answer、target_time、keywords、reason。caption DB 以 date/start/end/video_path/text 建記憶片段；parse_query 實際使用 keywords。時間為來源自訂8位編碼，需保留原字串再建立經核驗的時間換算。",
+    "evaluation": "calculate_accuracy 只對已進 answers 的 model_option 與 metadata.answer strip 後精確比較；query_all/main 遇例外 continue，故漏題可能不進分母。get_answer 遇 API 字串 error 會隨機選 A–D；須另列失敗 fallback。主入口 extract_evidence 實際 modality=text，EgoGPT 是可換的 caption/視覺模型，不能把此設定報成每題直接看影片。",
+    "standardization": {
+      "profile": "longitudinal_memory_mcqa",
+      "reuse": "人物／日期／query time、題目與證據 schema、記憶資料庫與四選一評分。",
+      "transform": "case 保留本人、query timestamp、合法 past cutoff、是否提供 keywords，以及 target_time/reason 的 GT 身份。cache/DB 對應 caption model/version、影片範圍與讀取記錄；完整預定題清單與已答題清單並列，漏題、隨機回退、解析失敗分開。",
+      "missing": "尚未下載完整一週影片、EgoIT、建立 DB 或呼叫模型。需核驗每層摘要／retrieval/filter 的時間截止與 evidence 完整性，並固定 keyword 可用條件；不同人物和同時攝影不能直接計成獨立環境。"
+    },
+    "version_note": "主 README 中早期 arXiv-on-hold 等訊息仍保留，身份以實際論文標題／arXiv ID 為準。EgoGPT 文件對其他 EgoSchema/EgoPlan/EgoThink 的結果是外部測試，不算 EgoLife 原生題目。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "EvolvingLMMs-Lab/EgoLife",
+        "requested_repo": "EvolvingLMMs-Lab/EgoLife",
+        "commit": "7a97157908757cc898c26835b718653055ecc5f5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            87
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 87,
+        "sha256": "d3863be08474a3a4bb65f10cf468cf4e27c180a925ce652c5af4922c036c0802",
+        "url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/README.md",
+        "reading_url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/README.md#L1-L87",
+        "why": "EgoLife／EgoGPT／EgoRAG 的角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EvolvingLMMs-Lab/EgoLife",
+        "requested_repo": "EvolvingLMMs-Lab/EgoLife",
+        "commit": "7a97157908757cc898c26835b718653055ecc5f5",
+        "ref": null,
+        "path": "EgoGPT/README.md",
+        "ranges": [
+          [
+            1,
+            62
+          ],
+          [
+            95,
+            146
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 146,
+        "sha256": "5ca068d2fb3ebccb2bc68d6f1c8a9790f3be48a94e035037cf1aedcfaed6a90c",
+        "url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoGPT/README.md",
+        "reading_url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoGPT/README.md#L1-L62",
+        "why": "EgoIT 混合訓練與外部 lmms-eval",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EvolvingLMMs-Lab/EgoLife",
+        "requested_repo": "EvolvingLMMs-Lab/EgoLife",
+        "commit": "7a97157908757cc898c26835b718653055ecc5f5",
+        "ref": null,
+        "path": "EgoRAG/README.md",
+        "ranges": [
+          [
+            1,
+            195
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 195,
+        "sha256": "9a93e7b448f92edcb9c217542df61ba1c95514fc913a9f9dd263ac3cebf4f93e",
+        "url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoRAG/README.md",
+        "reading_url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoRAG/README.md#L1-L195",
+        "why": "QA 與 caption DB schema",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EvolvingLMMs-Lab/EgoLife",
+        "requested_repo": "EvolvingLMMs-Lab/EgoLife",
+        "commit": "7a97157908757cc898c26835b718653055ecc5f5",
+        "ref": null,
+        "path": "EgoRAG/main.py",
+        "ranges": [
+          [
+            1,
+            9
+          ],
+          [
+            15,
+            21
+          ],
+          [
+            33,
+            41
+          ],
+          [
+            67,
+            112
+          ],
+          [
+            115,
+            170
+          ],
+          [
+            173,
+            183
+          ],
+          [
+            218,
+            242
+          ],
+          [
+            247,
+            256
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 265,
+        "sha256": "14aadddbb42a118876a402cca038b1d0591566e8318c94065e816a3d970cd36f",
+        "url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoRAG/main.py",
+        "reading_url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoRAG/main.py#L1-L9",
+        "why": "實際 query/answer/text-evidence 流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EvolvingLMMs-Lab/EgoLife",
+        "requested_repo": "EvolvingLMMs-Lab/EgoLife",
+        "commit": "7a97157908757cc898c26835b718653055ecc5f5",
+        "ref": null,
+        "path": "EgoRAG/egorag/agents/RagAgent.py",
+        "ranges": [
+          [
+            1,
+            117
+          ],
+          [
+            125,
+            134
+          ],
+          [
+            143,
+            157
+          ],
+          [
+            159,
+            178
+          ],
+          [
+            193,
+            199
+          ],
+          [
+            203,
+            212
+          ],
+          [
+            217,
+            223
+          ],
+          [
+            227,
+            235
+          ],
+          [
+            239,
+            245
+          ],
+          [
+            257,
+            269
+          ],
+          [
+            277,
+            372
+          ],
+          [
+            380,
+            447
+          ],
+          [
+            449,
+            481
+          ],
+          [
+            483,
+            518
+          ],
+          [
+            520,
+            543
+          ],
+          [
+            549,
+            615
+          ],
+          [
+            619,
+            625
+          ],
+          [
+            627,
+            665
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 665,
+        "sha256": "3171db120c276e94d471e14b31216bcec94bbd8051d28b515f81fec156409a40",
+        "url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoRAG/egorag/agents/RagAgent.py",
+        "reading_url": "https://github.com/EvolvingLMMs-Lab/EgoLife/blob/7a97157908757cc898c26835b718653055ecc5f5/EgoRAG/egorag/agents/RagAgent.py#L1-L117",
+        "why": "cutoff、keywords、證據、失敗回退及分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c135ba0118360d997ae77e0c8764b5c137c11471f512a4ba8b74788539f05a8b"
+  },
+  "repository_binding_review_sha256": "c135ba0118360d997ae77e0c8764b5c137c11471f512a4ba8b74788539f05a8b",
+  "repository_bindings": [
+    {
+      "requested_repo": "EvolvingLMMs-Lab/EgoLife",
+      "resolved_repo": "EvolvingLMMs-Lab/EgoLife",
+      "aliases_in_this_review": [
+        "evolvinglmms-lab/egolife"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "7a97157908757cc898c26835b718653055ecc5f5",
+          "reviewed_files": [
+            "EgoGPT/README.md",
+            "EgoRAG/README.md",
+            "EgoRAG/egorag/agents/RagAgent.py",
+            "EgoRAG/main.py",
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/EvolvingLMMs-Lab/EgoLife",
+          "link_label": "Code",
+          "project_url": "https://egolife-ai.github.io/",
+          "page_sha256": "abc93bb87757a967d7906d5cabddf6635dda8220116474f8aae22c293ef01b28"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P033",
+          "review_file": "content/github_review/reviews/P033.json",
+          "review_sha256": "c135ba0118360d997ae77e0c8764b5c137c11471f512a4ba8b74788539f05a8b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "休閒與運動",
+    "社交與溝通"
+  ],
+  "source_review": {
+    "paper_id": "P033",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoLife，arXiv 2503.03803v3（2026-02-09）。",
+    "scope_read": "蒐集、QA流程、正式題庫與當版跑分範圍。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "休閒與運動",
+      "社交與溝通"
+    ],
+    "role": "長期記憶與生活助理",
+    "environment": "1個自建EgoHouse、6人共同生活7天；15台外部相機不是15個環境。",
+    "tasks": "5題型：EntityLog、EventRecall、HabitInsight、RelationMap、TaskMaster。",
+    "cases": "約300小時原始／266小時保留影片；正式EgoLifeQA 3,000題（每人500）。本版§5快速實驗只用Jake的500題；EgoIT-99K為訓練資料。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 1,
+        "unit": "EgoHouse",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "QA types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3000,
+        "unit": "正式QA",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "本文快速實驗實評QA",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 266,
+        "unit": "保留影片小時",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "multiple-choice accuracy；依certificate長度、題型、audio／identity設定分析。",
+      "比較captioner時，最終QA由共同GPT-4o回答；這與將GPT當評分judge不同。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "來源為連续一週個人經歷；99K／D1模型訓練與QA證據时间應另外追蹤。",
+    "lineage": "新錄EgoHouse；EgoIT-99K含其他ego來源，不能把訓練集99K稱本benchmark新增test量。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          5
+        ],
+        "locator": "表1–2與§3.5",
+        "supports": "1屋／266h／3,000題"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "§5 Implementation Details",
+        "supports": "實評Jake 500題與共同回答器"
+      }
+    ],
+    "unresolved": [
+      "完整3,000題是否有同設定的發布成績，須另查後續版本。"
+    ],
+    "reuse": "補多日記憶、習慣與人際關係；需要保留個人／共同事件重疊而非把6人同步影片全當獨立時長。",
+    "reviewed_pdf_sha256": "62089719b6879f1f7f10401989959c9a7e0531aa411284d10c9a713f0634c49a",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoLife",
+    "year": 2025,
+    "title": "EgoLife: Towards Egocentric Life Assistant",
+    "source_url": "https://arxiv.org/abs/2503.03803",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "leisure",
+      "social"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "社交與溝通",
+      "休閒活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "休閒與運動",
+      "社交與溝通"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P033",
+      "domain_ids": [
+        "home",
+        "food",
+        "leisure",
+        "social"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P033",
+          "domain_ids": [
+            "home",
+            "food",
+            "leisure",
+            "social"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "5題型：EntityLog、EventRecall、HabitInsight、RelationMap、TaskMaster。",
+            "1個自建EgoHouse、6人共同生活7天；15台外部相機不是15個環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "62089719b6879f1f7f10401989959c9a7e0531aa411284d10c9a713f0634c49a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "62089719b6879f1f7f10401989959c9a7e0531aa411284d10c9a713f0634c49a",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "leisure",
+        "social"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P033",
+      "name": "EgoLife",
+      "expected_title": "EgoLife: Towards Egocentric Life Assistant",
+      "source_url": "https://arxiv.org/abs/2503.03803",
+      "pdf_url": "https://arxiv.org/pdf/2503.03803",
+      "retrieved_at": "2026-10-02T21:33:25.791896+00:00",
+      "pdf_sha256": "62089719b6879f1f7f10401989959c9a7e0531aa411284d10c9a713f0634c49a",
+      "text_sha256": "1ed9d8d36788b335545fa43c8334b849169e13973b2b4715997a652eacf9e1cd",
+      "pdf_bytes": 16379415,
+      "pages": 27,
+      "text_characters": 230561,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2503.03803v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2503.03803v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 1,
+        "unit": "EgoHouse",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P033:1",
+        "paper_id": "P033",
+        "benchmark": "EgoLife",
+        "native_term": "EgoHouse",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.03803v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.03803v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "QA types",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P033:2",
+        "paper_id": "P033",
+        "benchmark": "EgoLife",
+        "native_term": "QA types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.03803v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.03803v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3000,
+        "unit": "正式QA",
+        "pages": [
+          3,
+          5
+        ],
+        "record_id": "review10:P033:3",
+        "paper_id": "P033",
+        "benchmark": "EgoLife",
+        "native_term": "正式QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.03803v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.03803v3",
+            "locator": "PDF pp. 3, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "本文快速實驗實評QA",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P033:4",
+        "paper_id": "P033",
+        "benchmark": "EgoLife",
+        "native_term": "本文快速實驗實評QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.03803v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.03803v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 266,
+        "unit": "保留影片小時",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P033:5",
+        "paper_id": "P033",
+        "benchmark": "EgoLife",
+        "native_term": "保留影片小時",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.03803v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.03803v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "EvolvingLMMs-Lab/EgoLife"
+  ],
+  "external_repositories": []
+}

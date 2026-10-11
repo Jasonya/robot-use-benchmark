@@ -1,0 +1,100 @@
+{
+  "paper_id": "P139",
+  "summary": "R3M主庫提供Ego4D表徵訓練，BC評測在eval分支。已分開固定兩個commit；不能只看其中一份README的coming-soon文句判斷code可得性。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/r3m",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          38
+        ]
+      ],
+      "why": "原作、資料格式與明確eval分支入口",
+      "commit": "b2334e726887fa0206962d7984c69c5fb09cceab"
+    },
+    {
+      "repo": "facebookresearch/r3m",
+      "path": "r3m/utils/data_loaders.py",
+      "ranges": [
+        [
+          30,
+          61
+        ]
+      ],
+      "why": "預先抽frame的Ego4D與manifest讀取",
+      "commit": "b2334e726887fa0206962d7984c69c5fb09cceab"
+    },
+    {
+      "repo": "facebookresearch/r3m",
+      "ref": "eval",
+      "path": "evaluation/README.md",
+      "ranges": [
+        [
+          1,
+          25
+        ]
+      ],
+      "why": "BC評測來源與MetaWorld/RoboHive指定版本",
+      "commit": "600d866675f2b09e493fdad31df7a3c73f8da688"
+    },
+    {
+      "repo": "facebookresearch/r3m",
+      "ref": "eval",
+      "path": "evaluation/r3meval/core/train_loop.py",
+      "ranges": [
+        [
+          97,
+          115
+        ],
+        [
+          141,
+          180
+        ]
+      ],
+      "why": "demo截取、env-specific成功與跨epochmax",
+      "commit": "600d866675f2b09e493fdad31df7a3c73f8da688"
+    },
+    {
+      "repo": "facebookresearch/r3m",
+      "ref": "eval",
+      "path": "evaluation/r3meval/utils/obs_wrappers.py",
+      "ranges": [
+        [
+          120,
+          159
+        ]
+      ],
+      "why": "圖像量程與可選proprio拼接",
+      "commit": "600d866675f2b09e493fdad31df7a3c73f8da688"
+    },
+    {
+      "repo": "facebookresearch/r3m",
+      "ref": "eval",
+      "path": "r3m/models/models_r3m.py",
+      "ranges": [
+        [
+          78,
+          107
+        ]
+      ],
+      "why": "表徵輸入0–255、相似度與learned reward接口",
+      "commit": "600d866675f2b09e493fdad31df7a3c73f8da688"
+    }
+  ],
+  "environment": "下游重用MetaWorld fork、Franka Kitchen、Adroit/RoboHive；人類Ego4D訓練影片和robot環境是不同資料層。",
+  "tasks": "學習通用視覺表示，再用少量示範BC；表徵模型是方法，並未新定義所有下游操作task。",
+  "data": "Ego4D預處理為224×224編號JPG＋manifest.csv（clip路徑、長度、語言配對）。BC讀multiview demo pickle並取前num_demos；encoder接收0–255圖像，wrapper選擇是否拼接proprio，需保留資訊預算。",
+  "evaluation": "Adroit/Kitchen呼叫原env.evaluate_success；MetaWorld fallback取每trajectory最後env_infos.success平均×100；每次eval seed含epoch偏移，另追蹤max_success。最後步成功、跨epoch最佳、原環境成功函式都不能混為單一通用指標。",
+  "standardization": {
+    "profile": "human_video_representation_transfer_reference",
+    "reuse": "Ego4D父來源、表示接口、BC demo/相機/機體資料與eval分支。",
+    "transform": "method與task/case分離；case固定相機/proprio、demo數、encoder輸入量程、seed與checkpoint規則；原benchmark versions另列。",
+    "missing": "Ego4D與downstream素材、MetaWorld fork/RoboHive v0.0.5依賴閉合、固定eval initial states和完整重現。"
+  },
+  "version_note": "主庫b2334e7與eval分支600d866分開。eval分支root README仍說coming soon，但evaluation目錄已有程式；main README明確連此分支。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

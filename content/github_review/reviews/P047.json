@@ -1,0 +1,163 @@
+{
+  "paper_id": "P047",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "AVT是重用EK55/EK100、EGTEA及50Salads的預測方法；README還固定了外部RULSTM commit，必須把模型repo與父資料／評測來源分開。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "README.md",
+      "ranges": [
+        [
+          13,
+          55
+        ],
+        [
+          71,
+          142
+        ]
+      ],
+      "why": "確認精確論文、父資料和指定外部commit。",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "docs/DATASETS.md",
+      "ranges": [
+        [
+          1,
+          20
+        ]
+      ],
+      "why": "核對其他資料集標註來源。",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "datasets/base_video_dataset.py",
+      "ranges": [
+        [
+          23,
+          32
+        ],
+        [
+          38,
+          71
+        ],
+        [
+          73,
+          79
+        ],
+        [
+          82,
+          100
+        ],
+        [
+          106,
+          112
+        ],
+        [
+          116,
+          138
+        ]
+      ],
+      "why": "讀時間窗口、future與discard規則。",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "func/train_eval_ops.py",
+      "ranges": [
+        [
+          10,
+          37
+        ],
+        [
+          51,
+          102
+        ],
+        [
+          113,
+          121
+        ],
+        [
+          129,
+          159
+        ]
+      ],
+      "why": "讀target/logits與分類指標。",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "common/utils.py",
+      "ranges": [
+        [
+          17,
+          44
+        ]
+      ],
+      "why": "核對accuracy分母和多維輸出處理。",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5"
+    }
+  ],
+  "environment": "影片或預取特徵的觀測脈絡，無互動場景定義。",
+  "tasks": "依tau_a提前量及tau_o觀測長度做動作預測，另有未來特徵學習；辨識與預測模式不能混用。",
+  "data": "base_video_dataset保存orig_start/orig_end，轉換出過去窗口和future_i窗口並另記discarded樣本；不同資料根目錄與特徵頻率保留。",
+  "evaluation": "BasicLossAccuracy對各target類型計cross-entropy、top1/top5；common.utils.accuracy會展平時間維。正式EPIC評測另依README固定的RULSTM接口。",
+  "standardization": {
+    "profile": "action_anticipation",
+    "reuse": "時間窗轉換、target字典、標籤空間及原生metric。",
+    "transform": "case分開context、未來reference、tau_a/tau_o和資料版本；future欄位作訓練目標或評分證據，不能自動全部給推論端。",
+    "missing": "素材閉合、外部RULSTM指定版本、discarded分母與共同split核對。"
+  },
+  "version_note": "原作外部RULSTM固定57842b27d6264318be2cb0beb9e2f8c2819ad9bc；不能默認使用其他commit的評測。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "README.md",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+      "sha256": "ba6a3dadccb633120377ec4fc1421e8d6f752b41b8ffe5a926686e907efd4523",
+      "url": "https://raw.githubusercontent.com/facebookresearch/AVT/b082c99a6b3104780237022274db74f5c3124cc5/README.md",
+      "permalink": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/README.md",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__AVT/files/README.md"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "docs/DATASETS.md",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+      "sha256": "f909a9ad7059ef0c5abad39096e715ed7bf9a76e0059be5c96e2737daf4556d5",
+      "url": "https://raw.githubusercontent.com/facebookresearch/AVT/b082c99a6b3104780237022274db74f5c3124cc5/docs/DATASETS.md",
+      "permalink": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/docs/DATASETS.md",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__AVT/files/docs/DATASETS.md"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "datasets/base_video_dataset.py",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+      "sha256": "ef01e5ed3c2d4962f0e0a128d901cd35b3910ef78a77fb11cacee8f4ef983ef1",
+      "url": "https://raw.githubusercontent.com/facebookresearch/AVT/b082c99a6b3104780237022274db74f5c3124cc5/datasets/base_video_dataset.py",
+      "permalink": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/datasets/base_video_dataset.py",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__AVT/files/datasets/base_video_dataset.py"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "func/train_eval_ops.py",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+      "sha256": "fb8ce65aca0afb191058a55388667b1b569cd5ce98fc68b1e20992a138f85de2",
+      "url": "https://raw.githubusercontent.com/facebookresearch/AVT/b082c99a6b3104780237022274db74f5c3124cc5/func/train_eval_ops.py",
+      "permalink": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/func/train_eval_ops.py",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__AVT/files/func/train_eval_ops.py"
+    },
+    {
+      "repo": "facebookresearch/AVT",
+      "path": "common/utils.py",
+      "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+      "sha256": "11afbce7f50fa34018acfab1826e4c13c2f1493a9ba3da9e3df4128321a98561",
+      "url": "https://raw.githubusercontent.com/facebookresearch/AVT/b082c99a6b3104780237022274db74f5c3124cc5/common/utils.py",
+      "permalink": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/common/utils.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/facebookresearch__AVT/common/utils.py"
+    }
+  ]
+}

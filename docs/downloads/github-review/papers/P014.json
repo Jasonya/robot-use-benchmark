@@ -1,0 +1,992 @@
+{
+  "paper_id": "P014",
+  "name": "Ego-Exo4D",
+  "title": "Ego-Exo4D: Understanding Skilled Human Activity from First- and Third-Person Perspectives",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2311.18259",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "care",
+    "transport",
+    "leisure",
+    "music",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P014",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Ego-Exo4D 的主檔案、姿態、步驟與視角關係倉庫分工明確。已核對共享步驟 ID、姿態有效關節／座標以及具體評分；挑戰年份與論文任務清單不能混為一談。",
+    "environment": "同時拍攝第一／第三人稱的熟練活動，檔案舉運動、音樂、舞蹈、腳踏車維修。以 take_uid 連多相機與標註，camera 數不等於環境數，scenario 是活動分類。",
+    "tasks": "步驟辨識／程式理解、穿戴者身體／手部 3D pose、ego-exo 物件 correspondence 等分成子挑戰。taxonomy 的 step_id 僅 scenario 內唯一；跨 scenario 共用步驟以 step_unique_id 表示，不能逐 scenario 直接加總。",
+    "data": "keystep JSON 有 annotations/taxonomy/vocabulary，含 take_uid、scenario、segments 的 start/end_time、step_id、step_unique_id、is_essential。body loader 讀 takes.json、camera_extrinsics、annotation／automatic 與可見旗標，提供 global／aria／當前相機座標選項。hand GT 以 take_uid/frame_number/right或left_hand_3d 及 hand_valid_3d 索引。",
+    "evaluation": "手姿態要求 21×3、將公尺轉毫米，僅有效關節計 MPJPE；PA-MPJPE 使用平移／旋轉／尺度對齊，逐手影格誤差再平均。offset 模式加回 GT wrist，須列成不同條件。細粒度步驟以 ego_segment_name 對齊 label_id，缺預測報錯，計 top-1。correspondence 提供邊界 F 與輪廓中心距離／影像對角線正規化；完整聚合入口尚未驗證。",
+    "standardization": {
+      "profile": "synchronized_multiview_skill_pose",
+      "reuse": "take／步驟全域 ID、階層 taxonomy、姿態有效性旗標和手部 evaluator。",
+      "transform": "環境保持實體場景／take／相機多層關聯；scenario→task 用原生 taxonomy，step_unique_id 保留跨 scenario 共用。姿態與視角關係以獨立 profile 記錄 frame、座標、米／毫米、pseudo/manual、GT wrist 條件與對齊方式。",
+      "missing": "尚未取得多視角影片與校準、執行 pose／keystep evaluator，或完整核讀程式理解／proficiency 的實作。fine_grained/eval_json.py 使用 os.path 卻未 import os，為靜態發現的整合問題；需在 adapter 測試時修正並保留差異。"
+    },
+    "version_note": "已釘選檔案的 challenge 頁為 2026，但 pose 倉庫 README 仍列 2024；不能把當年開放的 2 項挑戰當整個 benchmark 覆蓋量。body loader 排除含 bouldering 名稱的 take 並依相機／標註可用性篩選，應儲存實際納入清單。relation README 的 translation 仍寫 Coming Soon，不能只憑此推定 tree 完全無相關程式。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "EGO4D/Ego-Exo4D-docs",
+        "requested_repo": "EGO4D/Ego-Exo4D-docs",
+        "commit": "aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            35
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 53,
+        "sha256": "3ddba9089afb0518bc6d8e7bc226e612cf3ee4278db9ada8a1cc9dbbdb6ec6f0",
+        "url": "https://github.com/EGO4D/Ego-Exo4D-docs/blob/aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757/README.md",
+        "reading_url": "https://github.com/EGO4D/Ego-Exo4D-docs/blob/aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757/README.md#L1-L35",
+        "why": "官方檔案倉庫身份",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/Ego-Exo4D-docs",
+        "requested_repo": "EGO4D/Ego-Exo4D-docs",
+        "commit": "aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757",
+        "ref": null,
+        "path": "docs/challenge.md",
+        "ranges": [
+          [
+            1,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 114,
+        "sha256": "ccc709a55a13b8a105171ea7b63e605850fa8a8f6ed34f27d0f10352f28640c7",
+        "url": "https://github.com/EGO4D/Ego-Exo4D-docs/blob/aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757/docs/challenge.md",
+        "reading_url": "https://github.com/EGO4D/Ego-Exo4D-docs/blob/aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757/docs/challenge.md#L1-L91",
+        "why": "年份、活動背景與挑戰入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/Ego-Exo4D-docs",
+        "requested_repo": "EGO4D/Ego-Exo4D-docs",
+        "commit": "aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757",
+        "ref": null,
+        "path": "docs/annotations/keystep.md",
+        "ranges": [
+          [
+            1,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 140,
+        "sha256": "13782ef5c0d4bc5d6da99e6aab4d3394bfc15bda0df0f73831d66b2983123c42",
+        "url": "https://github.com/EGO4D/Ego-Exo4D-docs/blob/aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757/docs/annotations/keystep.md",
+        "reading_url": "https://github.com/EGO4D/Ego-Exo4D-docs/blob/aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757/docs/annotations/keystep.md#L1-L92",
+        "why": "scenario-local／global step ID 與欄位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-egopose",
+        "requested_repo": "EGO4D/ego-exo4d-egopose",
+        "commit": "2494c0d192b92784525342df6c6828e3aad04c2e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            20
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 20,
+        "sha256": "9635b49144bdd03e36e6f7925dcec926814905199c02f1b34cdac77fcba4a5a7",
+        "url": "https://github.com/EGO4D/ego-exo4d-egopose/blob/2494c0d192b92784525342df6c6828e3aad04c2e/README.md",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-egopose/blob/2494c0d192b92784525342df6c6828e3aad04c2e/README.md#L1-L20",
+        "why": "身體／手部任務",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-egopose",
+        "requested_repo": "EGO4D/ego-exo4d-egopose",
+        "commit": "2494c0d192b92784525342df6c6828e3aad04c2e",
+        "ref": null,
+        "path": "bodypose/data/dataset_egoexo.py",
+        "ranges": [
+          [
+            27,
+            55
+          ],
+          [
+            58,
+            100
+          ],
+          [
+            108,
+            114
+          ],
+          [
+            117,
+            142
+          ],
+          [
+            145,
+            159
+          ],
+          [
+            166,
+            172
+          ],
+          [
+            182,
+            195
+          ],
+          [
+            198,
+            204
+          ],
+          [
+            206,
+            232
+          ],
+          [
+            239,
+            246
+          ],
+          [
+            250,
+            330
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 331,
+        "sha256": "9cd64ce8c0c5d31d89a0f8449e04680638241da207c6b24aa3601a88abbe2723",
+        "url": "https://github.com/EGO4D/ego-exo4d-egopose/blob/2494c0d192b92784525342df6c6828e3aad04c2e/bodypose/data/dataset_egoexo.py",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-egopose/blob/2494c0d192b92784525342df6c6828e3aad04c2e/bodypose/data/dataset_egoexo.py#L27-L55",
+        "why": "座標、take、pseudo/manual 與資料篩選",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-egopose",
+        "requested_repo": "EGO4D/ego-exo4d-egopose",
+        "commit": "2494c0d192b92784525342df6c6828e3aad04c2e",
+        "ref": null,
+        "path": "handpose/evaluation/evaluate.py",
+        "ranges": [
+          [
+            1,
+            137
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 137,
+        "sha256": "f696301c794277a8663f3492f275e544b93413b0ff15b20f88451065234237f5",
+        "url": "https://github.com/EGO4D/ego-exo4d-egopose/blob/2494c0d192b92784525342df6c6828e3aad04c2e/handpose/evaluation/evaluate.py",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-egopose/blob/2494c0d192b92784525342df6c6828e3aad04c2e/handpose/evaluation/evaluate.py#L1-L137",
+        "why": "有效關節、單位及 MPJPE／PA-MPJPE",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-keystep",
+        "requested_repo": "EGO4D/ego-exo4d-keystep",
+        "commit": "3ceee681f5fb097765093b583a4ee3a757197151",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            9
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 9,
+        "sha256": "dfe0eadb28e9d1b7daf7fe55f3eea04a2a5ab8694c0eb84e2f01c82a30dfe0fc",
+        "url": "https://github.com/EGO4D/ego-exo4d-keystep/blob/3ceee681f5fb097765093b583a4ee3a757197151/README.md",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-keystep/blob/3ceee681f5fb097765093b583a4ee3a757197151/README.md#L1-L9",
+        "why": "兩種步驟任務入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-keystep",
+        "requested_repo": "EGO4D/ego-exo4d-keystep",
+        "commit": "3ceee681f5fb097765093b583a4ee3a757197151",
+        "ref": null,
+        "path": "fine_grained/eval_json.py",
+        "ranges": [
+          [
+            1,
+            42
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 42,
+        "sha256": "1bfa7f2e2554341112022702204d41cc26b8ecc8f02655127dadc926940cefa3",
+        "url": "https://github.com/EGO4D/ego-exo4d-keystep/blob/3ceee681f5fb097765093b583a4ee3a757197151/fine_grained/eval_json.py",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-keystep/blob/3ceee681f5fb097765093b583a4ee3a757197151/fine_grained/eval_json.py#L1-L42",
+        "why": "segment ID 對齊與正確率",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-relation",
+        "requested_repo": "EGO4D/ego-exo4d-relation",
+        "commit": "d6b7443fefb2dddfa731a57ad60d317e80818a63",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            14
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 14,
+        "sha256": "8d9b739789aed8d4249e0d0e09ed4341400defa7e2834985342d5ee71ab5675a",
+        "url": "https://github.com/EGO4D/ego-exo4d-relation/blob/d6b7443fefb2dddfa731a57ad60d317e80818a63/README.md",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-relation/blob/d6b7443fefb2dddfa731a57ad60d317e80818a63/README.md#L1-L14",
+        "why": "關係任務與 translation 檔案狀態",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/ego-exo4d-relation",
+        "requested_repo": "EGO4D/ego-exo4d-relation",
+        "commit": "d6b7443fefb2dddfa731a57ad60d317e80818a63",
+        "ref": null,
+        "path": "correspondence/evaluation/metrics.py",
+        "ranges": [
+          [
+            4,
+            10
+          ],
+          [
+            41,
+            47
+          ],
+          [
+            65,
+            74
+          ],
+          [
+            110,
+            139
+          ],
+          [
+            191,
+            197
+          ],
+          [
+            210,
+            216
+          ],
+          [
+            231,
+            237
+          ],
+          [
+            242,
+            258
+          ],
+          [
+            264,
+            271
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 276,
+        "sha256": "f728510c8f3059f1373af09b7246e50741560345dae94ad7e29dbb67eb1aa2c5",
+        "url": "https://github.com/EGO4D/ego-exo4d-relation/blob/d6b7443fefb2dddfa731a57ad60d317e80818a63/correspondence/evaluation/metrics.py",
+        "reading_url": "https://github.com/EGO4D/ego-exo4d-relation/blob/d6b7443fefb2dddfa731a57ad60d317e80818a63/correspondence/evaluation/metrics.py#L4-L10",
+        "why": "輪廓中心距離與 F 函式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ddc8f1333fd2c03f519cc6fed90a5b33dc6f18e03acd6f7f5ed036405224cfa0"
+  },
+  "repository_binding_review_sha256": "ddc8f1333fd2c03f519cc6fed90a5b33dc6f18e03acd6f7f5ed036405224cfa0",
+  "repository_bindings": [
+    {
+      "requested_repo": "EGO4D/Ego-Exo4D-docs",
+      "resolved_repo": "EGO4D/Ego-Exo4D-docs",
+      "aliases_in_this_review": [
+        "ego4d/ego-exo4d-docs"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "aa763b1cd2d1816bcfcf2d141d5fd5a0bde61757",
+          "reviewed_files": [
+            "README.md",
+            "docs/annotations/keystep.md",
+            "docs/challenge.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "ego-exo4d",
+          "search_receipt_sha256": "5dccb3d5cb2b4545163b90fc28c052b8ffaaf7fecb2c4abf376162251d8e5741",
+          "url": "https://github.com/EGO4D/Ego-Exo4D-docs",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P014",
+          "review_file": "content/github_review/reviews/P014.json",
+          "review_sha256": "ddc8f1333fd2c03f519cc6fed90a5b33dc6f18e03acd6f7f5ed036405224cfa0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/ego-exo4d-egopose",
+      "resolved_repo": "EGO4D/ego-exo4d-egopose",
+      "aliases_in_this_review": [
+        "ego4d/ego-exo4d-egopose"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "2494c0d192b92784525342df6c6828e3aad04c2e",
+          "reviewed_files": [
+            "README.md",
+            "bodypose/data/dataset_egoexo.py",
+            "handpose/evaluation/evaluate.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://docs.ego-exo4d-data.org/challenge/",
+          "page_sha256": "e6e933ea50636e64ae6d162ad14db3c4bf36c8d309b7496943146c7835ad9813",
+          "url": "https://github.com/EGO4D/ego-exo4d-egopose/tree/main/bodypose",
+          "link_label": "[github]"
+        },
+        {
+          "kind": "repository_search_candidate",
+          "query": "ego-exo4d",
+          "search_receipt_sha256": "5dccb3d5cb2b4545163b90fc28c052b8ffaaf7fecb2c4abf376162251d8e5741",
+          "url": "https://github.com/EGO4D/ego-exo4d-egopose",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P014",
+          "review_file": "content/github_review/reviews/P014.json",
+          "review_sha256": "ddc8f1333fd2c03f519cc6fed90a5b33dc6f18e03acd6f7f5ed036405224cfa0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/ego-exo4d-keystep",
+      "resolved_repo": "EGO4D/ego-exo4d-keystep",
+      "aliases_in_this_review": [
+        "ego4d/ego-exo4d-keystep"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "3ceee681f5fb097765093b583a4ee3a757197151",
+          "reviewed_files": [
+            "README.md",
+            "fine_grained/eval_json.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://docs.ego-exo4d-data.org/challenge/",
+          "page_sha256": "e6e933ea50636e64ae6d162ad14db3c4bf36c8d309b7496943146c7835ad9813",
+          "url": "https://github.com/EGO4D/ego-exo4d-keystep/tree/main/procedure_understanding",
+          "link_label": "[github]"
+        },
+        {
+          "kind": "repository_search_candidate",
+          "query": "ego-exo4d",
+          "search_receipt_sha256": "5dccb3d5cb2b4545163b90fc28c052b8ffaaf7fecb2c4abf376162251d8e5741",
+          "url": "https://github.com/EGO4D/ego-exo4d-keystep",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P014",
+          "review_file": "content/github_review/reviews/P014.json",
+          "review_sha256": "ddc8f1333fd2c03f519cc6fed90a5b33dc6f18e03acd6f7f5ed036405224cfa0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/ego-exo4d-relation",
+      "resolved_repo": "EGO4D/ego-exo4d-relation",
+      "aliases_in_this_review": [
+        "ego4d/ego-exo4d-relation"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d6b7443fefb2dddfa731a57ad60d317e80818a63",
+          "reviewed_files": [
+            "README.md",
+            "correspondence/evaluation/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "ego-exo4d",
+          "search_receipt_sha256": "5dccb3d5cb2b4545163b90fc28c052b8ffaaf7fecb2c4abf376162251d8e5741",
+          "url": "https://github.com/EGO4D/ego-exo4d-relation",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P014",
+          "review_file": "content/github_review/reviews/P014.json",
+          "review_sha256": "ddc8f1333fd2c03f519cc6fed90a5b33dc6f18e03acd6f7f5ed036405224cfa0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "個人照護",
+    "交通移動與車輛維修",
+    "休閒與運動",
+    "音樂與表演",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P014",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Ego-Exo4D，arXiv 2311.18259v4；正文指定採2024年3月資料v2。",
+    "scope_read": "資料、8場域、benchmark總表、關係／keystep／procedure／熟練度／pose評分及切分附錄。",
+    "pages_read": [
+      2,
+      4,
+      6,
+      10,
+      19,
+      24,
+      25,
+      28,
+      30,
+      36,
+      38,
+      39,
+      41,
+      42,
+      44,
+      69,
+      73,
+      74
+    ],
+    "domains": [
+      "餐飲與烹飪",
+      "個人照護",
+      "交通移動與車輛維修",
+      "休閒與運動",
+      "音樂與表演",
+      "穿戴互動與動作介面"
+    ],
+    "role": "綜合第一人稱資料與評測",
+    "environment": "123個自然scene、13城市；多台ego／exo相機同步錄同take，視角不增加場景或活動次數。",
+    "tasks": "8原生domains、43活動、689 keysteps為整體概述；keystep標註子集17活動／664標籤，正式識別過濾後278葉節點。4大benchmark family內含跨視角關係、程序、熟練度、3D姿態等端點。",
+    "cases": "整體1,286小時、5,035 takes（概述）；附錄切分列5,045 takes，須查版本差異。keystep識別130,979視角片段，test 33,001，其中ego 6,373。不能用全部14M自動／人工姿態影格替代題數。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 8,
+        "unit": "原作技能domains",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 123,
+        "unit": "自然錄製scene",
+        "pages": [
+          4,
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 43,
+        "unit": "整體活動",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 278,
+        "unit": "正式keystep識別標籤",
+        "pages": [
+          28,
+          73
+        ]
+      },
+      {
+        "field": "data",
+        "value": 5035,
+        "unit": "概述takes",
+        "pages": [
+          4,
+          10
+        ]
+      },
+      {
+        "field": "case",
+        "value": 33001,
+        "unit": "keystep test視角片段",
+        "pages": [
+          74
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6373,
+        "unit": "keystep test ego片段",
+        "pages": [
+          74
+        ]
+      }
+    ],
+    "evaluation": [
+      "跨視角mask用visibility accuracy／IoU／位置誤差；生成視角另有生成metric。",
+      "keystep recognition top-1 accuracy；程序前置／可選／錯誤／缺步／後續步用calibrated AP。",
+      "熟練程度用top-1；指導／正確執行時刻用L1時間門檻mAP。",
+      "人體用MPJPE、MPJVE；手部用MPJPE及PA-MPJPE；人工GT與自動GT分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "以take及participant保持互斥，衍生片段繼承父take；附錄列3,082 train／842 val／1,121 test。procedure測試graph及標籤不公開。",
+    "lineage": "獨立同步多視角蒐集；同take的多視角和多端點共用來源。本文提醒v1過時，不能混用v1／v2數字。",
+    "evidence": [
+      {
+        "pages": [
+          10,
+          19
+        ],
+        "locator": "圖6、表3",
+        "supports": "原作層級、子集與註記量"
+      },
+      {
+        "pages": [
+          36,
+          39,
+          41,
+          44
+        ],
+        "locator": "各benchmark Metrics",
+        "supports": "不同端點評分"
+      },
+      {
+        "pages": [
+          69,
+          73,
+          74
+        ],
+        "locator": "附錄E、表E6",
+        "supports": "participant切分、278標籤及test量"
+      }
+    ],
+    "unresolved": [
+      "概述5,035与附錄5,045 takes相差10，待manifest核對。",
+      "整体689与keystep子集664不能視為同口徑。"
+    ],
+    "reuse": "可擴展維修、照護、運動、音樂與熟練度；多數為人類技能觀測，轉成robot執行規格須另定機體與成功條件。",
+    "reviewed_pdf_sha256": "15e31586e111eb32fe54131840b7733b095fb3b20bebb14be9610d11967e26a8",
+    "reviewed_on": "2026-10-02",
+    "name": "Ego-Exo4D",
+    "year": 2023,
+    "title": "Ego-Exo4D: Understanding Skilled Human Activity from First- and Third-Person Perspectives",
+    "source_url": "https://arxiv.org/abs/2311.18259",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "food",
+      "care",
+      "transport",
+      "leisure",
+      "music",
+      "wearable"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "交通工具與維修",
+      "照護與個人活動",
+      "運動與身體技能",
+      "音樂與表演"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "個人照護",
+      "交通移動與車輛維修",
+      "休閒與運動",
+      "音樂與表演",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P014",
+      "domain_ids": [
+        "food",
+        "care",
+        "transport",
+        "leisure",
+        "music",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P014",
+          "domain_ids": [
+            "food",
+            "care",
+            "transport",
+            "leisure",
+            "music"
+          ],
+          "pages": [
+            2,
+            4,
+            6,
+            10,
+            19,
+            24,
+            25,
+            28,
+            30,
+            36,
+            38,
+            39,
+            41,
+            42,
+            44,
+            69,
+            73,
+            74
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "8原生domains、43活動、689 keysteps為整體概述；keystep標註子集17活動／664標籤，正式識別過濾後278葉節點。4大benchmark family內含跨視角關係、程序、熟練度、3D姿態等端點。",
+            "123個自然scene、13城市；多台ego／exo相機同步錄同take，視角不增加場景或活動次數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "15e31586e111eb32fe54131840b7733b095fb3b20bebb14be9610d11967e26a8"
+        },
+        {
+          "paper_id": "P014",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            2,
+            4,
+            6,
+            10,
+            19,
+            24,
+            25,
+            28,
+            30,
+            36,
+            38,
+            39,
+            41,
+            42,
+            44,
+            69,
+            73,
+            74
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "Ego／Exo對應、3D手／身體姿態等動作介面資料。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "15e31586e111eb32fe54131840b7733b095fb3b20bebb14be9610d11967e26a8"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "15e31586e111eb32fe54131840b7733b095fb3b20bebb14be9610d11967e26a8",
+      "previous_domain_ids": [
+        "food",
+        "care",
+        "transport",
+        "leisure",
+        "music"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P014",
+      "name": "Ego-Exo4D",
+      "expected_title": "Ego-Exo4D: Understanding Skilled Human Activity from First- and Third-Person Perspectives",
+      "source_url": "https://arxiv.org/abs/2311.18259",
+      "pdf_url": "https://arxiv.org/pdf/2311.18259",
+      "retrieved_at": "2026-10-02T21:33:08.658141+00:00",
+      "pdf_sha256": "15e31586e111eb32fe54131840b7733b095fb3b20bebb14be9610d11967e26a8",
+      "text_sha256": "2230d1a03235536f2998a7c402a0d3085be4146c90314de4bf0e8e4c49f3abe5",
+      "pdf_bytes": 44082158,
+      "pages": 99,
+      "text_characters": 491391,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2311.18259v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2311.18259v4"
+    },
+    "counts": [
+      {
+        "field": "domain",
+        "value": 8,
+        "unit": "原作技能domains",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P014:1",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "原作技能domains",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 123,
+        "unit": "自然錄製scene",
+        "pages": [
+          4,
+          10
+        ],
+        "record_id": "review10:P014:2",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "自然錄製scene",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 4, 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 43,
+        "unit": "整體活動",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P014:3",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "整體活動",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 278,
+        "unit": "正式keystep識別標籤",
+        "pages": [
+          28,
+          73
+        ],
+        "record_id": "review10:P014:4",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "正式keystep識別標籤",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 28, 73",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 5035,
+        "unit": "概述takes",
+        "pages": [
+          4,
+          10
+        ],
+        "record_id": "review10:P014:5",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "概述takes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 4, 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 33001,
+        "unit": "keystep test視角片段",
+        "pages": [
+          74
+        ],
+        "record_id": "review10:P014:6",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "keystep test視角片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 74",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6373,
+        "unit": "keystep test ego片段",
+        "pages": [
+          74
+        ],
+        "record_id": "review10:P014:7",
+        "paper_id": "P014",
+        "benchmark": "Ego-Exo4D",
+        "native_term": "keystep test ego片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.18259v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.18259v4",
+            "locator": "PDF pp. 74",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "EGO4D/Ego-Exo4D-docs",
+    "EGO4D/ego-exo4d-egopose",
+    "EGO4D/ego-exo4d-keystep",
+    "EGO4D/ego-exo4d-relation"
+  ],
+  "external_repositories": []
+}

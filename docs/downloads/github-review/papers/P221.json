@@ -1,0 +1,435 @@
+{
+  "paper_id": "P221",
+  "name": "STAformer++",
+  "title": "Integrating Affordances and Attention models for Short-Term Object Interaction Anticipation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2602.14837",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "identity_or_version_unresolved",
+  "review": {
+    "paper_id": "P221",
+    "reviewed_on": "2026-10-11",
+    "status": "identity_or_version_unresolved",
+    "summary": "P221精確論文連到作者AFFttention庫，但pinned版本停在2024年；已實讀舊版STA reader與metric，尚無法把它核定為2026 STAformer++的完整實作。入口雖引用DETR，但必要模組不在完整樹中，且新版Swin-T/EgoVideo/DETR配置未對上。",
+    "identity_note": "論文為 Integrating Affordances and Attention models for Short-Term Object Interaction Anticipation，Lorenzo Mur-Labadia等，arXiv:2602.14837v1；P221-discovery保留PDF第1、9頁指向lmur98/AFFttention的超連結。這是2024 AFF-ttention的延伸，作者與repo關聯已確認；未確認的是2026新版方法與公開程式版本的一致性。",
+    "environment": "離線Ego4D STA v1/v2及由EPIC-KITCHENS active-object tracks/action segments衍生的STA影片標註。environment affordance為歷史影片相似場域的noun/verb先驗，並非互動模擬器或新機器人場景。",
+    "tasks": "每query輸出(box,noun,verb,TTC,score)，另利用environment affordance及interaction hotspot調整預測。論文新增STAformer++的Swin-T、EgoVideo、DETR與learned affordance integration，不能只因同一repo有字樣就視為已公開可執行；舊版配置是Dino2D_with_EgoVLP、ROI_HEADS.VERSION=aff。論文EPIC-STA的33,804 train／7,055 val是衍生標註instances，104 noun／51 verb是taxonomy，不是新增robot tasks。",
+    "data": "Ego4D reader依TRAIN/VAL/TEST_LISTS讀info.video_metadata及annotations；每例uid、video_id、frame、objects[*].box/noun_category_id/verb_category_id/time_to_contact。v2配置指向v2資料，但活躍讀取仍用video_id、video_uid行被註解，需明確版本適配。fast clip以frame-arange(N×stride)[::-1]取歷史，負索引夾到0；配置N=16、stride=1，不能未讀metadata就假設FPS。noun+1，非v1 ROI verb+1；writer再減回。AFF檔以v_id/frame尋找AFF_N_top3、AFF_V_top3，找不到用全1先驗。EPIC pkl為eid、video_id、timestamp、objects內平行arrays；合併noun群組、剔除含others的整例及指定verb後重編ID。EPIC框被乘(1920,1080,1920,1080)，影格int(timestamp×30+1)，16張含當前影格、最低1；AFF卻以round(timestamp×30)+2查詢，兩個frame convention不可混同。test分支直接讀val_annotations.pkl，不能列成獨立test split。",
+    "evaluation": "STATask.validation_epoch_end先以uid建dict（重複UID會覆寫），再呼叫OverallMeanAveragePrecision(top_k=5)，輸出8個class-agnostic AP及4個按noun平均的mAP。匹配為+1像素面積IoU>0.5、TTC誤差≤0.25秒及各項noun/verb條件，按score貪婪一對一配GT；每query、每metric忽略前4×GT物件數個FP。recall分母是已加入GT中的相應類別物件數；AP為VOC precision-envelope積分×100，mAP預設僅平均有GT的noun，不按noun-verb joint class平均。需保留程式缺陷：add的空preds={}分支再次判斷len(preds)>0，因而不加入GT；空array字典與真正空字典行為不同，不能宣稱未檢測案例分母已安全處理。Ego4D _load_annotations對無objects例還會造出[0,0,100,100]及零標籤dummy target，不能拿test-unannotated當validation真值。",
+    "standardization": {
+      "profile": "offline_sta_annotations_with_unresolved_method_revision",
+      "reuse": "可重用已核讀的舊版Ego4D/EPIC reader規格、noun/verb offset、affordance sidecar schema與原生AP/mAP定義，標成AFF-ttention 2024 lineage；論文2026方法另存版本關係。",
+      "transform": "保留source→Ego4D/EPIC衍生標註關係；case使用版本+split+uid/eid，區分原annotation、清理後有效case與taxonomy。顯式映射EPIC normalized xyxy→1920×1080像素、timestamp→影格及獨立AFF lookup frame；保留noun合併/剔除表、background offset、FP-budget及AP vs noun-macro mAP。",
+      "missing": "新版STAformer++正確revision與Swin-T/EgoVideo/DETR/learned-affordance完整實作；pinned tree缺少入口匯入的detr_criterion.py、detr_backbone.py、detr_transformer.py、detr_matcher.py及ego4d_sta_hands_still_video.py，DETR_head也未在入口定義。另缺正式annotation/sidecar資產與portable路徑、v1/v2欄位適配、EPIC雙frame偏移核驗及空預測/無GT的計分測例。"
+    },
+    "version_note": "固定commit 1a1253fa2bde09ef1de4894f3bf872c1fbf270de，日期2024-07-15；2026論文§4是明確架構延伸。完整tree未truncated，因此缺失的DETR/hand模組不是快取挑檔漏抓。README要求依StillFast配置，程式仍import stillfast但目錄叫stillfast_code，另有硬編碼本機/省略號路徑；只能主張已讀具體舊版程式段，不能主張新版可重現。",
+    "discovery_evidence": [
+      {
+        "kind": "cached_primary_paper",
+        "url": "https://arxiv.org/pdf/2602.14837",
+        "pdf_sha256": "387d99fe9224b1c1c016c80445c276732b6221b014c11284c728ebd1b3edf597",
+        "local_file": "audit/.cache/fulltext_review/P221/pages.json",
+        "sha256": "f298251e4455874d3fc3fbc2083eec8cbe0e12fac20ffd99db3dae81dd7439b9",
+        "json_pointers": [
+          "/0/text",
+          "/1/text",
+          "/5/text",
+          "/8/text"
+        ],
+        "finding": "讀精確身份、2024→2026延伸、新版DETR/Swin-T/EgoVideo定義、EPIC衍生標註及評測種類。"
+      },
+      {
+        "kind": "cached_pdf_repository_links",
+        "local_file": "audit/.cache/github_review/P221-discovery.json",
+        "sha256": "7ccfb97b948b2b7d78007c89ce85f18b97ecb651997874ebe36e2c8218adbfc4",
+        "finding": "PDF超連結直接確認作者repo，但不保證目前branch含新版實作。",
+        "json_pointers": [
+          "/paper_url",
+          "/pdf_sha256",
+          "/candidates"
+        ]
+      },
+      {
+        "kind": "pinned_repository_revision",
+        "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/manifest.json",
+        "sha256": "469b8fc1e539636c5c438a72264df9d3a302f1ceee13046b13cb5f04a20d3714",
+        "finding": "核對2024-07-15 commit與完整tree狀態。",
+        "json_pointers": [
+          "/resolved_repo",
+          "/commit",
+          "/commit_date",
+          "/tree_truncated"
+        ]
+      },
+      {
+        "kind": "pinned_repository_tree",
+        "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/tree.json",
+        "sha256": "37cf77cd06ef6ee1482a0f5b4e0524a2f486ee00d4ba7ca081b48061e0fc9cbd",
+        "finding": "完整樹不存在入口所需的DETR與hand reader模組；保留版本缺口。",
+        "json_pointers": [
+          "/sha",
+          "/tree",
+          "/truncated"
+        ]
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            3,
+            14
+          ],
+          [
+            25,
+            51
+          ],
+          [
+            55,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "a4c37c474099ed28ecbecdf1d247f2feb9ceee85cb8d06634e25a7d3743cd672",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/README.md",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/README.md#L3-L14",
+        "why": "確認公開庫仍介紹2024 AFF-ttention／STAformer、外部affordance資產及StillFast依存。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/models/stillfast.py",
+        "ranges": [
+          [
+            1,
+            30
+          ],
+          [
+            73,
+            128
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 128,
+        "sha256": "5648a6453b1eaac621281c8b86052ae1a47828345c8323b988a15fa9e3c0a041",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/stillfast.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/stillfast.py#L1-L30",
+        "why": "核對實際FasterRCNN入口、DETR未完成分支及匯入但不在pinned tree的模組。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+        "ranges": [
+          [
+            13,
+            35
+          ],
+          [
+            39,
+            76
+          ],
+          [
+            114,
+            120
+          ],
+          [
+            142,
+            162
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 163,
+        "sha256": "c2003b9a4830b711750a6e6b0b5f4dd438a327cc5e97d20c228e7bfcef12829b",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v2/config.yaml#L13-L35",
+        "why": "確認16影格stride1、v2 taxonomy、ROI aff head與split配置。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/datasets/ego4d_sta_still.py",
+        "ranges": [
+          [
+            22,
+            82
+          ],
+          [
+            102,
+            153
+          ],
+          [
+            232,
+            258
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 258,
+        "sha256": "5228feac241c882a8be10161f01f6f0f3d667305e5b34370e5af535836460afc",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still.py#L22-L82",
+        "why": "讀annotations/videos結構、train清理、video_id/v2差異、dummy GT與類別offset。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/datasets/ego4d_sta_still_video.py",
+        "ranges": [
+          [
+            9,
+            17
+          ],
+          [
+            72,
+            110
+          ],
+          [
+            168,
+            226
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 226,
+        "sha256": "0d43f895e3ed3306cf52db844e36353623e035e18b1a554dc1f3a527f5cf7fb7",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still_video.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still_video.py#L9-L17",
+        "why": "固定歷史frame索引、AFF_N/V_top3 sidecar及輸出targets。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/datasets/ek_55_sta_dataset.py",
+        "ranges": [
+          [
+            79,
+            116
+          ],
+          [
+            138,
+            213
+          ],
+          [
+            224,
+            256
+          ],
+          [
+            260,
+            405
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 480,
+        "sha256": "fdec7c6d54adb00074c75ea16678720b7332f049052b9f82adc4fbc23ef6559e",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ek_55_sta_dataset.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ek_55_sta_dataset.py#L79-L116",
+        "why": "核對EPIC分類合併/剔除、pkl split、30FPS、框乘1920×1080與affordance時間偏移。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/models/faster_rcnn_AFF_sta.py",
+        "ranges": [
+          [
+            209,
+            243
+          ],
+          [
+            364,
+            405
+          ],
+          [
+            423,
+            489
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 584,
+        "sha256": "91635ee2e07c3113c361a55b721a23f8a149eba4aa5ef912acbab1f491b71c98",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn_AFF_sta.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn_AFF_sta.py#L209-L243",
+        "why": "確定已公開的affordance是sidecar prior乘softmax後正規化，並非完整新版learned memory實作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/tasks/sta.py",
+        "ranges": [
+          [
+            44,
+            90
+          ],
+          [
+            94,
+            193
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 194,
+        "sha256": "64eecd82cb5e5ec2837297755819575d01ec829006d7a2a1b66d92d728356c10",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/tasks/sta.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/tasks/sta.py#L44-L90",
+        "why": "核對UID聚合去重、OverallMeanAveragePrecision(top_k=5)及submission offset逆映射。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lmur98/AFFttention",
+        "requested_repo": "lmur98/AFFttention",
+        "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+        "ref": null,
+        "path": "stillfast_code/evaluation/sta_metrics.py",
+        "ranges": [
+          [
+            1,
+            205
+          ],
+          [
+            215,
+            266
+          ],
+          [
+            268,
+            359
+          ],
+          [
+            416,
+            524
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 665,
+        "sha256": "0b797ca8729203c5ebb9d3c7df468c81bcdf4f291c7136cbd54c54c27ec3c794",
+        "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/evaluation/sta_metrics.py",
+        "reading_url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/evaluation/sta_metrics.py#L1-L205",
+        "why": "讀具體matching、FP容忍預算、AP分母、macro noun averaging及空預測處理缺陷。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a578de88d2a852cc8cb2036f543a51a01034f4c4783df58ed57b2cd413f8beb5"
+  },
+  "repository_binding_review_sha256": "a578de88d2a852cc8cb2036f543a51a01034f4c4783df58ed57b2cd413f8beb5",
+  "repository_bindings": [
+    {
+      "requested_repo": "lmur98/AFFttention",
+      "resolved_repo": "lmur98/AFFttention",
+      "aliases_in_this_review": [
+        "lmur98/affttention"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "identity_or_version_unresolved",
+      "versions": [
+        {
+          "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+          "reviewed_files": [
+            "README.md",
+            "stillfast_code/datasets/ego4d_sta_still.py",
+            "stillfast_code/datasets/ego4d_sta_still_video.py",
+            "stillfast_code/datasets/ek_55_sta_dataset.py",
+            "stillfast_code/evaluation/sta_metrics.py",
+            "stillfast_code/models/faster_rcnn_AFF_sta.py",
+            "stillfast_code/models/stillfast.py",
+            "stillfast_code/tasks/sta.py",
+            "stillfast_code/test_dir/Aff_ttention_v2/config.yaml"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/lmur98/AFFttention",
+          "pdf_page": 1,
+          "pdf_sha256": "387d99fe9224b1c1c016c80445c276732b6221b014c11284c728ebd1b3edf597",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/lmur98/AFFttention",
+          "pdf_page": 9,
+          "pdf_sha256": "387d99fe9224b1c1c016c80445c276732b6221b014c11284c728ebd1b3edf597",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P221",
+          "review_file": "content/github_review/reviews/P221.json",
+          "review_sha256": "a578de88d2a852cc8cb2036f543a51a01034f4c4783df58ed57b2cd413f8beb5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "lmur98/AFFttention"
+  ],
+  "external_repositories": []
+}

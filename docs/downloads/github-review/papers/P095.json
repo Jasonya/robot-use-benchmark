@@ -1,0 +1,431 @@
+{
+  "paper_id": "P095",
+  "name": "RxR",
+  "title": "Room-Across-Room: Multilingual Vision-and-Language Navigation with Dense Spatiotemporal Grounding",
+  "year": 2020,
+  "paper_url": "https://arxiv.org/abs/2010.07954",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P095",
+    "summary": "RxR公開多語指令、跟隨示範、視角軌跡與讀取程式；同一Matterport場景、語言改寫、示範和後加合成指令應分開計數。",
+    "environment": "重用Matterport3D scan／全景viewpoint和導航連通圖；與R2R同父資產，不可跨來源直接相加。",
+    "tasks": "英語、印地語、泰盧固語導航與細粒度語言／視覺對齊。guide instruction是題目條件，follower demonstration是人類執行示範；二者非兩套獨立環境。",
+    "data": "gzip JSONL guide含split/instruction_id/annotator_id/language/path_id/scan/path/heading/timed_instruction；少數word無時間欄位。follower有demonstration_id及父instruction_id。NPZ包含pano/time/audio_time、展平16數相機矩陣和mask/features；time為秒，heading為弧度且零朝+y、z向上。",
+    "evaluation": "README定義NE、<3m SR、SPL、DTW/nDTW/sDTW；follower資料已有metrics。已讀倉庫的具體程式是載入／視覺化，不是完整競賽evaluator；RxR與RxR-Habitat兩種執行／提交協定需分別接線，不能以預存人類分數代模型評測。",
+    "standardization": {
+      "profile": "multilingual_navigation_with_temporal_grounding",
+      "reuse": "多語ID、source scan、path、guide-follower關係、秒制詞語／視角對齊與原native metrics。",
+      "transform": "case鍵保留instruction_id；示範另連demonstration_id。environment沿Matterport資產鍵去重；pose/語音時間基準分開。後加marky合成指令與原人類資料另標來源版本。",
+      "missing": "競賽scorer與stop/action預算核對、全量資料／資產取得、時間缺值處理、機器產生指令與原split隔離。"
+    },
+    "version_note": "README含2021修正7個pose檔和2022新增landmarks／100萬合成指令；不可將現有完整下載內容當2020論文原始資料量。倉庫已封存不等於外部資料不可用。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "google-research-datasets/RxR",
+        "requested_repo": "google-research-datasets/RxR",
+        "commit": "d22df5940a0486a42b703cd445937210ce21e9f5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            131
+          ],
+          [
+            133,
+            300
+          ],
+          [
+            315,
+            357
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 357,
+        "sha256": "59623f1dcdc55a11246868ac62df860f00837f63e17565bf098f4bba1a6176f0",
+        "url": "https://github.com/google-research-datasets/RxR/blob/d22df5940a0486a42b703cd445937210ce21e9f5/README.md",
+        "reading_url": "https://github.com/google-research-datasets/RxR/blob/d22df5940a0486a42b703cd445937210ce21e9f5/README.md#L1-L131",
+        "why": "原始資料schema、時空對齊、標準指標和後加資料版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research-datasets/RxR",
+        "requested_repo": "google-research-datasets/RxR",
+        "commit": "d22df5940a0486a42b703cd445937210ce21e9f5",
+        "ref": null,
+        "path": "visualizations/setup.py",
+        "ranges": [
+          [
+            42,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 96,
+        "sha256": "76db25268f377be0318792d484aad6f8f8f8772a6b156ac21cdac0736b3adaa1",
+        "url": "https://github.com/google-research-datasets/RxR/blob/d22df5940a0486a42b703cd445937210ce21e9f5/visualizations/setup.py",
+        "reading_url": "https://github.com/google-research-datasets/RxR/blob/d22df5940a0486a42b703cd445937210ce21e9f5/visualizations/setup.py#L42-L92",
+        "why": "讀取JSONL/NPZ與導航圖、scan到mesh連結",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research-datasets/RxR",
+        "requested_repo": "google-research-datasets/RxR",
+        "commit": "d22df5940a0486a42b703cd445937210ce21e9f5",
+        "ref": null,
+        "path": "marky-mT5/render_landmarks.py",
+        "ranges": [
+          [
+            24,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 86,
+        "sha256": "9606aaf59736afbab5096450e7f8f054b75655cebe4048f088d0336161591ef6",
+        "url": "https://github.com/google-research-datasets/RxR/blob/d22df5940a0486a42b703cd445937210ce21e9f5/marky-mT5/render_landmarks.py",
+        "reading_url": "https://github.com/google-research-datasets/RxR/blob/d22df5940a0486a42b703cd445937210ce21e9f5/marky-mT5/render_landmarks.py#L24-L46",
+        "why": "後加landmark資料讀取與MatterSim相機設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4ede9735f76bc3da0f19db02d605b76689a84b6685a2af307803f137d25877d5"
+  },
+  "repository_binding_review_sha256": "4ede9735f76bc3da0f19db02d605b76689a84b6685a2af307803f137d25877d5",
+  "repository_bindings": [
+    {
+      "requested_repo": "google-research-datasets/RxR",
+      "resolved_repo": "google-research-datasets/RxR",
+      "aliases_in_this_review": [
+        "google-research-datasets/rxr"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d22df5940a0486a42b703cd445937210ce21e9f5",
+          "reviewed_files": [
+            "README.md",
+            "marky-mT5/render_landmarks.py",
+            "visualizations/setup.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/google-research-datasets/RxR",
+          "pdf_page": 2,
+          "pdf_sha256": "8a964d95106ff267f934acf705a6b0be304a193f84745fe0ad55f51133d61bd8",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P095",
+          "review_file": "content/github_review/reviews/P095.json",
+          "review_sha256": "4ede9735f76bc3da0f19db02d605b76689a84b6685a2af307803f137d25877d5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P095",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RxR，arXiv 2010.07954v1。",
+    "scope_read": "path採樣、90scene重用、多語註記、split與path-adherence metrics。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "role": "導航benchmark",
+    "environment": "同Matterport3D90個室內場景；不是比R2R又新增90。",
+    "tasks": "16,522 paths；English/Hindi/Telugu三語，同一path有多語／多描述與guide/follower traces。",
+    "cases": "126,069 instructions；path split11,089train／1,232val-seen／1,517val-unseen／2,684test。這些是path數，不能當同數instruction。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "Matterport3D scenes",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 16522,
+        "unit": "paths",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 126069,
+        "unit": "instructions（全部split）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2684,
+        "unit": "test paths",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "PL、NE、SR、SPL、NDTW、SDTW；原作主重NDTW/SDTW以獎勵遵循指定路徑，與R2R只到終點不同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "沿R2R／Matterport場景split；test-standard/test-challenge隱藏；3語每語約14K paths有交集。",
+    "lineage": "原始scene共用R2R，path另採樣；與R2R多任務訓練的追加資料不能再算新test。",
+    "related_paper_ids": [
+      "P094"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "Path Statistics、表2、Evaluation",
+        "supports": "16,522／126,069、split與NDTW"
+      }
+    ],
+    "unresolved": [
+      "各language及test子split指令ID量需manifest核。"
+    ],
+    "reuse": "證明同導航family可以擴語言與過程規則；規則差異應明確保留。",
+    "reviewed_pdf_sha256": "8a964d95106ff267f934acf705a6b0be304a193f84745fe0ad55f51133d61bd8",
+    "reviewed_on": "2026-10-02",
+    "name": "RxR",
+    "year": 2020,
+    "title": "Room-Across-Room: Multilingual Vision-and-Language Navigation with Dense Spatiotemporal Grounding",
+    "source_url": "https://arxiv.org/abs/2010.07954",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "office"
+    ],
+    "review_tags": [
+      "室內導航",
+      "居家生活",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P095",
+      "domain_ids": [
+        "home",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P095",
+          "domain_ids": [
+            "home",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            9
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "16,522 paths；English/Hindi/Telugu三語，同一path有多語／多描述與guide/follower traces。",
+            "同Matterport3D90個室內場景；不是比R2R又新增90。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "8a964d95106ff267f934acf705a6b0be304a193f84745fe0ad55f51133d61bd8"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "8a964d95106ff267f934acf705a6b0be304a193f84745fe0ad55f51133d61bd8",
+      "previous_domain_ids": [
+        "home",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P095",
+      "name": "RxR",
+      "expected_title": "Room-Across-Room: Multilingual Vision-and-Language Navigation with Dense Spatiotemporal Grounding",
+      "source_url": "https://arxiv.org/abs/2010.07954",
+      "pdf_url": "https://arxiv.org/pdf/2010.07954",
+      "retrieved_at": "2026-10-02T21:34:02.301298+00:00",
+      "pdf_sha256": "8a964d95106ff267f934acf705a6b0be304a193f84745fe0ad55f51133d61bd8",
+      "text_sha256": "7af1d7f7b1da66a01ba96c41ff97f74f46445c4366f1ee14f360bf89da631b10",
+      "pdf_bytes": 5644312,
+      "pages": 21,
+      "text_characters": 103860,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2010.07954v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2010.07954v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "Matterport3D scenes",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P095:1",
+        "paper_id": "P095",
+        "benchmark": "RxR",
+        "native_term": "Matterport3D scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.07954v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.07954v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 16522,
+        "unit": "paths",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P095:2",
+        "paper_id": "P095",
+        "benchmark": "RxR",
+        "native_term": "paths",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.07954v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.07954v1",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 126069,
+        "unit": "instructions（全部split）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P095:3",
+        "paper_id": "P095",
+        "benchmark": "RxR",
+        "native_term": "instructions（全部split）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.07954v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.07954v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2684,
+        "unit": "test paths",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P095:4",
+        "paper_id": "P095",
+        "benchmark": "RxR",
+        "native_term": "test paths",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.07954v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.07954v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "google-research-datasets/RxR"
+  ],
+  "external_repositories": []
+}

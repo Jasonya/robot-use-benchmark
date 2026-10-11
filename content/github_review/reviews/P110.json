@@ -1,0 +1,74 @@
+{
+  "paper_id": "P110",
+  "summary": "AHA公開failure生成及失敗問答評測；Yes/No腳本把正確率稱為F1，LLM fuzzy評分則會略過無有效裁判輸出的題。共同報表需要保留實際公式與分母。",
+  "reading_order": [
+    {
+      "repo": "NVlabs/AHA",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          75
+        ]
+      ],
+      "why": "精確論文與RLBench/FailGen來源",
+      "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa"
+    },
+    {
+      "repo": "NVlabs/AHA",
+      "path": "aha/evaluation/REFLECT_test.json",
+      "ranges": [],
+      "json_pointers": [
+        "/0"
+      ],
+      "why": "選讀一筆id/image/conversations與failure問答樣本",
+      "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa"
+    },
+    {
+      "repo": "NVlabs/AHA",
+      "path": "aha/evaluation/eval_metrics/check_answer_Yes_No.py",
+      "ranges": [
+        [
+          20,
+          55
+        ],
+        [
+          89,
+          123
+        ]
+      ],
+      "why": "字串ID對整數question_id、逗點前答案及實際accuracy公式",
+      "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa"
+    },
+    {
+      "repo": "NVlabs/AHA",
+      "path": "aha/evaluation/eval_metrics/LLM_fuzzy.py",
+      "ranges": [
+        [
+          27,
+          76
+        ],
+        [
+          78,
+          112
+        ]
+      ],
+      "why": "模型裁判提示／版本、0/0.5/1解析與有效樣本平均",
+      "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa"
+    }
+  ],
+  "environment": "RLBench/FailGen產生的機器人失敗片段，另重用REFLECT等test來源；示例是時間格狀拼圖，不是額外可操控場景。",
+  "tasks": "判斷子任務成功與解釋失敗原因；下游恢復應用另有執行protocol，問答分數本身不等於恢復成功。",
+  "data": "GT JSON含字串id、image和human/gpt conversations；Yes/No預測為JSONL整數question_id與text。樣本格圖包含時間順序與未來空白格說明；source video/frame範圍需追回父資料。",
+  "evaluation": "Yes/No程式取逗點前小寫答案，(yes正確+no正確)/indx_num為accuracy而非標準F1；默認indx_num不能當全資料實數。fuzzy用claude-3-haiku-20240307，解析correct/partially/incorrect→1/.5/0，按列序配對且只對有效裁判分數平均；須保存ID、invalid count和裁判回執。",
+  "standardization": {
+    "profile": "robot_failure_multimodal_question_answering",
+    "reuse": "問答schema、父benchmark標記、二元／文字理由分開評測、原parser。",
+    "transform": "case以父影片+子任務+時間窗+prompt建鍵；GT/預測用ID對齊，不僅等長zip。evaluator保存原稱F1與實際accuracy別名、fuzzy模型/提示/解析和完整分母。",
+    "missing": "全量影像和time-window對映、FailGen設定/資料split閉合、裁判一致性與invalid處理、下游物理恢復證據。"
+  },
+  "version_note": "固定ICLR2025公開碼；README依賴PerAct RLBench並含fork更新，不將其視為與所有RLBench版本相同。只核對生成來源及評分核心，未生成資料或呼叫裁判。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

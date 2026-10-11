@@ -1,0 +1,62 @@
+{
+  "paper_id": "P031",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoPlan-Bench2 比第一版加入明確 domain/scenario 欄位並擴充人類生活用途；已核讀完整 eval.py，確認其測量仍是影片下一步四選一。",
+  "reading_order": [
+    {
+      "repo": "qiulu66/EgoPlan-Bench2",
+      "path": "README.md",
+      "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+      "ranges": [
+        [
+          1,
+          161
+        ]
+      ],
+      "why": "原生用途分類、欄位及 CoT 方法範圍"
+    },
+    {
+      "repo": "qiulu66/EgoPlan-Bench2",
+      "path": "eval.py",
+      "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+      "ranges": [
+        [
+          1,
+          172
+        ]
+      ],
+      "why": "截片、取樣、字母解析與 accuracy"
+    }
+  ],
+  "environment": "Ego4D v1_288p 影片，原文案 4 major domains／24 scenarios 是生活用途分類，不是 24 個物理 layout。sample_id 的 UUID 字首連到父影片，另有 task_start_frame。",
+  "tasks": "依整段進度及當前觀測推下一動作。四候選與 task_goal 構成題目；CoT／GroundingDINO 是可選方法處理，不能當多一批評測任務。",
+  "data": "sample_id、domain、scenario、task_goal、choice_a–d、golden_choice_idx、answer、task_start_frame、current_observation_frame、task_progress_metadata。eval 從 start 到 current 逐 frame 截影片（含末 frame），或用 linspace 抽預設8張給 image model。",
+  "evaluation": "extract_characters_regex 取回覆第一個大寫 A–D，空字串算錯，再與 golden_choice_idx 比較累積 accuracy；儲存 raw model_response 與 extracted_answer。parser 的部分 prefix 字串因少逗號被相接，且非嚴格字邊界匹配，需儲存此原始版本。",
+  "standardization": {
+    "profile": "video_next_action_mcqa",
+    "reuse": "來源 domain/scenario、完整觀測區間、四候選與推論／解析／分數紀錄。",
+    "transform": "沿用父 Ego4D ancestry，新增 source-local domain/scenario 對映；case 留 sample_id/觀測範圍。image-8frame、video、CoT 分成 evaluator configuration，不把方法條件算成新任務；選項及字串一致性可在 intake 檢查。",
+    "missing": "未取得完整 HF 題庫／影片或執行。需將所有來源 domain/scenario 逐項對映本計畫用途，不能只抄 4/24。輸出採 append 且每次 count 重設，重跑需 session ID 與去重；已存在的視覺快取需繫結 source/sampling hash。"
+  },
+  "version_note": "與 P030 的 EPIC/Ego4D 雙父庫不同，本版檔案只指 Ego4D；題目集合、父影片與候選需核對後才能算淨新增量。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "qiulu66/EgoPlan-Bench2",
+      "path": "README.md",
+      "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+      "sha256": "9007c79d83078a8e5b4419a19d8e6af661cecd73409a8076f9757d5359716644",
+      "url": "https://github.com/qiulu66/EgoPlan-Bench2/blob/5c75ffff73688fc454473cc7a19ad6d09415c5e3/README.md",
+      "local_file": "audit/.cache/github_review/repos/qiulu66__EgoPlan-Bench2/files/README.md"
+    },
+    {
+      "repo": "qiulu66/EgoPlan-Bench2",
+      "path": "eval.py",
+      "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+      "sha256": "c9f069436c672e2240da097289128983252c86fa296e9ec050dfa092be1190b4",
+      "url": "https://github.com/qiulu66/EgoPlan-Bench2/blob/5c75ffff73688fc454473cc7a19ad6d09415c5e3/eval.py",
+      "local_file": "audit/.cache/github_review/repos/qiulu66__EgoPlan-Bench2/files/eval.py"
+    }
+  ]
+}

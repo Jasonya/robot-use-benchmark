@@ -1,0 +1,479 @@
+{
+  "paper_id": "P229",
+  "name": "UniEgoMotion",
+  "title": "UniEgoMotion: A Unified Model for Egocentric Motion Reconstruction, Forecasting, and Generation",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2508.01126",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "leisure",
+    "music",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P229",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "UniEgoMotion 把重建、生成和預測放在同一人體動作框架；它的 EE4D-Motion 是 EgoExo4D 的處理版本。已核對切窗／split、可見資訊 mask、3D 評分與地面接觸代理量，不能把三種設定當成三批獨立原始資料。",
+    "environment": "EgoExo4D 多用途人類活動的 Aria 影片、軌跡與擬合 SMPL-X 身體；沒有新增可執行機器人環境。EE4D-Motion 使用父資料 take／train-val 關係。",
+    "tasks": "原生三種 model task：recon 全觀測重建；gen 僅第一影格可見；fore 可見 window 前 1/4（典型 20/80 幀）。這些是觀測協定差異，不能直接增加三倍獨立情境。",
+    "data": "DATASET.md：原始 4,792 takes、約 208 小時，篩選為 train 2,032／val 560 takes、約 110 小時。segment key 的 start/end 使用 30 Hz 原始 index、含末端；motion 為 10 Hz。dataset 每 20 motion frames 建窗，正式 evaluation 再用每第十個 validation sample。SMPL-X 是擬合結果，需保留失敗／遮蔽篩選及父 take ID。",
+    "evaluation": "評分含全身／body 前 22 joints／hand 25:55 的 MPJPE 與 PA-MPJPE、head／trajectory 誤差、足滑、穿地、騰空與接地距離。rotation error 是 R差的 Frobenius norm，非角度。接觸指標各有 4 cm／8 cm 等閾值；足滑按序列長度歸一且乘 1000，不是成功率。compute_3d_metrics 遍歷 GT key，評整段和每 20 幀；pred trajectory=None 時以 GT trajectory 替代，此條件下 trajectory 誤差不能證明模型預測能力。",
+    "standardization": {
+      "profile": "egocentric_body_motion_reconstruction_generation_forecasting",
+      "reuse": "重用 take lineage、SMPL-X／Aria 對照、明確 mask 與 evaluator 各原生欄位。；保留 reconstruction／generation／forecast 的條件差異，不混合 rank。",
+      "transform": "canonical case 固定 take、start/end、30→10 Hz 對照、valid frames、觀測 mask 和 train-only normalization revision。；把 supplied-GT trajectory 與 predicted trajectory 設為不同 evaluation condition；報分時明示。；全段與分段 metrics 分開；若另評純未來區間，新增 evaluator 版本並保留原生成績。",
+      "missing": "未下載受原始資料／SMPL-X 授權約束的完整資產，未跑模型。；語義生成評分與模型內部 diffusion 未在本次列出的 3D reader 範圍內完整審核。"
+    },
+    "version_note": "本次固定官方 commit，三種 task 共用 EE4D-Motion。論文／README 的資料量為來源報告量，不是本案已取得題數；時間窗口和 eval 抽樣不可省略。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "chaitanya100100/UniEgoMotion",
+        "requested_repo": "chaitanya100100/UniEgoMotion",
+        "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            60
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 91,
+        "sha256": "31d2abe436e4d3db589e3db5f21a5ebfc508dc86298d9f52a1c91df796f28eea",
+        "url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/README.md",
+        "reading_url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/README.md#L1-L60",
+        "why": "確認方法、官方 repo 與資料依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chaitanya100100/UniEgoMotion",
+        "requested_repo": "chaitanya100100/UniEgoMotion",
+        "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+        "ref": null,
+        "path": "DATASET.md",
+        "ranges": [
+          [
+            1,
+            56
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 56,
+        "sha256": "455a1982d04adb561531526c28874f4055fdad59272a9f1c39f53fdb9d6e01b4",
+        "url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/DATASET.md",
+        "reading_url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/DATASET.md#L1-L56",
+        "why": "核對父 take、資料篩選、原生 30 Hz index 與 10 Hz motion、validation 抽樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chaitanya100100/UniEgoMotion",
+        "requested_repo": "chaitanya100100/UniEgoMotion",
+        "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+        "ref": null,
+        "path": "dataset/ee4d_motion_dataset.py",
+        "ranges": [
+          [
+            36,
+            91
+          ],
+          [
+            230,
+            250
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 428,
+        "sha256": "16a5b3d9af7f61a26448c05bcebb3f41b2b0b968959b9d66a98c85796487905b",
+        "url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/dataset/ee4d_motion_dataset.py",
+        "reading_url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/dataset/ee4d_motion_dataset.py#L36-L91",
+        "why": "檢查訓練統計來源、20-frame stride、reconstruction／generation／forecast mask。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chaitanya100100/UniEgoMotion",
+        "requested_repo": "chaitanya100100/UniEgoMotion",
+        "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+        "ref": null,
+        "path": "eval/compute_3d_metrics.py",
+        "ranges": [
+          [
+            15,
+            109
+          ],
+          [
+            113,
+            124
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 124,
+        "sha256": "ec38548783257ba6933a8b1176f7e590344f06d26753b53bd7845a72e58a41e4",
+        "url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/eval/compute_3d_metrics.py",
+        "reading_url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/eval/compute_3d_metrics.py#L15-L109",
+        "why": "追蹤 GT key 分母、whole-clip／20-frame segment、缺失 trajectory 的替代。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chaitanya100100/UniEgoMotion",
+        "requested_repo": "chaitanya100100/UniEgoMotion",
+        "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+        "ref": null,
+        "path": "eval/metrics.py",
+        "ranges": [
+          [
+            9,
+            127
+          ],
+          [
+            192,
+            275
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 343,
+        "sha256": "2b3ae0ec2820699bde17552d453bff8e334e975e8061708a13aab8c2939bff0a",
+        "url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/eval/metrics.py",
+        "reading_url": "https://github.com/chaitanya100100/UniEgoMotion/blob/580c92c6d70a91672c4106bab30ca82cdd80f379/eval/metrics.py#L9-L127",
+        "why": "確認 rotation norm、body／hand joint subsets、PA 與 foot／floor 指標的真正計算。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "758053a51f9adac11a109b5e2e7dd7e08519e46827bc82ef3ede24d3531ff4c4"
+  },
+  "repository_binding_review_sha256": "758053a51f9adac11a109b5e2e7dd7e08519e46827bc82ef3ede24d3531ff4c4",
+  "repository_bindings": [
+    {
+      "requested_repo": "chaitanya100100/UniEgoMotion",
+      "resolved_repo": "chaitanya100100/UniEgoMotion",
+      "aliases_in_this_review": [
+        "chaitanya100100/uniegomotion"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+          "reviewed_files": [
+            "DATASET.md",
+            "README.md",
+            "dataset/ee4d_motion_dataset.py",
+            "eval/compute_3d_metrics.py",
+            "eval/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/chaitanya100100/UniEgoMotion",
+          "link_label": "Code & Data",
+          "project_url": "https://chaitanya100100.github.io/UniEgoMotion/",
+          "page_sha256": "835e82d59c5553408b4570f7ff5a236c70dd902f4306c92c0123c07db9d4ba33"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P229",
+          "review_file": "content/github_review/reviews/P229.json",
+          "review_sha256": "758053a51f9adac11a109b5e2e7dd7e08519e46827bc82ef3ede24d3531ff4c4",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "休閒與運動",
+    "音樂與表演",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P229",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "UniEgoMotion: A Unified Model for Egocentric Motion Reconstruction, Forecasting, and Generation；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "餐飲與烹飪",
+      "休閒與運動",
+      "音樂與表演",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EgoExo4D原takes，新增pseudoSMPL-X重建。",
+    "tasks": "reconstruction、forecasting、generation三不同觀測條件；同資料重用。",
+    "cases": "EE4D-Motion110+h；143Ktrain8sclips（每2s抽）、4,400valclips（每20s抽）。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "motion endpoints",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 143000,
+        "unit": "training clips（約數）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4400,
+        "unit": "validation clips",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "MPJPE/PA/handerror、headpose、footcontact/sliding、semantic/FID；不同endpoint分項。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "officialtake-levelsplit；forecast看2s預測6s，generation只看一幀，reconstruction可看全input。",
+    "lineage": "EgoExo4Dmulti-viewoptimization生成新motionlabels；非110h新獨立capture。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "三端點accuracy/inputs不同，不能用同一個難度或成功率比較；best-ofK需最終protocol固定。"
+    ],
+    "reuse": "補全身與scene-awareforecast，但應防止把reconstruction偷看未來當forecast。",
+    "reviewed_pdf_sha256": "841c3f6b142a703b951a3bbf3b4b85d7ce9d771d5fcebda569b703a3c857baa7",
+    "reviewed_on": "2026-10-02",
+    "name": "UniEgoMotion",
+    "year": 2025,
+    "title": "UniEgoMotion: A Unified Model for Egocentric Motion Reconstruction, Forecasting, and Generation",
+    "source_url": "https://arxiv.org/abs/2508.01126",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "food",
+      "leisure",
+      "music",
+      "wearable"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "運動與身體技能",
+      "音樂與表演"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "休閒與運動",
+      "音樂與表演",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P229",
+      "domain_ids": [
+        "food",
+        "leisure",
+        "music",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P229",
+          "domain_ids": [
+            "food",
+            "leisure",
+            "music"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "reconstruction、forecasting、generation三不同觀測條件；同資料重用。",
+            "EgoExo4D原takes，新增pseudoSMPL-X重建。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "841c3f6b142a703b951a3bbf3b4b85d7ce9d771d5fcebda569b703a3c857baa7"
+        },
+        {
+          "paper_id": "P229",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "第一人稱全身動作重建、預測與生成。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "841c3f6b142a703b951a3bbf3b4b85d7ce9d771d5fcebda569b703a3c857baa7"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "841c3f6b142a703b951a3bbf3b4b85d7ce9d771d5fcebda569b703a3c857baa7",
+      "previous_domain_ids": [
+        "food",
+        "leisure",
+        "music"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P229",
+      "name": "UniEgoMotion",
+      "expected_title": "UniEgoMotion: A Unified Model for Egocentric Motion Reconstruction, Forecasting, and Generation",
+      "source_url": "https://arxiv.org/abs/2508.01126",
+      "pdf_url": "https://arxiv.org/pdf/2508.01126",
+      "retrieved_at": "2026-10-02T22:14:32.696053+00:00",
+      "pdf_sha256": "841c3f6b142a703b951a3bbf3b4b85d7ce9d771d5fcebda569b703a3c857baa7",
+      "text_sha256": "ecbe2f91a936d11b5ee951af9fb336be9bc5574b8d2c32c2bb2563bea44ddf80",
+      "pdf_bytes": 8646311,
+      "pages": 17,
+      "text_characters": 112583,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2508.01126v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2508.01126v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "motion endpoints",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P229:1",
+        "paper_id": "P229",
+        "benchmark": "UniEgoMotion",
+        "native_term": "motion endpoints",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.01126v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.01126v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 143000,
+        "unit": "training clips（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P229:2",
+        "paper_id": "P229",
+        "benchmark": "UniEgoMotion",
+        "native_term": "training clips（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.01126v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.01126v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4400,
+        "unit": "validation clips",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P229:3",
+        "paper_id": "P229",
+        "benchmark": "UniEgoMotion",
+        "native_term": "validation clips",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.01126v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.01126v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "chaitanya100100/UniEgoMotion"
+  ],
+  "external_repositories": []
+}

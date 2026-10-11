@@ -1,0 +1,96 @@
+{
+  "paper_id": "P190",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "UniGarmentManip透過衣物dense correspondence把示範動作轉到新衣物。程式提供3類衣物/3種代表任務的研究框架，但資料配對樣本與實際操控episode須分開。",
+  "reading_order": [
+    {
+      "repo": "luhr2003/UniGarmentManip",
+      "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          43
+        ]
+      ],
+      "why": "原作、3類/3任務及資料/環境/示範模組"
+    },
+    {
+      "repo": "luhr2003/UniGarmentManip",
+      "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+      "path": "train/dataloader/preprocess/pickle2h5.py",
+      "ranges": [
+        [
+          15,
+          42
+        ]
+      ],
+      "why": "原始record→HDF5欄位與輸出檔名"
+    },
+    {
+      "repo": "luhr2003/UniGarmentManip",
+      "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+      "path": "train/dataloader/dataloader.py",
+      "ranges": [
+        [
+          81,
+          109
+        ],
+        [
+          234,
+          255
+        ],
+        [
+          338,
+          366
+        ],
+        [
+          403,
+          407
+        ]
+      ],
+      "why": "mesh/deformation配對、可見性GT與對應點採樣"
+    },
+    {
+      "repo": "luhr2003/UniGarmentManip",
+      "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+      "path": "task/fold/double_from_flat.py",
+      "ranges": [
+        [
+          101,
+          152
+        ],
+        [
+          198,
+          232
+        ]
+      ],
+      "why": "示範/mesh固定、特徵相似點→world pick/place與環境checker"
+    },
+    {
+      "repo": "luhr2003/UniGarmentManip",
+      "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+      "path": "garmentgym/garmentgym/env/bimanual_fold.py",
+      "ranges": [
+        [
+          608,
+          727
+        ]
+      ],
+      "why": "具體funnel/simple摺法的area與語義keypoint距離規則"
+    }
+  ],
+  "environment": "GarmentGym/PyFlex衣物模擬；3種衣物類別、單/雙臂、flat/messy與多步設定屬不同變化維度，不以笛卡兒積當全部已驗證場景。",
+  "tasks": "主要unfolding/fling、folding、hanging；訓練dense correspondence是支援方法，兩point cloud或20對correspondence不是20個robot任務。",
+  "data": "HDF5有points/colors/vertices/visible_vertices/visible_indices、camera_intrisics/camera_extrisics、rgb/depth/faces。reader按mesh與deform層配對，__getitem__交替cross-shape/cross-deform，從visible vertices找20對correspondence。converter將.pkl換成h5漏了點，但reader只找.h5，需核對/修正檔名契約。",
+  "evaluation": "動作從demo點的normalized feature相似度argmax映射到新point cloud，再投影回world控制；fold checker先等穩定，按final/init coverage比例與肩/袖/角點距離判定，各fold type門檻不同。此為幾何啟發式，不直接驗證層拓撲；GT mesh indices只供訓練/判分不能直接作policy觀測。",
+  "standardization": {
+    "profile": "dense_correspondence_for_garment_manipulation",
+    "reuse": "mesh/deformation/visibility配對結構、示範到控制的幾何轉換、已讀兩種fold成功條件。",
+    "transform": "source按garmentUID與deformationID分層，case保存示範序列/目標fold/相機/mesh尺度；將point-correspondence訓練example與robot rollout分別計數。",
+    "missing": "衣物/示範split、檔名和schema一致性、完整hanging/fling與其他fold checker、坐標單位/動作預算與跨衣物重現。"
+  },
+  "version_note": "固定fe15994，CVPR2024原作；本次核讀雙手fold鏈與共用correspondence reader，未聲稱所有支線及實機實驗已重現。",
+  "runtime_executed": false
+}

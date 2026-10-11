@@ -1,0 +1,598 @@
+{
+  "paper_id": "P107",
+  "name": "COLOSSEUM",
+  "title": "THE COLOSSEUM: A Benchmark for Evaluating Generalization for Robotic Manipulation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2402.08191",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P107",
+    "summary": "Colosseum在20個RLBench任務上加入擾動；變體產生、示範seed及RVT評測在不同檔案／倉庫。RVT所稱success rate來自100倍縮放的成功reward。",
+    "environment": "RLBench/PyRep/CoppeliaSim TTM場景；scene載入自定義TTM並在episode／step套變體。原README20任務×14因素不可直接當280獨立場景／新語義任務。",
+    "tasks": "源任務＋物件/桌面/背景/相機/光照/物理參數等擾動。例CloseBox只有1原生task variation、4句說明，成功登記JointCondition(box_joint,2.6)，依固定RLBench版本判。",
+    "data": "factor含variation/name/enabled/targets及參數；demo保存NumPy random state，可依指定demo index恢復。正式示範在外部tar，未取得，例項必須帶variant配置與資產版本。",
+    "evaluation": "官方連結RVT runner以指定demo初態評測，例預設25episodes和25控制步，使用規劃式末端姿態＋離散gripper。wrapper將原task reward>=1的成功縮放100；IK/path/invalid-action錯誤給0並終止。CSV success rate取eval_envs/return，需保留0–100尺度與實際完成／缺題數。",
+    "standardization": {
+      "profile": "manipulation_generalization_factors",
+      "reuse": "20task定義、factor schema、TTM/示範seed、原生成功條件與RVT評測入口。",
+      "transform": "task連RLBench父任務，case固定factor值/啟用時間/初態/控制預算；evaluator保存成功布林、100倍報分和錯誤分母，重複來源不增語義任務。",
+      "missing": "RLBench/PyRep/fork精確依賴閉合、所有factor資產與demo取得、YARR聚合環節和同預算原生跑通。"
+    },
+    "version_note": "scene程式用函式參數數量相容upstream/PerAct RLBench；安裝可成功不代表兩版本物理／評分完全一致。RVT repo沿用RVT README，身份由Colosseum官方README明確連結確認。",
+    "additional_repo_proposals": [
+      {
+        "repo": "robot-colosseum/rvt_colosseum",
+        "role": "official_baseline_evaluation",
+        "basis": "primary benchmark README line54 links this repo"
+      }
+    ],
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/robot-colosseum",
+        "requested_repo": "robot-colosseum/robot-colosseum",
+        "commit": "098a910ae1d490524adb49b8d50735b00a1a62de",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            54
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 54,
+        "sha256": "b872882d16168350ba98a1cc828011e056e874667cfcff68bac3720043ddacc0",
+        "url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/README.md",
+        "reading_url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/README.md#L1-L54",
+        "why": "原論文、20任務/14變化因子、原生RVT評測repo",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/robot-colosseum",
+        "requested_repo": "robot-colosseum/robot-colosseum",
+        "commit": "098a910ae1d490524adb49b8d50735b00a1a62de",
+        "ref": null,
+        "path": "colosseum/rlbench/tasks/close_box.py",
+        "ranges": [
+          [
+            1,
+            32
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 32,
+        "sha256": "904b51c5473f2b26fa86464b6083034bb302687618a83c709acc7fcfbb8c2910",
+        "url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/rlbench/tasks/close_box.py",
+        "reading_url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/rlbench/tasks/close_box.py#L1-L32",
+        "why": "具體JointCondition成功predicate和語言變體",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/robot-colosseum",
+        "requested_repo": "robot-colosseum/robot-colosseum",
+        "commit": "098a910ae1d490524adb49b8d50735b00a1a62de",
+        "ref": null,
+        "path": "colosseum/variations/manager.py",
+        "ranges": [
+          [
+            29,
+            104
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 104,
+        "sha256": "b578988079ad4dbd7499dfcb747ed7b55eeb0fac73201db9c32941c7df83a1ca",
+        "url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/variations/manager.py",
+        "reading_url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/variations/manager.py#L29-L104",
+        "why": "factor enable/targets及reset/step時套用",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/robot-colosseum",
+        "requested_repo": "robot-colosseum/robot-colosseum",
+        "commit": "098a910ae1d490524adb49b8d50735b00a1a62de",
+        "ref": null,
+        "path": "colosseum/rlbench/extensions/scene.py",
+        "ranges": [
+          [
+            66,
+            120
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 120,
+        "sha256": "ec581351df5df96251304785d45b2fc82265e7f0a69776f8bb9e8ee5aa18840d",
+        "url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/rlbench/extensions/scene.py",
+        "reading_url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/rlbench/extensions/scene.py#L66-L120",
+        "why": "TTM資產與變體生命週期、RLBench fork相容性",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/robot-colosseum",
+        "requested_repo": "robot-colosseum/robot-colosseum",
+        "commit": "098a910ae1d490524adb49b8d50735b00a1a62de",
+        "ref": null,
+        "path": "colosseum/rlbench/extensions/task_environment.py",
+        "ranges": [
+          [
+            59,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 85,
+        "sha256": "aaff85c47de0810f1d6dddb94615302c47090b92fe4a02ff93bb8fa61c7ec69b",
+        "url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/rlbench/extensions/task_environment.py",
+        "reading_url": "https://github.com/robot-colosseum/robot-colosseum/blob/098a910ae1d490524adb49b8d50735b00a1a62de/colosseum/rlbench/extensions/task_environment.py#L59-L85",
+        "why": "demo NumPy狀態保存與重設",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/rvt_colosseum",
+        "requested_repo": "robot-colosseum/rvt_colosseum",
+        "commit": "3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08",
+        "ref": null,
+        "path": "rvt/eval.py",
+        "ranges": [
+          [
+            194,
+            218
+          ],
+          [
+            295,
+            362
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 579,
+        "sha256": "285075cc2d0354aa9994944b1e5329c82655fab46e85c11829a9bdde0ab0c276",
+        "url": "https://github.com/robot-colosseum/rvt_colosseum/blob/3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08/rvt/eval.py",
+        "reading_url": "https://github.com/robot-colosseum/rvt_colosseum/blob/3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08/rvt/eval.py#L194-L218",
+        "why": "25episodes/25step默認、示範初態及CSV聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robot-colosseum/rvt_colosseum",
+        "requested_repo": "robot-colosseum/rvt_colosseum",
+        "commit": "3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08",
+        "ref": null,
+        "path": "rvt/utils/custom_rlbench_env.py",
+        "ranges": [
+          [
+            219,
+            219
+          ],
+          [
+            328,
+            350
+          ],
+          [
+            377,
+            406
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 454,
+        "sha256": "69934ae0c85070018636ccbd0a4eaf413404298e5611ac77eb1fcce5174a6626",
+        "url": "https://github.com/robot-colosseum/rvt_colosseum/blob/3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08/rvt/utils/custom_rlbench_env.py",
+        "reading_url": "https://github.com/robot-colosseum/rvt_colosseum/blob/3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08/rvt/utils/custom_rlbench_env.py#L219-L219",
+        "why": "reward_scale=100、動作錯誤處理、demo reset與variation",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "68951db730e5ab9f6aeb5f272890ae6294f5c6360d3e1bb710331566b04ba829"
+  },
+  "repository_binding_review_sha256": "68951db730e5ab9f6aeb5f272890ae6294f5c6360d3e1bb710331566b04ba829",
+  "repository_bindings": [
+    {
+      "requested_repo": "robot-colosseum/robot-colosseum",
+      "resolved_repo": "robot-colosseum/robot-colosseum",
+      "aliases_in_this_review": [
+        "robot-colosseum/robot-colosseum"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "098a910ae1d490524adb49b8d50735b00a1a62de",
+          "reviewed_files": [
+            "README.md",
+            "colosseum/rlbench/extensions/scene.py",
+            "colosseum/rlbench/extensions/task_environment.py",
+            "colosseum/rlbench/tasks/close_box.py",
+            "colosseum/variations/manager.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/robot-colosseum/robot-colosseum",
+          "link_label": "Code",
+          "project_url": "https://robot-colosseum.github.io/",
+          "page_sha256": "c46dcddd28a969911ee2c28358d43a90e34ad1d9b5f5f3e3b6111642aa693323"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P107",
+          "review_file": "content/github_review/reviews/P107.json",
+          "review_sha256": "68951db730e5ab9f6aeb5f272890ae6294f5c6360d3e1bb710331566b04ba829",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "robot-colosseum/rvt_colosseum",
+      "resolved_repo": "robot-colosseum/rvt_colosseum",
+      "aliases_in_this_review": [
+        "robot-colosseum/rvt_colosseum"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08",
+          "reviewed_files": [
+            "rvt/eval.py",
+            "rvt/utils/custom_rlbench_env.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P107",
+          "review_sha256": "68951db730e5ab9f6aeb5f272890ae6294f5c6360d3e1bb710331566b04ba829",
+          "proposal": {
+            "repo": "robot-colosseum/rvt_colosseum",
+            "role": "official_baseline_evaluation",
+            "basis": "primary benchmark README line54 links this repo"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P107",
+          "review_file": "content/github_review/reviews/P107.json",
+          "review_sha256": "68951db730e5ab9f6aeb5f272890ae6294f5c6360d3e1bb710331566b04ba829",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P107",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "COLOSSEUM，arXiv 2402.08191v2。",
+    "scope_read": "20task選取、14擾動、適用性、235test sets及real鏡像。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      9,
+      18
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "role": "穩健性與分布外評測",
+    "environment": "RLBench/PyRep場景，外觀、camera、質量與friction擾動；不是20,371獨立房屋。",
+    "tasks": "20基本操作tasks、14perturbation factors；原文20,371 unique task instances為生成配置規模。",
+    "cases": "正式235test sets×25episodes＝5,875episodes／model；train20tasks×100demos＝2,000。real另4task鏡像。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "base tasks",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "perturbation factors",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20371,
+        "unit": "生成task instances",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 5875,
+        "unit": "主protocol eval episodes",
+        "qualifier": "235×25",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "task-averaged success與相對無擾動success drop；不適用某factor的task不進該factor分母。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "train不加擾動但保留RLBench原variation；eval固定variation再隨機pose；主結果1train seed+1eval seed。",
+    "lineage": "RLBench子集擴充，YCB distractors；20×14全笛卡兒積不合法（無receiver／compound shape等限制）。",
+    "related_paper_ids": [
+      "P062"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          7
+        ],
+        "locator": "§III、Challenge、§IV-D",
+        "supports": "20/14/20,371 vs5,875與適用性"
+      }
+    ],
+    "unresolved": [
+      "20,371生成配置與235固定test set之逐ID對應需manifest匯入。"
+    ],
+    "reuse": "強調只有適用且可執行的擾動才計為case；支持擴規則但不能盲乘。",
+    "reviewed_pdf_sha256": "ae71956329278bc299039eaa133876b4b132772081418a26c733c4810169edf2",
+    "reviewed_on": "2026-10-02",
+    "name": "COLOSSEUM",
+    "year": 2024,
+    "title": "THE COLOSSEUM: A Benchmark for Evaluating Generalization for Robotic Manipulation",
+    "source_url": "https://arxiv.org/abs/2402.08191",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P107",
+      "domain_ids": [
+        "home",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P107",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            9,
+            18
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "20基本操作tasks、14perturbation factors；原文20,371 unique task instances為生成配置規模。",
+            "RLBench/PyRep場景，外觀、camera、質量與friction擾動；不是20,371獨立房屋。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "ae71956329278bc299039eaa133876b4b132772081418a26c733c4810169edf2"
+        },
+        {
+          "paper_id": "P107",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            9,
+            18
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "20個基本操作task上的物件／場景擾動。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "ae71956329278bc299039eaa133876b4b132772081418a26c733c4810169edf2"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "ae71956329278bc299039eaa133876b4b132772081418a26c733c4810169edf2",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P107",
+      "name": "COLOSSEUM",
+      "expected_title": "THE COLOSSEUM: A Benchmark for Evaluating Generalization for Robotic Manipulation",
+      "source_url": "https://arxiv.org/abs/2402.08191",
+      "pdf_url": "https://arxiv.org/pdf/2402.08191",
+      "retrieved_at": "2026-10-02T21:34:17.521125+00:00",
+      "pdf_sha256": "ae71956329278bc299039eaa133876b4b132772081418a26c733c4810169edf2",
+      "text_sha256": "530d77620e5443f59057fd74668ec551b73e5beb4b09d4e464126df553bb5af7",
+      "pdf_bytes": 26261797,
+      "pages": 33,
+      "text_characters": 149960,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2402.08191v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2402.08191v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "base tasks",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P107:1",
+        "paper_id": "P107",
+        "benchmark": "COLOSSEUM",
+        "native_term": "base tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2402.08191v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2402.08191v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "perturbation factors",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P107:2",
+        "paper_id": "P107",
+        "benchmark": "COLOSSEUM",
+        "native_term": "perturbation factors",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2402.08191v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2402.08191v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20371,
+        "unit": "生成task instances",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P107:3",
+        "paper_id": "P107",
+        "benchmark": "COLOSSEUM",
+        "native_term": "生成task instances",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2402.08191v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2402.08191v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 5875,
+        "unit": "主protocol eval episodes",
+        "qualifier": "235×25",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P107:4",
+        "paper_id": "P107",
+        "benchmark": "COLOSSEUM",
+        "native_term": "主protocol eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2402.08191v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2402.08191v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "robot-colosseum/robot-colosseum",
+    "robot-colosseum/rvt_colosseum"
+  ],
+  "external_repositories": []
+}

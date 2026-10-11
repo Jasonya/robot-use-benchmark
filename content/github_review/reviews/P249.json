@@ -1,0 +1,114 @@
+{
+  "paper_id": "P249",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoCast 的預設分支與 forecasting 分支是兩個不同版本。已追到預測分支的 loader→test_fcast→report；目前 pred_input=True 路徑會改寫回傳 gt，不能直接把這個快照視為可重現論文 ground-truth 評測。",
+  "reading_order": [
+    {
+      "repo": "BCV-Uniandes/EgoCast",
+      "commit": "1db0c6e185491a189f4bf2ff934c76bd2f565b3f",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          137
+        ]
+      ],
+      "why": "確認父資料、current-frame estimation 與 forecasting 分支的官方指示。"
+    },
+    {
+      "repo": "BCV-Uniandes/EgoCast",
+      "commit": "6ba9eec74fc4bd393a8daa559e4fd559d97a4c9c",
+      "ref": "forecasting",
+      "path": "options/train_egocast_forecasting.json",
+      "ranges": [
+        [
+          1,
+          98
+        ]
+      ],
+      "why": "固定 80-frame history／15 future 與 pred_input 設定。"
+    },
+    {
+      "repo": "BCV-Uniandes/EgoCast",
+      "commit": "6ba9eec74fc4bd393a8daa559e4fd559d97a4c9c",
+      "ref": "forecasting",
+      "path": "options/test_egocast_forecasting.json",
+      "ranges": [
+        [
+          1,
+          96
+        ]
+      ],
+      "why": "對照 test future_frames=30、來源路徑、checkpoint 與 train 設定差異。"
+    },
+    {
+      "repo": "BCV-Uniandes/EgoCast",
+      "commit": "6ba9eec74fc4bd393a8daa559e4fd559d97a4c9c",
+      "ref": "forecasting",
+      "path": "data/dataset_egoexo.py",
+      "ranges": [
+        [
+          361,
+          462
+        ],
+        [
+          568,
+          662
+        ]
+      ],
+      "why": "確認 take 篩選、17 joints、cached prediction 載入及 gt 變數沿用。"
+    },
+    {
+      "repo": "BCV-Uniandes/EgoCast",
+      "commit": "6ba9eec74fc4bd393a8daa559e4fd559d97a4c9c",
+      "ref": "forecasting",
+      "path": "models/model_egocast.py",
+      "ranges": [
+        [
+          182,
+          198
+        ],
+        [
+          406,
+          484
+        ]
+      ],
+      "why": "追到 sample 的 gt、滑窗 forecast、zero-error 分母及速度軸。"
+    },
+    {
+      "repo": "BCV-Uniandes/EgoCast",
+      "commit": "6ba9eec74fc4bd393a8daa559e4fd559d97a4c9c",
+      "ref": "forecasting",
+      "path": "main_train_egocast.py",
+      "ranges": [
+        [
+          234,
+          315
+        ]
+      ],
+      "why": "核對跳過 index 17/62、每 take 等權平均、cm 輸出與實際 test caller。"
+    }
+  ],
+  "environment": "EgoExo4D 與 Aria Digital Twin 的人體姿態預測，沒有新機器人環境。已深入核讀的 forecast 路徑為 EgoExo4D；ADT loader 雖存在，本次未聲稱完整核對其 forecast evaluator。",
+  "tasks": "先估當前全身姿態，再由歷史頭部軌跡與估計姿態預測未來。論文比較 0.5／1／2／3／4／5 秒 horizons；default repo 的姿態估計、forecast branch 的預測與 oracle-GT pose input 必須分條件。",
+  "data": "EgoExo4D take_uid、camera_pose、body annotation、17-joint skeleton、visible flags、time index、cached prediction route。forecast train config window_size=80、future_frames=15，test config 為 30；檔名與 dataroot 中的 fps 字樣不足以證明實際 sampling frequency。test loader 排除 take_name 含 bouldering，且為 prediction input 使用外部 camera 檔絕對路徑。",
+  "evaluation": "test_fcast 滑窗產生多個預測，skeletal MPJPE 乘 visibility 後除 (error!=0) 計數，真正零誤差也被排除；速度沿相鄰窗口軸相減並乘 10，aria 分支乘 30，不能直接視為同一 future-time 速度。外層每 take 等權平均，跳過 enumerated index 17/62。更關鍵的是 pred_input=True 時 skeletons_window 被 cached prediction 覆蓋，且同變數作輸入及回傳 gt，feed_data→test_fcast 沿用；需修復／核實獨立 GT 才能發布結果。論文的跨 horizon AUC 不在本次讀到的 caller 中實作。",
+  "standardization": {
+    "profile": "egocentric_estimation_conditioned_body_pose_forecasting",
+    "reuse": "可重用 current-estimation→forecast 的任務分解、take／frame 對照、17-joint schema；固定兩個 branch commits 與父資料版本。",
+    "transform": "以 task 記錄 forecasting 目標，case 指明 estimated-pose 或 GT-pose 條件、history／horizon／sampling、visibility 和獨立 GT 資產。將 default／forecast revision 分開；修訂 gt、mask、velocity 或 index exclusions 時新增 evaluator version 與原生對照。",
+    "missing": "未下載完整 EgoExo／ADT、cached predictions 或 checkpoint，未執行模型。當前源碼有上述評分鏈缺口與本機路徑依賴，尚不能認為可直接重現 paper horizon curve。"
+  },
+  "version_note": "default commit 1db0c6e 與 forecasting commit 6ba9eec7 各自鎖定。README 的影片下載範例重複 annotation 命令；需依父資料工具取得真正影像。此處只報靜態可查的路徑差異，不聲稱論文結果有誤。",
+  "runtime_executed": false,
+  "discovery_evidence": [
+    {
+      "kind": "paper",
+      "url": "https://arxiv.org/abs/2412.02903",
+      "checked_sections": [
+        "第 2 頁：0.5／1／2／3／4／5 秒 forecast horizons 與 MPJPE curve area。"
+      ]
+    }
+  ]
+}

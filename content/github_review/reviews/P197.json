@@ -1,0 +1,84 @@
+{
+  "paper_id": "P197",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoSim提供真正的身體穿戴相機模擬擴充，核心在SIPCharacter C++，不是AirSim通用的image benchmarker。它產生多相機/IMU/骨架資料，並非robot任務成功評測器。",
+  "reading_order": [
+    {
+      "repo": "eth-siplab/EgoSim",
+      "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "原作、MultiEgoView、最多6socket與IMU/相機設定"
+    },
+    {
+      "repo": "eth-siplab/EgoSim",
+      "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+      "path": "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SimModeSIPCharacter.cpp",
+      "ranges": [
+        [
+          117,
+          154
+        ]
+      ],
+      "why": "settings NED→Unreal spawn變換與avatar建立"
+    },
+    {
+      "repo": "eth-siplab/EgoSim",
+      "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+      "path": "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawn.cpp",
+      "ranges": [
+        [
+          148,
+          162
+        ],
+        [
+          185,
+          205
+        ],
+        [
+          427,
+          492
+        ],
+        [
+          503,
+          520
+        ],
+        [
+          533,
+          550
+        ]
+      ],
+      "why": "camera lag、IMU噪聲配置與實際tick推導"
+    },
+    {
+      "repo": "eth-siplab/EgoSim",
+      "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+      "path": "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawnSimApi.cpp",
+      "ranges": [
+        [
+          18,
+          105
+        ]
+      ],
+      "why": "record欄位、雙時計、6相機/IMU及所有bone world pose"
+    }
+  ],
+  "environment": "Unreal Engine/AirSim的SIPCharacter avatar，可接FBX/SMPL系列動畫與多socket身體攝影機；6camera sockets是同avatar的感測位置，非6個獨立場景。MultiEgoView實拍資料另有下載來源。",
+  "tasks": "身體相機視角、運動/活動資料生成及下游感知研究。avatar動畫和camera placement本身不構成已帶robot goal/scorer的操作task。",
+  "data": "record有VehicleName、相對建立時間TimeStampMs、TimeStampAnimationS、6組相機position/quaternion(xyzw)、IMU acc/velocity及bone世界pose。settings採NED轉換，record直接寫Unreal Actor/Bone位置；位置/加速度單位需驗證，不能看到註解convert to meters就假定已換算。",
+  "evaluation": "本次未確認完整語義下游benchmark scorer，capture FPS不是活動理解成功率。tick依clock_speed和record_interval採樣；camera2角速度噪聲用dist_vel1，camera3所讀角速度噪聲被註解，與六份std設定未完全對稱，需逐sensor記實際生成條件。",
+  "standardization": {
+    "profile": "body_worn_multiview_camera_and_imu_simulation",
+    "reuse": "SIPCharacter生成器、sensor mount/lag設定、完整record字段與雙時計。",
+    "transform": "environment保存UE場景/avatar/animation/插件版本；case保存socket視角、noise與時序/座標轉換，body poses作label時不得作隱式policy輸入；觀測生成與下游任務/判分分層。",
+    "missing": "MultiEgoView原生reader與split、UE資產/animation權利及取得、坐標/時間/IMU統計實測、下游task/scorer與部署驗證。"
+  },
+  "version_note": "固定e48780e；NeurIPS2024作品於2502.18373存檔。只核讀實際EgoSim擴充，未把整個AirSim所有功能當成本文評測範圍。",
+  "runtime_executed": false
+}

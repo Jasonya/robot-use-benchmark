@@ -1,0 +1,216 @@
+{
+  "paper_id": "P244",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "BiAnt的固定論文、Panasonic作者頁與精確arXiv-ID查詢均未提供可確認的方法repo。已核明forward為8段觀測→20段預測，backward為訓練時16→12；測試只做forward，以5組候選的最低edit distance評測。",
+  "identity_note": "Bidirectional Action Sequence Learning for Long-term Action Anticipation with Large Language Models；Yuji Sato（Panasonic Connect）、Yasunori Ishii（Panasonic Holdings）、Takayoshi Yamashita（Chubu University）。固定arXiv:2508.00374v1（2025-08-01）；arXiv comments及Panasonic的Ishii作者頁均列MVA2025／Best Poster Award。同頁其他Panasonic code links、AntGPT基線及名稱相似BiAnt搜尋結果不代表本篇實作。",
+  "reading_order": [],
+  "environment": "Ego4D v2離線人類第一人稱日常活動，例子包含桌面紙板處理與洗衣。沒有可互動的robot環境；automated driving／robotics為動機，不是新增已測試場景。",
+  "tasks": "以過去action segments中的辨識noun／verb標籤預測未來verb–noun序列。訓練同時用[forward]和[backward]提示；原來8個observed加20個future action形成28段窗口，反向訓練取倒序16段作context、餘12段作target。推論只輸入8段已觀測動作作forward預測，backward所用未來標籤屬訓練資料，不能放進測試可見context。",
+  "data": "§3–4將動作形式記為a=(n,v)，Fig.2的實際prompt文字則用verb noun；轉換時須以欄位身份而非tuple位置硬套。母庫詞彙為117 verbs／521 nouns；每segment約240 frames是論文概述，不是固定片長，沒有已核FPS／時間邊界或序列化key。visual encoder與action recognition在本方法LLM訓練時凍結，具體骨幹與reader未能核實，不以AntGPT目前程式補填。LLM為Llama2-7B、參數有效微調、8-bit量化；forward/backward loss權重均1。Table1是Ego4D v2 test；§4另明示task-token ablation使用官方validation中的160樣本，未提供這160筆ID或完整test case數。附錄S1的16是backward context長度，不是推論觀測長度。",
+  "evaluation": "§4報noun／verb／action三種ED，越低越好；K=5生成候選中選最低ED，Z=20為每條預測的action位置數，不是20秒。未核到距離演算法的操作集合／正規化分母、三種指標是否各自挑不同候選、未知標籤／長短輸出處理、候選採樣參數與scorer。Table1的test分數與160-sample validation ablation及附錄S1數字需分開，不能將160當整個benchmark題數，亦不能將best-of-5 ED改叫單次成功率。",
+  "standardization": {
+    "profile": "paper_only_bidirectional_training_forward_action_sequence_forecasting",
+    "reuse": "可保留Ego4D v2依存關係、117/521詞彙規模、8→20 forward／16→12 backward設定、方向提示與K=5 ED協定，以及test和160樣本ablation的區分。沒有可直接重用的已核BiAnt loader或evaluator。",
+    "transform": "source固定arXiv v1並記MVA2025；domain/environment歸人類影片。task將training direction和inference direction分開；case須保留video/clip/segment ID、stopping boundary、verb/noun taxonomy、observed window、20步GT與5條候選。backward pairs僅連train split；evaluator保存ED種類及候選預算，native action index不任意轉成秒或robot控制命令。",
+    "missing": "官方BiAnt repo及commit、28段窗口與反向樣本產生器、GT／辨識label來源和split隔離、prompt/output parser、精確label-ID表、160筆ablation manifest與ED實作。AntGPT是文中採用的baseline，未確認其任何固定commit包含BiAnt改動。"
+  },
+  "version_note": "快取「BiAnt」repository search共有74筆但只返回8筆，這8筆為無關帳號／專案，未聲稱已排除全部74筆。新增精確查詢「\"2508.00374\" in:readme」HTTP200、total_count=0、incomplete_results=false。Panasonic作者頁同篇條目只有arXiv link；arXiv頁無method repo連結。結論為限定查證範圍內尚未確認code，不是不存在證明；本輪小型讀取／查詢均200，未遇rate limit。",
+  "discovery_evidence": [
+    {
+      "provider": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P244/pages.json",
+      "sha256": "39bc61a72024cdc33674d4e0a4bbb49936b0b2d6f5bd7456468ce963911fd69d",
+      "json_pointers": [
+        "/0/text",
+        "/1/text",
+        "/2/text",
+        "/3/text",
+        "/6/text",
+        "/7/text"
+      ],
+      "finding": "核讀身份、§3訓練及推論、Fig.2提示、§4的Ego4D v2/K=5/160-sample設定，以及附錄S1的backward窗口與loss權重。",
+      "url": "https://arxiv.org/pdf/2508.00374",
+      "version": "arXiv:2508.00374v1",
+      "page_ranges": [
+        [
+          1,
+          4
+        ],
+        [
+          7,
+          8
+        ]
+      ],
+      "pages_read": [
+        1,
+        2,
+        3,
+        4,
+        7,
+        8
+      ],
+      "page_line_ranges": [
+        {
+          "page": 1,
+          "ranges": [
+            [
+              1,
+              58
+            ]
+          ]
+        },
+        {
+          "page": 2,
+          "ranges": [
+            [
+              1,
+              69
+            ]
+          ]
+        },
+        {
+          "page": 3,
+          "ranges": [
+            [
+              1,
+              81
+            ]
+          ]
+        },
+        {
+          "page": 4,
+          "ranges": [
+            [
+              1,
+              68
+            ]
+          ]
+        },
+        {
+          "page": 7,
+          "ranges": [
+            [
+              1,
+              57
+            ]
+          ]
+        },
+        {
+          "page": 8,
+          "ranges": [
+            [
+              1,
+              46
+            ]
+          ]
+        }
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P244/paper.pdf",
+      "pdf_sha256": "cb0774d546574c40eb079703ed538a480546d1ecce688c3ba9907e298d132a6c"
+    },
+    {
+      "provider": "cached_pdf_link_discovery",
+      "local_file": "audit/.cache/github_review/P244-discovery.json",
+      "sha256": "4c49f0a99d73e2438785d416afeb21844bf80adec08af29e9ed34d54308a129f",
+      "json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "核對精確論文、PDF指紋、連結候選與code-availability摘錄；候選本身不等同官方repo。"
+    },
+    {
+      "provider": "cached_project_candidates",
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/243"
+      ],
+      "finding": "本ID的project及repository候選均為空；enriched_projects亦無本ID條目。"
+    },
+    {
+      "provider": "cached_github_repository_search",
+      "local_file": "audit/.cache/github_review/search/P244.json",
+      "sha256": "a0e712d9a913bcf17f9782721fe73778d6462d188fbe70c968101423eb770bc6",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "既有query「BiAnt」total_count=74、快取8筆：biantris/biantris、duanxue/biantwo、biantink32/biantink32、Biantara20032017/Biantara20032017、halimraka/Biantara2026、LaDavidMichael/BiantoFactory、Biant7/Biant7、biantailong/biantailong0013。返回metadata不匹配本篇；沒有核讀其程式或全部74筆。"
+    },
+    {
+      "provider": "bounded_exact_github_repository_search",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P244/exact_id_search.json",
+      "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+      "json_pointers": [
+        "/total_count",
+        "/incomplete_results",
+        "/items"
+      ],
+      "finding": "精確arXiv-ID query返回0筆；只作有限範圍的negative discovery evidence。"
+    },
+    {
+      "provider": "shared_paced_search_receipt",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P244/exact_id_search.json.receipt.json",
+      "sha256": "7325ebcc848adcf7ec6dac16d9113523da15d78c4cb3b9d4bec916c1f931a2fa",
+      "json_pointers": [
+        "/requested_url",
+        "/retrieved_at",
+        "/status",
+        "/sha256"
+      ],
+      "finding": "透過共享network.py的6.5秒GitHub search pacing；HTTP200，未重試。"
+    }
+  ],
+  "additional_repo_proposals": [],
+  "source_files": [
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P244/arxiv_abstract.html",
+      "sha256": "525dbe75835b593bcbf5ed2a74ed27852176313a89d28d9bbbd29fb2e02cfa71",
+      "url": "https://arxiv.org/abs/2508.00374v1",
+      "retrieved_at": "2026-10-10T07:55:56.263162+00:00",
+      "ranges": [
+        [
+          116,
+          171
+        ],
+        [
+          332,
+          375
+        ]
+      ],
+      "source_role": "cached_primary_metadata",
+      "why": "確認精確題名、作者、v1與MVA2025說明；通用Code/Data開關不等於本篇有code。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P244/arxiv_abstract.html.receipt.json",
+      "receipt_sha256": "500613baac2ec312e36226e1ad0d3fcf9c2138ba5f2e106e89b3398873104be7"
+    },
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P244/author_institution.html",
+      "sha256": "bbfa6f6e9cf8040c31edc461c9c40d8503e500e5ce6f2ee1d7f024e9ce464212",
+      "url": "https://tech-ai.panasonic.com/en/researcher_introduction/003/",
+      "retrieved_at": "2026-10-11T02:54:29.830668+00:00",
+      "ranges": [
+        [
+          677,
+          693
+        ],
+        [
+          711,
+          737
+        ]
+      ],
+      "source_role": "official_institution_author_publications",
+      "why": "Panasonic正式Ishii頁列同題名及三作者，MVA2025條目只有arXiv；鄰近manhattan-deep-calib為另一篇camera-calibration專案。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P244/author_institution.html.receipt.json",
+      "receipt_sha256": "28e7bc6dcae15baceba993dbcff836d8f53a68596dd77320bc4b96340f401712"
+    }
+  ],
+  "runtime_executed": false
+}

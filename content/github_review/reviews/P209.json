@@ -1,0 +1,802 @@
+{
+  "paper_id": "P209",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "HUI360 已核官方 baseline 與 Interact360 標註／CSV 管線。論文結果必須對應 baseline legacy 分支與固定 HF dataset revision；新版 main 的 32-frame／16-frame cutoff、資料 main 及最佳 F1 threshold 搜尋不能直接當論文 30／15 協定。已追到實際 track reader、視窗標籤、AUROC／F1／AP scorer，未執行模型或下載大型資料。",
+  "identity_note": "arXiv:2608.11051v1 的官方 project 明確分開 Code (Baselines)=hucebot/HUI360-Baselines 與 Code (Pipeline)=RaphaelLorenzo/Interact360；前者 README 直接連同一 arXiv 並要求論文使用 legacy，後者雖仍有 arXiv TDB placeholder，但官方 project、HAL 與題名均指向本篇。SSUP-HRI 是重用父資料，不另當 HUI360 新收集來源。",
+  "reading_order": [
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          18
+        ]
+      ],
+      "why": "確認本篇身分及 legacy 才對應論文結果。",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "ref": "main"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          3
+        ],
+        [
+          47,
+          52
+        ]
+      ],
+      "why": "確認 legacy 與論文使用的固定 HF 資料版。",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "ref": "legacy"
+    },
+    {
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "process/detect_interactions.py",
+      "ranges": [
+        [
+          23,
+          52
+        ],
+        [
+          81,
+          105
+        ],
+        [
+          148,
+          157
+        ]
+      ],
+      "why": "核實 mask intersection 的 level 3 標註與預設 pixel 門檻。",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "ref": "main"
+    },
+    {
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "export/export_utils.py",
+      "ranges": [
+        [
+          9,
+          36
+        ],
+        [
+          78,
+          126
+        ]
+      ],
+      "why": "核日期字串、人工檢查 flags、associated track 合併及 invalid 標記。",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "ref": "main"
+    },
+    {
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "export/export_to_dataset_plain_csv.py",
+      "ranges": [
+        [
+          128,
+          295
+        ],
+        [
+          298,
+          394
+        ],
+        [
+          396,
+          445
+        ],
+        [
+          595,
+          624
+        ]
+      ],
+      "why": "追逐 detection→track/frame CSV、onset、時間單位、quality 篩選與輸出檔名。",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "ref": "main"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "experiments/configs/expe_classifier/lstm_config.yaml",
+      "ranges": [
+        [
+          1,
+          29
+        ],
+        [
+          65,
+          156
+        ]
+      ],
+      "why": "核資料 revision、30-frame 輸入、15-frame cutoffs、recording split 及固定取樣。",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "ref": "legacy"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "datasets/HUIDataset.py",
+      "ranges": [
+        [
+          130,
+          217
+        ],
+        [
+          248,
+          451
+        ],
+        [
+          486,
+          574
+        ],
+        [
+          612,
+          701
+        ],
+        [
+          759,
+          896
+        ]
+      ],
+      "why": "追 CSV reader、連續有效影格、正／負例視窗、normalize、每 track 一個樣本的分母。",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "ref": "legacy"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "infer.py",
+      "ranges": [
+        [
+          396,
+          443
+        ],
+        [
+          530,
+          637
+        ],
+        [
+          670,
+          700
+        ],
+        [
+          771,
+          804
+        ]
+      ],
+      "why": "核 checkpoint 協定、實際 inference、AUROC／binary F1 與全同硬分類分支。",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "ref": "legacy"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "training.py",
+      "ranges": [
+        [
+          55,
+          68
+        ],
+        [
+          131,
+          185
+        ]
+      ],
+      "why": "核 validation AP、threshold sweep 及全同預測時未初始化回傳值。",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "ref": "legacy"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "experiments/configs/in_hui/lstm_base.yaml",
+      "ranges": [
+        [
+          36,
+          46
+        ],
+        [
+          82,
+          113
+        ],
+        [
+          260,
+          267
+        ]
+      ],
+      "why": "分開記新版 32／16、stride 與可變動 HF main。",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "ref": "main"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "infer.py",
+      "ranges": [
+        [
+          61,
+          83
+        ],
+        [
+          152,
+          177
+        ],
+        [
+          188,
+          227
+        ],
+        [
+          339,
+          359
+        ]
+      ],
+      "why": "核新版 per-input metric、同集合最佳 threshold 與 checkpoint 版本限制。",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "ref": "main"
+    },
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "utils/eval_utils.py",
+      "ranges": [
+        [
+          10,
+          34
+        ]
+      ],
+      "why": "確認新版以100個threshold求同一label集合的最高binary F1。",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "ref": "main"
+    }
+  ],
+  "environment": "robot-egocentric 360° equirectangular 觀測。paper 的新 HUI360 有 9 真實場所、30 robot setups、68 recordings；71.3 小時原始資料裁成 1,937 episodes／11.3 小時（15 fps）。4,310 person tracks 中 375 有物理互動；另 SSUP-A 是 SSUP-HRI 兩個 field sessions 的重標註，27,698 tracks／419 interactions，不可當獨立新捕捉資料。本輪沒有可互動 robot policy 環境，評的是離線 anticipation。",
+  "tasks": "預測人是否即將與平臺發生物理 interaction；positive onset 依投放、拿取等實際事件與人工修訂，並非對 gaze／社交意圖的通用判定。RF／MLP／LSTM 是模型，T_ADV horizons 5/10/15/20/30 frames（15 Hz 下約0.33/0.67/1/1.33/2秒）與輸入降採樣是同一 task 的條件。論文 HUI locations1–7 train、8–9 test，SSUP 第一／二場次 train/test；實際程式依 checkpoint 的 include_recordings_val 等清單選樣，變數 val 不能擅自解讀成另有第三份驗證集。",
+  "data": "Interact360 讀 episodes/<id>/annotations_360.json 的 image_file/image_shape/detections；track_id 可由 associated_track_id 合併，含 validity、bbox、mask_rle、mask_size、engagement_level、17點 ViTPose 與308點 Sapiens。bbox／pose 是原全景像素，x 可跨影像寬度邊界，不能直接裁成普通2D box。detect_interactions 的相交面積>min_pixels_intersection（預設10,000）給 level3，否則0，之後允許人工修訂。export 只收 checked/valid 類 flags，依validity與quality連續段篩選，寫 data-<recording>-<index>-of-<total>.csv；unique_track_identifier=recording_episode_track。timestamp 由檔名 %Y_%m_%d_%H_%M_%S_%f 解析；另存 timestamp_sec、相對track秒、time_to_first_interaction秒，無互動用99999.0 sentinel。缺 Sapiens 資料可填0，需視作缺失而非真座標。baseline CSV reader 把 engagement／時間／ID 列列為 metadata，指定LSTM features為 mask area+bbox+17×(x,y,score)，即56維／frame；keypoints先box-normalize再用固定HUI mean/std。",
+  "evaluation": "legacy get_track_input_possible_indices 將 image_index 連續存在、validity、至少9個ViTPose score≥0.5與mask_size篩選做AND，再找連續段。第一個 engagement>0 定義 onset；interaction_cutoff／positive_cutoff 以frame計。非互動 track 可截到最大mask面積（近距離proxy），並依設定把視窗對齊該處。force_positive_samples 會排除互動track的早期負窗。__len__ 是合格track數，__getitem__ 為各track固定或隨機選一個候選視窗；固定索引清單與subsample必須保存。legacy infer 對每個視窗得到 sigmoid(logit) 或 RF predict_proba[:,1]，用>0.5算 binary P/R/F1，整個pass的分數送 roc_auc_score；training.evaluate 另算 average_precision_score。其 N 是實際送入的合格track視窗，AUROC 比較正負樣本排序，F1分母為2TP+FP+FN，不是4,310 raw tracks、375 interactions或百萬detections。new main 可用 stride 展開多視窗，需重記樣本數；main infer 直接算 AUROC/AP，並在同一集合用100個threshold搜尋最佳F1。未下載實際CSV，因此不宣稱驗算任何eligible test case數。",
+  "implementation_findings": [
+    {
+      "finding": "legacy infer 的所有hard predictions相同分支直接把accuracy/P/R/F1/AUC設0，即使raw scores可能仍有排序資訊。legacy training.evaluate 同分支也將AP設0，卻未初始化 best_threshold／best_f1 就回傳，存在可由控制流程確定的未綁定變數問題；未實際執行。",
+      "sources": [
+        "legacy infer.py:430-443,537-549",
+        "legacy training.py:168-185"
+      ]
+    },
+    {
+      "finding": "main 的 F1 threshold 是對當次evaluation labels最適化，不是獨立validation選好再凍結的operating point；必須將此F1與threshold-free AUROC/AP分開記錄。",
+      "sources": [
+        "main infer.py:343-356",
+        "main utils/eval_utils.py:10-34"
+      ]
+    },
+    {
+      "finding": "main 嘗試相容舊checkpoint時，只要原本沒有config便會exit，即使有hyperparameters也一樣；不能直接承諾legacy checkpoint可供main重現。main evaluate 還無條件使用CUDA timing，CPU-only路徑未驗證。",
+      "sources": [
+        "main infer.py:68-70,167-169,190-195"
+      ]
+    },
+    {
+      "finding": "paper 明說 mean/std 由全HUI360估計，legacy使用固定HUI_NORMALIZATION_VALUES。若共同協定要求train-only normalization，需另建版本而非默默更換原生成績。原標註export以engagement==3定位，baseline以>0定位；須保留原release的label集合與人工修訂。",
+      "sources": [
+        "paper p.6",
+        "legacy datasets/HUIDataset.py:299-304,759-833",
+        "Interact360 export/export_to_dataset_plain_csv.py:274-295"
+      ]
+    }
+  ],
+  "standardization": {
+    "profile": "robot_egocentric_person_track_interaction_anticipation",
+    "reuse": "可重用兩倉庫原生track/frame結構、人工curation flags、mask-intersection標籤、legacy reader／window selector／score path及固定normalization；SSUP重用關係獨立記錄。",
+    "transform": "source 必須同存 paper v1、baseline legacy或main commit、dataset revision、Interact360 commit。environment 區分location／setup／recording；task 保存物理interaction定義與horizon。case 用dataset+recording+episode+track+window起訖／sample index，另保留raw track與條件化window父子關係；frame index、檔名時間、relative seconds、panorama seam／pose confidence／缺失標記分開。evaluator 保存正負樣本N、filters、取樣seed／stride、threshold來源、AUROC/AP/F1及normalization版本，不能轉成機器人完成工作成功率。",
+    "missing": "固定revision的完整CSV／track manifest與checkpoint protocol對齊、eligible windows實際清點、SSUP跨全景邊界與missing-pose處理驗證、legacy邊界分支修正、獨立threshold選擇、原始影像／curation與標註版本閉合。只做靜態核讀；snapshot_download、大型骨架／影像、模型、GUI與模擬均未執行。"
+  },
+  "version_note": "主核論文baseline legacy=32a90eb716e503ef8a0daabc052ce7c34ba36a95，README／config 指定 dataset rlorlou/HUI360@3c8a342548534b6b92d32b0099e266962facdf45，30-frame輸入、15-frame兩cutoff、25epochs。另讀 main=a6bd61c8539061242cbf756a18847c0900a8707c（2026-08-29）新版核心設定／reader入口／scorer，預設32frames／16cutoff／75epochs及hf_dataset_revision: main，不能混用數字。Interact360=d11ec02d666965968293813b9c17501cf1568cf6（2026-05-06），其README的CSV教學雖TBD，實際export程式已存在且已核。以上是選定核心區段，不是全基線架構／整個標註模型codebase已審完。",
+  "additional_repo_proposals": [
+    {
+      "repo": "hucebot/HUI360-Baselines",
+      "ref": "legacy",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "role": "paper_baseline_version",
+      "proposal": "協調者應將論文baseline綁到此分支快照與固定HF dataset revision，main另保留新版關係；既有兩repo binding不需擴到其他模型倉庫。"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P209/pages.json",
+      "sha256": "84a077886821c80f123dafcea0b6b011a56a8c2bcfc19cc0d7cf4adca824ae7c",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        4,
+        5,
+        6,
+        8
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/7/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P209/paper.pdf",
+      "pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f",
+      "url": "https://arxiv.org/abs/2608.11051"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/README.md",
+      "sha256": "4215cc7f7a99b0e891a274cff6676ab4645402a8ee4e573f68919158341048f5",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "README.md",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "ae2474c55bb55a5e7f478db1fb51e20955e25d4d",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/README.md",
+      "ranges": [
+        [
+          1,
+          52
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/README.md.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/experiments/configs/expe_classifier/lstm_config.yaml",
+      "sha256": "c8994899993a1c534c481c0372de8142f5c9732f14469b80756b85c536ce1ec6",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "experiments/configs/expe_classifier/lstm_config.yaml",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "b8fa8c02deec390e8c9030f447c2a04e41b5dbaf",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/experiments/configs/expe_classifier/lstm_config.yaml",
+      "ranges": [
+        [
+          1,
+          231
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/experiments/configs/expe_classifier/lstm_config.yaml.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/datasets/HUIDataset.py",
+      "sha256": "0e180f9a16d80dadbc30e916abed19e0cbd0e85141077ed94c6589a4e87690c6",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "datasets/HUIDataset.py",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "491f8625840e18ad1e5278137cefbd5d11daaea6",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/datasets/HUIDataset.py",
+      "ranges": [
+        [
+          1,
+          128
+        ],
+        [
+          130,
+          217
+        ],
+        [
+          220,
+          246
+        ],
+        [
+          248,
+          451
+        ],
+        [
+          486,
+          704
+        ],
+        [
+          741,
+          896
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/datasets/HUIDataset.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/utils/data_utils.py",
+      "sha256": "ff932f55ba2a2dab3dbbc674b37a284b3eca850e41891eb215ca0ec212d8911c",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "utils/data_utils.py",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "a4fd2994ae54ff430152afc59b0e0e527c92d2e3",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/utils/data_utils.py",
+      "ranges": [
+        [
+          1,
+          60
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/utils/data_utils.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/datasets/hui_norm_values.py",
+      "sha256": "6c152bb22fe398930cc2d523ebd15690d3bdc1224997a2dc5359d8520e9d7d34",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "datasets/hui_norm_values.py",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "552387d8b8a6e38e19e95edb6146b605fa954043",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/datasets/hui_norm_values.py",
+      "ranges": [
+        [
+          1,
+          38
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/datasets/hui_norm_values.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/infer.py",
+      "sha256": "93ee13462a0727be26fcf7ce6b21a6a8ec16b80d25982aa96d1bb64b31498ca6",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "infer.py",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "d37d9d116bd6260c050c282d3f6c1d4f243318d2",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/infer.py",
+      "ranges": [
+        [
+          1,
+          53
+        ],
+        [
+          396,
+          443
+        ],
+        [
+          530,
+          637
+        ],
+        [
+          670,
+          700
+        ],
+        [
+          755,
+          804
+        ],
+        [
+          806,
+          885
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/infer.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/training.py",
+      "sha256": "ed4ac35e97af8eb9b0b1faf8b77185b12d9f8f34f1907b66e3e6677e75042c6b",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "training.py",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "git_blob_sha": "4f574e2c8dfe8570fc3be4ef6280dabdc835f348",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/32a90eb716e503ef8a0daabc052ce7c34ba36a95/training.py",
+      "ranges": [
+        [
+          55,
+          68
+        ],
+        [
+          131,
+          185
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines__legacy_32a90eb/files/training.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/hucebot__HUI360-Baselines/files/README.md",
+      "sha256": "068d4071a7c52e18a240366b46acaccbe0c3010e633ae56d88f3f9135942deca",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "README.md",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "git_blob_sha": "ba23e97b87c95cef1da620579d0c2c73fa9e9a90",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/a6bd61c8539061242cbf756a18847c0900a8707c/README.md",
+      "ranges": [
+        [
+          1,
+          168
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines/files/experiments/configs/in_hui/lstm_base.yaml",
+      "sha256": "03856bb09fcafe77ffbb2256318ea6100fcf57c65415552cb705a0194d002760",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "experiments/configs/in_hui/lstm_base.yaml",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "git_blob_sha": "dc77beb8c452074322803a29420f7bed26ed7739",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/a6bd61c8539061242cbf756a18847c0900a8707c/experiments/configs/in_hui/lstm_base.yaml",
+      "ranges": [
+        [
+          1,
+          267
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines/files/experiments/configs/in_hui/lstm_base.yaml.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines/files/infer.py",
+      "sha256": "16c7dba5d741bc1a398bf821cdb35831dc3851f5b1e483b2e393b13e2a550c98",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "infer.py",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "git_blob_sha": "e04ef05b2c39e4bde1fd7cb341bad1fd4f8376d4",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/a6bd61c8539061242cbf756a18847c0900a8707c/infer.py",
+      "ranges": [
+        [
+          61,
+          177
+        ],
+        [
+          188,
+          254
+        ],
+        [
+          321,
+          359
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines/files/infer.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines/files/utils/loader_utils.py",
+      "sha256": "9449ae79e31b68ae7c1ff42e56070edfbe0a7bbd52d0a8927731e4aa73ea5915",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "utils/loader_utils.py",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "git_blob_sha": "532b1760415626688aa5bacae681711267b5fe04",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/a6bd61c8539061242cbf756a18847c0900a8707c/utils/loader_utils.py",
+      "ranges": [
+        [
+          1,
+          169
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/hucebot__HUI360-Baselines/files/utils/loader_utils.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/hucebot__HUI360-Baselines/files/utils/eval_utils.py",
+      "sha256": "fc95d20efeb60b3562c5672d510b9e077f79fa28929c2df7538430731b46f6c5",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "utils/eval_utils.py",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "git_blob_sha": "37955f7a0794ef18b55d280ce4a6c8a8dfeac20c",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/a6bd61c8539061242cbf756a18847c0900a8707c/utils/eval_utils.py",
+      "ranges": [
+        [
+          1,
+          34
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/hucebot__HUI360-Baselines/files/datasets/HUIDataset.py",
+      "sha256": "b847f93ee853695420e8e0b261f6d4dfcda56f2bf081ce6f032ec55dff4d4325",
+      "repo": "hucebot/HUI360-Baselines",
+      "path": "datasets/HUIDataset.py",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "git_blob_sha": "3d2129642c3c97970c77abf9697eeaff53f0a7a0",
+      "url": "https://raw.githubusercontent.com/hucebot/HUI360-Baselines/a6bd61c8539061242cbf756a18847c0900a8707c/datasets/HUIDataset.py",
+      "ranges": [
+        [
+          59,
+          114
+        ],
+        [
+          210,
+          272
+        ],
+        [
+          1086,
+          1142
+        ],
+        [
+          1300,
+          1339
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RaphaelLorenzo__Interact360/files/README.md",
+      "sha256": "32b8697d916429f23844a5ca99f79e43f82b9ce8c16cdfa69d8bf027eab16a21",
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "README.md",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "git_blob_sha": "e583d546c52f86faca7578d05692f219684ab4e0",
+      "url": "https://raw.githubusercontent.com/RaphaelLorenzo/Interact360/d11ec02d666965968293813b9c17501cf1568cf6/README.md",
+      "ranges": [
+        [
+          1,
+          11
+        ],
+        [
+          146,
+          158
+        ],
+        [
+          178,
+          237
+        ],
+        [
+          328,
+          359
+        ],
+        [
+          415,
+          458
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/RaphaelLorenzo__Interact360/files/process/detect_interactions.py",
+      "sha256": "0808eab5cba755323f766087f97a1ba8562525e3eebbb8e2a6b23edfdba4cfaa",
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "process/detect_interactions.py",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "git_blob_sha": "7ebe1a760ebc851a851bcdc8270e5bfe99b46a76",
+      "url": "https://raw.githubusercontent.com/RaphaelLorenzo/Interact360/d11ec02d666965968293813b9c17501cf1568cf6/process/detect_interactions.py",
+      "ranges": [
+        [
+          1,
+          174
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/RaphaelLorenzo__Interact360/files/process/detect_interactions.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RaphaelLorenzo__Interact360/files/export/export_to_dataset_plain_csv.py",
+      "sha256": "d1e79f3b1e754dda45db976bb3dea82d7f11fbb47153a432a5c3c2e417bdee06",
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "export/export_to_dataset_plain_csv.py",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "git_blob_sha": "d16f70d6804d2101dbc19dc3de34711c2c4aba72",
+      "url": "https://raw.githubusercontent.com/RaphaelLorenzo/Interact360/d11ec02d666965968293813b9c17501cf1568cf6/export/export_to_dataset_plain_csv.py",
+      "ranges": [
+        [
+          128,
+          295
+        ],
+        [
+          298,
+          394
+        ],
+        [
+          396,
+          513
+        ],
+        [
+          520,
+          624
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/RaphaelLorenzo__Interact360/files/export/export_utils.py",
+      "sha256": "f77134561120561e0d91e288f7b95d16aa98edf36c243e25ec6417f7f4cfea08",
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "export/export_utils.py",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "git_blob_sha": "df8d18b8eafe8dbcbd22eba43149ca2713c6a662",
+      "url": "https://raw.githubusercontent.com/RaphaelLorenzo/Interact360/d11ec02d666965968293813b9c17501cf1568cf6/export/export_utils.py",
+      "ranges": [
+        [
+          1,
+          126
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/RaphaelLorenzo__Interact360/files/export/export_utils.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RaphaelLorenzo__Interact360/files/export/full_dataset_to_light_csvs.py",
+      "sha256": "21d6b44f1b105473f6cab1e1bf724c3f07a300b14202ea53a1f394afcc0dc019",
+      "repo": "RaphaelLorenzo/Interact360",
+      "path": "export/full_dataset_to_light_csvs.py",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "git_blob_sha": "e036331e11fee9ea3aecafb11910bda3aebdbbd4",
+      "url": "https://raw.githubusercontent.com/RaphaelLorenzo/Interact360/d11ec02d666965968293813b9c17501cf1568cf6/export/full_dataset_to_light_csvs.py",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P209/legacy/ref.json",
+      "sha256": "c56396b448b038c0ec5c00fb53c3076c3c675473dcbd0bfd3195dbc8ee00d44b",
+      "url": "https://api.github.com/repos/hucebot/HUI360-Baselines/git/ref/heads/legacy",
+      "json_pointers": [
+        "/ref",
+        "/object"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P209/legacy/tree.json",
+      "sha256": "9ae1bbd25e5524c966bd18657575d1d27ba8a809e3ee7d85940ab024aac7c1bf",
+      "repo": "hucebot/HUI360-Baselines",
+      "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+      "url": "https://api.github.com/repos/hucebot/HUI360-Baselines/git/trees/32a90eb716e503ef8a0daabc052ce7c34ba36a95?recursive=1",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree/1",
+        "/tree/14",
+        "/tree/16",
+        "/tree/20",
+        "/tree/25",
+        "/tree/30",
+        "/tree/32"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/hucebot__HUI360-Baselines/manifest.json",
+      "sha256": "999be5dc634dd9e7c75e8c0b88e5137d7e0bade8a2d5173412bbaab9ee942f24",
+      "json_pointers": [
+        "/commit",
+        "/commit_date",
+        "/tree_truncated",
+        "/metadata"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/hucebot__HUI360-Baselines/tree.json",
+      "sha256": "2330997a5fb39f2a457315131959ecb2dc2615b3d05da2991e74eae6b9e74e8d",
+      "repo": "hucebot/HUI360-Baselines",
+      "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree/2",
+        "/tree/14",
+        "/tree/39",
+        "/tree/62"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RaphaelLorenzo__Interact360/manifest.json",
+      "sha256": "2da00b3be362e227b66e09b24585942249447f1acb1f8991461dfb15baa1dfcc",
+      "json_pointers": [
+        "/commit",
+        "/commit_date",
+        "/tree_truncated",
+        "/metadata"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RaphaelLorenzo__Interact360/tree.json",
+      "sha256": "e24d86e611fee2f54d1fc66ef54ea39280e48aa22f210388e76d4eaba2e59d58",
+      "repo": "RaphaelLorenzo/Interact360",
+      "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree/1",
+        "/tree/12",
+        "/tree/13",
+        "/tree/27"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/projects/54d9f9ca801a88f268a589e19c1d6a4c2ffa27cb1f035d5e3ae20be206ad0249.txt",
+      "sha256": "65ad95a328048466b7c2813907008d4a6a982d7437a105afd2e240a051928886",
+      "url": "https://hucebot.github.io/hui360",
+      "ranges": [
+        [
+          1,
+          80
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/208"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/P209-discovery.json",
+      "sha256": "c01f36d822e78efa35b84c340d2fdd10b87b1dbe4e5f369203d3c08984591987",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0",
+        "/candidates/2",
+        "/code_contexts"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

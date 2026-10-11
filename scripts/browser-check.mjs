@@ -67,7 +67,7 @@ try{
   function pass(name,detail){checks.push({name,status:'passed',detail});console.log('PASS',name);}
   const setValue=async(selector,value)=>evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));return true;})()`);
   const visibleCount=()=>evaluate(`Array.from(document.querySelectorAll('[data-entry]')).filter(e=>!e.hidden).length`);
-  const noOverflow=()=>evaluate('document.documentElement.scrollWidth<=innerWidth+1');
+  const noOverflow=()=>evaluate('document.documentElement.scrollWidth<=document.documentElement.clientWidth+1');
 
   await viewport(1440,1100);
   await go('zh-hant/index.html');
@@ -85,6 +85,79 @@ try{
   assert.equal(await evaluate("document.querySelector('#towel-fold-b').getAttribute('visibility')"),'visible');
   assert.equal(await evaluate("document.querySelector('#fold-pairs').textContent"),'B → A · C → D');
   pass('Research-first homepage and preserved example','Homepage leads with survey and task union; the earlier goal demonstration is preserved inside the engineering appendix.');
+
+  await go('zh-hant/github-review.html');
+  assert.equal(await evaluate("document.querySelectorAll('[data-gh-row]').length"),250);
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-gh-row]')).filter(x=>!x.hidden).length"),183);
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-gh-filters]')).display"),'grid');
+  await snapshot('github-review-desktop');
+  await setValue('[data-gh-filters] [name=scope]','related_reference');
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-gh-row]')).filter(x=>!x.hidden).length"),67);
+  await setValue('[data-gh-filters] [name=scope]','');
+  await setValue('[data-gh-filters] [name=q]','P105');
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-gh-row]')).filter(x=>!x.hidden).length"),1);
+  assert.ok(await evaluate("document.querySelector('[data-gh-row]:not([hidden])').textContent.includes('LIBERO')"));
+  assert.ok(await evaluate("new URLSearchParams(location.search).get('q')==='P105'"));
+  await viewport(1024,900);
+  assert.ok(await noOverflow());
+  pass('GitHub corpus scope and search','250 rows; main183/reference67 stay separate, exact paper lookup and URL state work.');
+
+  await viewport(1440,1100);
+  await go('zh-hant/github/P105.html');
+  assert.ok(await evaluate("document.querySelector('.github-five-fields').textContent.includes('10,030')"));
+  assert.ok(await evaluate("document.querySelector('.github-reading').textContent.includes('/libero_spatial/0')"));
+  assert.ok(await evaluate("Array.from(document.querySelectorAll('.github-reading a')).every(a=>/github\\.com\\/[^/]+\\/[^/]+\\/blob\\/[a-f0-9]{40}\\//.test(a.href))"));
+  await snapshot('github-paper-desktop');
+  await go('zh-hans/github-standard.html');
+  assert.equal(await evaluate("document.documentElement.lang"),'zh-Hans');
+  assert.equal(await evaluate("document.querySelectorAll('.github-layers>li').length"),3);
+  assert.ok(await evaluate("document.querySelector('h1').textContent.includes('整理')"));
+  pass('GitHub evidence and common structure','Per-paper immutable source links and JSON selectors render; bilingual three-layer guide is available.');
+
+  await go('zh-hant/github/P207.html');
+  assert.equal(await evaluate("document.querySelectorAll('.github-reading a[href^=\"https://huggingface.co/datasets/\"]').length"),2);
+  assert.ok(await evaluate("Array.from(document.querySelectorAll('.github-reading a[href^=\"https://huggingface.co/\"]')).every(a=>/\\/blob\\/[a-f0-9]{40}\\//.test(a.href))"));
+  await go('zh-hant/github/P249.html');
+  assert.ok(await evaluate("document.querySelector('.github-reading').textContent.includes('6ba9eec74f')"));
+  await go('zh-hant/github/P170.html');
+  assert.ok(await evaluate("document.querySelector('.github-candidates').textContent.includes('mayalhc/motionforge')"));
+  assert.ok(await evaluate("document.querySelector('.github-candidates').textContent.includes('已排除')"));
+  pass('GitHub external data, branches and excluded candidates','Pinned Hugging Face files use their own host; EgoCast forecasting keeps its branch, and the unrelated MotionForge candidate remains explicitly excluded.');
+
+  await go('zh-hant/github-report.html');
+  assert.equal(await evaluate("document.querySelectorAll('.github-report-entry').length"),250);
+  assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('#report-whole tbody tr')).map(r=>Number(r.querySelector('td b').textContent.replaceAll(',','')))"),[21,284,2096,114288,4]);
+  assert.equal(await evaluate("document.querySelectorAll('#report-standard .github-layers>li').length"),3);
+  assert.ok(await evaluate("document.getElementById('report-standard').textContent.includes('OpenEQA')"));
+  assert.ok(await evaluate("document.querySelector('a[href$=\"robot-use-source-atlas-zh-hant.pdf\"]')!==null"));
+  assert.ok(await noOverflow());
+  await snapshot('github-report-desktop');
+  await viewport(390,844,true);
+  assert.ok(await noOverflow());
+  await snapshot('github-report-mobile');
+  pass('Complete source atlas report','One report includes current five-field counts, distributions, a three-layer diagram, both examples,250 paper sections and the current PDF.');
+
+  await viewport(390,844,true);
+  await go('zh-hant/github-standard.html');
+  assert.ok(await noOverflow());
+  await snapshot('github-standard-mobile');
+  await go('zh-hant/github/P028.html');
+  assert.ok(await noOverflow());
+  await snapshot('github-paper-mobile');
+  await go('zh-hans/github-review.html?q=P119&scope=');
+  assert.ok(await noOverflow());
+  assert.equal(await evaluate("Array.from(document.querySelectorAll('[data-gh-row]')).filter(x=>!x.hidden).length"),1);
+  pass('GitHub mobile reading','Guide, per-paper evidence and Simplified Chinese filters fit a390px screen.');
+
+  await cdp.send('Emulation.setScriptExecutionDisabled',{value:true});
+  await cdp.send('Page.navigate',{url:new URL('zh-hant/github-review.html',BASE).href});
+  await waitFor("document.readyState==='complete'&&location.pathname.endsWith('/zh-hant/github-review.html')");
+  assert.equal(await evaluate("document.querySelectorAll('[data-gh-row]').length"),250);
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-gh-filters]')).display"),'none');
+  assert.ok(await evaluate("document.querySelector('a[href=\"github/P001.html\"]')!==null"));
+  await cdp.send('Emulation.setScriptExecutionDisabled',{value:false});
+  pass('GitHub no-JavaScript access','The entire250-paper index and static reading links remain available without scripts.');
+  await viewport(1440,1100);
 
   await go('zh-hant/collection-pipeline.html');
   assert.ok(await noOverflow());

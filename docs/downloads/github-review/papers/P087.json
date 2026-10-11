@@ -1,0 +1,935 @@
+{
+  "paper_id": "P087",
+  "name": "GarmentLab",
+  "title": "GarmentLab: A Unified Simulation and Benchmark for Garment Manipulation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2411.01200",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "garment",
+    "care"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P087",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已核讀 Isaac Sim 場景、Fold／Hang／Bimanual 範例、點雲資料管線及 RL fold 的具體 evaluator。公開程式可作來源與部分任務參考，但所讀路徑未實現論文整套20任務及持續5秒成功驗收；多處資料鍵、split 與計分接線尚未閉合。",
+    "identity_note": "README 直接連結 arXiv:2411.01200、官方 GarmentLab 頁面與同名倉庫，BibTeX 題名及作者對應 NeurIPS 2024 論文。LearningBaseline/unigarmentmanip 是本倉庫中的基線實作，不另外算新 benchmark。",
+    "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+    "paper_evidence": {
+      "local_file": "audit/.cache/fulltext_review/P087/pages.json",
+      "sha256": "af148e7f3b5b9e309758d94c2183a3522b9f2071e5ae7dd3b8f5e76c4e2f11ea",
+      "pdf_sha256": "8b0cea58cae1f425754a11a328f6082eafc8066dd93300c8255ba4ae17ffa999",
+      "pages_read": [
+        17
+      ],
+      "scope": "附錄 Metrics 段：任務達標須維持至少5秒、fold IoU／unfold coverage。"
+    },
+    "environment": "Isaac Sim 4.0.0／PhysX；BaseEnv 匯入 USD 房間與地面、啟用 GPU dynamics／CCD；GarmentConfig 保存 USD、pos、ori、scale、stretch/bend/shear stiffness、friction 和 collision offsets。FoldEnv 使用 Franka、頂視 Recording_Camera 的 depth／point-cloud／segmentation；BimanualEnv 配兩支 Franka。原生 Euler／quaternion 與 USD scale 混用，不能直接假定所有輸入角度或資產尺寸相同。",
+    "tasks": "README 宣稱20任務、5互動群、11衣物類別、20場景及9000+資產，均為不同單位且非本次驗證的可執行 case 數。本輪追查 Fold、Hang、雙臂展布及 RL fold 子路徑；demo 是固定資產／抓點序列。RL fold/config 實際 task_name 為 hang，須由協調者核對任務名稱與實驗配置，不能僅依資料夾分類。",
+    "data": "collector 把 pcd_points／mesh_points 寫入 {garment}/p_{index}.npz、另存 rgb_{index}.png；loader 還要求 keypoints_visible_mask、pcd_keypoints_id、visible_mesh_indices，需補前處理來源。loader 回傳兩份點雲與 correspondence 索引，交替產生同衣物跨變形及跨衣物配對，不是 robot episode。get_deformation_paths 先按衣物目錄數字排序再切 split；config.train_ratio=1 會把所有衣物給 train、val 為空，不能套用論文 split。BaseEnv 的 .npy record/replay 是 callback 框架，base callback 為 pass，未提供統一有效軌跡 schema。",
+    "evaluation": "HangEnv.get_reward 讀 garment_mesh.get_world_pose() 的 z>門檻（預設0.3，demo傳0.5），未檢查掛架接觸或5秒穩定。FoldEnv 與 FoldDemo 沒有 fold success checker。BimanualEnv 以 trial/reference coverage>0.75，但 evaluator 會停止／重設衣物姿態且面積 min/span 使用xy、pos2d卻使用xz，必須標為原生疑點。RL fold 的 eval_policy 平均30次 SimEnv.step(...,True) 布林值；SimEnv 計算抓點到指定粒子的誤差，兩個 reward_action>0 才成功，誤差恰為0.1經非線性分支後仍為正。雖計算0.8×reward_action＋0.2×reward_result，非eval實際回傳 reward_action，eval也未用結果形狀誤差。FoldTask.calculate_metrics 是 Cartpole 範本，不是主 fold evaluator。點雲 simple_val 以歸一化特徵 argmax 找 correspondence，報平均歐氏距離與 distance<threshold 比例；val_score.py 卻讀 points/keypoints_id、取 train 的0.8子集，而且呼叫 cal_distance_accuracy 時少了必填 distance_threshold。",
+    "standardization": {
+      "profile": "garment_simulation_components_with_partial_task_evaluators",
+      "reuse": "USD／材料設定、場景與感測配置、固定任務腳本、點雲配對結構及已查明的原生 checker。",
+      "transform": "source 綁 commit；environment 綁資產與物理參數；task 對應實際腳本／配置及論文標籤；case 需另建 garment_id＋初態＋示範／seed；evaluator 分 geometry matching、抓點成功、掛衣高度、論文持續成功。資料配對數、render frames、衣物物件與30次RL評測不可混算。",
+      "missing": "完整20任務 case/split manifest；fold IoU／持續5秒的可執行 checker；原始npz→標註npz→val_score的欄位橋接與threshold修正；coverage軸向與state mutation決策；資產、真機benchmark文件及校正尚未納入可執行接線。"
+    },
+    "integration_issues": [
+      "標示為核心程式段落已核讀、evaluator完整性不足；不可顯示20任務都已具備自動驗收。",
+      "修正或版本化 Hang高度代理、Bimanual coverage軸向與改寫場景、RL折衣實際抓點成功三種語義落差。",
+      "前處理欄位、val_score少參數、train_ratio=1與使用train當val須先解決，才能建立有效資料／評測adapter。",
+      "README 的 demo/StoreDemo.py 與 pinned tree 的 demo/StoreDemo .py 名稱不同，保留空白路徑問題供入口整合。"
+    ],
+    "version_note": "固定 2025-03-02 commit，晚於2024論文；READMEs與論文宣稱不代表此公開版本已實現所有協定。本次未啟動 SimulationApp、未下載 USD/模型，亦未將 template 或檔案數當核讀完整性。",
+    "reviewed_on": "2026-10-11",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            49
+          ],
+          [
+            51,
+            65
+          ],
+          [
+            82,
+            118
+          ],
+          [
+            120,
+            128
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 128,
+        "sha256": "28a50080b1f0aa673e14c843fa05c92e6d75c423bb7b2314bf56ce9584177695",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/README.md",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/README.md#L1-L49",
+        "why": "識別論文、20任務宣稱、Isaac Sim 4.0.0 與外部資產。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "Env/Config/GarmentConfig.py",
+        "ranges": [
+          [
+            1,
+            35
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 35,
+        "sha256": "88478a5d74543119827066716bab60d462247741b3396b2aa8c722b14f35948a",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/Config/GarmentConfig.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/Config/GarmentConfig.py#L1-L35",
+        "why": "USD、位姿、scale、彈簧／碰撞材料參數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "Env/env/BaseEnv.py",
+        "ranges": [
+          [
+            37,
+            133
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 146,
+        "sha256": "7e9ee804da59d9eda1e49795e56cf1c51c90d04b4c2390c0ed64addd48267f76",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/BaseEnv.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/BaseEnv.py#L37-L133",
+        "why": "場景匯入、GPU 物理、record/replay callback 與無成功條件的 step。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "demo/FoldDemo.py",
+        "ranges": [
+          [
+            1,
+            40
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 40,
+        "sha256": "ecf60c69fc5afca6a5f790399859a977efa49dfbec20e25f299795fae7a01800",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/demo/FoldDemo.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/demo/FoldDemo.py#L1-L40",
+        "why": "固定衣物／抓點的示範流程，不是完整測試 case manifest。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "Env/env/FoldEnv.py",
+        "ranges": [
+          [
+            1,
+            87
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 87,
+        "sha256": "bdb171edc76108813287a3186a524b2fd718e66d7a5ddba8dca867f19f8cc2b5",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/FoldEnv.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/FoldEnv.py#L1-L87",
+        "why": "確認場景與相機實作，以及沒有 fold success checker。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "demo/HangDemo.py",
+        "ranges": [
+          [
+            8,
+            35
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 35,
+        "sha256": "a073ec7f9fce615fc6bb511ea6410c8cc5066fb93ac7839721d0d19f95ea6bce",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/demo/HangDemo.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/demo/HangDemo.py#L8-L35",
+        "why": "實際呼叫 get_reward(pick_threshold=0.5)。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "Env/env/HangEnv.py",
+        "ranges": [
+          [
+            29,
+            59
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 62,
+        "sha256": "67d08258db0c369ed14cc1ee227222e82d99656785586d1f729fb8db35671332",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/HangEnv.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/HangEnv.py#L29-L59",
+        "why": "高度判斷的具體成功函式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "Env/env/BimanualEnv.py",
+        "ranges": [
+          [
+            29,
+            134
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 222,
+        "sha256": "2861d8c2b9152fcc5626490714f291a3391983424235fa9b696a128ddbd87fd9",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/BimanualEnv.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/Env/env/BimanualEnv.py#L29-L134",
+        "why": "狀態改寫的 coverage ratio 與面積座標軸混用。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/unigarmentmanip/collect/collect_cd/collect_front_open_deformation.py",
+        "ranges": [
+          [
+            229,
+            303
+          ],
+          [
+            312,
+            365
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 402,
+        "sha256": "52b19a13447213832e58cafedb6566334e0e11050b19e9d5e19069c4ab4f7885",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/collect/collect_cd/collect_front_open_deformation.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/collect/collect_cd/collect_front_open_deformation.py#L229-L303",
+        "why": "原始 npz 與 RGB 寫入鍵值、garment/frame 命名。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/unigarmentmanip/train/dataloader/dataloader.py",
+        "ranges": [
+          [
+            15,
+            146
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 167,
+        "sha256": "680e6464b464c50dfdc10bd06b89f08509965f58ee9013f844f8b42576a75bac",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/dataloader/dataloader.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/dataloader/dataloader.py#L15-L146",
+        "why": "點雲 correspondence 欄位、跨變形／跨物件配對與補樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/unigarmentmanip/train/dataloader/utils.py",
+        "ranges": [
+          [
+            5,
+            40
+          ],
+          [
+            46,
+            65
+          ],
+          [
+            88,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 260,
+        "sha256": "aa8317fcd398539ea6169ca12aa6f3ce62bf88e1f87ba472353f0f94ff8660d8",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/dataloader/utils.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/dataloader/utils.py#L5-L40",
+        "why": "以衣物目錄做 split 與配對，不把 pair 數當衣物數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/unigarmentmanip/train/base/config.py",
+        "ranges": [
+          [
+            1,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 86,
+        "sha256": "029de85c496c7da2524d12ed1b1f6f9b698860933f5df3cdb9e2eac6864db8a9",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/base/config.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/base/config.py#L1-L46",
+        "why": "train_ratio=1 與 correspondence threshold 的實際預設。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/unigarmentmanip/utils/val_score.py",
+        "ranges": [
+          [
+            38,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "822f0f8ba85848ecd8bc294226b11d50ecc79faeffe3fea2ed7a41d517785628",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/utils/val_score.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/utils/val_score.py#L38-L110",
+        "why": "驗證入口讀取 train 子集、舊 npz 鍵以及遺漏參數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/unigarmentmanip/train/val/simple_val.py",
+        "ranges": [
+          [
+            27,
+            89
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 137,
+        "sha256": "01a900131cba3ede64d4e5377ee7c7083b9a255bb84a16c3c7263d8c06009c2e",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/val/simple_val.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/unigarmentmanip/train/val/simple_val.py#L27-L89",
+        "why": "cosine correspondence 配對、歐氏誤差與門檻 accuracy。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/rl_fold/rl_fold.py",
+        "ranges": [
+          [
+            44,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 102,
+        "sha256": "6ecb437588da7f2311fac2a349950a4a1f0365847d6f9f3a64ab1591b689ca18",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_fold.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_fold.py#L44-L100",
+        "why": "確認實際 eval 入口與30次 rollout 呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/rl_fold/config/config.yaml",
+        "ranges": [
+          [
+            1,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "a8f59acb120e31d1e4b6e6c9ee157a0d2d2c46c7f5e5f3578fb9fb8b46fcc7a8",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/config/config.yaml",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/config/config.yaml#L1-L38",
+        "why": "具體 garment、demo_point／target_point 及 task_name=hang。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/rl_fold/rl_utils/task_defne.py",
+        "ranges": [
+          [
+            14,
+            60
+          ],
+          [
+            111,
+            135
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 135,
+        "sha256": "427f2d9f333bb4d0d03ab9738e6f1edf2c6f3084efc4aebd709928b59547bd7f",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/task_defne.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/task_defne.py#L14-L60",
+        "why": "辨識 FoldTask 裡的 Cartpole 範本殘留，不能當 fold checker。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/rl_fold/rl_utils/rl_env.py",
+        "ranges": [
+          [
+            111,
+            130
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 308,
+        "sha256": "0a14bd8092a3fb38a0fff91dd23d378aed2af4f8171703e0277cd7f8673ea6dd",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/rl_env.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/rl_env.py#L111-L130",
+        "why": "task 在此提供 action/observation space，避免將範本 checker 誤當主 evaluator。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/rl_fold/rl_utils/ppo.py",
+        "ranges": [
+          [
+            160,
+            216
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 675,
+        "sha256": "d4720b7a4ae029b67a6f0bfe32e299add3fcaa2ed12602777ecfd19897145186",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/ppo.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/ppo.py#L160-L216",
+        "why": "eval_policy 真正呼叫 SimEnv.step(...,True) 並平均布林回傳。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "GarmentLab/GarmentLab",
+        "requested_repo": "GarmentLab/GarmentLab",
+        "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+        "ref": null,
+        "path": "LearningBaseline/rl_fold/rl_utils/simulation_env.py",
+        "ranges": [
+          [
+            31,
+            149
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 293,
+        "sha256": "79c5d128f00d2179232b5d88c33040b3b25ed47dcab974fc95cb8fc4be14bd48",
+        "url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/simulation_env.py",
+        "reading_url": "https://github.com/GarmentLab/GarmentLab/blob/6ee0620fddb8083d5eab554fa343cdc966c61d5f/LearningBaseline/rl_fold/rl_utils/simulation_env.py#L31-L149",
+        "why": "讀取抓點誤差、unused 混合 reward、每回合 reset 與實際成功旗標。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7b49453700942192fbb57dab378921d6c2dc43289c4ac3bf381c28adc4a064ba"
+  },
+  "repository_binding_review_sha256": "7b49453700942192fbb57dab378921d6c2dc43289c4ac3bf381c28adc4a064ba",
+  "repository_bindings": [
+    {
+      "requested_repo": "GarmentLab/GarmentLab",
+      "resolved_repo": "GarmentLab/GarmentLab",
+      "aliases_in_this_review": [
+        "garmentlab/garmentlab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f",
+          "reviewed_files": [
+            "Env/Config/GarmentConfig.py",
+            "Env/env/BaseEnv.py",
+            "Env/env/BimanualEnv.py",
+            "Env/env/FoldEnv.py",
+            "Env/env/HangEnv.py",
+            "LearningBaseline/rl_fold/config/config.yaml",
+            "LearningBaseline/rl_fold/rl_fold.py",
+            "LearningBaseline/rl_fold/rl_utils/ppo.py",
+            "LearningBaseline/rl_fold/rl_utils/rl_env.py",
+            "LearningBaseline/rl_fold/rl_utils/simulation_env.py",
+            "LearningBaseline/rl_fold/rl_utils/task_defne.py",
+            "LearningBaseline/unigarmentmanip/collect/collect_cd/collect_front_open_deformation.py",
+            "LearningBaseline/unigarmentmanip/train/base/config.py",
+            "LearningBaseline/unigarmentmanip/train/dataloader/dataloader.py",
+            "LearningBaseline/unigarmentmanip/train/dataloader/utils.py",
+            "LearningBaseline/unigarmentmanip/train/val/simple_val.py",
+            "LearningBaseline/unigarmentmanip/utils/val_score.py",
+            "README.md",
+            "demo/FoldDemo.py",
+            "demo/HangDemo.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/GarmentLab/GarmentLab",
+          "link_label": "Code",
+          "project_url": "https://garmentlab.github.io/",
+          "page_sha256": "b62f223ffc40a14d8f31f65a108378a3da18c32775353d30c4d166c8a494b809"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "GarmentLab/GarmentLab",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "GarmentLab/GarmentLab",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "6ee0620fddb8083d5eab554fa343cdc966c61d5f"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P087",
+          "review_file": "content/github_review/reviews/P087.json",
+          "review_sha256": "7b49453700942192fbb57dab378921d6c2dc43289c4ac3bf381c28adc4a064ba",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "衣物與洗護",
+    "個人照護"
+  ],
+  "source_review": {
+    "paper_id": "P087",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "GarmentLab，arXiv 2411.01200v3。",
+    "scope_read": "資產與5種物理互動、20task、實驗子集、split及5秒success。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      16,
+      17,
+      20
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "衣物與洗護",
+      "個人照護"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "20scene與9,000+object models資產庫；PhysX多物理方法，scene/asset數不等於實評數。",
+    "tasks": "20tasks歸5interaction groups：garment-garment/fluid/FEM/rigid/avatar；含摺、展、掛、吹乾、洗、收納、穿衣。",
+    "cases": "不同task初態／garment取樣；正文baseline以大件fold/unfold/hang、小件place/hang及若干RL子集為主，沒有统一全20task題數。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 20,
+        "unit": "scene資產",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "tasks",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "物理互動groups",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 11,
+        "unit": "garment categories",
+        "pages": [
+          2,
+          17
+        ]
+      }
+    ],
+    "evaluation": [
+      "達task-specific判準後維持至少5秒；fold用IoU、unfold用coverage，其他物理互動有專用容差。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "objects70/15/15；另novel state／scene；主實驗並非全部20task同程度跑分。",
+    "lineage": "ClothesNet、ShapeNet、PartNet/YCB、PartNet-Mobility、Omniverse/actorcore等資產；RoboVerse遷移其子集。",
+    "related_paper_ids": [
+      "P082"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          5,
+          6
+        ],
+        "locator": "資產概述、表2–3",
+        "supports": "20scene、20task與來源"
+      },
+      {
+        "pages": [
+          9,
+          17
+        ],
+        "locator": "§7、附錄B",
+        "supports": "實測子集、split、5秒成功"
+      }
+    ],
+    "unresolved": [
+      "摺衣輪廓IoU無法單獨檢查層次／拓撲正確；需更細規則。",
+      "完整20task有效case數待manifest。"
+    ],
+    "reuse": "柔性物與日常服務廣度的重要來源；應保留materials與state/evaluator可用程度。",
+    "reviewed_pdf_sha256": "8b0cea58cae1f425754a11a328f6082eafc8066dd93300c8255ba4ae17ffa999",
+    "reviewed_on": "2026-10-02",
+    "name": "GarmentLab",
+    "year": 2024,
+    "title": "GarmentLab: A Unified Simulation and Benchmark for Garment Manipulation",
+    "source_url": "https://arxiv.org/abs/2411.01200",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "home",
+      "garment",
+      "care"
+    ],
+    "review_tags": [
+      "衣物與柔性物操作",
+      "洗衣服務",
+      "照護與個人活動",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "衣物與洗護",
+      "個人照護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P087",
+      "domain_ids": [
+        "home",
+        "garment",
+        "care"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P087",
+          "domain_ids": [
+            "home",
+            "garment",
+            "care"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            16,
+            17,
+            20
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "20tasks歸5interaction groups：garment-garment/fluid/FEM/rigid/avatar；含摺、展、掛、吹乾、洗、收納、穿衣。",
+            "20scene與9,000+object models資產庫；PhysX多物理方法，scene/asset數不等於實評數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "8b0cea58cae1f425754a11a328f6082eafc8066dd93300c8255ba4ae17ffa999"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "8b0cea58cae1f425754a11a328f6082eafc8066dd93300c8255ba4ae17ffa999",
+      "previous_domain_ids": [
+        "home",
+        "garment",
+        "care"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P087",
+      "name": "GarmentLab",
+      "expected_title": "GarmentLab: A Unified Simulation and Benchmark for Garment Manipulation",
+      "source_url": "https://arxiv.org/abs/2411.01200",
+      "pdf_url": "https://arxiv.org/pdf/2411.01200",
+      "retrieved_at": "2026-10-02T21:33:56.975173+00:00",
+      "pdf_sha256": "8b0cea58cae1f425754a11a328f6082eafc8066dd93300c8255ba4ae17ffa999",
+      "text_sha256": "b7e3f033de6c3d80d9aa3750b1e60dd8764b03c90e26a9a416595768209b4ba3",
+      "pdf_bytes": 6432056,
+      "pages": 38,
+      "text_characters": 147191,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2411.01200v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2411.01200v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 20,
+        "unit": "scene資產",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P087:1",
+        "paper_id": "P087",
+        "benchmark": "GarmentLab",
+        "native_term": "scene資產",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.01200v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.01200v3",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "tasks",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P087:2",
+        "paper_id": "P087",
+        "benchmark": "GarmentLab",
+        "native_term": "tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.01200v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.01200v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "物理互動groups",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P087:3",
+        "paper_id": "P087",
+        "benchmark": "GarmentLab",
+        "native_term": "物理互動groups",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.01200v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.01200v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 11,
+        "unit": "garment categories",
+        "pages": [
+          2,
+          17
+        ],
+        "record_id": "review10:P087:4",
+        "paper_id": "P087",
+        "benchmark": "GarmentLab",
+        "native_term": "garment categories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.01200v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.01200v3",
+            "locator": "PDF pp. 2, 17",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "GarmentLab/GarmentLab"
+  ],
+  "external_repositories": []
+}

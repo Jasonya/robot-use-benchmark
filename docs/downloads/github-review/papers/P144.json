@@ -1,0 +1,469 @@
+{
+  "paper_id": "P144",
+  "name": "CAP / EgoGym",
+  "title": "Contact-Anchored Policies: Contact Conditioning Creates Strong Robot Utility Models",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2602.09017",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P144",
+    "summary": "CAP/EgoGym來源有公開policy和real2sim抓取路徑；此路徑的稀疏成功是提升高度，且包含重力補償輔助，不能由此推定完整EgoGym實驗全部已可重現。",
+    "environment": "MuJoCo real2sim scene.xml和可替換物件/幹擾物，另有實機/人類gripper資料；物件asset、機體與scene設定應各自有ID。",
+    "tasks": "接觸條件化policy；已核對的RUM-Pick-v0是具體抓取測試，不等於原文所有utility/EgoGym任務。",
+    "data": "loader按同一trajectory slice取RGB、可選depth及action；sim observation含RGB和object_2d/3d_position。評測可明確使用這些位置作conditioning，屬資訊預算差異；2D投影參數480×360與obs宣告256需核對。",
+    "evaluation": "default sparse以物件升高>carry_threshold(.02)給1，terminated=bool(reward)。dense模式reward一般非零，不能沿用此termination當成功。step含600次physics控制、首次grasp另gravcomp=1和2000步，應保留輔助/成本設定；總成功按指定episode數聚合。",
+    "standardization": {
+      "profile": "contact_conditioned_policy_and_real2sim_grasp",
+      "reuse": "原物件/場景配置、資料切片、目標條件與稀疏lift checker。",
+      "transform": "case區分2D/3D/無條件與合法觀測，保存位置單位/解析度、7D增量/Euler與gripper閾值、physics substeps及重力輔助。",
+      "missing": "完整EgoGym原生manifest/接觸標註、所有utility task規則、素材/模型與校準、dense/sparse判分分離及原文對照。"
+    },
+    "version_note": "固定8ab1117；目前深入的是公開real2sim pick流程，未宣稱每個CAP應用、全部人類資料與實機checker皆公開或已執行。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "jeffacce/cap-policy",
+        "requested_repo": "jeffacce/cap-policy",
+        "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            20
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 20,
+        "sha256": "a765c8c021275a2e7bb37a8ebe52287a6852868b3ce540b1b6bc3b54238febf0",
+        "url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/README.md",
+        "reading_url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/README.md#L1-L20",
+        "why": "精確論文與發布/硬體指南",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "jeffacce/cap-policy",
+        "requested_repo": "jeffacce/cap-policy",
+        "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2",
+        "ref": null,
+        "path": "imitation-in-homes/dataloaders/decord_dataset.py",
+        "ranges": [
+          [
+            237,
+            251
+          ],
+          [
+            285,
+            292
+          ],
+          [
+            326,
+            351
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 518,
+        "sha256": "783ae537dea5714af41589ba3304eaed7160456beb1b432733e8f8a4c9920b51",
+        "url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/imitation-in-homes/dataloaders/decord_dataset.py",
+        "reading_url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/imitation-in-homes/dataloaders/decord_dataset.py#L237-L251",
+        "why": "video/action/depth共享切片索引和資料格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "jeffacce/cap-policy",
+        "requested_repo": "jeffacce/cap-policy",
+        "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2",
+        "ref": null,
+        "path": "imitation-in-homes/real2sim/tasks/pick.py",
+        "ranges": [
+          [
+            22,
+            61
+          ],
+          [
+            99,
+            189
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 189,
+        "sha256": "2a04772b7957720e41ec494d4bb42b96d4c49705d06b3bf51042f6144643bb2e",
+        "url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/imitation-in-homes/real2sim/tasks/pick.py",
+        "reading_url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/imitation-in-homes/real2sim/tasks/pick.py#L22-L61",
+        "why": "原生action、目標觀測、carry threshold與輔助physics",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "jeffacce/cap-policy",
+        "requested_repo": "jeffacce/cap-policy",
+        "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2",
+        "ref": null,
+        "path": "imitation-in-homes/real2sim/evaluate.py",
+        "ranges": [
+          [
+            16,
+            51
+          ],
+          [
+            140,
+            188
+          ],
+          [
+            190,
+            213
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 247,
+        "sha256": "351f307a24c162cbeea268133f8811f0019d6ea60864f432d3311cc8d8987fd1",
+        "url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/imitation-in-homes/real2sim/evaluate.py",
+        "reading_url": "https://github.com/jeffacce/cap-policy/blob/8ab11176ecb61a5e88f290958877ab17a6f3e8e2/imitation-in-homes/real2sim/evaluate.py#L16-L51",
+        "why": "object/seed排程、2D/3D/無條件與分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "331ae799884ddd8d9a94f66757639069ac7cabbad9c818167ab13febf115b519"
+  },
+  "repository_binding_review_sha256": "331ae799884ddd8d9a94f66757639069ac7cabbad9c818167ab13febf115b519",
+  "repository_bindings": [
+    {
+      "requested_repo": "jeffacce/cap-policy",
+      "resolved_repo": "jeffacce/cap-policy",
+      "aliases_in_this_review": [
+        "jeffacce/cap-policy"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2",
+          "reviewed_files": [
+            "README.md",
+            "imitation-in-homes/dataloaders/decord_dataset.py",
+            "imitation-in-homes/real2sim/evaluate.py",
+            "imitation-in-homes/real2sim/tasks/pick.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/jeffacce/cap-policy",
+          "link_label": "GitHub",
+          "project_url": "https://cap-policy.github.io",
+          "page_sha256": "2a1fad0cf98e1b94466213639f094a6497dd65c09e94c1a4f7da599a956c8317"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P144",
+          "review_file": "content/github_review/reviews/P144.json",
+          "review_sha256": "331ae799884ddd8d9a94f66757639069ac7cabbad9c818167ab13febf115b519",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P144",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Contact-Anchored Policies / EgoGym，arXiv 2602.09017v1。",
+    "scope_read": "資料、接觸prompt、EgoGym設計、3task真實與跨機體eval、tool chaining。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      11
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "role": "模擬平台與任務套件",
+    "environment": "資料報424environments＝Pick289/Open87/Close48，為作者收集配置口徑；EgoGym是程序生成MuJoCo套件。",
+    "tasks": "3utility task families：Pick、Open、Close；不因接觸座標不同自動變新語義任務。",
+    "cases": "20,365human-tool demonstrations、23.1小時；real Pick250trials，Open/Close每checkpoint100trials；EgoGym有915Objaverse object pool。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 424,
+        "unit": "資料收集environments",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "utility task families",
+        "pages": [
+          2,
+          7,
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 20365,
+        "unit": "demonstrations",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 250,
+        "unit": "real Pick trials",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task success；oracle human contact prompt、VLM contact prompt、retry設定分開。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "real新scene/object zero-shot；sim用作training loop model selection，不能當獨立未見test。",
+    "lineage": "Objaverse assets＋iPhone手持工具資料；CAP可作高階模型tool calls的低階utility。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          6,
+          7,
+          8,
+          11
+        ],
+        "locator": "Data、EgoGym、§4.1/4.4",
+        "supports": "424/20365/3、250與oracle/tool條件"
+      }
+    ],
+    "unresolved": [
+      "424是否跨Pick/Open/Close具有同址重用需ID核；EgoGym完整eval bank量待code。"
+    ],
+    "reuse": "支持multimodal tool use與robot skills組合，但示範用contact anchors、主eval有oracle條件，應明列。",
+    "reviewed_pdf_sha256": "b0428cf26ad882127851059de2fafebb3ae164e38f631b9d941ca8ac0ebbeda4",
+    "reviewed_on": "2026-10-02",
+    "name": "CAP / EgoGym",
+    "year": 2026,
+    "title": "Contact-Anchored Policies: Contact Conditioning Creates Strong Robot Utility Models",
+    "source_url": "https://arxiv.org/abs/2602.09017",
+    "primary_type": "T",
+    "category_name": "人類觀測到機器人轉移",
+    "domain_ids": [
+      "home",
+      "office"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P144",
+      "domain_ids": [
+        "home",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P144",
+          "domain_ids": [
+            "home",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            8,
+            11
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3utility task families：Pick、Open、Close；不因接觸座標不同自動變新語義任務。",
+            "資料報424environments＝Pick289/Open87/Close48，為作者收集配置口徑；EgoGym是程序生成MuJoCo套件。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b0428cf26ad882127851059de2fafebb3ae164e38f631b9d941ca8ac0ebbeda4"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b0428cf26ad882127851059de2fafebb3ae164e38f631b9d941ca8ac0ebbeda4",
+      "previous_domain_ids": [
+        "home",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P144",
+      "name": "CAP / EgoGym",
+      "expected_title": "Contact-Anchored Policies: Contact Conditioning Creates Strong Robot Utility Models",
+      "source_url": "https://arxiv.org/abs/2602.09017",
+      "pdf_url": "https://arxiv.org/pdf/2602.09017",
+      "retrieved_at": "2026-10-02T21:34:27.569600+00:00",
+      "pdf_sha256": "b0428cf26ad882127851059de2fafebb3ae164e38f631b9d941ca8ac0ebbeda4",
+      "text_sha256": "8fa8b78db46ba1a1539b12c60fc4a9b63a30c4368cbf53e129e1d95c744aadee",
+      "pdf_bytes": 7907170,
+      "pages": 29,
+      "text_characters": 91004,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2602.09017v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2602.09017v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 424,
+        "unit": "資料收集environments",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P144:1",
+        "paper_id": "P144",
+        "benchmark": "CAP / EgoGym",
+        "native_term": "資料收集environments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2602.09017v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2602.09017v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "utility task families",
+        "pages": [
+          2,
+          7,
+          8
+        ],
+        "record_id": "review10:P144:2",
+        "paper_id": "P144",
+        "benchmark": "CAP / EgoGym",
+        "native_term": "utility task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2602.09017v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2602.09017v1",
+            "locator": "PDF pp. 2, 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 20365,
+        "unit": "demonstrations",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P144:3",
+        "paper_id": "P144",
+        "benchmark": "CAP / EgoGym",
+        "native_term": "demonstrations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2602.09017v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2602.09017v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 250,
+        "unit": "real Pick trials",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P144:4",
+        "paper_id": "P144",
+        "benchmark": "CAP / EgoGym",
+        "native_term": "real Pick trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2602.09017v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2602.09017v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "jeffacce/cap-policy"
+  ],
+  "external_repositories": []
+}

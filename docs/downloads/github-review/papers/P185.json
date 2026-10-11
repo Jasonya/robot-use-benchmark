@@ -1,0 +1,767 @@
+{
+  "paper_id": "P185",
+  "name": "RGBench",
+  "title": "Real Garment Benchmark (RGBench): A Comprehensive Benchmark for Robotic Garment Manipulation featuring a High-Fidelity Scalable Simulator",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2511.06434",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P185",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+    "identity_note": "arXiv:2511.06434v2（2025-11-12）首頁 → rgbench.github.io → hwk0809/RGBench；README的AAAI2026題名與作者相符。網站模板eliahuhorwitz/Academic-project-page-template與Nerfies不算benchmark來源。",
+    "summary": "這是服裝模擬fidelity評測，不是學習policy的task-success榜。已核讀98-capture registry、processed CSV／PCD reader、PyBullet fixed-point回放、具體Chamfer／stability計算與兩階段聚合；GarmentDynamics本體仍只有外部import插槽及已發布baseline數字。",
+    "environment": "真實雙臂衣物操弄capture與同一動作的cloth simulator配對。公開資料文件列Piper／RealSense D455，固定PDF則描述Piper或JAKA K1／RealSense L515，應保存各版本capture硬體證據。fixed_point以錄製末端位置驅動mesh anchors；robot mode包含robot tracking/contact。所讀PyBullet wrapper在grasp/fold讀取position並把grabber orientation固定identity，不能直接宣稱完整6DoF姿態精確重放。普通MuJoCo僅fixed_point；GarmentDynamics不等於普通MuJoCo wrapper。",
+    "tasks": "Grasp、Fling、Fold三種原生動作；native case key=(garment,action,robot,sample_id)。靜態解析完整experiment_library得到9 garment keys、98 entries、98個不重複data_subfolder。baseline CSV有105行：fixed_point三動作各21行，robot的fold/grasp各21行，缺robot-fling的21個cells；runner也明示fling只支援fixed_point。baseline只有7件衣物，grey_sunwear／khaki_blazer的資料仍有但未入baseline。PDF6k+ mesh assets=4k+自有工業assets+2k+ ClothesNet來源，不是6,000個task或capture；mesh解析度variants亦不增加衣物數。",
+    "data": "每capture含calibration/world_to_camera_transform.json、兩臂joints/*joint_states_and_end_pose.csv、segment_pcds/pointcloud_<absolute_timestamp>_segmented.pcd；mesh另由HF來源供應。實際load_processed_data要求time、pos_1…pos_gripper，或pos_x/y/z、orn_w/x/y/z；文件列header.stamp.secs/nsecs及JSON position/name是另一層ROS輸入約定，不可直接餵此reader。pose輸出quaternion=wxyz，base_rotation_quat輸入給SciPy用xyzw，位置以R_base_to_world.apply(local)+translation組合。PCD由camera_to_world=inv(world_to_camera)轉世界座標，timestamp減master_start_time。main逐一遍歷PCD，再用target_time+camera_delay+fling_prepare_time+fling_wait_time推進sim；不是重採樣成共同FPS。保留原seconds、delay、sim step大小、record/calculation windows與point/vertex數。",
+    "evaluation": "compute_cost輸出單向Chamfer L1 sim→real及real→sim、L2 sim→real、雙方向one-sided Hausdorff、sim_stability_score及兩點雲平均z差絕對值。Chamfer L1是每source point找Manhattan nearest distance後平均；L2用Euclidean距離而非平方距離，單位維持m。CPU/GPU對Nx3路徑同義，但batch輸入CPU只取[0]、GPU平均batch，不能未驗證就擴成batched evaluator。stability實際將同一frame vertices[1:-1]與相鄰vertex-index三點均值作L2偏差，再除總vertex數N，並非跨時間穩定性。HD委派point-cloud-utils且未傳norm，PDF公式卻寫L1；pyproject只限>=0.30，本輪未鎖定/核讀該依賴版本的HD實作，norm一致性列為缺件。record window決定計算哪些frame，calculation window再按sim_time取mean/std；benchmark primary fidelity metric為cd_l1_r2s。空sim mesh frame會跳過，低於z門檻的vertices函式只警告仍原樣返回。這些誤差不能轉成操作success率。",
+    "standardization": {
+      "profile": "paired_real_sim_garment_dynamics_fidelity",
+      "reuse": "98個capture registry／每case時間窗、world calibration、CSV pose與PCD reader、BaseEnvWrapper到具體sim stepping、方向性Chamfer與result schema。",
+      "transform": "source分capture dataset、工業asset subset、ClothesNet重用與code commit；environment保存sim engine/version/mode、robot／sensor、mesh/material；task記動作primitive；case用capture key，simulator/mode/mesh resolution是trial條件。evaluator分direction/norm/unit、raw frame errors、window mean/std及跨sample mean。保存case frame coverage、camera delay與calibration SHA；不要把105列baseline或不同sim run倍增case。raw ROS→processed CSV明示轉換，保持wxyz/xyzw與base-transform方向。",
+      "missing": "HF capture／mesh與校準檔的實際revision及完整性驗證；GarmentDynamics本體、完整工業library與不同component條款；HD norm／依賴pin；spatial vertex-order stability的指標命名或實作釐清；資料文件與processed CSV／capture硬體版本對齊；重跑sample去重、mean/std尾列存在性與跳過frame的coverage檢查。"
+    },
+    "version_note": "固定2026-07-30的5cc3d072。公開來源是evaluation harness加asset子集，不能將paper『Ours／mujoco_style3d』baseline當成此repo可跑的普通MuJoCo。比較腳本掃描所有timestamp run且aggregate時丟robot、按garment/action/simulator/mode平均，重複sample會被重複加權。n_samples亦非處處3。現有cloth params依GarmentDynamics擬合，跨sim使用須保留校準協定。未下載6.7GB資料、checkpoint或執行sim。",
+    "integration_issues": [
+      "編目為simulation-fidelity benchmark；98 captures、105 baseline rows與6k+ assets分開。",
+      "sim_stability_score實際沿vertex index；HD norm依賴未固定，兩者不能直接套論文語義。",
+      "processed CSV schema、相機版本／外參、sample重跑去重與mean/std輸出驗證需整合；GarmentDynamics維持未公開runtime狀態。"
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            15,
+            38
+          ],
+          [
+            143,
+            154
+          ],
+          [
+            327,
+            354
+          ],
+          [
+            423,
+            449
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 452,
+        "sha256": "47135c92c3ce47eb9d0f5bb8ea1abd473b48a4e37101728db8ff9e90401f5ddc",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/README.md",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/README.md#L15-L38",
+        "why": "公開範圍、兩種actuation mode、asset／capture授權與論文身分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "configs/experiment_library.yaml",
+        "ranges": [
+          [
+            1,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 960,
+        "sha256": "54c8a668e4d5569c7124cd3429681e14cde483b5771624d4eed8605bd33a0b18",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/configs/experiment_library.yaml",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/configs/experiment_library.yaml#L1-L45",
+        "why": "原生(garment,action,robot,sample) key、capture路徑、camera delay及兩個時間窗。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "configs/main.yaml",
+        "ranges": [
+          [
+            8,
+            44
+          ],
+          [
+            47,
+            98
+          ],
+          [
+            116,
+            124
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 124,
+        "sha256": "73a93d3c02672319f2d7dfb36fdbaddfac8972b55eccf1a088aa0cdf7530a8e5",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/configs/main.yaml",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/configs/main.yaml#L8-L44",
+        "why": "Hydra registry binding、資料／calibration path與實際mode／delay設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "configs/cloth_params/green_tshirt.yaml",
+        "ranges": [
+          [
+            1,
+            22
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 22,
+        "sha256": "640b0743c8a90dd408e0dc18a0079bf85179026084c73ab2bd03aa59fcc8a248",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/configs/cloth_params/green_tshirt.yaml",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/configs/cloth_params/green_tshirt.yaml#L1-L22",
+        "why": "mesh resolution、物理參數與shoulder vertex ID；不能混用其他mesh的index。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/csv_data.py",
+        "ranges": [
+          [
+            24,
+            78
+          ],
+          [
+            465,
+            558
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 581,
+        "sha256": "9ac0be05d8b28bfd4c1a301d65fea97f7ba55d4ff8b60335e25100bea8bb6cb5",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/csv_data.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/csv_data.py#L24-L78",
+        "why": "真實reader要time/pos_*／orn_*處理後欄位，並做base transform與起點裁切。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/transforms.py",
+        "ranges": [
+          [
+            79,
+            123
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 182,
+        "sha256": "a0f9e0a51ff0e34da919c99f41d3f659eaa013dbf5bd01ee7b6dd91aa741ae26",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/transforms.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/transforms.py#L79-L123",
+        "why": "相機外參的反矩陣、手眼refinement與缺檔時identity fallback。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/envs/__init__.py",
+        "ranges": [
+          [
+            6,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 55,
+        "sha256": "7c8f03ba3df6a13324f48caa37c950962ac87d70aaa88fb9baa1003d9852e5a6",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/envs/__init__.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/envs/__init__.py#L6-L55",
+        "why": "選擇具體PyBullet/IsaacSim/MuJoCo wrapper，GarmentDynamics屬外部closed-source dependency。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/envs/pybullet/cloth_pybullet_fixed_point_env.py",
+        "ranges": [
+          [
+            41,
+            78
+          ],
+          [
+            115,
+            123
+          ],
+          [
+            184,
+            249
+          ],
+          [
+            336,
+            376
+          ],
+          [
+            429,
+            482
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 725,
+        "sha256": "f4f943a847734696518537f46b7710cc27afc96be47ccc7212eb6edbc762b51f",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/envs/pybullet/cloth_pybullet_fixed_point_env.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/envs/pybullet/cloth_pybullet_fixed_point_env.py#L41-L78",
+        "why": "以CSV pose驅動固定vertex anchor、time stepping及世界座標mesh讀取。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "scripts/run_benchmark.py",
+        "ranges": [
+          [
+            45,
+            86
+          ],
+          [
+            165,
+            244
+          ],
+          [
+            259,
+            286
+          ],
+          [
+            302,
+            376
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 384,
+        "sha256": "ccca709714a666b79f1459477d1c5dc2da98858fabd24f9e091fedc2a01cfd06",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/scripts/run_benchmark.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/scripts/run_benchmark.py#L45-L86",
+        "why": "依每個真實PCD timestamp推進sim、計算方向性cost，再依calculation window彙總。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/metrics.py",
+        "ranges": [
+          [
+            17,
+            39
+          ],
+          [
+            59,
+            88
+          ],
+          [
+            91,
+            122
+          ],
+          [
+            125,
+            176
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 176,
+        "sha256": "2d949794d120392e7954d7555fe5b569a19628d54218834a91612eb509daeb47",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/metrics.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/metrics.py#L17-L39",
+        "why": "Chamfer L1/L2具體nearest-neighbor與單幀vertex-index stability。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/visualization.py",
+        "ranges": [
+          [
+            252,
+            295
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 295,
+        "sha256": "7b93f3bdeacc42c62a33aaf412a9f0a5fd351703f3f027982ce6d0b0a61b7901",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/visualization.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/visualization.py#L252-L295",
+        "why": "以sim_time過濾calculation window，再對frame等權mean/std。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "rgbench/output.py",
+        "ranges": [
+          [
+            110,
+            124
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 143,
+        "sha256": "6c2fbe30d31a6fca12702f565c616d1362b0225fa53b7b383b12534d7905f0c1",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/output.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/rgbench/output.py#L110-L124",
+        "why": "metrics.csv尾端mean/std列與index=False的輸出約定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "scripts/compare_to_paper.py",
+        "ranges": [
+          [
+            49,
+            127
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 227,
+        "sha256": "426e32d047852e919d3fb2fc8e4ff59ffe1dcfc7218979762c1c82eb7202f571",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/scripts/compare_to_paper.py",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/scripts/compare_to_paper.py#L49-L127",
+        "why": "取iloc[-2]後依cell平均、baseline join與rank；重跑sample未去重。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "results/paper_baselines.csv",
+        "ranges": [
+          [
+            1,
+            6
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 106,
+        "sha256": "71ab1ff601d469b88ca0db05cac2d46feafa96414305c1ec1902be4e63f3672c",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/results/paper_baselines.csv",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/results/paper_baselines.csv#L1-L6",
+        "why": "baseline長表keys與實際n_samples可為2，不能一律假設3。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hwk0809/RGBench",
+        "requested_repo": "hwk0809/RGBench",
+        "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+        "ref": null,
+        "path": "results/README.md",
+        "ranges": [
+          [
+            13,
+            36
+          ],
+          [
+            61,
+            93
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 97,
+        "sha256": "55ad29bbf52eb39a7eef29a3856351f896698b4695b770b52c5acef80484c2ba",
+        "url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/results/README.md",
+        "reading_url": "https://github.com/hwk0809/RGBench/blob/5cc3d07209362b3bfdbfbc067168dea9a791690a/results/README.md#L13-L36",
+        "why": "7件baseline garments、105/126涵蓋與GarmentDynamics不可由此repo重現。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "8979806a6d25ecdd5c8094860b2ad21fb526a71451d851ad64105d6fafa1f2a7"
+  },
+  "repository_binding_review_sha256": "8979806a6d25ecdd5c8094860b2ad21fb526a71451d851ad64105d6fafa1f2a7",
+  "repository_bindings": [
+    {
+      "requested_repo": "hwk0809/RGBench",
+      "resolved_repo": "hwk0809/RGBench",
+      "aliases_in_this_review": [
+        "hwk0809/rgbench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5cc3d07209362b3bfdbfbc067168dea9a791690a",
+          "reviewed_files": [
+            "README.md",
+            "configs/cloth_params/green_tshirt.yaml",
+            "configs/experiment_library.yaml",
+            "configs/main.yaml",
+            "results/README.md",
+            "results/paper_baselines.csv",
+            "rgbench/csv_data.py",
+            "rgbench/envs/__init__.py",
+            "rgbench/envs/pybullet/cloth_pybullet_fixed_point_env.py",
+            "rgbench/metrics.py",
+            "rgbench/output.py",
+            "rgbench/transforms.py",
+            "rgbench/visualization.py",
+            "scripts/compare_to_paper.py",
+            "scripts/run_benchmark.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/hwk0809/RGBench",
+          "link_label": "Code",
+          "project_url": "https://rgbench.github.io/",
+          "page_sha256": "c2aa19daf4257bc767be742edb34019bbb7a02eb30da228f03e201af3a50b359"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P185",
+          "review_file": "content/github_review/reviews/P185.json",
+          "review_sha256": "8979806a6d25ecdd5c8094860b2ad21fb526a71451d851ad64105d6fafa1f2a7",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P185",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RGBench，arXiv 2511.06434v2。",
+    "scope_read": "garment來源、三primitive、real/sim pair、distance及performance benchmarking。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      13,
+      15
+    ],
+    "domains": [
+      "衣物與洗護"
+    ],
+    "role": "柔性物模擬器評測",
+    "environment": "配對真實dual-Piper/Jaka工作站與garment simulation；direct-vertex與robot-URDF modes分開。",
+    "tasks": "3manipulation primitives：Grasp/Fling/Fold；9garment types的real GT比較，主表是其中子集。",
+    "cases": "6,000+garment assets＝4,000+industry＋2,000+ClothesNet；非6,000eval tasks。已讀段落未報全部paired trajectory數。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 6000,
+        "unit": "garment assets",
+        "qualifier": "6,000+",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "manipulation primitives",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 9,
+        "unit": "real comparison garment types",
+        "pages": [
+          5,
+          13
+        ]
+      }
+    ],
+    "evaluation": [
+      "真實/模擬點雲的Chamfer與Hausdorff L1，r2s/s2r分開；runtime/memory/mesh vertices另測simulation engine。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "人工配對動作及材料/形狀參數；主要評測simulation fidelity，不是policy完成率。",
+    "lineage": "ClothesNet重用；BCM外部驗證不是新獨立資料源。",
+    "related_paper_ids": [
+      "P087",
+      "P167"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          13,
+          15
+        ],
+        "locator": "Dataset、Task/Mode、Metrics、Appendix",
+        "supports": "6000+/3/9、fidelity與L1"
+      }
+    ],
+    "unresolved": [
+      "全部paired trajectory IDs及industry assets再分發範圍需release核；不要用mesh數充題數。"
+    ],
+    "reuse": "補benchmark的模擬有效性檢驗；這個評分層與policy task success有不同目的。",
+    "reviewed_pdf_sha256": "abc60e4860b3f9e166eeb0391fbf21186ec162cf7ffa413ed321ba8851b61970",
+    "reviewed_on": "2026-10-02",
+    "name": "RGBench",
+    "year": 2025,
+    "title": "Real Garment Benchmark (RGBench): A Comprehensive Benchmark for Robotic Garment Manipulation featuring a High-Fidelity Scalable Simulator",
+    "source_url": "https://arxiv.org/abs/2511.06434",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P185",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P185",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            13,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3manipulation primitives：Grasp/Fling/Fold；9garment types的real GT比較，主表是其中子集。",
+            "配對真實dual-Piper/Jaka工作站與garment simulation；direct-vertex與robot-URDF modes分開。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "abc60e4860b3f9e166eeb0391fbf21186ec162cf7ffa413ed321ba8851b61970"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "abc60e4860b3f9e166eeb0391fbf21186ec162cf7ffa413ed321ba8851b61970",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P185",
+      "name": "RGBench",
+      "expected_title": "Real Garment Benchmark (RGBench): A Comprehensive Benchmark for Robotic Garment Manipulation featuring a High-Fidelity Scalable Simulator",
+      "source_url": "https://arxiv.org/abs/2511.06434",
+      "pdf_url": "https://arxiv.org/pdf/2511.06434",
+      "retrieved_at": "2026-10-02T21:34:55.160460+00:00",
+      "pdf_sha256": "abc60e4860b3f9e166eeb0391fbf21186ec162cf7ffa413ed321ba8851b61970",
+      "text_sha256": "fa937750a439953726146742f10e61b52f28d50f1b843a4d2e0ca90097df285d",
+      "pdf_bytes": 9046255,
+      "pages": 20,
+      "text_characters": 117751,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2511.06434v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2511.06434v2"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 6000,
+        "unit": "garment assets",
+        "qualifier": "6,000+",
+        "pages": [
+          1,
+          3
+        ],
+        "record_id": "review10:P185:1",
+        "paper_id": "P185",
+        "benchmark": "RGBench",
+        "native_term": "garment assets",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.06434v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.06434v2",
+            "locator": "PDF pp. 1, 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "manipulation primitives",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P185:2",
+        "paper_id": "P185",
+        "benchmark": "RGBench",
+        "native_term": "manipulation primitives",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.06434v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.06434v2",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 9,
+        "unit": "real comparison garment types",
+        "pages": [
+          5,
+          13
+        ],
+        "record_id": "review10:P185:3",
+        "paper_id": "P185",
+        "benchmark": "RGBench",
+        "native_term": "real comparison garment types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.06434v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.06434v2",
+            "locator": "PDF pp. 5, 13",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "hwk0809/RGBench"
+  ],
+  "external_repositories": []
+}

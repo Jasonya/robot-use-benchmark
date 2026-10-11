@@ -1,0 +1,518 @@
+{
+  "paper_id": "P116",
+  "name": "OopsieVerse",
+  "title": "OopsieVerse: A Safety Benchmark with Damage-Aware Simulation for Robot Manipulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.31993",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P116",
+    "summary": "OopsieVerse把機體／物件損傷追蹤加到既有模擬器；任務成功和健康值是兩條評分線。已核對thermal公式、health累積及觀測／HDF5對映。",
+    "environment": "BEHAVIOR-1K/OmniGibson及RoboCasa/RoboSuite父環境＋damageable物件／機體部件；損傷模型擴充不自動產生新的生活場域。",
+    "tasks": "完成原操作目標並控制損傷；需要記錄允許的damage條件、閾值及破壞後能力改變。各任務具體completion function仍由其配置提供。",
+    "data": "obs.health為float32部件向量；info.damage_info分object/part/evaluator，HDF5 attr health_list_link_names固定向量對映，另存task_completion/reward。health是真實可見感測或僅sim特權訊號需在protocol聲明。",
+    "evaluation": "各part由100開始，每次update扣各evaluator damage並下界0，object health取最小part。thermal超出閾值按scale×溫差且cap100；OG取Temperature，讀取失敗回0。step有init_skip_steps和可覆寫reward_fn；計量必須固定步頻/暖機/scale，損傷分數是模擬模型輸出。",
+    "standardization": {
+      "profile": "damage_augmented_robot_simulation",
+      "reuse": "父task＋damage配置、各part健康與細項診斷、HDF5部件字典。",
+      "transform": "case固定機體/材料/損傷參數/步頻/初始health與合法觀測；evaluator分task completion、damage trajectory、約束違反，原先無損傷與擴充協定分版。",
+      "missing": "全任務completion predicates與assets對齊、機械/電氣子模型逐項接線、步頻與真實損傷校準、回放T/T+1及狀態閉合驗證。"
+    },
+    "version_note": "固定2026-10公開碼；本次深入熱損傷及共同health流程，未宣稱所有損傷機制、全部任務或真實安全效能已驗證。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "UT-Austin-RobIn/oopsieverse",
+        "requested_repo": "UT-Austin-RobIn/oopsieverse",
+        "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            9,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "d4b92f8ed1cc6cdf19d93043e8fb2784fa3b941e08fe48850a97340302c562ea",
+        "url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/README.md",
+        "reading_url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/README.md#L9-L38",
+        "why": "精確論文與BEHAVIOR/RoboCasa/RoboSuite父來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UT-Austin-RobIn/oopsieverse",
+        "requested_repo": "UT-Austin-RobIn/oopsieverse",
+        "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+        "ref": null,
+        "path": "damagesim/core/damageable_env.py",
+        "ranges": [
+          [
+            43,
+            77
+          ],
+          [
+            240,
+            269
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 290,
+        "sha256": "13a2ddcb2204d0ab92456939616569ec3b998484fe7a640c1826b2ba05883981",
+        "url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/core/damageable_env.py",
+        "reading_url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/core/damageable_env.py#L43-L77",
+        "why": "damage啟用/鎖定、health觀測欄位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UT-Austin-RobIn/oopsieverse",
+        "requested_repo": "UT-Austin-RobIn/oopsieverse",
+        "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+        "ref": null,
+        "path": "damagesim/core/damageable_mixin.py",
+        "ranges": [
+          [
+            69,
+            99
+          ],
+          [
+            129,
+            174
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 218,
+        "sha256": "b4f8f68dd3025750910b90b75db02a8a07e149313fc8d6b72fbc4c0ecaa3de21",
+        "url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/core/damageable_mixin.py",
+        "reading_url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/core/damageable_mixin.py#L69-L99",
+        "why": "初始100、各part累積扣損與最小part健康",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UT-Austin-RobIn/oopsieverse",
+        "requested_repo": "UT-Austin-RobIn/oopsieverse",
+        "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+        "ref": null,
+        "path": "damagesim/core/evaluators/thermal.py",
+        "ranges": [
+          [
+            24,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 75,
+        "sha256": "981b065c9204cf1612ccc9e65828450eaeb37832287a93a63cf85349f5155dbc",
+        "url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/core/evaluators/thermal.py",
+        "reading_url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/core/evaluators/thermal.py#L24-L75",
+        "why": "過熱/過冷損傷確切公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UT-Austin-RobIn/oopsieverse",
+        "requested_repo": "UT-Austin-RobIn/oopsieverse",
+        "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+        "ref": null,
+        "path": "damagesim/omnigibson/evaluators/thermal.py",
+        "ranges": [
+          [
+            1,
+            60
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 60,
+        "sha256": "3a5c296f5e6e13764356ddb55162c18c01bdf47f70df1ea6381ba0a0bc73c0d2",
+        "url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/omnigibson/evaluators/thermal.py",
+        "reading_url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/omnigibson/evaluators/thermal.py#L1-L60",
+        "why": "具體OG Temperature讀取及缺值行為",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UT-Austin-RobIn/oopsieverse",
+        "requested_repo": "UT-Austin-RobIn/oopsieverse",
+        "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+        "ref": null,
+        "path": "damagesim/omnigibson/damageable_env.py",
+        "ranges": [
+          [
+            233,
+            290
+          ],
+          [
+            437,
+            472
+          ],
+          [
+            1087,
+            1125
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1125,
+        "sha256": "fb959dce7ea4fffab77026410b74667a23865c73d10cd83961a1dfc6d15c2596",
+        "url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/omnigibson/damageable_env.py",
+        "reading_url": "https://github.com/UT-Austin-RobIn/oopsieverse/blob/a739f99e94f32c3229ae6932299e2e0e8c065480/damagesim/omnigibson/damageable_env.py#L233-L290",
+        "why": "step與damage更新、task completion、序列化健康部件索引",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c6e38a2161250e356207fbfc773e7119750b76283c55ee8ac1fb9342b175913c"
+  },
+  "repository_binding_review_sha256": "c6e38a2161250e356207fbfc773e7119750b76283c55ee8ac1fb9342b175913c",
+  "repository_bindings": [
+    {
+      "requested_repo": "UT-Austin-RobIn/oopsieverse",
+      "resolved_repo": "UT-Austin-RobIn/oopsieverse",
+      "aliases_in_this_review": [
+        "ut-austin-robin/oopsieverse"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480",
+          "reviewed_files": [
+            "README.md",
+            "damagesim/core/damageable_env.py",
+            "damagesim/core/damageable_mixin.py",
+            "damagesim/core/evaluators/thermal.py",
+            "damagesim/omnigibson/damageable_env.py",
+            "damagesim/omnigibson/evaluators/thermal.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/UT-Austin-RobIn/oopsieverse",
+          "link_label": "",
+          "project_url": "https://robin-lab.cs.utexas.edu/oopsieverse/",
+          "page_sha256": "177cdc3d956e050131e62644a7cd6b982634d0433156d1b0cc15c496fe0c07bd"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/UT-Austin-RobIn/oopsieverse",
+          "link_label": "Code",
+          "project_url": "https://robin-lab.cs.utexas.edu/oopsieverse/",
+          "page_sha256": "177cdc3d956e050131e62644a7cd6b982634d0433156d1b0cc15c496fe0c07bd"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P116",
+          "review_file": "content/github_review/reviews/P116.json",
+          "review_sha256": "c6e38a2161250e356207fbfc773e7119750b76283c55ee8ac1fb9342b175913c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P116",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "OopsieVerse，arXiv 2606.31993v1。",
+    "scope_read": "DamageSim三類傷害、32實作/21task設計、demo及safe-success評分。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "安全與約束評測",
+    "environment": "OmniGibson與RoboCasa/Robosuite兩後端；熱／流體傷害只在支援相應物理的後端可用。",
+    "tasks": "32task instantiations對應21unique task designs；不是32不同語義任務。",
+    "cases": "5示範task共90demonstrations，health feedback有/無各半；IL每task30rollouts。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "unique task designs",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 32,
+        "unit": "跨simulator task instantiations",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 90,
+        "unit": "5task demos",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "IL每task評測rollouts",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "task completion與safe completion分開；後者需goal成功且所有tracked object health維持>95。",
+      "damage由力、溫度、液體接觸的參數模型計算，不能等同已校準的真實損害機率。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同collection/curation/RL/VLA設定分開；5task IL子集不代表全32皆同程度實驗。",
+    "lineage": "BEHAVIOR1K與RoboCasa任務加damage觀測／reward／termination；共享goal與backend instantiations。",
+    "related_paper_ids": [
+      "P100",
+      "P070",
+      "P069"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§IV、§V-A、圖4–5",
+        "supports": "32/21、90/30及safe-success"
+      }
+    ],
+    "unresolved": [
+      "damage threshold跨材料／跨後端的物理標定程度須另驗證。"
+    ],
+    "reuse": "為同一goal增加保護物件／低破壞條件的直接先例，規則差異應獨立可查。",
+    "reviewed_pdf_sha256": "cbef5a184d84ac4490de9dbbfde077c3b9a7905c1d6bc581e739540b078af3d2",
+    "reviewed_on": "2026-10-02",
+    "name": "OopsieVerse",
+    "year": 2026,
+    "title": "OopsieVerse: A Safety Benchmark with Damage-Aware Simulation for Robot Manipulation",
+    "source_url": "https://arxiv.org/abs/2606.31993",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "表面清潔"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P116",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P116",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "32task instantiations對應21unique task designs；不是32不同語義任務。",
+            "OmniGibson與RoboCasa/Robosuite兩後端；熱／流體傷害只在支援相應物理的後端可用。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "cbef5a184d84ac4490de9dbbfde077c3b9a7905c1d6bc581e739540b078af3d2"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "cbef5a184d84ac4490de9dbbfde077c3b9a7905c1d6bc581e739540b078af3d2",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P116",
+      "name": "OopsieVerse",
+      "expected_title": "OopsieVerse: A Safety Benchmark with Damage-Aware Simulation for Robot Manipulation",
+      "source_url": "https://arxiv.org/abs/2606.31993",
+      "pdf_url": "https://arxiv.org/pdf/2606.31993",
+      "retrieved_at": "2026-10-02T21:34:31.953103+00:00",
+      "pdf_sha256": "cbef5a184d84ac4490de9dbbfde077c3b9a7905c1d6bc581e739540b078af3d2",
+      "text_sha256": "0ad67fb5b04b2c4c93b4d4d94e850c0d513595fe1a94e4a981f45c968ed6afb3",
+      "pdf_bytes": 35214449,
+      "pages": 17,
+      "text_characters": 105589,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.31993v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.31993v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "unique task designs",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P116:1",
+        "paper_id": "P116",
+        "benchmark": "OopsieVerse",
+        "native_term": "unique task designs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.31993v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.31993v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 32,
+        "unit": "跨simulator task instantiations",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P116:2",
+        "paper_id": "P116",
+        "benchmark": "OopsieVerse",
+        "native_term": "跨simulator task instantiations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.31993v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.31993v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 90,
+        "unit": "5task demos",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P116:3",
+        "paper_id": "P116",
+        "benchmark": "OopsieVerse",
+        "native_term": "5task demos",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.31993v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.31993v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "IL每task評測rollouts",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P116:4",
+        "paper_id": "P116",
+        "benchmark": "OopsieVerse",
+        "native_term": "IL每task評測rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.31993v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.31993v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "UT-Austin-RobIn/oopsieverse"
+  ],
+  "external_repositories": []
+}

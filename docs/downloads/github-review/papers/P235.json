@@ -1,0 +1,588 @@
+{
+  "paper_id": "P235",
+  "name": "TransFusion",
+  "title": "Summarize the Past to Predict the Future: Natural Language Descriptions of Context Boost Multimodal Object Interaction Anticipation",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2301.09209",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P235",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "作者頁直接連 algvr/transfusion，已核 Ego4D v1/v2 reader、語言摘要輸入及實際 Top-5 STA mAP。此來源是離線下一次人類物件互動預測；外部摘要、SlowFast TTC 替換與跨 GPU 合併都是結果協定的一部分。論文 EK100 路徑在現行入口尚未閉合。",
+    "identity_note": "精確題名與 Pasca、Gavryushin 等八位作者相符；清單 2023 是 arXiv 初稿，快取為 arXiv:2301.09209v4（2024-03-10）。PDF p.1 連作者專頁，專頁 HTML 52–117 行顯示相同題名、作者、CVPR 2024 與 Code→algvr/transfusion。專頁／現行 repo 支援兩版 Ego4D，不能把這個版本直接當 v4 文中全部 EK100 實驗的完整 release。",
+    "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+    "environment": "Ego4D 人類第一人稱日常場景，包含廚房、園藝、維修等；論文另以 EPIC-KITCHENS-100 廚房影片驗證。輸入是 prediction frame 與其過去的語言化情境，沒有 robot state/action 或 simulator。",
+    "tasks": "每個 prediction uid 可有多個將互動的物件，預測 box、noun、verb、time_to_contact、score。v1 固定 mapping 有 87 nouns／74 verbs，v2 為 128／81；這些是詞彙類別，不是新增任務數。Noun、Noun-Verb、Noun-TTC、Overall 為不同匹配限制的指標，另有 noun-only／verb-only 消融。",
+    "data": "fho_sta_{train,val,test_unannotated}.json 以 annotations、noun_categories、verb_categories、info.video_metadata 組成；每筆 uid、video_id(v1)/video_uid(v2)、frame、clip_id、clip_uid、clip_frame、objects[{box,verb_category_id,noun_category_id,time_to_contact}]。框為原影像 xyxy 像素，TTC 為秒；det_sec=frame/fps，fps 讀各影片 metadata，不能一律硬設 30。reader 轉 Bboxes/all_nouns/all_verbs/det_diff，objects_to_entries 只留最後物件 TTC，再對所有物件複製，接軌應保留原始每物件 TTC 並驗證此假設。LMDB 模式可縮至高 480，jpg 模式不先縮框。noun ID 0 移至末類以讓 0 作背景，輸出再還原；v1/v2 對 nut/tape 等字串處理不同。設定 subset=0 實際使用原始 orig_split；另排除 5 個 UID、有框過濾與讀圖失敗跳下一筆，故完整 case 分母須由版本化可讀 uid manifest 計算，不能直接沿用論文的 64,798 統計。test 中 ball/take 與固定框為 loader placeholder，不能當 GT。語言 JSON 用 prediction uid 索引，v1 將 object_lang/action_lang 直接串接，v2 加分號；目前 current 策略消費預先生成摘要。",
+    "evaluation": "EgoNAOTrainer 的 train/val 均建 STAMeanAveragePrecision(top_k=5)，先將預測與 GT 框轉整數。每圖按 confidence 遞減、以最大有效 IoU 一對一配對；IoU 使用像素端點 +1 面積，實作 boxes>0.5，abs(TTC error)<=0.25 秒。論文 p.5 寫 IoU>=0.5、TTC<0.25，邊界不可混寫。Top-5 實作對每種配對條件豁免該圖最高分的 (5-1)×GT物件數個 FP；不是隻計五類。剩餘預測依 class/confidence 合併，recall=累積TP/該類GT物件數，precision=TP/(TP+FP)，取單調 precision envelope 的 VOC 積分；count_all_classes=False，對有 GT 的類別作宏平均×100，joint 指標按 noun 平均。trainer 輸出 results[uid]=至多5個{box,noun_category_id,verb_category_id,time_to_contact,score}，所以線上 raw-pred 指標與匯出檔重評有額外截斷差異。DDP 本地 AP 後同步不等於合併資料再計 AP；README 要合併 JSON 用 EGO4D/forecasting 正式腳本。TTC loss 在兩設定均為 0，README 指論文結果使用外部 SlowFast TTC；這次沒有把本地 scorer 充當已核正式 server 結果。",
+    "standardization": {
+      "profile": "offline_egocentric_next_object_interaction",
+      "reuse": "版本化 category mapping、原始 annotation→case 欄位、語言 uid lookup、STA 配對與 AP 聚合，以及 submission JSON 外形。",
+      "transform": "source 記 paper/repo/Ego4D revision；domain/environment 指人類影片及該筆場景；task 保留下一次互動預測；case key=(dataset_version,split,uid)，frame 與 clip_frame 各留參照系，boxes 記 xyxy/原圖尺寸，objects 與 TTC 逐筆保留。label 同時存原 category ID 與背景重編號；context 記生成模型、輸入最大 frame/time、摘要資產 SHA、GT／預測模式。evaluator 區分本地／匯出／正式 server、Top-5 FP 預算、noun macro AP、TTC來源及 DDP 合併策略。",
+      "missing": "需固定外部 context、Ego4D 標註與 SlowFast TTC revision；目前 loader 只按 uid 取字串，無法證明摘要只使用過去影格，w_leak=False 也不是此證明。核對多物件 TTC 被壓成一值、5 筆輸出截斷與實際可讀 case 分母。adapt_ttc_values.py 使用 argparse 的 description 引數、連字號 positional 名稱卻以底線取值，且 test_keys 未定義，不能視為可直接執行的 TTC 整合器；README 所述 evaluate_wandb_jsons.py 不在固定 tree。EK100 論文採 UniDet 產生 pseudo boxes 並依影片分割，現行 get_annotations_df 只接受 Ego4D，須找對應 release／處理過的 manifest 才能宣稱重現。"
+    },
+    "version_note": "固定 55d3a4eca3325dc65f5f0391cc27105ba110c00f。論文方法、作者專頁 CVPR 2024 release、Ego4D v1/v2 與 EK100 pseudo-label 實驗各留版本關係；同名 LiDAR TransFusion 不屬本篇。僅核上述核心來源，未執行上游、下載完整影片／模型／摘要套件。",
+    "discovery_evidence": [
+      {
+        "provider": "primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P235/pages.json",
+        "sha256": "b9f12649608b55903083a70fb517c3d634c7c77b0f66673c6b86651fe132b2d0",
+        "url": "https://arxiv.org/pdf/2301.09209",
+        "json_pointers": [
+          "/0/text",
+          "/2/text",
+          "/4/text",
+          "/5/text",
+          "/7/text",
+          "/11/text",
+          "/15/text",
+          "/18/text",
+          "/19/text"
+        ],
+        "version": "arXiv:2301.09209v4; CVPR 2024",
+        "pdf_local_file": "audit/.cache/fulltext_review/P235/paper.pdf",
+        "pdf_sha256": "a6764f4da82fee8ded27275830a1fc9130e00d270c510d831c69f27d05a37506",
+        "pages": [
+          1,
+          3,
+          5,
+          6,
+          8,
+          12,
+          16,
+          19,
+          20
+        ]
+      },
+      {
+        "provider": "author_project",
+        "local_file": "audit/.cache/github_review/http/4008de3d6b0683074395064bb6fe3ca45202b1927c47f7ba56de1506a5e8099d.body",
+        "sha256": "b6fc1a66bdf642d092c93ce91cf692d3cf2d3f811a219f650fb61eeddb3fedb4",
+        "url": "https://eth-ait.github.io/transfusion-proj/",
+        "ranges": [
+          [
+            52,
+            117
+          ]
+        ],
+        "note": "固定快取 HTML 直接連作者程式。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            6
+          ],
+          [
+            19,
+            37
+          ],
+          [
+            43,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 91,
+        "sha256": "e307f3c47744c7c1f063a69002690284841d96f8faa712aa4272106d766a01a6",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/README.md",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/README.md#L1-L6",
+        "why": "作者方法、資料版本、官方評分依賴與 TTC 後處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "data_preprocessing/utils/annotations_df_utils.py",
+        "ranges": [
+          [
+            74,
+            124
+          ],
+          [
+            127,
+            274
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 274,
+        "sha256": "60c69183b85f9f9a0466d92d009585cadb3578527e61885380ee4d7d5e72057d",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/utils/annotations_df_utils.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/utils/annotations_df_utils.py#L74-L124",
+        "why": "STA annotations→DataFrame、原始 category/frame/TTC、split 與排除條件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "data_preprocessing/utils/path_utils.py",
+        "ranges": [
+          [
+            62,
+            125
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 333,
+        "sha256": "3a2af172c23ec94dd78f7b486c0284b05d42b56ff1808b910690dff2b72dc659",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/utils/path_utils.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/utils/path_utils.py#L62-L125",
+        "why": "uid-keyed 外部語言摘要替換；現行入口接受的資料來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "data_preprocessing/datasets/base_nao_dataset.py",
+        "ranges": [
+          [
+            40,
+            147
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 249,
+        "sha256": "2b5ea56f7bacff629b000b85126a34e403401a503814b6ab4c19bb32d9bab407",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/datasets/base_nao_dataset.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/datasets/base_nao_dataset.py#L40-L147",
+        "why": "video_id/video_uid、框縮放與 label mapping。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "data_preprocessing/utils/dataset_utils.py",
+        "ranges": [
+          [
+            82,
+            143
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 187,
+        "sha256": "5efbc51be0de9cf24c54a2fb301b6e6d866b93fc5ee8e75334e8c4d4da91d972",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/utils/dataset_utils.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/utils/dataset_utils.py#L82-L143",
+        "why": "noun 0 移至末類以保留背景；非單純全類別 +1。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "data_preprocessing/datasets/egonao_datasets.py",
+        "ranges": [
+          [
+            90,
+            103
+          ],
+          [
+            131,
+            183
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 183,
+        "sha256": "bd5b21b6f2ae703649c1622419acb0758ec8999ef776d49d01b45d54627cdf94",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/datasets/egonao_datasets.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/datasets/egonao_datasets.py#L90-L103",
+        "why": "image/bboxes/labels/verb/ttc/id/orig_shape 及讀圖失敗時跳下一筆。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/nao/configs/ego_nao_res50_ego4d.yml",
+        "ranges": [
+          [
+            11,
+            79
+          ],
+          [
+            129,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 165,
+        "sha256": "f9902cdc757a448992bbeb1e398ef0f7e833b91f199499a424ceb4d9c59ce2d4",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/configs/ego_nao_res50_ego4d.yml",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/configs/ego_nao_res50_ego4d.yml#L11-L79",
+        "why": "v1 原生 split、外部摘要、current 策略與 TTC loss 關閉。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/nao/configs/ego_nao_res50_ego4dv2.yml",
+        "ranges": [
+          [
+            11,
+            79
+          ],
+          [
+            122,
+            152
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 173,
+        "sha256": "a55a839985d2c27a47a72afc7cb6d58d696d46b06ea7361afbcafb5051ce1bc5",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/configs/ego_nao_res50_ego4dv2.yml",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/configs/ego_nao_res50_ego4dv2.yml#L11-L79",
+        "why": "v2 mapping／摘要資產與多 GPU 設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "data_preprocessing/train_test_splits/utils.py",
+        "ranges": [
+          [
+            97,
+            144
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 144,
+        "sha256": "883d1b5b8a6c01a11fffbec0dc2990eb300ac12484dfd3b351e1ccd24896e2db",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/train_test_splits/utils.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/data_preprocessing/train_test_splits/utils.py#L97-L144",
+        "why": "subset=0 實際沿用 orig_split，不執行名稱所示的新分層切分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/nao/snao_data.py",
+        "ranges": [
+          [
+            84,
+            152
+          ],
+          [
+            155,
+            175
+          ],
+          [
+            207,
+            224
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 224,
+        "sha256": "02e4ef587ba5ac792a223f20324d285afb119fb3e243045dc32eef9b5a1ba1d1",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/snao_data.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/snao_data.py#L84-L152",
+        "why": "split 套用、空 test 回退與語言 wrapper 連接。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "modeling/narration_embeds/collate_wrapper_utils.py",
+        "ranges": [
+          [
+            13,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 162,
+        "sha256": "820f9ecd1aefeff4700ace0ea799975108669f3c9965f60580b136582271262a",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/modeling/narration_embeds/collate_wrapper_utils.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/modeling/narration_embeds/collate_wrapper_utils.py#L13-L45",
+        "why": "current／previous wrapper 的實際選擇。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "modeling/narration_embeds/datasets/current_embeddings_dsets.py",
+        "ranges": [
+          [
+            63,
+            101
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 101,
+        "sha256": "6dade0f0dca72156fd4089394ccf9d92bd379a8bef489c9fe17e742598951b76",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/modeling/narration_embeds/datasets/current_embeddings_dsets.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/modeling/narration_embeds/datasets/current_embeddings_dsets.py#L63-L101",
+        "why": "current word wrapper 按 prediction uid 取得摘要；無生成時間稽核。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/nao/ego_nao_data.py",
+        "ranges": [
+          [
+            53,
+            79
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 79,
+        "sha256": "0928e4712f5cd061377272a7b8064a32e796bd43d97ba6340e3bc65ea7e9c430",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/ego_nao_data.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/ego_nao_data.py#L53-L79",
+        "why": "EgoNaoDataset 接外部摘要 wrapper 的實際路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/nao/ego_nao_trainer.py",
+        "ranges": [
+          [
+            15,
+            31
+          ],
+          [
+            107,
+            158
+          ],
+          [
+            195,
+            250
+          ],
+          [
+            400,
+            438
+          ],
+          [
+            500,
+            501
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 501,
+        "sha256": "5c66c3f308e62935809666fe09d9bb1576ec8f99e45047279936cae2a4bf6bed",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/ego_nao_trainer.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/nao/ego_nao_trainer.py#L15-L31",
+        "why": "模型預測→本地 scorer、整數框、每圖僅輸出前 5 筆及輸出欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/metrics_losses/ego_metrics.py",
+        "ranges": [
+          [
+            4,
+            59
+          ],
+          [
+            123,
+            205
+          ],
+          [
+            207,
+            288
+          ],
+          [
+            302,
+            364
+          ],
+          [
+            468,
+            561
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 561,
+        "sha256": "b8eab7d054bd36ddb2ea631c44f1f275472b446b7b59d6e919f34a293a80c59e",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/metrics_losses/ego_metrics.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/metrics_losses/ego_metrics.py#L4-L59",
+        "why": "實際 IoU/TTC 配對、FP 豁免、每類 GT 分母與 AP 積分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "algvr/transfusion",
+        "requested_repo": "algvr/transfusion",
+        "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+        "ref": null,
+        "path": "runner/utils/adapt_ttc_values.py",
+        "ranges": [
+          [
+            7,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 48,
+        "sha256": "1d2c155ef3e40f6cecbb51e48c7c6592efc9d80aeea799dc14e0f2a4e25068c0",
+        "url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/utils/adapt_ttc_values.py",
+        "reading_url": "https://github.com/algvr/transfusion/blob/55d3a4eca3325dc65f5f0391cc27105ba110c00f/runner/utils/adapt_ttc_values.py#L7-L46",
+        "why": "依 score 配對替換 TTC 及未閉合的 CLI／test_keys。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "9a0888979f5b66475dfd11c7806cd534c0fca834d9c34a0cbe9d1f1cfcc93ca4"
+  },
+  "repository_binding_review_sha256": "9a0888979f5b66475dfd11c7806cd534c0fca834d9c34a0cbe9d1f1cfcc93ca4",
+  "repository_bindings": [
+    {
+      "requested_repo": "algvr/transfusion",
+      "resolved_repo": "algvr/transfusion",
+      "aliases_in_this_review": [
+        "algvr/transfusion"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "55d3a4eca3325dc65f5f0391cc27105ba110c00f",
+          "reviewed_files": [
+            "README.md",
+            "data_preprocessing/datasets/base_nao_dataset.py",
+            "data_preprocessing/datasets/egonao_datasets.py",
+            "data_preprocessing/train_test_splits/utils.py",
+            "data_preprocessing/utils/annotations_df_utils.py",
+            "data_preprocessing/utils/dataset_utils.py",
+            "data_preprocessing/utils/path_utils.py",
+            "modeling/narration_embeds/collate_wrapper_utils.py",
+            "modeling/narration_embeds/datasets/current_embeddings_dsets.py",
+            "runner/metrics_losses/ego_metrics.py",
+            "runner/nao/configs/ego_nao_res50_ego4d.yml",
+            "runner/nao/configs/ego_nao_res50_ego4dv2.yml",
+            "runner/nao/ego_nao_data.py",
+            "runner/nao/ego_nao_trainer.py",
+            "runner/nao/snao_data.py",
+            "runner/utils/adapt_ttc_values.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/algvr/transfusion",
+          "link_label": "Code",
+          "project_url": "https://eth-ait.github.io/transfusion-proj/",
+          "page_sha256": "b6fc1a66bdf642d092c93ce91cf692d3cf2d3f811a219f650fb61eeddb3fedb4"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P235",
+          "review_file": "content/github_review/reviews/P235.json",
+          "review_sha256": "9a0888979f5b66475dfd11c7806cd534c0fca834d9c34a0cbe9d1f1cfcc93ca4",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "algvr/transfusion"
+  ],
+  "external_repositories": []
+}

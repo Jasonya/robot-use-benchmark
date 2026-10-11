@@ -1,0 +1,285 @@
+{
+  "paper_id": "P243",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "已核FactCheck原作的Observe–Plan–Verify流程、資料與mAP設定，並找到通訊作者列出的同篇IET Software論文；該條目僅連Paper，尚無confirmed官方方法repo。本文的Verifier是LLM推理模組，報告的mAP是未來類別集合評測，不能當成實體可行性驗證或機器人成功率。",
+  "identity_note": "FactCheck: Feasibility-aware Long-term Action Anticipation with Multi-agent Collaboration；Rui Cao、Jiannong Cao、Bo Yuan、Zhiyuan Wen、Mingjin Zhang。固定核讀arXiv:2606.14778v1（2026-06-10）；首頁的Journal 2023與DOI xxx/xxxx是模板內容。通訊作者Zhiyuan Wen的publications頁列同五位作者及IET Software 2026、DOI 10.1049/sfw2/7118691。此FactCheck是動作預測方法，非同名新聞／文字事實查核專案。",
+  "reading_order": [],
+  "environment": "離線EPIC-KITCHENS-55與EGTEA Gaze+人類第一人稱廚房活動。Observer由已觀測片段的辨識結果重建物件狀態，並非從robot simulator取得真實狀態。§5.4的長程操作及人機協作屬未來應用構想，沒有本篇實體robot評測環境。",
+  "tasks": "§3以M個action segments構成影片、N=floor(αM)個歷史片段預測Z=floor(βM)個未來verb–noun動作；α為25/50/75%，β≤1−α。Observer產生歷史動作、意圖／環境摘要及圖；Planner生成有序草稿；Verifier依Object Availability、Affordance Validity、State Consistency修正。三個agent是推理角色，不是三臺robot，也不是三個獨立benchmark。§5.1.1實際評測取剩餘影片中的動作類別集合，須保留「序列生成、集合計分」差異。",
+  "data": "§4.1與§5.1.3：每action segment均勻抽4影格，以凍結CLIP-ViT-L/14-336px加訓練分類head辨識verb/noun；抽樣是每片段4張，非4 FPS。History Action Abstract是一句生成文字。圖的noun node保存Attr(n)=(v,t_start,t_end)，edge weight計歷史轉移頻率；時間單位未明列。Table3提供示意JSON的nodes[].id/state/history及edges[].src/tgt/w；§5.1.3另稱圖序列化為JSONL，未取得真正檔案或parser，不能將示例當已驗證schema。Planner用Qwen2.5-3B/7B-Instruct與QLoRA；摘要及Verifier用grok-4-1-fast-reasoning，Verifier prompt含3個人工few-shot範例。母庫的EK-55 39.6K segments／125 verbs／352 nouns及EGTEA 86 videos／10,325 action instances／19 verbs／53 nouns，不是本篇測試case數。精確split ID、完整提示與範例、生成輸出及資料reader均缺。",
+  "evaluation": "§5.1.1按α=25/50/75%的觀測比例，對剩餘(1−α)部分的未來類別做mAP-All／mAP-Freq／mAP-Rare；Freq/Rare沿EGO-TOPO分組，這裡未提供類別表或頻率門檻。未核到實際sequence→class score轉換、重複動作處理、AP積分／空positive類別及各α平均方式。沒有獨立的物理可行性真值、constraint violation rate或robot rollout；Table3是定性修正案例，不能作scorer。§5.1.1稱沿用train/test split，§5.2.1卻將EK-55結果稱validation；§3的floor與79動作案例「50%=40個observed」亦不一致，須以原始case生成器釐清。",
+  "standardization": {
+    "profile": "paper_only_feasibility_aware_action_sequence_generation_with_set_evaluation",
+    "reuse": "可重用三角色流程、歷史資訊可見性、三種feasibility約束、圖示意欄位、每segment4影格與多觀測比例，以及mAP-All/Freq/Rare的原生名稱。未取得作者可執行checker或dataset reader。",
+    "transform": "source保留arXiv v1及作者頁所列journal關係；domain/environment歸人類影片預測。task同時保存有序生成目標與無序集合計分。case應保留video/segment、α/β、observed recognized labels、生成摘要／圖、draft與refined outputs，並與GT分離；evaluator記類別與頻率分組、提示／模型版本及採樣預算。圖中的狀態為推斷記憶，不升格成已確認的實體世界狀態。",
+    "missing": "官方method repo與commit、完整graph schema／讀寫器、觀測切點及split manifest、sequence-to-score與mAP實作、三個few-shot範例及API設定。需釐清noun node與文中action edge的連結語義、JSONL和表中JSON示例的對應、floor邊界及test/validation稱法；若要評機器人可行性，還缺獨立狀態真值與執行判準。"
+  },
+  "version_note": "cached repository query「FactCheck action anticipation」為0筆；arXiv摘要及PDF連結抽取沒有method code連結，Qwen/Grok連結屬模型引用。通訊作者同篇publication條目只列期刊Paper。一次依該連結讀取Wiley得到HTTP403 Forbidden，共享network.py沒有標成rate_limited，未重試；期刊版code/data availability仍未核到，另列為待查來源，不能把403當repo不存在。技術結論限固定arXiv v1；未確認全球不存在程式。",
+  "discovery_evidence": [
+    {
+      "provider": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P243/pages.json",
+      "sha256": "9304a04689d8b06053befc2ef88918ef794777d21bbce807fc6a86bd1e6711c6",
+      "json_pointers": [
+        "/0/text",
+        "/4/text",
+        "/5/text",
+        "/6/text",
+        "/7/text",
+        "/8/text",
+        "/9/text",
+        "/10/text",
+        "/11/text",
+        "/12/text",
+        "/13/text"
+      ],
+      "finding": "核讀身份、§3形式定義、§4圖與三角色、§5資料／mAP／API及few-shot配置、Table3欄位、定性案例與§5.4未來robot用途。",
+      "url": "https://arxiv.org/pdf/2606.14778",
+      "version": "arXiv:2606.14778v1",
+      "page_ranges": [
+        [
+          1,
+          1
+        ],
+        [
+          5,
+          14
+        ]
+      ],
+      "pages_read": [
+        1,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "page_line_ranges": [
+        {
+          "page": 1,
+          "ranges": [
+            [
+              1,
+              74
+            ]
+          ]
+        },
+        {
+          "page": 5,
+          "ranges": [
+            [
+              1,
+              63
+            ]
+          ]
+        },
+        {
+          "page": 6,
+          "ranges": [
+            [
+              1,
+              67
+            ]
+          ]
+        },
+        {
+          "page": 7,
+          "ranges": [
+            [
+              1,
+              87
+            ]
+          ]
+        },
+        {
+          "page": 8,
+          "ranges": [
+            [
+              1,
+              67
+            ]
+          ]
+        },
+        {
+          "page": 9,
+          "ranges": [
+            [
+              1,
+              51
+            ]
+          ]
+        },
+        {
+          "page": 10,
+          "ranges": [
+            [
+              1,
+              60
+            ]
+          ]
+        },
+        {
+          "page": 11,
+          "ranges": [
+            [
+              1,
+              58
+            ]
+          ]
+        },
+        {
+          "page": 12,
+          "ranges": [
+            [
+              1,
+              55
+            ]
+          ]
+        },
+        {
+          "page": 13,
+          "ranges": [
+            [
+              1,
+              69
+            ]
+          ]
+        },
+        {
+          "page": 14,
+          "ranges": [
+            [
+              1,
+              70
+            ]
+          ]
+        }
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P243/paper.pdf",
+      "pdf_sha256": "6a6048431ba467de481197e7c518676c3de357635b2ff0e4d988b3e77a243a3f"
+    },
+    {
+      "provider": "cached_pdf_link_discovery",
+      "local_file": "audit/.cache/github_review/P243-discovery.json",
+      "sha256": "a9047d9c86863e2fefc6b59570c1cb07e7adf19d03dec4f9f4479ce85223f650",
+      "json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "核對精確論文、PDF指紋、連結候選與code-availability摘錄；候選本身不等同官方repo。"
+    },
+    {
+      "provider": "cached_project_candidates",
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/242"
+      ],
+      "finding": "本ID的project及repository候選均為空；enriched_projects亦無本ID條目。"
+    },
+    {
+      "provider": "cached_github_repository_search",
+      "local_file": "audit/.cache/github_review/search/P243.json",
+      "sha256": "e5aec4c064e2210a3d4c568e7ebefff12d77731b25470f3138b5d6443258ae18",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "既有GitHub repository query「FactCheck action anticipation」HTTP200、total_count=0；這只界定該查詢未命中，不是repo不存在證明。"
+    },
+    {
+      "provider": "deferred_primary_publisher_receipt",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/journal_article.html.receipt.json",
+      "sha256": "f64b23a121b575cfd49a2dc75bf206c3c59c6b464655d84463abd03b15b1b088",
+      "json_pointers": [
+        "/requested_url",
+        "/retrieved_at",
+        "/status",
+        "/error"
+      ],
+      "finding": "由通訊作者同篇publication連出的DOI頁一次HTTP403 Forbidden；helper沒有rate_limited標記，未重試、未讀到期刊全文／availability。"
+    }
+  ],
+  "deferred_sources": [
+    {
+      "url": "https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/sfw2/7118691",
+      "status": "http_403_forbidden",
+      "reason": "期刊版code/data availability尚待可讀的primary source；一般403回覆未被共享helper辨識為rate limit，與repository unavailable分開。",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/journal_article.html.receipt.json"
+    }
+  ],
+  "additional_repo_proposals": [],
+  "source_files": [
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/arxiv_abstract.html",
+      "sha256": "a0a613f003ad4a3c97f87328fdf4de8fabc4e427bc41e4ed3d7e7321530778e9",
+      "url": "https://arxiv.org/abs/2606.14778v1",
+      "retrieved_at": "2026-10-10T07:55:56.251080+00:00",
+      "ranges": [
+        [
+          116,
+          167
+        ],
+        [
+          325,
+          375
+        ]
+      ],
+      "source_role": "cached_primary_metadata",
+      "why": "核對題名、作者與v1日期；Code/Data頁籤只含通用外部服務開關，沒有本篇方法repo證明。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/arxiv_abstract.html.receipt.json",
+      "receipt_sha256": "9d1c2354f1f8f16a85473c8d1058ca83ed2143a6b1ac1c287b3631d7b2d5dd3b"
+    },
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/author_home.html",
+      "sha256": "c5af4344dbcc972ca9c9e0a52f64e9701bc71e3672c2145ce63ac6602363ea28",
+      "url": "https://preke.github.io/",
+      "retrieved_at": "2026-10-11T02:52:36.643789+00:00",
+      "ranges": [
+        [
+          277,
+          312
+        ],
+        [
+          351,
+          361
+        ]
+      ],
+      "source_role": "corresponding_author_identity",
+      "why": "Zhiyuan Wen、PolyU與Jiannong Cao關係對上作者身份；由實際Publications連結續查。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/author_home.html.receipt.json",
+      "receipt_sha256": "4a8add5c9c81a9d73fcfad8b64588b1a74c733807beb3e1c96f2896fd201c1ff"
+    },
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/author_publications.html",
+      "sha256": "70b0870f259110d9e859a96ac4be34bbf7760a04430bbcc5d4a99d9f585bc194",
+      "url": "https://preke.github.io/publication.html",
+      "retrieved_at": "2026-10-11T02:52:44.252199+00:00",
+      "ranges": [
+        [
+          352,
+          370
+        ]
+      ],
+      "source_role": "corresponding_author_publication_entry",
+      "why": "同五名作者及精確FactCheck題名，列IET Software 2026並僅連Wiley Paper；相鄰其他project連結不挪作本篇code。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P243/author_publications.html.receipt.json",
+      "receipt_sha256": "ac6db74f10a4312231afc4ded679f56690908b68d879d3f7336405d3375b8630"
+    }
+  ],
+  "runtime_executed": false
+}

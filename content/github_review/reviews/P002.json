@@ -1,0 +1,68 @@
+{
+  "paper_id": "P002",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "這個倉庫提供影片—文字表徵訓練與跨資料集檢索評測；HowTo100M 是訓練資料來源，程式的主要評測入口另外讀 MSR-VTT、YouCook2 和 LSMDC。",
+  "reading_order": [
+    {
+      "repo": "antoine77340/howto100m",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          65
+        ]
+      ],
+      "why": "先區分 HowTo100M 訓練資料與三個下游檢索評測集合。"
+    },
+    {
+      "repo": "antoine77340/howto100m",
+      "path": "youtube_dataloader.py",
+      "ranges": [
+        [
+          19,
+          52
+        ],
+        [
+          144,
+          150
+        ]
+      ],
+      "why": "看影片 ID、task、字幕時間段和不同頻率特徵如何組成輸入。"
+    },
+    {
+      "repo": "antoine77340/howto100m",
+      "path": "eval.py",
+      "ranges": [
+        [
+          83,
+          94
+        ]
+      ],
+      "why": "找到檢索評測入口及送入 metric 的影片—文字相似度矩陣。"
+    },
+    {
+      "repo": "antoine77340/howto100m",
+      "path": "metrics.py",
+      "ranges": [
+        [
+          9,
+          29
+        ]
+      ],
+      "why": "核對 R@1、R@5、R@10 和 median rank 的實作。"
+    }
+  ],
+  "environment": "原作影片／YouTube 來源作觀測脈絡；這個倉庫沒有可直接當成本庫互動環境的 scene registry。",
+  "tasks": "保留 CSV 的人類 task 標籤與影片—文字檢索題型；不能把字幕片段或人類活動直接改成機器人任務。",
+  "data": "CSV video_id/task/path、caption 起訖時間、2D/3D 特徵。loader 明示兩種特徵各自的取樣頻率；完整影片與特徵由外部下載。",
+  "evaluation": "eval.py 將影片與文字配對矩陣送到 metrics.py，以正確配對的排名算 R@1/5/10、median rank。README 指出 YouCook2 使用 validation 集合。",
+  "standardization": {
+    "profile": "video_annotations_and_retrieval",
+    "reuse": "影片 ID、字幕時段、活動標籤、下游檢索 split 與 metric 可以保留。",
+    "transform": "轉成 video/context 紀錄與檢索 case；分開保存原片時間、各特徵頻率及對應關係，另記真正使用的下游資料來源。",
+    "missing": "原始素材／特徵下載閉合、跨來源影片重複、共同用途映射與本庫 evaluator 接線。"
+  },
+  "version_note": "本輪讀取固定 commit 的公開程式；不把 README 的歷史「largest」敘述當成現時排名。",
+  "runtime_executed": false
+}

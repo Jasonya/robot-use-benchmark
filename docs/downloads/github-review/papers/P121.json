@@ -1,0 +1,242 @@
+{
+  "paper_id": "P121",
+  "name": "EgoZero",
+  "title": "EgoZero: Robot Learning from Smart Glasses",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2505.20290",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P121",
+    "summary": "EgoZero公開Aria示範前處理和Franka點軌跡控制；提供的Franka底層done固定False，不能直接把現有success日誌當自動任務成功評測。",
+    "environment": "人類Aria錄影與Franka/iPhone RGB-D實機部署，需ArUco/相機/robotframe的標定；手持示範場景不等於已可重播機器人環境。",
+    "tasks": "由人類點／手部軌跡學習操作；原README按指定手消失來分demo，用另一手reset，這是蒐集協定而非任務語義。",
+    "data": "每demo保存original.mp4、palm/wrist/index/thumb/grasp/pose.npy、fingers_keypoints及first_frame_g2w；人工標記物件點／triangulation另存。Frankafeatures為pos3+quat4+gripper1；底層宣告action_dim=7卻按pos/quat/gripper切片，須核對wrapper實際編碼。",
+    "evaluation": "eval.sh選eval_point_track、10queries/10history與temporal_agg；日誌平均goal_achieved。所讀Franka step總回done=False，wrapper把done設為goal_achieved，因此此路徑未提供task-specific自動成功checker。實機操作展示與論文實驗評分需另保留人工／任務規則。",
+    "standardization": {
+      "profile": "smart_glasses_point_policy_transfer",
+      "reuse": "示範切分規則、物件點／手軌跡、pose標定、部署query/history約定。",
+      "transform": "人類demo連原VRS/MPS與分段時間，policy action保留幾何/關節/夾爪轉換；case需加具體任務goal與判分器，不能直接沿用placeholder done。",
+      "missing": "全量資料/權重、原始校準與採樣紀錄、action形狀驗證、每task成功rubric及可重現測試初態。"
+    },
+    "version_note": "固定51dc1c6；公開code偏資料處理/實機部署，硬體另依Franka-Teach。未向MPS提交資料或執行機器人。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "vliu15/egozero",
+        "requested_repo": "vliu15/egozero",
+        "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            6,
+            16
+          ],
+          [
+            50,
+            87
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 87,
+        "sha256": "6b2706176f9f5012e9b7cbcdf054ec93da4a8590b951203b31591d2b6bea2187",
+        "url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/README.md",
+        "reading_url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/README.md#L6-L16",
+        "why": "原作、手部缺席分段、人工點選與資料/部署流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "vliu15/egozero",
+        "requested_repo": "vliu15/egozero",
+        "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+        "ref": null,
+        "path": "preprocess.py",
+        "ranges": [
+          [
+            485,
+            521
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 728,
+        "sha256": "266253e65b8dfd908e2873356b7e1dd835bdfd829a1764a790dae934b59d8392",
+        "url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/preprocess.py",
+        "reading_url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/preprocess.py#L485-L521",
+        "why": "每demo保存的影片、手部與姿態/對映欄位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "vliu15/egozero",
+        "requested_repo": "vliu15/egozero",
+        "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+        "ref": null,
+        "path": "scripts/eval.sh",
+        "ranges": [
+          [
+            31,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 47,
+        "sha256": "c5292139c80db5752819a37ec62e638c5d4ee76de1a86470465e1a2833cb39b8",
+        "url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/scripts/eval.sh",
+        "reading_url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/scripts/eval.sh#L31-L45",
+        "why": "真正部署入口為eval_point_track及歷史/查詢預算",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "vliu15/egozero",
+        "requested_repo": "vliu15/egozero",
+        "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+        "ref": null,
+        "path": "franka-env/franka_env/envs/franka_env.py",
+        "ranges": [
+          [
+            98,
+            113
+          ],
+          [
+            143,
+            204
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 293,
+        "sha256": "2628678d0c065bb5cf4e994cf596ee99ec41ed90643ecf6fa2cfe8ba39e4f733",
+        "url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/franka-env/franka_env/envs/franka_env.py",
+        "reading_url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/franka-env/franka_env/envs/franka_env.py#L98-L113",
+        "why": "底層action切片、RGB-D觀測、reward/done返回",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "vliu15/egozero",
+        "requested_repo": "vliu15/egozero",
+        "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+        "ref": null,
+        "path": "point_policy/suite/point_policy.py",
+        "ranges": [
+          [
+            219,
+            231
+          ],
+          [
+            277,
+            292
+          ],
+          [
+            435,
+            451
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 655,
+        "sha256": "799025337488b6066fce1438b7551193525b80317626d05effdcc2b7d1495773",
+        "url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/point_policy/suite/point_policy.py",
+        "reading_url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/point_policy/suite/point_policy.py#L219-L231",
+        "why": "點動作轉實機指令與goal_achieved沿用done",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "vliu15/egozero",
+        "requested_repo": "vliu15/egozero",
+        "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+        "ref": null,
+        "path": "point_policy/eval_point_track.py",
+        "ranges": [
+          [
+            532,
+            566
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 613,
+        "sha256": "53f1e8c23b2523178a9ab55b310598ce5c286e60731f2c0d2b471fef8fe4384a",
+        "url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/point_policy/eval_point_track.py",
+        "reading_url": "https://github.com/vliu15/egozero/blob/51dc1c622b564bcc10515777c6a8489b5833b3b5/point_policy/eval_point_track.py#L532-L566",
+        "why": "末步goal_achieved平均的限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "623d885bddf3cedc3e04d0853d17ab1650dbc2c155870edb004fcc372353cad8"
+  },
+  "repository_binding_review_sha256": "623d885bddf3cedc3e04d0853d17ab1650dbc2c155870edb004fcc372353cad8",
+  "repository_bindings": [
+    {
+      "requested_repo": "vliu15/egozero",
+      "resolved_repo": "vliu15/egozero",
+      "aliases_in_this_review": [
+        "vliu15/egozero"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5",
+          "reviewed_files": [
+            "README.md",
+            "franka-env/franka_env/envs/franka_env.py",
+            "point_policy/eval_point_track.py",
+            "point_policy/suite/point_policy.py",
+            "preprocess.py",
+            "scripts/eval.sh"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/vliu15/egozero",
+          "link_label": "Code",
+          "project_url": "https://egozero-robot.github.io",
+          "page_sha256": "7f0b2d58e3a23a0cf52e66e68a59fbd1a8075b18b07cbdaa9180367e2a69fa80"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P121",
+          "review_file": "content/github_review/reviews/P121.json",
+          "review_sha256": "623d885bddf3cedc3e04d0853d17ab1650dbc2c155870edb004fcc372353cad8",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "vliu15/egozero"
+  ],
+  "external_repositories": []
+}

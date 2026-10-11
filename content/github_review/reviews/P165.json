@@ -1,0 +1,142 @@
+{
+  "paper_id": "P165",
+  "reviewed_on": "2026-10-11",
+  "status": "identity_or_version_unresolved",
+  "summary": "已核讀同名網站與同owner的LIBERO-Recovery評估庫，但目前程式的人工XY擾動協定與論文「自然執行失敗」不同；不能直接當作論文完整release。",
+  "reading_order": [
+    {
+      "repo": "liulin815/libero-recover",
+      "commit": "c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "why": "舊庫僅一行README"
+    },
+    {
+      "repo": "liulin815/libero-recover",
+      "commit": "c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c",
+      "path": "index.html",
+      "ranges": [
+        [
+          20,
+          41
+        ],
+        [
+          63,
+          97
+        ],
+        [
+          580,
+          595
+        ]
+      ],
+      "why": "同名匿名網站、Coming Soon與原生數量單位"
+    },
+    {
+      "repo": "liulin815/LIBERO-Recovery",
+      "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          100
+        ]
+      ],
+      "why": "10/20未來釋出計畫及當前custom scene協定"
+    },
+    {
+      "repo": "liulin815/LIBERO-Recovery",
+      "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+      "path": "examples/LIBERO/eval_files/eval_libero_custom_scene.py",
+      "ranges": [
+        [
+          79,
+          151
+        ],
+        [
+          166,
+          204
+        ],
+        [
+          212,
+          244
+        ],
+        [
+          310,
+          371
+        ],
+        [
+          386,
+          451
+        ],
+        [
+          501,
+          543
+        ]
+      ],
+      "why": "擾動、重置、雙gripper split、模型輸入及case/結果manifest"
+    },
+    {
+      "repo": "liulin815/LIBERO-Recovery",
+      "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+      "path": "LIBERO/libero/libero/envs/env_wrapper.py",
+      "ranges": [
+        [
+          87,
+          105
+        ]
+      ],
+      "why": "step轉接與內層reset重試"
+    },
+    {
+      "repo": "liulin815/LIBERO-Recovery",
+      "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+      "path": "LIBERO/libero/libero/envs/bddl_base_domain.py",
+      "ranges": [
+        [
+          779,
+          809
+        ]
+      ],
+      "why": "done實際由_check_success覆寫"
+    },
+    {
+      "repo": "liulin815/LIBERO-Recovery",
+      "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+      "path": "LIBERO/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "ranges": [
+        [
+          135,
+          162
+        ]
+      ],
+      "why": "具體子類以goal predicate AND判成功"
+    }
+  ],
+  "environment": "沿用LIBERO/MuJoCo；程式scene定義為.bddl+_sim_state.npy pair。這是任務設定/物理初態組合，非必然獨立房屋。網站列2178recovery scenarios，未取得對應完整資產manifest。",
+  "tasks": "論文L1重試/L2調適/L3物件狀態恢復/L4環境恢復；程式目前主要對custom state加±2cm自由物件XY擾動，5closed+5open起始試驗。語義任務、failure scenario和10次trial不能相加。",
+  "data": "原文2000+自然失敗情境；網站另列3184恢復示範、625731frame、110task types，單位不同。程式frame記雙相機、EEF/axis-angle/gripper狀態，模型example只送image+lang；manifest存scene/trial/gripper_init/obj_deltas/success等。缺完整failure trajectory/原始goal與recover標註的連結。",
+  "evaluation": "最多520step，done取原LIBERO goal conjunction；close/open分報。outer reset宣稱12次重試，但內層env_wrapper.reset會吞RandomizationError並持續重試，須驗證失敗行為；建構/重置失敗被跳過會影響分母。flat_state擾動索引還需確認time/qpos佈局。沒有據此重現論文四層恢復結果。",
+  "standardization": {
+    "profile": "recovery_from_saved_simulator_state",
+    "reuse": "已讀custom state replay、gripper設定、擾動/輸入/原生success及manifest接口。",
+    "transform": "保留論文source、候選website與code各自版本；case要連到自然失敗τ_fail/s_f及目標，人工擾動另列衍生協定；記seed/實際state hash、gripper settle、無效reset與分母。",
+    "missing": "原作到code的明確完整release對應、全部場景/資料、論文四層標註與規則；修正或確認flat_state/重置/分母後再執行。"
+  },
+  "version_note": "網站c8cdf8d仍匿名且Paper/Code/Data皆Soon；code7584d1b README計畫2026-10-20釋出，該日期尚未到。2609.05178v3 p4明說不人工擾動，與此版做法不同，故處置identity_or_version_unresolved。",
+  "runtime_executed": false,
+  "identity_note": "網站題名與論文相符、候選eval庫同owner；未把匿名網站與當前custom-scene code的關係直接認定為完整論文版本。",
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2609.05178",
+    "pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a",
+    "paper_pages_read": [
+      1,
+      4
+    ],
+    "scope": "Paper protocol contrasted with candidate implementation; full-release correspondence unresolved"
+  }
+}

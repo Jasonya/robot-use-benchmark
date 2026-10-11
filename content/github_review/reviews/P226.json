@@ -1,0 +1,60 @@
+{
+  "paper_id": "P226",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoTraj提供戶外行人頭部/視線/影片資料與EgoViz reader；公開檔案可支持資料對齊，但不是完整trajectory預測baseline實作。四元數順序在README與reader註解不一致，需核驗。",
+  "reading_order": [
+    {
+      "repo": "yehiahmad/EgoTraj",
+      "commit": "902c354d178c625820851c9a9c184f7932c83472",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          60
+        ],
+        [
+          61,
+          79
+        ],
+        [
+          124,
+          167
+        ],
+        [
+          222,
+          248
+        ]
+      ],
+      "why": "原作、75participants、sensor clock、預測/split與資料契約"
+    },
+    {
+      "repo": "yehiahmad/EgoTraj",
+      "commit": "902c354d178c625820851c9a9c184f7932c83472",
+      "path": "ego_viz.py",
+      "ranges": [
+        [
+          1079,
+          1120
+        ],
+        [
+          1235,
+          1275
+        ]
+      ],
+      "why": "30Hz近鄰重採樣及HDF5/annotation/video join讀取"
+    }
+  ],
+  "environment": "真實都市步行、7個預設waypoints間自行選路，MetaQuestPro錄制；75participants不是75個不同物理環境，位置為session-relative、Y向上、地平面x-z，沒有地理坐標。",
+  "tasks": "行人trajectory forecasting與AR導航研究，原文/README採1.5秒觀測→3.5秒預測；不同participant/waypoint/unfamiliar splits另列。不是robot實際導航任務完成benchmark。",
+  "data": "HDF5按session含pose position/rotation/velocity/angular_velocity/timestamp、gaze origin/direction、video segment/frame/has_video；scene annotations為1fps，用pose_idx回連30Hz資料。README稱quaternion wxyz，reader按xyzw解讀；原始資料必須核定。未匹配影片frame以NaN標示。",
+  "evaluation": "README列ADE/FDE(m)、L1_head與bootstrap結果，但repo主要EgoViz，未確認完整baseline/scorer。影片在拍攝時已疊紅色gaze dot，RGB-only是否允許這個線索需在case條件明示；1fps VLM scene descriptions也需有獨立可見性/生成版本。",
+  "standardization": {
+    "profile": "egocentric_urban_trajectory_and_gaze_data",
+    "reuse": "session/pose_idx跨模態join、原生視線與local坐標、資料reader和source split設計。",
+    "transform": "case固定participant/session/觀測截止與預測窗口；統一quaternion及clock、保留has_video mask、原始/疊點影像與VLM annotation來源；模態消融先界定合法可見線索。",
+    "missing": "全部資料/split manifest、quaternion查核、baseline/scorer與姿態metric定義、含gaze-dot版本的公平輸入設計。"
+  },
+  "version_note": "固定902c354、原作2605.19004；README結果是原作報告，本輪只核讀資料/視覺化介面，未重跑預測模型。",
+  "runtime_executed": false
+}

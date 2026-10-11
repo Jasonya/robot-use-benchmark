@@ -1,0 +1,271 @@
+{
+  "paper_id": "P203",
+  "reviewed_on": "2026-10-11",
+  "status": "website_only",
+  "summary": "已確認 saroo25/Egostream 是論文官方網站的靜態原始碼。首頁明示 data 尚未公開且 GitHub coming soon；唯一 Python 檔 server.py 只是 HTTP 靜態伺服器，沒有資料 reader、memory manager 或評測 scorer。",
+  "identity_note": "arXiv:2605.31557v2 首頁連到 saroo25.github.io/Egostream；網站題名、Rosario Forte／Giuseppe Lando／Antonino Furnari 與 Catania 單位一致，並反連同一 arXiv。網站 cache 與 pinned index.html SHA256 相同，可確認此 repo 的網站角色。論文 p.3 所稱匿名 GitHub release，未在 pinned PDF 連結或公開網站找到可解析的 release 位址。",
+  "reading_order": [
+    {
+      "repo": "saroo25/Egostream",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          3
+        ]
+      ],
+      "why": "確認倉庫自述為靜態 landing page。"
+    },
+    {
+      "repo": "saroo25/Egostream",
+      "path": "index.html",
+      "ranges": [
+        [
+          34,
+          111
+        ],
+        [
+          113,
+          211
+        ]
+      ],
+      "why": "核對作者、paper link、未公開公告、AVW 與串流協定。"
+    },
+    {
+      "repo": "saroo25/Egostream",
+      "path": "server.py",
+      "ranges": [
+        [
+          1,
+          62
+        ]
+      ],
+      "why": "核對 Python 入口只提供靜態網站，不能冒稱 benchmark runner。"
+    },
+    {
+      "repo": "saroo25/Egostream",
+      "path": "script.js",
+      "ranges": [
+        [
+          1,
+          38
+        ]
+      ],
+      "why": "核對 JavaScript 只有選單、捲動與顯示動畫，沒有隱藏資料／scorer 呼叫。"
+    }
+  ],
+  "environment": "重用 Ego4D Episodic Memory VQA、EgoLife、EgoTempo、Multi-Hop EgoQA 與 HD-EPIC 的人類第一人稱影片；沒有新增可執行機器人環境。父來源、影片、參與者與重寫 QA 關係必須保留。",
+  "tasks": "7 個 primary memory dimensions：detail、spatial、temporal、event、social、causal、prospective；每題另可有 secondary tags。7 個 recall regimes 是同題的時間條件：0 秒、0–5 秒、5–30 秒、30–180 秒、180–1,800 秒、1,800–28,800 秒、超過 28,800 秒，不應計成額外語義 task。",
+  "data": "論文流程 2,634 candidates → 2,335 人工核對 → 2,250 final base questions，再依 AVW 展成 8,528 question–recall evaluations。每題概念上關聯來源影片、四選一題／正解、evidence moment、primary／secondary labels、AVW 與 recall timestamp；目前沒有公開 annotation 檔可驗證這些概念的實際 JSON keys、時間原點、split 或 loader。Appendix A.6 以秒為 delay 單位，Instant=0，其餘依 regime 截取高斯分佈取樣，只接受落在該題 AVW 的時間，ultra-long 用 TTL；不是每題固定乘 7。",
+  "evaluation": "論文 §3.4 定義四選一 accuracy = 正確推論數／適用 question–recall 推論數，完整實驗分母 8,528；語義類別與 recall regime 用各自子集分母，不能用 2,250 代替。串流只准使用 recall time 前畫面，建記憶時不可先知 query，亦不可無限保存原影格再重讀；需記 memory budget 與平均每 frame 處理時間。Appendix A.7 描述 ingestion／QA 分離並要求回覆選項 index；實際 parser、skip／error 計數、記憶限制與 timing scorer 未公開，論文協定不可記成程式已核。",
+  "standardization": {
+    "profile": "streaming_episodic_mcq_with_answer_validity_window",
+    "reuse": "可保留官方網站／paper 的題型、AVW 定義、因果觀測限制、原生統計及子題擴充關係；網站程式僅作 discovery 證據。",
+    "transform": "source 記 v2、website repo commit 與五父來源；task 記 primary dimension、secondary tags；case 分成 base QA 與帶 recall timestamp／AVW／regime 的條件化評測紀錄，保留群聚 parent ID。evaluator 分開記整體／類別／regime accuracy、實際有效推論分母、memory／frame budget 及時間成本。",
+    "missing": "公開 annotations／split／source manifest、AVW 與 recall 抽樣清單／seed、資料 reader、串流 memory manager、答案解析與 concrete scorer。尚無可核實的 executable release；不能把網站部署程式當評測。"
+  },
+  "version_note": "pinned paper 是 2605.31557v2（2026-06-01）；website repo main 固定 8cb0dab06659a56a7de75b88770f31eecec17944。完整非截斷 tree 已核，public release 狀態與論文「匿名倉庫已分享」敘述不一致。這是 website-only／release 未找到，不是 GitHub 404 或 rate-limit deferred。",
+  "additional_repo_proposals": [
+    {
+      "repo": "saroo25/Egostream",
+      "role": "official_project_website_only",
+      "proposal": "可補登為官方網站來源，不應綁成評測實作。",
+      "commit": "8cb0dab06659a56a7de75b88770f31eecec17944"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "source": "audit/.cache/github_review/P203-discovery.json",
+      "json_pointers": [
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "PDF 唯一 project URL 連到本網站；匿名 release 宣告未附可用 GitHub URL。"
+    },
+    {
+      "source": "audit/.cache/github_review/search/P203-refined.json",
+      "json_pointers": [
+        "/query",
+        "/results/0"
+      ],
+      "finding": "EGOSTREAM benchmark 精確搜尋回傳的 saroo25/Egostream 自述 static landing page。"
+    },
+    {
+      "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/tree.json",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree"
+      ],
+      "finding": "依共享節流 network.fetch 補讀 pinned tree，再核 index/server/script 的實際內容；未擴查無關同名結果。"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P203/pages.json",
+      "sha256": "58fbf84eb223e68b43f97b48a413ecf4a59888fc953cb8ca27eb711a1a6a6cd5",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        37,
+        38,
+        39
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/36/text",
+        "/37/text",
+        "/38/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P203/paper.pdf",
+      "pdf_sha256": "2b7fad2f7b3b003fe66a26ce10fe8f4c0b2950ae9a0a072a3f9215790a59ef17",
+      "url": "https://arxiv.org/abs/2605.31557"
+    },
+    {
+      "local_file": "audit/.cache/github_review/projects/2b7a97107560054abe62a8098fdcea9cd33a986745d112159629528ca4da5dd7.txt",
+      "sha256": "667e40a708f7d115355cb4ddda4cf1ef29d0a3ed60bcdc52209cabeff5fdfcab",
+      "url": "https://saroo25.github.io/Egostream/",
+      "ranges": [
+        [
+          1,
+          96
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/README.md",
+      "sha256": "44f1b4019d54388dac5118bb79895f7b2127fcf5ebc747d16fadc2c61569e868",
+      "repo": "saroo25/Egostream",
+      "path": "README.md",
+      "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+      "git_blob_sha": "61d0f60730d5df244cd71691823963e357200b76",
+      "url": "https://raw.githubusercontent.com/saroo25/Egostream/8cb0dab06659a56a7de75b88770f31eecec17944/README.md",
+      "ranges": [
+        [
+          1,
+          3
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/README.md.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/index.html",
+      "sha256": "d5444e2637ad7ad38a01b101845cf3caf461b1c37d159215dde9897157e5f354",
+      "repo": "saroo25/Egostream",
+      "path": "index.html",
+      "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+      "git_blob_sha": "e9c92d88f8b91a683f18da77fb7ae31ceeb8e275",
+      "url": "https://raw.githubusercontent.com/saroo25/Egostream/8cb0dab06659a56a7de75b88770f31eecec17944/index.html",
+      "ranges": [
+        [
+          1,
+          241
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/index.html.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/server.py",
+      "sha256": "d053b0e41b71587680c60fbcd0794c355b153fc250c33053ba40d74b433deab7",
+      "repo": "saroo25/Egostream",
+      "path": "server.py",
+      "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+      "git_blob_sha": "843ee605dc06c3c0fcaab58a0a7379a19fc74a0c",
+      "url": "https://raw.githubusercontent.com/saroo25/Egostream/8cb0dab06659a56a7de75b88770f31eecec17944/server.py",
+      "ranges": [
+        [
+          1,
+          62
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/server.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/script.js",
+      "sha256": "9d27d8b88c73ab6f60f4eff26602cdb0761cdfbd25c5fecd98cd64469b759205",
+      "repo": "saroo25/Egostream",
+      "path": "script.js",
+      "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+      "git_blob_sha": "d085052870090c27ab47fe97ff263f1bd6910f0a",
+      "url": "https://raw.githubusercontent.com/saroo25/Egostream/8cb0dab06659a56a7de75b88770f31eecec17944/script.js",
+      "ranges": [
+        [
+          1,
+          38
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/files/script.js.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/metadata.json",
+      "sha256": "dbdd0e238463420f80e65b0f4b65ed02fcdac9893faaeb83556cc894c2b13f2d",
+      "url": "https://api.github.com/repos/saroo25/Egostream",
+      "json_pointers": [
+        "/full_name",
+        "/description",
+        "/default_branch",
+        "/pushed_at"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/ref.json",
+      "sha256": "351298b1cd3c769caecf74e5a19609bd16ff1d7cf73738382d6ecf57cfacf9d9",
+      "url": "https://api.github.com/repos/saroo25/Egostream/git/ref/heads/main",
+      "json_pointers": [
+        "/ref",
+        "/object"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/tree.json",
+      "sha256": "a3b71dd99041b9c0127c65c2c75f5860371f7abde0f7bdd90070648dd80016a1",
+      "url": "https://api.github.com/repos/saroo25/Egostream/git/trees/8cb0dab06659a56a7de75b88770f31eecec17944?recursive=1",
+      "repo": "saroo25/Egostream",
+      "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/P203-discovery.json",
+      "sha256": "89558b1251e903bfed9b88723d6d513cbc588ee61c4f6f0d4ab846aae03caad4",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P203.json",
+      "sha256": "398497b57e25bc271a7947a3c80cbb9a6b883956dc5367feb4ec668dd01a26ee",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P203-refined.json",
+      "sha256": "7fa288457cf616c7850c1524659be56b28d8ffb0844f45280e3202d8ac5bf5b9",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

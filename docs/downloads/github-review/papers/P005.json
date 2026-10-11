@@ -1,0 +1,482 @@
+{
+  "paper_id": "P005",
+  "name": "YouCook2",
+  "title": "Towards Automatic Learning of Procedures from Web Instructional Videos",
+  "year": 2017,
+  "paper_url": "https://arxiv.org/abs/1703.09788",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P005",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "作者ProcNets倉庫將YouCook2影片程式分段、Lua Torch訓練/驗證與Python proposal評分放在一起；應讀實際公式，不把所有分數都當同一種IoU。",
+    "environment": "網路烹飪影片的觀測脈絡；未提供可互動場景。",
+    "tasks": "程式片段提議/分段；步驟文字與時間段不是機器人控制任務。",
+    "data": "database JSON的annotations/segment、影片duration/total_frame CSV與ResNet特徵；均勻取樣和temporal augmentation會改變時間到特徵索引的換算。",
+    "evaluation": "Lua iou是intersection/union；名稱為jacc的函式實際除以預測片段長度。驗證對每個GT找最佳proposal，再逐影片平均。Python另按tIoU算precision/recall並限制每影片proposal數。",
+    "standardization": {
+      "profile": "instructional_video_temporal_proposals",
+      "reuse": "原生video ID、segment、split、duration/frame資訊和兩套明確指標。",
+      "transform": "原始秒數與取樣索引分欄；記proposal上限、tIoU與逐影片分母，保留原生指標名及公式，不能直接改成robot success。",
+      "missing": "完整素材/特徵與split閉合、Lua/Python2依賴移植，以及指標等價性驗證。"
+    },
+    "version_note": "當前公開碼是舊Lua Torch/Python2實作；README的PyTorch未來發布敘述不代表已取得該版本。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "LuoweiZhou/ProcNets-YouCook2",
+        "requested_repo": "LuoweiZhou/ProcNets-YouCook2",
+        "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            77
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 77,
+        "sha256": "617881861a25238ca6efa4ebf6153f437a479416df115d8d1dd90c5c8f17d501",
+        "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/README.md",
+        "reading_url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/README.md#L1-L77",
+        "why": "匹配作者論文、資料與評測路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "LuoweiZhou/ProcNets-YouCook2",
+        "requested_repo": "LuoweiZhou/ProcNets-YouCook2",
+        "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+        "ref": null,
+        "path": "misc/DataLoader.lua",
+        "ranges": [
+          [
+            8,
+            12
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            22,
+            30
+          ],
+          [
+            37,
+            41
+          ],
+          [
+            58,
+            63
+          ],
+          [
+            89,
+            97
+          ],
+          [
+            102,
+            106
+          ],
+          [
+            108,
+            112
+          ],
+          [
+            122,
+            135
+          ],
+          [
+            145,
+            149
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 152,
+        "sha256": "304a7c4b76e85b1c8ef03c826e08e4e736aaef4382af5901fe20f9e0d3ecb7d5",
+        "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/misc/DataLoader.lua",
+        "reading_url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/misc/DataLoader.lua#L8-L12",
+        "why": "原始時間、均勻取樣與augmentation換算。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "LuoweiZhou/ProcNets-YouCook2",
+        "requested_repo": "LuoweiZhou/ProcNets-YouCook2",
+        "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+        "ref": null,
+        "path": "train_bilstm_seq.lua",
+        "ranges": [
+          [
+            23,
+            31
+          ],
+          [
+            165,
+            231
+          ],
+          [
+            247,
+            273
+          ],
+          [
+            292,
+            298
+          ],
+          [
+            301,
+            315
+          ],
+          [
+            355,
+            362
+          ],
+          [
+            367,
+            376
+          ],
+          [
+            379,
+            394
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 436,
+        "sha256": "ff91bc0d635b36754d50177e5b109e5572d2e36b7fd81568086b584a1a7b6e9a",
+        "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/train_bilstm_seq.lua",
+        "reading_url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/train_bilstm_seq.lua#L23-L31",
+        "why": "IoU/Jacc實際公式及驗證聚合。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "LuoweiZhou/ProcNets-YouCook2",
+        "requested_repo": "LuoweiZhou/ProcNets-YouCook2",
+        "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+        "ref": null,
+        "path": "script/eval_recall_precision.py",
+        "ranges": [
+          [
+            1,
+            80
+          ],
+          [
+            120,
+            186
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 186,
+        "sha256": "f78a70b10ab4290373fc387307f283e96455badb690ec57f397fef41bb2a2b19",
+        "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/script/eval_recall_precision.py",
+        "reading_url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/script/eval_recall_precision.py#L1-L80",
+        "why": "proposal格式、split與tIoU判分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ac5ec24f833738412ec217312cbe00d319d22a78ffe9389069fe16280851e036"
+  },
+  "repository_binding_review_sha256": "ac5ec24f833738412ec217312cbe00d319d22a78ffe9389069fe16280851e036",
+  "repository_bindings": [
+    {
+      "requested_repo": "LuoweiZhou/ProcNets-YouCook2",
+      "resolved_repo": "LuoweiZhou/ProcNets-YouCook2",
+      "aliases_in_this_review": [
+        "luoweizhou/procnets-youcook2"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+          "reviewed_files": [
+            "README.md",
+            "misc/DataLoader.lua",
+            "script/eval_recall_precision.py",
+            "train_bilstm_seq.lua"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "YouCook2",
+          "search_receipt_sha256": "a67a363aa8bd7896336343d555667cfc1dccd7ee8f6d8dfbb7bbe73fe6c5e268",
+          "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P005",
+          "review_file": "content/github_review/reviews/P005.json",
+          "review_sha256": "ac5ec24f833738412ec217312cbe00d319d22a78ffe9389069fe16280851e036",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P005",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1703.09788v3。",
+    "scope_read": "YouCook2資料、標註、split、程序分段與proposal評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      8
+    ],
+    "domains": [
+      "餐飲與烹飪"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "自然料理影片；非4個物理場景。Africa／Americas／Asia／Europe是料理來源分類。",
+    "tasks": "89道食譜；benchmark要求定位程序步驟及描述。食譜、步驟、影片為不同層次。",
+    "cases": "2,000影片、176小時；每道食譜按67／23／10%分train／val／test。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 89,
+        "unit": "食譜",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "影片",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 176,
+        "unit": "小時",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "程序分段：Jaccard及mean IoU。",
+      "proposal：IoU 0.5下precision／recall／F1，與整體程序分段分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每食譜67／23／10%；本文百分比不自行換算成精確發布ID數。",
+    "lineage": "YouTube教學影片；与其他料理影片庫的原始video重疊需逐ID核對。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "YouCook2資料與annotation章",
+        "supports": "食譜、影片、時數、split"
+      },
+      {
+        "pages": [
+          7,
+          8
+        ],
+        "locator": "程序分段與proposal實驗",
+        "supports": "Jaccard／IoU／F1的適用端點"
+      }
+    ],
+    "unresolved": [
+      "發布版本精確split ID數及素材可得性尚未逐檔核。"
+    ],
+    "reuse": "可提供料理程序與步驟語言；不能直接把2,000影片列為2,000robot任務。",
+    "reviewed_pdf_sha256": "4ef636404bea37184e1fa056fa2a71a92705a1b3bc4ee58917a11806de17fbe3",
+    "reviewed_on": "2026-10-02",
+    "name": "YouCook2",
+    "year": 2017,
+    "title": "Towards Automatic Learning of Procedures from Web Instructional Videos",
+    "source_url": "https://arxiv.org/abs/1703.09788",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理"
+    ],
+    "domain_names": [
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P005",
+      "domain_ids": [
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P005",
+          "domain_ids": [
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "89道食譜；benchmark要求定位程序步驟及描述。食譜、步驟、影片為不同層次。",
+            "自然料理影片；非4個物理場景。Africa／Americas／Asia／Europe是料理來源分類。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "4ef636404bea37184e1fa056fa2a71a92705a1b3bc4ee58917a11806de17fbe3"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "4ef636404bea37184e1fa056fa2a71a92705a1b3bc4ee58917a11806de17fbe3",
+      "previous_domain_ids": [
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P005",
+      "name": "YouCook2",
+      "expected_title": "Towards Automatic Learning of Procedures from Web Instructional Videos",
+      "source_url": "https://arxiv.org/abs/1703.09788",
+      "pdf_url": "https://arxiv.org/pdf/1703.09788",
+      "retrieved_at": "2026-10-02T21:32:53.493213+00:00",
+      "pdf_sha256": "4ef636404bea37184e1fa056fa2a71a92705a1b3bc4ee58917a11806de17fbe3",
+      "text_sha256": "6a2b27358f186593bee693448c6cf20de5614eac7a97a12b1b61f21981392642",
+      "pdf_bytes": 2212392,
+      "pages": 10,
+      "text_characters": 70232,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1703.09788v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1703.09788v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 89,
+        "unit": "食譜",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P005:1",
+        "paper_id": "P005",
+        "benchmark": "YouCook2",
+        "native_term": "食譜",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1703.09788v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1703.09788v3",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "影片",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P005:2",
+        "paper_id": "P005",
+        "benchmark": "YouCook2",
+        "native_term": "影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1703.09788v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1703.09788v3",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 176,
+        "unit": "小時",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P005:3",
+        "paper_id": "P005",
+        "benchmark": "YouCook2",
+        "native_term": "小時",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1703.09788v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1703.09788v3",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "LuoweiZhou/ProcNets-YouCook2"
+  ],
+  "external_repositories": []
+}

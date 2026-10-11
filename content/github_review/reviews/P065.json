@@ -1,0 +1,91 @@
+{
+  "paper_id": "P065",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "CALVIN 要一起固定 benchmark 主倉庫與 calvin_env 子模組。資料是按時間步保存的多感測器／動作／狀態，評測則是連續指令鏈；不能把訓練視窗當成正式評測題。",
+  "reading_order": [
+    {
+      "repo": "mees/calvin",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          75
+        ]
+      ],
+      "why": "核對原作、資料分割、相機／觸覺和相對／絕對動作配置。"
+    },
+    {
+      "repo": "mees/calvin",
+      "path": "dataset/README.md",
+      "ranges": [
+        [
+          1,
+          134
+        ]
+      ],
+      "why": "讀取具體NPZ欄位、動作縮放、狀態可見範圍和語言索引。"
+    },
+    {
+      "repo": "mees/calvin",
+      "path": "calvin_models/calvin_agent/datasets/disk_dataset.py",
+      "ranges": [
+        [
+          71,
+          130
+        ]
+      ],
+      "why": "確認連續時間步、語言片段和訓練視窗的組成。"
+    },
+    {
+      "repo": "mees/calvin",
+      "path": "calvin_models/calvin_agent/evaluation/evaluate_policy.py",
+      "ranges": [
+        [
+          79,
+          179
+        ]
+      ],
+      "why": "確認固定初態、連續子任務、失敗中止及原作task oracle。"
+    },
+    {
+      "repo": "mees/calvin",
+      "path": "calvin_models/calvin_agent/evaluation/utils.py",
+      "ranges": [
+        [
+          77,
+          84
+        ]
+      ],
+      "why": "確認至少連續成功1至5項的prefix成功率。"
+    },
+    {
+      "repo": "mees/calvin_env",
+      "ref": "1431a46bd36bde5903fb6345e68b5ccc30def666",
+      "path": "calvin_env/envs/tasks.py",
+      "ranges": [
+        [
+          10,
+          33
+        ],
+        [
+          245,
+          255
+        ]
+      ],
+      "why": "以主倉庫實際pin的子模組核對起終狀態條件和抽屜位移判定。"
+    }
+  ],
+  "environment": "A–D場景與機體／感測配置由calvin_env提供；D_eval是評測設定，不能直接另算獨立layout。",
+  "tasks": "task函式以start_info/end_info變化定義；語言可對應相同原生task。正式long-horizon評測是從同一初態連續執行指令，失敗就停止prefix。",
+  "data": "每步NumPy字典包含rgb/depth/tactile、actions、rel_actions、robot_obs、scene_obs；語言檔另外保存ann/task/embedding及起訖索引。scene_obs是評分/狀態資料，README明示原作不供政策使用。",
+  "evaluation": "rollout用原作task oracle比對起終info；evaluate_sequence保持環境狀態延續，子任務失敗即回傳成功prefix長度。count_success計至少完成1至5項的比例。",
+  "standardization": {
+    "profile": "robot_episodes_and_language_chains",
+    "reuse": "NPZ欄位、語言片段、場景定義、固定序列／初態和task oracle。",
+    "transform": "保留7維absolute與relative兩種動作的區別、世界座標和50/20縮放；訓練視窗、指令鏈case、子任務執行各自識別。依協定分開政策輸入和評分狀態。",
+    "missing": "完整素材閉合、共同跨來源任務對齊及本庫協定下的執行驗證。"
+  },
+  "version_note": "mees/calvin在fa03f01…的Git tree明確pin calvin_env到1431a46…，與calvin_env目前main 797142c…不同。要重現CALVIN就使用gitlink，不直接替換成依賴倉庫的最新main。",
+  "runtime_executed": false
+}

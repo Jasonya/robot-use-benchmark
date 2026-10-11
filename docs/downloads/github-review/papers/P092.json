@@ -1,0 +1,473 @@
+{
+  "paper_id": "P092",
+  "name": "ICRA cloth competition",
+  "title": "A Dataset and Benchmark for Robotic Cloth Unfolding Grasp Selection: The ICRA 2024 Cloth Competition",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2508.16749",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P092",
+    "summary": "競賽倉庫公開雙臂布料觀測格式與半自動面積量測；coverage 原始面積與正規化競賽得分需要分開。",
+    "environment": "真實雙UR5e／Robotiq工作站及雙目深度相機；Drake場景供運動規劃，布料點雲凸包焊接為障礙，不代表完整柔性物理模擬。",
+    "tasks": "布料攤展競賽中的抓取與展開結果；每次sample/scene及衣物初態不是新的任務語義。",
+    "data": "CompetitionObservation含左右RGB、與左圖對齊depth_map、confidence_map、世界座標point_cloud、相機／左右臂／TCP世界姿態與關節；檔案為PNG/TIFF/PLY/JSON，讀寫程式明確處理RGB/BGR。README指向83GB外部資料，未下載。",
+    "evaluation": "組織者選框／正負點→SAM遮罩→按平均深度±outlierThreshold過濾→每像素投影面積加總。server.py把此原始面積寫為coverage；README所述相對最大可展面積之比例仍需衣物基準面積，不能直接把輸出值當0–1成功率。",
+    "standardization": {
+      "profile": "real_deformable_observation_and_human_assisted_measurement",
+      "reuse": "原生觀測欄位、相機標定／機體座標、選區與面積量測紀錄。",
+      "transform": "environment記工作站與標定版本，case連sample及衣物初態；evaluator保留原面積單位、最大面積分母、人工框點、SAM版本、過濾參數與複核。",
+      "missing": "資料資產、衣物最大面積基準、合法介入規則與一致性評估、可重設初態及整體競賽分數聚合尚需接入。"
+    },
+    "version_note": "釘選2024競賽倉庫；README的未來式文字不能否定已存在的evaluation-service。已讀核心章節，未重現比賽。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Victorlouisdg/cloth-competition",
+        "requested_repo": "Victorlouisdg/cloth-competition",
+        "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            24
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 57,
+        "sha256": "2100bce0a79ea67a62fc16edcdeda584fcb8e1c6e3322907d0a370963954fa6b",
+        "url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/README.md",
+        "reading_url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/README.md#L1-L24",
+        "why": "確認競賽、資料與程式角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Victorlouisdg/cloth-competition",
+        "requested_repo": "Victorlouisdg/cloth-competition",
+        "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c",
+        "ref": null,
+        "path": "cloth-tools/cloth_tools/dataset/format.py",
+        "ranges": [
+          [
+            29,
+            75
+          ],
+          [
+            78,
+            222
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 235,
+        "sha256": "732c15af40e5c8f60fe6a9d9f5ddf9b399b9927e28a5343f5b6b2195164a6098",
+        "url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/cloth-tools/cloth_tools/dataset/format.py",
+        "reading_url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/cloth-tools/cloth_tools/dataset/format.py#L29-L75",
+        "why": "原生雙目／深度／世界座標／雙臂觀測儲存及讀取",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Victorlouisdg/cloth-competition",
+        "requested_repo": "Victorlouisdg/cloth-competition",
+        "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c",
+        "ref": null,
+        "path": "cloth-tools/cloth_tools/drake/scenes.py",
+        "ranges": [
+          [
+            31,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 196,
+        "sha256": "e1b482a1f9e6e99f05aea0af56108aca73eb6b8d513483b73b1b3c6f335ce16d",
+        "url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/cloth-tools/cloth_tools/drake/scenes.py",
+        "reading_url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/cloth-tools/cloth_tools/drake/scenes.py#L31-L91",
+        "why": "雙UR5e工作站與布料碰撞近似",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Victorlouisdg/cloth-competition",
+        "requested_repo": "Victorlouisdg/cloth-competition",
+        "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c",
+        "ref": null,
+        "path": "evaluation-service/README.md",
+        "ranges": [
+          [
+            1,
+            19
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 56,
+        "sha256": "cc5af242bf5f51fb27826e2d9bb6a21d304947b8dd14172748c439fe64d4adae",
+        "url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/evaluation-service/README.md",
+        "reading_url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/evaluation-service/README.md#L1-L19",
+        "why": "人工選區與競賽coverage定義",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Victorlouisdg/cloth-competition",
+        "requested_repo": "Victorlouisdg/cloth-competition",
+        "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c",
+        "ref": null,
+        "path": "evaluation-service/backend/server.py",
+        "ranges": [
+          [
+            42,
+            82
+          ],
+          [
+            81,
+            178
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 470,
+        "sha256": "de2c167c7d6ebb2a6307074d5728e83e241e7411f93cd4823c9271402f01bc64",
+        "url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/evaluation-service/backend/server.py",
+        "reading_url": "https://github.com/Victorlouisdg/cloth-competition/blob/34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c/evaluation-service/backend/server.py#L42-L82",
+        "why": "SAM遮罩、深度離群值、相機投影面積與輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c88b199e84661a2ba00680d00cd0f6be144063a54d272d6c3da885a4414dcc9f"
+  },
+  "repository_binding_review_sha256": "c88b199e84661a2ba00680d00cd0f6be144063a54d272d6c3da885a4414dcc9f",
+  "repository_bindings": [
+    {
+      "requested_repo": "Victorlouisdg/cloth-competition",
+      "resolved_repo": "Victorlouisdg/cloth-competition",
+      "aliases_in_this_review": [
+        "victorlouisdg/cloth-competition"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c",
+          "reviewed_files": [
+            "README.md",
+            "cloth-tools/cloth_tools/dataset/format.py",
+            "cloth-tools/cloth_tools/drake/scenes.py",
+            "evaluation-service/README.md",
+            "evaluation-service/backend/server.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/Victorlouisdg/cloth-competition",
+          "pdf_page": 7,
+          "pdf_sha256": "c44a1dff77f6fe471123e7e70b03b6735ed494e18190396a44c5c4232962b274",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P092",
+          "review_file": "content/github_review/reviews/P092.json",
+          "review_sha256": "c88b199e84661a2ba00680d00cd0f6be144063a54d272d6c3da885a4414dcc9f",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P092",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ICRA2024 Cloth Competition dataset，arXiv 2508.16749v2。",
+    "scope_read": "固定unfold primitive、硬體／grasp execution、coverage metric、資料及比賽規模。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      11
+    ],
+    "domains": [
+      "衣物與洗護"
+    ],
+    "role": "真實操作benchmark",
+    "environment": "雙UR5e＋單stereo camera標準工作站；訓練在lab、比賽在會場，cloth初態無法精確複製。",
+    "tasks": "1個核心任務：懸掛布料選grasp後stretch展開；34garment items不是34task。",
+    "cases": "679episodes＝503訓練嘗試＋176競賽trial；11隊各16次（8衣物×2），同題型由不同方法執行。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "核心unfold grasp-selection任務",
+        "pages": [
+          6,
+          7
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 34,
+        "unit": "cloth items",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 679,
+        "unit": "recorded unfolding episodes",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 176,
+        "unit": "11方法競賽trials",
+        "pages": [
+          8,
+          11
+        ]
+      }
+    ],
+    "evaluation": [
+      "主metric projected coverage／最大面積；另grasp success及成功抓取條件下coverage。",
+      "30秒grasp計算上限為建議，非由679樣本推導的固定速度門檻。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "503與176來源／用途分開；訓練也含失敗抓取；176是實驗運行，不是176獨立任務。",
+    "lineage": "部分毛巾來自Household Cloth Object Set，與其它cloth benchmarks資產可能重用。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          11
+        ],
+        "locator": "§3.2–3.4、§4.2、Competition Results",
+        "supports": "固定primitive、679/503/176與指標"
+      }
+    ],
+    "unresolved": [
+      "場地與初態差異無法完全消除；本庫無法只靠既有影片重跑physical grasp。"
+    ],
+    "reuse": "可借真實garment多樣性與grasp/coverage分離；不宜把單次展開當完整摺衣／收納任務。",
+    "reviewed_pdf_sha256": "c44a1dff77f6fe471123e7e70b03b6735ed494e18190396a44c5c4232962b274",
+    "reviewed_on": "2026-10-02",
+    "name": "ICRA cloth competition",
+    "year": 2025,
+    "title": "A Dataset and Benchmark for Robotic Cloth Unfolding Grasp Selection: The ICRA 2024 Cloth Competition",
+    "source_url": "https://arxiv.org/abs/2508.16749",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與柔性物操作",
+      "洗衣服務"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P092",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P092",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            2,
+            5,
+            6,
+            7,
+            8,
+            11
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "1個核心任務：懸掛布料選grasp後stretch展開；34garment items不是34task。",
+            "雙UR5e＋單stereo camera標準工作站；訓練在lab、比賽在會場，cloth初態無法精確複製。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "c44a1dff77f6fe471123e7e70b03b6735ed494e18190396a44c5c4232962b274"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c44a1dff77f6fe471123e7e70b03b6735ed494e18190396a44c5c4232962b274",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P092",
+      "name": "ICRA cloth competition",
+      "expected_title": "A Dataset and Benchmark for Robotic Cloth Unfolding Grasp Selection: The ICRA 2024 Cloth Competition",
+      "source_url": "https://arxiv.org/abs/2508.16749",
+      "pdf_url": "https://arxiv.org/pdf/2508.16749",
+      "retrieved_at": "2026-10-02T21:34:01.942109+00:00",
+      "pdf_sha256": "c44a1dff77f6fe471123e7e70b03b6735ed494e18190396a44c5c4232962b274",
+      "text_sha256": "dcf818c45e44d148cdc96d6793ca593b65ed618347f0e2496ce595da14e19314",
+      "pdf_bytes": 11013740,
+      "pages": 18,
+      "text_characters": 118428,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2508.16749v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2508.16749v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "核心unfold grasp-selection任務",
+        "pages": [
+          6,
+          7
+        ],
+        "record_id": "review10:P092:1",
+        "paper_id": "P092",
+        "benchmark": "ICRA cloth competition",
+        "native_term": "核心unfold grasp-selection任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.16749v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.16749v2",
+            "locator": "PDF pp. 6, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 34,
+        "unit": "cloth items",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P092:2",
+        "paper_id": "P092",
+        "benchmark": "ICRA cloth competition",
+        "native_term": "cloth items",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.16749v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.16749v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 679,
+        "unit": "recorded unfolding episodes",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P092:3",
+        "paper_id": "P092",
+        "benchmark": "ICRA cloth competition",
+        "native_term": "recorded unfolding episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.16749v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.16749v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 176,
+        "unit": "11方法競賽trials",
+        "pages": [
+          8,
+          11
+        ],
+        "record_id": "review10:P092:4",
+        "paper_id": "P092",
+        "benchmark": "ICRA cloth competition",
+        "native_term": "11方法競賽trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.16749v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.16749v2",
+            "locator": "PDF pp. 8, 11",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Victorlouisdg/cloth-competition"
+  ],
+  "external_repositories": []
+}

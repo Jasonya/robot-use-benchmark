@@ -1,0 +1,503 @@
+{
+  "paper_id": "P179",
+  "name": "REBOOT",
+  "title": "REBOOT: From Failure to Recovery - A Dataset and Benchmark for Precision Assembly",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.22591",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P179",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+    "ref": "depth",
+    "identity_note": "arXiv:2609.22591v1 第16頁及作者 nanayawoa 的專案頁均連至此 fork；README 自稱 LeRobot (REBOOT fork)，承接 Trossen fork、LeRobot v0.4.3 與 depth PR2604。這是資料錄製／讀取支援倉庫，不是18項組裝任務的完整模擬器。",
+    "summary": "已核讀 REBOOT 的 depth reader、frame／video 對齊、phase.json 裁切讀取與通用 evaluator。原生18任務及人工五階段判定主要定義於論文；所查固定版本未提供 REBOOT 專用自動 phase scorer。另實查官方 RCA recovery 資料 metadata，確認僅30 episodes、train split 且沒有 meta/phase.json，不能直接把論文2,160段視為已閉合的公開資料。",
+    "environment": "實體 NIST Assembly Task Board #1，Trossen WidowX AI 兩支6關節 follower 與 leader teleoperation；四臺 RGB-D 視角為 high、low、left_wrist、right_wrist。論文物件初位在名義位置周圍3–6 cm 變動，目標板固定。雙臂硬體／14D state 不等於每段雙臂協作：論文第10頁只有83／2,160段屬雙臂，且主要為 recovery_install。",
+    "tasks": "依第23頁表10保留9種物件各 install/remove，共18項：M12、USB-A、USB-C、RJ45、NEMA 1-15P、HAN10E、RCA、16mm bar/cylinder。每 task 保留 C1/C2/continuous symmetry、clearance（mm）、precision tier。共同五階段是 Align(pick)、Engage(pick)、Transport、Align(place)、Engage(place)，不是90個獨立任務。論文每 task 有60 expert+60 recovery，總2,160；第7頁『10 types』與具體9列 inventory 不一致，採表10枚舉並標記差異。",
+    "data": "論文 action/state 為兩臂各6 joint+1 gripper 的14D絕對目標／狀態，30 Hz；保留關節及夾爪原生尺度，不推定全部維度為角度。實查 REBOOT26/rca_recovery_install@fb4e5c5：info.codebase_version=v3.0、30 episodes、26,939 frames、1 task、splits.train='0:30'；action/observation.state 為 float32[14]，RGB 為480×640×3 video、四個 *_depth 為480×640×1 depth。data/chunk-*/file-*.parquet 與 videos/{video_key}/chunk-*/file-*.mp4 透過 episode metadata 的 chunk/file/from_timestamp 連接；reader 裁定 delta_indices 不跨 episode，另輸出 *_is_pad。相機程式以 z16 讀 uint16，docstring 稱 mm，但資料 info 未提供 depth scale，仍需校準資訊。論文 phase schema 含 repo_id/task_id/episode_index、phase_boundaries.tau_0…tau_5、failure.originating_phase/failure_mode/t_f/t_r/t_s；trim reader 則要求外層 episodes[]，按 failure.<cut-key>（預設t_r）取 [start,stop)。抽查的 RCA dataset file inventory 未含 meta/phase.json；其他38個 API 列出項目未逐一查資料，不能斷言全部缺標註。",
+    "evaluation": "論文以人工標記的 last-completed phase／first failure phase 形成每階段分佈及最終成功率，不能由 clearance 單欄推導自動成功。正文第7頁寫20 rollouts/task/policy，第8頁與附錄A.5寫15，後者18×3×15=810；須釐清實際使用名冊。公開 lerobot_eval.py 讀 info.final_info.is_success 或 info.is_success，缺值用False，沿 episode 合併為 any(success)，再平均成 pc_success（百分比），同時計 reward；它不判斷 connector engagement 或 phase 邊界，不能代替 REBOOT grader。失敗詞彙也有版本差：第6頁四類，附錄與第7頁另含 slip。裁切器會移除 dtype=depth／名稱結尾_depth 的 feature，重新產生 index/timestamp，未重映射 phase/failure 時間，不能直接把其輸出當原版完整 recovery case。",
+    "standardization": {
+      "profile": "real_robot_rgbd_assembly_with_phase_annotations",
+      "reuse": "14D通道名稱、四相機／depth schema、LeRobot v3 episode 索引讀取、原生 task inventory、人工 phase/failure 表達及裁切窗解析。",
+      "transform": "source 分別保留程式 commit 與每個 HF dataset revision；environment 記硬體／board；task 用 object+install/remove；case 用 dataset revision+episode_index，另存 expert/recovery 與雙臂旗標；frame/time 用30 Hz與原 offset 連接。保留 source_frame_index 與 trim offset，重新映射 phase/t_f/t_r/t_s，避免刪 depth；evaluator 獨立保存人工階段判定與通用 rollout success，不合併。",
+      "missing": "36個理論 task×episode-type 分組與官方實際38個資料 repo／分片的對照及去重；完整 episode 與 phase annotation 名冊；RCA 本次固定版本僅30段及缺phase的原因；15/20 rollout 協定釐清；原生 joint/gripper/depth 校準尺度；公開 REBOOT 專用 grader 或人工評分流程。"
+    },
+    "version_note": "固定 depth 分支269d539，不以 upstream LeRobot 最新版替代；HF實查固定fb4e5c5。README 的『2,160 bimanual』與論文83段實際協作需分開解讀；論文1-based phase公式、範例tau_0=0及程式0-based slice 也要保留來源差異。未下載 parquet/video，未安裝或執行上游程式。",
+    "additional_repo_proposals": [
+      {
+        "repository": "REBOOT26/rca_recovery_install",
+        "host": "huggingface",
+        "role": "official_dataset_subset",
+        "commit": "fb4e5c5efcc64c734c3635d0e521894faf66e673",
+        "basis": "論文／README 的 REBOOT26 連結；本輪只補讀 API inventory 與 meta/info.json。"
+      }
+    ],
+    "integration_issues": [
+      "HF repo／分片數與task數分離；RCA所讀版本30段，不可套用每task 60 recovery。",
+      "phase.json 未在抽查資料版本出現，且裁切器丟depth及不搬移phase metadata。",
+      "15／20評測次數、4／5 failure modes、9／10物件及雙臂口徑需協調者保留差異，不自動覆蓋。"
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "anon-robo-account/REBOOT",
+        "requested_repo": "anon-robo-account/REBOOT",
+        "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            11,
+            27
+          ],
+          [
+            47,
+            67
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "43e8c5342e596cfaa31da077a32e36be309844e7ed470f04c72bc41b610cca61",
+        "url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/README.md",
+        "reading_url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/README.md#L11-L27",
+        "why": "確認 fork 角色、LeRobot v3/depth 與 REBOOT26 官方資料來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "anon-robo-account/REBOOT",
+        "requested_repo": "anon-robo-account/REBOOT",
+        "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+        "ref": null,
+        "path": "src/lerobot/datasets/lerobot_dataset.py",
+        "ranges": [
+          [
+            161,
+            217
+          ],
+          [
+            233,
+            260
+          ],
+          [
+            934,
+            1060
+          ],
+          [
+            1117,
+            1160
+          ],
+          [
+            1321,
+            1338
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1780,
+        "sha256": "bb09aa5ee29c41cf6c35dbfc4dbacd891a712102fbddd41e597d088de69df0dd",
+        "url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/src/lerobot/datasets/lerobot_dataset.py",
+        "reading_url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/src/lerobot/datasets/lerobot_dataset.py#L161-L217",
+        "why": "從 metadata 到 parquet／MP4 reader、episode 邊界 padding、timestamp offset 與 depth 分流。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "anon-robo-account/REBOOT",
+        "requested_repo": "anon-robo-account/REBOOT",
+        "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+        "ref": null,
+        "path": "src/lerobot/cameras/realsense/camera_realsense.py",
+        "ranges": [
+          [
+            280,
+            291
+          ],
+          [
+            327,
+            365
+          ],
+          [
+            420,
+            461
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 643,
+        "sha256": "6fc111f437e429113dd471e76b36def83969992b8f86fd178bedc7159e8aa11a",
+        "url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/src/lerobot/cameras/realsense/camera_realsense.py",
+        "reading_url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/src/lerobot/cameras/realsense/camera_realsense.py#L280-L291",
+        "why": "RealSense z16、uint16 depth 與相機後處理，避免當 RGB 正規化。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "anon-robo-account/REBOOT",
+        "requested_repo": "anon-robo-account/REBOOT",
+        "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+        "ref": null,
+        "path": "dtset-trim/dataset_episode_trim.py",
+        "ranges": [
+          [
+            1,
+            18
+          ],
+          [
+            74,
+            157
+          ],
+          [
+            191,
+            259
+          ],
+          [
+            269,
+            279
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 333,
+        "sha256": "6c3a8b93cfa7c5d14f5c4be92a19c6d3b73efe0d726a65e3d30913b201b04caa",
+        "url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/dtset-trim/dataset_episode_trim.py",
+        "reading_url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/dtset-trim/dataset_episode_trim.py#L1-L18",
+        "why": "實際 phase.json schema、failure.t_r、半開 frame slice，以及刪除 depth／重建索引的行為。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "anon-robo-account/REBOOT",
+        "requested_repo": "anon-robo-account/REBOOT",
+        "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+        "ref": null,
+        "path": "src/lerobot/scripts/lerobot_eval.py",
+        "ranges": [
+          [
+            198,
+            231
+          ],
+          [
+            366,
+            381
+          ],
+          [
+            438,
+            463
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 844,
+        "sha256": "095b8c55fbad24a1146d39d6163722df6bd16b88a209ffa564afd02cd669b8ee",
+        "url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/src/lerobot/scripts/lerobot_eval.py",
+        "reading_url": "https://github.com/anon-robo-account/REBOOT/blob/269d53958caf32913104c5a93f8ee4ed84704a0f/src/lerobot/scripts/lerobot_eval.py#L198-L231",
+        "why": "具體程式只彙總環境 is_success 與 reward，沒有 REBOOT 五階段的物理／視覺判定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "1d5f12672f9c2a7dd3b0031f640fc5d2d8f026ad05e6a2d99a048a1560abe2dd"
+  },
+  "repository_binding_review_sha256": "1d5f12672f9c2a7dd3b0031f640fc5d2d8f026ad05e6a2d99a048a1560abe2dd",
+  "repository_bindings": [
+    {
+      "requested_repo": "anon-robo-account/REBOOT",
+      "resolved_repo": "anon-robo-account/REBOOT",
+      "aliases_in_this_review": [
+        "anon-robo-account/reboot"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "269d53958caf32913104c5a93f8ee4ed84704a0f",
+          "reviewed_files": [
+            "README.md",
+            "dtset-trim/dataset_episode_trim.py",
+            "src/lerobot/cameras/realsense/camera_realsense.py",
+            "src/lerobot/datasets/lerobot_dataset.py",
+            "src/lerobot/scripts/lerobot_eval.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/anon-robo-account/REBOOT",
+          "pdf_page": 16,
+          "pdf_sha256": "1f5401dfe2a8209a83cb96780a43fbfa0938f8a743eb8285be793fbdd60cf6f5",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/anon-robo-account/REBOOT",
+          "link_label": "Code",
+          "project_url": "https://nanayawoa.github.io/REBOOT",
+          "page_sha256": "8e359b36cf6cfb48df2a6d594c0b9acc4f8dcb54915d7a07421aa0b8a3e26459"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P179",
+          "review_file": "content/github_review/reviews/P179.json",
+          "review_sha256": "1d5f12672f9c2a7dd3b0031f640fc5d2d8f026ad05e6a2d99a048a1560abe2dd",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P179",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "REBOOT，arXiv 2609.22591v1。",
+    "scope_read": "assembly清單、精度層級、expert/recovery資料、初態與實驗協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "裝配與生產作業"
+    ],
+    "role": "精密組裝與恢復benchmark",
+    "environment": "真實雙臂WidowX/Trossen工作站；NIST Assembly Task Board #1。",
+    "tasks": "表2為9物件×安裝/移除＝18tasks；精度、對稱性及5操作phase是task屬性。",
+    "cases": "18×(60 expert+60 recovery)＝2,160 demonstrations。§protocol寫每task/policy20rollouts，主分析卻用15×18×3＝810，保留差異。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "assembly/disassembly tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2160,
+        "unit": "expert+recovery demonstration episodes",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 810,
+        "unit": "主分析總evaluation rollouts",
+        "qualifier": "15×18×3；與protocol 20次不一致",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "逐task物理完成率，另按clearance、symmetry、phase及failure分析；初始物件3–6cm範圍變化，goal board固定。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "expert/recovery及模型設定受控比較；recovery demonstrations刻意重現先前觀察到的policy失敗。",
+    "lineage": "沿用標準assembly board；9物件不是9獨立工作環境。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "Table 2、Dataset、Evaluation",
+        "supports": "18/2160、精度與15/20次衝突"
+      }
+    ],
+    "unresolved": [
+      "p7的10 connector types與表2的9物件、20與15rollouts需要release核對；failure清單是否含slip也有版本差異。"
+    ],
+    "reuse": "補精密插接、對稱性與failure phase；組裝和拆解可保留相反目標關係。",
+    "reviewed_pdf_sha256": "1f5401dfe2a8209a83cb96780a43fbfa0938f8a743eb8285be793fbdd60cf6f5",
+    "reviewed_on": "2026-10-02",
+    "name": "REBOOT",
+    "year": 2026,
+    "title": "REBOOT: From Failure to Recovery - A Dataset and Benchmark for Precision Assembly",
+    "source_url": "https://arxiv.org/abs/2609.22591",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "industry"
+    ],
+    "review_tags": [
+      "組裝與拆解",
+      "工業製造"
+    ],
+    "domain_names": [
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P179",
+      "domain_ids": [
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P179",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "表2為9物件×安裝/移除＝18tasks；精度、對稱性及5操作phase是task屬性。",
+            "真實雙臂WidowX/Trossen工作站；NIST Assembly Task Board #1。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "1f5401dfe2a8209a83cb96780a43fbfa0938f8a743eb8285be793fbdd60cf6f5"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "1f5401dfe2a8209a83cb96780a43fbfa0938f8a743eb8285be793fbdd60cf6f5",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P179",
+      "name": "REBOOT",
+      "expected_title": "REBOOT: From Failure to Recovery - A Dataset and Benchmark for Precision Assembly",
+      "source_url": "https://arxiv.org/abs/2609.22591",
+      "pdf_url": "https://arxiv.org/pdf/2609.22591",
+      "retrieved_at": "2026-10-02T21:34:55.267651+00:00",
+      "pdf_sha256": "1f5401dfe2a8209a83cb96780a43fbfa0938f8a743eb8285be793fbdd60cf6f5",
+      "text_sha256": "6428d487c17ab8a2d433f47927f16d10d25f15cc28650d877cd5ba6b3e824082",
+      "pdf_bytes": 23056733,
+      "pages": 23,
+      "text_characters": 83512,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.22591v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.22591v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "assembly/disassembly tasks",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P179:1",
+        "paper_id": "P179",
+        "benchmark": "REBOOT",
+        "native_term": "assembly/disassembly tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.22591v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.22591v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2160,
+        "unit": "expert+recovery demonstration episodes",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P179:2",
+        "paper_id": "P179",
+        "benchmark": "REBOOT",
+        "native_term": "expert+recovery demonstration episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.22591v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.22591v1",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 810,
+        "unit": "主分析總evaluation rollouts",
+        "qualifier": "15×18×3；與protocol 20次不一致",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P179:3",
+        "paper_id": "P179",
+        "benchmark": "REBOOT",
+        "native_term": "主分析總evaluation rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.22591v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.22591v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "anon-robo-account/REBOOT"
+  ],
+  "external_repositories": []
+}

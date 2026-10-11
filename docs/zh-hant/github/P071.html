@@ -1,0 +1,114 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RoboCasa365｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="RoboCasa365 應從 TASK_SET_REGISTRY、split 建環境、LeRobot extras 和具體 task checker 讀起。現行程式的 all_tasks 來自資料registry而非365項完整任務名冊；論文與後續檔案的trial數、horizon也已不同。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P071.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P071.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P071.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="RoboCasa365｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="RoboCasa365 應從 TASK_SET_REGISTRY、split 建環境、LeRobot extras 和具體 task checker 讀起。現行程式的 all_tasks 來自資料registry而非365項完整任務名冊；論文與後續檔案的trial數、horizon也已不同。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P071.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P071.html","title":"RoboCasa365｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P071.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P071.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P071 · RoboCasa365</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P071 · RoboCasa365</h1><p class="lede">RoboCasa365: A Large-Scale Simulation Framework for Training and Benchmarking Generalist Robots</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>benchmark／資料／評測主來源</span><a href="https://arxiv.org/abs/2603.04356" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p071">用途與原生規模依據</a>
+    </div>
+    <p class="github-scope">核讀快照 2026-10-10。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">RoboCasa365 應從 TASK_SET_REGISTRY、split 建環境、LeRobot extras 和具體 task checker 讀起。現行程式的 all_tasks 來自資料registry而非365項完整任務名冊；論文與後續檔案的trial數、horizon也已不同。</p>
+    <aside class="github-version"><b>版本與身份</b><p>主倉庫同時殘留舊eval_utils的PandaMobile/B split；365應沿env_utils＋Gym讀取。Gym預設split=&quot;test&quot;，create_env只接受None/all/pretrain/target，因此呼叫時需明設split。LeRobot playback拒絕filter_key；--use_abs_actions沒有進入use_actions分支，而底層get_episode_actions(abs_actions=True)也明確未實作。README要求robosuite master，LeRobot與policy runner版本尚未固定；本次沒有宣稱執行相容。</p><p>對應 arXiv:2603.04356v1（2026-03-04／ICLR 2026），四位作者及題名與README的RoboCasa365引用一致。與P070共用官方倉庫，但這份筆記固定365時代main：456174f62b89b8fca99eaaf33949c29fec9cfc2a。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>居家整理與清潔、餐飲與烹飪</dd></div><div><dt>環境</dt><dd>pretrain由layout 11–60與style 11–60交叉組成2500組；target只用(1,1)…(10,10)十組，不是10×10。create_env同時切換obj_instance_split。Kitchen會再排除任務不支援的layout/style；2500不能保證每task都有2500個有效場景。</dd></div><div><dt>任務</dt><dd>論文365＝65 atomic＋300 composite；target50明列18 atomic-seen、16 composite-seen、16 composite-unseen。固定registry經AST計數為65 atomic＋252 composite＝317個key，all_tasks直接串接這兩表；pretrain300與target50聯集316，另外一個key是PlaceOnDishRack。這是資料／評測入口的覆蓋差異，不以317覆蓋論文365，也不推論未列者沒有環境實作。</dd></div><div><dt>題數與資料</dt><dd>get_ds_meta輸出path/horizon/filter_key/task/split/source；human預設pretrain100、target500 demos，MimicGen一般10000但OpenCabinet特例5000。缺folder回None，soup會略過。LeRobot讀data/*/episode_NNNNNN.parquet的action，按meta/modality.json重排；重播另需extras/dataset_meta.json的env_args，及每episode的states.npz、model.xml.gz、ep_meta.json。ep_meta保留layout_id/style_id/object_cfgs/fixture_refs/cam_configs/lang及底盤初態。action原始順序為eef平移3、旋轉3、gripper1、base/torso4、mode1；Gym提供三個video.*視角、state.*與annotation.human.task_description，不能直接按LeRobot欄位字典順序拼接。</dd></div><div><dt>評估方式</dt><dd>Gym.step→Kitchen.reward／具體_check_success；PickPlaceCounterToCabinet要求bbox位於某一櫃內區域且eef離物件&gt;0.25公尺。obj_inside_of仍在未正規化軸投影使用0.05，非固定5公分容差。Gym將checker轉為reward 0/1與info.success；ignore_done=True且truncated固定False，registry的horizon必須由policy runner另行取用。論文§G.2每task30 trials、期限內曾成功即算成功、跨task平均；現行檔案改50 rollouts且v1.0.1把horizon增至1.5倍。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作數字：保留論文的單位與頁碼</summary><p>下列為既有原文審閱摘錄；GitHub快照和本庫取得範圍另見上文，不互相代替。</p><ul><li><strong>50</strong> 新pretrain floor layouts · 原文頁 4</li><li><strong>2,500</strong> pretrain layout-style scenes · 原文頁 4</li><li><strong>10</strong> target scenes · 原文頁 4</li><li><strong>365</strong> tasks · 原文頁 5</li><li><strong>50</strong> target eval tasks · 原文頁 6</li><li><strong>600,000</strong> synthetic pretrain demos · 60×10K · 原文頁 6</li></ul></details>
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/README.md#L5-L22" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>辨認2024/365兩篇論文及v1.0.1 horizon、2026-07標註更新。</p><small>L5–22 · L129–150</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 7c0c1a7ce2f12e459fe8b2bf79be8ecf065e13740ecd8bcf6e207d2a3a196eb6</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/docs/benchmarking/benchmarking_overview.md#L16-L33" target="_blank" rel="noopener noreferrer"><code>docs/benchmarking/benchmarking_overview.md</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>當前檔案的50 rollouts與1.5倍horizon，對照論文30 trials。</p><small>L16–33</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 476353c8054bfaac67d9a6a522769cad0cca6dadd33925f9884f6f872436f201</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/docs/datasets/datasets_overview.md#L3-L71" target="_blank" rel="noopener noreferrer"><code>docs/datasets/datasets_overview.md</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>300 pretrain、50 target與18/16/16三組資料。</p><small>L3–71</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 8a4839fc0fdd127e03113adcef519455d279848a66ca1214c083dfd7c3e59a2a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/dataset_registry.py#L1-L40" target="_blank" rel="noopener noreferrer"><code>robocasa/utils/dataset_registry.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>task資料條目、target清單與all_tasks實際組成。</p><small>L1–40 · L2130–2170 · L2802–2860 · L2931–2962</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/dataset_registry_utils.py#L11-L89" target="_blank" rel="noopener noreferrer"><code>robocasa/utils/dataset_registry_utils.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>資料路徑、demo_fraction/filter_key、缺資料時略過及task horizon取得。</p><small>L11–89 · L121–169 · L240–253</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 9ea74602711ab9c499314bc3d94c4b61db6fe85bebf616cce573b9d39ba02e3b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/models/scenes/scene_registry.py#L14-L92" target="_blank" rel="noopener noreferrer"><code>robocasa/models/scenes/scene_registry.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>1–10 target與11–60 pretrain的layout/style群組。</p><small>L14–92 · L162–199</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 284f4b019d50f3960045666c461e54e8663dbcaf2f68ac19ff4cbc60c30e4901</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/env_utils.py#L57-L154" target="_blank" rel="noopener noreferrer"><code>robocasa/utils/env_utils.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>split到場景／物件的對映、12維action切片與成功時計數的參考loop。</p><small>L57–154 · L157–193</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 2543d593897008b104c0fa7bb83c987675b4e583ae519b324de98f99c71a5fcd</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/wrappers/gym_wrapper.py#L33-L140" target="_blank" rel="noopener noreferrer"><code>robocasa/wrappers/gym_wrapper.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>typed observation/action、預設split、success、done與未註冊TimeLimit的行為。</p><small>L33–140 · L143–177 · L303–328 · L342–385 · L400–424</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 356d61ca9e4b777ca0515323d38167cb7560b837cb37ea460f16ba01b4cf2d49</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/environments/kitchen/atomic/kitchen_pick_place.py#L24-L137" target="_blank" rel="noopener noreferrer"><code>robocasa/environments/kitchen/atomic/kitchen_pick_place.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>具體PickPlaceCounterToCabinet的物件配置、指令與checker。</p><small>L24–137</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 f7157fb5809e73d4ee954974d8c8e199f18d9a0f48ce41f84c2b5d7b74eaf676</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/object_utils.py#L14-L64" target="_blank" rel="noopener noreferrer"><code>robocasa/utils/object_utils.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>完整追到fixture內部幾何投影及eef距離。</p><small>L14–64 · L645–652</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 3a7ddb8ba503c5f397baa1513b7b5f370c3c3b2a6a67fa723e83c9472c58af4a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/environments/kitchen/kitchen.py#L376-L396" target="_blank" rel="noopener noreferrer"><code>robocasa/environments/kitchen/kitchen.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>20 Hz、場景組合排除、ep_meta及reward委派。</p><small>L376–396 · L424–445 · L1167–1214 · L1530–1540</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 35b1395ce65d51b993296aff1881fd5371542aec4c4e8ffc38c3f775327b5c56</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/scripts/dataset_scripts/playback_dataset.py#L254-L304" target="_blank" rel="noopener noreferrer"><code>robocasa/scripts/dataset_scripts/playback_dataset.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>LeRobot重播的真實reader呼叫與filter/absolute-action限制。</p><small>L254–304 · L315–345</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 9a3556e941f364862177e85d339b519f657d9be8308f76a09c642b560a9ceba7</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/lerobot_utils.py#L63-L79" target="_blank" rel="noopener noreferrer"><code>robocasa/utils/lerobot_utils.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>Parquet action排序、meta/modality.json與必需extras實體欄位。</p><small>L63–79 · L123–165 · L199–346</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 4d6aafd67753576917546c487e960a3fadf5ba1f32c5fb5604e69336f5262f6c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/eval_utils.py#L14-L57" target="_blank" rel="noopener noreferrer"><code>robocasa/utils/eval_utils.py</code> ↗</a><span>GitHub · robocasa/robocasa · 456174f62b</span></div>
+      <p>核對main殘留的PandaMobile、B物件split與五場景舊介面，避免誤用於365評測。</p><small>L14–57</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 7f8cd36e49941b463ff3ea6ecaf3ae52653d1bfa543147c6830e8977e1f2e6b6</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>有版本的task sets、pretrain/target分割、LeRobot modality及extras、場景／物件生成設定與具體bool checker。</p></section><section><h3>需要轉換</h3><p>source記論文v1及commit；task全集、資料覆蓋、target集合分欄。case記split、layout/style pair、物件分割、seed、控制頻率及實際horizon；evaluator儲存trial數、期限內成功與跨task平均，禁止和P070或不同horizon結果直接合併。</p></section><section><h3>仍需補齊</h3><p>365任務與317個資料key的完整對照、正式policy runner依賴commit／seed清單、per-frame subtask標註的實際檔案schema，以及LeRobot影片／extras／資產的閉合驗證。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;kind&quot;: &quot;pinned_primary_paper&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P071/pages.json&quot;,
+    &quot;pages&quot;: [
+      1,
+      22
+    ],
+    &quot;pdf_sha256&quot;: &quot;f3e6877b8de3dd471afb6951c1e067729e2a57c53fcb3d6daaa0f4af5080206b&quot;
+  },
+  {
+    &quot;kind&quot;: &quot;primary_paper_section_record&quot;,
+    &quot;local_file&quot;: &quot;content/fulltext_review/batch07.json&quot;,
+    &quot;paper_id&quot;: &quot;P071&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P071.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P070.html">← 上一篇 · RoboCasa</a><a href="P072.html">下一篇 → · VLABench</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

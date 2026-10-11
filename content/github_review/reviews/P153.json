@@ -1,0 +1,32 @@
+{
+  "paper_id": "P153",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "EgoExo-Gen先預測跨視角手物mask再生成第一人稱影片；原作實驗是Ego-Exo4D子集及H2O轉移，目前未確認其官方實作repo。",
+  "reading_order": [],
+  "environment": "Ego-Exo4D cooking來源涵蓋60location、564小時的原生子集描述；H2O作外部分佈測試，不新增物理robot環境。",
+  "tasks": "Exo影片及HOI mask+Ego首影格→未來Ego mask/影片；cross-view mask prediction與video generation是兩個評估輸出。",
+  "data": "原文p6列33,448訓練clip、平均1秒；validation抽1000clip，其中500標HOI mask；H2O val122clip。16frame模型輸入、mask480²與影片256²；選4個exo視角中手mask比例最高者，需保留view selection。此為原文數量，未下載case。",
+  "evaluation": "Mask用IoU、對齊質心後的Contour Accuracy、正規化質心Location Error；影片用SSIM/PSNR/LPIPS/FVD。不同mask/影片子集及source split不可混同；缺官方scorer和明確clip ID。",
+  "standardization": {
+    "profile": "cross_view_hand_object_video_prediction",
+    "reuse": "Ego/Exo同步父來源、兩階段HOI建構、原生指標與子集設計。",
+    "transform": "source關聯Ego-Exo4D/H2O；case保存take/clip/view/narration、可見exo完整影片和ego首影格；GT mask不可直接視為所有方法合法輸入。",
+    "missing": "官方實作、clip ID/annotation release、mask生成版本與data leakage檢查、相同前處理的評估腳本。"
+  },
+  "version_note": "核對2504.11732 ICLR2025原文p5–6與cached題名/EgoExo-Gen搜尋。搜尋的awesome lists只保留為線索，沒有當作本篇官方code。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2504.11732",
+    "pdf_sha256": "0d48cb5d2187863f040a0c29716e31d4fb076062c507a92da0ef09c8d2f72e19",
+    "paper_pages_read": [
+      5,
+      6
+    ],
+    "search_receipts": [
+      "audit/.cache/github_review/search/P153-refined.json",
+      "audit/.cache/github_review/search/P153.json"
+    ],
+    "scope": "Primary paper and cached discovery; no code implementation confirmed"
+  }
+}

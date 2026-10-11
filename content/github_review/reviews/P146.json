@@ -1,0 +1,72 @@
+{
+  "paper_id": "P146",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "DexH2R提供人到機器人的動態交接資料與抓取/接近策略。所讀DP評測將進入最終抓取插值記為成功，不能直接解讀為真實物件已穩定交接。",
+  "reading_order": [
+    {
+      "repo": "4DVLab/DexH2R",
+      "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "論文身分、18視角、subject/object/sequence及相機標定"
+    },
+    {
+      "repo": "4DVLab/DexH2R",
+      "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+      "path": "DiffusionPolicy/DP/diffusion_policy/dataset/eval_dp_dataset.py",
+      "ranges": [
+        [
+          14,
+          58
+        ],
+        [
+          86,
+          121
+        ]
+      ],
+      "why": "Zarr欄位、明確episode切片與RGB/depth預處理"
+    },
+    {
+      "repo": "4DVLab/DexH2R",
+      "commit": "43c5e5c948396e9ab4ea2040b445b70e36046459",
+      "path": "DiffusionPolicy/DP/diffusion_policy/workspace/eval_dp_baseline_workspace.py",
+      "ranges": [
+        [
+          123,
+          129
+        ],
+        [
+          349,
+          377
+        ],
+        [
+          401,
+          423
+        ],
+        [
+          575,
+          607
+        ]
+      ],
+      "why": "平移距離、插值觸發、穿透修正與輸出metrics"
+    }
+  ],
+  "environment": "真實多視角人類交接，Kinect/RealSense/ZCam合計18視角；人類MANO與Shadow Hand qpos、物件mesh/point cloud及逐時刻物件pose。相機數不當作環境數。",
+  "tasks": "動態靈巧抓取、人到機器人的接近與交接；subject/object/sequence形成資料階層，grasp pose preparation和approaching motion是方法/子流程。",
+  "data": "原資料按subject zip；sequence含calibration、mano、obj_pose、qpos和real_obj_pcd。depth原始int16需按文件轉uint16；DP loader又將image/depth除255，需區分原始物理深度與模型輸入。Zarr包含agent_pos/action/final_grasp/traj_index等；先建隨機val_mask後被索引區間覆寫，應保存實際mask_start/end。",
+  "evaluation": "compute_pose_distance最後只回傳平移距離×100(cm)，算出的旋轉差未加入。接近門檻、非零物件變化與最少frame觸發Is_interpolate，dp_success_rate取此旗標。安全率扣除GT穿透基線後判斷是否零穿透；名為max_pener_depth的量在累加後除總frame，不能直接稱最大深度。這是靜態程式判讀，未跑策略。",
+  "standardization": {
+    "profile": "dynamic_human_robot_handover",
+    "reuse": "多相機標定、原生split、物件與手姿態、DP輸入及指標公式。",
+    "transform": "environment綁定拍攝/標定與robot；task描述交接條件；case保留subject/object/sequence與完整初態；將接近、抓取穩定、交接完成分別定義evaluator。",
+    "missing": "資料/mesh資產取得、depth尺度驗證、穿透函數及最末trajectory匯總完整查核、實際穩定抓取/交接checker與重現。"
+  },
+  "version_note": "固定43c5e5c；README仍用wang-youzhuo舊owner和空DiffusionPolicy連結，所讀為4DVLab當前固定版。只核讀列出的DP核心片段，未宣稱CVAE/MotionNet全部核讀。",
+  "runtime_executed": false
+}

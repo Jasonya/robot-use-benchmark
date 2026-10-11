@@ -1,0 +1,136 @@
+{
+  "paper_id": "P172",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "LabUtopia把場景/觀測放在task、完成檢查放在controller；只讀task類別會漏掉真正判分。此版同時存在不同HDF5欄位格式，匯入時需要分開對接。",
+  "reading_order": [
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          95
+        ],
+        [
+          274,
+          313
+        ],
+        [
+          328,
+          373
+        ]
+      ],
+      "why": "當前Isaac版本、task/controller分工與60Hz資料約定"
+    },
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "config/level1_pick.yaml",
+      "ranges": [
+        [
+          1,
+          69
+        ]
+      ],
+      "why": "具體場景、物件range、3相機、robot和budget"
+    },
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "tasks/base_task.py",
+      "ranges": [
+        [
+          286,
+          356
+        ]
+      ],
+      "why": "觀測state與reset/timeout訊號"
+    },
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "controllers/base_controller.py",
+      "ranges": [
+        [
+          19,
+          41
+        ],
+        [
+          122,
+          150
+        ]
+      ],
+      "why": "60次持續成功及episode計數"
+    },
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "controllers/pick_controller.py",
+      "ranges": [
+        [
+          20,
+          25
+        ],
+        [
+          50,
+          78
+        ],
+        [
+          129,
+          154
+        ]
+      ],
+      "why": "pick抬高0.1m的具體連續判定"
+    },
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "policy/dataset/nav_dataset.py",
+      "ranges": [
+        [
+          1,
+          41
+        ],
+        [
+          81,
+          121
+        ]
+      ],
+      "why": "HDF5舊schema、state/action視窗及validation副本"
+    },
+    {
+      "repo": "Rui-li023/LabUtopia",
+      "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+      "path": "scripts/convert_labsim_data_to_lerobot.py",
+      "ranges": [
+        [
+          55,
+          84
+        ],
+        [
+          109,
+          162
+        ],
+        [
+          183,
+          244
+        ]
+      ],
+      "why": "新schema、FPS偵測/降採樣及LeRobot欄位轉換"
+    }
+  ],
+  "environment": "實驗室USD場景和Franka/移動機器人等配置；所讀level1_pick指定lab_001、3相機與物件初態range。多個YAML/相機不直接當獨立物理環境。",
+  "tasks": "以基礎、組合、泛化和長序列四層組織實驗室操作；配置task_type/controller_type決定行為，scene/物件組合構成具體case。此輪核讀pick，不將每個config別名視為新語義task。",
+  "data": "NavDataset使用joint_positions/robot_position/cam_01_rgb/cam_02_rgb/hand_cam_rgb，action取joint_positions序列；其validation只copy同一資料與sequence表，非獨立holdout。新converter期待agent_pose/actions與相機欄位，缺shape預設7、缺FPS預設60；source<=target FPS時保留所有frame，須確認輸出timebase。",
+  "evaluation": "pick controller要求物體Z比初始高0.1且連續60次check；reset時計success_count。task.done只是reset_needed，base timeout還調on_task_complete(True)，不能用task.done替代controller成功。50個inference episodes只是README範例；正式case/budget須按發布協定固定。",
+  "standardization": {
+    "profile": "hierarchical_scientific_lab_simulation",
+    "reuse": "YAML場景/感測/初態、task/controller分工、具體pick evaluator與HDF5→LeRobot路徑。",
+    "transform": "先辨識HDF5 schema版本和action是否command/state；建立episode級split；case記physics/control/check頻率、連續成功時間與timeout獨立結果；原文規模和當前config取樣分開。",
+    "missing": "全部task完成checker、原文到當前版本對照、獨立validation、舊/新資料schema轉接、FPS/shape fallback驗證與場景資產/基線重現。"
+  },
+  "version_note": "固定8df7278，README已指IsaacSim5.1；論文為2505.22634，不能把現在的軟體依賴版本直接當成2025原論文設定。未執行Isaac或遠端policy。",
+  "runtime_executed": false
+}

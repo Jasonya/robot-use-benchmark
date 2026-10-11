@@ -1,0 +1,217 @@
+{
+  "paper_id": "P190",
+  "name": "UniGarmentManip",
+  "title": "UniGarmentManip: A Unified Framework for Category-Level Garment Manipulation via Dense Visual Correspondence",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2405.06903",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P190",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "UniGarmentManip透過衣物dense correspondence把示範動作轉到新衣物。程式提供3類衣物/3種代表任務的研究框架，但資料配對樣本與實際操控episode須分開。",
+    "environment": "GarmentGym/PyFlex衣物模擬；3種衣物類別、單/雙臂、flat/messy與多步設定屬不同變化維度，不以笛卡兒積當全部已驗證場景。",
+    "tasks": "主要unfolding/fling、folding、hanging；訓練dense correspondence是支援方法，兩point cloud或20對correspondence不是20個robot任務。",
+    "data": "HDF5有points/colors/vertices/visible_vertices/visible_indices、camera_intrisics/camera_extrisics、rgb/depth/faces。reader按mesh與deform層配對，__getitem__交替cross-shape/cross-deform，從visible vertices找20對correspondence。converter將.pkl換成h5漏了點，但reader只找.h5，需核對/修正檔名契約。",
+    "evaluation": "動作從demo點的normalized feature相似度argmax映射到新point cloud，再投影回world控制；fold checker先等穩定，按final/init coverage比例與肩/袖/角點距離判定，各fold type門檻不同。此為幾何啟發式，不直接驗證層拓撲；GT mesh indices只供訓練/判分不能直接作policy觀測。",
+    "standardization": {
+      "profile": "dense_correspondence_for_garment_manipulation",
+      "reuse": "mesh/deformation/visibility配對結構、示範到控制的幾何轉換、已讀兩種fold成功條件。",
+      "transform": "source按garmentUID與deformationID分層，case保存示範序列/目標fold/相機/mesh尺度；將point-correspondence訓練example與robot rollout分別計數。",
+      "missing": "衣物/示範split、檔名和schema一致性、完整hanging/fling與其他fold checker、坐標單位/動作預算與跨衣物重現。"
+    },
+    "version_note": "固定fe15994，CVPR2024原作；本次核讀雙手fold鏈與共用correspondence reader，未聲稱所有支線及實機實驗已重現。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "luhr2003/UniGarmentManip",
+        "requested_repo": "luhr2003/UniGarmentManip",
+        "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 43,
+        "sha256": "03371174603dcf939386c5ac5c8d7d97e073b4b08afdb511a127e7fc3d34d7cf",
+        "url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/README.md",
+        "reading_url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/README.md#L1-L43",
+        "why": "原作、3類/3任務及資料/環境/示範模組",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "luhr2003/UniGarmentManip",
+        "requested_repo": "luhr2003/UniGarmentManip",
+        "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+        "ref": null,
+        "path": "train/dataloader/preprocess/pickle2h5.py",
+        "ranges": [
+          [
+            15,
+            42
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 69,
+        "sha256": "17bfde1341e66e64505a1b32e8728fbb85e94f9a6cd03164f3476edb1a31942c",
+        "url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/train/dataloader/preprocess/pickle2h5.py",
+        "reading_url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/train/dataloader/preprocess/pickle2h5.py#L15-L42",
+        "why": "原始record→HDF5欄位與輸出檔名",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "luhr2003/UniGarmentManip",
+        "requested_repo": "luhr2003/UniGarmentManip",
+        "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+        "ref": null,
+        "path": "train/dataloader/dataloader.py",
+        "ranges": [
+          [
+            81,
+            109
+          ],
+          [
+            234,
+            255
+          ],
+          [
+            338,
+            366
+          ],
+          [
+            403,
+            407
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 410,
+        "sha256": "70ad920957c6705b4e0effb433acbe2b3a00ae439116abd4d1ba81a546619632",
+        "url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/train/dataloader/dataloader.py",
+        "reading_url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/train/dataloader/dataloader.py#L81-L109",
+        "why": "mesh/deformation配對、可見性GT與對應點採樣",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "luhr2003/UniGarmentManip",
+        "requested_repo": "luhr2003/UniGarmentManip",
+        "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+        "ref": null,
+        "path": "task/fold/double_from_flat.py",
+        "ranges": [
+          [
+            101,
+            152
+          ],
+          [
+            198,
+            232
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 241,
+        "sha256": "484d91c29c4dbf7565edf1e9713f58ce25a9a7b6023f5eaacfd29c14fcf4fe03",
+        "url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/task/fold/double_from_flat.py",
+        "reading_url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/task/fold/double_from_flat.py#L101-L152",
+        "why": "示範/mesh固定、特徵相似點→world pick/place與環境checker",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "luhr2003/UniGarmentManip",
+        "requested_repo": "luhr2003/UniGarmentManip",
+        "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+        "ref": null,
+        "path": "garmentgym/garmentgym/env/bimanual_fold.py",
+        "ranges": [
+          [
+            608,
+            727
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 904,
+        "sha256": "d5c495f2085a9fb6d4260425fc6c018e81a3192c3416b28e4387d83f70d4e42e",
+        "url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/garmentgym/garmentgym/env/bimanual_fold.py",
+        "reading_url": "https://github.com/luhr2003/UniGarmentManip/blob/fe15994326991298f06d4fd3f821069d07b34f4e/garmentgym/garmentgym/env/bimanual_fold.py#L608-L727",
+        "why": "具體funnel/simple摺法的area與語義keypoint距離規則",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c17a01b410961da1591011cefcc61e388599ce6d46bf6d43d6dce81f68a4d5bd"
+  },
+  "repository_binding_review_sha256": "c17a01b410961da1591011cefcc61e388599ce6d46bf6d43d6dce81f68a4d5bd",
+  "repository_bindings": [
+    {
+      "requested_repo": "luhr2003/UniGarmentManip",
+      "resolved_repo": "luhr2003/UniGarmentManip",
+      "aliases_in_this_review": [
+        "luhr2003/unigarmentmanip"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "fe15994326991298f06d4fd3f821069d07b34f4e",
+          "reviewed_files": [
+            "README.md",
+            "garmentgym/garmentgym/env/bimanual_fold.py",
+            "task/fold/double_from_flat.py",
+            "train/dataloader/dataloader.py",
+            "train/dataloader/preprocess/pickle2h5.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/luhr2003/UniGarmentManip",
+          "link_label": "[Code]",
+          "project_url": "https://warshallrho.github.io/unigarmentmanip",
+          "page_sha256": "5358c62817188650ef59c4d2cab22062f95cc56e1b362e2bf2e7082a2d442fee"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P190",
+          "review_file": "content/github_review/reviews/P190.json",
+          "review_sha256": "c17a01b410961da1591011cefcc61e388599ce6d46bf6d43d6dce81f68a4d5bd",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "luhr2003/UniGarmentManip"
+  ],
+  "external_repositories": []
+}

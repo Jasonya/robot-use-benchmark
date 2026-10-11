@@ -1,0 +1,450 @@
+{
+  "paper_id": "P110",
+  "name": "AHA",
+  "title": "AHA: A Vision-Language-Model for Detecting and Reasoning Over Failures in Robotic Manipulation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2410.00371",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P110",
+    "summary": "AHA公開failure生成及失敗問答評測；Yes/No腳本把正確率稱為F1，LLM fuzzy評分則會略過無有效裁判輸出的題。共同報表需要保留實際公式與分母。",
+    "environment": "RLBench/FailGen產生的機器人失敗片段，另重用REFLECT等test來源；示例是時間格狀拼圖，不是額外可操控場景。",
+    "tasks": "判斷子任務成功與解釋失敗原因；下游恢復應用另有執行protocol，問答分數本身不等於恢復成功。",
+    "data": "GT JSON含字串id、image和human/gpt conversations；Yes/No預測為JSONL整數question_id與text。樣本格圖包含時間順序與未來空白格說明；source video/frame範圍需追回父資料。",
+    "evaluation": "Yes/No程式取逗點前小寫答案，(yes正確+no正確)/indx_num為accuracy而非標準F1；默認indx_num不能當全資料實數。fuzzy用claude-3-haiku-20240307，解析correct/partially/incorrect→1/.5/0，按列序配對且只對有效裁判分數平均；須保存ID、invalid count和裁判回執。",
+    "standardization": {
+      "profile": "robot_failure_multimodal_question_answering",
+      "reuse": "問答schema、父benchmark標記、二元／文字理由分開評測、原parser。",
+      "transform": "case以父影片+子任務+時間窗+prompt建鍵；GT/預測用ID對齊，不僅等長zip。evaluator保存原稱F1與實際accuracy別名、fuzzy模型/提示/解析和完整分母。",
+      "missing": "全量影像和time-window對映、FailGen設定/資料split閉合、裁判一致性與invalid處理、下游物理恢復證據。"
+    },
+    "version_note": "固定ICLR2025公開碼；README依賴PerAct RLBench並含fork更新，不將其視為與所有RLBench版本相同。只核對生成來源及評分核心，未生成資料或呼叫裁判。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "NVlabs/AHA",
+        "requested_repo": "NVlabs/AHA",
+        "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 240,
+        "sha256": "81a8fc37adb71d2293d996ccfd46cff5405d45ad2618696a94817998fea779c0",
+        "url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/README.md",
+        "reading_url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/README.md#L1-L75",
+        "why": "精確論文與RLBench/FailGen來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "NVlabs/AHA",
+        "requested_repo": "NVlabs/AHA",
+        "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa",
+        "ref": null,
+        "path": "aha/evaluation/REFLECT_test.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/0"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/0",
+            "selected_value_sha256": "c41805672a56389f214458f3d7d72c86b9691160052bb5a9f657b9b21d19282e"
+          }
+        ],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 800,
+        "sha256": "e5ddcb3aaee4c96214e4dda5e56e07423033825423799583dfd8801c940b6f70",
+        "url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/aha/evaluation/REFLECT_test.json",
+        "reading_url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/aha/evaluation/REFLECT_test.json",
+        "why": "選讀一筆id/image/conversations與failure問答樣本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "NVlabs/AHA",
+        "requested_repo": "NVlabs/AHA",
+        "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa",
+        "ref": null,
+        "path": "aha/evaluation/eval_metrics/check_answer_Yes_No.py",
+        "ranges": [
+          [
+            20,
+            55
+          ],
+          [
+            89,
+            123
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 123,
+        "sha256": "69185eb480883071365a1f63e10e4abd6a9a7eaa25ae65782c0e4065095da970",
+        "url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/aha/evaluation/eval_metrics/check_answer_Yes_No.py",
+        "reading_url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/aha/evaluation/eval_metrics/check_answer_Yes_No.py#L20-L55",
+        "why": "字串ID對整數question_id、逗點前答案及實際accuracy公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "NVlabs/AHA",
+        "requested_repo": "NVlabs/AHA",
+        "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa",
+        "ref": null,
+        "path": "aha/evaluation/eval_metrics/LLM_fuzzy.py",
+        "ranges": [
+          [
+            27,
+            76
+          ],
+          [
+            78,
+            112
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 112,
+        "sha256": "e69569478456507400aebab4122f116f8faf5591675a42a674be539767f776d9",
+        "url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/aha/evaluation/eval_metrics/LLM_fuzzy.py",
+        "reading_url": "https://github.com/NVlabs/AHA/blob/0d39c0591566ddaf997be5822f3dead8e08501aa/aha/evaluation/eval_metrics/LLM_fuzzy.py#L27-L76",
+        "why": "模型裁判提示／版本、0/0.5/1解析與有效樣本平均",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c9280f600bdb0fb8d8bd2ac93246294b55c911fe888c271918ab7750c6d61e7b"
+  },
+  "repository_binding_review_sha256": "c9280f600bdb0fb8d8bd2ac93246294b55c911fe888c271918ab7750c6d61e7b",
+  "repository_bindings": [
+    {
+      "requested_repo": "NVlabs/AHA",
+      "resolved_repo": "NVlabs/AHA",
+      "aliases_in_this_review": [
+        "nvlabs/aha"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0d39c0591566ddaf997be5822f3dead8e08501aa",
+          "reviewed_files": [
+            "README.md",
+            "aha/evaluation/REFLECT_test.json",
+            "aha/evaluation/eval_metrics/LLM_fuzzy.py",
+            "aha/evaluation/eval_metrics/check_answer_Yes_No.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/NVlabs/AHA/tree/main",
+          "link_label": "Code",
+          "project_url": "https://aha-vlm.github.io/",
+          "page_sha256": "09efe258accaf18becb58a03e6cd5a9a409727032aca935cd1c5be3d644fabb3"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P110",
+          "review_file": "content/github_review/reviews/P110.json",
+          "review_sha256": "c9280f600bdb0fb8d8bd2ac93246294b55c911fe888c271918ab7750c6d61e7b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P110",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "AHA: A Vision-Language-Model for Detecting and Reasoning Over Failures in Robotic Manipulation；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "environment": "RLBench、ManiSkill與realRoboFail；非新增三套物理環境。",
+    "tasks": "7failure modes的Yes/No判斷＋原因解釋；識別失敗不等同真正恢復。",
+    "cases": "49KtrainingfailureQA；test11K（10未見RLBench tasks），ManiSkill-Fail130pairs（4tasks），realRoboFail7tasks。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "failure modes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 11000,
+        "unit": "held-out RLBench failure QA（約數）",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 130,
+        "unit": "ManiSkill-Fail pairs",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 49000,
+        "unit": "failure training pairs（約數）",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "binary success labelaccuracy、ROUGE-L、cosinesimilarity、LLM fuzzy match。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度",
+      "人類或模型判讀"
+    ],
+    "split": "RLBench train/test taskdisjoint，跨sim與real另測；額外VQA/LVIS訓練資料不可算failurecases。",
+    "lineage": "FailGen改keyframes/gripper動作合成失敗；RoboFail重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "keyframe產生failurelabels是生成機制標籤，和視覺可觀測真因未必完全相同。"
+    ],
+    "reuse": "可大量增加失敗規則cases，同時用跨來源/真實子集驗證而不冒稱新增語義工作。",
+    "reviewed_pdf_sha256": "d647c7bff1ccb2d0ae805bab761177aba8cd50d81d0418ca174e9ae97054791b",
+    "reviewed_on": "2026-10-02",
+    "name": "AHA",
+    "year": 2024,
+    "title": "AHA: A Vision-Language-Model for Detecting and Reasoning Over Failures in Robotic Manipulation",
+    "source_url": "https://arxiv.org/abs/2410.00371",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P110",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P110",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "7failure modes的Yes/No判斷＋原因解釋；識別失敗不等同真正恢復。",
+            "RLBench、ManiSkill與realRoboFail；非新增三套物理環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "d647c7bff1ccb2d0ae805bab761177aba8cd50d81d0418ca174e9ae97054791b"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d647c7bff1ccb2d0ae805bab761177aba8cd50d81d0418ca174e9ae97054791b",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P110",
+      "name": "AHA",
+      "expected_title": "AHA: A Vision-Language-Model for Detecting and Reasoning Over Failures in Robotic Manipulation",
+      "source_url": "https://arxiv.org/abs/2410.00371",
+      "pdf_url": "https://arxiv.org/pdf/2410.00371",
+      "retrieved_at": "2026-10-02T22:13:42.212735+00:00",
+      "pdf_sha256": "d647c7bff1ccb2d0ae805bab761177aba8cd50d81d0418ca174e9ae97054791b",
+      "text_sha256": "1484774f878d50ed8c063c68c33b76954e9f0e8df85ca5123fa7ff9e0c22bad3",
+      "pdf_bytes": 16631034,
+      "pages": 15,
+      "text_characters": 55898,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2410.00371v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2410.00371v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "failure modes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P110:1",
+        "paper_id": "P110",
+        "benchmark": "AHA",
+        "native_term": "failure modes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00371v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00371v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 11000,
+        "unit": "held-out RLBench failure QA（約數）",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P110:2",
+        "paper_id": "P110",
+        "benchmark": "AHA",
+        "native_term": "held-out RLBench failure QA（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00371v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00371v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 130,
+        "unit": "ManiSkill-Fail pairs",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P110:3",
+        "paper_id": "P110",
+        "benchmark": "AHA",
+        "native_term": "ManiSkill-Fail pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00371v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00371v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 49000,
+        "unit": "failure training pairs（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P110:4",
+        "paper_id": "P110",
+        "benchmark": "AHA",
+        "native_term": "failure training pairs（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00371v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00371v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "NVlabs/AHA"
+  ],
+  "external_repositories": []
+}

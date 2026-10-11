@@ -1,0 +1,92 @@
+{
+  "paper_id": "P138",
+  "summary": "Diffusion Policy跨既有benchmark比較；Push-T的mean_score是每次rollout最高部分reward的平均，且checkpoint聚合有max與低loss選樣兩種口徑。",
+  "reading_order": [
+    {
+      "repo": "real-stanford/diffusion_policy",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          20
+        ],
+        [
+          28,
+          59
+        ]
+      ],
+      "why": "原作、三seed實驗紀錄與paper聚合鍵",
+      "commit": "5ba07ac6661db573af695b419a7947ecb704690f"
+    },
+    {
+      "repo": "real-stanford/diffusion_policy",
+      "path": "diffusion_policy/dataset/pusht_image_dataset.py",
+      "ranges": [
+        [
+          15,
+          65
+        ],
+        [
+          74,
+          90
+        ]
+      ],
+      "why": "Zarr episode/sequence、模型觀測與2D action",
+      "commit": "5ba07ac6661db573af695b419a7947ecb704690f"
+    },
+    {
+      "repo": "real-stanford/diffusion_policy",
+      "path": "diffusion_policy/env/pusht/pusht_env.py",
+      "ranges": [
+        [
+          109,
+          138
+        ],
+        [
+          311,
+          317
+        ]
+      ],
+      "why": "幾何coverage、reward尺度與done閾值",
+      "commit": "5ba07ac6661db573af695b419a7947ecb704690f"
+    },
+    {
+      "repo": "real-stanford/diffusion_policy",
+      "path": "diffusion_policy/env_runner/pusht_image_runner.py",
+      "ranges": [
+        [
+          222,
+          251
+        ]
+      ],
+      "why": "每rollout最大reward、seed分母與已記錄原作差異",
+      "commit": "5ba07ac6661db573af695b419a7947ecb704690f"
+    },
+    {
+      "repo": "real-stanford/diffusion_policy",
+      "path": "multirun_metrics.py",
+      "ranges": [
+        [
+          30,
+          97
+        ]
+      ],
+      "why": "跨epoch max與低train/val-loss選樣",
+      "commit": "5ba07ac6661db573af695b419a7947ecb704690f"
+    }
+  ],
+  "environment": "Push-T、robomimic、Kitchen等父環境以及實機評測分開；方法repo包含多套實驗，不代表這些全是新的獨立環境資料。",
+  "tasks": "Diffusion Policy學習動作序列；每個task仍追到父benchmark。Push-T是將T形物推到目標pose，圖像/lowdim兩種觀測不增語義任務。",
+  "data": "Push-T Zarr含img/state/action，SequenceSampler按episode mask、horizon與padding出樣本。模型觀測image與agent_pos，action是2D推動控制目標；訓練state還含物體pose但不是全數模型可見。",
+  "evaluation": "coverage=物體與目標交集/目標面積；reward=clip(coverage/.95,0,1)，done在coverage>.95。runner取每episode最高reward平均為mean_score，仍可有部分分數。multirun的max與k_min_train_loss依不同epoch選樣，需分開報；runner註記原作只聚合前n_envs的歷史差異。",
+  "standardization": {
+    "profile": "action_diffusion_across_existing_tasks",
+    "reuse": "父task/資料source、Zarr/序列窗口、具體Push-T grader與experiment config/log。",
+    "transform": "case保留觀測可見性、episode/seed、horizon/控制與圖像前處理；metric保存coverage、scaled reward、binary done和checkpoint選擇規則，不把mean_score全稱成功率。",
+    "missing": "各其他父benchmark版本/資產與checker接線、原作vs修正seed集合、固定checkpoint/held-out再現和全套baseline。"
+  },
+  "version_note": "固定5ba07ac；README/runner已公開說明原作與修正聚合範圍。未執行原模型，未假定目前main可逐數字重現原paper。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

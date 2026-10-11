@@ -1,0 +1,546 @@
+{
+  "paper_id": "P207",
+  "name": "EgoCoT-Bench",
+  "title": "EgoCoT-Bench: Benchmarking Grounded and Verifiable Operation-Centric Chain of Thought Reasoning for MLLMs",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.19559",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P207",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "GitHub DStardust/EgoCoT 是本篇官方補充網站，HF 另有公開 dev／test 標註、媒體重建 manifest 與實際 reconstruction reader。已核程式只有媒體處理與網站示例，未找到正式 Acc／R／SCR scorer 或 test 正解；不能把網站題目點選函式當成 benchmark evaluator。",
+    "identity_note": "pinned arXiv:2605.19559v1 連到 dstardust.github.io/EgoCoT，固定 repo index.html 與既有 website cache 的 SHA256 相同；其 Dataset 按鈕連 DStardust/EgoCoT-Bench，dataset card 反連同一 paper／project。PDF 作者有 Yang Dai、Dian Jiao、Tianwei Lin、Wenqiao Zhang；網站頁首隻列前三人，文獻作者以 PDF 為準。搜尋的 EmbodiedGPT/EgoCOT_Dataset 是 2023 年另一候選，未將同名視為本篇；頁尾 Academic Project Page Template 亦非 benchmark。",
+    "environment": "五個公共人類第一人稱父來源 Ego4D、EPIC-KITCHENS、Charades-Ego、MECCANO、HD-EPIC 加自錄影片，涵蓋生活、廚房及組裝操作；沒有可互動的機器人環境。pinned reconstruction CSV 清點為 351 個 (source_dataset,source_video_id)，但有 352 個 processed_clip_id／output paths；MECCANO 0001_part1 有 416×234 與 588×331 兩版，必須保留版本關係。",
+    "tasks": "4 groups／12 subtasks：Egocentric Grounding & Perception＝Active Object Grounding、Hand-Object Association、Manipulation State Perception；Spatio-Temporal Retrospection＝State Retrospection、Location/Visibility Retrospection、Hand-Object Temporal Retrospection；Predictive & Causal Inference＝Next State Anticipation、Next Action Anticipation、Local Cause-Outcome Inference；High-level Grounded Reasoning＝Progress Reasoning、Hand-Object Grounded CoT、Goal-Oriented Object Tracking。均是四選一影片理解及公開解釋／證據品質，不是可執行操作技能。",
+    "data": "HF pinned tree 的實際資料檔為 data/dev-00000-of-00001.parquet 與 data/test-00000-of-00001.parquet；card 指定 load_dataset 後取 dev／test，300／2,872 題。小型官方 viewer 回應各抽一列：qid、question、choices[{label,text}]、answer、cot[{step,text}]、media_id、source、big_category_en、sub_category_en、type；dev 有答案與解釋，test 範例 answer=\"\"、cot=[]。兩份 viewer 的 features 沒有獨立 evidence／bbox 欄，不能依 card 的 may include 自造結構化證據。pinned CSV 實際 3,172 個唯一 qid；columns 含 processed_clip_id、source_dataset/video_id、source_start_sec/end_sec、target_width/height、resize_mode、fps、preprocess_version、expected_local_output_path、coordinate_system。所有 start/end 為空、resize_mode=stretch、座標系 processed_clip；2,859 QA 引用 4 fps、313 QA 引用 8 fps，這是題目列數而非影格數。63 個自錄輸出與第三方待重建媒體分開。",
+    "evaluation": "paper §3.2.4 的 Acc 為四選一 exact match／全部評測題；R 是 Qwen-Max 對公開生成解釋與參考解釋的 0–5 分；SCR = 答對且 R≤2 的題數／所有答對題數×100，分母不是全題數，零答對的處置未由公開程式核實。paper 的 3,172 題結果不可當作 public hidden-test 2,872 題分數；card 的 dev 193 個 video、test 351 個 video 與總 351 個來源顯示不能假定 video-disjoint。paper 另以 2,800 responses 核對 judge，人類一致性樣本不是額外 benchmark cases。GitHub handleAnswer 只對四個寫死示例比字母，leaderboard 只排序 HTML；HF scripts tree 唯一程式 reconstruct_media.py 沒有模型推論、judge、R／SCR 聚合或提交驗證。正式 test scorer／labels 在本輪已核來源中未公開。",
+    "standardization": {
+      "profile": "egocentric_mcq_rationale_and_media_reconstruction",
+      "reuse": "可重用 qid、group／subtask／type、選項及 public dev 解釋、來源／processed clip 映射、重建 CSV 與實際 reader；paper 的 Acc／R／SCR 保留各自定義。",
+      "transform": "source 同時記 paper v1、website commit、HF revision 與五父資料來源；task 按四群十二類，case 按 qid 保留 dev/test、media_id、options，將 cot 記公開參考解釋而非模型私有思考。environment 記 human-egocentric context；媒體引用需帶來源 ID、processed resolution／fps／coordinate_system，351 sources 與 352 processed variants 分開。evaluator 分別記 Acc 的 N、R 的判讀數及 SCR 的答對分母；test 空正解標為 withheld，不能轉成錯誤標籤或零分。",
+      "missing": "正式 evaluator／submission runner、hidden test labels、judge prompt與精確版本／解析／失敗處置、完整結構化時空 evidence、父素材取得與重建驗證。reconstruction script 用整段 source_video_id 影片，未使用 start/end／resize_mode 欄；CSV 的 start/end 全空，對含切段後綴的 source_video_id 仍須外部定位到正確已裁素材。讀影格失敗時 continue 而不補位，可能改變輸出時間軸；需校核處理後 timestamps／bbox。"
+    },
+    "version_note": "GitHub 71e6114c155c7a593fa39e2af801b51e836b53ca 是網站；HF 31c4aa4adc88632c6efe984cf8c5399cc75f6fc3 是 clean public release，只重發自錄媒體，不能將其與較早含第三方處理片的版本混用。raw README／CSV／reconstruction script 均固定 HF revision。viewer/rows endpoint 未回傳 dataset revision，本輪只保存帶時間與 SHA256 的一列 dev／test 與 features 作輔助欄位核對，不聲稱已核 pinned Parquet 全體內容；未下載影片或執行 reconstruction。",
+    "additional_repo_proposals": [
+      {
+        "repo": "DStardust/EgoCoT",
+        "role": "official_project_website_only",
+        "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+        "proposal": "可補登官方網站來源；HF dataset 應另建 data／preprocessing 來源，不能綁為正式 scorer。"
+      }
+    ],
+    "discovery_evidence": [
+      {
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/tree.json",
+        "json_pointers": [
+          "/sha",
+          "/truncated"
+        ],
+        "finding": "完整 43-entry GitHub tree 僅頁面、UI JS、圖片／PDF／示例影片，未含 benchmark Python evaluator。"
+      },
+      {
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_tree_scripts.json",
+        "json_pointers": [
+          "/0"
+        ],
+        "finding": "HF scripts 僅 reconstruct_media.py；LICENSE 的 evaluation scripts 字樣不能證明實際 scorer 已發布。"
+      },
+      {
+        "source": "audit/.cache/github_review/search/P207-refined.json",
+        "json_pointers": [
+          "/query",
+          "/results"
+        ],
+        "finding": "兩個 EgoCoT 同名候選已依 paper／primary project 鏈區分。"
+      },
+      {
+        "kind": "unversioned_official_viewer_schema_sample",
+        "provider": "huggingface_dataset_viewer",
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_dev_one_row.json",
+        "sha256": "a3ed34588ce92f0cbff2c6a6c7ad94f9b1e5f34004befcad22476f40907ae681",
+        "url": "https://datasets-server.huggingface.co/rows?dataset=DStardust%2FEgoCoT-Bench&config=default&split=dev&offset=0&length=1",
+        "json_pointers": [
+          "/features",
+          "/rows/0",
+          "/num_rows_total"
+        ],
+        "finding": "dev 的一列與欄位快照；endpoint 未回傳 revision，只作輔助核對，不當作固定 commit 的 GitHub 檔案。"
+      },
+      {
+        "kind": "unversioned_official_viewer_schema_sample",
+        "provider": "huggingface_dataset_viewer",
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_test_one_row.json",
+        "sha256": "dadb158ccf45792b8a3b7b97e123865d4955029706a40ccf2cf96fb9c110abcb",
+        "url": "https://datasets-server.huggingface.co/rows?dataset=DStardust%2FEgoCoT-Bench&config=default&split=test&offset=0&length=1",
+        "json_pointers": [
+          "/features",
+          "/rows/0",
+          "/num_rows_total"
+        ],
+        "finding": "test 的一列與欄位快照；endpoint 未回傳 revision，只作輔助核對，不當作固定 commit 的 GitHub 檔案。"
+      },
+      {
+        "kind": "pinned_dataset_revision",
+        "provider": "huggingface_dataset",
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_refs.json",
+        "json_pointers": [
+          "/branches/0/targetCommit"
+        ],
+        "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+        "finding": "公開 refs API 固定 main 的40字元revision；reader與CSV的固定revision下載receipt、SHA256及HF tree blob OID均已對齊。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "DStardust/EgoCoT",
+        "requested_repo": "DStardust/EgoCoT",
+        "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+        "ref": "main",
+        "path": "index.html",
+        "ranges": [
+          [
+            510,
+            585
+          ],
+          [
+            865,
+            905
+          ],
+          [
+            2580,
+            2599
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2999,
+        "sha256": "224d9c70a16d7e8463ab34267bcb12aa02d376b88d7d025a35922447c946e286",
+        "url": "https://github.com/DStardust/EgoCoT/blob/71e6114c155c7a593fa39e2af801b51e836b53ca/index.html",
+        "reading_url": "https://github.com/DStardust/EgoCoT/blob/71e6114c155c7a593fa39e2af801b51e836b53ca/index.html#L510-L585",
+        "why": "核對作者、官方 dataset 連結、dev/test 可見資訊及提交欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DStardust/EgoCoT",
+        "requested_repo": "DStardust/EgoCoT",
+        "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+        "ref": "main",
+        "path": "index.html",
+        "ranges": [
+          [
+            229,
+            298
+          ],
+          [
+            302,
+            465
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2999,
+        "sha256": "224d9c70a16d7e8463ab34267bcb12aa02d376b88d7d025a35922447c946e286",
+        "url": "https://github.com/DStardust/EgoCoT/blob/71e6114c155c7a593fa39e2af801b51e836b53ca/index.html",
+        "reading_url": "https://github.com/DStardust/EgoCoT/blob/71e6114c155c7a593fa39e2af801b51e836b53ca/index.html#L229-L298",
+        "why": "追真正 JavaScript：只排序已寫好的分數並比對四個示例題，沒有模型結果的 benchmark 聚合。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DStardust/EgoCoT",
+        "requested_repo": "DStardust/EgoCoT",
+        "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+        "ref": "main",
+        "path": "static/js/index.js",
+        "ranges": [
+          [
+            1,
+            142
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 142,
+        "sha256": "cda22b63ac751c525390e19f702dba8c87ca8005a57c829d9872e349ba6f8a6c",
+        "url": "https://github.com/DStardust/EgoCoT/blob/71e6114c155c7a593fa39e2af801b51e836b53ca/static/js/index.js",
+        "reading_url": "https://github.com/DStardust/EgoCoT/blob/71e6114c155c7a593fa39e2af801b51e836b53ca/static/js/index.js#L1-L142",
+        "why": "核對其餘 JS 是網站互動與影片輪播。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "huggingface_dataset",
+        "repo": "DStardust/EgoCoT-Bench",
+        "requested_repo": "datasets/DStardust/EgoCoT-Bench",
+        "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+        "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+        "path": "scripts/reconstruct_media.py",
+        "ranges": [
+          [
+            18,
+            103
+          ],
+          [
+            106,
+            147
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 147,
+        "sha256": "705fc0d548844566c4edfe106833a48d30f9c3a20b988806927ee9ca04ed119d",
+        "url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/blob/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/scripts/reconstruct_media.py",
+        "reading_url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/blob/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/scripts/reconstruct_media.py",
+        "why": "追 CSV reader、來源影片定位、fps／resize／逐影格處理與重複輸出去重；不執行程式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "huggingface_dataset",
+        "repo": "DStardust/EgoCoT-Bench",
+        "requested_repo": "datasets/DStardust/EgoCoT-Bench",
+        "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+        "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+        "path": "manifests/media_reconstruction.csv",
+        "ranges": [
+          [
+            1,
+            4
+          ],
+          [
+            109,
+            109
+          ],
+          [
+            2472,
+            2472
+          ],
+          [
+            3171,
+            3173
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 3173,
+        "sha256": "08d85c4a1bbbc6bd205b46e7c6d57adb9f03435b4ecab01a05fd4e75f831a034",
+        "url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/blob/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/manifests/media_reconstruction.csv",
+        "reading_url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/blob/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/manifests/media_reconstruction.csv",
+        "why": "核 qid／來源／處理版本／座標欄及同來源兩個不同解析度輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c6746037b2dfaa30bbd883a7af3fc1f99810fcdfa074ebe072e41ae0e598dd4b"
+  },
+  "repository_binding_review_sha256": "c6746037b2dfaa30bbd883a7af3fc1f99810fcdfa074ebe072e41ae0e598dd4b",
+  "repository_bindings": [
+    {
+      "requested_repo": "DStardust/EgoCoT",
+      "resolved_repo": "DStardust/EgoCoT",
+      "aliases_in_this_review": [
+        "dstardust/egocot"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+          "reviewed_files": [
+            "index.html",
+            "static/js/index.js"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P207",
+          "review_sha256": "c6746037b2dfaa30bbd883a7af3fc1f99810fcdfa074ebe072e41ae0e598dd4b",
+          "proposal": {
+            "repo": "DStardust/EgoCoT",
+            "role": "official_project_website_only",
+            "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+            "proposal": "可補登官方網站來源；HF dataset 應另建 data／preprocessing 來源，不能綁為正式 scorer。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P207",
+          "review_file": "content/github_review/reviews/P207.json",
+          "review_sha256": "c6746037b2dfaa30bbd883a7af3fc1f99810fcdfa074ebe072e41ae0e598dd4b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P207",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoCoT-Bench，arXiv 2605.19559v1。",
+    "scope_read": "來源/scene graph審核、12subtasks全表、3172QA、SCR與judge驗證。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "裝配與生產作業"
+    ],
+    "role": "影片推理與證據benchmark",
+    "environment": "Ego4D、EPIC、MECCANO、Charades-Ego、HD-EPIC及自錄；351clips不是351獨立環境。",
+    "tasks": "4研究groups/12subtasks，從object grounding到state回顧、預測、progress與goal tracking。",
+    "cases": "3,172四選一QA、351video clips；參考reasoning與時空證據同屬一題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "reasoning subtasks",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3172,
+        "unit": "QA pairs",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 351,
+        "unit": "video clips",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "答案exact match；Qwen-Max judge給reasoning0–5。SCR＝答對但reasoning≤2的比例，分母僅答對題。",
+      "judge與人類在2,800responses比較QWK/一致率；它衡量輸出解釋與證據一致，不證明模型內部思考忠實。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "人類或模型判讀"
+    ],
+    "split": "主文是benchmark evaluation；精確train/dev manifest未列。MCQ、rationale與evidence非不同題庫。",
+    "lineage": "父影片及新增人工修訂STSG；五公共父庫與自錄不代表六份互不重疊世界經驗。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "§3.2、Metrics、Reasoning Quality",
+        "supports": "351/3172/12、SCR分母及judge核對"
+      }
+    ],
+    "unresolved": [
+      "Table1寫Open/Close而metrics說全部四選一；以主實驗協定為準並保留差異。"
+    ],
+    "reuse": "可加入答案與證據一致性的評測；不要把rationale judge直接叫物理成功驗證。",
+    "reviewed_pdf_sha256": "98ac34ca6c5e5e85367bbc76844e70d30939b29b4c58188ffdbe431af5e9b237",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoCoT-Bench",
+    "year": 2026,
+    "title": "EgoCoT-Bench: Benchmarking Grounded and Verifiable Operation-Centric Chain of Thought Reasoning for MLLMs",
+    "source_url": "https://arxiv.org/abs/2605.19559",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "industry"
+    ],
+    "review_tags": [
+      "居家生活",
+      "烹飪與飲食",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P207",
+      "domain_ids": [
+        "home",
+        "food",
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P207",
+          "domain_ids": [
+            "home",
+            "food",
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4研究groups/12subtasks，從object grounding到state回顧、預測、progress與goal tracking。",
+            "Ego4D、EPIC、MECCANO、Charades-Ego、HD-EPIC及自錄；351clips不是351獨立環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "98ac34ca6c5e5e85367bbc76844e70d30939b29b4c58188ffdbe431af5e9b237"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "98ac34ca6c5e5e85367bbc76844e70d30939b29b4c58188ffdbe431af5e9b237",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P207",
+      "name": "EgoCoT-Bench",
+      "expected_title": "EgoCoT-Bench: Benchmarking Grounded and Verifiable Operation-Centric Chain of Thought Reasoning for MLLMs",
+      "source_url": "https://arxiv.org/abs/2605.19559",
+      "pdf_url": "https://arxiv.org/pdf/2605.19559",
+      "retrieved_at": "2026-10-02T21:35:05.685689+00:00",
+      "pdf_sha256": "98ac34ca6c5e5e85367bbc76844e70d30939b29b4c58188ffdbe431af5e9b237",
+      "text_sha256": "5264c567866fc7a1b538ab79940e93ebaf96acdc181c6f8ebf22df79250e346d",
+      "pdf_bytes": 1892490,
+      "pages": 8,
+      "text_characters": 82467,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2605.19559v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2605.19559v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "reasoning subtasks",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P207:1",
+        "paper_id": "P207",
+        "benchmark": "EgoCoT-Bench",
+        "native_term": "reasoning subtasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.19559v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.19559v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3172,
+        "unit": "QA pairs",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P207:2",
+        "paper_id": "P207",
+        "benchmark": "EgoCoT-Bench",
+        "native_term": "QA pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.19559v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.19559v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 351,
+        "unit": "video clips",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P207:3",
+        "paper_id": "P207",
+        "benchmark": "EgoCoT-Bench",
+        "native_term": "video clips",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.19559v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.19559v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "DStardust/EgoCoT"
+  ],
+  "external_repositories": [
+    "huggingface_dataset:DStardust/EgoCoT-Bench"
+  ]
+}

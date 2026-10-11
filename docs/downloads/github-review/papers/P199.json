@@ -1,0 +1,448 @@
+{
+  "paper_id": "P199",
+  "name": "OpenEgo",
+  "title": "OpenEgo: A Large-Scale Multimodal Egocentric Dataset for Dexterous Manipulation",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2509.05513",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P199",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已確認OpenEgo官方對應repo，提供六來源的統一資料API與LeRobot轉檔。其290 tasks是原作來源表加總，與本庫跨來源去重任務聯集不同。",
+    "environment": "彙整CaptainCook4D、HOI4D、HoloAssist、EgoDex、HOT3D、HO-Cap；原作1107h/119.6Mframes/344.5krecordings/600+environments沿用父來源，並非重新拍攝的獨立環境池。",
+    "tasks": "意圖對齊action primitives與dexterous hand trajectory學習。原表24+16+20+194+33+3=290個原生task labels；各父來源粒度可能不同，須保留來源再歸併。",
+    "data": "API按mp4列demo，讀joints.hdf5、annotation.json、metadata.hdf5；Action.start/end是秒，round(timestamp×fps)並採end-exclusive slice。EgoDex joint slice與annotation getter仍NotImplemented；按parent目錄建name索引會讓同目錄多影片互相覆寫查找。EgoDex直接取transform平移，需核驗與camera-frame宣告的對齊。",
+    "evaluation": "此repo主要是資料API/轉檔，不含可核驗的手軌跡baseline evaluator。LeRobot action實際存下一frame雙手21×3×2=126D座標，末frame重複，非robot actuator command。缺visibility會補全1、缺annotation會空列表、不同FPS僅warning並截各模態最短長度，正式case不得默認這些都有效。",
+    "standardization": {
+      "profile": "multi_source_egocentric_human_hand_trajectories",
+      "reuse": "原source ID、Action時間/物件/actor、統一reader與顯式next-pose轉檔schema。",
+      "transform": "用父source+完整video相對路徑+segment界線建ID；保留measured/estimated/converted pose與座標單位、visibility unknown、原FPS；126D next-pose prediction與robot執行action分開profile。",
+      "missing": "EgoDex未實作分支、六來源坐標/units/hand-order轉換驗證、case級去重與split、parent資料權利、真正預測scorer和robot retarget驗證。"
+    },
+    "version_note": "固定51f704a，README明確連2509.05513及原作網站；有MIT code不代表六份底層資料享有同一授權。未下載完整1107h或執行轉檔。",
+    "runtime_executed": false,
+    "additional_repo_proposals": [
+      {
+        "repo": "ahadjawaid/openego",
+        "role": "author_dataset_api_and_converter",
+        "basis": "README連精確2509.05513及www.openegocentric.com；repo owner與第一作者相符。"
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "ahadjawaid/openego",
+        "requested_repo": "ahadjawaid/openego",
+        "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 347,
+        "sha256": "722e8353d4b8c09768fb54b3822d04394dad2eef4e7d5a01ff8325e4488f19f7",
+        "url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/README.md",
+        "reading_url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/README.md#L1-L95",
+        "why": "精確原作ID、六父來源、原生加總與API宣告",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ahadjawaid/openego",
+        "requested_repo": "ahadjawaid/openego",
+        "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+        "ref": null,
+        "path": "openego/data/openego.py",
+        "ranges": [
+          [
+            1,
+            137
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 137,
+        "sha256": "2018f89b4d3d88afb8695467ccc24a6d14037529d6cbbcd9453d1452d76f21e2",
+        "url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/openego/data/openego.py",
+        "reading_url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/openego/data/openego.py#L1-L137",
+        "why": "實際影片索引、source辨識、EgoDex特殊載入與未實作分支",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ahadjawaid/openego",
+        "requested_repo": "ahadjawaid/openego",
+        "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+        "ref": null,
+        "path": "openego/data/annotations.py",
+        "ranges": [
+          [
+            9,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "ffe72a6d20358cf5fe2b6df80da1485ed7015e0b4b5ce3c344c7bb3c7806158b",
+        "url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/openego/data/annotations.py",
+        "reading_url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/openego/data/annotations.py#L9-L105",
+        "why": "action timestamps/actors/objects、frame界線及visibility",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ahadjawaid/openego",
+        "requested_repo": "ahadjawaid/openego",
+        "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+        "ref": null,
+        "path": "port_openego_to_lerobot.py",
+        "ranges": [
+          [
+            32,
+            77
+          ],
+          [
+            84,
+            122
+          ],
+          [
+            173,
+            226
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 242,
+        "sha256": "feb24698e153b4d0d673f8dadaa77a07dff41f1239048ff15c16ffae861d61e2",
+        "url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/port_openego_to_lerobot.py",
+        "reading_url": "https://github.com/ahadjawaid/openego/blob/51f704ae36a34b6d91636295142138262ebb26e0/port_openego_to_lerobot.py#L32-L77",
+        "why": "126D人手狀態/next-frame target、終態與不同FPS/缺標註處理",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7a551d54f658f62fce9de3d3fa6349075410936e5270d1851aad07863e71f6e3"
+  },
+  "repository_binding_review_sha256": "7a551d54f658f62fce9de3d3fa6349075410936e5270d1851aad07863e71f6e3",
+  "repository_bindings": [
+    {
+      "requested_repo": "ahadjawaid/openego",
+      "resolved_repo": "ahadjawaid/openego",
+      "aliases_in_this_review": [
+        "ahadjawaid/openego"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+          "reviewed_files": [
+            "README.md",
+            "openego/data/annotations.py",
+            "openego/data/openego.py",
+            "port_openego_to_lerobot.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P199",
+          "review_sha256": "7a551d54f658f62fce9de3d3fa6349075410936e5270d1851aad07863e71f6e3",
+          "proposal": {
+            "repo": "ahadjawaid/openego",
+            "role": "author_dataset_api_and_converter",
+            "basis": "README連精確2509.05513及www.openegocentric.com；repo owner與第一作者相符。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P199",
+          "review_file": "content/github_review/reviews/P199.json",
+          "review_sha256": "7a551d54f658f62fce9de3d3fa6349075410936e5270d1851aad07863e71f6e3",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P199",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "OpenEgo，arXiv 2509.05513v1。",
+    "scope_read": "六來源表、hand/primitive統一、實際0.1%子集實驗和held-out metric。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "穿戴互動與動作介面"
+    ],
+    "role": "整合型人類影片資料與預測benchmark",
+    "environment": "作者列10kitchens與610indoor rooms／600+environments；是多來源合併，未證明全庫去重。",
+    "tasks": "290 source task labels＝六來源原生task數相加；不等於290正規化機器人目標。",
+    "cases": "1,107h、344.5Krecordings、119.6Mframes；實驗只train在0.1%子集，10%demonstrations held-out，精確eval IDs/分母需核。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 290,
+        "unit": "六來源task labels合計",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1107,
+        "unit": "來源video hours合計",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 344500,
+        "unit": "source recordings",
+        "qualifier": "344.5K約數",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "AED/FED/DTW只算可見hand joints；8/16/32/64frames horizons。未測robot physical task success。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "作者稱demonstration-level holdout10%，但0.1%子集與holdout母集合關係需ID核。",
+    "lineage": "CaptainCook4D、HOI4D、HoloAssist、EgoDex、HOT3D、HO-Cap；語言多自動生成且部分人工核，新增的是統一label/format。",
+    "related_paper_ids": [
+      "P018",
+      "P017",
+      "P022",
+      "P141",
+      "P119"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "locator": "Table1、§3–4、Limitations",
+        "supports": "來源相加、290/1107、0.1%與trajectory endpoint"
+      }
+    ],
+    "unresolved": [
+      "跨來源環境/task去重未完成；data aggregation不可與父來源再次加總。"
+    ],
+    "reuse": "最直接的整合資料前作之一；我們必須清楚提出超出統一格式的task聯集與評測規則。",
+    "reviewed_pdf_sha256": "84068f8b5d7e8add70826aacda59a02d425f56125bcf3f1c450fe966db7f7e65",
+    "reviewed_on": "2026-10-02",
+    "name": "OpenEgo",
+    "year": 2025,
+    "title": "OpenEgo: A Large-Scale Multimodal Egocentric Dataset for Dexterous Manipulation",
+    "source_url": "https://arxiv.org/abs/2509.05513",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "wearable"
+    ],
+    "review_tags": [
+      "居家生活",
+      "工具使用",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P199",
+      "domain_ids": [
+        "home",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P199",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "290 source task labels＝六來源原生task數相加；不等於290正規化機器人目標。",
+            "作者列10kitchens與610indoor rooms／600+environments；是多來源合併，未證明全庫去重。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "84068f8b5d7e8add70826aacda59a02d425f56125bcf3f1c450fe966db7f7e65"
+        },
+        {
+          "paper_id": "P199",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "多個ego來源的統一手部關節與語言動作介面。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "84068f8b5d7e8add70826aacda59a02d425f56125bcf3f1c450fe966db7f7e65"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "84068f8b5d7e8add70826aacda59a02d425f56125bcf3f1c450fe966db7f7e65",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P199",
+      "name": "OpenEgo",
+      "expected_title": "OpenEgo: A Large-Scale Multimodal Egocentric Dataset for Dexterous Manipulation",
+      "source_url": "https://arxiv.org/abs/2509.05513",
+      "pdf_url": "https://arxiv.org/pdf/2509.05513",
+      "retrieved_at": "2026-10-02T21:35:01.613682+00:00",
+      "pdf_sha256": "84068f8b5d7e8add70826aacda59a02d425f56125bcf3f1c450fe966db7f7e65",
+      "text_sha256": "9fb6d66b9e82444bb447d1bb6a7bf80f4c008f74691b10c1eeba2ab89f6dfbeb",
+      "pdf_bytes": 8562474,
+      "pages": 7,
+      "text_characters": 26784,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2509.05513v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2509.05513v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 290,
+        "unit": "六來源task labels合計",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P199:1",
+        "paper_id": "P199",
+        "benchmark": "OpenEgo",
+        "native_term": "六來源task labels合計",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2509.05513v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2509.05513v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1107,
+        "unit": "來源video hours合計",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P199:2",
+        "paper_id": "P199",
+        "benchmark": "OpenEgo",
+        "native_term": "來源video hours合計",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2509.05513v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2509.05513v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 344500,
+        "unit": "source recordings",
+        "qualifier": "344.5K約數",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P199:3",
+        "paper_id": "P199",
+        "benchmark": "OpenEgo",
+        "native_term": "source recordings",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2509.05513v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2509.05513v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "ahadjawaid/openego"
+  ],
+  "external_repositories": []
+}

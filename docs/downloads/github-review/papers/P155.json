@@ -1,0 +1,65 @@
+{
+  "paper_id": "P155",
+  "name": "EgoExo-WM",
+  "title": "EgoExo-WM: Unlocking Exo Video for Ego World Models",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.15477",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "website_only",
+  "review": {
+    "paper_id": "P155",
+    "reviewed_on": "2026-10-11",
+    "status": "website_only",
+    "summary": "EgoExo-WM原作頁面仍將Code標為Coming Soon；可整理其人類全身動作世界模型協定，尚無取得的官方loader/scorer。",
+    "environment": "Nymeria訓練資料及HOMAGE、LEMMA、Ego-Exo4D Bike/Cooking測試影片；將HowTo100M/CrossTask/100DOH的exo片轉ego作訓練。生成視角沿用原拍攝事件lineage。",
+    "tasks": "全身動作條件下的2秒未來視覺預測，另用世界模型替候選人體動作排序；這是人類motion planning評估，不是新增robot物理任務庫。",
+    "data": "原文固定200小時訓練預算：190h Nymeria+10h轉換exo；測試描述HOMAGE/LEMMA取150clip、Bike/Cooking各125clip，前兩者150是各組或合計仍待manifest核定，未先加總。2秒=4Hz×8frame；不同來源motion估計器/標註需分開。",
+    "evaluation": "視覺用DINOv3-L latent L2，動作一致性用wrist PCK@20；pixel與latent方法採不同wrist predictor需保留。planning每case產生4個horizon8候選，以最末latent距goal排序，再評whole-body/wrist MPJPE，5次run均值/標準差；不是取4個GT最小error當部署成功。",
+    "standardization": {
+      "profile": "whole_body_action_conditioned_ego_world_model",
+      "reuse": "原生來源lineage、統一2秒/4Hz條件、預測與候選動作排序的分項度量。",
+      "transform": "source記human-motion schema與frame clock；case分合法goal/obs、候選動作及未來GT；將conversion比例和take/clip重用關係保留。",
+      "missing": "官方code/weights與測試clip IDs、150clip範圍、wrist評估器差異、底層actor motion到robot動作的可執行轉換。"
+    },
+    "version_note": "2605.15477v2與2026-10-10已取得的UT Austin官方頁相符，Code仍Coming Soon。原文p7說未發布的是比較方法EgoControl，不誤當本篇可用性證據。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2605.15477",
+      "pdf_sha256": "da55904838bef0335247613bc4063eaa7a852f4932c7313d42f4c2d82b98be33",
+      "paper_pages_read": [
+        6,
+        7,
+        8
+      ],
+      "author_project": {
+        "url": "https://vision.cs.utexas.edu/projects/EgoExo-WM/",
+        "receipt": {
+          "requested_url": "https://vision.cs.utexas.edu/projects/EgoExo-WM/",
+          "retrieved_at": "2026-10-10T07:37:55.264062+00:00",
+          "status": 200,
+          "resolved_url": "https://vision.cs.utexas.edu/projects/EgoExo-WM/",
+          "content_type": "text/html",
+          "bytes": 31298,
+          "sha256": "e9bb5c75b48328640db51fa6bb0e83393d1cc09ef10264d25212617efa3361a8"
+        },
+        "code_link_status": "Code (Coming Soon)",
+        "text_cache": "audit/.cache/github_review/projects/fee0a53bcddbb9a3ebf6df91d62b0fc90f33537375cc95cfb8a3e2bc2de88616.txt"
+      },
+      "cached_searches": [
+        "audit/.cache/github_review/search/P155.json",
+        "audit/.cache/github_review/search/P155-refined.json"
+      ]
+    },
+    "reading_order": [],
+    "review_sha256": "8e02f6200079ee500a7c6fd0e1bbf77e375536f44babb6b72eea8675a95e8f34"
+  },
+  "repository_binding_review_sha256": "8e02f6200079ee500a7c6fd0e1bbf77e375536f44babb6b72eea8675a95e8f34",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [],
+  "source_review": null,
+  "repositories": [],
+  "external_repositories": []
+}

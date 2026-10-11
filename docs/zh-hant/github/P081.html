@@ -1,0 +1,156 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ARNOLD｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="ARNOLD已追到NPZ重建、兩階段策略、具體joint／pickup／orientation／water checker及score聚合。水量實作是cup world-AABB內粒子比例，成功還需連續穩定；normalized訓練state不可直接當checker原生target。checkpoint選擇有list.argmax靜態錯誤，且GT輔助結果必須獨立儲存。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P081.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P081.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P081.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="ARNOLD｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="ARNOLD已追到NPZ重建、兩階段策略、具體joint／pickup／orientation／water checker及score聚合。水量實作是cup world-AABB內粒子比例，成功還需連續穩定；normalized訓練state不可直接當checker原生target。checkpoint選擇有list.argmax靜態錯誤，且GT輔助結果必須獨立儲存。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P081.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P081.html","title":"ARNOLD｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P081.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P081.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P081 · ARNOLD</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P081 · ARNOLD</h1><p class="lede">ARNOLD: A Benchmark for Language-Grounded Task Learning With Continuous States in Realistic 3D Scenes</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>benchmark／資料／評測主來源</span><a href="https://arxiv.org/abs/2304.04321" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p081">用途與原生規模依據</a>
+    </div>
+    <p class="github-scope">核讀快照 2026-10-11。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">ARNOLD已追到NPZ重建、兩階段策略、具體joint／pickup／orientation／water checker及score聚合。水量實作是cup world-AABB內粒子比例，成功還需連續穩定；normalized訓練state不可直接當checker原生target。checkpoint選擇有list.argmax靜態錯誤，且GT輔助結果必須獨立儲存。</p>
+    <aside class="github-version"><b>版本與身份</b><p>固定arnold-benchmark/arnold@40ad6861f45b676bf538b7a0e180d81c8d454823（2024-04-01），晚於論文v2，README另含CVPR 2024 Challenge公告；不能混用Challenge與ICCV paper的case/split。P077/P078方法在此的軸、單位、keypoint及checker均已改寫，需標為重用方法的另一實驗版本。未執行Isaac Sim、policy、Cython或上游shell。</p><p>固定論文為Gong、Huang等人的ARNOLD: A Benchmark for Language-Grounded Task Learning With Continuous States in Realistic 3D Scenes，arXiv:2304.04321v2（2023-09-11）。PDF第7頁直接指arnold-benchmark/arnold，README作者、題名與arXiv相符。此repo含benchmark與改寫的PerAct/6D-CLIPort基線；它們是P077/P078方法的重用，不是原倉庫資料或同一評測協定。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>居家整理與清潔、通用物件與機動作業</dd></div><div><dt>環境</dt><dd>Isaac Sim／USD、Franka與五相機front/base/left/wrist_bottom/wrist（配置128×128）。load_task將stage設為y-up、1單位=0.01m、gravity=(0,-1,0)且magnitude=981；physics設120Hz。場景／機器人／物件／material USD依NPZ info重建，路徑改寫假設原始路徑含VRKitchen2.0或指定materials字串。README的20 scenes／40 objects／10k demos是來源宣告，未以本地asset／NPZ列舉驗證。</dd></div><div><dt>任務</dt><dd>8個原生task為pickup_object、reorient_object、open/close_drawer、open/close_cabinet、pour_water、transfer_water。訓練樣本分act1抓取／act2操作，sample_weights=0.2/0.8；一般四keyframes（初態、預抓、抓住、終態），water六幀並混合frame3位置與frame4姿態作第二動作。二次policy決策不等於3或6個planner stages。7個split需保留train/val/test/novel_object/novel_scene/novel_state/any_state；預設eval只跑後五者。</dd></div><div><dt>題數與資料</dt><dd>每case是.npz，gt為keyframe物件序列，info包含scene_parameters、robot_parameters、objects_parameters及robot_shift。gt使用instruction、robot_base、position_rotation_world、gripper_joint_positions、images；每camera有rgb、semanticSegmentation、depthLinear、camera內參／pose。Reader把position/finger由cm除100成m、wxyz轉xyzw，以機器人前方0.5m為中心；PerAct點雲維持y-up，CLIPort heightmap換軸成z-up。depthLinear先clip到[0,10]，Cython反投影乘100到cm、世界變換後再除100；不能把raw depth直接當cm。target_points註解寫[6]，實際concat xyz+xyzw是7D（rot=None才3D）。parse_state從檔名取標籤：pickup目標/40、reorient角度/180、pour為(100-p)/100、transfer為p/100，其他直接取浮點；runtime CheckerParameters.target_state另取info中的cm／度／比例／百分點原生單位。尚未讀任何示範NPZ內容，欄位證據來自reader。</dd></div><div><dt>評估方式</dt><dd>eval→load_task→OpenDrawer或PourWater/TransferWater.step→120Hz physics callback→具體Checker.start_checking→BaseChecker。joint把位置按lower/upper化為0–100%，必要時翻轉target，要求比例差&lt;0.1且每physics-step百分點差&lt;0.05；pickup要求相對初始y高度誤差&lt;5cm且每step y位移&lt;0.1原生單位；orientation要求物件y軸相對世界y的角度誤差&lt;20度，穩定性檢查同樣是y位移，不是角速度。water用所有粒子落在cupShape世界AABB的比例，誤差&lt;10百分點、受約束杯偏離直立&lt;30度，transfer另需兩杯外spill&lt;10%；pour只看原杯殘餘量。各條件需連續success_steps&gt;steps_per_second*2，失敗清零；末planner stage完成後最多再step 300次讀success，callback已從reset啟動，並未在末階段重新開始2秒計時。horizon=2400是planner主迴圈tick預算，額外gripper等待及success period另計。eval寫stats[fname]=1/0/-1、score=correct/total（0–1），-1包含timeout及捕捉到的例外並留在分母；console另乘100。0gt/1gt/2gt與use_gt旗標必須區分。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作數字：保留論文的單位與頁碼</summary><p>下列為既有原文審閱摘錄；GitHub快照和本庫取得範圍另見上文，不互相代替。</p><ul><li><strong>20</strong> 3D scenes · 原文頁 4</li><li><strong>40</strong> objects · 原文頁 4</li><li><strong>8</strong> task types · 原文頁 5</li><li><strong>10,080</strong> 全部split的valid demonstrations · 原文頁 5</li><li><strong>773</strong> IID test instances · 原文頁 5</li></ul></details>
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/README.md#L1-L22" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>精確身份、8-task/7-split宣告、外部資料及尚待發布的demonstration generator。</p><small>L1–22 · L32–60</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 335646a950869ab7e7768b74f8bb272214d707eb607d407241d66a5e27184c79</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/configs/default.yaml#L23-L40" target="_blank" rel="noopener noreferrer"><code>configs/default.yaml</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>GT介入、五個eval splits、相機、兩階段策略與planner預算。</p><small>L23–40 · L75–108</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 81e5340be569c92efc76fe3aa68f89ccf3210bd57a4a4ca376b753943ff9d42c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/dataset.py#L19-L37" target="_blank" rel="noopener noreferrer"><code>dataset.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>npz gt、四／六關鍵幀、cm/wxyz轉換、act1/act2與normalized state。</p><small>L19–37 · L40–76 · L78–206 · L228–279 · L282–325</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 93afc70c41db8981a35f412e8243d1903b449551e482571430519f7d5744b215</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/env.py#L1-L7" target="_blank" rel="noopener noreferrer"><code>utils/env.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>五視角的固定順序。</p><small>L1–7</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 4887444285073475ce56077198b32a08b8827d78870bd4fb58452a205f29ab80</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/transforms.py#L145-L165" target="_blank" rel="noopener noreferrer"><code>utils/transforms.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>camera內參／pose與點雲座標轉換。</p><small>L145–165</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 c53207c17cc97edcea83614feddceabec197ac7edec80e4dae79fadff5bd19d6</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/compute_points.pyx#L7-L28" target="_blank" rel="noopener noreferrer"><code>utils/compute_points.pyx</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>depth乘100進cm camera frame；未編譯此Cython程式。</p><small>L7–28</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 64a51e7bb50bc9c6bdbd268ba69b9e9557ac1df2a5bb1c9e4bbd492a9077e1ec</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/__init__.py#L39-L109" target="_blank" rel="noopener noreferrer"><code>tasks/__init__.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>npz info重建USD資產、物理與fluid欄位、checker dispatch及y-up/cm stage。</p><small>L39–109 · L111–210</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 8385da4138fa4869059f8b39e1ba01509064310dc5a76db4d02957485883e78a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/environment/parameters.py#L16-L44" target="_blank" rel="noopener noreferrer"><code>environment/parameters.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>Object/Scene/Robot與CheckerParameters的實際schema。</p><small>L16–44 · L55–87</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 2c0c04ce435543723341d8fe4b4266ceee82a32648af36381e607b43d7935e12</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/base_task.py#L122-L179" target="_blank" rel="noopener noreferrer"><code>tasks/base_task.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>120Hz、RMPFlow與Franka／sensor setup。</p><small>L122–179 · L332–374</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 3024474fd4fc6e69b45ec2a096263cf5d8e3567770d6f929f1cdd63ef521835c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/open_drawer.py#L104-L227" target="_blank" rel="noopener noreferrer"><code>tasks/open_drawer.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>兩次policy step、三planner stages、2400 tick timeout與末階段checker讀取。</p><small>L104–227</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 caf139387ad8a486f5ae9daf3516b41f71dfc40a66cdb0b99db73cc4ee0eaf1f</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/pour_water.py#L66-L94" target="_blank" rel="noopener noreferrer"><code>tasks/pour_water.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>pour檢查原容器殘餘水量；六stage動作完成後才讀success。</p><small>L66–94 · L123–125 · L145–194 · L265–295</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 272e7b3f107490676f13900ccf3b9f63c36ef5b1b6947d1a89db8757c7ed4359</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/transfer_water.py#L41-L100" target="_blank" rel="noopener noreferrer"><code>tasks/transfer_water.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>transfer檢查接收杯、原杯upright及spill；不是pour同一目標。</p><small>L41–100</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 33a3be979b064be3d1bb44c7e439a1162cacd85e563fd78bfb02d07c31939f2e</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/base_checker.py#L14-L39" target="_blank" rel="noopener noreferrer"><code>tasks/checkers/base_checker.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>physics callback與連續超過2秒保持條件，失敗即清零。</p><small>L14–39 · L44–93</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 a7044f2bfef39456bc12fc98b267ec1205e6a9e68d4a5d0930f0417107202047</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/joint_checker.py#L36-L84" target="_blank" rel="noopener noreferrer"><code>tasks/checkers/joint_checker.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>關節範圍比例、方向翻轉、±0.1與每step變化門檻。</p><small>L36–84 · L87–153</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 9357e867c6cdeeaf27537c908c4faa16b031af41d04e8e0a80172ed186108538</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/pickup_checker.py#L7-L74" target="_blank" rel="noopener noreferrer"><code>tasks/checkers/pickup_checker.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>y高度目標、5cm容差與每physics-step位移。</p><small>L7–74</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 3521a4e93747b7e87376513d3a7669068e37968fbe5a094ce35daf24caea2da1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/orient_checker.py#L8-L69" target="_blank" rel="noopener noreferrer"><code>tasks/checkers/orient_checker.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>物件y軸相對世界y的角度、20度容差；穩定度仍取y位置。</p><small>L8–69</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 c06ffd4a5484f1ee8e4be76fd9c4d6d29b9117d2abfe3209711a1ffb778a583e</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/water_checker.py#L13-L30" target="_blank" rel="noopener noreferrer"><code>tasks/checkers/water_checker.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>AABB粒子比例、±10百分點、upright&lt;30度與spill&lt;10%。</p><small>L13–30 · L55–82 · L100–112 · L126–207</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 f53b4f677683dc7e6c2924fa073843229769b76bd6db84b0ed13d88755c3feaf</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/ckpt_selection.py#L84-L110" target="_blank" rel="noopener noreferrer"><code>ckpt_selection.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>val成功率及跨task平均選模型；list.argmax靜態缺陷。</p><small>L84–110 · L133–214</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 0cc74a8c93330d2222d0199c8494096b8a3ae2320a590bc1ec81d0311b7406cd</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/eval.py#L29-L49" target="_blank" rel="noopener noreferrer"><code>eval.py</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>GT模式、NPZ case讀取、-1錯誤、分母與逐task/split輸出JSON。</p><small>L29–49 · L82–111 · L113–229</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 99ca95ea9ae64bd465024e958836eb9bf6e00c0e98e9d2f2a9d5baa84a497256</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/arnold-benchmark/arnold/blob/40ad6861f45b676bf538b7a0e180d81c8d454823/eval_pipeline.sh#L1-L34" target="_blank" rel="noopener noreferrer"><code>eval_pipeline.sh</code> ↗</a><span>GitHub · arnold-benchmark/arnold · 40ad6861f4</span></div>
+      <p>官方串接checkpoint選擇與0gt/1gt分開評測。</p><small>L1–34</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 a31a6bf9392f93f89f002ae0418f6bdfa8a309979e8a1c9cdd1adae8f90c9b03</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>NPZ欄位／USD物理設定、語言與native continuous target、四類checker、兩階段policy／多stage planner、task/split/case成功記錄。</p></section><section><h3>需要轉換</h3><p>source綁v2+commit；case保留NPZ檔名、object/scene/state split、raw info和asset引用。建立cm↔m、wxyz↔xyzw、y-up↔z-up的明確轉換，normalized learning goal與runtime target分欄。evaluator儲存每步穩定性單位、hold ticks、planner耗時、GT介入、checkpoint及-1原因，水量保留particle-AABB proxy名稱。</p></section><section><h3>仍需補齊</h3><p>ckpt_selection.py 204產生Python list、205直接.argmax()，在此靜態路徑不能完成best checkpoint挑選，需協調者處理且保留修補版本；本輪未執行確認。缺USD/material/fluid資產及實際NPZ manifest、其餘具體task stage覆寫的逐項核對。water AABB不是精確杯內幾何或真實體積，須保留限制。GT log名稱對任意use_gt組合未全區分；bare except把不同錯誤壓成-1且已有score會跳過整個split，需追加設定hash／錯誤分類。README尚列demonstration generator為TODO。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P081-discovery.json&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/code_contexts/1&quot;
+    ],
+    &quot;paper_version&quot;: &quot;2304.04321v2&quot;,
+    &quot;pdf_sha256&quot;: &quot;5a2b6c0126bde99772c888036524fd071cf3890034be184e26c437bd42f50fdb&quot;,
+    &quot;finding&quot;: &quot;精確identity及PDF第7頁直接repository link。&quot;,
+    &quot;sha256&quot;: &quot;de2700df09e39d005a981baba8863e399dcb93ef292a6fbe9752e450551393bc&quot;,
+    &quot;text_excerpts&quot;: [
+      {
+        &quot;json_pointer&quot;: &quot;/opening_text&quot;,
+        &quot;character_range&quot;: [
+          917,
+          955
+        ],
+        &quot;text&quot;: &quot;arXiv:2304.04321v2 [cs.AI] 11 Sep 2023&quot;,
+        &quot;scope&quot;: &quot;僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。&quot;
+      }
+    ]
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P081/pages.json&quot;,
+    &quot;sha256&quot;: &quot;143954d5357f2049854411ecab1b650981560c89891bcc09a1c6539255464614&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/6/text&quot;
+    ],
+    &quot;finding&quot;: &quot;Table 4黑／灰結果區別完整與first-phase GT；論文要求planner最後動作完成才評成功。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P081.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P080.html">← 上一篇 · DexArt</a><a href="P082.html">下一篇 → · RoboVerse</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

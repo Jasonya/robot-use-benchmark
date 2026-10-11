@@ -1,0 +1,277 @@
+{
+  "paper_id": "P183",
+  "reviewed_on": "2026-10-11",
+  "status": "public_readme_only",
+  "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+  "identity_note": "收錄arXiv:2606.18097v1，第一作者Chongyu Zhu、University of Toronto。既有精化搜尋找到WireManip/WireCraft；本輪固定commit作者為GitHub ChongyuZhu，其公開profile同名且company=University of Toronto，README完整題名相符。共同作者Zachary Tang的第一方頁也確認原論文與本人參與，但該頁未直接連repo。作者身分證據足以提出高可信來源綁定候選，仍將綁定修改交協調者。",
+  "summary": "限量primary discovery找到作者身分支持的WireManip/WireCraft，固定tree不截斷且只含223 bytes／4行README。README宣告程式預計2026年11月初發布；當日2026-10-11尚無task、reader或scorer可核讀，因此本篇處置為公開README佔位，不再泛稱沒有候選，也不採用同名第三方專案。",
+  "reading_order": [
+    {
+      "repo": "WireManip/WireCraft",
+      "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          4
+        ]
+      ],
+      "why": "完整題名及未來程式release計畫；完整tree確證此commit僅README。"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "source_file": "audit/.cache/github_review/search/P183.json",
+      "json_pointers": [
+        "/query",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "廣搜24筆、只列前8筆，含admin panel／CMS／Minecraft等無關專案；不當成論文repo。"
+    },
+    {
+      "source_file": "audit/.cache/github_review/search/P183-refined.json",
+      "json_pointers": [
+        "/query",
+        "/results/0"
+      ],
+      "finding": "WireCraft manipulation精化搜尋回WireManip/WireCraft，完整題名相符，僅作候選起點。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_commit.json",
+      "json_pointers": [
+        "/sha",
+        "/commit/message",
+        "/commit/author/name",
+        "/author/login"
+      ],
+      "finding": "commit=9acbc318，訊息repo creation and code release plan，作者Chongyu Zhu／ChongyuZhu。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_chongyu_github.json",
+      "json_pointers": [
+        "/login",
+        "/name",
+        "/company"
+      ],
+      "finding": "提交者profile的姓名／University of Toronto與論文第一作者一致。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_tree.json",
+      "json_pointers": [
+        "/tree",
+        "/truncated"
+      ],
+      "finding": "完整tree只有README.md，無程式、任務config、資料或license檔。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_zachary.html",
+      "ranges": [
+        [
+          10,
+          14
+        ]
+      ],
+      "finding": "共同作者第一方頁列完整作者、同一arXiv與WireCraft專案；沒有把其他repo當作official code。"
+    }
+  ],
+  "environment": "以下為論文規格，尚無repo實作可驗證：Isaac Lab2.2.1／Isaac Sim4.5，另聲稱驗證5.1。DLO有PhysX D6剛性segment chain及FEM deformable兩種表示，對齊task／connector介面而非聲稱材料參數等價。模擬支援UR5、Franka、Trossen Stationary AI；實體validation用UR5+Robotiq2F-85、腕部與側視RGB、3D列印Ethernet接頭／task board。實體腕部force/torque sensor讀值未用於policy，只需在sim匹配其幾何offset。",
+  "tasks": "三個family為connector insertion、clip routing、channel seating。論文註冊五種connector geometry，其中cylinder/cuboid/Ethernet/DisplayPort進入所報實驗，USB-A為額外asset；不能把五個connector全當已評測tasks。clip difficulty最多3個clips；channel由5 segments組成，可為直線或每joint最多±20°彎曲。family、variant、fixture數、reset variation與episode均不同單位，無公開registry可確認精確全部task count。",
+  "data": "論文稱scripted、RL rollout、sim teleoperation、real UR5四種來源共用LeRobot-compatible schema。UR5 state/action各7D（6 joint+gripper），雙RGB與instruction同步；這是論文語義，未取得實際feature keys、parquet/video path、dataset revision或reader。IL/VLA比較使用同一1,000條scripted insertion trajectories，非全benchmark總case數。RL另用42D privileged observation與Cartesian delta pose+gripper action，clip到[-1,1]再乘0.01；不與joint-space dataset action直接合併。原生physics dt=1/120 s、decimation=2、control=60 Hz，其他實體資料時間約定需待公開。",
+  "evaluation": "只有paper-defined protocol：insertion分SRreach（夾持plug進入socket周邊2 cm）及SRinsert（tip就座），不得以reach代替insert；3 mm是Ethernet測試clearance，不是插入成功閾值。clip需seated於clips；channel需超過80%線長在channel內，尚無公開離散化／checker細節。RL報3 seeds的mean±std，8秒horizon；IL/VLA附錄F用4 seeds×16 rollouts=64/checkpoint、800 simulator steps，不可與8秒／60 Hz budget默認等同。checkpoint以相同evaluation rollouts的reach success取前三，並非held-out validation選模；insert來自同checkpoint、未另最佳化。公開tree無可執行scorer，不能聲稱已核對這些條件的程式實作。",
+  "standardization": {
+    "profile": "readme_placeholder_with_paper_specified_industrial_dlo_protocol",
+    "reuse": "可重用論文的task families／變化軸、兩種DLO表示、資料來源分類及reach/insert/channel的不同度量；README作release追蹤。",
+    "transform": "source保留paper v1及placeholder commit；environment按simulation model／robot／physical setup分開；task按family+fixture/connector geometry；case在公開reset seed／episode manifest後建立。evaluator先標paper_specified、runtime_unavailable，保存native units、budget、policy可見資訊及checkpoint選擇協定。各data-source mixing實驗保留R/S/P組成，不做語義等價合併。",
+    "missing": "11月release是否履行、真正task registry／reader／concrete scorer、dataset與3D assets manifest／授權、精確insert/clip判定、8秒vs800步預算對齊、各實驗checkpoint／split closure。"
+  },
+  "version_note": "pinned PDF June2026寫upon acceptance；9月新建README改成2026年11月初釋出計畫，當日仍在未來。這是作者公告，非程式已公開或會準時發布的保證。本輪只抓小型metadata／README與兩個作者頁，未下載資產或執行上游。",
+  "additional_repo_proposals": [
+    {
+      "requested_repo": "WireManip/WireCraft",
+      "role": "author_supported_code_release_placeholder",
+      "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+      "selection_status": "propose_binding_as_public_readme_only",
+      "basis": "精化搜尋精確題名＋README＋GitHub commit作者帳號與論文第一作者姓名／機構吻合；author webpage不含直接repo backlink，證據邊界已記錄。"
+    }
+  ],
+  "integration_issues": [
+    "請協調者審核並新增WireManip/WireCraft placeholder binding；勿仍顯示further_search_needed而漏掉已核讀README。",
+    "狀態應為public_readme_only，不能因repo存在就標成code-reviewed或可執行。",
+    "task family/geometry/case與reach/insert、RL/IL budgets及evaluation-based checkpoint selection均需保留。"
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/github_review/P183-discovery.json",
+      "sha256": "5a79a80c5c1e730852a6a392c401bfb313107a91d16f12194daa4027321b9ced",
+      "json_pointers": [
+        "/code_contexts",
+        "/paper_url",
+        "/pdf_sha256",
+        "/previous_repositories",
+        "/title"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P183-refined.json",
+      "sha256": "3e356088b8c9df67737ed5a945e08ee8b98b69d775bd0bf3d5ed4b524231e36f",
+      "kind": "cached_discovery_search",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P183.json",
+      "sha256": "c9f18cfd7e423d3c1632ba3deb8f23323bb2fbf8ccc8de90165e55f41efcc3fc",
+      "kind": "cached_discovery_search",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/182"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P183/pages.json",
+      "sha256": "1dce821b0d40ba8eeb5b6081cca175f70f935fa67983686357cc2fbbd145dea7",
+      "kind": "pinned_pdf_text",
+      "pdf_pages": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        13,
+        17,
+        18,
+        20,
+        23,
+        24
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/12/text",
+        "/16/text",
+        "/17/text",
+        "/19/text",
+        "/2/text",
+        "/22/text",
+        "/23/text",
+        "/3/text",
+        "/4/text",
+        "/5/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P183/paper.pdf",
+      "pdf_sha256": "7f2bbb231c2ff416c001d7c06e6efc0d68691404f48ed4e22afde76e1ff48e9a"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_metadata.json",
+      "sha256": "ce459df7c589045655f1fe6ba225e128d54b9fd350880ee56699c0a3ceb3bd11",
+      "kind": "primary_remote_text",
+      "url": "https://api.github.com/repos/WireManip/WireCraft",
+      "retrieved_at": "2026-10-11T01:20:05.669624+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_metadata.json.receipt.json",
+      "json_pointers": [
+        "/created_at",
+        "/default_branch",
+        "/description",
+        "/fork",
+        "/full_name",
+        "/homepage",
+        "/owner/login",
+        "/pushed_at"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_zachary.html",
+      "sha256": "5bbfae01ba3cd105821d70ce1c02f9ddd7a125c346c72c8d36095f03d2370896",
+      "kind": "primary_remote_text",
+      "url": "https://e-ndorfin.github.io/",
+      "retrieved_at": "2026-10-11T01:20:06.301599+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_zachary.html.receipt.json",
+      "read_ranges": [
+        [
+          1,
+          20
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_wirecraft_project.html",
+      "sha256": "e250e0a4c0207def8a5f4d2ce35403779f202ffede51962f61a736b22fde5a87",
+      "kind": "primary_remote_text",
+      "url": "https://e-ndorfin.github.io/projects/wirecraft/",
+      "retrieved_at": "2026-10-11T01:20:26.288898+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_wirecraft_project.html.receipt.json",
+      "read_ranges": [
+        [
+          1,
+          4
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_commit.json",
+      "sha256": "6b7a46e14fcf4897ff204c9afd663e58df41b5747ac7d6652d1be1fa60fb7eec",
+      "kind": "primary_remote_text",
+      "url": "https://api.github.com/repos/WireManip/WireCraft/commits/main",
+      "retrieved_at": "2026-10-11T01:20:26.737622+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_commit.json.receipt.json",
+      "json_pointers": [
+        "/author/login",
+        "/commit/author/name",
+        "/commit/message",
+        "/sha"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_tree.json",
+      "sha256": "b2f68b031ab7e43d7e009c03d0b04d2f0ddfaf331962246ce48951b7cca6e6bb",
+      "kind": "primary_remote_text",
+      "url": "https://api.github.com/repos/WireManip/WireCraft/git/trees/9acbc318c1ec8b8ae3caf773be1eb086fd5197c6?recursive=1",
+      "retrieved_at": "2026-10-11T01:20:27.527932+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_tree.json.receipt.json",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/README.md",
+      "sha256": "02e255d18f281f1663e76a5d9765127c529f75fce25245c48c7474e354eed2dc",
+      "repo": "WireManip/WireCraft",
+      "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+      "path": "README.md",
+      "git_blob_sha": "0a668692336f473a42306c4757d58387c640c7ec",
+      "kind": "primary_remote_text",
+      "url": "https://raw.githubusercontent.com/WireManip/WireCraft/9acbc318c1ec8b8ae3caf773be1eb086fd5197c6/README.md",
+      "retrieved_at": "2026-10-11T01:20:52.381234+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/README.md.receipt.json",
+      "read_ranges": [
+        [
+          1,
+          4
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_chongyu_github.json",
+      "sha256": "24cf16e9a299158bda5476ecf835fe2ba16ac301265af046f180e0137538a10d",
+      "kind": "primary_remote_text",
+      "url": "https://api.github.com/users/ChongyuZhu",
+      "retrieved_at": "2026-10-11T01:20:52.919482+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_chongyu_github.json.receipt.json",
+      "json_pointers": [
+        "/bio",
+        "/blog",
+        "/company",
+        "/login",
+        "/name"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

@@ -1,0 +1,102 @@
+{
+  "paper_id": "P064",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "LIBERO最清楚的入口是benchmark註冊表：每個Task把語言、BDDL、init-state檔與示範路徑連起來。成功判定要沿wrapper找到實際problem子類；base class的False是佔位。",
+  "reading_order": [
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "path": "README.md",
+      "ranges": [
+        [
+          15,
+          55
+        ]
+      ],
+      "why": "核對130任務、suite劃分與原始用途。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "path": "libero/libero/benchmark/__init__.py",
+      "ranges": [
+        [
+          35,
+          77
+        ],
+        [
+          108,
+          160
+        ]
+      ],
+      "why": "找Task欄位、BDDL、示範和初態引用；90/10不重複加成。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "path": "libero/libero/envs/env_wrapper.py",
+      "ranges": [
+        [
+          25,
+          104
+        ],
+        [
+          118,
+          145
+        ]
+      ],
+      "why": "看控制/相機約定、TASK_MAPPING和初態恢復。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "path": "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "ranges": [
+        [
+          135,
+          143
+        ]
+      ],
+      "why": "以具體problem確認goal_state經predicate逐一判定。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "path": "scripts/create_dataset.py",
+      "ranges": [
+        [
+          20,
+          60
+        ],
+        [
+          238,
+          278
+        ]
+      ],
+      "why": "核對HDF5的感測、actions、states、rewards、dones和init_state。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "path": "libero/lifelong/evaluate.py",
+      "ranges": [
+        [
+          72,
+          114
+        ],
+        [
+          261,
+          301
+        ]
+      ],
+      "why": "固定task/checkpoint/seed，區分行為模仿loss與rollout success。"
+    }
+  ],
+  "environment": "problem類型、MuJoCo場景與物件資產由BDDL和wrapper連接；suite或task數不能直接當layout數。",
+  "tasks": "Task含name/language/problem/problem_folder/bddl_file/init_states_file。原作100-task集合拆成90/10；程式有五個suite清單但不可重算同一組任務。",
+  "data": "HDF5示範含多視角RGB/可選depth、proprioception、action/state/reward/done；另存模型XML和初態。評測需固定.pruned_init等來源。",
+  "evaluation": "具體problem子類以parsed goal predicates合取檢查成功；evaluation腳本固定步數和checkpoint，保存loss與success_rate兩種不同指標。",
+  "standardization": {
+    "profile": "structured_goals_and_robot_episodes",
+    "reuse": "Task註冊、BDDL及init states、HDF5示範和具體problem evaluator。",
+    "transform": "保持task、scene/assets、initial state、case protocol分離；將原生goal program與predicate實作一起引用，HDF5映到typed episode資料。",
+    "missing": "跨來源等價判定、素材閉合、controller/相機一致性與本庫case驗證。"
+  },
+  "version_note": "不能只讀bddl_base_domain._check_success就斷言沒有判分器；必須追TASK_MAPPING到實際problem子類。",
+  "runtime_executed": false
+}

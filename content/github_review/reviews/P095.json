@@ -1,0 +1,64 @@
+{
+  "paper_id": "P095",
+  "summary": "RxR公開多語指令、跟隨示範、視角軌跡與讀取程式；同一Matterport場景、語言改寫、示範和後加合成指令應分開計數。",
+  "reading_order": [
+    {
+      "repo": "google-research-datasets/RxR",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          131
+        ],
+        [
+          133,
+          300
+        ],
+        [
+          315,
+          357
+        ]
+      ],
+      "why": "原始資料schema、時空對齊、標準指標和後加資料版本",
+      "commit": "d22df5940a0486a42b703cd445937210ce21e9f5"
+    },
+    {
+      "repo": "google-research-datasets/RxR",
+      "path": "visualizations/setup.py",
+      "ranges": [
+        [
+          42,
+          92
+        ]
+      ],
+      "why": "讀取JSONL/NPZ與導航圖、scan到mesh連結",
+      "commit": "d22df5940a0486a42b703cd445937210ce21e9f5"
+    },
+    {
+      "repo": "google-research-datasets/RxR",
+      "path": "marky-mT5/render_landmarks.py",
+      "ranges": [
+        [
+          24,
+          46
+        ]
+      ],
+      "why": "後加landmark資料讀取與MatterSim相機設定",
+      "commit": "d22df5940a0486a42b703cd445937210ce21e9f5"
+    }
+  ],
+  "environment": "重用Matterport3D scan／全景viewpoint和導航連通圖；與R2R同父資產，不可跨來源直接相加。",
+  "tasks": "英語、印地語、泰盧固語導航與細粒度語言／視覺對齊。guide instruction是題目條件，follower demonstration是人類執行示範；二者非兩套獨立環境。",
+  "data": "gzip JSONL guide含split/instruction_id/annotator_id/language/path_id/scan/path/heading/timed_instruction；少數word無時間欄位。follower有demonstration_id及父instruction_id。NPZ包含pano/time/audio_time、展平16數相機矩陣和mask/features；time為秒，heading為弧度且零朝+y、z向上。",
+  "evaluation": "README定義NE、<3m SR、SPL、DTW/nDTW/sDTW；follower資料已有metrics。已讀倉庫的具體程式是載入／視覺化，不是完整競賽evaluator；RxR與RxR-Habitat兩種執行／提交協定需分別接線，不能以預存人類分數代模型評測。",
+  "standardization": {
+    "profile": "multilingual_navigation_with_temporal_grounding",
+    "reuse": "多語ID、source scan、path、guide-follower關係、秒制詞語／視角對齊與原native metrics。",
+    "transform": "case鍵保留instruction_id；示範另連demonstration_id。environment沿Matterport資產鍵去重；pose/語音時間基準分開。後加marky合成指令與原人類資料另標來源版本。",
+    "missing": "競賽scorer與stop/action預算核對、全量資料／資產取得、時間缺值處理、機器產生指令與原split隔離。"
+  },
+  "version_note": "README含2021修正7個pose檔和2022新增landmarks／100萬合成指令；不可將現有完整下載內容當2020論文原始資料量。倉庫已封存不等於外部資料不可用。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

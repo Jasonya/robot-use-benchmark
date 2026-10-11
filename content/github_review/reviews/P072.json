@@ -1,0 +1,786 @@
+{
+  "paper_id": "P072",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "VLABench 有互動VLA評測與離線VLM技能序列評測兩條不同鏈。已追到select_fruit的容器幾何、progress實作、HDF5 writer/reader及DSL匹配；metric.py的pass不代表全庫沒有評分器，但現行總分與CLI確有靜態缺陷。",
+  "identity_note": "固定論文為arXiv:2412.18194v1（2024-12-24），README引用相同題名與11位作者。固定程式cf588fe60c0c7282174fe979f5913170cfe69017（2025-11-11）已有2025評測軌道與資料更新，不能視作2024預覽版的原封快照。",
+  "discovery_evidence": [
+    {
+      "kind": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P072/pages.json",
+      "pages": [
+        1,
+        5,
+        6
+      ],
+      "pdf_sha256": "9dc4aa5cfa6dcb86a30099eda2482bf45814285a8d6662df624ed79f2382788b"
+    },
+    {
+      "kind": "author_project_repository_link",
+      "local_file": "content/github_review/repository_bindings.json",
+      "paper_id": "P072"
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          39
+        ],
+        [
+          139,
+          184
+        ],
+        [
+          193,
+          204
+        ]
+      ],
+      "why": "核對作品、2025資料發布與VLA/VLM分流。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/configs/task_config.json",
+      "ranges": [
+        [
+          1,
+          18
+        ],
+        [
+          92,
+          119
+        ]
+      ],
+      "why": "引擎設定、studyroom、水果類別與容器split。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/config_manager.py",
+      "ranges": [
+        [
+          40,
+          114
+        ],
+        [
+          122,
+          150
+        ]
+      ],
+      "why": "seen/unseen抽樣及原生entity→class/XML映射。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/hierarchical_tasks/primitive/select_fruit_series.py",
+      "ranges": [
+        [
+          8,
+          30
+        ],
+        [
+          87,
+          97
+        ]
+      ],
+      "why": "指令、contain條件與pick/place expert序列。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/envs/__init__.py",
+      "ranges": [
+        [
+          15,
+          55
+        ]
+      ],
+      "why": "episode_config與task註冊的載入入口。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/dm_task.py",
+      "ranges": [
+        [
+          25,
+          76
+        ],
+        [
+          124,
+          152
+        ],
+        [
+          165,
+          222
+        ],
+        [
+          298,
+          303
+        ],
+        [
+          442,
+          460
+        ]
+      ],
+      "why": "狀態重建、condition實例化、終止checker與episode儲存。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/condition.py",
+      "ranges": [
+        [
+          43,
+          64
+        ],
+        [
+          178,
+          199
+        ],
+        [
+          299,
+          355
+        ]
+      ],
+      "why": "Contain、同時AND、累積條件及Pour姿態代理。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/configs/constant.py",
+      "ranges": [
+        [
+          153,
+          157
+        ]
+      ],
+      "why": "plate_seen/unseen皆實際映到Plate class。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/components/specific_entities/common_containers.py",
+      "ranges": [
+        [
+          102,
+          105
+        ]
+      ],
+      "why": "Plate繼承FlatContainer，閉合contain dispatch。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/components/container.py",
+      "ranges": [
+        [
+          34,
+          102
+        ]
+      ],
+      "why": "容器軸對齊bounds、平面半徑及高度判定，非抽象stub。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/envs/dm_env.py",
+      "ranges": [
+        [
+          7,
+          41
+        ],
+        [
+          118,
+          150
+        ],
+        [
+          213,
+          235
+        ]
+      ],
+      "why": "480×480多視角觀測、原生拼字instrinsic與進度委派。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/utils/skill_lib.py",
+      "ranges": [
+        [
+          18,
+          66
+        ]
+      ],
+      "why": "8維waypoint為xyz＋Euler＋兩指gripper；成功末步可能不記入示範。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "scripts/trajectory_generation.py",
+      "ranges": [
+        [
+          47,
+          110
+        ]
+      ],
+      "why": "成功篩選、只減底座平移的trajectory轉換與meta_info來源。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/utils/data_utils.py",
+      "ranges": [
+        [
+          12,
+          87
+        ]
+      ],
+      "why": "HDF5群組、dtypes、丟棄欄位及點雲補零。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "tutorials/3.process_dataset.ipynb",
+      "ranges": [
+        [
+          39,
+          52
+        ],
+        [
+          86,
+          118
+        ],
+        [
+          156,
+          160
+        ]
+      ],
+      "why": "實際HDF5 reader與作者保存的樣例欄位形狀；未執行notebook。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/tasks/hierarchical_tasks/primitive/base.py",
+      "ranges": [
+        [
+          4,
+          60
+        ]
+      ],
+      "why": "最近接近距離、曾抓握與當前條件比例的真正進度。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/evaluation/metric.py",
+      "ranges": [
+        [
+          4,
+          23
+        ]
+      ],
+      "why": "確認僅為未實作函式，不能當正式metric入口。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "scripts/evaluate_policy.py",
+      "ranges": [
+        [
+          11,
+          47
+        ]
+      ],
+      "why": "CLI預算、track JSON載入與metric選擇。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/evaluation/evaluator/base.py",
+      "ranges": [
+        [
+          39,
+          109
+        ],
+        [
+          122,
+          205
+        ]
+      ],
+      "why": "seed/episode來源、exception分母、IK動作、last成功與三個獨立均值。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/evaluation/evaluator/vlm.py",
+      "ranges": [
+        [
+          54,
+          110
+        ],
+        [
+          233,
+          279
+        ],
+        [
+          300,
+          325
+        ]
+      ],
+      "why": "圖片/指令/GT序列格式、離線計分與輸出路徑錯配。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "VLABench/evaluation/utils.py",
+      "ranges": [
+        [
+          7,
+          98
+        ],
+        [
+          148,
+          339
+        ]
+      ],
+      "why": "技能pattern→DAG、recall/exact比例及漏加權重的總分。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "path": "scripts/evaluate_vlm.py",
+      "ranges": [
+        [
+          14,
+          64
+        ]
+      ],
+      "why": "未定義CLI屬性及few-shot/CoT輸出設定。",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017"
+    }
+  ],
+  "environment": "MuJoCo/dm_control依scene、components、robot及MJCF資產組裝；select_fruit_series具體使用studyroom_0與table。觀測依模型的ncam迭代，不能把樣例四視角當所有任務固定相機數。物理步、NUM_SUBSTEPS=100與policy步數分開；影片10 fps不是通用控制頻率。",
+  "tasks": "論文100項（60 primitive＋40 composite）；原生task、config_manager與condition以註冊名連接。select_fruit的seen類別為apple/banana/orange/pear，unseen為peach/lemon/kiwi/mango；contain檢查物件worldbody位置點落在Plate的平面範圍及預設0–0.1公尺上方，不檢查整個物件bbox或穩定接觸。PourCondition只比較top/bottom site高度，是姿態代理，不代表液體流動。",
+  "data": "HDF5為data/<時間名>/observation、meta_info、trajectory、instruction；observation可含rgb uint8、depth/q_state/q_velocity/q_acceleration/ee_state及點雲float32。meta_info保存entities、target_entity、episode_config字串；writer略過segmentation、instrinsic、extrinsic等欄位，點雲補零且未另存有效點數。trajectory為8維xyz/Euler/兩指gripper；腳本只從xyz減robot_position，不能宣稱已做含旋轉的完整座標轉換。VLM題目則是task/exampleN/input的input.png/input_mask.png/instruction.txt與output/operation_sequence.json，GT為skill_sequence[{name,params}]。",
+  "evaluation": "互動鏈：Evaluator→load_env→dm_control終止→ConditionSet→ContainCondition→Plate/FlatContainer.contain；success取timestep.last。未提供episode_config時用42+i seeds；預設最多200個policy步，可由task_config覆蓋。當前API分別平均success、intention、progress；intention是歷史最小eef距離<0.1公尺，primitive progress將當前已滿足condition與曾抓握target計數合併，沒有實作論文0.2/0.8加權PS。離線VLM鏈用技能/參數多重集合recall、技能參數聯合recall及DAG節點匹配百分比；這些0–100分數不能轉稱物理成功率。",
+  "standardization": {
+    "profile": "interactive_robot_tasks_and_offline_skill_graph_cases",
+    "reuse": "原生task/config/condition、確定性episode_config、HDF5與DSL case結構、分開的物理checker及圖匹配metric。",
+    "transform": "同一source保留互動與離線兩種case/evaluator；映射name/params/target_entity_name/target_container_name時保存圖依賴模式、few-shot、CoT及資訊可見性。保留8維Euler waypoint、9維joint＋gripper控制與觀測四元數各自語義，不依維度誤併。",
+    "missing": "大型track JSON與外部vlm_evaluation_v1.0的完整case清單尚未取得，不能填全庫episode數；仍需修正CLI/metric、固定model與dm_control版本、資產閉合，以及逐task驗證進度支援。"
+  },
+  "version_note": "VLM get_final_score雖宣告0.4/0.4/0.1/0.1，實際total_score只加前兩項，因此完美匹配上限80；get_final_score_dict呼叫get_result_save_path時漏eval_dim。evaluate_vlm.py引用未宣告的task_list_json/save_dir。互動Evaluator捕捉episode例外後不加入task_infos，均值分母會縮小；必須另列請求、完成、失敗及錯誤數。README的舊CLI拼字/參數也不等於現行parser。這些是靜態檢查結果，未執行上游。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "91efa101fdf4e20a54250c1d20687417297141160bb5784fef3792bb3fc8c7db",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/README.md",
+      "read_ranges": [
+        [
+          1,
+          39
+        ],
+        [
+          139,
+          184
+        ],
+        [
+          193,
+          204
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/configs/task_config.json",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/configs/task_config.json",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/configs/task_config.json.receipt.json",
+      "sha256": "c1009c7bd09d55b72892a6f2db0a685b23848613846961ba6028ed595ecf5f10",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/configs/task_config.json",
+      "read_ranges": [
+        [
+          1,
+          18
+        ],
+        [
+          92,
+          119
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/config_manager.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/config_manager.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/config_manager.py.receipt.json",
+      "sha256": "c9a978015f7c9df949f97d7bb5578ef05a9ad7252838b762272a2356b16318e5",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/config_manager.py",
+      "read_ranges": [
+        [
+          40,
+          114
+        ],
+        [
+          122,
+          150
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/hierarchical_tasks/primitive/select_fruit_series.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/hierarchical_tasks/primitive/select_fruit_series.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/hierarchical_tasks/primitive/select_fruit_series.py.receipt.json",
+      "sha256": "e5f703126e8ec86ec77421199dff7e1e0e1230bd46c8b9a80b380914180b0ecb",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/hierarchical_tasks/primitive/select_fruit_series.py",
+      "read_ranges": [
+        [
+          8,
+          30
+        ],
+        [
+          87,
+          97
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/envs/__init__.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/VLABench/envs/__init__.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "2c7d7ae305c33c9c8dd49c230185818e93ae9c685a598848ba46b15ffd691922",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/envs/__init__.py",
+      "read_ranges": [
+        [
+          15,
+          55
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/dm_task.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/dm_task.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/dm_task.py.receipt.json",
+      "sha256": "5e0011bf019ac2393a51560eb46750c0319a27c6b36074a3bcf4a6bb04b9e109",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/dm_task.py",
+      "read_ranges": [
+        [
+          25,
+          76
+        ],
+        [
+          124,
+          152
+        ],
+        [
+          165,
+          222
+        ],
+        [
+          298,
+          303
+        ],
+        [
+          442,
+          460
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/condition.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/condition.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/condition.py.receipt.json",
+      "sha256": "6055c5ab3f7b8a11cca7de6c12346e8a5a5824d4e3fa4b2ff9d4c1b72c164927",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/condition.py",
+      "read_ranges": [
+        [
+          43,
+          64
+        ],
+        [
+          178,
+          199
+        ],
+        [
+          299,
+          355
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/configs/constant.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/configs/constant.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/configs/constant.py.receipt.json",
+      "sha256": "5fee10945957fcabaffa14a58ba04be7e89c0aace34f311f700dbba3497bf18c",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/configs/constant.py",
+      "read_ranges": [
+        [
+          153,
+          157
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/components/specific_entities/common_containers.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/components/specific_entities/common_containers.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/components/specific_entities/common_containers.py.receipt.json",
+      "sha256": "1a54584a0db229ce38ab4d6c1dbf8ddcad067faf3d2f99ea880f05859d986fe6",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/components/specific_entities/common_containers.py",
+      "read_ranges": [
+        [
+          102,
+          105
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/components/container.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/components/container.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/tasks/components/container.py.receipt.json",
+      "sha256": "1db8269a56f15ddd0f61dd4cb82008fd0cb3af9ea8dc70f50cb31c94c6789a96",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/components/container.py",
+      "read_ranges": [
+        [
+          34,
+          102
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/envs/dm_env.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/envs/dm_env.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/envs/dm_env.py.receipt.json",
+      "sha256": "953e113da7c7935999ea8f2a192b79641ed90de5d55cf3e124b8d00072c7ddd1",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/envs/dm_env.py",
+      "read_ranges": [
+        [
+          7,
+          41
+        ],
+        [
+          118,
+          150
+        ],
+        [
+          213,
+          235
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/utils/skill_lib.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/utils/skill_lib.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/utils/skill_lib.py.receipt.json",
+      "sha256": "f8019e745141bdb5e183853daebb0067623161ccc2b04dbb3adfdfce22c2f235",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/utils/skill_lib.py",
+      "read_ranges": [
+        [
+          18,
+          66
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "scripts/trajectory_generation.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/scripts/trajectory_generation.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "307dcb681f247a27fca17c66fb52d0c2c5a2f56fece6b2cee95f1beceb01785b",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/scripts/trajectory_generation.py",
+      "read_ranges": [
+        [
+          47,
+          110
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/utils/data_utils.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/utils/data_utils.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/utils/data_utils.py.receipt.json",
+      "sha256": "36583979270ba8ad0379f39ba816c1b36849ea233dd44218a620cc89729a42fa",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/utils/data_utils.py",
+      "read_ranges": [
+        [
+          12,
+          87
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "tutorials/3.process_dataset.ipynb",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/tutorials/3.process_dataset.ipynb",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "deb76f68e6dbe7cccb527ae105ae8365723816db947158c327035e722dcd712c",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/tutorials/3.process_dataset.ipynb",
+      "read_ranges": [
+        [
+          39,
+          52
+        ],
+        [
+          86,
+          118
+        ],
+        [
+          156,
+          160
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/tasks/hierarchical_tasks/primitive/base.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/VLABench/tasks/hierarchical_tasks/primitive/base.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "917441fdf81a0d34a76cb712bba6ff5c174b00522f19bc8bd9f13811d085a3a4",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/tasks/hierarchical_tasks/primitive/base.py",
+      "read_ranges": [
+        [
+          4,
+          60
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/evaluation/metric.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/VLABench/evaluation/metric.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "940513bb8f813f83aaa999146373bb069c9e2a370143f56e7b5c3496310fe8b1",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/evaluation/metric.py",
+      "read_ranges": [
+        [
+          4,
+          23
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "scripts/evaluate_policy.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/scripts/evaluate_policy.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/scripts/evaluate_policy.py.receipt.json",
+      "sha256": "e7774a13b62a708c72ea413abbe6a14125441858c2a35bd57023012ba4839622",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/scripts/evaluate_policy.py",
+      "read_ranges": [
+        [
+          11,
+          47
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/evaluation/evaluator/base.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/evaluation/evaluator/base.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/OpenMOSS__VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/files/VLABench/evaluation/evaluator/base.py.receipt.json",
+      "sha256": "190cd8daa9ef70252c3346c81f89731a3dc9c7eee737b0412f229e9e26f4d540",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/evaluation/evaluator/base.py",
+      "read_ranges": [
+        [
+          39,
+          109
+        ],
+        [
+          122,
+          205
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/evaluation/evaluator/vlm.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/VLABench/evaluation/evaluator/vlm.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "2d6b7ab160b3731426be99415bda1fa20595466bbcd069c79b0251e59f129035",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/evaluation/evaluator/vlm.py",
+      "read_ranges": [
+        [
+          54,
+          110
+        ],
+        [
+          233,
+          279
+        ],
+        [
+          300,
+          325
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "VLABench/evaluation/utils.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/VLABench/evaluation/utils.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "b3dc7d2a9943f0aaed5d2e60db9c5d78c747350fdc4ae19d4dc1953b141544ed",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/VLABench/evaluation/utils.py",
+      "read_ranges": [
+        [
+          7,
+          98
+        ],
+        [
+          148,
+          339
+        ]
+      ]
+    },
+    {
+      "repo": "OpenMOSS/VLABench",
+      "commit": "cf588fe60c0c7282174fe979f5913170cfe69017",
+      "path": "scripts/evaluate_vlm.py",
+      "local_file": "audit/.cache/github_review/repos/OpenMOSS__VLABench/files/scripts/evaluate_vlm.py",
+      "source_manifest": "audit/.cache/github_review/repos/OpenMOSS__VLABench/manifest.json",
+      "sha256": "ea757871aa6d9798ec628b2148dc37a9e6069f168fdb822a5a55697022f80512",
+      "url": "https://raw.githubusercontent.com/OpenMOSS/VLABench/cf588fe60c0c7282174fe979f5913170cfe69017/scripts/evaluate_vlm.py",
+      "read_ranges": [
+        [
+          14,
+          64
+        ]
+      ]
+    }
+  ]
+}

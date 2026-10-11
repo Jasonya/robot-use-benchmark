@@ -1,0 +1,467 @@
+{
+  "paper_id": "P104",
+  "name": "SIMPLER",
+  "title": "Evaluating Real-World Robot Manipulation Policies in Simulation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2405.05941",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P104",
+    "summary": "SIMPLER是實機設定的模擬評測，不是新的實機大資料集；兩種配置為視覺匹配與變體平均。已核對子模組中的done=success及抓取歷史成功規則。",
+    "environment": "Google Robot與WidowX+Bridge的SAPIEN/ManiSkill2實轉模擬設定；背景overlay、紋理、光照、幹擾物等變體是設定，不自動新增語義任務。",
+    "tasks": "抓取、移近、抽屜開關／放物，以及WidowX放置／堆疊等；ENVIRONMENT_MAP把不同罐姿態映射同class＋參數，需保留variant關係。",
+    "data": "reset options指定robot xy/quat和object xy或episode_id；模型輸出world_vector、rot_axangle、gripper、terminate_episode。控制頻率、sim_freq、相機、overlay與subtask推進全部是case協定。",
+    "evaluation": "此釘選子庫get_done=info.success；外層直到模型停止或truncated，保存最後done。抓取可按提起>1cm且無有效外部接觸，或連握5步；開啟episode_stats時曾顯著提起>2cm達5步亦可成功。另以Pearson/MMRV比較模型sim-real表現排序，不是單題完成率。",
+    "standardization": {
+      "profile": "real_to_sim_policy_evaluation",
+      "reuse": "真實setup對應、task alias/config、初態掃描及原生task metrics。",
+      "transform": "case保留視覺匹配/變體平均、variant權重、時間/動作約定；evaluator存瞬間/歷史成功旗標、subtask及固定子庫版本。sim-real correlation另為模型層聚合。",
+      "missing": "完整資產、真實結果配對與不確定性、每變體分母/權重、各task具體checker接線、原生模型執行。"
+    },
+    "version_note": "SimplerEnv main基於CPU ManiSkill2；README另連maniskill3分支。此tree的ManiSkill2_real2sim釘在ef7a4d4；不得替換為最新ManiSkill3後仍稱同設定。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "simpler-env/SimplerEnv",
+        "requested_repo": "simpler-env/SimplerEnv",
+        "commit": "eddb5690749a1e34267807c0f7b5eede323918d7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            64
+          ],
+          [
+            78,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 321,
+        "sha256": "81aaa39d59e41c6b60d6ccdf09c17b1f0ca284ce7cb780b62b908afac6c0dc28",
+        "url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/README.md",
+        "reading_url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/README.md#L1-L64",
+        "why": "兩種實轉模擬協定與ManiSkill2/3版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "simpler-env/SimplerEnv",
+        "requested_repo": "simpler-env/SimplerEnv",
+        "commit": "eddb5690749a1e34267807c0f7b5eede323918d7",
+        "ref": null,
+        "path": "simpler_env/__init__.py",
+        "ranges": [
+          [
+            1,
+            88
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 88,
+        "sha256": "ed5079f2aa8d9c85938f86440195ecdf90c4ee3afebb96b778375aad7cccac25",
+        "url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/simpler_env/__init__.py",
+        "reading_url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/simpler_env/__init__.py#L1-L88",
+        "why": "task alias至環境/參數對映，變體不能按名稱全加",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "simpler-env/SimplerEnv",
+        "requested_repo": "simpler-env/SimplerEnv",
+        "commit": "eddb5690749a1e34267807c0f7b5eede323918d7",
+        "ref": null,
+        "path": "simpler_env/evaluation/maniskill2_evaluator.py",
+        "ranges": [
+          [
+            15,
+            219
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 219,
+        "sha256": "4cd1daeeec8025447979b17d06271bdf218545105e7e6a641ab6c1ff26e758a2",
+        "url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/simpler_env/evaluation/maniskill2_evaluator.py",
+        "reading_url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/simpler_env/evaluation/maniskill2_evaluator.py#L15-L219",
+        "why": "初態掃描、模型/控制輸出、終止與最後成功判定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "simpler-env/SimplerEnv",
+        "requested_repo": "simpler-env/SimplerEnv",
+        "commit": "eddb5690749a1e34267807c0f7b5eede323918d7",
+        "ref": null,
+        "path": "simpler_env/utils/metrics.py",
+        "ranges": [
+          [
+            134,
+            163
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 229,
+        "sha256": "ee8596be6997d41295bf5b25f90c9b5b3ba47ef2bd92296b8c45e7ffc5606dc6",
+        "url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/simpler_env/utils/metrics.py",
+        "reading_url": "https://github.com/simpler-env/SimplerEnv/blob/eddb5690749a1e34267807c0f7b5eede323918d7/simpler_env/utils/metrics.py#L134-L163",
+        "why": "sim-real Pearson及MMRV的模型排序分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "simpler-env/ManiSkill2_real2sim",
+        "requested_repo": "simpler-env/ManiSkill2_real2sim",
+        "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+        "ref": null,
+        "path": "mani_skill2_real2sim/envs/sapien_env.py",
+        "ranges": [
+          [
+            547,
+            582
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 780,
+        "sha256": "7a6bec0915ccd014283a8cd0a2325a0c624e8ebc9f06b05e00e29a4bb86f5d8b",
+        "url": "https://github.com/simpler-env/ManiSkill2_real2sim/blob/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/mani_skill2_real2sim/envs/sapien_env.py",
+        "reading_url": "https://github.com/simpler-env/ManiSkill2_real2sim/blob/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/mani_skill2_real2sim/envs/sapien_env.py#L547-L582",
+        "why": "此版本terminated直接取info.success",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "simpler-env/ManiSkill2_real2sim",
+        "requested_repo": "simpler-env/ManiSkill2_real2sim",
+        "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+        "ref": null,
+        "path": "mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+        "ranges": [
+          [
+            401,
+            461
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 861,
+        "sha256": "c067aa46582a2ad9ced5a360b583221a9be635fab578368a0441685dced1965d",
+        "url": "https://github.com/simpler-env/ManiSkill2_real2sim/blob/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+        "reading_url": "https://github.com/simpler-env/ManiSkill2_real2sim/blob/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py#L401-L461",
+        "why": "提起高度、接觸與歷史5步成功條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "69ee2e42cc4aac568fde533a1bcdd0f27458087a2c04d9881cff2af807958a3c"
+  },
+  "repository_binding_review_sha256": "69ee2e42cc4aac568fde533a1bcdd0f27458087a2c04d9881cff2af807958a3c",
+  "repository_bindings": [
+    {
+      "requested_repo": "simpler-env/ManiSkill2_real2sim",
+      "resolved_repo": "simpler-env/ManiSkill2_real2sim",
+      "aliases_in_this_review": [
+        "simpler-env/maniskill2_real2sim"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+          "reviewed_files": [
+            "mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+            "mani_skill2_real2sim/envs/sapien_env.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P104",
+          "review_file": "content/github_review/reviews/P104.json",
+          "review_sha256": "69ee2e42cc4aac568fde533a1bcdd0f27458087a2c04d9881cff2af807958a3c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "simpler-env/SimplerEnv",
+      "resolved_repo": "simpler-env/SimplerEnv",
+      "aliases_in_this_review": [
+        "simpler-env/simplerenv"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "eddb5690749a1e34267807c0f7b5eede323918d7",
+          "reviewed_files": [
+            "README.md",
+            "simpler_env/__init__.py",
+            "simpler_env/evaluation/maniskill2_evaluator.py",
+            "simpler_env/utils/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/simpler-env/SimplerEnv",
+          "link_label": "Code",
+          "project_url": "https://simpler-env.github.io",
+          "page_sha256": "64d7f47aec883c14e733921c4a19544e0a5a399693a208716be52dfd2146de25"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P104",
+          "review_file": "content/github_review/reviews/P104.json",
+          "review_sha256": "69ee2e42cc4aac568fde533a1bcdd0f27458087a2c04d9881cff2af807958a3c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P104",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SIMPLER，arXiv 2405.05941。",
+    "scope_read": "real-to-sim目標、MMRV/Pearson、兩機體場景、visual matching與主比較。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      18,
+      20
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "轉移與評測有效性",
+    "environment": "2個real robot setups：Google Robot與WidowX/Bridge；4 robot texture版本是視覺補償，不是4個新環境。",
+    "tasks": "Google圖6四組（pick、move-near、open/close drawer、open+place）；WidowX圖7四組放置／堆疊，含grasp子項。原作按group而非唯一語義task計。",
+    "cases": "各task有專用real/sim trial安排；Octo多3policy seeds、Google4texture variants，用來降低評估方差，不作新題總量。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 2,
+        "unit": "real robot setups",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "圖6–7主要task groups",
+        "qualifier": "4+4，drawer開/關合组",
+        "pages": [
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task success；比較sim/real policy排名用Mean Maximum Rank Violation與Pearson r。",
+      "validated subset的相關性不保證所有新domain也有相同sim-real關係。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "train on real、evaluate in sim；visual matching與variant aggregation是不同評測策略。",
+    "lineage": "Google/Bridge真實資料＋SAPIEN，另IsaacSim驗證；ManiSkill3等重用SIMPLER子集。",
+    "related_paper_ids": [
+      "P068"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          6,
+          7,
+          8
+        ],
+        "locator": "§III–VI、圖6–7",
+        "supports": "兩setup、task groups、MMRV與資訊條件"
+      }
+    ],
+    "unresolved": [
+      "每task原生trial manifest未完全匯入，不虛構統一全庫題量。"
+    ],
+    "reuse": "為模擬benchmark有效性提供比較方法；沒有真機資源時只能先做sim範圍，不能宣稱完成sim-real驗證。",
+    "reviewed_pdf_sha256": "6a9481f3c0fc43fa6736e5f5fc8ddb72ebf05aad7dbd0ff31721e4d6bffec9e5",
+    "reviewed_on": "2026-10-02",
+    "name": "SIMPLER",
+    "year": 2024,
+    "title": "Evaluating Real-World Robot Manipulation Policies in Simulation",
+    "source_url": "https://arxiv.org/abs/2405.05941",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P104",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P104",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            18,
+            20
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "Google圖6四組（pick、move-near、open/close drawer、open+place）；WidowX圖7四組放置／堆疊，含grasp子項。原作按group而非唯一語義task計。",
+            "2個real robot setups：Google Robot與WidowX/Bridge；4 robot texture版本是視覺補償，不是4個新環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "6a9481f3c0fc43fa6736e5f5fc8ddb72ebf05aad7dbd0ff31721e4d6bffec9e5"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "6a9481f3c0fc43fa6736e5f5fc8ddb72ebf05aad7dbd0ff31721e4d6bffec9e5",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P104",
+      "name": "SIMPLER",
+      "expected_title": "Evaluating Real-World Robot Manipulation Policies in Simulation",
+      "source_url": "https://arxiv.org/abs/2405.05941",
+      "pdf_url": "https://arxiv.org/pdf/2405.05941",
+      "retrieved_at": "2026-10-02T21:34:13.687849+00:00",
+      "pdf_sha256": "6a9481f3c0fc43fa6736e5f5fc8ddb72ebf05aad7dbd0ff31721e4d6bffec9e5",
+      "text_sha256": "a3bcf8e02e09ed82b362b9664def0fad3e03bf36981781d14770086630262b18",
+      "pdf_bytes": 10090162,
+      "pages": 22,
+      "text_characters": 164133,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2405.05941v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2405.05941v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 2,
+        "unit": "real robot setups",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P104:1",
+        "paper_id": "P104",
+        "benchmark": "SIMPLER",
+        "native_term": "real robot setups",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2405.05941v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2405.05941v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "圖6–7主要task groups",
+        "qualifier": "4+4，drawer開/關合组",
+        "pages": [
+          7,
+          8
+        ],
+        "record_id": "review10:P104:2",
+        "paper_id": "P104",
+        "benchmark": "SIMPLER",
+        "native_term": "圖6–7主要task groups",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2405.05941v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2405.05941v1",
+            "locator": "PDF pp. 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "simpler-env/SimplerEnv",
+    "simpler-env/ManiSkill2_real2sim"
+  ],
+  "external_repositories": []
+}

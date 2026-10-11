@@ -1,0 +1,124 @@
+{
+  "paper_id": "P201",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoSAT已有streaming runner、query helper與正式main-table scorer；標準化時必須保留完整native JSON和effective queryset，單純壓成答案JSONL會丟掉判分資訊。",
+  "reading_order": [
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "原作、Ego4D父來源、1997影片/約4800QA與三種時間推理"
+    },
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "evaluation/README.md",
+      "ranges": [
+        [
+          1,
+          124
+        ]
+      ],
+      "why": "正式輸入、不同prediction flavor與各metric分母"
+    },
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "benchmark_val/runner.py",
+      "ranges": [
+        [
+          196,
+          225
+        ],
+        [
+          520,
+          599
+        ]
+      ],
+      "why": "interval影片裁切、空GT紀錄與source/query身份"
+    },
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "benchmark_val/helper.py",
+      "ranges": [
+        [
+          1992,
+          2018
+        ],
+        [
+          2385,
+          2410
+        ]
+      ],
+      "why": "retrospective/prospective query時間與合法window"
+    },
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "docs/model_guide.md",
+      "ranges": [
+        [
+          58,
+          82
+        ],
+        [
+          143,
+          211
+        ]
+      ],
+      "why": "model adapter契約、time_offset/相對時間與因果取frame模板"
+    },
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "evaluation/metrics.py",
+      "ranges": [
+        [
+          1,
+          61
+        ]
+      ],
+      "why": "零分母None與基本度量"
+    },
+    {
+      "repo": "leiyj23/EgoSAT",
+      "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+      "path": "evaluation/evaluate_main_table.py",
+      "ranges": [
+        [
+          351,
+          388
+        ],
+        [
+          463,
+          597
+        ],
+        [
+          600,
+          722
+        ]
+      ],
+      "why": "完整queryset MCQ、valid-only confidence與state-switch成對分母"
+    }
+  ],
+  "environment": "Ego4D的1997段第一人稱影片、約165h/56場景類型；場景類型不是已取得的56個simulator環境。原始Ego4D影片不在此repo重新分發。",
+  "tasks": "回顧、當下、預測三模式，約4800QA；另有answerability/branchiness/surprise與state-switch probes。group、step、兩probe配對及QA數分開，不從56×3推算task/case量。",
+  "data": "原生GT含video_uid、video_metadata.interval_start/end、samples；helper產effective queryset保留idx/t_eval/t_eval_rel/window/horizon/options/memory。runner只裁整個interval，真正每query可見prefix需由adapter依window執行；共通格式須保存原JSON、token probabilities、queryset references與model flavor。",
+  "evaluation": "MCQ對有效queryset中有GT的題計full denominator，缺/無效回答為錯；缺GT略過。scorer先掃現有prediction文件，所以整份缺失的GT仍需外部expected-case manifest檢查。confidence是有效cand_conf值均值，不能當accuracy或完整校準分數。state-switch需前後兩probe均對，主值用valid pairs，另有total/missing/invalid計數及僅成功pair的after-confidence。",
+  "standardization": {
+    "profile": "causal_egocentric_streaming_qa",
+    "reuse": "真正runner/helper/scorer、合法時間窗口、prediction flavor與透明分子/分母。",
+    "transform": "case保存source/video/interval/query idx與精確clock、options順序和pair ID；central input loader限定可見frame，GT獨立；score保留total/valid/missing和conditional confidence，不丟native payload。",
+    "missing": "完整Ego4D/QA資產與release split、每model相同expected queryset、adapter實際prefix稽核、全文件缺失計分及confidence欄位可用性驗證。"
+  },
+  "version_note": "固定7f65bbb；原作2606.24422。examples/evaluation_fixtures是合成格式例，不記為本庫新增真實評測題或原作模型跑分。本輪未執行模型/API/scorer。",
+  "runtime_executed": false
+}

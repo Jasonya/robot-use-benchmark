@@ -1,0 +1,101 @@
+{
+  "paper_id": "P046",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RULSTM同一倉庫含2019方法、PAMI擴展及EK55/EK100版本；動作前時間窗、資料身份與原生取樣設定須保留。",
+  "reading_order": [
+    {
+      "repo": "fpv-iplab/rulstm",
+      "path": "README.md",
+      "ranges": [
+        [
+          15,
+          94
+        ],
+        [
+          180,
+          229
+        ]
+      ],
+      "why": "核對論文及兩代資料與CSV。",
+      "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab"
+    },
+    {
+      "repo": "fpv-iplab/rulstm",
+      "path": "RULSTM/dataset.py",
+      "ranges": [
+        [
+          23,
+          64
+        ],
+        [
+          110,
+          158
+        ],
+        [
+          184,
+          209
+        ]
+      ],
+      "why": "核對過去和動作內特徵、時間設定與discarded IDs。",
+      "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab"
+    },
+    {
+      "repo": "fpv-iplab/rulstm",
+      "path": "RULSTM/utils.py",
+      "ranges": [
+        [
+          43,
+          96
+        ],
+        [
+          108,
+          155
+        ]
+      ],
+      "why": "核對top-k、macro recall、TTA和官方輸出。",
+      "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab"
+    }
+  ],
+  "environment": "第一人稱影片和特徵LMDB；程式中的env是LMDB讀取環境，不是機器人場景。",
+  "tasks": "動作預測及early recognition；同一標註在多個提前量報分，不等於多個新活動任務。",
+  "data": "CSV含標註ID、video、start/end frame與verb/noun/action；LMDB特徵按frame索引。SequenceDataset設定time_step、fps、sequence_length及action_samples，不足歷史者列入discarded_ids。",
+  "evaluation": "utils.py實作top-k accuracy、逐類平均top-k recall與多時間點結果；TTA使用原生2.0至0.25秒格。EK55/EK100 label space、split及官方JSON需分開。",
+  "standardization": {
+    "profile": "action_anticipation",
+    "reuse": "原生CSV/LMDB欄位、動作映射、時間取樣、排除清單及metrics。",
+    "transform": "保存context截止點、提前量、frame到時間換算及label空間；action_features只在合法協定中暴露。",
+    "missing": "特徵素材閉合、排除樣本分母、父EPIC資料重複及訓練汙染核對。"
+  },
+  "version_note": "現行repo含EK100等後續版本；P046原作EK55設定及後續基線不可合成新資料來源。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "fpv-iplab/rulstm",
+      "path": "README.md",
+      "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+      "sha256": "9da58396b10fff5dae0e5fd2086dc075dbe6d494fb6e2d9e1936272166d9db3a",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/rulstm/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/README.md",
+      "permalink": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/README.md",
+      "local_path": "audit/.cache/github_review/repos/fpv-iplab__rulstm/files/README.md"
+    },
+    {
+      "repo": "fpv-iplab/rulstm",
+      "path": "RULSTM/dataset.py",
+      "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+      "sha256": "ed9afc9f81a852700161ec00cf35398155250613cbb2a11dc1e6d68502fd695d",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/rulstm/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/dataset.py",
+      "permalink": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/dataset.py",
+      "local_path": "audit/.cache/github_review/repos/fpv-iplab__rulstm/files/RULSTM/dataset.py"
+    },
+    {
+      "repo": "fpv-iplab/rulstm",
+      "path": "RULSTM/utils.py",
+      "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+      "sha256": "1b2fd26db8c2c84e7aa248222161a8482cc61a44885dbda6e4e031132a9fe25f",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/rulstm/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/utils.py",
+      "permalink": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/utils.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/fpv-iplab__rulstm/RULSTM/utils.py"
+    }
+  ]
+}

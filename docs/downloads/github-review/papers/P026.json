@@ -1,0 +1,444 @@
+{
+  "paper_id": "P026",
+  "name": "EgoHOS",
+  "title": "Fine-Grained Egocentric Hand-Object Segmentation: Dataset, Model, and Applications",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2208.03826",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P026",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoHOS 是細粒度手物件分割，第一／第二階互動關係和 contact mask 有明確定義。已核讀原生類別、資料配置與實際 MMSegmentation 評分路徑。",
+    "environment": "真實第一人稱影像；來源內明列 train/val/test_indomain/test_outdomain。這裡 domain 指來源分佈測試條件，不直接等於生活用途領域數。",
+    "tasks": "左右手、由左／右／雙手互動的第一階／第二階物件，以及 dense contact。9 個 label IDs 含背景，是畫素類別，不能當 9 個操作任務或物件身份。",
+    "data": "資料夾 image/label/contact，EgoHOSDataset 讀 .jpg 和 .png，classes/palette 固定 0–8。handobj2 config 保留背景（reduce_zero_label=False）、padding ignore=255；test 預設 test_indomain，crop/resize 360×480。",
+    "evaluation": "CustomDataset 預設 mIoU；metrics.py 先套 label map／ignore_index，再累加逐類 intersection、pred、GT、union，算 IoU/Acc，summary 以 nanmean。還支援 Dice/Fscore，但不能由支援函式推定原論文都採用。contact 二值 mask 需用其獨立配置，不與 9-class 平均混算。",
+    "standardization": {
+      "profile": "image_hand_object_segmentation",
+      "reuse": "原生 label/palette、contact 與 split、實際 dataset→metrics 呼叫。",
+      "transform": "case 保留來源影像／split／raw label mask、接觸關係與第一／第二階；畫素座標、resize、ignore=255、背景納入和 nan 規則都進 evaluator profile。手物件分割與物理接觸／抓取成功不同。",
+      "missing": "尚未下載影像、mask、checkpoint 或執行。需取得各 head 配置與來源影片 ID 才能避免跨 split 同源影片；contact 與分階段模型的全部依賴仍須逐配置測試。"
+    },
+    "version_note": "此倉庫內含 MMSegmentation，已釘選其本地版本；不能換成最新版同名套件而不記錄差異。README 中 LaMa／FGVC／homan 等是應用依賴，不是額外 EgoHOS benchmark 來源。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "owenzlz/EgoHOS",
+        "requested_repo": "owenzlz/EgoHOS",
+        "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            111
+          ],
+          [
+            152,
+            200
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 200,
+        "sha256": "c5fd714f892eeb50622b82c8d7340d32316df9db8f90e31c1071e3acdcba46b3",
+        "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/README.md",
+        "reading_url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/README.md#L1-L111",
+        "why": "身份、label schema、四個 split 與模型流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "owenzlz/EgoHOS",
+        "requested_repo": "owenzlz/EgoHOS",
+        "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+        "ref": null,
+        "path": "mmsegmentation/mmseg/datasets/egohos.py",
+        "ranges": [
+          [
+            1,
+            34
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 34,
+        "sha256": "a3a10508b5090aa436a5cfd9d7754250c721bafd5b9b9c754fa4bed19ee4289e",
+        "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/datasets/egohos.py",
+        "reading_url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/datasets/egohos.py#L1-L34",
+        "why": "實際類別／palette 與副檔名",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "owenzlz/EgoHOS",
+        "requested_repo": "owenzlz/EgoHOS",
+        "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+        "ref": null,
+        "path": "mmsegmentation/configs/_base_/datasets/egohos_handobj2.py",
+        "ranges": [
+          [
+            1,
+            59
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 59,
+        "sha256": "6c2f91139bf90561fbd7188ead310813d2beb37a61faf950a09f4c2d3794d5b3",
+        "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/configs/_base_/datasets/egohos_handobj2.py",
+        "reading_url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/configs/_base_/datasets/egohos_handobj2.py#L1-L59",
+        "why": "背景、ignore 與 split 配置",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "owenzlz/EgoHOS",
+        "requested_repo": "owenzlz/EgoHOS",
+        "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+        "ref": null,
+        "path": "mmsegmentation/mmseg/datasets/custom.py",
+        "ranges": [
+          [
+            85,
+            93
+          ],
+          [
+            384,
+            392
+          ],
+          [
+            419,
+            427
+          ],
+          [
+            439,
+            447
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 487,
+        "sha256": "58aeb8b22ce231c2dda7f5fc88787a4cccbbc813f75937677d5780daca518b83",
+        "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/datasets/custom.py",
+        "reading_url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/datasets/custom.py#L85-L93",
+        "why": "實際 mIoU 呼叫與 nanmean 聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "owenzlz/EgoHOS",
+        "requested_repo": "owenzlz/EgoHOS",
+        "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+        "ref": null,
+        "path": "mmsegmentation/mmseg/core/evaluation/metrics.py",
+        "ranges": [
+          [
+            55,
+            103
+          ],
+          [
+            348,
+            395
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 395,
+        "sha256": "d9687f205e37a1fac1970419b5d41e20ae2d61cf34f15fca5f604f1ae91040b0",
+        "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/core/evaluation/metrics.py",
+        "reading_url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/core/evaluation/metrics.py#L55-L103",
+        "why": "畫素計數與 IoU/Dice/F 定義",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f56de731fb9761d022a426ced8a05d5b8539a78bb5d7429e8a3888632f473d3e"
+  },
+  "repository_binding_review_sha256": "f56de731fb9761d022a426ced8a05d5b8539a78bb5d7429e8a3888632f473d3e",
+  "repository_bindings": [
+    {
+      "requested_repo": "owenzlz/EgoHOS",
+      "resolved_repo": "owenzlz/EgoHOS",
+      "aliases_in_this_review": [
+        "owenzlz/egohos"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+          "reviewed_files": [
+            "README.md",
+            "mmsegmentation/configs/_base_/datasets/egohos_handobj2.py",
+            "mmsegmentation/mmseg/core/evaluation/metrics.py",
+            "mmsegmentation/mmseg/datasets/custom.py",
+            "mmsegmentation/mmseg/datasets/egohos.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/owenzlz/EgoHOS",
+          "pdf_page": 1,
+          "pdf_sha256": "94b61333b3477ef582a94281cc28852c750d6fbe096ddfe90c9434ca39101f07",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P026",
+          "review_file": "content/github_review/reviews/P026.json",
+          "review_sha256": "f56de731fb9761d022a426ced8a05d5b8539a78bb5d7429e8a3888632f473d3e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P026",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoHOS，arXiv 2208.03826v1。",
+    "scope_read": "來源、手物標籤定義、OOD測試與主要分割評估。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "Ego4D、EPIC、THU-READ及自錄GoPro多來源；無共同scene ID總數。",
+    "tasks": "左／右手、左／右／雙手接觸物分割；直接／間接接觸有標註，但本文主要評估直接接觸。",
+    "cases": "原作總量11,243影像；OOD另500影格來自30個YouTube影片，主分割實驗預設在此測試。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 11243,
+        "unit": "分割標註影像",
+        "pages": [
+          1,
+          5,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "OOD test影像",
+        "pages": [
+          2,
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "mIoU；binary hand、left/right hand、hand+arm、held-object等標籤定義分開比較。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "以原作validation選checkpoint，500-image OOD為另列測試；不能把源影片數當測試題數。",
+    "lineage": "直接重用Ego4D、EPIC影格；跨庫去重需frame時間戳。",
+    "related_paper_ids": [
+      "P009",
+      "P010",
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§3、表1",
+        "supports": "資料與標籤"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "§6",
+        "supports": "500 OOD影格及mIoU"
+      }
+    ],
+    "unresolved": [
+      "正文来源分量7,458+2,121+806+350未加總為11,243；subjects/activity的表格與敘述亦互換，暫不採這兩項總数。"
+    ],
+    "reuse": "可作接觸判定與視覺狀態監督；11,243不是11,243項可執行操作。",
+    "reviewed_pdf_sha256": "94b61333b3477ef582a94281cc28852c750d6fbe096ddfe90c9434ca39101f07",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoHOS",
+    "year": 2022,
+    "title": "Fine-Grained Egocentric Hand-Object Segmentation: Dataset, Model, and Applications",
+    "source_url": "https://arxiv.org/abs/2208.03826",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P026",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P026",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            9,
+            10,
+            12
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "左／右手、左／右／雙手接觸物分割；直接／間接接觸有標註，但本文主要評估直接接觸。",
+            "Ego4D、EPIC、THU-READ及自錄GoPro多來源；無共同scene ID總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "94b61333b3477ef582a94281cc28852c750d6fbe096ddfe90c9434ca39101f07"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "94b61333b3477ef582a94281cc28852c750d6fbe096ddfe90c9434ca39101f07",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P026",
+      "name": "EgoHOS",
+      "expected_title": "Fine-Grained Egocentric Hand-Object Segmentation: Dataset, Model, and Applications",
+      "source_url": "https://arxiv.org/abs/2208.03826",
+      "pdf_url": "https://arxiv.org/pdf/2208.03826",
+      "retrieved_at": "2026-10-02T21:33:30.268959+00:00",
+      "pdf_sha256": "94b61333b3477ef582a94281cc28852c750d6fbe096ddfe90c9434ca39101f07",
+      "text_sha256": "71312543ce113223106aca80dc1edd15933dedf6bb8ca1e3e74394334daef28a",
+      "pdf_bytes": 24109754,
+      "pages": 25,
+      "text_characters": 69746,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2208.03826v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2208.03826v1"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 11243,
+        "unit": "分割標註影像",
+        "pages": [
+          1,
+          5,
+          6
+        ],
+        "record_id": "review10:P026:1",
+        "paper_id": "P026",
+        "benchmark": "EgoHOS",
+        "native_term": "分割標註影像",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2208.03826v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2208.03826v1",
+            "locator": "PDF pp. 1, 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "OOD test影像",
+        "pages": [
+          2,
+          9
+        ],
+        "record_id": "review10:P026:2",
+        "paper_id": "P026",
+        "benchmark": "EgoHOS",
+        "native_term": "OOD test影像",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2208.03826v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2208.03826v1",
+            "locator": "PDF pp. 2, 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "owenzlz/EgoHOS"
+  ],
+  "external_repositories": []
+}

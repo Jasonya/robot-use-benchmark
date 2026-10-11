@@ -1,0 +1,833 @@
+{
+  "paper_id": "P224",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已追完EMPIRE的index/episode reader、30→12FPS取樣、混合MANO動作表示及best-of-8 joint scorer。公開庫有核心程式，但EMPIRE-651K資料與前處理明示尚未發布；650,910訓練視窗與111活動標籤為論文數字，未由實際dataset逐筆驗證。",
+  "identity_note": "arXiv:2608.22449v1，Wen Wang、Ruibing Hou、Hong Chang、Shiguang Shan、Xilin Chen，EMPIRE: Explicit Manipulation Planning as a Learnable Intermediate Representation for Egocentric Hand-Motion Forecasting。PDF第1頁直接連wangwen-banban/EMPIRE，README題名/arXiv一致。VITRA為程式與資料格式基礎，EgoDex為母資料，Being-H0為比較baseline，三者不能另算本篇新資料。",
+  "environment": "EgoDex/Apple Vision Pro的人類桌面操作第一人稱影片，RGB、相機內外參、雙手追蹤骨架轉MANO、task caption與per-hand plan。reader在query frame的camera座標表示整段未來姿態；公開FrameDataset只支援human，不提供robot互動環境。",
+  "tasks": "從current RGB、初始雙手狀態與caption生成操作plan，再預測雙手未來motion；plan描述不是可執行robot技能。論文650,910個5秒train windows、6,836個test windows、111個活動標籤需分開計數。Part1 ablation另以訓練任務重疊定義26 seen tasks/1,247 windows與85 unseen tasks/5,589 windows；並非全五partition訓練的預設unseen切分。task summary從episode名稱或obj_class/video_name解析label，再對指定training annotation snapshot比對，沒有封閉111-task registry。",
+  "data": "preferred layout為dataset/episode_frame_index.npz（index_frame_pair[N,2]=episode_index/frame_index、index_to_episode_id[E]）、episodic_annotations/id.npy及statistics.json；legacy .npy字典/processed_episodes_vitra_format也可讀。episode含video_name、video_decode_frame、intrinsics、extrinsics及left/right的beta、kept_frames、global_orient_worldspace、transl_worldspace、hand_pose、joints_worldspace、text/anno_type；caption→instruction、plan→cot只是alias。標準設定source_fps=30、target_fps=12，step=2.5，以np.rint取整，並可依此過濾index rows；future=59建立含current的60個window位置，再取next-state而產生60個未來action。OOB雖clip索引，但被mask剔除，60個slots不保證60個有效影格。text範圍採[start,end)，plan匹配卻允許end且取最近範圍。每hand51維為逐步腕平移m、腕旋轉xyz Euler-radians及下一步絕對15×3手指Euler；use_rel=false仍保留腕部relative分量。兩手102維action補到288；原state122維含betas，padding移除betas後補到296。predicted plan ABI為schema_version=1.0、plans[episode_id:frame_index]，主StageII配置明確讀該sidecar。",
+  "evaluation": "run_full_eval預設REPEAT_TIMES=8、ONLINE_PLAN=1、save_repeated_samples；model config為flow matching 4步。eval_mse先依mask選正規化動作MSE最小者，分母為有效action scalar數，這不是論文MPJPE。compute_egodex_metrics優先讀sampled_actions[N,K,T,D]，逐候選反正規化並recon_traj：累加腕平移、左乘腕旋轉、手指使用絕對角，再以MANO重建21關節；beta固定0、左手套軸修正，剔除初始state，只評未來。mask為hand/frame有效性，非獨立joint可見性。每window MPJPE=全部有效hand-frame之21-joint Euclidean均值；等價分母21×有效hand-frame數。選該MPJPE最小的同一候選來算wrist joint0與finger-relative（扣wrist後只取其餘20關節），不可各指標另挑best。FDE為每個有GT手最後有效frame的joint均值，再對手平均。最終對非NaN windows的metric等權nanmean，再m×1000轉mm；num_samples仍包含無有效手而為NaN的records，須另報有效分母。若NPZ沒有sampled_actions，scorer把pred_actions當K=1，無法恢復best-of-8。shard merge按sample_positions排序並檢查連續性；task summary再分組，並不將總分改成task-macro平均。",
+  "standardization": {
+    "profile": "offline_bimanual_parametric_motion_with_plan_conditioning",
+    "reuse": "重用versioned schema/resolver、canonical sample ID、plan sidecar、FPS/mask邏輯、MANO adapter、step重建、best-of-K MPJPE與task provenance摘要；保留EgoDex/VITRA lineage。",
+    "transform": "分開source/domain/environment/task/window/evaluator；case鍵為dataset revision+episode_id+frame_index，保存source/video/target FPS及np.rint後實際indices。將51維混合action、102有效維、288/296 padding及mean/std明確分層；保留anchor-camera與xyz-radians、公尺/mm轉換。evaluator保存K、4步設定、全部sampled_actions、選中best_k、21/20 joint定義、每window有效hand-frame及NaN分母。",
+    "missing": "未發布的index/episodes、骨架→MANO擬合與caption/plan前處理、資料/統計/sidecar/weights/MANO資產尚未閉合；不能驗證650,910/6,836筆或真正split無洩漏。需核對eval dataset statistics.json與scorer STATISTICS_PATH均使用對應training normalization，避免反正規化版本不同。須鎖定ONLINE_PLAN、各shard皆保留sampled_actions、真正K與完整case coverage；資料格式稱HF-compatible不代表已確認HF dataset repo/revision。"
+  },
+  "version_note": "固定commit bea74bb146baa750b02f291754cafd5ed6cd0bfe。標準StageII配置與predicted_plan ablation使用預測plan；ground_truth_plan另列。直接執行eval_mse的預設K=5、COT_GENERATE_THEN_CONDITION=0，可能使用GT plan suffix；正式shell才設定K=8與online生成，因此兩入口不可混同。online分支重讀raw image/coarse instruction而不用GT suffix，但資料載入仍依賴reference-plan存在；不能宣稱是完全無標註部署封裝。所有內容僅靜態核讀，未執行資料前處理、模型、MANO或評測。",
+  "discovery_evidence": [
+    {
+      "kind": "cached_primary_paper",
+      "url": "https://arxiv.org/pdf/2608.22449",
+      "pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03",
+      "local_file": "audit/.cache/fulltext_review/P224/pages.json",
+      "sha256": "f9bf7343b538d684bd24510223a7e08ef0bd2f3d41ebfd005637fcf249996f53",
+      "json_pointers": [
+        "/0/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/10/text"
+      ],
+      "finding": "確認repo身份、EMPIRE-651K原始粒度、split/60-step/K=8/4-step及joint指標；論文數字未當成已下載核驗樣本。"
+    }
+  ],
+  "reading_order": [
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/README.md",
+      "sha256": "81516f1f216ae4f0e117a70d89dad1b523aa48f8ec574b9f4f90d73b3605fcb4",
+      "ranges": [
+        [
+          1,
+          22
+        ],
+        [
+          35,
+          50
+        ],
+        [
+          84,
+          117
+        ]
+      ],
+      "why": "確認精確論文、dataset coming soon、VITRA依存與正式eval鏈。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/README.md",
+      "git_blob_sha": "7bbc088c787ac076ff16cb21f615c8d0105559b4"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "docs/DATA_SCHEMA.md",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/docs/DATA_SCHEMA.md",
+      "sha256": "c9a1dd24e1e06f9f074908887786e984ec6462a27994b0832d7ef016d9417300",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "核對index/episode/plan ABI，明確區分runtime格式與未發布dataset/preprocessing。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/docs/DATA_SCHEMA.md",
+      "git_blob_sha": "22fef38139022fde70c742406a3237c7a810abf9"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/schema.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/empire/datasets/schema.py",
+      "sha256": "c100a4c8f97863b604e4da4063a68b048635d7abb4fb791c3274f4875ef26321",
+      "ranges": [
+        [
+          25,
+          158
+        ],
+        [
+          164,
+          195
+        ],
+        [
+          198,
+          264
+        ]
+      ],
+      "why": "讀preferred/legacy resolver、index形狀、caption/plan別名、canonical sample ID與sidecar驗證。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/schema.py",
+      "git_blob_sha": "8631b4e1b3ab54f98e79432331daa890ea9e4ac3"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/configs/train_stage2_actor.json",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/configs/train_stage2_actor.json",
+      "sha256": "ac27854ed0147ba3bebb74dbcf00febf7c8b9b4c4536bee9a2ea04ef2bec1cb9",
+      "ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "why": "固定predicted-plan條件、60步、30→12FPS、8次sample及4-step flow matching設定。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/train_stage2_actor.json",
+      "git_blob_sha": "6c2fc4b1baaf0496217143a058a712bebb8dc9db"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/configs/ablations/ground_truth_plan.json",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/configs/ablations/ground_truth_plan.json",
+      "sha256": "04d41e5c87aa30c19b3143167fcdf08011efb903f0704ad5b5265770a954c2cd",
+      "ranges": [
+        [
+          1,
+          108
+        ]
+      ],
+      "why": "核對GT-plan ablation與預設sidecar條件的差別。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/ground_truth_plan.json",
+      "git_blob_sha": "21fe6476b52f182459126ec1456f5de4f7b41d03"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/configs/ablations/predicted_plan.json",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/configs/ablations/predicted_plan.json",
+      "sha256": "b3f484b8a3bd60fb00005719065db45d13d1707eb6018af070a21310cd620058",
+      "ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "why": "核對明確的predicted plan來源與sidecar路徑。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/predicted_plan.json",
+      "git_blob_sha": "956626f1c1767b26d56aa10c6271230d6cd9ce8b"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/data_mixture.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/datasets/data_mixture.py",
+      "sha256": "84be47f05914fa201d821a0f639014ff140b1a7b57102fa5547fabb86a297d60",
+      "ranges": [
+        [
+          1,
+          7
+        ]
+      ],
+      "why": "empire_train只是一個具名dataset mixture，沒有111個task registry。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/data_mixture.py",
+      "git_blob_sha": "a233fdcb5e62abfcd19a5ddddb8c4daa4f1adef8"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/empire/datasets/dataset.py",
+      "sha256": "5b7871619c71b8ccec42e1c05b9804b4209c268e1375d3e2e4fab08366fcd1f1",
+      "ranges": [
+        [
+          30,
+          219
+        ],
+        [
+          219,
+          259
+        ],
+        [
+          268,
+          340
+        ]
+      ],
+      "why": "追到EpisodicDatasetCore/EvalDataset、plan選擇、suffix資料及model tensor欄位。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/dataset.py",
+      "git_blob_sha": "496333a2b89fedc02d21c6e2d9bf1c55e8808156"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/human_dataset.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/empire/datasets/human_dataset.py",
+      "sha256": "51ad5b2da580cf3a641c63695e50c1ad1685a5a68ead36aa0c4cb658996216a4",
+      "ranges": [
+        [
+          48,
+          123
+        ],
+        [
+          169,
+          283
+        ],
+        [
+          345,
+          439
+        ],
+        [
+          536,
+          597
+        ],
+        [
+          639,
+          661
+        ],
+        [
+          731,
+          787
+        ],
+        [
+          791,
+          842
+        ],
+        [
+          873,
+          947
+        ],
+        [
+          1040,
+          1202
+        ],
+        [
+          1283,
+          1406
+        ],
+        [
+          1430,
+          1558
+        ],
+        [
+          1596,
+          1686
+        ],
+        [
+          1681,
+          1750
+        ],
+        [
+          1850,
+          1899
+        ]
+      ],
+      "why": "核讀FPS推斷/取樣、anchor-camera轉換、有效mask、相對腕/絕對finger混合表示、padding及evaluation同約定。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/human_dataset.py",
+      "git_blob_sha": "afde5c044b80bb81043c37f14c38ab25c469a306"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/utils/data_utils.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/utils/data_utils.py",
+      "sha256": "63f2b65253b7c5dfe52eca7d980f680685549e08e0cd63f3118cb046d61a1b1a",
+      "ranges": [
+        [
+          268,
+          408
+        ],
+        [
+          462,
+          539
+        ]
+      ],
+      "why": "追到mean/std正規化及實際step-wise wrist/pose重建，不能把latent MSE當MPJPE。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/utils/data_utils.py",
+      "git_blob_sha": "21c0a827d1c4383bd7d0630f40746581d85f7d36"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/run_full_eval.sh",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/scripts/run_full_eval.sh",
+      "sha256": "79e20432a8c2c14ccda3c40e7f08f013963f344ee01cfb31f2f67c22ab772f24",
+      "ranges": [
+        [
+          1,
+          106
+        ]
+      ],
+      "why": "正式入口預設K=8、online plan、保留全部sample、merge→joint metric→task summary。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/run_full_eval.sh",
+      "git_blob_sha": "a5aba656ade6ce774e085cc389d15d3a62251e9a"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/eval_mse.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/eval_mse.py",
+      "sha256": "66524a3f9fb841c67319e2e3750932620d2bc04c1c9307959ec0fe83333b5d90",
+      "ranges": [
+        [
+          21,
+          116
+        ],
+        [
+          152,
+          190
+        ],
+        [
+          192,
+          274
+        ],
+        [
+          275,
+          391
+        ],
+        [
+          379,
+          444
+        ],
+        [
+          450,
+          583
+        ]
+      ],
+      "why": "核對K預算、GT-plan/online分支、MSE預選與sampled_actions/UID/FPS輸出。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/eval_mse.py",
+      "git_blob_sha": "56485ac97fa9857197c350741cd362d2035b0841"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/merge_eval_shards.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/merge_eval_shards.py",
+      "sha256": "b67de594d0a855ff146a3bca87385dde07d38eed096d37ba47189cd453da9fb0",
+      "ranges": [
+        [
+          1,
+          56
+        ]
+      ],
+      "why": "確認按sample_positions排序及連續性檢查；欄位只取各shard交集。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/merge_eval_shards.py",
+      "git_blob_sha": "33e6d1cf10345859a17d960c746d63a86e3c8656"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/egodex_eval_utils.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/egodex_eval_utils.py",
+      "sha256": "f9aa07d3d76a078fc36e811b949a6ccde9f7d85c598c1c12d0195b5ff9925a32",
+      "ranges": [
+        [
+          19,
+          74
+        ],
+        [
+          157,
+          190
+        ],
+        [
+          192,
+          289
+        ],
+        [
+          291,
+          307
+        ]
+      ],
+      "why": "重建左右手21關節、beta=0、左手chirality、初始frame剔除及mask。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/egodex_eval_utils.py",
+      "git_blob_sha": "3e325c344e43e91b4246d43246a7d204f1a518e1"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/models/mano.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/models/mano.py",
+      "sha256": "eaf3e256daf9ad1ec579ed31f103f698fff4370cb0e7f49a1206f78fb6ef216f",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "why": "確認SMPL-X MANO補五個指尖並轉OpenPose 21-joint順序。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/models/mano.py",
+      "git_blob_sha": "431311c32b5d3b4a1dbcb5b6826a221743f5f763"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/compute_egodex_metrics.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/compute_egodex_metrics.py",
+      "sha256": "4f3aa41581425dcc527c947f55282c3183d609bcb9172313663246fb1ff24b27",
+      "ranges": [
+        [
+          1,
+          406
+        ]
+      ],
+      "why": "完整核讀具體joint scorer：per-hand有效frame、best MPJPE、wrist/finger-relative/FDE、NaN與window平均。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/compute_egodex_metrics.py",
+      "git_blob_sha": "8a12ae5444220590371420ffdf161ccb4816913a"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/summarize_egodex_all_tasks.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/summarize_egodex_all_tasks.py",
+      "sha256": "1f884ad61fba268cf50ddf1f8630780c5beb67059620f66fd92cc88796ac91ef",
+      "ranges": [
+        [
+          1,
+          98
+        ],
+        [
+          157,
+          238
+        ]
+      ],
+      "why": "核對task解析、training snapshot定義seen/unseen及episode/raw-file/window各自計數。",
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/summarize_egodex_all_tasks.py",
+      "git_blob_sha": "340f107adff15aaa3a0725bc968bce77a62ad706"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/README.md",
+      "sha256": "81516f1f216ae4f0e117a70d89dad1b523aa48f8ec574b9f4f90d73b3605fcb4",
+      "ranges": [
+        [
+          1,
+          22
+        ],
+        [
+          35,
+          50
+        ],
+        [
+          84,
+          117
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/README.md",
+      "git_blob_sha": "7bbc088c787ac076ff16cb21f615c8d0105559b4"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "docs/DATA_SCHEMA.md",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/docs/DATA_SCHEMA.md",
+      "sha256": "c9a1dd24e1e06f9f074908887786e984ec6462a27994b0832d7ef016d9417300",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/docs/DATA_SCHEMA.md",
+      "git_blob_sha": "22fef38139022fde70c742406a3237c7a810abf9"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/schema.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/empire/datasets/schema.py",
+      "sha256": "c100a4c8f97863b604e4da4063a68b048635d7abb4fb791c3274f4875ef26321",
+      "ranges": [
+        [
+          25,
+          158
+        ],
+        [
+          164,
+          195
+        ],
+        [
+          198,
+          264
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/schema.py",
+      "git_blob_sha": "8631b4e1b3ab54f98e79432331daa890ea9e4ac3"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/configs/train_stage2_actor.json",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/configs/train_stage2_actor.json",
+      "sha256": "ac27854ed0147ba3bebb74dbcf00febf7c8b9b4c4536bee9a2ea04ef2bec1cb9",
+      "ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/train_stage2_actor.json",
+      "git_blob_sha": "6c2fc4b1baaf0496217143a058a712bebb8dc9db"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/configs/ablations/ground_truth_plan.json",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/configs/ablations/ground_truth_plan.json",
+      "sha256": "04d41e5c87aa30c19b3143167fcdf08011efb903f0704ad5b5265770a954c2cd",
+      "ranges": [
+        [
+          1,
+          108
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/ground_truth_plan.json",
+      "git_blob_sha": "21fe6476b52f182459126ec1456f5de4f7b41d03"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/configs/ablations/predicted_plan.json",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/configs/ablations/predicted_plan.json",
+      "sha256": "b3f484b8a3bd60fb00005719065db45d13d1707eb6018af070a21310cd620058",
+      "ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/predicted_plan.json",
+      "git_blob_sha": "956626f1c1767b26d56aa10c6271230d6cd9ce8b"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/data_mixture.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/datasets/data_mixture.py",
+      "sha256": "84be47f05914fa201d821a0f639014ff140b1a7b57102fa5547fabb86a297d60",
+      "ranges": [
+        [
+          1,
+          7
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/data_mixture.py",
+      "git_blob_sha": "a233fdcb5e62abfcd19a5ddddb8c4daa4f1adef8"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/empire/datasets/dataset.py",
+      "sha256": "5b7871619c71b8ccec42e1c05b9804b4209c268e1375d3e2e4fab08366fcd1f1",
+      "ranges": [
+        [
+          30,
+          219
+        ],
+        [
+          219,
+          259
+        ],
+        [
+          268,
+          340
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/dataset.py",
+      "git_blob_sha": "496333a2b89fedc02d21c6e2d9bf1c55e8808156"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/datasets/human_dataset.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/empire/datasets/human_dataset.py",
+      "sha256": "51ad5b2da580cf3a641c63695e50c1ad1685a5a68ead36aa0c4cb658996216a4",
+      "ranges": [
+        [
+          48,
+          123
+        ],
+        [
+          169,
+          283
+        ],
+        [
+          345,
+          439
+        ],
+        [
+          536,
+          597
+        ],
+        [
+          639,
+          661
+        ],
+        [
+          731,
+          787
+        ],
+        [
+          791,
+          842
+        ],
+        [
+          873,
+          947
+        ],
+        [
+          1040,
+          1202
+        ],
+        [
+          1283,
+          1406
+        ],
+        [
+          1430,
+          1558
+        ],
+        [
+          1596,
+          1686
+        ],
+        [
+          1681,
+          1750
+        ],
+        [
+          1850,
+          1899
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/human_dataset.py",
+      "git_blob_sha": "afde5c044b80bb81043c37f14c38ab25c469a306"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/utils/data_utils.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/utils/data_utils.py",
+      "sha256": "63f2b65253b7c5dfe52eca7d980f680685549e08e0cd63f3118cb046d61a1b1a",
+      "ranges": [
+        [
+          268,
+          408
+        ],
+        [
+          462,
+          539
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/utils/data_utils.py",
+      "git_blob_sha": "21c0a827d1c4383bd7d0630f40746581d85f7d36"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/run_full_eval.sh",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/scripts/run_full_eval.sh",
+      "sha256": "79e20432a8c2c14ccda3c40e7f08f013963f344ee01cfb31f2f67c22ab772f24",
+      "ranges": [
+        [
+          1,
+          106
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/run_full_eval.sh",
+      "git_blob_sha": "a5aba656ade6ce774e085cc389d15d3a62251e9a"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/eval_mse.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/eval_mse.py",
+      "sha256": "66524a3f9fb841c67319e2e3750932620d2bc04c1c9307959ec0fe83333b5d90",
+      "ranges": [
+        [
+          21,
+          116
+        ],
+        [
+          152,
+          190
+        ],
+        [
+          192,
+          274
+        ],
+        [
+          275,
+          391
+        ],
+        [
+          379,
+          444
+        ],
+        [
+          450,
+          583
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/eval_mse.py",
+      "git_blob_sha": "56485ac97fa9857197c350741cd362d2035b0841"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/merge_eval_shards.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/merge_eval_shards.py",
+      "sha256": "b67de594d0a855ff146a3bca87385dde07d38eed096d37ba47189cd453da9fb0",
+      "ranges": [
+        [
+          1,
+          56
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/merge_eval_shards.py",
+      "git_blob_sha": "33e6d1cf10345859a17d960c746d63a86e3c8656"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/egodex_eval_utils.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/egodex_eval_utils.py",
+      "sha256": "f9aa07d3d76a078fc36e811b949a6ccde9f7d85c598c1c12d0195b5ff9925a32",
+      "ranges": [
+        [
+          19,
+          74
+        ],
+        [
+          157,
+          190
+        ],
+        [
+          192,
+          289
+        ],
+        [
+          291,
+          307
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/egodex_eval_utils.py",
+      "git_blob_sha": "3e325c344e43e91b4246d43246a7d204f1a518e1"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "empire/models/mano.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/wangwen-banban__EMPIRE/empire/models/mano.py",
+      "sha256": "eaf3e256daf9ad1ec579ed31f103f698fff4370cb0e7f49a1206f78fb6ef216f",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/models/mano.py",
+      "git_blob_sha": "431311c32b5d3b4a1dbcb5b6826a221743f5f763"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/compute_egodex_metrics.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/compute_egodex_metrics.py",
+      "sha256": "4f3aa41581425dcc527c947f55282c3183d609bcb9172313663246fb1ff24b27",
+      "ranges": [
+        [
+          1,
+          406
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/compute_egodex_metrics.py",
+      "git_blob_sha": "8a12ae5444220590371420ffdf161ccb4816913a"
+    },
+    {
+      "provider": "github",
+      "repo": "wangwen-banban/EMPIRE",
+      "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+      "path": "scripts/summarize_egodex_all_tasks.py",
+      "local_file": "audit/.cache/github_review/repos/wangwen-banban__EMPIRE/files/scripts/summarize_egodex_all_tasks.py",
+      "sha256": "1f884ad61fba268cf50ddf1f8630780c5beb67059620f66fd92cc88796ac91ef",
+      "ranges": [
+        [
+          1,
+          98
+        ],
+        [
+          157,
+          238
+        ]
+      ],
+      "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/summarize_egodex_all_tasks.py",
+      "git_blob_sha": "340f107adff15aaa3a0725bc968bce77a62ad706"
+    }
+  ],
+  "runtime_executed": false
+}

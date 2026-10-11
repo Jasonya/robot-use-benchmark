@@ -1,0 +1,507 @@
+{
+  "paper_id": "P004",
+  "name": "CrossTask",
+  "title": "Cross-task weakly supervised learning from instructional videos",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1903.08225",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "craft",
+    "transport"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P004",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "CrossTask 的核心是從教學影片定位有順序的步驟。18 個 primary tasks 有時段標註；65 個 related tasks 用於跨任務學習，不能全部當成同樣有答案的評測題。",
+    "environment": "教學影片來源；沒有互動場景清單。",
+    "tasks": "原生人類活動包含有序 step descriptions；primary 與 related 任務資格需保留。",
+    "data": "tasks 檔、task/video/URL CSV、每影片特徵 NumPy、敘述限制 CSV 及逐步時間標註。read_assignment 對 start floor、end ceil 並使用半開時段。",
+    "evaluation": "train.py 的 eval 以 DP 產生步驟指派；get_recalls 按有 GT 的步驟計匹配，再以 task 平均。這是步驟定位召回，不是整個程序的物理完成率。",
+    "standardization": {
+      "profile": "human_procedure_and_temporal_labels",
+      "reuse": "83個原生活動 ID、primary/related 資格、步驟順序、影片與時間標註、原作 recall 邏輯。",
+      "transform": "原始秒數與衍生時間格分欄；固定影片分割與隨機分割種子。人類活動、定位 case 和模型重跑分開計數。",
+      "missing": "完整來源素材及標註包、當前依賴環境重現、本庫 split 血緣核對與 evaluator 接線。"
+    },
+    "version_note": "公開程式的版本已固定；README 的外部下載與舊依賴尚未作完整可執行重現。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "DmZhukov/CrossTask",
+        "requested_repo": "DmZhukov/CrossTask",
+        "commit": "9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            54
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 54,
+        "sha256": "0a10cf465a0920395728ea9e484a05b39a69b010567b5fffec663df7aa2703d8",
+        "url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/README.md",
+        "reading_url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/README.md#L1-L54",
+        "why": "先分清83活動、18/65子集、外部資料包和1秒特徵時間格。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DmZhukov/CrossTask",
+        "requested_repo": "DmZhukov/CrossTask",
+        "commit": "9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5",
+        "ref": null,
+        "path": "data.py",
+        "ranges": [
+          [
+            1,
+            109
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "4cc5bf3a0caccad512c34e8232cda633fef2ad5ee40b41e6645a349d22432ea9",
+        "url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/data.py",
+        "reading_url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/data.py#L1-L109",
+        "why": "讀 task/step 列表、影片 CSV、時間邊界轉成指派矩陣及 train/test 分割。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DmZhukov/CrossTask",
+        "requested_repo": "DmZhukov/CrossTask",
+        "commit": "9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5",
+        "ref": null,
+        "path": "train.py",
+        "ranges": [
+          [
+            1,
+            85
+          ],
+          [
+            144,
+            182
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 182,
+        "sha256": "7821269c9383634ff6092f0ca0a71a3d9172bc1f95489f1987dee39a22556dee",
+        "url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/train.py",
+        "reading_url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/train.py#L1-L85",
+        "why": "找到 get_recalls 與 eval，核對可用 GT 子集及逐 task 平均方式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DmZhukov/CrossTask",
+        "requested_repo": "DmZhukov/CrossTask",
+        "commit": "9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5",
+        "ref": null,
+        "path": "dp.pyx",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 72,
+        "sha256": "80ae8fe34a98281d865736d30cf03b0e8feddaff5630b090e4d400a5a249d699",
+        "url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/dp.pyx",
+        "reading_url": "https://github.com/DmZhukov/CrossTask/blob/9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5/dp.pyx#L1-L72",
+        "why": "確認順序限制與 exactly_one 的動態規劃指派，這會影響輸出與評分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "eb2454a991f2279f2dfcd97c3eeebb4e056ae3969413a852f810057b49256c17"
+  },
+  "repository_binding_review_sha256": "eb2454a991f2279f2dfcd97c3eeebb4e056ae3969413a852f810057b49256c17",
+  "repository_bindings": [
+    {
+      "requested_repo": "DmZhukov/CrossTask",
+      "resolved_repo": "DmZhukov/CrossTask",
+      "aliases_in_this_review": [
+        "dmzhukov/crosstask"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5",
+          "reviewed_files": [
+            "README.md",
+            "data.py",
+            "dp.pyx",
+            "train.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/DmZhukov/CrossTask",
+          "pdf_page": 2,
+          "pdf_sha256": "1613d28f8d75e86ceedd8b6f2a9c2a4bbf29e5ee8485026bfc7be29826ae7632",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "DmZhukov/CrossTask",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "9e6fdccbce430c27ae2febbc7ad9c4bbf33e00d5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P004",
+          "review_file": "content/github_review/reviews/P004.json",
+          "review_sha256": "eb2454a991f2279f2dfcd97c3eeebb4e056ae3969413a852f810057b49256c17",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "交通移動與車輛維修"
+  ],
+  "source_review": {
+    "paper_id": "P004",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1903.08225v2。",
+    "scope_read": "資料建立、主要／相關任務定義、原作主評測，追讀附錄評分。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      14
+    ],
+    "domains": [
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "交通移動與車輛維修"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "wikiHow程序及YouTube影片；沒有原生物理場景ID總數。",
+    "tasks": "83個程序＝18個主要評測任務＋65個相關支援任務；主實驗不能寫成83個同地位測試任務。",
+    "cases": "約4.7K影片；正文列主要任務212小時、相關任務161小時。每輪主要任務test為1,850影片。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 83,
+        "unit": "全部程序",
+        "pages": [
+          2,
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "主要評測程序",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 65,
+        "unit": "相關訓練程序",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4700,
+        "unit": "影片",
+        "qualifier": "約4.7K",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1850,
+        "unit": "每輪test影片",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "主指標step recall：每步只預測一個位置，落在GT時間段才正確。",
+      "20次隨機切分的平均；附錄另報mAP，不能把附錄指標冒充唯一主指標。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每個主要任務每輪30訓練影片；固定每任務20驗證影片不進train/test；其餘1,850影片測試；重複20次。",
+    "lineage": "wikiHow中篩選程序，YouTube蒐集影片；相關任務篩除以影片重疊判定的近重複。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "資料章與§6.1 Metrics and setup",
+        "supports": "18＋65、test量、step recall及重複切分"
+      },
+      {
+        "pages": [
+          14
+        ],
+        "locator": "附錄評測",
+        "supports": "mAP是補充評分"
+      }
+    ],
+    "unresolved": [
+      "前文376小時與正文212＋161小時口徑不完全一致，暫保留原文各自約數。",
+      "4.7K總量尚未以發布清單精確重算。"
+    ],
+    "reuse": "18個評測程序與65個支援程序分開引入；程序步驟可以映射機器人規格，但影片切分不能直接沿用作實體控制題。",
+    "reviewed_pdf_sha256": "1613d28f8d75e86ceedd8b6f2a9c2a4bbf29e5ee8485026bfc7be29826ae7632",
+    "reviewed_on": "2026-10-02",
+    "name": "CrossTask",
+    "year": 2019,
+    "title": "Cross-task weakly supervised learning from instructional videos",
+    "source_url": "https://arxiv.org/abs/1903.08225",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "food",
+      "craft",
+      "transport"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "交通工具與維修",
+      "工藝與修繕"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "交通移動與車輛維修"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P004",
+      "domain_ids": [
+        "food",
+        "craft",
+        "transport"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P004",
+          "domain_ids": [
+            "food",
+            "craft",
+            "transport"
+          ],
+          "pages": [
+            1,
+            2,
+            5,
+            6,
+            14
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "83個程序＝18個主要評測任務＋65個相關支援任務；主實驗不能寫成83個同地位測試任務。",
+            "wikiHow程序及YouTube影片；沒有原生物理場景ID總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "1613d28f8d75e86ceedd8b6f2a9c2a4bbf29e5ee8485026bfc7be29826ae7632"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "1613d28f8d75e86ceedd8b6f2a9c2a4bbf29e5ee8485026bfc7be29826ae7632",
+      "previous_domain_ids": [
+        "food",
+        "craft",
+        "transport"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P004",
+      "name": "CrossTask",
+      "expected_title": "Cross-task weakly supervised learning from instructional videos",
+      "source_url": "https://arxiv.org/abs/1903.08225",
+      "pdf_url": "https://arxiv.org/pdf/1903.08225",
+      "retrieved_at": "2026-10-02T21:32:53.493596+00:00",
+      "pdf_sha256": "1613d28f8d75e86ceedd8b6f2a9c2a4bbf29e5ee8485026bfc7be29826ae7632",
+      "text_sha256": "e8285c035460e245a7f9317799686b611a93e23022d097e2d64355893aa5a03c",
+      "pdf_bytes": 5367267,
+      "pages": 18,
+      "text_characters": 108557,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1903.08225v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1903.08225v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 83,
+        "unit": "全部程序",
+        "pages": [
+          2,
+          5,
+          6
+        ],
+        "record_id": "review10:P004:1",
+        "paper_id": "P004",
+        "benchmark": "CrossTask",
+        "native_term": "全部程序",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.08225v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.08225v2",
+            "locator": "PDF pp. 2, 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "主要評測程序",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P004:2",
+        "paper_id": "P004",
+        "benchmark": "CrossTask",
+        "native_term": "主要評測程序",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.08225v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.08225v2",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 65,
+        "unit": "相關訓練程序",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P004:3",
+        "paper_id": "P004",
+        "benchmark": "CrossTask",
+        "native_term": "相關訓練程序",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.08225v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.08225v2",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4700,
+        "unit": "影片",
+        "qualifier": "約4.7K",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P004:4",
+        "paper_id": "P004",
+        "benchmark": "CrossTask",
+        "native_term": "影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.08225v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.08225v2",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1850,
+        "unit": "每輪test影片",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P004:5",
+        "paper_id": "P004",
+        "benchmark": "CrossTask",
+        "native_term": "每輪test影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.08225v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.08225v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "DmZhukov/CrossTask"
+  ],
+  "external_repositories": []
+}

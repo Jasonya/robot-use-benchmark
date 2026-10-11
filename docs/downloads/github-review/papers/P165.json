@@ -1,0 +1,589 @@
+{
+  "paper_id": "P165",
+  "name": "LIBERO-Recover",
+  "title": "LIBERO-RECOVER: Beyond Task Success Towards Failure Recovery in Robotic Manipulation Models",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.05178",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "identity_or_version_unresolved",
+  "review": {
+    "paper_id": "P165",
+    "reviewed_on": "2026-10-11",
+    "status": "identity_or_version_unresolved",
+    "summary": "已核讀同名網站與同owner的LIBERO-Recovery評估庫，但目前程式的人工XY擾動協定與論文「自然執行失敗」不同；不能直接當作論文完整release。",
+    "environment": "沿用LIBERO/MuJoCo；程式scene定義為.bddl+_sim_state.npy pair。這是任務設定/物理初態組合，非必然獨立房屋。網站列2178recovery scenarios，未取得對應完整資產manifest。",
+    "tasks": "論文L1重試/L2調適/L3物件狀態恢復/L4環境恢復；程式目前主要對custom state加±2cm自由物件XY擾動，5closed+5open起始試驗。語義任務、failure scenario和10次trial不能相加。",
+    "data": "原文2000+自然失敗情境；網站另列3184恢復示範、625731frame、110task types，單位不同。程式frame記雙相機、EEF/axis-angle/gripper狀態，模型example只送image+lang；manifest存scene/trial/gripper_init/obj_deltas/success等。缺完整failure trajectory/原始goal與recover標註的連結。",
+    "evaluation": "最多520step，done取原LIBERO goal conjunction；close/open分報。outer reset宣稱12次重試，但內層env_wrapper.reset會吞RandomizationError並持續重試，須驗證失敗行為；建構/重置失敗被跳過會影響分母。flat_state擾動索引還需確認time/qpos佈局。沒有據此重現論文四層恢復結果。",
+    "standardization": {
+      "profile": "recovery_from_saved_simulator_state",
+      "reuse": "已讀custom state replay、gripper設定、擾動/輸入/原生success及manifest接口。",
+      "transform": "保留論文source、候選website與code各自版本；case要連到自然失敗τ_fail/s_f及目標，人工擾動另列衍生協定；記seed/實際state hash、gripper settle、無效reset與分母。",
+      "missing": "原作到code的明確完整release對應、全部場景/資料、論文四層標註與規則；修正或確認flat_state/重置/分母後再執行。"
+    },
+    "version_note": "網站c8cdf8d仍匿名且Paper/Code/Data皆Soon；code7584d1b README計畫2026-10-20釋出，該日期尚未到。2609.05178v3 p4明說不人工擾動，與此版做法不同，故處置identity_or_version_unresolved。",
+    "runtime_executed": false,
+    "identity_note": "網站題名與論文相符、候選eval庫同owner；未把匿名網站與當前custom-scene code的關係直接認定為完整論文版本。",
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.05178",
+      "pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a",
+      "paper_pages_read": [
+        1,
+        4
+      ],
+      "scope": "Paper protocol contrasted with candidate implementation; full-release correspondence unresolved"
+    },
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "liulin815/libero-recover",
+        "requested_repo": "liulin815/libero-recover",
+        "commit": "c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            1
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1,
+        "sha256": "9a21b97186591f45f264db46351d0b97294f33a71b3230a582188c6a688e61b7",
+        "url": "https://github.com/liulin815/libero-recover/blob/c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c/README.md",
+        "reading_url": "https://github.com/liulin815/libero-recover/blob/c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c/README.md#L1-L1",
+        "why": "舊庫僅一行README",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liulin815/libero-recover",
+        "requested_repo": "liulin815/libero-recover",
+        "commit": "c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c",
+        "ref": null,
+        "path": "index.html",
+        "ranges": [
+          [
+            20,
+            41
+          ],
+          [
+            63,
+            97
+          ],
+          [
+            580,
+            595
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 736,
+        "sha256": "baa3220798a38a0ddbdd8b6312c4c87305eae1abdd0eca6a97346823074ab49a",
+        "url": "https://github.com/liulin815/libero-recover/blob/c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c/index.html",
+        "reading_url": "https://github.com/liulin815/libero-recover/blob/c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c/index.html#L20-L41",
+        "why": "同名匿名網站、Coming Soon與原生數量單位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liulin815/LIBERO-Recovery",
+        "requested_repo": "liulin815/LIBERO-Recovery",
+        "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 401,
+        "sha256": "e9fab34e885cafc5c0a12a5d44b7abeb3bd1e7e44d27f6e8d88fdf1ad9308b1e",
+        "url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/README.md",
+        "reading_url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/README.md#L1-L100",
+        "why": "10/20未來釋出計畫及當前custom scene協定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liulin815/LIBERO-Recovery",
+        "requested_repo": "liulin815/LIBERO-Recovery",
+        "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+        "ref": null,
+        "path": "examples/LIBERO/eval_files/eval_libero_custom_scene.py",
+        "ranges": [
+          [
+            79,
+            151
+          ],
+          [
+            166,
+            204
+          ],
+          [
+            212,
+            244
+          ],
+          [
+            310,
+            371
+          ],
+          [
+            386,
+            451
+          ],
+          [
+            501,
+            543
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 591,
+        "sha256": "53494f06b7af0063e573ca2a04d56fcf6c41e962bd70e3ea439ec8ad7581f46c",
+        "url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/examples/LIBERO/eval_files/eval_libero_custom_scene.py",
+        "reading_url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/examples/LIBERO/eval_files/eval_libero_custom_scene.py#L79-L151",
+        "why": "擾動、重置、雙gripper split、模型輸入及case/結果manifest",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liulin815/LIBERO-Recovery",
+        "requested_repo": "liulin815/LIBERO-Recovery",
+        "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+        "ref": null,
+        "path": "LIBERO/libero/libero/envs/env_wrapper.py",
+        "ranges": [
+          [
+            87,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 278,
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0",
+        "url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/LIBERO/libero/libero/envs/env_wrapper.py",
+        "reading_url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/LIBERO/libero/libero/envs/env_wrapper.py#L87-L105",
+        "why": "step轉接與內層reset重試",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liulin815/LIBERO-Recovery",
+        "requested_repo": "liulin815/LIBERO-Recovery",
+        "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+        "ref": null,
+        "path": "LIBERO/libero/libero/envs/bddl_base_domain.py",
+        "ranges": [
+          [
+            779,
+            809
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 851,
+        "sha256": "055836670ac5fcac7e033fc86404718fd53854996e5776b1ff68b646f7bbcc9d",
+        "url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/LIBERO/libero/libero/envs/bddl_base_domain.py",
+        "reading_url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/LIBERO/libero/libero/envs/bddl_base_domain.py#L779-L809",
+        "why": "done實際由_check_success覆寫",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liulin815/LIBERO-Recovery",
+        "requested_repo": "liulin815/LIBERO-Recovery",
+        "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+        "ref": null,
+        "path": "LIBERO/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+        "ranges": [
+          [
+            135,
+            162
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 212,
+        "sha256": "0defb17c0bbab8f6bd34c021ac15598ea101fe1e48690cb440d4ef92762880fe",
+        "url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/LIBERO/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+        "reading_url": "https://github.com/liulin815/LIBERO-Recovery/blob/7584d1baf3191e9a326c1d984e3fc7735a6cccbf/LIBERO/libero/libero/envs/problems/libero_tabletop_manipulation.py#L135-L162",
+        "why": "具體子類以goal predicate AND判成功",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "757b8a490484dd612f7b36994ce33e93f40323024aede1d6122e5409ec74fbb0"
+  },
+  "repository_binding_review_sha256": "757b8a490484dd612f7b36994ce33e93f40323024aede1d6122e5409ec74fbb0",
+  "repository_bindings": [
+    {
+      "requested_repo": "liulin815/libero-recover",
+      "resolved_repo": "liulin815/libero-recover",
+      "aliases_in_this_review": [
+        "liulin815/libero-recover"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "identity_or_version_unresolved",
+      "versions": [
+        {
+          "commit": "c8cdf8d1b3c51e0a92680a9720095fd3b1ae6b4c",
+          "reviewed_files": [
+            "README.md",
+            "index.html"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "LIBERO-Recover",
+          "search_receipt_sha256": "584ef1dfa5036cb26256a218ea6450f25f920fe6869436571d46e2e6be9bbee0",
+          "url": "https://github.com/liulin815/libero-recover",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P165",
+          "review_file": "content/github_review/reviews/P165.json",
+          "review_sha256": "757b8a490484dd612f7b36994ce33e93f40323024aede1d6122e5409ec74fbb0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "liulin815/LIBERO-Recovery",
+      "resolved_repo": "liulin815/LIBERO-Recovery",
+      "aliases_in_this_review": [
+        "liulin815/libero-recovery"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "identity_or_version_unresolved",
+      "versions": [
+        {
+          "commit": "7584d1baf3191e9a326c1d984e3fc7735a6cccbf",
+          "reviewed_files": [
+            "LIBERO/libero/libero/envs/bddl_base_domain.py",
+            "LIBERO/libero/libero/envs/env_wrapper.py",
+            "LIBERO/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+            "README.md",
+            "examples/LIBERO/eval_files/eval_libero_custom_scene.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "LIBERO-Recover",
+          "search_receipt_sha256": "584ef1dfa5036cb26256a218ea6450f25f920fe6869436571d46e2e6be9bbee0",
+          "url": "https://github.com/liulin815/LIBERO-Recovery",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P165",
+          "review_file": "content/github_review/reviews/P165.json",
+          "review_sha256": "757b8a490484dd612f7b36994ce33e93f40323024aede1d6122e5409ec74fbb0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P165",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LIBERO-Recover，arXiv 2609.05178v3。",
+    "scope_read": "failure對normal variation的區分、2178scenario生成、恢復資料與RSR/RD/RC。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "LIBERO自然rollout失敗的state snapshots；不是2178不同room layouts。",
+    "tasks": "130上游tasks、4recovery levels；LIBERO100再拆90/10報告，不能另加兩suite。",
+    "cases": "2,178recovery scenarios；413training failure scenes有3,184human recovery trajectories，訓練使用場景排出最終eval。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 130,
+        "unit": "上游tasks",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "recovery levels",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2178,
+        "unit": "recovery scenarios",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3184,
+        "unit": "recovery training trajectories",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "Recovery Success Rate完成原goal；Recovery Degradation比較failure前後；RC=1−task-level success率標準差。",
+      "RC公式實際是跨task變異，不完全等同文中所說同task不同failure的穩定性。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "六policy產failure，Qwen定位/分類；自然failure分布不平衡。eval每task10trials、520step，需固定scenario/perturbation解讀。",
+    "lineage": "LIBERO延伸；失敗條件要execution-induced且需改plan但仍可恢復，不能把任何位置變化都叫failure。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "§2–4、圖4",
+        "supports": "2178/130、failure規則、train/eval與metric"
+      }
+    ],
+    "unresolved": [
+      "recoverability對每scenario的完整驗證證據、2178與training排除先後、eval task詞義需manifest查。"
+    ],
+    "reuse": "可引入真實policy失敗狀態而非純人工擾動；恢復題需要前史與可恢復證據。",
+    "reviewed_pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a",
+    "reviewed_on": "2026-10-02",
+    "name": "LIBERO-Recover",
+    "year": 2026,
+    "title": "LIBERO-RECOVER: Beyond Task Success Towards Failure Recovery in Robotic Manipulation Models",
+    "source_url": "https://arxiv.org/abs/2609.05178",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P165",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P165",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            9
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "130上游tasks、4recovery levels；LIBERO100再拆90/10報告，不能另加兩suite。",
+            "LIBERO自然rollout失敗的state snapshots；不是2178不同room layouts。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P165",
+      "name": "LIBERO-Recover",
+      "expected_title": "LIBERO-RECOVER: Beyond Task Success Towards Failure Recovery in Robotic Manipulation Models",
+      "source_url": "https://arxiv.org/abs/2609.05178",
+      "pdf_url": "https://arxiv.org/pdf/2609.05178",
+      "retrieved_at": "2026-10-02T21:34:33.543199+00:00",
+      "pdf_sha256": "ee23bf31934cc0e262b4b30458be149df135ec3695c866939c482c0b55fe414a",
+      "text_sha256": "58cf2fc5436bc9cd99c9bc518b21f9e5129163f9ac8bab1c720d8fcf79507fe4",
+      "pdf_bytes": 16085987,
+      "pages": 38,
+      "text_characters": 153137,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.05178v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.05178v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 130,
+        "unit": "上游tasks",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P165:1",
+        "paper_id": "P165",
+        "benchmark": "LIBERO-Recover",
+        "native_term": "上游tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.05178v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.05178v3",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "recovery levels",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P165:2",
+        "paper_id": "P165",
+        "benchmark": "LIBERO-Recover",
+        "native_term": "recovery levels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.05178v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.05178v3",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2178,
+        "unit": "recovery scenarios",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P165:3",
+        "paper_id": "P165",
+        "benchmark": "LIBERO-Recover",
+        "native_term": "recovery scenarios",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.05178v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.05178v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3184,
+        "unit": "recovery training trajectories",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P165:4",
+        "paper_id": "P165",
+        "benchmark": "LIBERO-Recover",
+        "native_term": "recovery training trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.05178v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.05178v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "liulin815/libero-recover",
+    "liulin815/LIBERO-Recovery"
+  ],
+  "external_repositories": []
+}

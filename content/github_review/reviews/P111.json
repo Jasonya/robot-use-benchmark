@@ -1,0 +1,52 @@
+{
+  "paper_id": "P111",
+  "status": "website_only",
+  "summary": "已找到並核讀HELM中的RoboReward官方入口，以及其連出的資料卡；目前確認的是排行榜網站與資料格式，未確認專用訓練／評測後端實作。",
+  "reading_order": [
+    {
+      "repo": "stanford-crfm/helm",
+      "path": "helm-frontend/src/components/Landing/RoboRewardLanding.tsx",
+      "ranges": [
+        [
+          1,
+          101
+        ]
+      ],
+      "why": "精確arXiv、HF資料/模型與排行榜連結；此檔是前端展示",
+      "commit": "63754d05db6f874e41a395880fb573890a13e791"
+    }
+  ],
+  "environment": "OXE和RoboArena的真實機器人rollout影片；源自多機體／場景，獎勵配對不能當新增物理軌跡或環境。",
+  "tasks": "看task instruction＋rollout video預測1–5結束進度；反事實指令和時間截短產生不同評分題，但保留同一父影片關係。",
+  "data": "官方資料卡列video/task/reward/gpt5_mini_check；train45,072、val6,232、test2,831，合54,135配對（作者資料卡數字，未全量下載）。自動檢查輸出是標籤審核證據，不能作模型輸入；test另由人驗證。",
+  "evaluation": "原文主指標為progress MAE並按來源群組聚合。HELM前端只渲染MiniLeaderboard與連結，不能當本地scorer；資料卡指出五級rubric，但本次未取得完整原生評分後端／輸出解析和group aggregation程式。",
+  "standardization": {
+    "profile": "robot_video_reward_labels",
+    "reuse": "官方資料卡schema、五級分數、train/val/test口徑、OXE/RoboArena來源鏈。",
+    "transform": "case以video＋instruction＋截短窗口識別；同一父episode的反事實／截短放在同split lineage群。reward/reference和審核訊號隔離；evaluator維持MAE與群組分母。",
+    "missing": "全量影片／原始episode ID對映、官方scorer實作、模型輸出解析、生成／人工審核紀錄和語義去重。"
+  },
+  "version_note": "HELM main的固定commit可查到對應2601.00675前端；未將整個HELM通用後端宣稱為RoboReward專用評測程式。資料卡引用v0.0.1排行榜，latest與固定版本要分開。",
+  "additional_repo_proposals": [
+    {
+      "repo": "stanford-crfm/helm",
+      "role": "leaderboard_website",
+      "basis": "paper project URL is HELM; pinned RoboRewardLanding links exact arXiv and official dataset"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "url": "https://huggingface.co/datasets/teetone/RoboReward/raw/main/README.md",
+      "sha256": "39cac60ab217b992d61ef7f5e7275515a6d05055b8a91171213e7ab5e354b5f1",
+      "ranges": [
+        [
+          1,
+          65
+        ]
+      ],
+      "supports": "officially linked dataset card read in full; not data download or evaluator execution"
+    }
+  ],
+  "reviewed_on": "2026-10-10",
+  "runtime_executed": false
+}

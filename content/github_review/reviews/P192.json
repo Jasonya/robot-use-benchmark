@@ -1,0 +1,88 @@
+{
+  "paper_id": "P192",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Phys-Liquid提供液體幾何/尺度估計reader及F-score/voxel IoU程式，但README的總量仍是N佔位、完整下載入口TBD；不能把樣本庫視為完整benchmark已取得。",
+  "reading_order": [
+    {
+      "repo": "dualtransparency/Phys-Liquid-AAAI",
+      "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          36
+        ]
+      ],
+      "why": "原作、四階段重建與sample/full release狀態"
+    },
+    {
+      "repo": "dualtransparency/Phys-Liquid-AAAI",
+      "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+      "path": "volume_estimate/dataset.py",
+      "ranges": [
+        [
+          9,
+          108
+        ],
+        [
+          113,
+          140
+        ]
+      ],
+      "why": "sample/frame結構、6視角拼圖、體積/尺度ratio標籤"
+    },
+    {
+      "repo": "dualtransparency/Phys-Liquid-AAAI",
+      "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+      "path": "metrics/F-Score.py",
+      "ranges": [
+        [
+          10,
+          94
+        ],
+        [
+          112,
+          189
+        ]
+      ],
+      "why": "質心對齊、點採樣、距離門檻與跳過/聚合分母"
+    },
+    {
+      "repo": "dualtransparency/Phys-Liquid-AAAI",
+      "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+      "path": "metrics/volume_iou.py",
+      "ranges": [
+        [
+          20,
+          50
+        ]
+      ],
+      "why": "mesh體素化與grid-index IoU"
+    },
+    {
+      "repo": "dualtransparency/Phys-Liquid-AAAI",
+      "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+      "path": "split_data.py",
+      "ranges": [
+        [
+          1,
+          60
+        ]
+      ],
+      "why": "手列13個結果目錄複製，非完整split生成協定"
+    }
+  ],
+  "environment": "模擬實驗室透明液體/容器，顏色、照明、場景與旋轉設定；六張生成/重建視角屬同一樣本的觀測，不增加六個環境。",
+  "tasks": "透明液體segmentation、多視角mask、3D reconstruction及metric scale/volume估計；屬於感知/量測任務，不直接驗證robot倒水或吸液完成。",
+  "data": "sample/frame目錄有multiview_images.png、volumes.json、real_volume.json；拼圖切成6×256²。pseudo volume乘1e-6、width乘1e-2；label_mode可為體積比、三軸比、算術/幾何平均，需記模式與單位。缺檔/GT會跳過，README沒有可用總量數字。",
+  "evaluation": "F-score先各自質心對齊，隨機採10000surface points，以距離門檻(預設0.02)算precision/recall；不測絕對位置誤差。frame缺pred/GT/載入錯誤被略過，再sample內均值→sample間均值。voxel IoU以各網格grid_index相交，shared origin/voxel尺度需驗證；這些都不是task成功率。",
+  "standardization": {
+    "profile": "transparent_liquid_geometry_and_volume",
+    "reuse": "具體label生成、前處理與原生幾何metrics，可作universal benchmark的量測能力來源。",
+    "transform": "case_id連到物理sample/frame與view；保存原始/重建mesh、座標/單位/scale mode，GT只給scorer；報attempted/valid/skipped與metric seed，避免有效子集分母混淆。",
+    "missing": "完整公開資料/精確數量、正式split manifest、物理單位、voxel共同grid、sample間相依性與task級液體操作驗收。"
+  },
+  "version_note": "固定2d4e3c8，AAAI26 source/sample repo；split_data.py只是指定結果資料夾複製工具，沒有據此宣稱已取得完整train/test。",
+  "runtime_executed": false
+}

@@ -1,0 +1,106 @@
+{
+  "paper_id": "P063",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "原作倉庫已轉到Farama的現行Meta-World。當前代碼可以核讀任務、動作和評測接口，但README已引用MetaWorld+，必須保留與2019原作協議的版本差異。",
+  "reading_order": [
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          55
+        ]
+      ],
+      "why": "核對現行論文連結、Gymnasium API及MT/ML任務分割。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/env_dict.py",
+      "ranges": [
+        [
+          80,
+          110
+        ]
+      ],
+      "why": "任務名稱如何映到class及train/test清單。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/sawyer_xyz_env.py",
+      "ranges": [
+        [
+          320,
+          336
+        ],
+        [
+          475,
+          527
+        ]
+      ],
+      "why": "以程式確認動作縮放、frame stack與39維基礎觀測。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/envs/sawyer_drawer_open_v3.py",
+      "ranges": [
+        [
+          66,
+          88
+        ],
+        [
+          115,
+          188
+        ]
+      ],
+      "why": "核對info.success與不同reward版本，避免用reward替代成功。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/evaluation.py",
+      "ranges": [
+        [
+          48,
+          103
+        ],
+        [
+          106,
+          169
+        ]
+      ],
+      "why": "核對每任務episode數、成功終止、平均方式及meta適應預算。"
+    }
+  ],
+  "environment": "Sawyer/MuJoCo任務環境；source task/env ID不等於獨立家居場景。",
+  "tasks": "MT與ML清單保留原生任務和train/test成員；現行v3任務與2019版不可僅刪掉版本後綴就宣稱等價。",
+  "data": "四維動作是xyz增量控制加gripper；set_xyz_action另乘action_scale。基礎觀測為當前18維、前一觀測18維與目標3維，goal可被遮蔽；benchmark還可加task ID。",
+  "evaluation": "evaluation.py在成功時終止episode，用info.success按任務計成功率，再對任務平均。meta評測另外包含適應步數、適應episode和evaluation episode預算。",
+  "standardization": {
+    "profile": "interactive_task_definitions",
+    "reuse": "版本化task IDs、train/test清單、reset參數、info.success與正式evaluation流程。",
+    "transform": "記下v3、reward版本、goal可見性、action_scale、觀測stack和適應預算；共同ActionSpec保留原生4維與轉換規則，不強塞成7維。",
+    "missing": "2019原作相符release的獨立重現、跨來源task/scene對齊及統一case清單。"
+  },
+  "version_note": "發現現行state_space.md仍寫9D且表格列18維，但程式_get_obs明確組成39維；欄位標準化以固定程式與測試查核，不能只抄說明頁。",
+  "runtime_executed": false,
+  "repository_aliases": [
+    {
+      "repo": "rlworkgroup/metaworld",
+      "canonical_repo": "Farama-Foundation/Metaworld",
+      "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+      "evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/rlworkgroup/metaworld",
+          "retrieved_at": "2026-10-10T07:46:20.423326+00:00",
+          "status": 200,
+          "resolved_url": "https://api.github.com/repositories/207383121",
+          "content_type": "application/json; charset=utf-8",
+          "bytes": 7064,
+          "sha256": "bca4e430f09ccdda6d25229793b4326df970e81f6ad47174d01c1e4914a857b3"
+        }
+      ]
+    }
+  ],
+  "identity_note": "舊入口rlworkgroup/metaworld的已保存GitHub metadata回應指向Farama-Foundation/Metaworld，按倉庫別名保留，不另外算成未讀的第二個倉庫。"
+}

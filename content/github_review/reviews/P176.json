@@ -1,0 +1,104 @@
+{
+  "paper_id": "P176",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "AutoBio初步版有真實task/evaluator程式與LeRobot資料；MuJoCo和Blender是同任務的兩種渲染版本。必須保留render lineage與各task具體量測，不能只拿生成影片數當題數。",
+  "reading_order": [
+    {
+      "repo": "autobio-bench/AutoBio",
+      "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          80
+        ]
+      ],
+      "why": "preliminary身分、9類資料的兩種render與LeRobot2.0"
+    },
+    {
+      "repo": "autobio-bench/AutoBio",
+      "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+      "path": "autobio/task.py",
+      "ranges": [
+        [
+          16,
+          83
+        ],
+        [
+          90,
+          146
+        ]
+      ],
+      "why": "task factory原生名稱、state/step/serializer接口"
+    },
+    {
+      "repo": "autobio-bench/AutoBio",
+      "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+      "path": "autobio/evaluate.py",
+      "ranges": [
+        [
+          18,
+          21
+        ],
+        [
+          43,
+          100
+        ]
+      ],
+      "why": "master seed生成每episode seed、結果bool列表"
+    },
+    {
+      "repo": "autobio-bench/AutoBio",
+      "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+      "path": "autobio/evaluator.py",
+      "ranges": [
+        [
+          174,
+          266
+        ]
+      ],
+      "why": "合法觀測、10physics步/action、健康/時間/成功條件"
+    },
+    {
+      "repo": "autobio-bench/AutoBio",
+      "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+      "path": "autobio/mani_pipette.py",
+      "ranges": [
+        [
+          132,
+          239
+        ]
+      ],
+      "why": "雙UR5e task_info、初態、液麵/操作條件的具體checker"
+    },
+    {
+      "repo": "autobio-bench/AutoBio",
+      "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+      "path": "RoboticsDiffusionTransformer/data/lerobot_vla_dataset.py",
+      "ranges": [
+        [
+          12,
+          45
+        ],
+        [
+          181,
+          240
+        ]
+      ],
+      "why": "FPS相對timestamp、圖像history/padding、state/action正規化"
+    }
+  ],
+  "environment": "MuJoCo生物實驗室資產與Blender Cycles外觀渲染；pipette例為雙UR5e和靈巧手/夾爪。physics scene、相機和render edition分別記錄，Blender不另增物理環境。",
+  "tasks": "當前factory接受13個原生task名稱，README列9種dataset各有MuJoCo/Blender版本；這兩個範圍不是同一清單。原子操作與完整儀器任務需要按原作版本對照；pickup匯入模組未在固定tree找到。",
+  "data": "LeRobot v2.0每episode parquet與videos，meta包含episodes/info/stats/tasks；README影片224²@50fps。runtime使用observation/state、影像與prompt，task_info指定state_indices/action_indices/camera_mapping。RDT資料用fps建立action/history timestamps並保存缺影像mask；不可將補0當真實sensor。",
+  "evaluation": "每action保持10個MuJoCo physics步，chunk外檢查time_limit/early_stop，可能超出名義budget到chunk末；不健康模擬回False。pipette checker追蹤tip入液麵、拇指命令變化與最後抬離液麵，未直接對抽取體積作容差檢查。history deque追加qpos未明確copy，也需驗證歷史狀態是否別名。",
+  "standardization": {
+    "profile": "laboratory_simulation_with_render_variants",
+    "reuse": "明確task/serializer/factory、LeRobot結構、paired renderer來源、具體task checker與seed協定。",
+    "transform": "source+task+episode為底層ID，render variant作observation版本；case固定physics/action時間、joint順序、初態及scorer；量化體積/精度可作新增規則，保持原版可比。",
+    "missing": "preliminary版本缺件、13factory與原作task清單對齊、完整資產/資料、command/state normalizer、history/budget驗證與全部task重現。"
+  },
+  "version_note": "固定0850421，README明列Preliminary Version。未安裝MuJoCo/Blender或執行policy；未將renderer份數當新任務或獨立示範。",
+  "runtime_executed": false
+}

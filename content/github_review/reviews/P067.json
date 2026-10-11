@@ -1,0 +1,398 @@
+{
+  "paper_id": "P067",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "原ManiSkill2網址目前只是搬家說明；實作應固定mani-skill/ManiSkill的v0.5.3。它把episode設定、HDF5軌跡、JSON資訊和原生success評測分開保存。 2026-10-11 另補讀 ManiSkill2-Learn 的 BC 資料與單程序評測入口，與主 benchmark 的 v0.5.3 契約分開記錄。",
+  "reading_order": [
+    {
+      "repo": "haosulab/ManiSkill2",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "why": "確認搬家與原作指定的v0.5.3版本。",
+      "commit": "63e0e7db636664bf0c323df5174ce9ca19b726e7"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "ref": "v0.5.3",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "確認ManiSkill2、原生任務家族、剛體／柔體資產與控制模式。",
+      "commit": "493be36121a9dd06071a57172274babe617b789f"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "ref": "v0.5.3",
+      "path": "mani_skill2/envs/pick_and_place/pick_cube.py",
+      "ranges": [
+        [
+          54,
+          83
+        ],
+        [
+          141,
+          150
+        ]
+      ],
+      "why": "看觀測模式差異和放置／robot-static合成success。",
+      "commit": "493be36121a9dd06071a57172274babe617b789f"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "ref": "v0.5.3",
+      "path": "mani_skill2/utils/wrappers/record.py",
+      "ranges": [
+        [
+          146,
+          186
+        ],
+        [
+          222,
+          325
+        ]
+      ],
+      "why": "讀episode identity/reset/control、T+1觀測、T動作與深度編碼。",
+      "commit": "493be36121a9dd06071a57172274babe617b789f"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "ref": "v0.5.3",
+      "path": "mani_skill2/evaluation/evaluator.py",
+      "ranges": [
+        [
+          45,
+          91
+        ]
+      ],
+      "why": "按episode_cfg/reset_kwargs執行，檢查episode ID唯一性與success輸出。",
+      "commit": "493be36121a9dd06071a57172274babe617b789f"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "README.md",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          1,
+          23
+        ],
+        [
+          174,
+          195
+        ],
+        [
+          246,
+          268
+        ],
+        [
+          292,
+          324
+        ],
+        [
+          336,
+          363
+        ]
+      ],
+      "why": "baseline 身份、Gymnasium／camera-order 版本差異、控制模式先轉換與示範／評測入口。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "configs/brl/bc/pointnet.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          1,
+          60
+        ]
+      ],
+      "why": "BC 示例的 replay 欄位／佔位資料路徑與 num=10、單程序評測；不是 benchmark 固定 trial 數。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "tools/convert_state.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          39,
+          142
+        ],
+        [
+          149,
+          185
+        ],
+        [
+          196,
+          248
+        ]
+      ],
+      "why": "HDF5+JSON reset 契約、剛體 state／柔體 action 路徑、輸出 dones／episode_dones、可選 next_obs 與軌跡重編號。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/replay_buffer.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          30,
+          145
+        ]
+      ],
+      "why": "由 buffer_filenames 建構 ReplayMemory/FileCache；容量與 num_samples 如何控制讀取。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/utils/file/cache_utils.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          77,
+          128
+        ],
+        [
+          156,
+          181
+        ],
+        [
+          215,
+          256
+        ],
+        [
+          289,
+          385
+        ],
+        [
+          447,
+          480
+        ]
+      ],
+      "why": "追到實際 HDF5 group reader、逐檔限制／鍵排序，以及布林欄位和 episode_dones 的讀取處理。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/apis/run_rl.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          35,
+          79
+        ],
+        [
+          265,
+          268
+        ],
+        [
+          293,
+          315
+        ],
+        [
+          351,
+          395
+        ]
+      ],
+      "why": "checkpoint／evaluation CLI 到 evaluator.run、結果輸出與 evaluation env_cfg／seed。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/builder.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          18,
+          27
+        ]
+      ],
+      "why": "Evaluation 的建構；num_procs>1 會選 BatchEvaluation，與本次單程序示例分清。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/env_utils.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          96,
+          186
+        ]
+      ],
+      "why": "實際 gym.make、觀測 wrapper、時間上限和 obs_frame 預設值。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/wrappers.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          61,
+          107
+        ],
+        [
+          190,
+          239
+        ],
+        [
+          683,
+          695
+        ]
+      ],
+      "why": "Gymnasium terminated/truncated 原樣傳遞及 ignore_dones 可抑制 terminated；不自行改寫為 info.success。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/vec_env.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          149,
+          166
+        ]
+      ],
+      "why": "live step_dict 的 dones=terminated、episode_dones=terminated OR truncated。"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/evaluation.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "ranges": [
+        [
+          34,
+          46
+        ],
+        [
+          252,
+          300
+        ],
+        [
+          328,
+          483
+        ]
+      ],
+      "why": "單程序實際評測循環、策略取樣模式、最後一步 finish、level 數限制和 statistics.csv 分母。"
+    }
+  ],
+  "environment": "SAPIEN任務依env_id、asset模型、reset_kwargs和control_mode建立；柔體另外依賴原作Warp版本。",
+  "tasks": "註冊的env/task與原作家族保留其單位；不是每個asset模型、隨機seed都增加一個基礎任務。",
+  "data": "HDF5 traj_id配合JSON episodes/env_info；reset初態使觀測／env_states比actions多一筆。depth以uint16保存，原作寫入前乘2^10，必須保存這個尺度。 補讀 Learn：tools/convert_state.py 依 HDF5 traj 後綴尋找 JSON episodes 的 episode_id/reset_kwargs，逐 state 重建剛體觀測，或由 env_init_state 重播動作取得柔體觀測；控制模式須先在主 ManiSkill2 轉好。輸出為 T 筆 obs/actions/rewards，dones 直接來自原 success，episode_dones 僅尾筆為真，next_obs 要加 --with-next。輸出 traj_{cnt} 重新編號，須另存原 episode 對映。BC 的 buffer_filenames 範例仍是 SOME_DEMO_FILE；ReplayMemory→FileCacheWorker 實際讀 HDF5 groups，num_samples 限制每檔前幾條排序軌跡，-1 才是全部，不能稱為隨機 split。",
+  "evaluation": "Evaluator按episode_cfg的reset_kwargs重建，終止時讀info.success等scalar；PickCube示例要求物件放到目標且robot靜止。reward、terminated、truncated不互相替代。 補讀 Learn 的獨立路徑：run_rl.py --evaluation／--resume-from→build_evaluation→Evaluation.run；單程序策略預設 mode=eval，BC 範例 num=10、num_procs=1 只是設定值。live step_dict 把 terminated 命名為 dones，以 terminated OR truncated 判 episode_dones；Evaluation 在終止那一步把 dones 記為 finish，statistics.csv 存 length/reward/finish，顯示的是 mean(finish) 的「Success or Early Stop Rate」。此 caller 並未直接取 info.success；只有綁定環境的終止契約相符時才能解作成功率。only_save_success_traj 篩存檔、不縮減 statistics 的所有已評 trial 分母；與前述主 benchmark Evaluator 的 info.success 分開。",
+  "standardization": {
+    "profile": "robot_episodes_with_reset_contract",
+    "reuse": "env/task IDs、episode ID、reset kwargs、control mode、HDF5/JSON及原生success。 可另重用 baseline 的 HDF5 視覺轉換、ReplayMemory 輸入及 length/reward/finish 原生報表。",
+    "transform": "原始T+1觀測與T個transition保留對齊；深度尺度、obs mode、state、success、時間上限分欄，不用共通dtype猜單位。 另保存 Learn commit、checkpoint、實際 env_cfg、seed、num/eval_levels、sample_mode 與輸入／輸出 trajectory ID 對映；原 success、示範 dones、live terminated/truncated/finish 分欄。FileCache 的 purify_items 可補 worker_indices、把 dones 轉 bool，並將讀取片段末項 episode_dones 設真，不能依訓練 buffer 片段另增物理 episode。",
+    "missing": "完整資產／示範閉合、共同split血緣與本庫eval adapter驗證。 Learn 的示範／checkpoint／資產未取得或執行；需替換示例佔位路徑、保存完整 reset／split 血緣，驗證控制模式、觀測處理與主 benchmark 的 success／終止關係。converter 的 obs_frame 預設 base，而 make_gym_env 預設 world，資料生成／訓練／評測都需顯式對齊。"
+  },
+  "version_note": "v0.5.3解析到commit493be361…；最新main是ManiSkill3，因此每個來源連結都帶ref/commit。 Learn 固定 e9860aff595da3ad34829d62c923be0b50001427，與主 benchmark v0.5.3 的提交分開；其 README 指明 0.5.0 起改 Gymnasium，較舊環境用 ms2_gym 分支（本次未核讀該分支）。README 另說早期 checkpoint／環境 0.3、0.4 的 RGBD camera order 不同，須保留實際 wrapper／觀測版本，不把 Learn、ManiSkill2022 challenge 或 ManiSkill3 當成同一版主 benchmark。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "README.md",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "1a12383b2b1c77e1714e02b550dc4938a6459f641ff5b21313fa6d40370f65bd",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/README.md",
+      "local_file": "audit/.cache/github_review/repos/haosulab__ManiSkill2-Learn/files/README.md"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "configs/brl/bc/pointnet.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "4e284e71ab1a7eb2f6cb4d53d7b590e2c913343b8d4d2fb62d19178a6e1aec89",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/configs/brl/bc/pointnet.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/haosulab__ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/configs/brl/bc/pointnet.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "tools/convert_state.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "42e4dca0f9271f07c35d122e75629fbe8e2502e84306112bd517be39c5555485",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/tools/convert_state.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/haosulab__ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/tools/convert_state.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/replay_buffer.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "5b91ee4cbdd1f500609411b5b4daa4a7357d120c71434de6862422886192de63",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/replay_buffer.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/haosulab__ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/replay_buffer.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/utils/file/cache_utils.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "5f70dcde7d64ae213558e1e0438838c18bed0a603c361e04eafcdd01c443e7bc",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/utils/file/cache_utils.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/haosulab__ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/utils/file/cache_utils.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/apis/run_rl.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "e8cdeb7f7fdcdc4f6cf8177cae0183266a34dfc59c2fbefbc7f8e9af5e32a42b",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/apis/run_rl.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/haosulab__ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/apis/run_rl.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/builder.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "68f7ceffa30a3f6534066c913a3fa9373a046b2286dfff66b7636bd017fea3fa",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/builder.py",
+      "local_file": "audit/.cache/github_review/repos/haosulab__ManiSkill2-Learn/files/maniskill2_learn/env/builder.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/env_utils.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "8419e7bdcafe95a39afe87ba9df694e46201eeb4e9bb024d2cb68ca6a027b47f",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/env_utils.py",
+      "local_file": "audit/.cache/github_review/repos/haosulab__ManiSkill2-Learn/files/maniskill2_learn/env/env_utils.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/wrappers.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "81b7b21e6bd9a5d4665350e434d9d422d61ce4723a958e2eefcfe110ed4fe541",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/wrappers.py",
+      "local_file": "audit/.cache/github_review/repos/haosulab__ManiSkill2-Learn/files/maniskill2_learn/env/wrappers.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/vec_env.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "09ebbe569b950ce5a46975b5a5bd185d5e98ccdde83f18415c73acd49db42650",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/vec_env.py",
+      "local_file": "audit/.cache/github_review/repos/haosulab__ManiSkill2-Learn/files/maniskill2_learn/env/vec_env.py"
+    },
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "path": "maniskill2_learn/env/evaluation.py",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "sha256": "f35504ef5380d6613da96acd876b7f4f12251c668de323aee9f5d5438e7d8ec5",
+      "url": "https://raw.githubusercontent.com/haosulab/ManiSkill2-Learn/e9860aff595da3ad34829d62c923be0b50001427/maniskill2_learn/env/evaluation.py",
+      "local_file": "audit/.cache/github_review/repos/haosulab__ManiSkill2-Learn/files/maniskill2_learn/env/evaluation.py"
+    }
+  ],
+  "additional_repo_proposals": [
+    {
+      "repo": "haosulab/ManiSkill2-Learn",
+      "role": "ManiSkill2 的 baseline 學習／視覺示範轉換／評測工具；不取代主 benchmark 版本",
+      "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+      "evidence": "https://github.com/haosulab/ManiSkill2-Learn/blob/e9860aff595da3ad34829d62c923be0b50001427/README.md#L1-L5",
+      "review_status": "source_sections_reviewed"
+    }
+  ],
+  "follow_up": {
+    "reviewed_on": "2026-10-11",
+    "repo": "haosulab/ManiSkill2-Learn",
+    "commit": "e9860aff595da3ad34829d62c923be0b50001427",
+    "status": "source_sections_reviewed",
+    "scope": "BC 示範格式／實際讀取與單程序 Evaluation caller；主 benchmark 仍保留 v0.5.3。"
+  }
+}

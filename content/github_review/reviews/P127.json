@@ -1,0 +1,72 @@
+{
+  "paper_id": "P127",
+  "summary": "BridgeData V2提供raw/自訂TFRecord/RLDS多種表示。預設訓練action會被改寫成到達狀態差分，gripper還會使用後續狀態重新標記，不能只改檔案副檔名。",
+  "reading_order": [
+    {
+      "repo": "rail-berkeley/bridge_data_v2",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          27
+        ],
+        [
+          41,
+          74
+        ]
+      ],
+      "why": "原作、表示與方法角色、真實controller來源",
+      "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928"
+    },
+    {
+      "repo": "rail-berkeley/bridge_data_v2",
+      "path": "jaxrl_m/data/bridge_dataset.py",
+      "ranges": [
+        [
+          41,
+          81
+        ],
+        [
+          257,
+          312
+        ],
+        [
+          349,
+          397
+        ]
+      ],
+      "why": "TFRecord schema、action重標、chunk padding與goal relabeling",
+      "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928"
+    },
+    {
+      "repo": "rail-berkeley/bridge_data_v2",
+      "path": "experiments/eval.py",
+      "ranges": [
+        [
+          82,
+          150
+        ],
+        [
+          325,
+          369
+        ]
+      ],
+      "why": "checkpoint action反正規化、sticky gripper與DOF限制",
+      "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928"
+    }
+  ],
+  "environment": "WidowX在多種桌面/廚房環境的蒐集與部署；raw示範和scripted資料、經轉換的TFRecord/RLDS共用來源episode。",
+  "tasks": "goal-image或language條件的操作；各算法/目標重標與視角不是新的物理任務。CALVIN/SuSIE子目錄為其他實驗來源，需另標parent。",
+  "data": "自訂TFRecord每example一trajectory，含observations與next_observations的image/state、actions、terminals/truncates和可選language。relabel_actions用next_proprio[:6]-current_proprio[:6]，gripper閾值>.95/<.05再回填中間值；chunk補首obs/末action，goal與language另採樣。",
+  "evaluation": "部署從checkpoint還原action_mean/std；採樣後可加noise、sticky-gripper狀態機與屏蔽部分姿態自由度，再送WidowX。這些是控制協定。所讀eval程式提供rollout，沒有通用任務成功predicate；原作實機成功標記需另建protocol。",
+  "standardization": {
+    "profile": "robot_demonstration_with_action_and_goal_relabeling",
+    "reuse": "父episode、多格式對映、原生7D action/重標規則、goal和語言條件。",
+    "transform": "保存raw_action與training_action的轉換/normalization版本；補值mask、來源時間、goal採樣一起記入case；評測固定action execution horizon及gripper/DOF後處理。",
+    "missing": "raw→NumPy→TFRecord/RLDS全量ID映射、相機/場景metadata、測試split與成功rubric、與OXE子資料去重、原生部署驗證。"
+  },
+  "version_note": "固定bc60a35，README清楚區分raw demos與scripted zip及多種表示。此repo是訓練/部署方法實作，不能把其所有分支範例當Bridge新增benchmark。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

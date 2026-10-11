@@ -1,0 +1,32 @@
+{
+  "paper_id": "P214",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "此COIN是2026 Chain of Interaction，與P003的2019影片COIN不同。論文定義90個互動推理task及6類指標，但目前未確認官方GitHub。",
+  "reading_order": [],
+  "environment": "ManiSkill3/Panda桌面操作，PartNet-Mobility與其他物件資產；5個camera views與depth/segmentation/proprio是觀測設定，不是5環境。",
+  "tasks": "COIN-Primitive20、COIN-Composition20、COIN-50共50，合計90task。原作三種reasoning domains是物件中心、robot理解、組合推理，不直接當生活用途。VQA probes和子任務序列另有層級。",
+  "data": "原文20primitive各50teleop demos共1000，不能當全90task都各50demo。兩action space：VLA delta EEF+gripper；CodeAsPolicy7joint absolute+gripper。完整case/split、teleop原檔及scorer尚未取得。",
+  "evaluation": "原文SR、CSR、VQA score、trajectory stability(TS)、gripper stability(GS)、GCS=SRcomposition/SRprimitive；TS使用速度/加速度/jerk變異係數的指數分項，GS有預期切換次數等依賴。缺code時不能核對零分母、取樣頻率與穩定性實作，也不能把TS/GS當物理安全。",
+  "standardization": {
+    "profile": "interactive_reasoning_manipulation_and_qa",
+    "reuse": "90task三層設計、部分可觀測互動、兩種policy動作界面與6類原作指標。",
+    "transform": "task維持原生20/20/50集合；case分清操控、subtask planning與VQA，固定camera/segmentation是否合法、action轉換和score版本；新規則另列衍生關係。",
+    "missing": "官方repo/全部task與示範/合法split、動作轉換、TS/GS/GCS精確grader與原生baseline。"
+  },
+  "version_note": "2604.16886v1；原文引用ERQA、MuJoCoAR等他作repo不是此COIN code。原作名稱同P003但題名/ID/資料皆不同，維持獨立source。",
+  "runtime_executed": false,
+  "identity_note": "P214=Chain Of Interaction (2026)；P003=COIN instructional video dataset (2019)。",
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2604.16886",
+    "pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c",
+    "paper_pages_read": [
+      4,
+      6
+    ],
+    "search_receipts": [
+      "audit/.cache/github_review/search/P214-refined.json",
+      "audit/.cache/github_review/search/P214.json"
+    ]
+  }
+}

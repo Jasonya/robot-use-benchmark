@@ -1,0 +1,92 @@
+{
+  "paper_id": "P102",
+  "summary": "NavVerse提供室內、室外與連接場景的連續導航；原程式的成功距離是參考路徑近似值，collision指標是卡住代理量，不等同接觸感測。",
+  "reading_order": [
+    {
+      "repo": "UMich-CURLY/NavVerse-Benchmark",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          17
+        ],
+        [
+          48,
+          81
+        ],
+        [
+          130,
+          155
+        ]
+      ],
+      "why": "原作範圍、版本化場景包與episode檔分離",
+      "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b"
+    },
+    {
+      "repo": "UMich-CURLY/NavVerse-Benchmark",
+      "path": "navverse/episode.py",
+      "ranges": [
+        [
+          23,
+          142
+        ]
+      ],
+      "why": "scene/episode/goal與兩種instruction schema",
+      "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b"
+    },
+    {
+      "repo": "UMich-CURLY/NavVerse-Benchmark",
+      "path": "navverse/measures.py",
+      "ranges": [
+        [
+          1,
+          12
+        ],
+        [
+          194,
+          265
+        ],
+        [
+          291,
+          350
+        ],
+        [
+          430,
+          462
+        ],
+        [
+          546,
+          642
+        ]
+      ],
+      "why": "success/SPL/碰撞率的實際公式",
+      "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b"
+    },
+    {
+      "repo": "UMich-CURLY/NavVerse-Benchmark",
+      "path": "baselines/eval_navverse.py",
+      "ranges": [
+        [
+          1400,
+          1420
+        ]
+      ],
+      "why": "split manifest驗證與隔離episode目錄",
+      "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b"
+    }
+  ],
+  "environment": "作者報100室內＋50室外＋50連接場景，來源USD/navmesh/scene_scale/collider設定另存。這是作者release聲明，尚非本庫已取得200個資產。",
+  "tasks": "ObjNav/VLN/PlaceNav三種條件導航；原episode_target_type分obj/place，instruction_type分target/vln，避免把同一終點的兩種指令視為新場景。",
+  "data": "VLNEpisode含scene_id/scene_type/episode_id/path/scale/navmesh_preset、goals(instance/type/location/radius/reference_path)、start_position/start_rotation；episode_label=scene_id+episode_id。JSON讀取錯誤會continue，匯入應另列遺漏。",
+  "evaluation": "距離取當前點到各reference_path點的直距＋後續路徑長，再扣目標半徑；成功需STOP且距離<1.6。SPL由該初始距離與實走長計。collision以有移動指令但pose變化<0.015判斷，collision_rate平均此代理訊號，非直接物理碰撞次數；保留原名與操作定義。",
+  "standardization": {
+    "profile": "continuous_indoor_outdoor_navigation",
+    "reuse": "場景與episode schema、split manifests、語言/目標條件和native measures。",
+    "transform": "environment固定場景包hash+navmesh/collider；case存scene_episode+目標/指令/機體/控制模式；metric存實際距離近似、STOP及卡住判定而非僅縮寫。",
+    "missing": "10,000作者報episode的全量取得／ID完整性、各機體控制與場景有效性、物理contact及近似指標對照。"
+  },
+  "version_note": "原PDF p1連umich-curly.github.io/NavVerse-Benchmark，與此同名組織庫和題名相符；本次固定2026-09後更新之commit，非宣稱逐項重現7月版本。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

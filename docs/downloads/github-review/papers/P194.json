@@ -1,0 +1,47 @@
+{
+  "paper_id": "P194",
+  "name": "Cloth gripper interface",
+  "title": "A Simple Gripper Interface for Simulator-Agnostic Cloth Manipulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.29340",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P194",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "這篇提供模擬器無關的cloth gripper概念介面，適合參考action contract；原文未提供可確認的GitHub，不能當成已取得的跨模擬器adapter。",
+    "environment": "原文在constraint-based不可伸長四邊形cloth mesh模擬；說明如何接position/force/constraint三類solver，並非已驗證所有backend等價。",
+    "tasks": "兩種grasping volume：box pinch與square-pyramid point grasp；屬抓持模型選項，沒有因此新增兩種完整摺布task或case庫。",
+    "data": "指令由gripper位置/四元數/jaw state組成；在open→closed時用local-volume內的節點、面中心和邊中心挑grasp support，儲存local座標直到open清除；squeeze按數個simulation steps插值。尚無可取原生程式、trajectory schema或split。",
+    "evaluation": "原文比較抓持策略/可控性與計算成本；抓持用移動位置約束，沒有計算夾爪壓力、摩擦或完整局部變形。此模型的穩定抓持不等於真實摩擦/滑脫測試通過。",
+    "standardization": {
+      "profile": "simulator_agnostic_kinematic_cloth_grasp_interface",
+      "reuse": "清楚的pose/jaw/grasp-region契約與solver適配概念。",
+      "transform": "environment必存grasp_model、mesh解析度、抓持集合與squeeze時間；action記local/world pose及jaw edge；不同backend分別驗證，不將相同函式名稱當物理等價。",
+      "missing": "作者實作、solver接口、原生評測資料與可重現案例；壓力/摩擦/滑脫/恢復能力另需支持的物理模型。"
+    },
+    "version_note": "已讀2609.29340v2 p3–4；原文Drive連結為示例素材，cached精確gripper-interface搜尋未確認GitHub。只登錄方法/接口參考，沒有假造code路徑。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.29340",
+      "pdf_sha256": "f583e2b7aff2c99ebc92e5fb9145aaffa01c21f5e2e11050930226eb49a44582",
+      "paper_pages_read": [
+        3,
+        4
+      ],
+      "discovery_record": "audit/.cache/github_review/P194-discovery.json"
+    },
+    "reading_order": [],
+    "review_sha256": "6cf99af15e710ac2cb811eb88c065f22c9dcb2f0e971a7bef67a2e866f9d297a"
+  },
+  "repository_binding_review_sha256": "6cf99af15e710ac2cb811eb88c065f22c9dcb2f0e971a7bef67a2e866f9d297a",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [],
+  "source_review": null,
+  "repositories": [],
+  "external_repositories": []
+}

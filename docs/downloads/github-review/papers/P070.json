@@ -1,0 +1,643 @@
+{
+  "paper_id": "P070",
+  "name": "RoboCasa",
+  "title": "RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2406.02523",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P070",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "2024 RoboCasa 的資料介面可由官方 v0.2 tag 核讀：25項 single-stage 資料註冊、5項 multi-stage 資料註冊、HDF5 重播與具體幾何 checker。這些資料入口不是論文100項任務的完整清單；現行 main 已轉為 RoboCasa365。",
+    "identity_note": "對應 arXiv:2406.02523v1（2024-06-04）及八位作者的 RSS 2024 論文。v0.2 README 直接列此題名／作者並連原論文；v0.2 是同一作品的後續維護版，未宣稱其commit就是投稿時程式。",
+    "discovery_evidence": [
+      {
+        "kind": "pinned_primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P070/pages.json",
+        "pages": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "pdf_sha256": "7aca93ca3f157e32a46e02d675b3b2c24e3073a7807c038f7f566b73db87bde3"
+      },
+      {
+        "kind": "official_tag_resolution",
+        "local_file": "audit/.cache/github_review_worker/P069-P076/robocasa-tags.json",
+        "source_manifest": "audit/.cache/github_review_worker/P069-P076/robocasa-tags.receipt.json",
+        "ref": "v0.2",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb"
+      }
+    ],
+    "environment": "原論文10個floor plans×12個styles＝120種廚房組合；v0.2 scene_registry 的layout ID為0–9、style為0–11，分別解到YAML。fixtures包括櫃子、檯面、家電；一個layout的材質變化不另算平面配置。",
+    "tasks": "論文100項＝25 atomic＋75 composite。已讀PnPCounterToCab把物件從檯面放入櫃內；get_ep_meta.lang插入抽樣物件名稱，_get_obj_cfgs給name/obj_groups/graspable/placement及兩個幹擾物。資料registry的5個composite入口只涵蓋ArrangeVegetables、MicrowaveThawing、RestockPantry、PreSoakPan、PrepareCoffee，不能據此說其餘任務不存在。",
+    "data": "registry以human_path、mg_path、horizon及download_links連接v0.1資料；human_raw讀demo.hdf5，human_im／mg_im分別挑選帶影像／生成材質的檔案，NavigateKitchen沒有mg_path。HDF5 data.attrs.env_args提供env_name/type/env_kwargs；data/demo_N內含states、actions或actions_abs、obs/<camera>_image，attrs含model_file與ep_meta。ep_meta、XML、資產與初態需一起還原，frame index、控制頻率與影片抽幀分開記。",
+    "evaluation": "已閉合run_random_rollouts→PnPCounterToCab._check_success→obj_inside_of AND gripper_obj_far。前者檢查物件8個bbox角點對fixture內部3軸的投影，後者要求eef與物件中心距離>0.25公尺。obj_inside_of的0.05加在未正規化軸向量的內積上，不能直接標為5公分容許誤差。create_eval_env固定(1,1)/(2,2)/(4,4)/(6,9)/(7,10)，obj_instance_split=B。論文每task50 trials；這裡main只是3回合×100步隨機動作示例，不是正式BC-Transformer評測預算。",
+    "standardization": {
+      "profile": "kitchen_task_definitions_and_hdf5_episodes",
+      "reuse": "layout/style YAML引用、原生task class、物件抽樣與語言模板、v0.1 HDF5資料來源、task checker。",
+      "transform": "source固定論文v1與程式v0.2；environment分layout/style/asset；task保留PnP等原生ID；case記物件split、場景pair、初態與控制設定；evaluator分開bool成功、step horizon及trial數。raw、rendered、MimicGen資料保留派生關係。",
+      "missing": "完整75 composite與已公開資料入口的逐項對應、原始2024程式／robosuite精確版本、正式policy runner設定與50 trials seed清單，以及HDF5／資產閉合驗證。"
+    },
+    "version_note": "v0.2固定756598a5be52e052339bb2d957426e39015c2afb；目前main固定456174f62b89b8fca99eaaf33949c29fec9cfc2a，屬P071。不可把v0.2的0-based layout/style、PnPCounterToCab、HDF5 env_args與365的1-based ID、PickPlaceCounterToCabinet、LeRobot格式按名稱直接合併。舊版仍要求robosuite master並留有舊controller入口，需要額外鎖定相容版本。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            29
+          ],
+          [
+            90,
+            98
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 98,
+        "sha256": "e8df3848c57411d770219e5d71ec9be5bf39439555547fb967536f4d707e7252",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/README.md",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/README.md#L1-L29",
+        "why": "確認2024作品與後續v0.2／robosuite v1.5依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "robocasa/models/scenes/scene_registry.py",
+        "ranges": [
+          [
+            7,
+            62
+          ],
+          [
+            65,
+            118
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 154,
+        "sha256": "c7233febbc62c5175cea7e584d6c295ac15e9077af9a593d88fafd106e8353bc",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/models/scenes/scene_registry.py",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/models/scenes/scene_registry.py#L7-L62",
+        "why": "10種layout、12種style各有獨立ID與YAML引用。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "robocasa/utils/dataset_registry.py",
+        "ranges": [
+          [
+            1,
+            354
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 354,
+        "sha256": "9bcca3be8bf0380050f5a1e768a11d53099b4254c95e54af3007ebf3b8514bb7",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/utils/dataset_registry.py",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/utils/dataset_registry.py#L1-L354",
+        "why": "逐項核讀25＋5資料入口、horizon、v0.1資料路徑、raw/image/MimicGen選擇。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "robocasa/environments/kitchen/single_stage/kitchen_pnp.py",
+        "ranges": [
+          [
+            24,
+            139
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 908,
+        "sha256": "93bc570061133bea1cdf901708507f0e963228b8febbede4d96a74d145323b45",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/environments/kitchen/single_stage/kitchen_pnp.py",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/environments/kitchen/single_stage/kitchen_pnp.py#L24-L139",
+        "why": "PnPCounterToCab的指令、fixtures、目標／幹擾物、初始開門及成功條件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "robocasa/utils/object_utils.py",
+        "ranges": [
+          [
+            12,
+            60
+          ],
+          [
+            349,
+            356
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 367,
+        "sha256": "744f8429d88cee5f47b21ed6c89a103141c475ac4f887b6ee27439a1648a28f1",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/utils/object_utils.py",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/utils/object_utils.py#L12-L60",
+        "why": "從checker追到bounding-box投影與gripper距離閾值。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "robocasa/scripts/playback_dataset.py",
+        "ranges": [
+          [
+            133,
+            191
+          ],
+          [
+            214,
+            272
+          ],
+          [
+            378,
+            395
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 540,
+        "sha256": "e367562c0435feb8244d4c21cc4f7bed3ef21dbb635fdbbddb41d047d2e881ff",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/scripts/playback_dataset.py",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/scripts/playback_dataset.py#L133-L191",
+        "why": "HDF5 reader與模型、ep_meta、states、actions還原。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+        "ref": "v0.2",
+        "path": "robocasa/utils/eval_utils.py",
+        "ranges": [
+          [
+            16,
+            59
+          ],
+          [
+            62,
+            103
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 103,
+        "sha256": "f98b32a31440e6f5002e8881bbbb507b00f278ebb5223fc7f0cecb6ce687e91a",
+        "url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/utils/eval_utils.py",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/756598a5be52e052339bb2d957426e39015c2afb/robocasa/utils/eval_utils.py#L16-L59",
+        "why": "五個固定場景組合、B物件split與成功時計數的參考loop。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robocasa/robocasa",
+        "requested_repo": "robocasa/robocasa",
+        "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+        "ref": "main_snapshot",
+        "path": "README.md",
+        "ranges": [
+          [
+            5,
+            22
+          ],
+          [
+            142,
+            150
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 150,
+        "sha256": "7c0c1a7ce2f12e459fe8b2bf79be8ecf065e13740ecd8bcf6e207d2a3a196eb6",
+        "url": "https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/README.md",
+        "reading_url": "https://github.com/robocasa/robocasa/blob/456174f62b89b8fca99eaaf33949c29fec9cfc2a/README.md#L5-L22",
+        "why": "確認目前main承載365版，避免把新版本規模回填2024論文。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "5b25b28a5a6b0c4cb5e5a2cfd4623d2eaff9c42b0fcad97d9092c34589bd4811"
+  },
+  "repository_binding_review_sha256": "5b25b28a5a6b0c4cb5e5a2cfd4623d2eaff9c42b0fcad97d9092c34589bd4811",
+  "repository_bindings": [
+    {
+      "requested_repo": "robocasa/robocasa",
+      "resolved_repo": "robocasa/robocasa",
+      "aliases_in_this_review": [
+        "robocasa/robocasa"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+          "reviewed_files": [
+            "README.md"
+          ]
+        },
+        {
+          "commit": "756598a5be52e052339bb2d957426e39015c2afb",
+          "reviewed_files": [
+            "README.md",
+            "robocasa/environments/kitchen/single_stage/kitchen_pnp.py",
+            "robocasa/models/scenes/scene_registry.py",
+            "robocasa/scripts/playback_dataset.py",
+            "robocasa/utils/dataset_registry.py",
+            "robocasa/utils/eval_utils.py",
+            "robocasa/utils/object_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/robocasa/robocasa",
+          "link_label": "Code",
+          "project_url": "https://robocasa.ai",
+          "page_sha256": "b5f482f117a5b6cb47d1fa76c7d86bd269da32a00b38025df335cdb2f19972de"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "robocasa/robocasa",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "4f8a2980def75a55dff96b990745b83540425f09"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "robocasa/robocasa",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "4f8a2980def75a55dff96b990745b83540425f09"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P070",
+          "review_file": "content/github_review/reviews/P070.json",
+          "review_sha256": "5b25b28a5a6b0c4cb5e5a2cfd4623d2eaff9c42b0fcad97d9092c34589bd4811",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P070",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboCasa，arXiv 2406.02523v1。",
+    "scope_read": "場景、資產、100tasks組成、MimicGen數據與正式eval子集。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "10 floor plans×12 styles＝120 scenes；只能把10稱平面layout數。額外AI textures不新增layout。",
+    "tasks": "100＝25 atomic（8skills）＋75 composite（20料理活動標籤下生成並實作）。",
+    "cases": "atomic有1,250 human demos；生成實驗72K（24tasks，排除navigation）另28K組成100K發布集。主要eval每task50 trials，分5個固定場景。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "floor plans",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 120,
+        "unit": "layout-style scenes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 75,
+        "unit": "composite tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100000,
+        "unit": "generated trajectories",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "物理task success；按skill、資料規模、未見物件／style分列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "eval只用未見物件實例；5場景中2種style未見。MimicGen有成功rejection sampling，訓練資料成功不代表policy成功。",
+    "lineage": "Robosuite底座、Objaverse／Luma資產、MimicGen擴樣；後續RoboCasa365是同家族延伸。",
+    "related_paper_ids": [
+      "P069",
+      "P071"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§III-B/C、§IV、§V-A",
+        "supports": "10 vs120、25+75、100K及eval範圍"
+      }
+    ],
+    "unresolved": [
+      "本庫先前收集的60個來源場景條目來自不同repo版本，不能與此PDF120 scenes混寫，更不能叫60獨立layouts。"
+    ],
+    "reuse": "支持生活工作组合擴充；域仍主要在廚房，須報真實layout與style層次。",
+    "reviewed_pdf_sha256": "7aca93ca3f157e32a46e02d675b3b2c24e3073a7807c038f7f566b73db87bde3",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboCasa",
+    "year": 2024,
+    "title": "RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots",
+    "source_url": "https://arxiv.org/abs/2406.02523",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P070",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P070",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "100＝25 atomic（8skills）＋75 composite（20料理活動標籤下生成並實作）。",
+            "10 floor plans×12 styles＝120 scenes；只能把10稱平面layout數。額外AI textures不新增layout。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7aca93ca3f157e32a46e02d675b3b2c24e3073a7807c038f7f566b73db87bde3"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7aca93ca3f157e32a46e02d675b3b2c24e3073a7807c038f7f566b73db87bde3",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P070",
+      "name": "RoboCasa",
+      "expected_title": "RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots",
+      "source_url": "https://arxiv.org/abs/2406.02523",
+      "pdf_url": "https://arxiv.org/pdf/2406.02523",
+      "retrieved_at": "2026-10-02T21:33:39.571927+00:00",
+      "pdf_sha256": "7aca93ca3f157e32a46e02d675b3b2c24e3073a7807c038f7f566b73db87bde3",
+      "text_sha256": "5876d5eb6430b122ea96d814902fa750e321d4838fc77796b081ca15814b0493",
+      "pdf_bytes": 8307032,
+      "pages": 16,
+      "text_characters": 90860,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2406.02523v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2406.02523v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "floor plans",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P070:1",
+        "paper_id": "P070",
+        "benchmark": "RoboCasa",
+        "native_term": "floor plans",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2406.02523v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2406.02523v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 120,
+        "unit": "layout-style scenes",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P070:2",
+        "paper_id": "P070",
+        "benchmark": "RoboCasa",
+        "native_term": "layout-style scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2406.02523v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2406.02523v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "tasks",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P070:3",
+        "paper_id": "P070",
+        "benchmark": "RoboCasa",
+        "native_term": "tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2406.02523v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2406.02523v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 75,
+        "unit": "composite tasks",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P070:4",
+        "paper_id": "P070",
+        "benchmark": "RoboCasa",
+        "native_term": "composite tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2406.02523v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2406.02523v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100000,
+        "unit": "generated trajectories",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P070:5",
+        "paper_id": "P070",
+        "benchmark": "RoboCasa",
+        "native_term": "generated trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2406.02523v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2406.02523v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "robocasa/robocasa"
+  ],
+  "external_repositories": []
+}

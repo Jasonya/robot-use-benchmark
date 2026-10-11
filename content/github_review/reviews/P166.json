@@ -1,0 +1,101 @@
+{
+  "paper_id": "P166",
+  "reviewed_on": "2026-10-11",
+  "status": "website_only",
+  "summary": "已確認SafeVLA-Bench的作者網站庫與原論文相符；榜單提供task-aware安全評估定義，但新找到的SafeVLA-Bench-release入口取得回404，尚未讀到其STL scorer。",
+  "reading_order": [
+    {
+      "repo": "JFan5/safevla.org",
+      "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          30
+        ]
+      ],
+      "why": "網站用途、safevla.org與展示內容"
+    },
+    {
+      "repo": "JFan5/safevla.org",
+      "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+      "path": "index.html",
+      "ranges": [
+        [
+          13,
+          16
+        ],
+        [
+          43,
+          86
+        ],
+        [
+          343,
+          373
+        ]
+      ],
+      "why": "精確論文ID、榜單規模、8spec與N/A語義"
+    },
+    {
+      "repo": "JFan5/safevla.org",
+      "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+      "path": "leaderboard.html",
+      "ranges": [
+        [
+          128,
+          177
+        ]
+      ],
+      "why": "每suite rollout分母、種子群組、release入口與9月重計版本"
+    }
+  ],
+  "environment": "沿用LIBERO四suite及RoboCasa-365 atomic-seen，所加的是事後trajectory instrumentation與安全規則；不自動增加獨立scene或task。",
+  "tasks": "論文p5記58個既有task，使用7種機制template組合和物件tag選適用條款。8個安全family分scene interaction、object handling、execution三組；規則條款數不是task數。",
+  "data": "作者榜單宣稱24policy、27policy–benchmark entries、22,500 scored rollouts；LIBERO每row每suite10task×20episode=200，RoboCasa18family×50=900。這些是已報run數，不能直接當獨立評測case量；兩組RoboCasa seed互不配對。",
+  "evaluation": "SR沿用父benchmark；Safety=滿足所有適用條款的episode比例；SBU=成功且違規佔全部episode，SBU/SR才是成功中違規比例；VSI為每episode最嚴重違規的正規化深度。signal不可用是N/A。9月版本由per-step force重新算RoboCasa，舊action-log數字不能混報。閾值屬文中模擬proxy，不是實體安全認證。",
+  "standardization": {
+    "profile": "posthoc_task_aware_trajectory_audit",
+    "reuse": "適用條款registry概念、原生success與附加規則分離、四種度量的分母及結果版本註記。",
+    "transform": "task保留原LIBERO/RoboCasa ID，evaluator另版本化STL/threshold/tags；case保留相同input/action/budget，新增per-step raw signal evidence與N/A，而非把安全規則乘成新task數。",
+    "missing": "release repo可存取、compute_stl_robustness.py實作、per-episode verdict/force logs、clauses與template明細及重現。"
+  },
+  "version_note": "網站固定3178c93並直接引用2606.00773；leaderboard L160連JFan5/SafeVLA-Bench-release，但本次API404。Jatshi同名庫是另一研究，未混入。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2606.00773",
+    "pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a",
+    "paper_pages_read": [
+      4,
+      5
+    ],
+    "release_access": {
+      "requested_url": "https://api.github.com/repos/JFan5/SafeVLA-Bench-release",
+      "retrieved_at": "2026-10-11T00:49:01.733399+00:00",
+      "status": 404,
+      "error": "Not Found"
+    }
+  },
+  "additional_repo_proposals": [
+    {
+      "repo": "JFan5/SafeVLA-Bench-release",
+      "reason": "作者固定版leaderboard.html L157–165明確連結的評估release；本次取得404，作待取得入口。",
+      "source_role": "announced_evaluation_release",
+      "access_status": 404
+    }
+  ],
+  "repository_candidate_dispositions": [
+    {
+      "repo": "JFan5/SafeVLA-Bench-release",
+      "status": "announced_repository_unavailable",
+      "reason": "原作／作者頁明列的入口；保存於2026-10-11T00:49:01.733399+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+      "evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/JFan5/SafeVLA-Bench-release",
+          "retrieved_at": "2026-10-11T00:49:01.733399+00:00",
+          "status": 404,
+          "error": "Not Found"
+        }
+      ]
+    }
+  ]
+}

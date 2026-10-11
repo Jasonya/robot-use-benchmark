@@ -1,0 +1,644 @@
+{
+  "paper_id": "P017",
+  "name": "HOI4D",
+  "title": "HOI4D: A 4D Egocentric Dataset for Category-Level Human-Object Interaction",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2203.01577",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P017",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "HOI4D 有可直接利用的 room、layout、物件與任務路徑，原生任務表也已核讀；後續 semantic/action segmentation challenge 的張量與類別空間需獨立儲存。",
+    "environment": "路徑 ZY/H/C/N/S/s/T 分別代表 camera、human、object class、object instance、room、room layout、task。S 與 s 才提供實體房間／佈局身份，T 不可計為新環境。",
+    "tasks": "task_definitions.csv 按 16 個物件類別列 T1–T6，含取放、開關、切割、倒水、收納、裝訂等；有 N/A 和相同文字重複欄位。T 編號僅在物件類別內有意義，不能把列×欄或動作 segmentation label 當通用任務總數。",
+    "data": "align_rgb/depth、objpose JSON、action/color.json、raw_pc/label.pcd、相機 output.log、motion masks 與 MANO pose 各自保留。CAD 的 canonical frame 定義物件姿態；MANO 轉米時除 1000。action challenge HDF5 讀 pcd/center/label，與原始 RGB-D 資料是加工關係。",
+    "evaluation": "semantic test_seg.py 去掉輸出 channel 0/1、回加 label offset=2，再聚合各類 intersection/union；跳過 0/1 與 GT 無樣本類，計 macro accuracy/mIoU。action train_p4.py 用 frame accuracy、segment edit 與 F1@.1/.25/.5，結果還依 batch 聚合。公開 challenge 輸出形狀分別 (892,300,8192) 與 (892,150)，是序列×時間×點或序列×時間，不能當任務類別數。",
+    "standardization": {
+      "profile": "rgbd_hand_object_4d",
+      "reuse": "room/layout/task 身份、原生任務表、CAD articulation／pose 及 semantic/action 評分。",
+      "transform": "保留 C+T 複合 task ID 並以 parent source 追溯，N/A 不計數，重複語義僅提出待核對關係。environment 用 S/s，case 記原始序列→challenge HDF5 row 的對映、點取樣與 label mapping；3D/4D segmentation、動作分割與人體姿態分 profile。",
+      "missing": "尚未取得 RGB-D、CAD、HDF5 或執行 CUDA baseline；需要 release.txt 和 challenge row-order／sampling 對映、標註時間單位與原生 challenge evaluator 版本核對。不能把具有人類取放標籤的影片當已可執行的機器人題。"
+    },
+    "version_note": "三倉庫均引用同一 HOI4D 論文；兩個 challenge 倉庫同時引用後續 PPTr，不表示這些程式和首版論文的所有協定完全相同。task 表的 T1–T6 是來源內編碼，與本計畫舊 T 模組無關。",
+    "runtime_executed": false,
+    "identity_note": "Instructions 的精確標題／作者／官方專案連結及兩個 challenge README 的同題引用、hoi4d.top 指向一致；保留各自 repo 角色。",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "leolyliu/HOI4D-Instructions",
+        "requested_repo": "leolyliu/HOI4D-Instructions",
+        "commit": "15478666c44af86740d537e89b72cd47efeb44f8",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            113
+          ],
+          [
+            133,
+            169
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 169,
+        "sha256": "4cedf0eea779d9743d8ba6ec064e3518767729e7305f284dd2b44726e7935cc7",
+        "url": "https://github.com/leolyliu/HOI4D-Instructions/blob/15478666c44af86740d537e89b72cd47efeb44f8/README.md",
+        "reading_url": "https://github.com/leolyliu/HOI4D-Instructions/blob/15478666c44af86740d537e89b72cd47efeb44f8/README.md#L1-L113",
+        "why": "資料路徑、姿態與空間資產約定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leolyliu/HOI4D-Instructions",
+        "requested_repo": "leolyliu/HOI4D-Instructions",
+        "commit": "15478666c44af86740d537e89b72cd47efeb44f8",
+        "ref": null,
+        "path": "definitions/task/task_definitions.csv",
+        "ranges": [
+          [
+            1,
+            17
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 17,
+        "sha256": "8e01b3977f68306897b56f0912639119e79516ce6efcb41695edbdfa19c4f159",
+        "url": "https://github.com/leolyliu/HOI4D-Instructions/blob/15478666c44af86740d537e89b72cd47efeb44f8/definitions/task/task_definitions.csv",
+        "reading_url": "https://github.com/leolyliu/HOI4D-Instructions/blob/15478666c44af86740d537e89b72cd47efeb44f8/definitions/task/task_definitions.csv#L1-L17",
+        "why": "逐物件原生任務表",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hoi4d/HOI4D_SemSeg",
+        "requested_repo": "hoi4d/HOI4D_SemSeg",
+        "commit": "66df3ff3f0465a9863781aace4d4f16bc204a43e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 55,
+        "sha256": "7866951ba53177b8b9046a4fdb5ddd91189cde2c9e3f63db6ed0288ee2de0c1a",
+        "url": "https://github.com/hoi4d/HOI4D_SemSeg/blob/66df3ff3f0465a9863781aace4d4f16bc204a43e/README.md",
+        "reading_url": "https://github.com/hoi4d/HOI4D_SemSeg/blob/66df3ff3f0465a9863781aace4d4f16bc204a43e/README.md#L1-L55",
+        "why": "challenge 身份與輸出 shape",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hoi4d/HOI4D_SemSeg",
+        "requested_repo": "hoi4d/HOI4D_SemSeg",
+        "commit": "66df3ff3f0465a9863781aace4d4f16bc204a43e",
+        "ref": null,
+        "path": "test_seg.py",
+        "ranges": [
+          [
+            20,
+            28
+          ],
+          [
+            31,
+            55
+          ],
+          [
+            65,
+            100
+          ],
+          [
+            144,
+            166
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 189,
+        "sha256": "92816e7a1a18df6d1143d7cb5ab0d288d65e226e2863158fd16152eb8eba5bda",
+        "url": "https://github.com/hoi4d/HOI4D_SemSeg/blob/66df3ff3f0465a9863781aace4d4f16bc204a43e/test_seg.py",
+        "reading_url": "https://github.com/hoi4d/HOI4D_SemSeg/blob/66df3ff3f0465a9863781aace4d4f16bc204a43e/test_seg.py#L20-L28",
+        "why": "label offset、skip 與 mIoU",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hoi4d/HOI4D_ActionSeg",
+        "requested_repo": "hoi4d/HOI4D_ActionSeg",
+        "commit": "ca779d86ad3dbf03275e0bc02bf4f9a5cf025884",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            54
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 54,
+        "sha256": "48cad99215abb7d2d40b5ead97db25d0b8c8ddc04d0cfef12f3d7ee8af159712",
+        "url": "https://github.com/hoi4d/HOI4D_ActionSeg/blob/ca779d86ad3dbf03275e0bc02bf4f9a5cf025884/README.md",
+        "reading_url": "https://github.com/hoi4d/HOI4D_ActionSeg/blob/ca779d86ad3dbf03275e0bc02bf4f9a5cf025884/README.md#L1-L54",
+        "why": "action challenge 格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hoi4d/HOI4D_ActionSeg",
+        "requested_repo": "hoi4d/HOI4D_ActionSeg",
+        "commit": "ca779d86ad3dbf03275e0bc02bf4f9a5cf025884",
+        "ref": null,
+        "path": "datasets/AS_base.py",
+        "ranges": [
+          [
+            1,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 80,
+        "sha256": "7e5c79c54a2a2e1eb238c530a8b499b1dac3cbdd066668a1b69fa19f28ea966d",
+        "url": "https://github.com/hoi4d/HOI4D_ActionSeg/blob/ca779d86ad3dbf03275e0bc02bf4f9a5cf025884/datasets/AS_base.py",
+        "reading_url": "https://github.com/hoi4d/HOI4D_ActionSeg/blob/ca779d86ad3dbf03275e0bc02bf4f9a5cf025884/datasets/AS_base.py#L1-L80",
+        "why": "HDF5 schema 與 train/test 讀取",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hoi4d/HOI4D_ActionSeg",
+        "requested_repo": "hoi4d/HOI4D_ActionSeg",
+        "commit": "ca779d86ad3dbf03275e0bc02bf4f9a5cf025884",
+        "ref": null,
+        "path": "train_p4.py",
+        "ranges": [
+          [
+            66,
+            80
+          ],
+          [
+            88,
+            96
+          ],
+          [
+            114,
+            143
+          ],
+          [
+            147,
+            189
+          ],
+          [
+            258,
+            270
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 311,
+        "sha256": "ad0284a90c3aba15ad0f184c7f9720c48aefaf108fcb74cadee816286cbf6796",
+        "url": "https://github.com/hoi4d/HOI4D_ActionSeg/blob/ca779d86ad3dbf03275e0bc02bf4f9a5cf025884/train_p4.py",
+        "reading_url": "https://github.com/hoi4d/HOI4D_ActionSeg/blob/ca779d86ad3dbf03275e0bc02bf4f9a5cf025884/train_p4.py#L66-L80",
+        "why": "frame accuracy／edit／F1",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "66e3d083d4c9b474d0d118491b1d2f75917c208914440cceabe60daa059f0eb1"
+  },
+  "repository_binding_review_sha256": "66e3d083d4c9b474d0d118491b1d2f75917c208914440cceabe60daa059f0eb1",
+  "repository_bindings": [
+    {
+      "requested_repo": "hoi4d/HOI4D_ActionSeg",
+      "resolved_repo": "hoi4d/HOI4D_ActionSeg",
+      "aliases_in_this_review": [
+        "hoi4d/hoi4d_actionseg"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ca779d86ad3dbf03275e0bc02bf4f9a5cf025884",
+          "reviewed_files": [
+            "README.md",
+            "datasets/AS_base.py",
+            "train_p4.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "HOI4D",
+          "search_receipt_sha256": "fa28765d17cf5a22186696a4aece39a75bece404a759ffbf8838eeaa39f4ff79",
+          "url": "https://github.com/hoi4d/HOI4D_ActionSeg",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P017",
+          "review_file": "content/github_review/reviews/P017.json",
+          "review_sha256": "66e3d083d4c9b474d0d118491b1d2f75917c208914440cceabe60daa059f0eb1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "hoi4d/HOI4D_SemSeg",
+      "resolved_repo": "hoi4d/HOI4D_SemSeg",
+      "aliases_in_this_review": [
+        "hoi4d/hoi4d_semseg"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "66df3ff3f0465a9863781aace4d4f16bc204a43e",
+          "reviewed_files": [
+            "README.md",
+            "test_seg.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "HOI4D",
+          "search_receipt_sha256": "fa28765d17cf5a22186696a4aece39a75bece404a759ffbf8838eeaa39f4ff79",
+          "url": "https://github.com/hoi4d/HOI4D_SemSeg",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P017",
+          "review_file": "content/github_review/reviews/P017.json",
+          "review_sha256": "66e3d083d4c9b474d0d118491b1d2f75917c208914440cceabe60daa059f0eb1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "leolyliu/HOI4D-Instructions",
+      "resolved_repo": "leolyliu/HOI4D-Instructions",
+      "aliases_in_this_review": [
+        "leolyliu/hoi4d-instructions"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "15478666c44af86740d537e89b72cd47efeb44f8",
+          "reviewed_files": [
+            "README.md",
+            "definitions/task/task_definitions.csv"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "HOI4D",
+          "search_receipt_sha256": "fa28765d17cf5a22186696a4aece39a75bece404a759ffbf8838eeaa39f4ff79",
+          "url": "https://github.com/leolyliu/HOI4D-Instructions",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P017",
+          "review_file": "content/github_review/reviews/P017.json",
+          "review_sha256": "66e3d083d4c9b474d0d118491b1d2f75917c208914440cceabe60daa059f0eb1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P017",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HOI4D，arXiv 2203.01577v4。",
+    "scope_read": "資料概述與三個benchmark完整定義／主要評分。",
+    "pages_read": [
+      1,
+      2,
+      7,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "610個室內rooms（錄製環境）；4個參與者，不是610個已接入互動模擬器。",
+    "tasks": "16物件類別、800實例；3端點：category-level pose tracking、4D segmentation、action segmentation。pose實驗只取4剛體＋1關節類別。",
+    "cases": "4,000 sequences、2.4M RGB-D影格；4D分割專用376影片／14語義類別，不能把全資料量當每個端點實測量。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 610,
+        "unit": "錄製rooms",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 800,
+        "unit": "物件實例",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "物件類別",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4000,
+        "unit": "sequences",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 376,
+        "unit": "4D分割影片子集（含train/test）",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "pose：5°5cm accuracy、旋轉／平移誤差；以擾動GT pose初始化。",
+      "4D分割mIoU；動作分段Acc、edit、F1@10/25/50。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "4D sequence隨機7:3 train/test；不等同未見房間或受試者切分。",
+    "lineage": "自行蒐集RGB-D及模型；NOCS／H2O／GTEA是外部對照，不屬本庫量。",
+    "evidence": [
+      {
+        "pages": [
+          1
+        ],
+        "locator": "Abstract",
+        "supports": "610／800／16／4,000"
+      },
+      {
+        "pages": [
+          7,
+          8
+        ],
+        "locator": "§6.1–6.3",
+        "supports": "端點子集與metric"
+      }
+    ],
+    "unresolved": [
+      "610 rooms的逐ID清單與可用重建品質未匯入。"
+    ],
+    "reuse": "補充物件／材質／房間變化和3D感知；原文明示未覆蓋雙手操作。",
+    "reviewed_pdf_sha256": "82c5f0bf505f59eed426c1efa03f12a4155a5e18416ff03477d9e25c301be74f",
+    "reviewed_on": "2026-10-02",
+    "name": "HOI4D",
+    "year": 2022,
+    "title": "HOI4D: A 4D Egocentric Dataset for Category-Level Human-Object Interaction",
+    "source_url": "https://arxiv.org/abs/2203.01577",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P017",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P017",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "16物件類別、800實例；3端點：category-level pose tracking、4D segmentation、action segmentation。pose實驗只取4剛體＋1關節類別。",
+            "610個室內rooms（錄製環境）；4個參與者，不是610個已接入互動模擬器。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "82c5f0bf505f59eed426c1efa03f12a4155a5e18416ff03477d9e25c301be74f"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "82c5f0bf505f59eed426c1efa03f12a4155a5e18416ff03477d9e25c301be74f",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P017",
+      "name": "HOI4D",
+      "expected_title": "HOI4D: A 4D Egocentric Dataset for Category-Level Human-Object Interaction",
+      "source_url": "https://arxiv.org/abs/2203.01577",
+      "pdf_url": "https://arxiv.org/pdf/2203.01577",
+      "retrieved_at": "2026-10-02T21:33:08.555173+00:00",
+      "pdf_sha256": "82c5f0bf505f59eed426c1efa03f12a4155a5e18416ff03477d9e25c301be74f",
+      "text_sha256": "5bb6125055dfc2ae720e29a610c8dc235749453842a7fe7dd8183ac64718db05",
+      "pdf_bytes": 10972752,
+      "pages": 17,
+      "text_characters": 94651,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2203.01577v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2203.01577v4"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 610,
+        "unit": "錄製rooms",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P017:1",
+        "paper_id": "P017",
+        "benchmark": "HOI4D",
+        "native_term": "錄製rooms",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2203.01577v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.01577v4",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 800,
+        "unit": "物件實例",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P017:2",
+        "paper_id": "P017",
+        "benchmark": "HOI4D",
+        "native_term": "物件實例",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2203.01577v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.01577v4",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "物件類別",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P017:3",
+        "paper_id": "P017",
+        "benchmark": "HOI4D",
+        "native_term": "物件類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2203.01577v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.01577v4",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4000,
+        "unit": "sequences",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P017:4",
+        "paper_id": "P017",
+        "benchmark": "HOI4D",
+        "native_term": "sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2203.01577v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.01577v4",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 376,
+        "unit": "4D分割影片子集（含train/test）",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P017:5",
+        "paper_id": "P017",
+        "benchmark": "HOI4D",
+        "native_term": "4D分割影片子集（含train/test）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2203.01577v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.01577v4",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "leolyliu/HOI4D-Instructions",
+    "hoi4d/HOI4D_SemSeg",
+    "hoi4d/HOI4D_ActionSeg"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,88 @@
+{
+  "paper_id": "P129",
+  "summary": "RH20T API能按時間對齊多相機、TCP和力矩，但不同機體有不同前處理；tactile原始資料可載入，按時間查詢接口仍是佔位。",
+  "reading_order": [
+    {
+      "repo": "rh20t/rh20t_api",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          60
+        ]
+      ],
+      "why": "資料API、相機/TCP/FT與毫秒查詢入口",
+      "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb"
+    },
+    {
+      "repo": "rh20t/rh20t_api",
+      "path": "rh20t_api/configurations.py",
+      "ranges": [
+        [
+          1,
+          83
+        ]
+      ],
+      "why": "機體單位/姿態/夾爪轉換及標定矩陣",
+      "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb"
+    },
+    {
+      "repo": "rh20t/rh20t_api",
+      "path": "rh20t_api/scene.py",
+      "ranges": [
+        [
+          38,
+          75
+        ],
+        [
+          114,
+          115
+        ],
+        [
+          467,
+          489
+        ],
+        [
+          528,
+          550
+        ],
+        [
+          563,
+          592
+        ],
+        [
+          617,
+          639
+        ]
+      ],
+      "why": "最近影格、連續值插值、原始tactile與未實作接口",
+      "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb"
+    },
+    {
+      "repo": "rh20t/rh20t_api",
+      "path": "rh20t_api/online.py",
+      "ranges": [
+        [
+          127,
+          155
+        ]
+      ],
+      "why": "機體base到相機的TCP/FT投影",
+      "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb"
+    }
+  ],
+  "environment": "多機器人配置與相機序列的實拍操作場景；scene folder是資料record脈絡，機體/攝影機數不能當獨立環境數。",
+  "tasks": "多樣操作示範與多模態學習資料；此庫主要提供loader/visualizer/online preprocessor，任務目標與評測協定需連原文／來源metadata。",
+  "data": "時間查詢以毫秒，影像選最近low-frequency timestamp，TCP/FT/關節/夾爪值另線性插值。TCP7D四元數、FT6D；Kuka位置除1000，Franka/UR5姿態及不同gripper各有processor；標定和raw/zeroed FT不能混用。",
+  "evaluation": "沒有從此資料API取得通用task成功scorer。get_tactile(timestamp)與detect_outlier仍NotImplemented，高頻gripper getter也未實作；不能由tactile.npy存在推定整套評測介面可用。",
+  "standardization": {
+    "profile": "multimodal_robot_sensor_demonstration",
+    "reuse": "配置ID、相機serial、raw/aligned資料、毫秒時間與機體/相機轉換參數。",
+    "transform": "source/native scene與實際workspace分開；case保存各模態原始時間/插值方式/資料缺失、TCP encoding、FT零偏和gripper單位；sensor trace不是直接可執行action。",
+    "missing": "全量metadata/素材、任務goal及split、四元數插值有效性、tactile/高頻gripper接線與原生評測判分。"
+  },
+  "version_note": "固定aa31244 API版；README列出的接口和實作範圍分開。未下載大資料或進行online機器人投影執行。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

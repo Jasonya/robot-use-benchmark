@@ -1,0 +1,476 @@
+{
+  "paper_id": "P051",
+  "name": "USST / EgoPAT3D trajectories",
+  "title": "Uncertainty-aware State Space Transformer for Egocentric 3D Hand Trajectory Forecasting",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2307.08243",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P051",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "USST的實作包含EgoPAT3D-DT／H2O-PT重標註資料流程；未來手軌跡須連同觀測比例、相機座標與seen／unseen切分保存。",
+    "environment": "第一人稱影片中的既有拍攝場景；EgoPAT3D loader明列scene與record切分，不是新增可操作模擬場景。",
+    "tasks": "由過去影像／位置預測未來2D或3D手部軌跡；global與local版本是不同座標／輸入設定。",
+    "data": "EgoPAT3D的pkl含traj2d、traj3d及num_preserve；mp4和T×4×4 odometry以scene/record/clip對齊。loader保存有效長度、正規化參數並裁切或補零。",
+    "evaluation": "utils先反正規化，再依觀測比例計逐軌跡平均歐氏距離ADE、最後一點FDE及各軸絕對誤差；3D、2D像素、norm2d不可混報。test.py分開seen與unseen。",
+    "standardization": {
+      "profile": "egocentric_hand_trajectory_forecasting",
+      "reuse": "父資料ID、場景切分、軌跡／odometry欄位與原生距離函數。",
+      "transform": "case保留scene/record/clip、有效影格、觀測比例與座標系；camera pose是觀測或轉換證據，不能當作robot action。",
+      "missing": "原始影片與重標註資產閉合、H2O專用loader／評分分支細讀及可執行adapter驗證。"
+    },
+    "version_note": "已核讀EgoPAT3D主要資料與評分路徑；不將H2O分支或外部EgoPAT3D新版本視為已同等驗證。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "oppo-us-research/USST",
+        "requested_repo": "oppo-us-research/USST",
+        "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 171,
+        "sha256": "2fdf0e13f01ca8edac56244b210214f1598da7303c73030377d60b6ffa0ad7ee",
+        "url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/README.md",
+        "reading_url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/README.md#L1-L110",
+        "why": "確認論文身份、EgoPAT3D-DT／H2O-PT及模型設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "oppo-us-research/USST",
+        "requested_repo": "oppo-us-research/USST",
+        "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+        "ref": null,
+        "path": "src/EgoPAT3DLoader.py",
+        "ranges": [
+          [
+            28,
+            36
+          ],
+          [
+            38,
+            87
+          ],
+          [
+            90,
+            137
+          ],
+          [
+            146,
+            190
+          ],
+          [
+            194,
+            205
+          ],
+          [
+            208,
+            231
+          ],
+          [
+            233,
+            308
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 477,
+        "sha256": "4daff30963fc2d8bf7b4cd937c512520e5bdb43cb479961e3c3f92aa6a559feb",
+        "url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/EgoPAT3DLoader.py",
+        "reading_url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/EgoPAT3DLoader.py#L28-L36",
+        "why": "讀scene split、軌跡欄位、odometry與有效長度。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "oppo-us-research/USST",
+        "requested_repo": "oppo-us-research/USST",
+        "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+        "ref": null,
+        "path": "src/utils.py",
+        "ranges": [
+          [
+            57,
+            205
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 504,
+        "sha256": "00e1311afac424cfdaeb9c0d22f5e94c0ce6aef15776d1d33d4aca37908c80d9",
+        "url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/utils.py",
+        "reading_url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/utils.py#L57-L205",
+        "why": "讀反正規化、觀測比例及實際ADE/FDE。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "oppo-us-research/USST",
+        "requested_repo": "oppo-us-research/USST",
+        "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+        "ref": null,
+        "path": "test.py",
+        "ranges": [
+          [
+            52,
+            74
+          ],
+          [
+            76,
+            88
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 105,
+        "sha256": "00f404d3e13e8cbc0f02ee590ec80b6a0fc8d32143a7fad97592b1a5b26798fb",
+        "url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/test.py",
+        "reading_url": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/test.py#L52-L74",
+        "why": "確認seen／unseen及eval_space分項。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "880cbf21bc6a44c70f06b0b71db9883714c45dc3a56563bd268edc677946e0fb"
+  },
+  "repository_binding_review_sha256": "880cbf21bc6a44c70f06b0b71db9883714c45dc3a56563bd268edc677946e0fb",
+  "repository_bindings": [
+    {
+      "requested_repo": "oppo-us-research/USST",
+      "resolved_repo": "oppo-us-research/USST",
+      "aliases_in_this_review": [
+        "oppo-us-research/usst"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+          "reviewed_files": [
+            "README.md",
+            "src/EgoPAT3DLoader.py",
+            "src/utils.py",
+            "test.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "USST",
+          "search_receipt_sha256": "436ed1a59cbb0ec0c35c08c6b0fe67aad7b911843e35141272d55c1e08673536",
+          "url": "https://github.com/oppo-us-research/USST",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P051",
+          "review_file": "content/github_review/reviews/P051.json",
+          "review_sha256": "880cbf21bc6a44c70f06b0b71db9883714c45dc3a56563bd268edc677946e0fb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P051",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Uncertainty-aware State Space Transformer for Egocentric 3D Hand Trajectory Forecasting；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "居家整理與清潔",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EgoPAT3D-DT 14scenes＝11seen+3unseen；H2O重用原capture。",
+    "tasks": "3D hand-centroid trajectory forecasting；2D projection另報，不是完整手指控制。",
+    "cases": "H2O 8,203/1,735/3,715 train/val/test windows；EgoPAT3D-DT 6,356/846/1,605 seen test+2,334 unseen test。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 14,
+        "unit": "EgoPAT3D-DT scenes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3715,
+        "unit": "H2O-PT test windows",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1605,
+        "unit": "EgoPAT3D-DT seen-test windows",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2334,
+        "unit": "EgoPAT3D-DT unseen-test windows",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "ADE/FDE，3D以米、2D以frame size正規化；3D模型投影和2D直接模型分開。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "H2O64frame windows步長15，窗口重疊；EgoPAT3D有held-out scenes。",
+    "lineage": "H2O→PT/DT、EgoPAT3D→DT是新增標註；不把父原片重複計。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "後續Diff-IP2D提及原repo的FDE erratum；比較成績需固定修正版本。"
+    ],
+    "reuse": "可新增trajectory模組；相近窗口須依原影片群聚切分與估計。",
+    "reviewed_pdf_sha256": "592b977dc3d758aa321266c4f5e7588d29c8fd207b4630fa191021a49d73b634",
+    "reviewed_on": "2026-10-02",
+    "name": "USST / EgoPAT3D trajectories",
+    "year": 2023,
+    "title": "Uncertainty-aware State Space Transformer for Egocentric 3D Hand Trajectory Forecasting",
+    "source_url": "https://arxiv.org/abs/2307.08243",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "home",
+      "wearable"
+    ],
+    "review_tags": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P051",
+      "domain_ids": [
+        "home",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P051",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3D hand-centroid trajectory forecasting；2D projection另報，不是完整手指控制。",
+            "EgoPAT3D-DT 14scenes＝11seen+3unseen；H2O重用原capture。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "592b977dc3d758aa321266c4f5e7588d29c8fd207b4630fa191021a49d73b634"
+        },
+        {
+          "paper_id": "P051",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "第一人稱3D手部軌跡預測。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "592b977dc3d758aa321266c4f5e7588d29c8fd207b4630fa191021a49d73b634"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "592b977dc3d758aa321266c4f5e7588d29c8fd207b4630fa191021a49d73b634",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P051",
+      "name": "USST / EgoPAT3D trajectories",
+      "expected_title": "Uncertainty-aware State Space Transformer for Egocentric 3D Hand Trajectory Forecasting",
+      "source_url": "https://arxiv.org/abs/2307.08243",
+      "pdf_url": "https://arxiv.org/pdf/2307.08243",
+      "retrieved_at": "2026-10-02T22:13:28.032678+00:00",
+      "pdf_sha256": "592b977dc3d758aa321266c4f5e7588d29c8fd207b4630fa191021a49d73b634",
+      "text_sha256": "4a2579a1d840399ae6f527b3b0011da407f3e28678971c978d7e8de288ce45d7",
+      "pdf_bytes": 15592351,
+      "pages": 16,
+      "text_characters": 94727,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2307.08243v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2307.08243v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 14,
+        "unit": "EgoPAT3D-DT scenes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P051:1",
+        "paper_id": "P051",
+        "benchmark": "USST / EgoPAT3D trajectories",
+        "native_term": "EgoPAT3D-DT scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2307.08243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.08243v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3715,
+        "unit": "H2O-PT test windows",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P051:2",
+        "paper_id": "P051",
+        "benchmark": "USST / EgoPAT3D trajectories",
+        "native_term": "H2O-PT test windows",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2307.08243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.08243v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1605,
+        "unit": "EgoPAT3D-DT seen-test windows",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P051:3",
+        "paper_id": "P051",
+        "benchmark": "USST / EgoPAT3D trajectories",
+        "native_term": "EgoPAT3D-DT seen-test windows",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2307.08243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.08243v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2334,
+        "unit": "EgoPAT3D-DT unseen-test windows",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P051:4",
+        "paper_id": "P051",
+        "benchmark": "USST / EgoPAT3D trajectories",
+        "native_term": "EgoPAT3D-DT unseen-test windows",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2307.08243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.08243v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "oppo-us-research/USST"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,450 @@
+{
+  "paper_id": "P007",
+  "name": "Charades-Ego",
+  "title": "Charades-Ego: A Large-Scale Dataset of Paired Third and First Person Videos",
+  "year": 2018,
+  "paper_url": "https://arxiv.org/abs/1804.09626",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P007",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Charades-Ego原文引用gsig的Charades演算法；這是沿用Charades的baseline框架，不是完整ego/exo配對資料發布。程式本身明示Python mAP只是近似官方MATLAB評分。",
+    "environment": "同一人類活動的第一/第三人稱錄製為成對觀測；相機視角不能算兩套互動環境。",
+    "tasks": "Charades多標籤活動識別，需另保留Ego配對與跨視角設定；原倉庫157類不能當157個機器人工作。",
+    "data": "CSV id/actions含class/start/end；loader以24FPS換算時間，video驗證均勻取25個影格，train/val使用不同取樣與label格式。",
+    "evaluation": "map.py逐類排序算AP，無正例類別為NaN；charades_map把沒有任何GT的影片分數壓至負無限。原碼要求精確排名使用官方MATLAB指令碼，這個近似不能靜默替代。",
+    "standardization": {
+      "profile": "paired_ego_exo_activity_recognition",
+      "reuse": "原生影片/活動ID、時間段、RGB/flow讀取和baseline預測格式。",
+      "transform": "補ego/exo對應與subject/session血緣，分開frame、video和跨視角評測；儲存原生取樣及評分版本。",
+      "missing": "Ego配對資料/split、精確官方MATLAB evaluator及當前執行環境。"
+    },
+    "version_note": "原文PDF第2頁明列此baseline來源；不要把其README上的原Charades結果當Charades-Ego本次實測。",
+    "runtime_executed": false,
+    "identity_note": "原作PDF裸網址github.com/gsig/charades-algorithms及作者挑戰頁共同支援；倉庫明示自己是Charades starter code。",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "gsig/charades-algorithms",
+        "requested_repo": "gsig/charades-algorithms",
+        "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            35
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 35,
+        "sha256": "3976e5488dc35716f242b72dd23b1a0b7fff33ad8d8990de964b69ea591275a3",
+        "url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/README.md",
+        "reading_url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/README.md#L1-L35",
+        "why": "確認baseline用途與原Charades引用關係。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "gsig/charades-algorithms",
+        "requested_repo": "gsig/charades-algorithms",
+        "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+        "ref": null,
+        "path": "pytorch/datasets/charadesrgb.py",
+        "ranges": [
+          [
+            1,
+            65
+          ],
+          [
+            78,
+            188
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 188,
+        "sha256": "3c18559b8e4c5c61ba39c6c8683e62def6e6271c84371cee3d8b984c44a09630",
+        "url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/pytorch/datasets/charadesrgb.py",
+        "reading_url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/pytorch/datasets/charadesrgb.py#L1-L65",
+        "why": "CSV schema、frame換算及video取樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "gsig/charades-algorithms",
+        "requested_repo": "gsig/charades-algorithms",
+        "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+        "ref": null,
+        "path": "pytorch/utils/map.py",
+        "ranges": [
+          [
+            1,
+            39
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 39,
+        "sha256": "da32c39274ed6721dd6bc3f579a981f9a361655a32e070fae41a6ab3917aa7a8",
+        "url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/pytorch/utils/map.py",
+        "reading_url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/pytorch/utils/map.py#L1-L39",
+        "why": "近似mAP實作與官方評分限制。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "20deaa0151d2ce4490106769cad275c71b5b57b06005d8fe010aee266ae926ac"
+  },
+  "repository_binding_review_sha256": "20deaa0151d2ce4490106769cad275c71b5b57b06005d8fe010aee266ae926ac",
+  "repository_bindings": [
+    {
+      "requested_repo": "gsig/charades-algorithms",
+      "resolved_repo": "gsig/charades-algorithms",
+      "aliases_in_this_review": [
+        "gsig/charades-algorithms"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+          "reviewed_files": [
+            "README.md",
+            "pytorch/datasets/charadesrgb.py",
+            "pytorch/utils/map.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "http://vuchallenge.org/charades.html",
+          "page_sha256": "799dcbd653ca63a29ecf3b4ca6b5684a083c766c524e6da9b416db5db362409a",
+          "url": "https://github.com/gsig/charades-algorithms",
+          "link_label": "Code for baseline algorithms @ GitHub"
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://prior.allenai.org/projects/charades",
+          "page_sha256": "70368a791c3ff988692b5c2cbc91622d0b0afa4c3d0a1d87bc19fde1fbfab5ff",
+          "url": "https://github.com/gsig/charades-algorithms",
+          "link_label": "Baseline Algorithms @ GitHub"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P007",
+          "review_file": "content/github_review/reviews/P007.json",
+          "review_sha256": "20deaa0151d2ce4490106769cad275c71b5b57b06005d8fe010aee266ae926ac",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P007",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF標題相符；arXiv 1804.09626v2。",
+    "scope_read": "短文3頁全文，聚焦配對蒐集、來源重疊及評測。",
+    "pages_read": [
+      1,
+      2,
+      3
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "112個家、112位演員；第一／第三人稱依相同腳本重演，非同步錄製的精確配準視角。",
+    "tasks": "157個activity classes；監督及zero-shot第一人稱動作識別。",
+    "cases": "6,167 train影片＋1,693 test影片＝7,860視角影片；兩種視角各34.4小時；68,536動作標註。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 112,
+        "unit": "錄製住宅",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 157,
+        "unit": "活動類別",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 7860,
+        "unit": "視角影片",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1693,
+        "unit": "test視角影片",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 68536,
+        "unit": "動作標註",
+        "pages": [
+          2
+        ]
+      }
+    ],
+    "evaluation": [
+      "video-level mAP；監督與zero-shot設定分別報告。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "參與者不跨train/test；視角影片數不直接改稱獨立活動episode。",
+    "lineage": "78.7%腳本取自Charades train，另增1,000腳本；與Charades有明確腳本來源關係。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2
+        ],
+        "locator": "Dataset與資料表",
+        "supports": "重演配對、112家、split、動作數"
+      },
+      {
+        "pages": [
+          2,
+          3
+        ],
+        "locator": "表1–2",
+        "supports": "mAP及zero-shot端點"
+      }
+    ],
+    "unresolved": [
+      "逐配對ID與上游Charades腳本ID尚未在本庫去重。"
+    ],
+    "reuse": "適合跨視角語義轉移；不能把配對當作同步3D重建或robot軌跡監督。",
+    "reviewed_pdf_sha256": "138cfb582bdf3ab17fb6aa3ad7f3dd09505f4410e6c31fd486f2aaf1c35beaf1",
+    "reviewed_on": "2026-10-02",
+    "name": "Charades-Ego",
+    "year": 2018,
+    "title": "Charades-Ego: A Large-Scale Dataset of Paired Third and First Person Videos",
+    "source_url": "https://arxiv.org/abs/1804.09626",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P007",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P007",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "157個activity classes；監督及zero-shot第一人稱動作識別。",
+            "112個家、112位演員；第一／第三人稱依相同腳本重演，非同步錄製的精確配準視角。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "138cfb582bdf3ab17fb6aa3ad7f3dd09505f4410e6c31fd486f2aaf1c35beaf1"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "138cfb582bdf3ab17fb6aa3ad7f3dd09505f4410e6c31fd486f2aaf1c35beaf1",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P007",
+      "name": "Charades-Ego",
+      "expected_title": "Charades-Ego: A Large-Scale Dataset of Paired Third and First Person Videos",
+      "source_url": "https://arxiv.org/abs/1804.09626",
+      "pdf_url": "https://arxiv.org/pdf/1804.09626",
+      "retrieved_at": "2026-10-02T21:32:54.333004+00:00",
+      "pdf_sha256": "138cfb582bdf3ab17fb6aa3ad7f3dd09505f4410e6c31fd486f2aaf1c35beaf1",
+      "text_sha256": "a1fc78ef0616e3e4692ea59ffa777600795d3a9a0b5058d59273e3b9a4ab7607",
+      "pdf_bytes": 3301069,
+      "pages": 3,
+      "text_characters": 16047,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1804.09626v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1804.09626v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 112,
+        "unit": "錄製住宅",
+        "pages": [
+          1,
+          2
+        ],
+        "record_id": "review10:P007:1",
+        "paper_id": "P007",
+        "benchmark": "Charades-Ego",
+        "native_term": "錄製住宅",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.09626v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.09626v2",
+            "locator": "PDF pp. 1, 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 157,
+        "unit": "活動類別",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P007:2",
+        "paper_id": "P007",
+        "benchmark": "Charades-Ego",
+        "native_term": "活動類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.09626v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.09626v2",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 7860,
+        "unit": "視角影片",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P007:3",
+        "paper_id": "P007",
+        "benchmark": "Charades-Ego",
+        "native_term": "視角影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.09626v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.09626v2",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1693,
+        "unit": "test視角影片",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P007:4",
+        "paper_id": "P007",
+        "benchmark": "Charades-Ego",
+        "native_term": "test視角影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.09626v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.09626v2",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 68536,
+        "unit": "動作標註",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P007:5",
+        "paper_id": "P007",
+        "benchmark": "Charades-Ego",
+        "native_term": "動作標註",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.09626v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.09626v2",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "gsig/charades-algorithms"
+  ],
+  "external_repositories": []
+}

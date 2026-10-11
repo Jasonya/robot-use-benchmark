@@ -1,0 +1,650 @@
+{
+  "paper_id": "P010",
+  "name": "EPIC-KITCHENS-100",
+  "title": "Rescaling Egocentric Vision",
+  "year": 2020,
+  "paper_url": "https://arxiv.org/abs/2006.13256",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P010",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EPIC-KITCHENS-100 需保留五項挑戰各自的資料與評測約定；本次核讀總標註、敘述工具及 C1 動作辨識實際指標，沒有把其他挑戰概括成已整合。",
+    "environment": "沿用部分 EPIC-55 廚房影片並新增拍攝；PXX_YY 與 PXX_1YY 的影片來源不同，不能把兩版影片量相加當作獨立場景。",
+    "tasks": "包含動作辨識、弱監督辨識、動作預測、無監督領域適應、影片文字檢索。verb、noun、action 類別與檢索句子各有原生 ID，挑戰種類不等於獨立任務數。",
+    "data": "train／validation／test_timestamps CSV 以 narration_id 對齊片段；narration_timestamp、start/stop_timestamp、frame 邊界各自儲存。anticipation 使用動作前 5 秒觀測並留 1 秒間隔；UDA 的 source/target 與 retrieval 的 sentence 表另列。C1 預測含 verb_output[N,97]、noun_output[N,300] 及 narration_id。",
+    "evaluation": "C1 utils/metrics.py 計算全部樣本 verb／noun／action top-1/top-5，以及 unseen participants、tail verbs／nouns／actions 的對應 top-1 子集；布林遮罩決定分母。其他四項挑戰需各自取得 evaluator，不可沿用 C1 得分。",
+    "standardization": {
+      "profile": "video_action_multitrack",
+      "reuse": "動作／敘述時間、原生 split、tail／unseen 子集、C1 分數格式與 top-k evaluator；narrator 可作為標註來源工具。",
+      "transform": "source 版本標 EPIC-100 並建立對 EPIC-55 的 video 重用邊；task／case 記錄 challenge、narration_id、合法觀測窗；retrieval 與 anticipation 分成不同 profile；指標保留原生子集與分母。",
+      "missing": "尚未下載影片、驗證 frame 修正版、取得隱藏測試或執行提交；C2–C5 的完整 loader／evaluator 仍需另外核讀與測試。"
+    },
+    "version_note": "固定提交的說明列出 P01_109、P27_103 預抽幀錯誤；原始影片與標註不受影響，資料取得時必須儲存修正版本。narrator 是工具，並非額外 benchmark。EPIC-55 many-shot P/R 不等於本版 tail 指標。",
+    "runtime_executed": false,
+    "additional_repo_proposals": [
+      {
+        "repo": "epic-kitchens/C1-Action-Recognition",
+        "role": "100 版動作辨識挑戰 evaluator",
+        "evidence": "100 版 annotations README 的 C1 連結與倉庫自述一致"
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-100-annotations",
+        "requested_repo": "epic-kitchens/epic-kitchens-100-annotations",
+        "commit": "ea8b40457a400c3fffa1c7f406ef3dc169cc2522",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            120
+          ],
+          [
+            136,
+            193
+          ],
+          [
+            375,
+            421
+          ],
+          [
+            544,
+            579
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 735,
+        "sha256": "e3f5eeb0d7c7908d55d43ad9fe8bc877c6717b89d22a94f8373f03ae158c523f",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-100-annotations/blob/ea8b40457a400c3fffa1c7f406ef3dc169cc2522/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-100-annotations/blob/ea8b40457a400c3fffa1c7f406ef3dc169cc2522/README.md#L1-L120",
+        "why": "五項挑戰、欄位、版本與錯誤修正",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-100-narrator",
+        "requested_repo": "epic-kitchens/epic-kitchens-100-narrator",
+        "commit": "d9d429819ca6d032efc63911d1071c2e9b2d4cea",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            68
+          ],
+          [
+            192,
+            229
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 243,
+        "sha256": "0081eb0e952c5b66196ba9c6a89e4b688f7abff4ce49c1f8466a4b552d709c19",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-100-narrator/blob/d9d429819ca6d032efc63911d1071c2e9b2d4cea/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-100-narrator/blob/d9d429819ca6d032efc63911d1071c2e9b2d4cea/README.md#L1-L68",
+        "why": "narration 標註工具與時間來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/C1-Action-Recognition",
+        "requested_repo": "epic-kitchens/C1-Action-Recognition",
+        "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            99
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 99,
+        "sha256": "67770d0c58b02e2ad9ea401fb1c689b63991bbaed29c8b4be58fe0f61189fbf2",
+        "url": "https://github.com/epic-kitchens/C1-Action-Recognition/blob/277586f7fcb6752cf79872dd67d7914baa541c1e/README.md",
+        "reading_url": "https://github.com/epic-kitchens/C1-Action-Recognition/blob/277586f7fcb6752cf79872dd67d7914baa541c1e/README.md#L1-L99",
+        "why": "C1 輸出維度、narration_id 與評測輸入",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/C1-Action-Recognition",
+        "requested_repo": "epic-kitchens/C1-Action-Recognition",
+        "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+        "ref": null,
+        "path": "utils/metrics.py",
+        "ranges": [
+          [
+            7,
+            13
+          ],
+          [
+            24,
+            30
+          ],
+          [
+            35,
+            41
+          ],
+          [
+            53,
+            65
+          ],
+          [
+            90,
+            106
+          ],
+          [
+            113,
+            129
+          ],
+          [
+            143,
+            155
+          ],
+          [
+            166,
+            175
+          ],
+          [
+            179,
+            193
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 197,
+        "sha256": "d23a7d515b5c1377e6174569b5798ff55b819a55e763d31e64873d78fcccf69c",
+        "url": "https://github.com/epic-kitchens/C1-Action-Recognition/blob/277586f7fcb6752cf79872dd67d7914baa541c1e/utils/metrics.py",
+        "reading_url": "https://github.com/epic-kitchens/C1-Action-Recognition/blob/277586f7fcb6752cf79872dd67d7914baa541c1e/utils/metrics.py#L7-L13",
+        "why": "top-k、unseen 與 tail 子集實作",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "cb8b784ac042ce0972bcd7c01b7f01d718625a037c56b6debc3b941f3b65699e"
+  },
+  "repository_binding_review_sha256": "cb8b784ac042ce0972bcd7c01b7f01d718625a037c56b6debc3b941f3b65699e",
+  "repository_bindings": [
+    {
+      "requested_repo": "epic-kitchens/C1-Action-Recognition",
+      "resolved_repo": "epic-kitchens/C1-Action-Recognition",
+      "aliases_in_this_review": [
+        "epic-kitchens/c1-action-recognition"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+          "reviewed_files": [
+            "README.md",
+            "utils/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P010",
+          "review_sha256": "cb8b784ac042ce0972bcd7c01b7f01d718625a037c56b6debc3b941f3b65699e",
+          "proposal": {
+            "repo": "epic-kitchens/C1-Action-Recognition",
+            "role": "100 版動作辨識挑戰 evaluator",
+            "evidence": "100 版 annotations README 的 C1 連結與倉庫自述一致"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P010",
+          "review_file": "content/github_review/reviews/P010.json",
+          "review_sha256": "cb8b784ac042ce0972bcd7c01b7f01d718625a037c56b6debc3b941f3b65699e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/epic-kitchens-100-annotations",
+      "resolved_repo": "epic-kitchens/epic-kitchens-100-annotations",
+      "aliases_in_this_review": [
+        "epic-kitchens/epic-kitchens-100-annotations"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ea8b40457a400c3fffa1c7f406ef3dc169cc2522",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P010",
+          "review_file": "content/github_review/reviews/P010.json",
+          "review_sha256": "cb8b784ac042ce0972bcd7c01b7f01d718625a037c56b6debc3b941f3b65699e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/epic-kitchens-100-narrator",
+      "resolved_repo": "epic-kitchens/epic-kitchens-100-narrator",
+      "aliases_in_this_review": [
+        "epic-kitchens/epic-kitchens-100-narrator"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d9d429819ca6d032efc63911d1071c2e9b2d4cea",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/epic-kitchens/epic-kitchens-100-narrator",
+          "pdf_page": 3,
+          "pdf_sha256": "2ad975f70d5b074a2b2616960bb53410a6d66ce973346284574e7b49684ab629",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P010",
+          "review_file": "content/github_review/reviews/P010.json",
+          "review_sha256": "cb8b784ac042ce0972bcd7c01b7f01d718625a037c56b6debc3b941f3b65699e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P010",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Rescaling Egocentric Vision，arXiv 2006.13256v4；採2021正文版本。",
+    "scope_read": "資料延伸與表1、六個challenge的定義及評測段落。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "45個錄製環境；包含2018影片與新錄影片，不能和EPIC 2018廚房量直接相加。",
+    "tasks": "6個challenge：全監督／弱監督動作識別、偵測、anticipation、跨年無監督適應、跨模態檢索。97 verbs、300 nouns、4,053 action classes不是4,053個實體操作goal。",
+    "cases": "700影片、89,977動作段；train／val／test動作段67,217／9,668／13,092；檢索採公開val，另有專用UDA切分。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 45,
+        "unit": "錄製環境",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "challenge",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4053,
+        "unit": "動作類別",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 89977,
+        "unit": "動作片段",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 700,
+        "unit": "影片",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 13092,
+        "unit": "test動作片段",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "識別top-1／top-5 accuracy；偵測mAP於temporal IoU 0.1–0.5。",
+      "anticipation以動作開始前1秒為截止，class-mean top-5 recall。",
+      "檢索用mAP及nDCG；UDA保留2018→2020的來源／目標域設定。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "主影片495／138／67；test皆新錄影片。主split、UDA、retrieval評測集合不可混為一個test量。",
+    "lineage": "2018上游影片重新標註，89,977為新版本總量；其約66M masks及手／物框多為自動產生，非同量人工評測題。",
+    "related_paper_ids": [
+      "P009",
+      "P011",
+      "P024"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "表1與Splits",
+        "supports": "精確動作量、split、上游重用"
+      },
+      {
+        "pages": [
+          7,
+          9,
+          10,
+          12,
+          13
+        ],
+        "locator": "§4.1–4.6",
+        "supports": "六端點及不同metric"
+      }
+    ],
+    "unresolved": [
+      "公開manifest与此PDF版本的精確ID差異尚未逐檔重算。"
+    ],
+    "reuse": "可復用同一生活影片家族的多端点评測；必須以共用影片與split lineage控制洩漏。",
+    "reviewed_pdf_sha256": "2ad975f70d5b074a2b2616960bb53410a6d66ce973346284574e7b49684ab629",
+    "reviewed_on": "2026-10-02",
+    "name": "EPIC-KITCHENS-100",
+    "year": 2020,
+    "title": "Rescaling Egocentric Vision",
+    "source_url": "https://arxiv.org/abs/2006.13256",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P010",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P010",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "6個challenge：全監督／弱監督動作識別、偵測、anticipation、跨年無監督適應、跨模態檢索。97 verbs、300 nouns、4,053 action classes不是4,053個實體操作goal。",
+            "45個錄製環境；包含2018影片與新錄影片，不能和EPIC 2018廚房量直接相加。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "2ad975f70d5b074a2b2616960bb53410a6d66ce973346284574e7b49684ab629"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2ad975f70d5b074a2b2616960bb53410a6d66ce973346284574e7b49684ab629",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P010",
+      "name": "EPIC-KITCHENS-100",
+      "expected_title": "Rescaling Egocentric Vision",
+      "source_url": "https://arxiv.org/abs/2006.13256",
+      "pdf_url": "https://arxiv.org/pdf/2006.13256",
+      "retrieved_at": "2026-10-02T21:33:03.779712+00:00",
+      "pdf_sha256": "2ad975f70d5b074a2b2616960bb53410a6d66ce973346284574e7b49684ab629",
+      "text_sha256": "6344cfd4db3a495cf7cdc6973e495bec9ff43d6311fc06bd5412b305b65d40c6",
+      "pdf_bytes": 27774535,
+      "pages": 20,
+      "text_characters": 126978,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2006.13256v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2006.13256v4"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 45,
+        "unit": "錄製環境",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P010:1",
+        "paper_id": "P010",
+        "benchmark": "EPIC-KITCHENS-100",
+        "native_term": "錄製環境",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2006.13256v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2006.13256v4",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "challenge",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P010:2",
+        "paper_id": "P010",
+        "benchmark": "EPIC-KITCHENS-100",
+        "native_term": "challenge",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2006.13256v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2006.13256v4",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4053,
+        "unit": "動作類別",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P010:3",
+        "paper_id": "P010",
+        "benchmark": "EPIC-KITCHENS-100",
+        "native_term": "動作類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2006.13256v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2006.13256v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 89977,
+        "unit": "動作片段",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P010:4",
+        "paper_id": "P010",
+        "benchmark": "EPIC-KITCHENS-100",
+        "native_term": "動作片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2006.13256v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2006.13256v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 700,
+        "unit": "影片",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P010:5",
+        "paper_id": "P010",
+        "benchmark": "EPIC-KITCHENS-100",
+        "native_term": "影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2006.13256v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2006.13256v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 13092,
+        "unit": "test動作片段",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P010:6",
+        "paper_id": "P010",
+        "benchmark": "EPIC-KITCHENS-100",
+        "native_term": "test動作片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2006.13256v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2006.13256v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "epic-kitchens/epic-kitchens-100-annotations",
+    "epic-kitchens/epic-kitchens-100-narrator",
+    "epic-kitchens/C1-Action-Recognition"
+  ],
+  "external_repositories": []
+}

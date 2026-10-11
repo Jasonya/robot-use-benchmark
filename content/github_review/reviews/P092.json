@@ -1,0 +1,88 @@
+{
+  "paper_id": "P092",
+  "summary": "競賽倉庫公開雙臂布料觀測格式與半自動面積量測；coverage 原始面積與正規化競賽得分需要分開。",
+  "reading_order": [
+    {
+      "repo": "Victorlouisdg/cloth-competition",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "why": "確認競賽、資料與程式角色",
+      "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c"
+    },
+    {
+      "repo": "Victorlouisdg/cloth-competition",
+      "path": "cloth-tools/cloth_tools/dataset/format.py",
+      "ranges": [
+        [
+          29,
+          75
+        ],
+        [
+          78,
+          222
+        ]
+      ],
+      "why": "原生雙目／深度／世界座標／雙臂觀測儲存及讀取",
+      "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c"
+    },
+    {
+      "repo": "Victorlouisdg/cloth-competition",
+      "path": "cloth-tools/cloth_tools/drake/scenes.py",
+      "ranges": [
+        [
+          31,
+          91
+        ]
+      ],
+      "why": "雙UR5e工作站與布料碰撞近似",
+      "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c"
+    },
+    {
+      "repo": "Victorlouisdg/cloth-competition",
+      "path": "evaluation-service/README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ]
+      ],
+      "why": "人工選區與競賽coverage定義",
+      "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c"
+    },
+    {
+      "repo": "Victorlouisdg/cloth-competition",
+      "path": "evaluation-service/backend/server.py",
+      "ranges": [
+        [
+          42,
+          82
+        ],
+        [
+          81,
+          178
+        ]
+      ],
+      "why": "SAM遮罩、深度離群值、相機投影面積與輸出",
+      "commit": "34dcac88c9dd1aaaccbc3fd4b06c86651a70cd0c"
+    }
+  ],
+  "environment": "真實雙UR5e／Robotiq工作站及雙目深度相機；Drake場景供運動規劃，布料點雲凸包焊接為障礙，不代表完整柔性物理模擬。",
+  "tasks": "布料攤展競賽中的抓取與展開結果；每次sample/scene及衣物初態不是新的任務語義。",
+  "data": "CompetitionObservation含左右RGB、與左圖對齊depth_map、confidence_map、世界座標point_cloud、相機／左右臂／TCP世界姿態與關節；檔案為PNG/TIFF/PLY/JSON，讀寫程式明確處理RGB/BGR。README指向83GB外部資料，未下載。",
+  "evaluation": "組織者選框／正負點→SAM遮罩→按平均深度±outlierThreshold過濾→每像素投影面積加總。server.py把此原始面積寫為coverage；README所述相對最大可展面積之比例仍需衣物基準面積，不能直接把輸出值當0–1成功率。",
+  "standardization": {
+    "profile": "real_deformable_observation_and_human_assisted_measurement",
+    "reuse": "原生觀測欄位、相機標定／機體座標、選區與面積量測紀錄。",
+    "transform": "environment記工作站與標定版本，case連sample及衣物初態；evaluator保留原面積單位、最大面積分母、人工框點、SAM版本、過濾參數與複核。",
+    "missing": "資料資產、衣物最大面積基準、合法介入規則與一致性評估、可重設初態及整體競賽分數聚合尚需接入。"
+  },
+  "version_note": "釘選2024競賽倉庫；README的未來式文字不能否定已存在的evaluation-service。已讀核心章節，未重現比賽。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

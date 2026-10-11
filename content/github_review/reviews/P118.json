@@ -1,0 +1,124 @@
+{
+  "paper_id": "P118",
+  "summary": "EgoMimic把Aria人類資料與Eve機器人資料轉成相似HDF5結構，但人類future palm位置和機器人關節動作仍是不同動作語義。",
+  "reading_order": [
+    {
+      "repo": "SimarKareer/EgoMimic",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          18
+        ],
+        [
+          37,
+          54
+        ],
+        [
+          82,
+          92
+        ]
+      ],
+      "why": "原作、三組樣本資料與獨立人/機器人normalization",
+      "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645"
+    },
+    {
+      "repo": "SimarKareer/EgoMimic",
+      "path": "data_processing.md",
+      "ranges": [
+        [
+          19,
+          77
+        ]
+      ],
+      "why": "手眼標定與人類/機器人轉換入口",
+      "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645"
+    },
+    {
+      "repo": "SimarKareer/EgoMimic",
+      "path": "egomimic/scripts/aria_process/aria_to_robomimic.py",
+      "ranges": [
+        [
+          181,
+          258
+        ],
+        [
+          299,
+          330
+        ],
+        [
+          468,
+          519
+        ]
+      ],
+      "why": "future palm到目前camera frame、篩樣、HDF5 chunk與插值",
+      "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645"
+    },
+    {
+      "repo": "SimarKareer/EgoMimic",
+      "path": "egomimic/utils/dataset.py",
+      "ranges": [
+        [
+          122,
+          196
+        ]
+      ],
+      "why": "時序padding/goal採樣及robot=0/hand=1標記",
+      "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645"
+    },
+    {
+      "repo": "SimarKareer/EgoMimic",
+      "path": "egomimic/scripts/evaluation/eval_real.py",
+      "ranges": [
+        [
+          225,
+          240
+        ],
+        [
+          279,
+          303
+        ]
+      ],
+      "why": "joint-action rollout/temporal aggregation而非任務判分",
+      "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645"
+    },
+    {
+      "repo": "SimarKareer/EgoMimic-Eve",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          31
+        ]
+      ],
+      "why": "硬體repo與主論文的相互認領",
+      "commit": "b0e45c3f750f009204309060fdb12e2bd57c402c"
+    },
+    {
+      "repo": "SimarKareer/EgoMimic-Eve",
+      "path": "scripts/record_episodes.py",
+      "ranges": [
+        [
+          302,
+          338
+        ]
+      ],
+      "why": "原robot14D關節/動作、JPEG壓縮長度與HDF5格式",
+      "commit": "b0e45c3f750f009204309060fdb12e2bd57c402c"
+    }
+  ],
+  "environment": "Aria Glasses的人類觀測與Eve/ViperX單臂或雙臂桌面平臺；實際camera extrinsics/arm側及人機資料來源要分開。",
+  "tasks": "人機共同模仿學習，示例包括groceries、laundry、小物放碗；mask/插值與同一demo多chunk是表示／樣本擴充，不是新增語義任務。",
+  "data": "人類future palm經future camera→world→目前camera變換，單手3D／雙手6D，actions_xyz再插值成100步actions_xyz_act；每300frame另存demo。robot原HDF5為qpos/qvel/effort/action14D，影像可JPEG padded且compress_len另存。type欄明記human/robot。",
+  "evaluation": "eval_real輸出actions_joints_act，可temporal aggregate，按query_frequency送到實機；此選讀程式是rollout，不提供統一任務成功判分。資料篩掉出界/跳動frame，case需保存原時間對映；offline action loss與physical success分開。",
+  "standardization": {
+    "profile": "human_robot_cotraining_with_camera_frame_actions",
+    "reuse": "人機兩域、轉換矩陣、原HDF5/處理後chunk關係、type與action keys。",
+    "transform": "source保留raw VRS/MPS與Eve session；case分domain/action語義/arm/camera/normalization，300frame chunk共享parent demo避免split洩漏，插值點不當獨立觀測。",
+    "missing": "原始資產與校準版本、前處理保留索引、robot/human action對齊驗證、下游人工/物理判分協定與全量split。"
+  },
+  "version_note": "主README仍連舊Eve名稱；已讀EgoMimic-Eve README明確回指本作。兩repo commit各固定；不把hardware代碼等同資料已取得。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

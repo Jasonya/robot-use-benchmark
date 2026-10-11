@@ -1,0 +1,585 @@
+{
+  "paper_id": "P141",
+  "name": "HoloAssist",
+  "title": "HoloAssist: an Egocentric Human Interaction Dataset for Interactive AI Assistants in the Real World",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2309.17024",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "office",
+    "craft",
+    "industry",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P141",
+    "summary": "HoloAssist提供多感測程序互動資料和多種任務；PyHoloAssist另提供投影工具。recognition、anticipation、hand forecasting各用不同觀測窗口與分母。",
+    "environment": "人類HoloLens工作session與指導者互動，RGB/depth/眼動/手/頭/IMU/音訊同步到RGB；session/裝置/活動不是可直接執行的robot environment。",
+    "tasks": "細/粗動作識別與anticipation、錯誤與介入偵測/預測、手部forecast；原Narration/Conversation/細/粗行為是標註種類，與生活用途/robot task不同層。",
+    "data": "session中*_synced資料按RGB時鐘排列，原annotation有id/start/end（秒）及attributes。anticipation取[0,t_start-time_range]並篩長度，hand forecast只取correct action，用過去3秒預測起始後1.5秒；不能把全量mistake資料當hand test分母。",
+    "evaluation": "分類top1/top5與precision/recall依class平均設定；hand分支ks=15/30/45是前綴frame數，不是候選數，且輸出名稱*_acc實際為masked 3D Euclidean距離。NUM_CLASSES<=10分支優先，配置要固定。投影工具nearest-neighbor假設時間順序。",
+    "standardization": {
+      "profile": "multisensor_human_instruction_and_intervention",
+      "reuse": "session/事件/模態同步、label字典、各任務窗口和有效mask、投影校準。",
+      "transform": "case固定benchmark kind、觀測截止/預測horizon、原事件/participant/split；相同session多題連父來源，手部距離/分類百分比/介入標籤分開。",
+      "missing": "全量素材與同步校準、手部座標/單位核對、每任務split/排除清單、不同感測缺失處理和全部端點重現。"
+    },
+    "version_note": "主release與PyHoloAssist各固定commit；後者是作者工具，不替代完整benchmark。UTF16 README行號指解碼文字，外部連結定位到檔案，不捏造GitHub逐行fragment。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Ember-HoloAssist/holoassist-release",
+        "requested_repo": "Ember-HoloAssist/holoassist-release",
+        "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            10
+          ],
+          [
+            30,
+            88
+          ],
+          [
+            139,
+            181
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 210,
+        "sha256": "83a34eccdb570da45b9453e52c81470d090afd08630a1d9a5b3ce7c5dae9df8c",
+        "url": "https://github.com/Ember-HoloAssist/holoassist-release/blob/f53ad2b5c3889784ef068e11fea10ba4ecf99970/README.md",
+        "reading_url": "https://github.com/Ember-HoloAssist/holoassist-release/blob/f53ad2b5c3889784ef068e11fea10ba4ecf99970/README.md#L1-L10",
+        "why": "主論文、同步模態、四種原始標註與正誤行為",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "taeinkwon/PyHoloAssist",
+        "requested_repo": "taeinkwon/PyHoloAssist",
+        "commit": "9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            17
+          ]
+        ],
+        "text_encoding": "utf-16",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 17,
+        "sha256": "53ac9ad7e40f4b543b04b8c5e3f6b9785792e85f98bffcaad0062a3380ee6f1d",
+        "url": "https://github.com/taeinkwon/PyHoloAssist/blob/9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae/README.md",
+        "reading_url": "https://github.com/taeinkwon/PyHoloAssist/blob/9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae/README.md",
+        "why": "原檔UTF16，已正確解碼；投影用途和PSI/校準資料依賴",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "taeinkwon/PyHoloAssist",
+        "requested_repo": "taeinkwon/PyHoloAssist",
+        "commit": "9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae",
+        "ref": null,
+        "path": "hand_eye_project.py",
+        "ranges": [
+          [
+            17,
+            34
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 385,
+        "sha256": "3efeeb1d8f83a9b36b85a324a15e57cd76ea1e362ddcfdf1347f2ef8f7347fbe",
+        "url": "https://github.com/taeinkwon/PyHoloAssist/blob/9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae/hand_eye_project.py",
+        "reading_url": "https://github.com/taeinkwon/PyHoloAssist/blob/9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae/hand_eye_project.py#L17-L34",
+        "why": "逐時間前進的nearest-neighbor同步方式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Ember-HoloAssist/holoassist-release",
+        "requested_repo": "Ember-HoloAssist/holoassist-release",
+        "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970",
+        "ref": null,
+        "path": "src/data_loader/raw_loader.py",
+        "ranges": [
+          [
+            54,
+            64
+          ],
+          [
+            193,
+            250
+          ],
+          [
+            296,
+            322
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 723,
+        "sha256": "1ee6549fa171812d9d7796b3170e9c72df43c5f034ba21cf6aebe5c396a2a28e",
+        "url": "https://github.com/Ember-HoloAssist/holoassist-release/blob/f53ad2b5c3889784ef068e11fea10ba4ecf99970/src/data_loader/raw_loader.py",
+        "reading_url": "https://github.com/Ember-HoloAssist/holoassist-release/blob/f53ad2b5c3889784ef068e11fea10ba4ecf99970/src/data_loader/raw_loader.py#L54-L64",
+        "why": "原事件ID、識別/預測窗口、正確動作hand子集",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Ember-HoloAssist/holoassist-release",
+        "requested_repo": "Ember-HoloAssist/holoassist-release",
+        "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970",
+        "ref": null,
+        "path": "src/test_net.py",
+        "ranges": [
+          [
+            114,
+            126
+          ],
+          [
+            394,
+            424
+          ],
+          [
+            483,
+            550
+          ],
+          [
+            719,
+            726
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 726,
+        "sha256": "edd0d6650c0a0b703b64eb5e8cdfe8389047a4af6382f5203a06d2ee69232631",
+        "url": "https://github.com/Ember-HoloAssist/holoassist-release/blob/f53ad2b5c3889784ef068e11fea10ba4ecf99970/src/test_net.py",
+        "reading_url": "https://github.com/Ember-HoloAssist/holoassist-release/blob/f53ad2b5c3889784ef068e11fea10ba4ecf99970/src/test_net.py#L114-L126",
+        "why": "top-k分類、手部prefix15/30/45及masked距離",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e2a7b9a2d1361c345cd505ce515603c1d33cad74d4b2975b4391da9dd3bd9d47"
+  },
+  "repository_binding_review_sha256": "e2a7b9a2d1361c345cd505ce515603c1d33cad74d4b2975b4391da9dd3bd9d47",
+  "repository_bindings": [
+    {
+      "requested_repo": "Ember-HoloAssist/holoassist-release",
+      "resolved_repo": "Ember-HoloAssist/holoassist-release",
+      "aliases_in_this_review": [
+        "ember-holoassist/holoassist-release"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970",
+          "reviewed_files": [
+            "README.md",
+            "src/data_loader/raw_loader.py",
+            "src/test_net.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Ember-HoloAssist/holoassist-release",
+          "link_label": "Baseline Code (Github)",
+          "project_url": "https://holoassist.github.io/",
+          "page_sha256": "16944474573bd0c29efadf80f2ca072c6e23e301833e73267b29d9254f1ba079"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P141",
+          "review_file": "content/github_review/reviews/P141.json",
+          "review_sha256": "e2a7b9a2d1361c345cd505ce515603c1d33cad74d4b2975b4391da9dd3bd9d47",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "taeinkwon/PyHoloAssist",
+      "resolved_repo": "taeinkwon/PyHoloAssist",
+      "aliases_in_this_review": [
+        "taeinkwon/pyholoassist"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae",
+          "reviewed_files": [
+            "README.md",
+            "hand_eye_project.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/taeinkwon/PyHoloAssist",
+          "link_label": "Hand Eye Projection Code (Github)",
+          "project_url": "https://holoassist.github.io/",
+          "page_sha256": "16944474573bd0c29efadf80f2ca072c6e23e301833e73267b29d9254f1ba079"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P141",
+          "review_file": "content/github_review/reviews/P141.json",
+          "review_sha256": "e2a7b9a2d1361c345cd505ce515603c1d33cad74d4b2975b4391da9dd3bd9d47",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "辦公與教育",
+    "工藝與修繕",
+    "裝配與生產作業",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P141",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HoloAssist，arXiv 2309.17024v1。",
+    "scope_read": "20task來源、sessions/標籤、mistake/intervention/forecasting、split與指標。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "domains": [
+      "餐飲與烹飪",
+      "辦公與教育",
+      "工藝與修繕",
+      "裝配與生產作業",
+      "協助、交接與陪伴"
+    ],
+    "role": "對話協作與任務完成",
+    "environment": "HoloLens2 wearer＋遠端instructor；16物件種類，非16場景。",
+    "tasks": "20程序；414coarse action classes；mistake detection、intervention type、3D手預測及action recognition。",
+    "cases": "2,221sessions、166小時、222人／350pairs；1,545train、213val、463test。錯誤/介入表只評10%全資料子集。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "程序tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 414,
+        "unit": "coarse action classes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2221,
+        "unit": "sessions",
+        "pages": [
+          4,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 463,
+        "unit": "test sessions",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "動作top-1/5；錯誤F-score與precision/recall；3種intervention分類。",
+      "手軌跡看過去3秒、預測0.5/1/1.5秒，用MPJPE厘米；只保留正確action。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每task按session70/10/20，並非保證參與者或instructor/performer pair全互斥。",
+    "lineage": "新錄human-human互動；字幕／動作／介入共用session，非多個獨立資料庫。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          7,
+          8,
+          9
+        ],
+        "locator": "§3、§4.2、Implementation、表5–9",
+        "supports": "20/2221/463與各端點子集"
+      }
+    ],
+    "unresolved": [
+      "fine action label總數和各endpoint精確可評IDs仍需manifest；不從coarse414推整套任務數。"
+    ],
+    "reuse": "提供人類教學、介入時機、程序錯誤與短期手預測；是協作型多模態來源。",
+    "reviewed_pdf_sha256": "af4fda7dcdcc0e5c9e4e4649f19bea3da6b3afe52e7a83d1adc8e7a79c011421",
+    "reviewed_on": "2026-10-02",
+    "name": "HoloAssist",
+    "year": 2023,
+    "title": "HoloAssist: an Egocentric Human Interaction Dataset for Interactive AI Assistants in the Real World",
+    "source_url": "https://arxiv.org/abs/2309.17024",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "food",
+      "office",
+      "craft",
+      "industry",
+      "assistance"
+    ],
+    "review_tags": [
+      "組裝與拆解",
+      "辦公活動",
+      "工業維修",
+      "餐飲與料理"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "辦公與教育",
+      "工藝與修繕",
+      "裝配與生產作業",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P141",
+      "domain_ids": [
+        "food",
+        "office",
+        "craft",
+        "industry",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P141",
+          "domain_ids": [
+            "food",
+            "office",
+            "craft",
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "20程序；414coarse action classes；mistake detection、intervention type、3D手預測及action recognition。",
+            "HoloLens2 wearer＋遠端instructor；16物件種類，非16場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "af4fda7dcdcc0e5c9e4e4649f19bea3da6b3afe52e7a83d1adc8e7a79c011421"
+        },
+        {
+          "paper_id": "P141",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "真人執行者與遠端指導者的協助／介入流程。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "af4fda7dcdcc0e5c9e4e4649f19bea3da6b3afe52e7a83d1adc8e7a79c011421"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "af4fda7dcdcc0e5c9e4e4649f19bea3da6b3afe52e7a83d1adc8e7a79c011421",
+      "previous_domain_ids": [
+        "food",
+        "office",
+        "craft",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P141",
+      "name": "HoloAssist",
+      "expected_title": "HoloAssist: an Egocentric Human Interaction Dataset for Interactive AI Assistants in the Real World",
+      "source_url": "https://arxiv.org/abs/2309.17024",
+      "pdf_url": "https://arxiv.org/pdf/2309.17024",
+      "retrieved_at": "2026-10-02T21:34:24.605431+00:00",
+      "pdf_sha256": "af4fda7dcdcc0e5c9e4e4649f19bea3da6b3afe52e7a83d1adc8e7a79c011421",
+      "text_sha256": "7492ebbbdca2507b22c55d070534202066a2425e20f123fdbe8e652795d75c1a",
+      "pdf_bytes": 9567757,
+      "pages": 22,
+      "text_characters": 202450,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2309.17024v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2309.17024v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "程序tasks",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P141:1",
+        "paper_id": "P141",
+        "benchmark": "HoloAssist",
+        "native_term": "程序tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2309.17024v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2309.17024v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 414,
+        "unit": "coarse action classes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P141:2",
+        "paper_id": "P141",
+        "benchmark": "HoloAssist",
+        "native_term": "coarse action classes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2309.17024v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2309.17024v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2221,
+        "unit": "sessions",
+        "pages": [
+          4,
+          7
+        ],
+        "record_id": "review10:P141:3",
+        "paper_id": "P141",
+        "benchmark": "HoloAssist",
+        "native_term": "sessions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2309.17024v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2309.17024v1",
+            "locator": "PDF pp. 4, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 463,
+        "unit": "test sessions",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P141:4",
+        "paper_id": "P141",
+        "benchmark": "HoloAssist",
+        "native_term": "test sessions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2309.17024v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2309.17024v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Ember-HoloAssist/holoassist-release",
+    "taeinkwon/PyHoloAssist"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,541 @@
+{
+  "paper_id": "P066",
+  "name": "ManiSkill",
+  "title": "ManiSkill: Generalizable Manipulation Skill Benchmark with Large-Scale Demonstrations",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2107.14483",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P066",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "2021原作應讀haosulab/ManiSkill-Legacy，不能用現在ManiSkill3的main代替。其四種基本任務會依PartNet模型與目標link產生更多環境ID，這些不是全部新的工作種類。",
+    "additional_repo_proposals": [
+      {
+        "repo": "haosulab/ManiSkill-Legacy",
+        "reason": "README直接連到原作2107.14483；倉庫描述明示NeurIPS2021benchmark。"
+      }
+    ],
+    "environment": "SAPIEN場景綁定PartNet-Mobility模型；model/link ID與level控制資產及初態變化。",
+    "tasks": "OpenCabinetDoor、OpenCabinetDrawer、PushChair、MoveBucket四種原生基本任務，再衍生模型／link設定。",
+    "data": "觀測可為點雲／RGBD／狀態；示範及資產外部取得，模型分割與初態在YAML／level設定。讀取時需保留觀測模式和模型身份。",
+    "evaluation": "具體task先產生條件旗標，base_env要求連續保持0.5秒；Evaluator依episode終止時eval_info計比例，不能以某一幀接近目標替代。",
+    "standardization": {
+      "profile": "interactive_task_definitions",
+      "reuse": "四種任務定義、model/link registry、level、初態和持續條件evaluator。",
+      "transform": "基本task、模型綁定、目標link和level分層存；保留成功持續時間、觀測模式和native done/time-limit約定。",
+      "missing": "全部資產／示範閉合、跨世代移植差異和共同case協定驗證。"
+    },
+    "version_note": "來源版本固定為Legacy commit58964d08…；與ManiSkill2 v0.5.3和ManiSkill3分別保存，不混用數量及API。",
+    "runtime_executed": false,
+    "repository_candidate_dispositions": [
+      {
+        "repo": "haosulab/ManiSkill",
+        "status": "later_generation_repository",
+        "reason": "此舊網址現在指向mani-skill/ManiSkill的後續世代；2021原作使用本篇已核讀的ManiSkill-Legacy。現行程式另見P068，不能用main代表2021版。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/haosulab/ManiSkill",
+            "retrieved_at": "2026-10-10T07:45:38.531031+00:00",
+            "status": 200,
+            "resolved_url": "https://api.github.com/repositories/520357130",
+            "content_type": "application/json; charset=utf-8",
+            "bytes": 6590,
+            "sha256": "379140b5678943183334544500202e92e3db3d32c66db2313139f313cd212308"
+          },
+          {
+            "related_paper_id": "P068",
+            "canonical_repo": "mani-skill/ManiSkill",
+            "snapshot_commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3"
+          }
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "haosulab/ManiSkill-Legacy",
+        "requested_repo": "haosulab/ManiSkill-Legacy",
+        "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 421,
+        "sha256": "9012fc5264de004e8a371d2cfbc3b36f5b3789d1ac69fc750732285f38ea27d5",
+        "url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/README.md",
+        "reading_url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/README.md#L1-L75",
+        "why": "確認2021身份、4種任務、162模型及原生系統。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "haosulab/ManiSkill-Legacy",
+        "requested_repo": "haosulab/ManiSkill-Legacy",
+        "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+        "ref": null,
+        "path": "mani_skill/env/__init__.py",
+        "ranges": [
+          [
+            1,
+            118
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 118,
+        "sha256": "a083b21a515cd159b31eb941d4363370dcfa942f834e9653e87db039bacf3ffa",
+        "url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/env/__init__.py",
+        "reading_url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/env/__init__.py#L1-L118",
+        "why": "區分基本任務ID、model綁定及target-link綁定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "haosulab/ManiSkill-Legacy",
+        "requested_repo": "haosulab/ManiSkill-Legacy",
+        "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+        "ref": null,
+        "path": "mani_skill/env/push_chair.py",
+        "ranges": [
+          [
+            267,
+            277
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 284,
+        "sha256": "8a146d13715a9004f6a18fc65a1a36b698540aa6c9cdc4bbecaf6a271cc2aef2",
+        "url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/env/push_chair.py",
+        "reading_url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/env/push_chair.py#L267-L277",
+        "why": "看具體成功條件：接近目標、姿態站立和靜止。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "haosulab/ManiSkill-Legacy",
+        "requested_repo": "haosulab/ManiSkill-Legacy",
+        "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+        "ref": null,
+        "path": "mani_skill/env/base_env.py",
+        "ranges": [
+          [
+            178,
+            181
+          ],
+          [
+            524,
+            571
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 683,
+        "sha256": "53fd0b0efab62357f42eff6d103bcad5a3445b4a5cf937ddf75d9f893d4cdad9",
+        "url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/env/base_env.py",
+        "reading_url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/env/base_env.py#L178-L181",
+        "why": "確認條件持續0.5秒才算通過，以及成功／時間上限終止的差別。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "haosulab/ManiSkill-Legacy",
+        "requested_repo": "haosulab/ManiSkill-Legacy",
+        "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+        "ref": null,
+        "path": "mani_skill/eval/evaluator.py",
+        "ranges": [
+          [
+            1,
+            59
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 59,
+        "sha256": "08da131888865bc825766cc58391246612acbcedd941ed93ffaebbe5ca454d8d",
+        "url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/eval/evaluator.py",
+        "reading_url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/eval/evaluator.py#L1-L59",
+        "why": "按指定level執行，收集最終eval_info並以episode數平均。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "haosulab/ManiSkill-Legacy",
+        "requested_repo": "haosulab/ManiSkill-Legacy",
+        "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+        "ref": null,
+        "path": "mani_skill/assets/config_files/chair_models_custom_split_example.yml",
+        "ranges": [
+          [
+            1,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 28,
+        "sha256": "1247fc740e6563f9c286448c8a8fb0293f04903e9b4f5a44e9cf2728f93eec2c",
+        "url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/assets/config_files/chair_models_custom_split_example.yml",
+        "reading_url": "https://github.com/haosulab/ManiSkill-Legacy/blob/58964d08b4c7d2e14c5e6e287dbb9430d900f54d/mani_skill/assets/config_files/chair_models_custom_split_example.yml#L1-L28",
+        "why": "模型ID、位姿和初始關節設定如何構成具體初態。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "720c5b7d0bb141e78d2948c01a7b014132c15ac7fbbd5fe35293890e978156d2"
+  },
+  "repository_binding_review_sha256": "720c5b7d0bb141e78d2948c01a7b014132c15ac7fbbd5fe35293890e978156d2",
+  "repository_bindings": [
+    {
+      "requested_repo": "haosulab/ManiSkill-Legacy",
+      "resolved_repo": "haosulab/ManiSkill-Legacy",
+      "aliases_in_this_review": [
+        "haosulab/maniskill-legacy"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "58964d08b4c7d2e14c5e6e287dbb9430d900f54d",
+          "reviewed_files": [
+            "README.md",
+            "mani_skill/assets/config_files/chair_models_custom_split_example.yml",
+            "mani_skill/env/__init__.py",
+            "mani_skill/env/base_env.py",
+            "mani_skill/env/push_chair.py",
+            "mani_skill/eval/evaluator.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P066",
+          "review_sha256": "720c5b7d0bb141e78d2948c01a7b014132c15ac7fbbd5fe35293890e978156d2",
+          "proposal": {
+            "repo": "haosulab/ManiSkill-Legacy",
+            "reason": "README直接連到原作2107.14483；倉庫描述明示NeurIPS2021benchmark。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P066",
+          "review_file": "content/github_review/reviews/P066.json",
+          "review_sha256": "720c5b7d0bb141e78d2948c01a7b014132c15ac7fbbd5fe35293890e978156d2",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [
+    {
+      "requested_repo": "haosulab/ManiSkill",
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/haosulab/ManiSkill",
+          "pdf_page": 1,
+          "pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/haosulab/ManiSkill",
+          "pdf_page": 18,
+          "pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374",
+          "basis": "pinned_pdf_hyperlink"
+        }
+      ],
+      "selection_status": "explained_source_lead",
+      "candidate_scope": "Retained discovery lead, not a confirmed implementation for this paper.",
+      "disposition_type": "later_generation_repository",
+      "disposition_note": "此舊網址現在指向mani-skill/ManiSkill的後續世代；2021原作使用本篇已核讀的ManiSkill-Legacy。現行程式另見P068，不能用main代表2021版。",
+      "disposition_evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/haosulab/ManiSkill",
+          "retrieved_at": "2026-10-10T07:45:38.531031+00:00",
+          "status": 200,
+          "resolved_url": "https://api.github.com/repositories/520357130",
+          "content_type": "application/json; charset=utf-8",
+          "bytes": 6590,
+          "sha256": "379140b5678943183334544500202e92e3db3d32c66db2313139f313cd212308"
+        },
+        {
+          "related_paper_id": "P068",
+          "canonical_repo": "mani-skill/ManiSkill",
+          "snapshot_commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3"
+        }
+      ]
+    }
+  ],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P066",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ManiSkill，arXiv 2107.14483v5。",
+    "scope_read": "原生task／environment定義、4 skills、物件split、demo及評分。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "原作environment以一個物件資產為單位；表1為52門櫃、35抽屜櫃、36椅、39桶，櫃體可能含多door/drawer，不能當162獨立房間。",
+    "tasks": "4 skills：OpenCabinetDoor、OpenCabinetDrawer、PushChair、MoveBucket；涵蓋單／雙臂mobile manipulation。",
+    "cases": "約36K成功demonstrations、1.5M frames；測試物件每skill10個，cabinet target有多門／多抽屜。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "skills",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 162,
+        "unit": "按4類相加的資產條目",
+        "qualifier": "52+35+36+39，非跨類去重",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 36000,
+        "unit": "成功demo trajectories",
+        "qualifier": "約數",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "預定test environment instances的mean success；task-specific終態／穩定性判定；training restrictions分track。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "同物件category下train/test object互斥；單個scene參數變化另為environment instance。",
+    "lineage": "SAPIEN＋PartNet-Mobility類資產；ManiSkill2繼承這4項，不可視作全部新任務。",
+    "related_paper_ids": [
+      "P067",
+      "P068"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5
+        ],
+        "locator": "表1、§2.1–2.2",
+        "supports": "4skills、object環境單位"
+      },
+      {
+        "pages": [
+          6,
+          7
+        ],
+        "locator": "§2.4與evaluation protocol",
+        "supports": "demo與success"
+      }
+    ],
+    "unresolved": [
+      "門櫃／抽屜櫃底層asset ID是否重疊需manifest核。"
+    ],
+    "reuse": "資產拓撲泛化與物件級environment是重要細節；需轉譯成共同欄位但不抹平原生定義。",
+    "reviewed_pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374",
+    "reviewed_on": "2026-10-02",
+    "name": "ManiSkill",
+    "year": 2021,
+    "title": "ManiSkill: Generalizable Manipulation Skill Benchmark with Large-Scale Demonstrations",
+    "source_url": "https://arxiv.org/abs/2107.14483",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P066",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P066",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4 skills：OpenCabinetDoor、OpenCabinetDrawer、PushChair、MoveBucket；涵蓋單／雙臂mobile manipulation。",
+            "原作environment以一個物件資產為單位；表1為52門櫃、35抽屜櫃、36椅、39桶，櫃體可能含多door/drawer，不能當162獨立房間。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P066",
+      "name": "ManiSkill",
+      "expected_title": "ManiSkill: Generalizable Manipulation Skill Benchmark with Large-Scale Demonstrations",
+      "source_url": "https://arxiv.org/abs/2107.14483",
+      "pdf_url": "https://arxiv.org/pdf/2107.14483",
+      "retrieved_at": "2026-10-02T21:33:35.138817+00:00",
+      "pdf_sha256": "90472755c9779e6088c8a94faaed0a4de3b9743d2d994c421973b0e7c402b374",
+      "text_sha256": "6578da9f4f8f94338529c07db894e63c24c522b12ae6a1ea9c6490bbf0d36b5b",
+      "pdf_bytes": 14120364,
+      "pages": 24,
+      "text_characters": 94045,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2107.14483v5",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2107.14483v5"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "skills",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P066:1",
+        "paper_id": "P066",
+        "benchmark": "ManiSkill",
+        "native_term": "skills",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2107.14483v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2107.14483v5",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 162,
+        "unit": "按4類相加的資產條目",
+        "qualifier": "52+35+36+39，非跨類去重",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P066:2",
+        "paper_id": "P066",
+        "benchmark": "ManiSkill",
+        "native_term": "按4類相加的資產條目",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2107.14483v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2107.14483v5",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 36000,
+        "unit": "成功demo trajectories",
+        "qualifier": "約數",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P066:3",
+        "paper_id": "P066",
+        "benchmark": "ManiSkill",
+        "native_term": "成功demo trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2107.14483v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2107.14483v5",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "haosulab/ManiSkill-Legacy"
+  ],
+  "external_repositories": []
+}

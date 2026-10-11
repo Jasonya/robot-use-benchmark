@@ -1,0 +1,780 @@
+{
+  "paper_id": "P180",
+  "name": "SafeManip",
+  "title": "SafeManip: A Property-Driven Benchmark for Temporal Safety Evaluation in Robotic Manipulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.12386",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P180",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+    "identity_note": "收錄 arXiv:2605.12386v3（2026-09-28），第6頁列此 GitHub；README 題名一致但仍匿名。程式固定2026-09-26 commit，早於該 PDF 修訂，尤其評分與ID映射不可假定完全同步。",
+    "summary": "已追到 privileged HDF5/JSON reader、simulator contact grounding、LTLf DFA、可恢復的 repeated-violation 狀態機與實際聚合器。公開 code 有20個 enforced specifications／8類，但所讀 analysis/monitor_metrics/RQ1 的分母與論文v3 per-trigger pooled metrics 不一致；id.csv 也有9個當前公式無法匹配。",
+    "environment": "沿用 RoboCasa365 廚房與 LIBERO 桌面模擬，主體是可取得 privileged simulator state 的安全監測層。論文50個RoboCasa tasks、4×10個LIBERO tasks是重用範圍，不另當90個新環境。固定scene實驗依seed鎖定layout／初態，應與一般scene variation分開。gitlink 的 LIBERO=8f1084e、LIBERO_openpi=f78abd6、RoboCasa=4f8a298。",
+    "tasks": "8類：碰撞／接觸、抓握穩定、釋放穩定、交叉汙染、action onset、mechanism、containment、enclosure/access。論文表2的10個template與表4／程式20個enforced spec不同單位；靜態AST逐一抽出20個name/ltl，抓握拆同步與掉落合法性，action onset有8種skill。task applicability 必須取原生場景／物件及ApplicableProperty表；LIBERO無某些語義觸發不能當免費安全分數。monitor目前每property每episode使用binding={}，未枚舉全物件組合。",
+    "data": "LIBERO reader 讀 data/demo_*/states、可選actions及init_state attr、data.attrs.bddl_file_name；直接set_state_from_flattened後forward，另設timestep=t+1防止監測狀態每frame重置。若actions數等於states數，嘗試最後action補一個terminal frame，故監測長度可能T+1；其replay_summary仍硬編split='train'，即使fallback可讀eval rollout。輸出 privileged_static_info、privileged_dynamic_info[{step,data}]、replay_summary；dynamic含task.timestep/success、robot.end_effector_pose、scene物件／fixture pose與predicates。env_ext quaternion由body_xquat輸出wxyz。monitor輸出property_name/ltl/binding、num_frames、violations/satisfied、original/repeated、repaired_traces、accepting_by_property/recovery_accepting_by_property；raw per-frame repeated trace預設移除。frame index、原生step、call_stride與秒數須分開，不從monitor行數推定物理時間。",
+    "evaluation": "具體collision grounding先排除合法robot/object/fixture/receiver/source-support/tool接觸，剩餘geom pair累加forbidden_contact_age，>20 frames才令forbidden_contact_sustained=True，enforced公式為G(!forbidden_contact_sustained)。SETTLE_TIMEOUT_FRAMES=100、SKILL_ONSET_FRAMES=10是本commit幀閾值。DFA逐frame轉移；repeated monitor進reject後凍結main並推進recovery DFA，recovery接受才結束unsafe episode及重新啟動，保留次數與duration。論文v3定義聚合後Vφ/Nφ及Uφ/Nφ，aggregate先pool counts，task success獨立。實際monitor_metrics卻算violated_instances/evaluated_instances及exposure_frames/monitored_frames；analysis.metrics的violations_per_skill_onset以evidence裡所有skill_*_onset_candidate_count的最大快照作分母，RQ1再平均各列ratio，不是每property trigger總數。因此這些現成CSV／圖不能直接標成v3正式per-trigger結果。timeout未觸發而影片已結束時run_monitor把該property歸satisfied，必須保存截斷／未觀測完成的限制。",
+    "standardization": {
+      "profile": "privileged_state_temporal_safety_monitoring",
+      "reuse": "原生property_name、enforced LTLf、recovery LTLf、predicate grounding／幀閾值、靜態scene角色、逐frame trace與unsafe episode區間。",
+      "transform": "source保留PDF版／parent commit／simulator gitlink；environment與task指向原生RoboCasa/LIBERO；case=原生task+policy+seed+scene/split+episode；evaluator拆task success、whole-rollout satisfaction、repeated counts、unsafe frames、per-property trigger counts。保留template→enforced-spec→category映射與NA applicability。零分母記NA，禁止把空類別回傳0當成已證安全；從trace另建有版本的trigger registry後才算v3 pooled metrics。",
+      "missing": "v3 per-trigger Nφ 的完整程式／可核對輸出；當前20個公式與id.csv／ApplicableProperty的版本對齊；被gitignore的working policy/simulator fork與公開extension的接線；末端補frame及硬編train provenance驗證；全部grounding與機制的獨立有效性檢查。本輪未跑MONA、模型或模擬。"
+    },
+    "version_note": "AST／CSV靜態比對發現9／20個當前公式不能由id.csv文字join到ID；例如collision已改sustained、grasp拆成兩spec、release改用object_dropped。id.csv也將釋放公式列為GraspStability、舊抓握公式列為ReleaseStability，與ApplicableProperty不同。不要用舊P1…ID自行覆寫native property_name。README明示working forks被gitignore，但monitor/sim公開extension確實存在，不能把整個來源誤標為無程式。",
+    "integration_issues": [
+      "必須分開論文v3 per-trigger、現行instance/frame指標與平均onset ratio三種口徑。",
+      "修復9個公式join落空與grasp/release類別互換前，不可匯入現成分析CSV作正式結果。",
+      "保留gitlink與gitignored fork限制、T+1末端frame、硬編train及timeout截斷語義。"
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            13,
+            69
+          ],
+          [
+            83,
+            92
+          ],
+          [
+            309,
+            353
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 410,
+        "sha256": "6cfc1a803f4735709e2f6061c0cfaa6b7f208b205e02b92229721805403e1661",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/README.md",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/README.md#L13-L69",
+        "why": "確認 safety layer 角色、gitignored working forks 與固定／變動場景流程。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": ".gitmodules",
+        "ranges": [
+          [
+            1,
+            41
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 41,
+        "sha256": "467773c69287c0b7fb95e761d451a7bac9cd9bf8ef05883e0930bba305616a03",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/.gitmodules",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/.gitmodules#L1-L41",
+        "why": "模擬器／模型是獨立 gitlink，不能把 parent tree 當完整上游程式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/analysis/ApplicableProperty.csv",
+        "ranges": [
+          [
+            1,
+            15
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 21,
+        "sha256": "1966fa1e7f56fa63ba7decc631e3f9ae793b1b70adaf44964caae289c9902cde",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/ApplicableProperty.csv",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/ApplicableProperty.csv#L1-L15",
+        "why": "以50個task欄位對應property applicability，不將所有安全類別套到每task。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+        "ranges": [
+          [
+            107,
+            219
+          ],
+          [
+            267,
+            305
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 438,
+        "sha256": "274ffbecdc97a8a570deed28a5c33e851a21d5b73536f41257652277ba6ada52",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/extract_privileged_from_dataset_libero.py#L107-L219",
+        "why": "HDF5 states/actions/BDDL reader、逐frame還原與末端frame補回。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/sim/libero/env_ext.py",
+        "ranges": [
+          [
+            50,
+            131
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 131,
+        "sha256": "88c09bd67cbb6d22d52ac5eb4e99a0df5134f2d3f5b07c5420e8b183bb60dacb",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/sim/libero/env_ext.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/sim/libero/env_ext.py#L50-L131",
+        "why": "實際輸出 task/scene/robot/predicates 與 wxyz quaternion。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/sim/robocasa/predicates.py",
+        "ranges": [
+          [
+            436,
+            456
+          ],
+          [
+            4140,
+            4273
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 9627,
+        "sha256": "6b34b271d94c41cebfad0b0375880af47c58e8fe22e2e3c7351dd79015b1775a",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/sim/robocasa/predicates.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/sim/robocasa/predicates.py#L436-L456",
+        "why": "allowed contact class 排除後，連續 forbidden contact 超過20 frames 才觸發 sustained。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/specs.py",
+        "ranges": [
+          [
+            443,
+            460
+          ],
+          [
+            527,
+            531
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 845,
+        "sha256": "90e01dfba4b8b181bb5409877247f54ea67e51fe268b3eec11f5c1ee7989553f",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/specs.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/specs.py#L443-L460",
+        "why": "具體 collision invariant 與 grasp weak-until，和文章template分層保存。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/predicates.py",
+        "ranges": [
+          [
+            119,
+            163
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 884,
+        "sha256": "fda268e2309507f79f54dea80ecc4d4d4cd2585f0c37b11b257a2cab51effd40",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/predicates.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/predicates.py#L119-L163",
+        "why": "predicate wrapper 只查已grounded值，必須往 sim implementation 追。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/monitor.py",
+        "ranges": [
+          [
+            72,
+            93
+          ],
+          [
+            225,
+            276
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 316,
+        "sha256": "a6c9536c303e31f0fa98888cea1a703afc4ba4262bd1abe83fd1ac76f4226c75",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/monitor.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/monitor.py#L72-L93",
+        "why": "每property使用單一空binding，逐frame餵入已grounded atom。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/LTLfDFA.py",
+        "ranges": [
+          [
+            161,
+            246
+          ],
+          [
+            267,
+            287
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 318,
+        "sha256": "4996132080b489b80d925f01a2e2feea28ae07fa5336c0d467226622e5eb91e5",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/LTLfDFA.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/LTLfDFA.py#L161-L246",
+        "why": "實際 MONA/DFA 建立、唯一轉移與終止／trap 判定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/repeated_violation_monitor.py",
+        "ranges": [
+          [
+            105,
+            245
+          ],
+          [
+            248,
+            319
+          ],
+          [
+            1408,
+            1437
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2027,
+        "sha256": "cf777c1e5cb3f531e3c82ab0c42e8a8aa0a8650652772ae666f17d606e49743f",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/repeated_violation_monitor.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/repeated_violation_monitor.py#L105-L245",
+        "why": "違反後凍結main、啟動recovery、恢復時reset，以及collision具體recovery公式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/run_monitor_on_privileged.py",
+        "ranges": [
+          [
+            103,
+            133
+          ],
+          [
+            1238,
+            1324
+          ],
+          [
+            1328,
+            1409
+          ],
+          [
+            1524,
+            1569
+          ],
+          [
+            1640,
+            1681
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1718,
+        "sha256": "3d6b6e29896a5b81e0ab394c369eda39f43b002dcf1802af069668bb3f7530f2",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/run_monitor_on_privileged.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/run_monitor_on_privileged.py#L103-L133",
+        "why": "reader→predicate修補→monitor→輸出；截斷timeout會被列為satisfied的實際語義。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/monitor/monitor_metrics.py",
+        "ranges": [
+          [
+            77,
+            125
+          ],
+          [
+            137,
+            230
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 293,
+        "sha256": "e43c11a2beb940620dfcf1a1d5d325f4a0970438d2f4bc196db015d7122c289f",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/monitor_metrics.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/monitor_metrics.py#L77-L125",
+        "why": "instance分母的violation_rate與frame exposure，不是per-trigger。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/analysis/metrics.py",
+        "ranges": [
+          [
+            72,
+            85
+          ],
+          [
+            266,
+            397
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 628,
+        "sha256": "6bd1e87912973a557f2857127023c5a589acdb28da4d93ad531ff15e69f51984",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/metrics.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/metrics.py#L72-L85",
+        "why": "onset候選計數、零分母空值、task/safety/safe-success的分離。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/analysis/id.csv",
+        "ranges": [
+          [
+            1,
+            20
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 20,
+        "sha256": "2c764951c8261d26b50ba1cce7c843243cd0ae66a531016fcacfc3306429bf9d",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/id.csv",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/id.csv#L1-L20",
+        "why": "舊公式／類別映射與當前spec不一致。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chengyuehuang511/SafeManip",
+        "requested_repo": "chengyuehuang511/SafeManip",
+        "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+        "ref": null,
+        "path": "SafeManip/analysis/RQ1.py",
+        "ranges": [
+          [
+            743,
+            766
+          ],
+          [
+            1846,
+            1864
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2552,
+        "sha256": "2d06de923c4962ece9a15a099500b3f53c3ed88510b95dc88a982e48d08c2d4b",
+        "url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/RQ1.py",
+        "reading_url": "https://github.com/chengyuehuang511/SafeManip/blob/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/RQ1.py#L743-L766",
+        "why": "圖表以ratio列取平均，未依論文先pool trigger與violation數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a2019e13e459ad3801ce50142690b70f69371bc04ea48120164349b08265eea8"
+  },
+  "repository_binding_review_sha256": "a2019e13e459ad3801ce50142690b70f69371bc04ea48120164349b08265eea8",
+  "repository_bindings": [
+    {
+      "requested_repo": "chengyuehuang511/SafeManip",
+      "resolved_repo": "chengyuehuang511/SafeManip",
+      "aliases_in_this_review": [
+        "chengyuehuang511/safemanip"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+          "reviewed_files": [
+            ".gitmodules",
+            "README.md",
+            "SafeManip/analysis/ApplicableProperty.csv",
+            "SafeManip/analysis/RQ1.py",
+            "SafeManip/analysis/id.csv",
+            "SafeManip/analysis/metrics.py",
+            "SafeManip/monitor/LTLfDFA.py",
+            "SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+            "SafeManip/monitor/monitor.py",
+            "SafeManip/monitor/monitor_metrics.py",
+            "SafeManip/monitor/predicates.py",
+            "SafeManip/monitor/repeated_violation_monitor.py",
+            "SafeManip/monitor/run_monitor_on_privileged.py",
+            "SafeManip/monitor/sim/libero/env_ext.py",
+            "SafeManip/monitor/sim/robocasa/predicates.py",
+            "SafeManip/monitor/specs.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/chengyuehuang511/SafeManip",
+          "pdf_page": 6,
+          "pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc",
+          "basis": "pdf_extracted_text"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P180",
+          "review_file": "content/github_review/reviews/P180.json",
+          "review_sha256": "a2019e13e459ad3801ce50142690b70f69371bc04ea48120164349b08265eea8",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P180",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SafeManip，arXiv 2605.12386v3。",
+    "scope_read": "8類/10模板、ManipVerse、事件監測、90host tasks及各policy協定。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      14,
+      15
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "安全與過程規則benchmark",
+    "environment": "RoboCasa365及LIBERO；主RoboCasa多task實驗在pretraining scenes，target-scene實驗另列。",
+    "tasks": "50 RoboCasa+40 LIBERO＝90 host task entries；8 safety categories、10 LTLf templates，只綁定適用task。",
+    "cases": "每policy/task50episodes，RoboCasa單設定2,500、LIBERO單設定2,000；不同訓練variant不是新題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "兩來源host task entries",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "安全規則templates",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每policy/task evaluation episodes",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "native SR；每trigger violation V/N與unsafe exposure U/N，分母是觸發事件，非episode數。恢復後monitor可重新啟動。",
+      "LIBERO只有部分規則適用；支援10模板不代表每task實測10種違規。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同host/checkpoint/target設定分開，不能把pretrain-scene與target-scene結果直接比。",
+    "lineage": "重用RoboCasa365/LIBERO並增加ManipVerse predicate與DFA監測；和SafeVLA是不同評測規則。",
+    "related_paper_ids": [
+      "P071",
+      "P064",
+      "P166"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          14,
+          15
+        ],
+        "locator": "Table 2、ManipVerse、Experimental Setup、Appendix",
+        "supports": "90/10/50、事件分母與pretraining場景"
+      }
+    ],
+    "unresolved": [
+      "資料hours與原RoboCasa365文章版本有差異；需固定release，不能反改原作數值。"
+    ],
+    "reuse": "任務聯集之外，另存task可適用的規則；安全規則數和語義task數各有自己的分母。",
+    "reviewed_pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc",
+    "reviewed_on": "2026-10-02",
+    "name": "SafeManip",
+    "year": 2026,
+    "title": "SafeManip: A Property-Driven Benchmark for Temporal Safety Evaluation in Robotic Manipulation",
+    "source_url": "https://arxiv.org/abs/2605.12386",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P180",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P180",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            14,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "50 RoboCasa+40 LIBERO＝90 host task entries；8 safety categories、10 LTLf templates，只綁定適用task。",
+            "RoboCasa365及LIBERO；主RoboCasa多task實驗在pretraining scenes，target-scene實驗另列。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P180",
+      "name": "SafeManip",
+      "expected_title": "SafeManip: A Property-Driven Benchmark for Temporal Safety Evaluation in Robotic Manipulation",
+      "source_url": "https://arxiv.org/abs/2605.12386",
+      "pdf_url": "https://arxiv.org/pdf/2605.12386",
+      "retrieved_at": "2026-10-02T21:34:47.719750+00:00",
+      "pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc",
+      "text_sha256": "945356e2ae98bde39195e54f1b60c37fc4c2bede9e1247e5c5f145a5de092f17",
+      "pdf_bytes": 3377261,
+      "pages": 33,
+      "text_characters": 183317,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2605.12386v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2605.12386v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "兩來源host task entries",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P180:1",
+        "paper_id": "P180",
+        "benchmark": "SafeManip",
+        "native_term": "兩來源host task entries",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.12386v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.12386v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "安全規則templates",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P180:2",
+        "paper_id": "P180",
+        "benchmark": "SafeManip",
+        "native_term": "安全規則templates",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.12386v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.12386v3",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每policy/task evaluation episodes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P180:3",
+        "paper_id": "P180",
+        "benchmark": "SafeManip",
+        "native_term": "每policy/task evaluation episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.12386v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.12386v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "chengyuehuang511/SafeManip"
+  ],
+  "external_repositories": []
+}

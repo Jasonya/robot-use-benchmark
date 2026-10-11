@@ -1,0 +1,49 @@
+{
+  "paper_id": "P175",
+  "reviewed_on": "2026-10-11",
+  "status": "repository_unavailable",
+  "summary": "Pipette原文明確提供GitHub，但本次取得回404。已整理12個wet-lab任務的共通格式與成功驗證augmentation設計，實作仍待取得。",
+  "reading_order": [],
+  "environment": "Isaac Sim/Isaac Lab、100+交互USD/消耗品資產；主要Franka Panda，部分task使用AgileX。三個RGB視角是感測配置，非三環境。",
+  "tasks": "12個sample handling、instrument/lid interaction、placement/alignment等wet-lab任務；NL parser輔助產生場景/任務設定，原文仍要求人工和模擬驗證。",
+  "data": "原文HDF5逐步記top/main/wrist RGB、proprio、sim state、action、language；成功驗證後轉LeRobot、去stale frame、對齊並降到10Hz，影像400²、robot-command8D。raw與augmented episode分別存，關聯同一原示範；資料增強不是新增語義task。",
+  "evaluation": "原文依物件pose、actuator state或幾何關係與registered threshold判success；每episode JSON應記成功/失敗理由/runtime/policy及control頻率/gripper threshold。code及文中另提的technical supplement未取得，尚無法驗證12task具體判分。",
+  "standardization": {
+    "profile": "wetlab_simulation_with_verified_augmentation",
+    "reuse": "task entry(scene/robot/sensor/instruction/target/constraints/criterion)與HDF5→LeRobot對齊流程。",
+    "transform": "建立原demo→augmentation lineage和各自render/action；case固定scene/初態/clock/8D命令語義，evaluator保留task-specific threshold與有效性。",
+    "missing": "可取GitHub、12task/資產/episode清單、technical supplement、實際converter/evaluator與simulation重現。"
+  },
+  "version_note": "同一2606.12936的v3題名已改為Success-Verified Simulation Augmentation，書目舊題名Data-Efficient保留版本註記。官方hbhuiyou/Pipette取得404，只作當次不可用判定。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2606.12936",
+    "pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+    "paper_pages_read": [
+      3,
+      5
+    ],
+    "repository_access": {
+      "requested_url": "https://api.github.com/repos/hbhuiyou/Pipette",
+      "retrieved_at": "2026-10-10T07:45:40.670001+00:00",
+      "status": 404,
+      "error": "Not Found"
+    }
+  },
+  "identity_note": "精確arXiv ID相同；論文版本改題名，不建立成另一份獨立benchmark。",
+  "repository_candidate_dispositions": [
+    {
+      "repo": "hbhuiyou/Pipette",
+      "status": "announced_repository_unavailable",
+      "reason": "原作／作者頁明列的入口；保存於2026-10-10T07:45:40.670001+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+      "evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/hbhuiyou/Pipette",
+          "retrieved_at": "2026-10-10T07:45:40.670001+00:00",
+          "status": 404,
+          "error": "Not Found"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "paper_id": "P227",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EggHand 是在 EgoH4／EgoExo4D 手部軌跡上評測的預測方法；「action」在這裡是未來 42 個人體關節座標，不能直接當成機器人控制命令。已逐段核對取樣、相機對齊與六項誤差的有效樣本口徑。",
+  "reading_order": [
+    {
+      "repo": "JYOUN9/EggHand_Code",
+      "commit": "72d9b8f58c62c48eb1570b1d36116bb80c8d3ceb",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          104
+        ]
+      ],
+      "why": "核對官方身分、資料 split／頻率、訓練與推論設定、論文欄位對照。"
+    },
+    {
+      "repo": "JYOUN9/EggHand_Code",
+      "commit": "72d9b8f58c62c48eb1570b1d36116bb80c8d3ceb",
+      "path": "docs/IMPLEMENTATION.md",
+      "ranges": [
+        [
+          1,
+          35
+        ]
+      ],
+      "why": "確認原生依賴版本、時間索引、補邊、mask 和 paper／code 指標差異。"
+    },
+    {
+      "repo": "JYOUN9/EggHand_Code",
+      "commit": "72d9b8f58c62c48eb1570b1d36116bb80c8d3ceb",
+      "path": "inference/evaluate.py",
+      "ranges": [
+        [
+          86,
+          123
+        ],
+        [
+          176,
+          193
+        ],
+        [
+          275,
+          297
+        ],
+        [
+          357,
+          395
+        ],
+        [
+          487,
+          490
+        ],
+        [
+          535,
+          643
+        ]
+      ],
+      "why": "追蹤資料欄位、逐座標訓練 mask、GT 有效關節、分母與錯誤處理。"
+    },
+    {
+      "repo": "JYOUN9/EggHand_Code",
+      "commit": "72d9b8f58c62c48eb1570b1d36116bb80c8d3ceb",
+      "path": "gr00t/model/transforms.py",
+      "ranges": [
+        [
+          356,
+          450
+        ]
+      ],
+      "why": "檢查 world-to-camera 外參、首個歷史相機的 canonical frame、零座標關節與 raw tensors。"
+    }
+  ],
+  "environment": "EgoExo4D 衍生的 EgoH4 人體影片／手部軌跡，非新建模擬場景。相機外參為 world→camera 3×4；以最早可見幀（offset −19，含邊界補幀）的相機位置與前向建立座標系。",
+  "tasks": "一個 3D 雙手預測設定：42 關節 × xyz。state offsets −19…0，4 個影像 offsets −18／−12／−6／0，target offsets 0…9；target 包含當前 timestep，不能稱為 10 個純未來幀。",
+  "data": "README 列 train 555 episodes／41,314 samples、val 109 episodes／8,830 samples，10 Hz，LeRobot v2.1。episode、重疊時間窗和關節數分開記；與 EgoH4／EgoExo4D 保留父資料關係。原始 126D 關節與 12D 外參經模型投影，32D latent action 不是原生 actuator 維度。",
+  "evaluation": "以公尺計算 wrist ADE／FDE、絕對 MPJPE／MPJPE-F、wrist-relative R-MPJPE／R-MPJPE-F。論文的 MPJPE 欄對應後兩項相對誤差。GT 三軸全零才排除關節；relative 額外要求 wrist 有效，包含對齊後零誤差的 wrist。ADE 先手腕→幀→sample 平均，MPJPE 池化有效 joint×time；不共用分母。全無效 sample 不計，異常直接停止並報 sample index。",
+  "standardization": {
+    "profile": "egocentric_3d_hand_forecasting",
+    "reuse": "重用原生 joint keys、episode／frame 對照、相機對齊與原生 evaluator。；保留同一評測的 absolute／relative 六欄，不把不同 alignment 的 MPJPE 合成一欄。",
+    "transform": "case 固定 source episode、base timestep、完整 observation／target offsets、padding mask、m 單位與 camera reference。；訓練 per-coordinate 非零 mask 和評測 per-joint mask 各自保存；新增缺失值策略必須另立協定。；資料 split 沿用父 take／episode，防止重疊窗口跨 train／test。",
+    "missing": "本次未下載影片／模型、未執行基線；資料與 checkpoint revision 仍需固定。；目前原生對齊會把全零缺失關節當點平移；不能事後把它誤認為觀測到的手。"
+  },
+  "version_note": "已讀 revision 的 implementation note 明載 warmup 為 1% 而非論文 5%；推論 BF16／四步 denoising 與訓練精度分開。閱讀範圍是列出的來源段落，未聲稱重現論文分數。",
+  "runtime_executed": false,
+  "repository_candidate_dispositions": [
+    {
+      "repo": "ISL-Lab/EggHand",
+      "status": "candidate_without_readable_commit",
+      "reason": "名稱搜尋得到的候選；repository metadata為200，但該次snapshot沒有取得可讀commit。本文的明確程式與論文對應已在JYOUN9/EggHand_Code核讀，不以這個空／不可讀候選補算第二份實作。",
+      "evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/ISL-Lab/EggHand",
+          "retrieved_at": "2026-10-10T08:09:09.649913+00:00",
+          "status": 200,
+          "resolved_url": "https://api.github.com/repos/ISL-Lab/EggHand",
+          "content_type": "application/json; charset=utf-8",
+          "bytes": 5915,
+          "sha256": "2aa35b00f7a27cf196fd0dcdc9b075f96262a0b29a301444ab8cf1f04ed3fa74"
+        },
+        {
+          "snapshot_status": "commit_unavailable_or_empty",
+          "commit_receipt": {
+            "requested_url": "https://api.github.com/repos/ISL-Lab/EggHand/git/ref/heads/main",
+            "retrieved_at": "2026-10-10T08:09:10.270121+00:00",
+            "status": 409,
+            "error": "Conflict"
+          }
+        }
+      ]
+    }
+  ]
+}

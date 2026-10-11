@@ -1,0 +1,440 @@
+{
+  "paper_id": "P197",
+  "name": "EgoSim / MultiEgoView",
+  "title": "EgoSim: An Egocentric Multi-view Simulator and Real Dataset for Body-worn Cameras during Motion and Activity",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2502.18373",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P197",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoSim提供真正的身體穿戴相機模擬擴充，核心在SIPCharacter C++，不是AirSim通用的image benchmarker。它產生多相機/IMU/骨架資料，並非robot任務成功評測器。",
+    "environment": "Unreal Engine/AirSim的SIPCharacter avatar，可接FBX/SMPL系列動畫與多socket身體攝影機；6camera sockets是同avatar的感測位置，非6個獨立場景。MultiEgoView實拍資料另有下載來源。",
+    "tasks": "身體相機視角、運動/活動資料生成及下游感知研究。avatar動畫和camera placement本身不構成已帶robot goal/scorer的操作task。",
+    "data": "record有VehicleName、相對建立時間TimeStampMs、TimeStampAnimationS、6組相機position/quaternion(xyzw)、IMU acc/velocity及bone世界pose。settings採NED轉換，record直接寫Unreal Actor/Bone位置；位置/加速度單位需驗證，不能看到註解convert to meters就假定已換算。",
+    "evaluation": "本次未確認完整語義下游benchmark scorer，capture FPS不是活動理解成功率。tick依clock_speed和record_interval採樣；camera2角速度噪聲用dist_vel1，camera3所讀角速度噪聲被註解，與六份std設定未完全對稱，需逐sensor記實際生成條件。",
+    "standardization": {
+      "profile": "body_worn_multiview_camera_and_imu_simulation",
+      "reuse": "SIPCharacter生成器、sensor mount/lag設定、完整record字段與雙時計。",
+      "transform": "environment保存UE場景/avatar/animation/插件版本；case保存socket視角、noise與時序/座標轉換，body poses作label時不得作隱式policy輸入；觀測生成與下游任務/判分分層。",
+      "missing": "MultiEgoView原生reader與split、UE資產/animation權利及取得、坐標/時間/IMU統計實測、下游task/scorer與部署驗證。"
+    },
+    "version_note": "固定e48780e；NeurIPS2024作品於2502.18373存檔。只核讀實際EgoSim擴充，未把整個AirSim所有功能當成本文評測範圍。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "eth-siplab/EgoSim",
+        "requested_repo": "eth-siplab/EgoSim",
+        "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 148,
+        "sha256": "f2d90d5be388f30418a331329a330f469f722decb8415da71095cbd000ab3f56",
+        "url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/README.md",
+        "reading_url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/README.md#L1-L85",
+        "why": "原作、MultiEgoView、最多6socket與IMU/相機設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "eth-siplab/EgoSim",
+        "requested_repo": "eth-siplab/EgoSim",
+        "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+        "ref": null,
+        "path": "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SimModeSIPCharacter.cpp",
+        "ranges": [
+          [
+            117,
+            154
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 184,
+        "sha256": "e551d3586de87eda8e9c35cff5a0d891c571fdf688ea37f70fc1642a5d0327c3",
+        "url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SimModeSIPCharacter.cpp",
+        "reading_url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SimModeSIPCharacter.cpp#L117-L154",
+        "why": "settings NED→Unreal spawn變換與avatar建立",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "eth-siplab/EgoSim",
+        "requested_repo": "eth-siplab/EgoSim",
+        "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+        "ref": null,
+        "path": "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawn.cpp",
+        "ranges": [
+          [
+            148,
+            162
+          ],
+          [
+            185,
+            205
+          ],
+          [
+            427,
+            492
+          ],
+          [
+            503,
+            520
+          ],
+          [
+            533,
+            550
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 650,
+        "sha256": "a2d20f5b5d08b90d981daab9202c8aecd883dbaea5c1c48623301121bdd33808",
+        "url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawn.cpp",
+        "reading_url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawn.cpp#L148-L162",
+        "why": "camera lag、IMU噪聲配置與實際tick推導",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "eth-siplab/EgoSim",
+        "requested_repo": "eth-siplab/EgoSim",
+        "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+        "ref": null,
+        "path": "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawnSimApi.cpp",
+        "ranges": [
+          [
+            18,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 105,
+        "sha256": "46f17bee550e905db1b5f779c52f27e9215bbe02587bd2754a283b3f945a6e0f",
+        "url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawnSimApi.cpp",
+        "reading_url": "https://github.com/eth-siplab/EgoSim/blob/e48780e6c8397ce41e9d43675c57246097958f79/Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawnSimApi.cpp#L18-L105",
+        "why": "record欄位、雙時計、6相機/IMU及所有bone world pose",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e1f86a1d785c139fb4a915037abf4b4604d4b612a4a27608f39f9a9d0c7d2349"
+  },
+  "repository_binding_review_sha256": "e1f86a1d785c139fb4a915037abf4b4604d4b612a4a27608f39f9a9d0c7d2349",
+  "repository_bindings": [
+    {
+      "requested_repo": "eth-siplab/EgoSim",
+      "resolved_repo": "eth-siplab/EgoSim",
+      "aliases_in_this_review": [
+        "eth-siplab/egosim"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "e48780e6c8397ce41e9d43675c57246097958f79",
+          "reviewed_files": [
+            "README.md",
+            "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawn.cpp",
+            "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SIPCharacterPawnSimApi.cpp",
+            "Unreal/Plugins/AirSim/Source/Vehicles/SIPCharacter/SimModeSIPCharacter.cpp"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/eth-siplab/EgoSim",
+          "link_label": "EgoSim code",
+          "project_url": "https://siplab.org/projects/EgoSim",
+          "page_sha256": "9289b7282a23d69f8fb754ae2acf8f24cf03e8c7a13e2ad3b942d844c08f57bd"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P197",
+          "review_file": "content/github_review/reviews/P197.json",
+          "review_sha256": "e1f86a1d785c139fb4a915037abf4b4604d4b612a4a27608f39f9a9d0c7d2349",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P197",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoSim / MultiEgoView，arXiv 2502.18373v1。",
+    "scope_read": "資料構成、四場景、body-camera位置、35活動、切分與body pose metrics。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "穿戴互動與動作介面"
+    ],
+    "role": "身體攝影機資料與感知benchmark",
+    "environment": "24locations分布於4virtual scenes；real資料在其中一個掃描courtyard收集。6個body cameras是視角。",
+    "tasks": "主要實驗為全身3D pose estimation；real演出35種BABEL活動，非35robot執行目標。",
+    "cases": "synthetic 119.4行為hours/77.4M六視角images；real約5h、13participants。5秒segments數未報。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "virtual scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "locations within scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 35,
+        "unit": "real human activity types",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 119.4,
+        "unit": "synthetic motion hours（6views）",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "global/PA MPJPE、translation/rotation/joint-angle error、jerk。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "synthetic依BABEL60/20/20；real random80/20與cross-participant10/3另列。",
+    "lineage": "AMASS/BABEL/BEDLAM motion/labels/assets；同一motion多bodyviews與多場景重渲染，非獨立動作資料。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§4、§6",
+        "supports": "4/24/35、119.4h及兩種real splits"
+      }
+    ],
+    "unresolved": [
+      "精確train/test片段IDs、重渲染motion去重需manifest；動作辨識/定位雖可支援，主實驗未全評。"
+    ],
+    "reuse": "支援頭、腰、手腕、膝攝影機的感知來源；加入視角泛化，不能當物理task completion。",
+    "reviewed_pdf_sha256": "db15f931833027b80e416c0bdb47bd3c7695ef3cce6733988110484295f4f7d2",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoSim / MultiEgoView",
+    "year": 2025,
+    "title": "EgoSim: An Egocentric Multi-view Simulator and Real Dataset for Body-worn Cameras during Motion and Activity",
+    "source_url": "https://arxiv.org/abs/2502.18373",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "wearable"
+    ],
+    "review_tags": [
+      "戶外活動",
+      "人體動作與身體感知"
+    ],
+    "domain_names": [
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P197",
+      "summary": "身體攝影機用來恢復使用者動作及支援互動輸入，歸入穿戴互動與動作介面。",
+      "evidence": [
+        {
+          "paper_id": "P197",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            5
+          ],
+          "locator": "Introduction、§4 MultiEgoView",
+          "observed_tasks": [
+            "頭、腰、手腕、膝部六視角",
+            "全身3D姿態與相機定位",
+            "immersive Mixed Reality／手部動作輸入"
+          ],
+          "reasoning": "原文明列穿戴和混合實境需求，能歸納應用，不必只留下『人體感知』技術標籤。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "db15f931833027b80e416c0bdb47bd3c7695ef3cce6733988110484295f4f7d2"
+        }
+      ],
+      "domain_ids": [
+        "wearable"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "db15f931833027b80e416c0bdb47bd3c7695ef3cce6733988110484295f4f7d2",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P197",
+      "name": "EgoSim / MultiEgoView",
+      "expected_title": "EgoSim: An Egocentric Multi-view Simulator and Real Dataset for Body-worn Cameras during Motion and Activity",
+      "source_url": "https://arxiv.org/abs/2502.18373",
+      "pdf_url": "https://arxiv.org/pdf/2502.18373",
+      "retrieved_at": "2026-10-02T21:35:03.036640+00:00",
+      "pdf_sha256": "db15f931833027b80e416c0bdb47bd3c7695ef3cce6733988110484295f4f7d2",
+      "text_sha256": "3544cdb7e436dee411f167f16dff750872636feb58eb0017f9312af648c506a8",
+      "pdf_bytes": 8092762,
+      "pages": 21,
+      "text_characters": 81012,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2502.18373v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2502.18373v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "virtual scenes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P197:1",
+        "paper_id": "P197",
+        "benchmark": "EgoSim / MultiEgoView",
+        "native_term": "virtual scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.18373v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.18373v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "locations within scenes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P197:2",
+        "paper_id": "P197",
+        "benchmark": "EgoSim / MultiEgoView",
+        "native_term": "locations within scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.18373v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.18373v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 35,
+        "unit": "real human activity types",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P197:3",
+        "paper_id": "P197",
+        "benchmark": "EgoSim / MultiEgoView",
+        "native_term": "real human activity types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.18373v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.18373v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 119.4,
+        "unit": "synthetic motion hours（6views）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P197:4",
+        "paper_id": "P197",
+        "benchmark": "EgoSim / MultiEgoView",
+        "native_term": "synthetic motion hours（6views）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.18373v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.18373v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "eth-siplab/EgoSim"
+  ],
+  "external_repositories": []
+}

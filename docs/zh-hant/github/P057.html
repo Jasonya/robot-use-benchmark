@@ -1,0 +1,86 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Motor attention and action forecasting｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="作者實作可讀出 EGTEA／EPIC 的動作、手部與接觸點資料格式；分類評分可追到實作，但手部／hotspot 測試入口停留在視覺化版本，不能宣稱完整重現論文評測。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P057.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P057.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P057.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="Motor attention and action forecasting｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="作者實作可讀出 EGTEA／EPIC 的動作、手部與接觸點資料格式；分類評分可追到實作，但手部／hotspot 測試入口停留在視覺化版本，不能宣稱完整重現論文評測。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P057.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P057.html","title":"Motor attention and action forecasting｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P057.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P057.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P057 · Motor attention and action forecasting</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P057 · Motor attention and action forecasting</h1><p class="lede">Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>benchmark／資料／評測主來源</span><a href="https://arxiv.org/abs/1911.10967" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p057">用途與原生規模依據</a>
+    </div>
+    <p class="github-scope">核讀快照 2026-10-10。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">作者實作可讀出 EGTEA／EPIC 的動作、手部與接觸點資料格式；分類評分可追到實作，但手部／hotspot 測試入口停留在視覺化版本，不能宣稱完整重現論文評測。</p>
+    <aside class="github-version"><b>版本與身份</b><p>固定 77675f97143202b0a8e4555a3f30334ebe3c219f（2019-11-22），早於已讀的 2020 v2 論文。設定引用作者本機路徑；本輪未下載資料／權重，未將被註解的實驗碼當成有效評分器。</p><p>論文為 Liu、Tang、Li、Rehg 的 Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video（arXiv:1911.10967；本地 PDF 為 v2／ECCV 2020）。論文連至作者頁，作者頁同列本 repo、相同 arXiv ID、四位作者及額外標註；頁面標題的 Egocentric Activity 是同一作品的標題差異。Repo 是方法與既有 EGTEA／EPIC 資料的轉接實作，不是另一套獨立機器人任務庫。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>餐飲與烹飪、穿戴互動與動作介面</dd></div><div><dt>環境</dt><dd>既有 EGTEA Gaze+／EPIC-Kitchens 的人類第一視角廚房影片。論文 §4.1 將 EGTEA 轉為 320×256、24 fps，EPIC 為 512×288、30 fps；手部與接觸位置投影在最後可觀測影格，沒有可執行機器人環境。</dd></div><div><dt>任務</dt><dd>聯合預測未來 verb/noun/action、motor attention 與 interaction hotspot。EGTEA 用 split1、提前 0.5 秒；EPIC 用指定 train/val 做消融、提前 1 秒，challenge seen/unseen 另列。106／2513 是各設定的 action 類數；論文補充的 7381／14951 是額外標註樣本數，不是新任務數。</dd></div><div><dt>題數與資料</dt><dd>根層 video_list 與 verb_dict/noun_dict/action_dict；每筆 filename、video_info.{width,height,fps,num_frames}、label=[verb,noun,action]、target。EPIC target=[hotspot_xy,fingertip_xy]，整數代表缺失；以 12 點直線插值產生手部熱圖。EGTEA target=[hand,hotspot_xy]，hand 有 12 筆 [x1,y1,x2,y2,num_hand]；num_hand=0 或 hotspot=(0,0) 改用均勻先驗。座標是各自影像畫素，缺失標記不能轉成真實原點；通用 convert_dataset.py 的產物並不足以供 joint loader 使用。</dd></div><div><dt>評估方式</dt><dd>eval_joint.py 對原圖／水平翻轉分類輸出取平均，計 top-1/top-5（%）與 mean class accuracy；後者對所有設定類別取平均，零支援類別依 epsilon 得零。論文 §4.3 另報 hotspot F1/KLD 與手部平均／最終位移（空間／時間下取樣後正規化；手部結果僅 EGTEA）。但 test_joint.py 的 compare_hotspot 忽略輸入預測，改造三張 8×8 中心先驗；compare_hand 用 GT 最大值&gt;0.01 的切片、argmax 點歐氏距離，末項取扁平化後最後有效切片，函式本身沒有論文正規化。這些評分呼叫與彙總均被註解；不能將函式名稱視為已接通的論文評測。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作數字：保留論文的單位與頁碼</summary><p>下列為既有原文審閱摘錄；GitHub快照和本庫取得範圍另見上文，不互相代替。</p><ul><li><strong>3</strong> joint forecasting endpoints · 原文頁 11</li></ul></details>
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/README.md#L1-L23" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>核對訓練／測試入口與外部資料、權重依賴。</p><small>L1–23</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 28cb7c1045d889ec1f48a695f00fc8ca97b0ac7a066593bd10f6e2858a1a3db1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/exp_configs/egtea-o/egteao-action_split1_i3d_res50v1_vae.json#L1-L28" target="_blank" rel="noopener noreferrer"><code>exp_configs/egtea-o/egteao-action_split1_i3d_res50v1_vae.json</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>確認 106 類、split1 設定、32 幀步長 2 與私人資料路徑。</p><small>L1–28</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 f1127524a9f87c7069e86d54374840ffb1cffb780582033017408d7468d2c0b6</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/exp_configs/epic-kitchens/epic-kitchens-action_trainval_i3d_csn152_vae.json#L1-L30" target="_blank" rel="noopener noreferrer"><code>exp_configs/epic-kitchens/epic-kitchens-action_trainval_i3d_csn152_vae.json</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>確認 EPIC train/val 的 2513 action 類及獨立設定。</p><small>L1–30</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 4a58ff0a0ebf86d6f2273e9e0d6cadbb21aeb09fa1c2e6a255167c721fbdbd67</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/libs/datasets/custom_dataset_joint.py#L22-L56" target="_blank" rel="noopener noreferrer"><code>libs/datasets/custom_dataset_joint.py</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>讀實際 JSON keys、兩資料集相反的 target 順序、12 時片熱圖與缺失標註處理。</p><small>L22–56 · L223–253 · L256–369 · L382–509 · L522–590</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 e685ce8abd068aef5c1bdc9a5199e6d663c2b8719bef2fa3bb8087390a67340c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/tools/convert_dataset.py#L68-L70" target="_blank" rel="noopener noreferrer"><code>tools/convert_dataset.py</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>README 的通用轉換器只寫 label_dict/video_list，並未產生 joint loader 必要欄位或 EPIC 分支。</p><small>L68–70 · L74–147</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 4a487a287df7689d1ded3b454ee74be4fa59eb9184e2541346b9881b60c336e1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/eval_joint.py#L59-L64" target="_blank" rel="noopener noreferrer"><code>eval_joint.py</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>核對推論翻轉平均及實際只計分類 top-1/top-5、mean class accuracy。</p><small>L59–64 · L97–108 · L127–216</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 d92fb38956912cd780b43b5f492d7273eb4ee44b9b5fa61dba6877e9b08f3d0a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/libs/utils/metrics.py#L21-L86" target="_blank" rel="noopener noreferrer"><code>libs/utils/metrics.py</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>確認按樣本加權的 top-k 百分比與 confusion matrix 各列召回的平均。</p><small>L21–86</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 b6f881661f46b6d10cdf901bff3c84cf2b64836cf1eda0b54d8a6aea345a5d94</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/test_joint.py#L78-L215" target="_blank" rel="noopener noreferrer"><code>test_joint.py</code> ↗</a><span>GitHub · 2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV · 77675f9714</span></div>
+      <p>核對 hotspot 中心先驗覆寫、有效手部切片的位移演算法與被註解的評分／輸出。</p><small>L78–215 · L298–407 · L440–461 · L486–554</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 1bad84ca5767e2bb763294207ec854df4e77544e5de56f90719607a92022b7b0</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>保留父資料集／split 身分、類別字典、clip 引用、原生熱圖建置及分類指標實作。</p></section><section><h3>需要轉換</h3><p>case 以父資料集+split+filename 定位，task 分為分類、接觸點與手部預測；按資料集解開 target，附影像大小、提前時間、畫素／熱圖座標和真實／插值／均勻先驗標記。evaluator 分別保留分類、F1/KLD、位移單位。</p></section><section><h3>仍需補齊</h3><p>需取得作者額外 joint JSON、標註與可觀測 clip 邊界，重建相符類別字典；修復／驗證 hotspot 與手部評分入口、正規化及有效切片彙整，再做執行驗證。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P057-discovery.json&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/candidates/0&quot;,
+      &quot;/code_contexts/0&quot;
+    ],
+    &quot;sha256&quot;: &quot;24aa17ea303cb2f1d35b1e5938476a74cc93799f05060d8c6533df870655331e&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P057.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P056.html">← 上一篇 · Forecasting hands and objects</a><a href="P058.html">下一篇 → · EgoPAT3Dv2</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

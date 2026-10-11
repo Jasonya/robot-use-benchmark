@@ -1,0 +1,92 @@
+{
+  "paper_id": "P148",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Assistax有明確的JAX/Brax/MJX環境、雙agent觀測/動作與獎勵介面；feeding原始done固定0，累積回報不能當成餵食完成率。",
+  "reading_order": [
+    {
+      "repo": "assistive-autonomy/assistax",
+      "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "官方題名、套件用途及multi-agent接口"
+    },
+    {
+      "repo": "assistive-autonomy/assistax",
+      "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+      "path": "assistax/envs/__init__.py",
+      "ranges": [
+        [
+          28,
+          97
+        ]
+      ],
+      "why": "7個registry名稱及episode/auto-reset/preference wrapper順序"
+    },
+    {
+      "repo": "assistive-autonomy/assistax",
+      "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+      "path": "assistax/envs/base_env.py",
+      "ranges": [
+        [
+          20,
+          69
+        ],
+        [
+          104,
+          121
+        ],
+        [
+          215,
+          241
+        ]
+      ],
+      "why": "agent actuator索引、全域狀態分流與shared/heterogeneous reward"
+    },
+    {
+      "repo": "assistive-autonomy/assistax",
+      "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+      "path": "assistax/envs/feeding.py",
+      "ranges": [
+        [
+          175,
+          204
+        ],
+        [
+          245,
+          310
+        ]
+      ],
+      "why": "feeding觀測、距離/速度/力等獎勵及done=0"
+    },
+    {
+      "repo": "assistive-autonomy/assistax",
+      "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+      "path": "assistax/baselines/MASAC/eval_masac.py",
+      "ranges": [
+        [
+          69,
+          80
+        ]
+      ],
+      "why": "只累計第一次episode結束以前的未折扣回報"
+    }
+  ],
+  "environment": "目前registry有scratchitch、bedbathing、armmanipulation、pushcoop、handover、feeding、teethbrushing共7個環境類別；這是程式註冊名稱數，非房間/layout數。",
+  "tasks": "生活照護與協作控制；不同task指定human/robot或robot1/robot2。disability、preference及sparse reward是可選協定設定，不自行增加語義任務。",
+  "data": "功能式reset/step使用JAX key和state，按agent分obs/action/reward/done。feeding機器人7 actuator、人類頭部2 actuator；觀測含pose、force與joint angle，屬state-based而非預設RGB視覺題。episode_length預設1000、action_repeat預設1。",
+  "evaluation": "feeding混合距離、姿態、速度、口部接觸力與控制成本；原始done=0，結束依外層episode wrapper。MASAC回報mask在首次done後截斷；__all__在heterogeneous模式取agent reward平均。使用者偏好/身體受限設定改變score，必須隨case記錄。",
+  "standardization": {
+    "profile": "assistive_multiagent_simulation",
+    "reuse": "registry、actuator/observation映射、wrapper參數、具體獎勵與return聚合。",
+    "transform": "source固定commit；environment保存task類別/MJX資產與控制設定；case保存人類policy、preference、disability、seed與時限；evaluator分原生return和另定的任務完成條件。",
+    "missing": "其餘6環境完整checker、資產/控制接口實測、統一測例清單、各方法在相同人類策略/偏好下的基線。"
+  },
+  "version_note": "固定a7d94f4；目前registry多於README頂部5張照護示意圖，應以註冊清單標明當前版本。未執行JAX、訓練或臨床評估。",
+  "runtime_executed": false
+}

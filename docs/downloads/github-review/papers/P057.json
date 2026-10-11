@@ -1,0 +1,519 @@
+{
+  "paper_id": "P057",
+  "name": "Motor attention and action forecasting",
+  "title": "Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1911.10967",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P057",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "作者實作可讀出 EGTEA／EPIC 的動作、手部與接觸點資料格式；分類評分可追到實作，但手部／hotspot 測試入口停留在視覺化版本，不能宣稱完整重現論文評測。",
+    "identity_note": "論文為 Liu、Tang、Li、Rehg 的 Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video（arXiv:1911.10967；本地 PDF 為 v2／ECCV 2020）。論文連至作者頁，作者頁同列本 repo、相同 arXiv ID、四位作者及額外標註；頁面標題的 Egocentric Activity 是同一作品的標題差異。Repo 是方法與既有 EGTEA／EPIC 資料的轉接實作，不是另一套獨立機器人任務庫。",
+    "environment": "既有 EGTEA Gaze+／EPIC-Kitchens 的人類第一視角廚房影片。論文 §4.1 將 EGTEA 轉為 320×256、24 fps，EPIC 為 512×288、30 fps；手部與接觸位置投影在最後可觀測影格，沒有可執行機器人環境。",
+    "tasks": "聯合預測未來 verb/noun/action、motor attention 與 interaction hotspot。EGTEA 用 split1、提前 0.5 秒；EPIC 用指定 train/val 做消融、提前 1 秒，challenge seen/unseen 另列。106／2513 是各設定的 action 類數；論文補充的 7381／14951 是額外標註樣本數，不是新任務數。",
+    "data": "根層 video_list 與 verb_dict/noun_dict/action_dict；每筆 filename、video_info.{width,height,fps,num_frames}、label=[verb,noun,action]、target。EPIC target=[hotspot_xy,fingertip_xy]，整數代表缺失；以 12 點直線插值產生手部熱圖。EGTEA target=[hand,hotspot_xy]，hand 有 12 筆 [x1,y1,x2,y2,num_hand]；num_hand=0 或 hotspot=(0,0) 改用均勻先驗。座標是各自影像像素，缺失標記不能轉成真實原點；通用 convert_dataset.py 的產物並不足以供 joint loader 使用。",
+    "evaluation": "eval_joint.py 對原圖／水平翻轉分類輸出取平均，計 top-1/top-5（%）與 mean class accuracy；後者對所有設定類別取平均，零支持類別依 epsilon 得零。論文 §4.3 另報 hotspot F1/KLD 與手部平均／最終位移（空間／時間下採樣後正規化；手部結果僅 EGTEA）。但 test_joint.py 的 compare_hotspot 忽略輸入預測，改造三張 8×8 中心先驗；compare_hand 用 GT 最大值>0.01 的切片、argmax 點歐氏距離，末項取扁平化後最後有效切片，函式本身沒有論文正規化。這些評分呼叫與彙總均被註解；不能將函式名稱視為已接通的論文評測。",
+    "standardization": {
+      "profile": "egocentric_interaction_forecasting",
+      "reuse": "保留父資料集／split 身分、類別字典、clip 引用、原生熱圖建置及分類指標實作。",
+      "transform": "case 以父資料集+split+filename 定位，task 分為分類、接觸點與手部預測；按資料集解開 target，附影像大小、提前時間、像素／熱圖座標和真實／插值／均勻先驗標記。evaluator 分別保留分類、F1/KLD、位移單位。",
+      "missing": "需取得作者額外 joint JSON、標註與可觀測 clip 邊界，重建相符類別字典；修復／驗證 hotspot 與手部評分入口、正規化及有效切片彙整，再做執行驗證。"
+    },
+    "version_note": "固定 77675f97143202b0a8e4555a3f30334ebe3c219f（2019-11-22），早於已讀的 2020 v2 論文。設定引用作者本機路徑；本輪未下載資料／權重，未將被註解的實驗碼當成有效評分器。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P057-discovery.json",
+        "json_pointers": [
+          "/title",
+          "/pdf_sha256",
+          "/candidates/0",
+          "/code_contexts/0"
+        ],
+        "sha256": "24aa17ea303cb2f1d35b1e5938476a74cc93799f05060d8c6533df870655331e"
+      }
+    ],
+    "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+    "runtime_executed": false,
+    "source_manifest_sha256": "8b96474c5c27238fd4b42e4e535b88807c19e006a9aaece6f41941ed587e9565",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            23
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 23,
+        "sha256": "28cb7c1045d889ec1f48a695f00fc8ca97b0ac7a066593bd10f6e2858a1a3db1",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/README.md",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/README.md#L1-L23",
+        "why": "核對訓練／測試入口與外部資料、權重依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "exp_configs/egtea-o/egteao-action_split1_i3d_res50v1_vae.json",
+        "ranges": [
+          [
+            1,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 36,
+        "sha256": "f1127524a9f87c7069e86d54374840ffb1cffb780582033017408d7468d2c0b6",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/exp_configs/egtea-o/egteao-action_split1_i3d_res50v1_vae.json",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/exp_configs/egtea-o/egteao-action_split1_i3d_res50v1_vae.json#L1-L28",
+        "why": "確認 106 類、split1 設定、32 幀步長 2 與私人資料路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "exp_configs/epic-kitchens/epic-kitchens-action_trainval_i3d_csn152_vae.json",
+        "ranges": [
+          [
+            1,
+            30
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "4a58ff0a0ebf86d6f2273e9e0d6cadbb21aeb09fa1c2e6a255167c721fbdbd67",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/exp_configs/epic-kitchens/epic-kitchens-action_trainval_i3d_csn152_vae.json",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/exp_configs/epic-kitchens/epic-kitchens-action_trainval_i3d_csn152_vae.json#L1-L30",
+        "why": "確認 EPIC train/val 的 2513 action 類及獨立設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "libs/datasets/custom_dataset_joint.py",
+        "ranges": [
+          [
+            22,
+            56
+          ],
+          [
+            223,
+            253
+          ],
+          [
+            256,
+            369
+          ],
+          [
+            382,
+            509
+          ],
+          [
+            522,
+            590
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 590,
+        "sha256": "e685ce8abd068aef5c1bdc9a5199e6d663c2b8719bef2fa3bb8087390a67340c",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/libs/datasets/custom_dataset_joint.py",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/libs/datasets/custom_dataset_joint.py#L22-L56",
+        "why": "讀實際 JSON keys、兩資料集相反的 target 順序、12 時片熱圖與缺失標註處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "tools/convert_dataset.py",
+        "ranges": [
+          [
+            68,
+            70
+          ],
+          [
+            74,
+            147
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 161,
+        "sha256": "4a487a287df7689d1ded3b454ee74be4fa59eb9184e2541346b9881b60c336e1",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/tools/convert_dataset.py",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/tools/convert_dataset.py#L68-L70",
+        "why": "README 的通用轉換器只寫 label_dict/video_list，並未產生 joint loader 必要欄位或 EPIC 分支。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "eval_joint.py",
+        "ranges": [
+          [
+            59,
+            64
+          ],
+          [
+            97,
+            108
+          ],
+          [
+            127,
+            216
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 222,
+        "sha256": "d92fb38956912cd780b43b5f492d7273eb4ee44b9b5fa61dba6877e9b08f3d0a",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/eval_joint.py",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/eval_joint.py#L59-L64",
+        "why": "核對推論翻轉平均及實際只計分類 top-1/top-5、mean class accuracy。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "libs/utils/metrics.py",
+        "ranges": [
+          [
+            21,
+            86
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 86,
+        "sha256": "b6f881661f46b6d10cdf901bff3c84cf2b64836cf1eda0b54d8a6aea345a5d94",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/libs/utils/metrics.py",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/libs/utils/metrics.py#L21-L86",
+        "why": "確認按樣本加權的 top-k 百分比與 confusion matrix 各列召回的平均。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+        "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+        "ref": null,
+        "path": "test_joint.py",
+        "ranges": [
+          [
+            78,
+            215
+          ],
+          [
+            298,
+            407
+          ],
+          [
+            440,
+            461
+          ],
+          [
+            486,
+            554
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 560,
+        "sha256": "1bad84ca5767e2bb763294207ec854df4e77544e5de56f90719607a92022b7b0",
+        "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/test_joint.py",
+        "reading_url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV/blob/77675f97143202b0a8e4555a3f30334ebe3c219f/test_joint.py#L78-L215",
+        "why": "核對 hotspot 中心先驗覆寫、有效手部切片的位移算法與被註解的評分／輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "02861a45c1f4412bdb46f209d4e538e94ca55f6dec24863fba10fa15ee30146a"
+  },
+  "repository_binding_review_sha256": "02861a45c1f4412bdb46f209d4e538e94ca55f6dec24863fba10fa15ee30146a",
+  "repository_bindings": [
+    {
+      "requested_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+      "resolved_repo": "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+      "aliases_in_this_review": [
+        "2020aptx4869lm/forecasting-human-object-interaction-in-fpv"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "77675f97143202b0a8e4555a3f30334ebe3c219f",
+          "reviewed_files": [
+            "README.md",
+            "eval_joint.py",
+            "exp_configs/egtea-o/egteao-action_split1_i3d_res50v1_vae.json",
+            "exp_configs/epic-kitchens/epic-kitchens-action_trainval_i3d_csn152_vae.json",
+            "libs/datasets/custom_dataset_joint.py",
+            "libs/utils/metrics.py",
+            "test_joint.py",
+            "tools/convert_dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV",
+          "link_label": "[code]",
+          "project_url": "https://aptx4869lm.github.io/ForecastingHOI/",
+          "page_sha256": "275ba05032c163c423556da63a82757b9243ff08f8194067a12faf7380ef0543"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P057",
+          "review_file": "content/github_review/reviews/P057.json",
+          "review_sha256": "02861a45c1f4412bdb46f209d4e538e94ca55f6dec24863fba10fa15ee30146a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P057",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      7,
+      8,
+      9,
+      11
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EGTEA與EPIC-Kitchens原capture。",
+    "tasks": "action anticipation、motor attention、interaction hotspot三端點。",
+    "cases": "EGTEA10,321action instances；EPIC39,596是父資料，全量hotspot僅EGTEA，EPIC只many-shot noun subset。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "joint forecasting endpoints",
+        "pages": [
+          11
+        ]
+      }
+    ],
+    "evaluation": [
+      "Top1/5、mean-class accuracy、hotspot F1/KLD、trajectory ADE/FDE。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "EGTEA split1/0.5秒anticipation，EPIC既有train/val及1秒anticipation。",
+    "lineage": "增加manualhotspots；EPIC motor attention用fingertip→hotspot線性插值近似，非完整真實追蹤。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          7,
+          8,
+          9,
+          11
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "新增hotspot/trajectory標註精確ID數未報，不能把39,596全當新增標註題。"
+    ],
+    "reuse": "補早期joint HOI預測及標籤品質差異，保留真實/推估label來源。",
+    "reviewed_pdf_sha256": "91f5c905b44c16ebb6de7ac8c6523846a0254a218889c9afb2fc8305e061fc33",
+    "reviewed_on": "2026-10-02",
+    "name": "Motor attention and action forecasting",
+    "year": 2019,
+    "title": "Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video",
+    "source_url": "https://arxiv.org/abs/1911.10967",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "food",
+      "wearable"
+    ],
+    "review_tags": [
+      "餐飲與料理"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P057",
+      "domain_ids": [
+        "food",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P057",
+          "domain_ids": [
+            "food"
+          ],
+          "pages": [
+            1,
+            7,
+            8,
+            9,
+            11
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "action anticipation、motor attention、interaction hotspot三端點。",
+            "EGTEA與EPIC-Kitchens原capture。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "91f5c905b44c16ebb6de7ac8c6523846a0254a218889c9afb2fc8305e061fc33"
+        },
+        {
+          "paper_id": "P057",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            7,
+            8,
+            9,
+            11
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "手部motor attention與接觸位置預測。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "91f5c905b44c16ebb6de7ac8c6523846a0254a218889c9afb2fc8305e061fc33"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "91f5c905b44c16ebb6de7ac8c6523846a0254a218889c9afb2fc8305e061fc33",
+      "previous_domain_ids": [
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P057",
+      "name": "Motor attention and action forecasting",
+      "expected_title": "Forecasting Human-Object Interaction: Joint Prediction of Motor Attention and Actions in First Person Video",
+      "source_url": "https://arxiv.org/abs/1911.10967",
+      "pdf_url": "https://arxiv.org/pdf/1911.10967",
+      "retrieved_at": "2026-10-02T22:13:31.641453+00:00",
+      "pdf_sha256": "91f5c905b44c16ebb6de7ac8c6523846a0254a218889c9afb2fc8305e061fc33",
+      "text_sha256": "a895b5d2ac596dd8a45fb52277194dbc4a259cf3a975a23a6fdb33aac26f8c8b",
+      "pdf_bytes": 1711363,
+      "pages": 24,
+      "text_characters": 76861,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1911.10967v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1911.10967v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "joint forecasting endpoints",
+        "pages": [
+          11
+        ],
+        "record_id": "review10:P057:1",
+        "paper_id": "P057",
+        "benchmark": "Motor attention and action forecasting",
+        "native_term": "joint forecasting endpoints",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1911.10967v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1911.10967v2",
+            "locator": "PDF pp. 11",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "2020aptx4869lm/Forecasting-Human-Object-Interaction-in-FPV"
+  ],
+  "external_repositories": []
+}

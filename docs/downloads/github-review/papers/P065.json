@@ -1,0 +1,531 @@
+{
+  "paper_id": "P065",
+  "name": "CALVIN",
+  "title": "CALVIN: A Benchmark for Language-Conditioned Policy Learning for Long-Horizon Robot Manipulation Tasks",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2112.03227",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P065",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "CALVIN 要一起固定 benchmark 主倉庫與 calvin_env 子模組。資料是按時間步保存的多感測器／動作／狀態，評測則是連續指令鏈；不能把訓練視窗當成正式評測題。",
+    "environment": "A–D場景與機體／感測配置由calvin_env提供；D_eval是評測設定，不能直接另算獨立layout。",
+    "tasks": "task函式以start_info/end_info變化定義；語言可對應相同原生task。正式long-horizon評測是從同一初態連續執行指令，失敗就停止prefix。",
+    "data": "每步NumPy字典包含rgb/depth/tactile、actions、rel_actions、robot_obs、scene_obs；語言檔另外保存ann/task/embedding及起訖索引。scene_obs是評分/狀態資料，README明示原作不供政策使用。",
+    "evaluation": "rollout用原作task oracle比對起終info；evaluate_sequence保持環境狀態延續，子任務失敗即回傳成功prefix長度。count_success計至少完成1至5項的比例。",
+    "standardization": {
+      "profile": "robot_episodes_and_language_chains",
+      "reuse": "NPZ欄位、語言片段、場景定義、固定序列／初態和task oracle。",
+      "transform": "保留7維absolute與relative兩種動作的區別、世界座標和50/20縮放；訓練視窗、指令鏈case、子任務執行各自識別。依協定分開政策輸入和評分狀態。",
+      "missing": "完整素材閉合、共同跨來源任務對齊及本庫協定下的執行驗證。"
+    },
+    "version_note": "mees/calvin在fa03f01…的Git tree明確pin calvin_env到1431a46…，與calvin_env目前main 797142c…不同。要重現CALVIN就使用gitlink，不直接替換成依賴倉庫的最新main。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "mees/calvin",
+        "requested_repo": "mees/calvin",
+        "commit": "fa03f01f19c65920e18cf37398a9ce859274af76",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 377,
+        "sha256": "ade3f2d224f5f299be858681ab117524b6457e371963718518718529b2fd12f2",
+        "url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/README.md",
+        "reading_url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/README.md#L1-L75",
+        "why": "核對原作、資料分割、相機／觸覺和相對／絕對動作配置。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mees/calvin",
+        "requested_repo": "mees/calvin",
+        "commit": "fa03f01f19c65920e18cf37398a9ce859274af76",
+        "ref": null,
+        "path": "dataset/README.md",
+        "ranges": [
+          [
+            1,
+            134
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 134,
+        "sha256": "2b2d97c6406dff2569e8dbb53d000f091bed46c2e04428a20972cfc1ac7c5521",
+        "url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/dataset/README.md",
+        "reading_url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/dataset/README.md#L1-L134",
+        "why": "讀取具體NPZ欄位、動作縮放、狀態可見範圍和語言索引。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mees/calvin",
+        "requested_repo": "mees/calvin",
+        "commit": "fa03f01f19c65920e18cf37398a9ce859274af76",
+        "ref": null,
+        "path": "calvin_models/calvin_agent/datasets/disk_dataset.py",
+        "ranges": [
+          [
+            71,
+            130
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 153,
+        "sha256": "3f24f17bce944de63ed62d77694036537888ab51d406f0716903c5e3ce7d28fe",
+        "url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/calvin_models/calvin_agent/datasets/disk_dataset.py",
+        "reading_url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/calvin_models/calvin_agent/datasets/disk_dataset.py#L71-L130",
+        "why": "確認連續時間步、語言片段和訓練視窗的組成。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mees/calvin",
+        "requested_repo": "mees/calvin",
+        "commit": "fa03f01f19c65920e18cf37398a9ce859274af76",
+        "ref": null,
+        "path": "calvin_models/calvin_agent/evaluation/evaluate_policy.py",
+        "ranges": [
+          [
+            79,
+            179
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 256,
+        "sha256": "b85dfdbfe5dffc79c75ee744a946eeeb04142bbd8a832ba45842a9fb3ad7aacf",
+        "url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/calvin_models/calvin_agent/evaluation/evaluate_policy.py",
+        "reading_url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/calvin_models/calvin_agent/evaluation/evaluate_policy.py#L79-L179",
+        "why": "確認固定初態、連續子任務、失敗中止及原作task oracle。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mees/calvin",
+        "requested_repo": "mees/calvin",
+        "commit": "fa03f01f19c65920e18cf37398a9ce859274af76",
+        "ref": null,
+        "path": "calvin_models/calvin_agent/evaluation/utils.py",
+        "ranges": [
+          [
+            77,
+            84
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 275,
+        "sha256": "35e444a68a4a2cc9a8b3195a4f9ad957c2384d7096306e113557d3c0dd8788e8",
+        "url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/calvin_models/calvin_agent/evaluation/utils.py",
+        "reading_url": "https://github.com/mees/calvin/blob/fa03f01f19c65920e18cf37398a9ce859274af76/calvin_models/calvin_agent/evaluation/utils.py#L77-L84",
+        "why": "確認至少連續成功1至5項的prefix成功率。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mees/calvin_env",
+        "requested_repo": "mees/calvin_env",
+        "commit": "1431a46bd36bde5903fb6345e68b5ccc30def666",
+        "ref": "1431a46bd36bde5903fb6345e68b5ccc30def666",
+        "path": "calvin_env/envs/tasks.py",
+        "ranges": [
+          [
+            10,
+            33
+          ],
+          [
+            245,
+            255
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 306,
+        "sha256": "bca84af6249b2fd2404d1bd17318c7f3cf640acc329d3a26306b29149fc00e1a",
+        "url": "https://github.com/mees/calvin_env/blob/1431a46bd36bde5903fb6345e68b5ccc30def666/calvin_env/envs/tasks.py",
+        "reading_url": "https://github.com/mees/calvin_env/blob/1431a46bd36bde5903fb6345e68b5ccc30def666/calvin_env/envs/tasks.py#L10-L33",
+        "why": "以主倉庫實際pin的子模組核對起終狀態條件和抽屜位移判定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "8af2a3f915e4d560b87afd5f16dc39b999d17964468d35ef9e9055e3dea1a129"
+  },
+  "repository_binding_review_sha256": "8af2a3f915e4d560b87afd5f16dc39b999d17964468d35ef9e9055e3dea1a129",
+  "repository_bindings": [
+    {
+      "requested_repo": "mees/calvin",
+      "resolved_repo": "mees/calvin",
+      "aliases_in_this_review": [
+        "mees/calvin"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "fa03f01f19c65920e18cf37398a9ce859274af76",
+          "reviewed_files": [
+            "README.md",
+            "calvin_models/calvin_agent/datasets/disk_dataset.py",
+            "calvin_models/calvin_agent/evaluation/evaluate_policy.py",
+            "calvin_models/calvin_agent/evaluation/utils.py",
+            "dataset/README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mees/calvin",
+          "link_label": "GitHub",
+          "project_url": "http://calvin.cs.uni-freiburg.de",
+          "page_sha256": "60a1f4278f8e72190037152cfa6f00b85b546d073bfc45267bfc929a88e6f66d"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P065",
+          "review_file": "content/github_review/reviews/P065.json",
+          "review_sha256": "8af2a3f915e4d560b87afd5f16dc39b999d17964468d35ef9e9055e3dea1a129",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "mees/calvin_env",
+      "resolved_repo": "mees/calvin_env",
+      "aliases_in_this_review": [
+        "mees/calvin_env"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "1431a46bd36bde5903fb6345e68b5ccc30def666",
+          "reviewed_files": [
+            "calvin_env/envs/tasks.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P065",
+          "review_file": "content/github_review/reviews/P065.json",
+          "review_sha256": "8af2a3f915e4d560b87afd5f16dc39b999d17964468d35ef9e9055e3dea1a129",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P065",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "CALVIN，arXiv 2112.03227v4。",
+    "scope_read": "4環境、34task與全部success criteria、play資料及MTLC／長鏈評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "A/B/C/D四個配置；共用桌面、robot及camera位置，但滑門／抽屜／開關位置與材質不同。",
+    "tasks": "34原子任務，包括方塊轉動／推移／抬起、收納、堆疊、開關門與燈。",
+    "cases": "24小時play、約2.4M steps／40M可重標窗口是資料潛量；正式long-horizon 1,000條5步鏈；單步每task10個rollouts。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "桌面配置",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 34,
+        "unit": "原子tasks",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "5步instruction chains",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 340,
+        "unit": "單步評測rollouts／一設定",
+        "qualifier": "34×10",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "task completion依起終状態变化，不只終點距離；長鏈只成功才轉下一subgoal，報鏈長／成功情況。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "single／multi／zero-shot multi環境；ABC→D為未見配置但語義任務已在train出現，語句另保留未見表達。",
+    "lineage": "PyBullet自建play環境；多後續VLA評測重用同1,000 chains，不能算各自新增題庫。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§III、圖6、LH-MTLC",
+        "supports": "4／34／1,000及state-change predicate"
+      }
+    ],
+    "unresolved": [
+      "模型成績比較必須固定語言／初態鏈版本及可用sensor。"
+    ],
+    "reuse": "可借序列可行性、過程状态與長鏈測試；34原子任務和5,000子步次數不能混算。",
+    "reviewed_pdf_sha256": "c8ad4741782fa8fb773377fbf61b8772b86574f255599a229d3f6ad4d878c60e",
+    "reviewed_on": "2026-10-02",
+    "name": "CALVIN",
+    "year": 2021,
+    "title": "CALVIN: A Benchmark for Language-Conditioned Policy Learning for Long-Horizon Robot Manipulation Tasks",
+    "source_url": "https://arxiv.org/abs/2112.03227",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P065",
+      "summary": "開抽屜、控制燈與把物件收好屬居家整理；方塊轉動、推移與堆疊則保留為通用作業。",
+      "evidence": [
+        {
+          "paper_id": "P065",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            3
+          ],
+          "locator": "§III.A CALVIN Environment／Tasks",
+          "observed_tasks": [
+            "開關抽屜和滑門",
+            "按按鈕或開關控制燈",
+            "收納物件"
+          ],
+          "reasoning": "即使場景是一張模擬桌，任務用途仍可判斷。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "c8ad4741782fa8fb773377fbf61b8772b86574f255599a229d3f6ad4d878c60e"
+        },
+        {
+          "paper_id": "P065",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            3
+          ],
+          "locator": "§III.A；34任務與環境設計",
+          "observed_tasks": [
+            "方塊抓放、轉動、堆疊與多步語言指令"
+          ],
+          "reasoning": "抽象方塊與通用控制部分獨立歸類，不取代已能辨認的家居用途。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "c8ad4741782fa8fb773377fbf61b8772b86574f255599a229d3f6ad4d878c60e"
+        }
+      ],
+      "domain_ids": [
+        "home",
+        "general"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c8ad4741782fa8fb773377fbf61b8772b86574f255599a229d3f6ad4d878c60e",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P065",
+      "name": "CALVIN",
+      "expected_title": "CALVIN: A Benchmark for Language-Conditioned Policy Learning for Long-Horizon Robot Manipulation Tasks",
+      "source_url": "https://arxiv.org/abs/2112.03227",
+      "pdf_url": "https://arxiv.org/pdf/2112.03227",
+      "retrieved_at": "2026-10-02T21:33:33.317862+00:00",
+      "pdf_sha256": "c8ad4741782fa8fb773377fbf61b8772b86574f255599a229d3f6ad4d878c60e",
+      "text_sha256": "abe080cbc54f1c094add6a695fce6ffe69c6a66592d1a2aea9e623483f5ca640",
+      "pdf_bytes": 2092247,
+      "pages": 10,
+      "text_characters": 70503,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2112.03227v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2112.03227v4"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "桌面配置",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P065:1",
+        "paper_id": "P065",
+        "benchmark": "CALVIN",
+        "native_term": "桌面配置",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.03227v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.03227v4",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 34,
+        "unit": "原子tasks",
+        "pages": [
+          3,
+          5
+        ],
+        "record_id": "review10:P065:2",
+        "paper_id": "P065",
+        "benchmark": "CALVIN",
+        "native_term": "原子tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.03227v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.03227v4",
+            "locator": "PDF pp. 3, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "5步instruction chains",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P065:3",
+        "paper_id": "P065",
+        "benchmark": "CALVIN",
+        "native_term": "5步instruction chains",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.03227v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.03227v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 340,
+        "unit": "單步評測rollouts／一設定",
+        "qualifier": "34×10",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P065:4",
+        "paper_id": "P065",
+        "benchmark": "CALVIN",
+        "native_term": "單步評測rollouts／一設定",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.03227v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.03227v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "mees/calvin",
+    "mees/calvin_env"
+  ],
+  "external_repositories": []
+}

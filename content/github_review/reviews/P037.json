@@ -1,0 +1,182 @@
+{
+  "paper_id": "P037",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoEnv 同時有 HM3D 模擬 walkthrough 與真實影片理解用途；已核讀 episode/scene ID、四方位狀態標註與具體評測，不能把128維特徵當任務。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "README.md",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "ranges": [
+        [
+          1,
+          92
+        ],
+        [
+          104,
+          145
+        ]
+      ],
+      "why": "模擬生成、版本、metadata 與下游角色"
+    },
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "DATASETS.md",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "ranges": [
+        [
+          1,
+          48
+        ]
+      ],
+      "why": "HouseTours/Ego4D 來源、時間與 room instance"
+    },
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "state_prediction/data/dataset.py",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "ranges": [
+        [
+          16,
+          24
+        ],
+        [
+          28,
+          34
+        ],
+        [
+          46,
+          58
+        ],
+        [
+          64,
+          94
+        ],
+        [
+          97,
+          103
+        ],
+        [
+          108,
+          114
+        ],
+        [
+          117,
+          131
+        ],
+        [
+          137,
+          149
+        ],
+        [
+          178,
+          184
+        ],
+        [
+          196,
+          202
+        ],
+        [
+          210,
+          234
+        ]
+      ],
+      "why": "scene/episode、query 抽樣與 label mask"
+    },
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "state_prediction/task.py",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "ranges": [
+        [
+          9,
+          17
+        ],
+        [
+          21,
+          29
+        ],
+        [
+          45,
+          57
+        ],
+        [
+          97,
+          105
+        ],
+        [
+          118,
+          126
+        ],
+        [
+          132,
+          140
+        ],
+        [
+          158,
+          177
+        ],
+        [
+          179,
+          203
+        ],
+        [
+          208,
+          216
+        ],
+        [
+          218,
+          242
+        ]
+      ],
+      "why": "方向 AP、距離 accuracy 與訓練 loss"
+    }
+  ],
+  "environment": "模擬 scene_id 屬 HM3D，episode_id 是初態與訪問目標形成的導航歷程。下游另用 HouseTours／Ego4D 真實影片；RoomPred instance 可區分同類多房間，屬來源內 metadata，不是全球唯一環境 ID。",
+  "tasks": "區域性物件存在／距離與相對 pose 學習，遷移到 RoomPred/NLQ。四方位、23 object classes、512 timestep 是張量軸；不代表 4×23×512 個獨立任務。",
+  "data": "episode_list.pth 連 state/{type}/{scene_id}_{episode_id}.pth；labels/dists 為 T×4×object，distance=-1 表示未出現。val walkthrough 均勻預選4 query，train 隨機 query／memory window。下游特徵每秒一筆 T×128；HouseTours 原 YouTube clip 與 Ego4D video/clip/time 必須保留父來源。",
+  "evaluation": "CardinalObjectStateTask 在每方向對多物件算 average_precision_score，再平均方向；distance argmax accuracy 僅 dists!=-1 的位置。訓練 BCE+masked CE 是 loss，不是實體導航成功；RoomPred/NLQ 的完整下游 metrics 不由這個 local-state evaluator 取代。",
+  "standardization": {
+    "profile": "sim_walkthrough_and_video_environment",
+    "reuse": "真實 scene/episode 分離、四方位物件／距離 schema、RoomPred 的 room instance 和 AP/masked accuracy。",
+    "transform": "HM3D source→scene→episode→query 建關聯，HouseTours/Ego4D 新標註另連 parent video/time；case 留 query/memory indices、可用歷史、pose/angle、missing-distance。128維 feature 作加工 artifact，不計為新題。",
+    "missing": "尚未取得 HM3D、導航軌跡、真實影片或執行。README 只提供50條 sample metadata，完整訓練需生成；需核驗 SCENE_SPLITS、room-instance 身份和下游評分，才能報可用環境／cases。"
+  },
+  "version_note": "檔案釘選 Habitat-sim0.2.2 與 Habitat-lab 特定提交；同樣 HM3D 名稱不等於其他 benchmark 的相同 split/episode。程式庫書目年份文字需仍以論文來源核對，不據README單行覆寫主書目。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "README.md",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "sha256": "56b985f1512f20b251cbff700dc0be0e5917f321a988d85f9aa4472bbd12d125",
+      "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/README.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__ego-env/files/README.md"
+    },
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "DATASETS.md",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "sha256": "ad264881ff45c00dda7945e21aced63a5ded6d675c8e4b527597908477679b3a",
+      "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/DATASETS.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__ego-env/files/DATASETS.md"
+    },
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "state_prediction/data/dataset.py",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "sha256": "854304729257d72da98f4f1b8737785d06b0933303a2a7071e32ecf7491b4aef",
+      "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/state_prediction/data/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__ego-env/files/state_prediction/data/dataset.py"
+    },
+    {
+      "repo": "facebookresearch/ego-env",
+      "path": "state_prediction/task.py",
+      "commit": "6f06c5888ba8157fe6c88b58566e2cb7acb5877f",
+      "sha256": "14e7516c7328ffb7c188ed6cd66d8026737447643cab247e7fb63097bafe3c59",
+      "url": "https://github.com/facebookresearch/ego-env/blob/6f06c5888ba8157fe6c88b58566e2cb7acb5877f/state_prediction/task.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__ego-env/files/state_prediction/task.py"
+    }
+  ]
+}

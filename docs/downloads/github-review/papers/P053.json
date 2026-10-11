@@ -1,0 +1,507 @@
+{
+  "paper_id": "P053",
+  "name": "HandsOnVLM",
+  "title": "HandsOnVLM: Vision-Language Models for Hand-Object Interaction Prediction",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2412.13187",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P053",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "HandsOnVLM公開了EPIC手軌跡與reasoning資料接口；核讀發現評分變數命名和實際函數不一致，必須保留程式版本並先校核。",
+    "environment": "EPIC-KITCHENS第一人稱影片與人類手軌跡；reasoning子集由有對應提問的影格篩選。",
+    "tasks": "一般或文字條件的雙手未來2D軌跡預測；預設評估入口是ek100 validation，非所有父資料的統一測試。",
+    "data": "dataset提供future_hands[2,5,2]、future_valid[2]、contact_point、image_abs_paths及prompt；評分移除首點後用雙手×4個未來點。reasoning用valid_index篩子集，影像張量的重複不增加題數。",
+    "evaluation": "traj_eval含ADE/FDE與四步加權WDE、位置及手的有效遮罩；但evaluate_traj_stochastic把compute_fde存為ade、compute_ade存為fde，最後回傳均值而非已算出的min。推論包裝還跳過無效生成，需另報覆蓋率。",
+    "standardization": {
+      "profile": "language_conditioned_hand_trajectory_forecasting",
+      "reuse": "EPIC來源鏈、prompt／軌跡欄位、reasoning篩選和有效遮罩。",
+      "transform": "case保留提問、原始影格ID、2D正規化座標、4步時間點與valid masks；metric保存實際函數、候選數及失敗輸出處理，不直接信任列印名稱。",
+      "missing": "外部資產及原始EPIC影片、時間步長核對、評分命名／均值修正對照與完整推論接線。"
+    },
+    "version_note": "靜態核讀另見inference正常回傳3項而evaluate_epic_kitchen_traj以2項接收；尚未執行，不能宣稱此commit可直接跑通或原文數值有相同問題。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Kami-code/HandsOnVLM-release",
+        "requested_repo": "Kami-code/HandsOnVLM-release",
+        "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 117,
+        "sha256": "199058953bdd79174d9e6c7b71cb5c27be803e65becec756c186aaa25c528861",
+        "url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/README.md",
+        "reading_url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/README.md#L1-L110",
+        "why": "確認精確論文、資料及評估入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Kami-code/HandsOnVLM-release",
+        "requested_repo": "Kami-code/HandsOnVLM-release",
+        "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+        "ref": null,
+        "path": "docs/prepare_data.md",
+        "ranges": [
+          [
+            1,
+            6
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 6,
+        "sha256": "197c1ce431e5bb27168f6ac2d4e52c0e56c2b4f98b3b70777d295720c29a74df",
+        "url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/docs/prepare_data.md",
+        "reading_url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/docs/prepare_data.md#L1-L6",
+        "why": "確認EPIC、Drive資產與LITA依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Kami-code/HandsOnVLM-release",
+        "requested_repo": "Kami-code/HandsOnVLM-release",
+        "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+        "ref": null,
+        "path": "handsonvlm/dataset/epic_dataset.py",
+        "ranges": [
+          [
+            11,
+            46
+          ],
+          [
+            48,
+            72
+          ],
+          [
+            77,
+            102
+          ],
+          [
+            111,
+            118
+          ],
+          [
+            122,
+            155
+          ],
+          [
+            158,
+            158
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 224,
+        "sha256": "29b13e9a1b3acc2c5fa153153bbd167777929e28c34d0f1264cdc21f5b2c2246",
+        "url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/handsonvlm/dataset/epic_dataset.py",
+        "reading_url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/handsonvlm/dataset/epic_dataset.py#L11-L46",
+        "why": "讀future欄位、影像與reasoning子集。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Kami-code/HandsOnVLM-release",
+        "requested_repo": "Kami-code/HandsOnVLM-release",
+        "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+        "ref": null,
+        "path": "handsonvlm/evaluation/evaluate.py",
+        "ranges": [
+          [
+            1,
+            26
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 26,
+        "sha256": "f40c11ea217462f6ddf4a74854c6e8a72ab8f234ea56a7bcc4749f6e32aa1f7b",
+        "url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/handsonvlm/evaluation/evaluate.py",
+        "reading_url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/handsonvlm/evaluation/evaluate.py#L1-L26",
+        "why": "確認實際ek100 validation入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Kami-code/HandsOnVLM-release",
+        "requested_repo": "Kami-code/HandsOnVLM-release",
+        "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+        "ref": null,
+        "path": "handsonvlm/evaluation/handsonvlm_inference.py",
+        "ranges": [
+          [
+            7,
+            64
+          ],
+          [
+            109,
+            138
+          ],
+          [
+            142,
+            151
+          ],
+          [
+            155,
+            177
+          ],
+          [
+            214,
+            224
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 229,
+        "sha256": "aaa24d35e5620b76e4ea1cf0ff7f6531bee481132ff37f57fbdde04b1be6fe8e",
+        "url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/handsonvlm/evaluation/handsonvlm_inference.py",
+        "reading_url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/handsonvlm/evaluation/handsonvlm_inference.py#L7-L64",
+        "why": "讀輸出有效性、四步截取及metric接線。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Kami-code/HandsOnVLM-release",
+        "requested_repo": "Kami-code/HandsOnVLM-release",
+        "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+        "ref": null,
+        "path": "hoi_forecast/evaluation/traj_eval.py",
+        "ranges": [
+          [
+            2,
+            254
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 254,
+        "sha256": "e03399e1df6fb93350c74006f6999c7ab52e8d3bf68ed3b803540983005aff82",
+        "url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/hoi_forecast/evaluation/traj_eval.py",
+        "reading_url": "https://github.com/Kami-code/HandsOnVLM-release/blob/1163d45a7b997fd63c1e84667422aefabbdba20e/hoi_forecast/evaluation/traj_eval.py#L2-L254",
+        "why": "讀實際遮罩、ADE/FDE呼叫與WDE計算。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "efc46bf37299826b14bd7649dcfd654fa12a1cb437e22b2f2e9310303eb8f4b5"
+  },
+  "repository_binding_review_sha256": "efc46bf37299826b14bd7649dcfd654fa12a1cb437e22b2f2e9310303eb8f4b5",
+  "repository_bindings": [
+    {
+      "requested_repo": "Kami-code/HandsOnVLM-release",
+      "resolved_repo": "Kami-code/HandsOnVLM-release",
+      "aliases_in_this_review": [
+        "kami-code/handsonvlm-release"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "1163d45a7b997fd63c1e84667422aefabbdba20e",
+          "reviewed_files": [
+            "README.md",
+            "docs/prepare_data.md",
+            "handsonvlm/dataset/epic_dataset.py",
+            "handsonvlm/evaluation/evaluate.py",
+            "handsonvlm/evaluation/handsonvlm_inference.py",
+            "hoi_forecast/evaluation/traj_eval.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "HandsOnVLM",
+          "search_receipt_sha256": "5348d239c5a8623b01592c9ce3a228190df5bd86a2638563925a5095341d8edb",
+          "url": "https://github.com/Kami-code/HandsOnVLM-release",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P053",
+          "review_file": "content/github_review/reviews/P053.json",
+          "review_sha256": "efc46bf37299826b14bd7649dcfd654fa12a1cb437e22b2f2e9310303eb8f4b5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P053",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HandsOnVLM: Vision-Language Models for Hand-Object Interaction Prediction；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      5,
+      6,
+      7
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EPIC/H2O/FPHA/Ego4D原影片環境，無新增可執行robot scenes。",
+    "tasks": "VHP顯式動作指令與RBHP隱式意圖兩預測任務；10observed→4future frames，4fps。",
+    "cases": "RBHP生成7.5K EPIC與8K Ego4D QA-prediction pairs；24K/epoch是抽樣預算而非獨立題庫。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "hand-prediction task formulations",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 8000,
+        "unit": "Ego4D zero-shot generated query pairs（約數）",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 7500,
+        "unit": "EPIC generated query pairs（約數）",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "ADE/FDE/WDE，不是語言答對率或robot完成率。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "EPIC validation及H2O/FPHA zero-shot；†版本混合五個額外QA訓練來源。",
+    "lineage": "OCT-style手軌跡標註＋GPT生成implicit instructions；父影片和explicit/implicit變體共享。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          5,
+          6,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "生成指令的精確train/test manifest與ground-truth歧義需核；不是每次生成都新語義task。"
+    ],
+    "reuse": "是擴充任務規則的來源：同軌跡在明示/隱式需求下重測，保留對照關係。",
+    "reviewed_pdf_sha256": "9ad31595678bd06e9139e118c6a693354034f7c08a91f74988de80f3e5836948",
+    "reviewed_on": "2026-10-02",
+    "name": "HandsOnVLM",
+    "year": 2024,
+    "title": "HandsOnVLM: Vision-Language Models for Hand-Object Interaction Prediction",
+    "source_url": "https://arxiv.org/abs/2412.13187",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "food",
+      "wearable"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P053",
+      "domain_ids": [
+        "food",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P053",
+          "domain_ids": [
+            "food"
+          ],
+          "pages": [
+            1,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "VHP顯式動作指令與RBHP隱式意圖兩預測任務；10observed→4future frames，4fps。",
+            "EPIC/H2O/FPHA/Ego4D原影片環境，無新增可執行robot scenes。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "9ad31595678bd06e9139e118c6a693354034f7c08a91f74988de80f3e5836948"
+        },
+        {
+          "paper_id": "P053",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            5,
+            6,
+            7
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "依明示或隱含語言需求預測手部軌跡。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "9ad31595678bd06e9139e118c6a693354034f7c08a91f74988de80f3e5836948"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "9ad31595678bd06e9139e118c6a693354034f7c08a91f74988de80f3e5836948",
+      "previous_domain_ids": [
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P053",
+      "name": "HandsOnVLM",
+      "expected_title": "HandsOnVLM: Vision-Language Models for Hand-Object Interaction Prediction",
+      "source_url": "https://arxiv.org/abs/2412.13187",
+      "pdf_url": "https://arxiv.org/pdf/2412.13187",
+      "retrieved_at": "2026-10-02T22:13:29.593270+00:00",
+      "pdf_sha256": "9ad31595678bd06e9139e118c6a693354034f7c08a91f74988de80f3e5836948",
+      "text_sha256": "1db066a7150896c88a875becd5b8b532863055b1a4e43f134af9b0fc3a0f7287",
+      "pdf_bytes": 12434645,
+      "pages": 18,
+      "text_characters": 65843,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2412.13187v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2412.13187v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "hand-prediction task formulations",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P053:1",
+        "paper_id": "P053",
+        "benchmark": "HandsOnVLM",
+        "native_term": "hand-prediction task formulations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.13187v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.13187v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 8000,
+        "unit": "Ego4D zero-shot generated query pairs（約數）",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P053:2",
+        "paper_id": "P053",
+        "benchmark": "HandsOnVLM",
+        "native_term": "Ego4D zero-shot generated query pairs（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.13187v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.13187v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 7500,
+        "unit": "EPIC generated query pairs（約數）",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P053:3",
+        "paper_id": "P053",
+        "benchmark": "HandsOnVLM",
+        "native_term": "EPIC generated query pairs（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.13187v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.13187v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Kami-code/HandsOnVLM-release"
+  ],
+  "external_repositories": []
+}

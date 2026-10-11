@@ -1,0 +1,814 @@
+{
+  "paper_id": "P012",
+  "name": "HD-EPIC",
+  "title": "HD-EPIC: A Highly-Detailed Egocentric Video Dataset",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2502.04144",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P012",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "HD-EPIC 的標註包含動作、物件移動、凝視、食譜／營養與音訊；VQA 原始 schema 支援多影片／片段。已追到主程式實際使用的 BaseVLM 與 LlavaVideo 評分，而非把舊單影片 Dataset 當作全部介面。",
+    "environment": "佩戴 Aria 眼鏡的真實廚房活動及對應 digital twin／fixture。video、participant、capture、fixture、3D 場景的 ID 分開，不把多個感測流計成新環境。",
+    "tasks": "以每個 JSON 的 question prototype 管理五選一 VQA；動作、物件關聯、凝視 priming、食譜和聲音是標註層，各自不自動成為可執行任務。",
+    "data": "敘述含 unique_narration_id、秒制 start/end_timestamp、另列 narration_timestamp、多個 verb/noun pairs 與 main_actions；assoc_info 連到 mask_info 的 0-based MP4 frame、XYZ、XYXY bbox、fixture。音訊以 48kHz sample index 標示。VQA 含 inputs/question/choices/correct_idx（0-based），保留多個 input 的 id 與時間窗。",
+    "evaluation": "主程式呼叫模型 run_eval；核讀 LlavaVideo 的 answer==correct_idx，再由 run_benchmark 對結果平均。BaseVLM 取回覆第一個大寫字母轉選項索引；invalid 回 -1。analyse_output 按 prototype 字首分組，另列 invalid／failure。輸入會按模型 max_video_length_seconds 降取樣，須一併報告 input_total_seconds 與 input_subsampled_seconds。",
+    "standardization": {
+      "profile": "multimodal_video_mcqa",
+      "reuse": "原始標註層關聯、五選一題目、時間／框 tag 解析、同輸入題目分組及正確率流程。",
+      "transform": "用原生 question ID 建 case，inputs 保留多影片與框；同一次 capture 的多感測／多題重用同一環境記錄。保留完整毫秒時間和原始座標，另記 native adapter 對時間取整秒、框轉 0–1000 的行為；模式 visual_text／narration 與取樣預算入 evaluator 約定。",
+      "missing": "尚未下載數 TB 感測資料、校準／digital twin 或執行模型。各模型 wrapper 的 parsing／API 版本仍需個別驗證；data/vqa_dataset.py 只支援單影片且舊欄位與正式 VQA 不同，不能直接通用。"
+    },
+    "version_note": "固定提交檔案已新增 MP4 對齊的中介 calibration／pose／gaze；不得假定與原論文首發資產同版。檔案明列 mask 與 bbox 由不同團隊標註可能不一致；YouTube 版本只供觀看，不作復現輸入。",
+    "runtime_executed": false,
+    "identity_note": "vqa-eval README 自述為 HD-EPIC CVPR2025 benchmark 程式，指向官方 annotations；已核對專案名稱和實際資料路徑。",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-annotations",
+        "requested_repo": "hd-epic/hd-epic-annotations",
+        "commit": "aa1f833febdfa14253328d11d0585c9eb1fe0b72",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            186
+          ],
+          [
+            218,
+            269
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 269,
+        "sha256": "8e9627915b3ed2eacfc41b4da6d6b368a82377c35a5e3b5a5e0f4f7783e0095f",
+        "url": "https://github.com/hd-epic/hd-epic-annotations/blob/aa1f833febdfa14253328d11d0585c9eb1fe0b72/README.md",
+        "reading_url": "https://github.com/hd-epic/hd-epic-annotations/blob/aa1f833febdfa14253328d11d0585c9eb1fe0b72/README.md#L1-L186",
+        "why": "多層標註、座標與 VQA 原生格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-downloader",
+        "requested_repo": "hd-epic/hd-epic-downloader",
+        "commit": "d3431a3a9051cbcadeca98fbb86137605a017525",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            44
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 151,
+        "sha256": "7fa03dcc608dff8dc8ce13631ee581f080a39eec8effec583b76d944f418bee5",
+        "url": "https://github.com/hd-epic/hd-epic-downloader/blob/d3431a3a9051cbcadeca98fbb86137605a017525/README.md",
+        "reading_url": "https://github.com/hd-epic/hd-epic-downloader/blob/d3431a3a9051cbcadeca98fbb86137605a017525/README.md#L1-L44",
+        "why": "資產分包與下載角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 45,
+        "sha256": "b67e86428607ad6a99b8e1c0a151eb17f5a857c83047d97ec7b65122206cd0ad",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/README.md",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/README.md#L1-L45",
+        "why": "原作者 benchmark 程式與配置入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "data/vqa_dataset.py",
+        "ranges": [
+          [
+            1,
+            99
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 99,
+        "sha256": "6088f668499f5d39a98c07277205e928715e3e7aaa65ad0150b32728a3098c32",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/data/vqa_dataset.py",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/data/vqa_dataset.py#L1-L99",
+        "why": "舊單影片 loader 限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "utils/questions.py",
+        "ranges": [
+          [
+            1,
+            70
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 70,
+        "sha256": "20cffb528d4ddf87622334c696304514fdc311f68805b1ebb171c9d67b41c128",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/utils/questions.py",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/utils/questions.py#L1-L70",
+        "why": "原始 inputs 分組及時間轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "models/base_model.py",
+        "ranges": [
+          [
+            8,
+            17
+          ],
+          [
+            22,
+            30
+          ],
+          [
+            35,
+            76
+          ],
+          [
+            110,
+            118
+          ],
+          [
+            122,
+            139
+          ],
+          [
+            163,
+            203
+          ],
+          [
+            207,
+            232
+          ],
+          [
+            235,
+            254
+          ],
+          [
+            256,
+            264
+          ],
+          [
+            267,
+            275
+          ],
+          [
+            282,
+            308
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 308,
+        "sha256": "435af848ef85d9d171a76aa67088ec150ffa3c7f9eb01853971034ef0b15ecde",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/models/base_model.py",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/models/base_model.py#L8-L17",
+        "why": "正式多輸入讀取、取樣與選項解析",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "models/llavavideo.py",
+        "ranges": [
+          [
+            32,
+            42
+          ],
+          [
+            65,
+            75
+          ],
+          [
+            91,
+            109
+          ],
+          [
+            112,
+            122
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 129,
+        "sha256": "d741a7bba6cd2292e7f846f105053416afe436ca0f7d55132f4ecec15812d191",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/models/llavavideo.py",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/models/llavavideo.py#L32-L42",
+        "why": "具體答案比較和輸出欄位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "run_benchmark.py",
+        "ranges": [
+          [
+            2,
+            17
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            72,
+            82
+          ],
+          [
+            95,
+            105
+          ],
+          [
+            130,
+            140
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 143,
+        "sha256": "25cb5c7b3ea3caf327b76cbc6f0a1576e1ac79bf46efedfcfc32ab423836a740",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/run_benchmark.py",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/run_benchmark.py#L2-L17",
+        "why": "實際入口及跨快取結果平均",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hd-epic/hd-epic-vqa-eval",
+        "requested_repo": "hd-epic/hd-epic-vqa-eval",
+        "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+        "ref": null,
+        "path": "scripts/analyse_output.py",
+        "ranges": [
+          [
+            1,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 91,
+        "sha256": "1d8e2a71f4c2f68df49ad2ea8bdcc715ae94017f2dbb86126748f6e26b3a4471",
+        "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/scripts/analyse_output.py",
+        "reading_url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/scripts/analyse_output.py#L1-L91",
+        "why": "題型統計與失敗分類",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "d4f83f925624092c52a053471597fe5da0b5fe4817f525295f316c52b157f625"
+  },
+  "repository_binding_review_sha256": "d4f83f925624092c52a053471597fe5da0b5fe4817f525295f316c52b157f625",
+  "repository_bindings": [
+    {
+      "requested_repo": "hd-epic/hd-epic-annotations",
+      "resolved_repo": "hd-epic/hd-epic-annotations",
+      "aliases_in_this_review": [
+        "hd-epic/hd-epic-annotations"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "aa1f833febdfa14253328d11d0585c9eb1fe0b72",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://hd-epic.github.io/site",
+          "page_sha256": "a5608fba8c6921e1d8998938aedcd1df7922085ec9ffd02a008c4d197b7ce49f",
+          "url": "https://github.com/hd-epic/hd-epic-annotations",
+          "link_label": "Annotations link"
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://hd-epic.github.io/site",
+          "page_sha256": "a5608fba8c6921e1d8998938aedcd1df7922085ec9ffd02a008c4d197b7ce49f",
+          "url": "https://github.com/hd-epic/hd-epic-annotations",
+          "link_label": "GitHub"
+        },
+        {
+          "kind": "repository_search_candidate",
+          "query": "HD-EPIC",
+          "search_receipt_sha256": "8ccaa771313ef4bcf577d9581f161f8376eb38d1845f10c5a6bb0a440a54c010",
+          "url": "https://github.com/hd-epic/hd-epic-annotations",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P012",
+          "review_file": "content/github_review/reviews/P012.json",
+          "review_sha256": "d4f83f925624092c52a053471597fe5da0b5fe4817f525295f316c52b157f625",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "hd-epic/hd-epic-downloader",
+      "resolved_repo": "hd-epic/hd-epic-downloader",
+      "aliases_in_this_review": [
+        "hd-epic/hd-epic-downloader"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d3431a3a9051cbcadeca98fbb86137605a017525",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://hd-epic.github.io/site",
+          "page_sha256": "a5608fba8c6921e1d8998938aedcd1df7922085ec9ffd02a008c4d197b7ce49f",
+          "url": "https://github.com/hd-epic/hd-epic-downloader",
+          "link_label": "This Github repo"
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://hd-epic.github.io/site",
+          "page_sha256": "a5608fba8c6921e1d8998938aedcd1df7922085ec9ffd02a008c4d197b7ce49f",
+          "url": "https://github.com/hd-epic/hd-epic-downloader",
+          "link_label": "Download Tool"
+        },
+        {
+          "kind": "repository_search_candidate",
+          "query": "HD-EPIC",
+          "search_receipt_sha256": "8ccaa771313ef4bcf577d9581f161f8376eb38d1845f10c5a6bb0a440a54c010",
+          "url": "https://github.com/hd-epic/hd-epic-downloader",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P012",
+          "review_file": "content/github_review/reviews/P012.json",
+          "review_sha256": "d4f83f925624092c52a053471597fe5da0b5fe4817f525295f316c52b157f625",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "hd-epic/hd-epic-vqa-eval",
+      "resolved_repo": "hd-epic/hd-epic-vqa-eval",
+      "aliases_in_this_review": [
+        "hd-epic/hd-epic-vqa-eval"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+          "reviewed_files": [
+            "README.md",
+            "data/vqa_dataset.py",
+            "models/base_model.py",
+            "models/llavavideo.py",
+            "run_benchmark.py",
+            "scripts/analyse_output.py",
+            "utils/questions.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "HD-EPIC",
+          "search_receipt_sha256": "8ccaa771313ef4bcf577d9581f161f8376eb38d1845f10c5a6bb0a440a54c010",
+          "url": "https://github.com/hd-epic/hd-epic-vqa-eval",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P012",
+          "review_file": "content/github_review/reviews/P012.json",
+          "review_sha256": "d4f83f925624092c52a053471597fe5da0b5fe4817f525295f316c52b157f625",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P012",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HD-EPIC，arXiv 2502.04144v2。",
+    "scope_read": "資料與數位廚房、VQA建立／評測、recognition、長期VOS附錄。",
+    "pages_read": [
+      1,
+      5,
+      6,
+      7,
+      28
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "影片問答與推理",
+    "environment": "9個新錄廚房，413個fixture數位模型；fixture不是413個環境。",
+    "tasks": "69食譜；VQA以7類註記建立30種問題prototype，另有動作／声音識別和長期VOS。",
+    "cases": "正式VQA為26,650道五選一題；100,000是作者估計可生成上限，不是發布題數。VOS另為1,000序列／20,548標註影格；41.3小時為原始影片長度。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 9,
+        "unit": "錄製廚房與數位副本",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 69,
+        "unit": "食譜",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "task",
+        "value": 30,
+        "unit": "VQA prototypes",
+        "pages": [
+          6,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 26650,
+        "unit": "五選一VQA題",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "VOS序列",
+        "pages": [
+          28
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 413,
+        "unit": "廚房fixtures",
+        "pages": [
+          1,
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "VQA報各prototype accuracy後分群平均，5選1；包含blind language基線。",
+      "VOS用J／F／J&F；recognition沿用EPIC100訓練權重，在新影片評估。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "定位為新資料上的validation／zero-shot benchmark；沒有依一般80/10/10重新分配。人類基線只抽600題。",
+    "lineage": "與EPIC系列研究相承但此批影片新錄；使用EPIC100模型訓練來源。數位副本不自動具備機器人物理／判分介面。",
+    "related_paper_ids": [
+      "P010",
+      "P011"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§4.3、§5.1、圖10、表2",
+        "supports": "場景／fixture、30 prototypes及26,650題"
+      },
+      {
+        "pages": [
+          28
+        ],
+        "locator": "附錄D.4與表A5",
+        "supports": "VOS正式序列量及metric"
+      }
+    ],
+    "unresolved": [
+      "原生數位副本的互動物理完整性、本庫素材取得與逐題manifest尚未核對。"
+    ],
+    "reuse": "提供比粗動作標籤更細的食譜、營養、3D、物件動態、視線問答；是可借鑑的多端點設計。",
+    "reviewed_pdf_sha256": "d3648a8692d038cad2027290facf25c9f5d8ff12b65f912f4dc6d99b99118092",
+    "reviewed_on": "2026-10-02",
+    "name": "HD-EPIC",
+    "year": 2025,
+    "title": "HD-EPIC: A Highly-Detailed Egocentric Video Dataset",
+    "source_url": "https://arxiv.org/abs/2502.04144",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P012",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P012",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            5,
+            6,
+            7,
+            28
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "69食譜；VQA以7類註記建立30種問題prototype，另有動作／声音識別和長期VOS。",
+            "9個新錄廚房，413個fixture數位模型；fixture不是413個環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "d3648a8692d038cad2027290facf25c9f5d8ff12b65f912f4dc6d99b99118092"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d3648a8692d038cad2027290facf25c9f5d8ff12b65f912f4dc6d99b99118092",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P012",
+      "name": "HD-EPIC",
+      "expected_title": "HD-EPIC: A Highly-Detailed Egocentric Video Dataset",
+      "source_url": "https://arxiv.org/abs/2502.04144",
+      "pdf_url": "https://arxiv.org/pdf/2502.04144",
+      "retrieved_at": "2026-10-02T21:33:04.667574+00:00",
+      "pdf_sha256": "d3648a8692d038cad2027290facf25c9f5d8ff12b65f912f4dc6d99b99118092",
+      "text_sha256": "55be9d5cad0217dd3264acaf5189bc4ba33cd0cdaf3bd341fee9a2926dd680b5",
+      "pdf_bytes": 47241694,
+      "pages": 29,
+      "text_characters": 359861,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2502.04144v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2502.04144v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 9,
+        "unit": "錄製廚房與數位副本",
+        "pages": [
+          1,
+          5
+        ],
+        "record_id": "review10:P012:1",
+        "paper_id": "P012",
+        "benchmark": "HD-EPIC",
+        "native_term": "錄製廚房與數位副本",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.04144v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.04144v2",
+            "locator": "PDF pp. 1, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 69,
+        "unit": "食譜",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P012:2",
+        "paper_id": "P012",
+        "benchmark": "HD-EPIC",
+        "native_term": "食譜",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.04144v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.04144v2",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 30,
+        "unit": "VQA prototypes",
+        "pages": [
+          6,
+          7
+        ],
+        "record_id": "review10:P012:3",
+        "paper_id": "P012",
+        "benchmark": "HD-EPIC",
+        "native_term": "VQA prototypes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.04144v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.04144v2",
+            "locator": "PDF pp. 6, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 26650,
+        "unit": "五選一VQA題",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P012:4",
+        "paper_id": "P012",
+        "benchmark": "HD-EPIC",
+        "native_term": "五選一VQA題",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.04144v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.04144v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "VOS序列",
+        "pages": [
+          28
+        ],
+        "record_id": "review10:P012:5",
+        "paper_id": "P012",
+        "benchmark": "HD-EPIC",
+        "native_term": "VOS序列",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.04144v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.04144v2",
+            "locator": "PDF pp. 28",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 413,
+        "unit": "廚房fixtures",
+        "pages": [
+          1,
+          5
+        ],
+        "record_id": "review10:P012:6",
+        "paper_id": "P012",
+        "benchmark": "HD-EPIC",
+        "native_term": "廚房fixtures",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2502.04144v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2502.04144v2",
+            "locator": "PDF pp. 1, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "hd-epic/hd-epic-annotations",
+    "hd-epic/hd-epic-downloader",
+    "hd-epic/hd-epic-vqa-eval"
+  ],
+  "external_repositories": []
+}

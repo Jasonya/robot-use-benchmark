@@ -1,0 +1,316 @@
+{
+  "paper_id": "P200",
+  "name": "SABER",
+  "title": "SABER: A Scalable Action-Based Embodied Dataset for Real-World VLA Adaptation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.09613",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "logistics",
+    "retail"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P200",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "SABER的公司research頁確認論文及HF資料入口，但本次公開取得HF card回401，沒有找到GitHub。可先整理retail用途及三種action representation，不能宣稱素材或scorer已取得。",
+    "environment": "多個真實grocery store；頭戴GoPro配固定ALIA360°六個同步視角，拍攝時沒有robot。相機數/視角數不能當商店或環境數。",
+    "tasks": "零售補貨、取放商品、貨架不同高度、籃車/冷藏櫃與走道活動；原文主張domain-specific VLA adaptation，尚無已取得的固定任務/評測case清單。",
+    "data": "原文約100小時雙流拍攝；Stream1為25K約10秒ego episodes的LAPA latent tokens，Stream2為18.6K ego episodes的人類21點hand pose/修正後retarget，Stream3由exo SMPL轉UnitreeG1。三stream來自相同拍攝，不相加當獨立物理episodes；手動修正的human pose與retarget不是原生robot控制紀錄。",
+    "evaluation": "原文包含VLA適配實驗及人工annotation QC；尚無取得的評估code/episode verdict，不能重現其提升倍數，也不能把人工QC比例當任務成功率。",
+    "standardization": {
+      "profile": "retail_human_capture_and_action_retargeting",
+      "reuse": "retail用途與雙流感測、latent/hand/body三層action來源分工。",
+      "transform": "source記拍攝session及三stream lineage；case分清human估計/人工修正/retarget/robot命令，保存相機同步與合法輸入；SABER-10K名稱不代替實際case manifest。",
+      "missing": "可用資料/card與code入口、stream schema/單位、店面/session/split ID、retarget校準與VLA評估協定/基線。"
+    },
+    "version_note": "2026-10-11原專案路徑轉向DreamVu首頁；research頁仍列精確2605.09613與DreamVu/SABER-10K，但公開HF raw請求401。401只表示本次未取得，未推定資源不存在或嘗試繞過存取限制。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2605.09613",
+      "pdf_sha256": "e4556b7aadaed076ac2792ec2c15b91853acad3f5eac7403898badc1396e8f98",
+      "paper_pages_read": [
+        6,
+        7,
+        8
+      ],
+      "discovery_record": "audit/.cache/github_review/P200-discovery.json",
+      "project_redirect": {
+        "requested_url": "https://www.dreamvu.ai/saber",
+        "retrieved_at": "2026-10-11T01:37:10.940203+00:00",
+        "status": 200,
+        "resolved_url": "https://www.dreamvu.ai/",
+        "content_type": "text/html; charset=utf-8",
+        "bytes": 46569,
+        "sha256": "db2d93bf4828bf979a0d6a47f903a1058e948a8cd0d7444136c83ece70ed0f23"
+      },
+      "author_research_page": {
+        "requested_url": "https://www.dreamvu.ai/research",
+        "retrieved_at": "2026-10-11T01:43:51.249013+00:00",
+        "status": 200,
+        "resolved_url": "https://www.dreamvu.ai/research",
+        "content_type": "text/html; charset=utf-8",
+        "bytes": 55239,
+        "sha256": "148d32e16f7c7fead4a59f8b048b22d63d05eb5a77ce1f26f0a16206c2ef3be5"
+      },
+      "dataset_card_access": {
+        "requested_url": "https://huggingface.co/datasets/DreamVu/SABER-10K/raw/main/README.md",
+        "retrieved_at": "2026-10-11T01:37:10.536466+00:00",
+        "status": 401,
+        "error": "Unauthorized"
+      }
+    },
+    "reading_order": [],
+    "review_sha256": "3b47238ab103cb64e7755c7835c6b1fbab908cd6833ca51b004026288e5397a0"
+  },
+  "repository_binding_review_sha256": "3b47238ab103cb64e7755c7835c6b1fbab908cd6833ca51b004026288e5397a0",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "包裝、倉儲與物流",
+    "零售與購物"
+  ],
+  "source_review": {
+    "paper_id": "P200",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SABER，arXiv 2605.09613v1。",
+    "scope_read": "零售資料三streams、native/retarget区别、訓練mixtures、RoboBenchMart10tasks與100rollouts。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "domains": [
+      "包裝、倉儲與物流",
+      "零售與購物"
+    ],
+    "role": "零售示範資料與技能轉移",
+    "environment": "多真實超市的頭戴/360°影片；camera capture無robot。精確店面數未報；下游是RoboBenchMart模擬。",
+    "tasks": "影片列12核心retail活動；下游10tasks＝fridge2、board-to-board3、floor2、basket3，主要搬放與開關。",
+    "cases": "100+h影片導出44.8Ksupervision samples＝25Klatent+18.6Khand+1.2Kbody，streams共享capture。每task100eval rollouts。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 44800,
+        "unit": "三supervision streams samples",
+        "qualifier": "約數；不是unique physical episodes",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "RoboBenchMart downstream tasks",
+        "pages": [
+          13
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task evaluation rollouts",
+        "pages": [
+          13
+        ]
+      }
+    ],
+    "evaluation": [
+      "success同時要求joint velocity<0.2、target到位、未擾動非target；非fridge tasks另報0/1⁄3/2⁄3/1進度。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "下游訓練含2.5Ktask-aligned RoboBenchMart demos＋4.8Krobot anchor；不是human-only零樣本轉移。",
+    "lineage": "三stream由相同人類capture生成，RoboBenchMart為下游父benchmark；不要重新計一次新10task。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          10,
+          11,
+          12,
+          13
+        ],
+        "locator": "Dataset、Mixture、§6.1",
+        "supports": "capture/44.8K/10/100、success規則"
+      }
+    ],
+    "unresolved": [
+      "不同stream的episode交集及各超市scene IDs未報；checkpoint選擇與held-out sampling需code核。"
+    ],
+    "reuse": "補商店補貨/拿取/購物用途；可轉移資料與可执行環境需要分別取得。",
+    "reviewed_pdf_sha256": "e4556b7aadaed076ac2792ec2c15b91853acad3f5eac7403898badc1396e8f98",
+    "reviewed_on": "2026-10-02",
+    "name": "SABER",
+    "year": 2026,
+    "title": "SABER: A Scalable Action-Based Embodied Dataset for Real-World VLA Adaptation",
+    "source_url": "https://arxiv.org/abs/2605.09613",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "logistics",
+      "retail"
+    ],
+    "review_tags": [
+      "零售與購物",
+      "包裝與倉儲"
+    ],
+    "domain_names": [
+      "包裝、倉儲與物流",
+      "零售與購物"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P200",
+      "domain_ids": [
+        "logistics",
+        "retail"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P200",
+          "domain_ids": [
+            "logistics",
+            "retail"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "影片列12核心retail活動；下游10tasks＝fridge2、board-to-board3、floor2、basket3，主要搬放與開關。",
+            "多真實超市的頭戴/360°影片；camera capture無robot。精確店面數未報；下游是RoboBenchMart模擬。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "e4556b7aadaed076ac2792ec2c15b91853acad3f5eac7403898badc1396e8f98"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "e4556b7aadaed076ac2792ec2c15b91853acad3f5eac7403898badc1396e8f98",
+      "previous_domain_ids": [
+        "logistics",
+        "retail"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P200",
+      "name": "SABER",
+      "expected_title": "SABER: A Scalable Action-Based Embodied Dataset for Real-World VLA Adaptation",
+      "source_url": "https://arxiv.org/abs/2605.09613",
+      "pdf_url": "https://arxiv.org/pdf/2605.09613",
+      "retrieved_at": "2026-10-02T21:35:04.339436+00:00",
+      "pdf_sha256": "e4556b7aadaed076ac2792ec2c15b91853acad3f5eac7403898badc1396e8f98",
+      "text_sha256": "7d915dcc9d64d446f39de3907a5295e46536c10a29b9f6e267d7237a6de12aa6",
+      "pdf_bytes": 16587816,
+      "pages": 19,
+      "text_characters": 71944,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2605.09613v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2605.09613v1"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 44800,
+        "unit": "三supervision streams samples",
+        "qualifier": "約數；不是unique physical episodes",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P200:1",
+        "paper_id": "P200",
+        "benchmark": "SABER",
+        "native_term": "三supervision streams samples",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.09613v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.09613v1",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "RoboBenchMart downstream tasks",
+        "pages": [
+          13
+        ],
+        "record_id": "review10:P200:2",
+        "paper_id": "P200",
+        "benchmark": "SABER",
+        "native_term": "RoboBenchMart downstream tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.09613v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.09613v1",
+            "locator": "PDF pp. 13",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task evaluation rollouts",
+        "pages": [
+          13
+        ],
+        "record_id": "review10:P200:3",
+        "paper_id": "P200",
+        "benchmark": "SABER",
+        "native_term": "每task evaluation rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.09613v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.09613v1",
+            "locator": "PDF pp. 13",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

@@ -1,0 +1,170 @@
+{
+  "paper_id": "P040",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RoboBench 的釘選版本已分 MCQ 與 Planning，並提供原生粒度表。本次核讀 loader、MCQ、Q1–Q3 planning 的核心規則，以及 point/IoU 輔助 evaluator；不把模型裁判等同物理執行。",
+  "reading_order": [
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "README.md",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "ranges": [
+        [
+          1,
+          94
+        ],
+        [
+          161,
+          225
+        ],
+        [
+          279,
+          330
+        ]
+      ],
+      "why": "2026 release原生粒度、兩種設定與程式結構"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/data/dataset.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "ranges": [
+        [
+          1,
+          149
+        ]
+      ],
+      "why": "manifest、request ID、Q suffix與prompt"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/multi_choice.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "ranges": [
+        [
+          1,
+          130
+        ]
+      ],
+      "why": "MCQ解析、可選裁判和分母"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/planning.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "ranges": [
+        [
+          26,
+          104
+        ],
+        [
+          244,
+          270
+        ],
+        [
+          305,
+          321
+        ],
+        [
+          372,
+          415
+        ],
+        [
+          595,
+          631
+        ],
+        [
+          713,
+          774
+        ]
+      ],
+      "why": "Q1 prompt、DAG、Q2/Q3與聚合"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/point.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "ranges": [
+        [
+          1,
+          105
+        ]
+      ],
+      "why": "點距離與valid-only分母"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/iou.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "ranges": [
+        [
+          1,
+          123
+        ]
+      ],
+      "why": "bbox IoU、門檻通過率與invalid處理"
+    }
+  ],
+  "environment": "影像／影片中的機器人或人類操作觀測；unique_id 中的 images 路徑定位樣本。cross-embodiment/object/view/attribute 是泛化條件，5 dimensions 是能力分類，不是5種生活用途。",
+  "tasks": "2026 release README 列5 dimensions、14 groups、25 tasks、32 subtask manifests、6,092 QA，MCQ=1,895、Planning=4,197；這是版本化原作者規模，非本次資料整合實數。Q1 多步計畫、Q2 下一步、Q3 狀態估計會共用同一來源影像。",
+  "data": "system_prompt.json 和 dimension/subtask/questions.json；question 有 unique_id、task_type、image_urls、robotic_type、question/options，轉 request_id/prompt。Q1–Q3 suffix 在找圖時去除；Q1另讀 dag.json 的 id→gt_dag，navigation 無同樣 DAG。human 在 prompt 被轉成 single-arm，原始 embodiment 不能因此覆寫。",
+  "evaluation": "MCQ 取 answer tag／清除 think 後比A–D集合，不明確輸出可用另設裁判正規化。Q1模型看首圖、GT nodes/DAG、預測計畫，給 node correctness與task completion各0–10後平均映0–100；空 critical-state集合依prompt直接Completion=10。Q2 skill/object/parameter三項平均，前兩任一0則parameter=0；Q3 yes/no精確比。Q1/Q2解析失敗排除均分但overall按原count加權；point/IoU亦只用有效解析作分母，需附valid率。",
+  "standardization": {
+    "profile": "robot_reasoning_mcqa_and_plan_judge",
+    "reuse": "原生32 manifest層級、題目/skill/DAG/prompt格式與逐項判分證據。",
+    "transform": "source 固定 release+commit，task 保留原25/32對映，不把 Q1/Q2/Q3 或新視角當新環境；case 保留 raw_question/來源圖/embodiment/DAG及觀測預算。evaluator 分MCQ、Q1/Q2/Q3和point/IoU等可選工具，native分數、parse_failures與分母同存。",
+    "missing": "未取得完整HF資料／DAG或執行模型裁判。需查 empty-goal cases、裁判一致性、skill語義與可用資產；MLLM imagined rollout 不能宣稱物理穩定性／真實任務成功。trajectory evaluator 未在本次核讀範圍。"
+  },
+  "version_note": "README已是ECCV2026 release，不能無版本註記地替換2025 arXiv表。IoU檔案開頭提mAP，但實際回傳平均IoU／pass rates，沒有AP排序積分；點／IoU工具存在也不代表32 manifest全都使用它們。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "README.md",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "sha256": "80750435c9f97a21f94ffeaeef372cdddc9905639b91e97c5c755123de3e10a5",
+      "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/README.md",
+      "local_file": "audit/.cache/github_review/repos/yulin-luo__RoboBench/files/README.md"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/data/dataset.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "sha256": "53bbc5ada13b1f5025e7a63852c353333b23a34662babadfaf7385a53b4c2cf5",
+      "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/data/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/yulin-luo__RoboBench/files/src/robobench/data/dataset.py"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/multi_choice.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "sha256": "04a0b2ad4d39b5c752b730d1726f4eb36791b726138298432884ac45214a3dc7",
+      "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/multi_choice.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/yulin-luo__RoboBench/src/robobench/evaluation/multi_choice.py"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/planning.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "sha256": "1c78e03840e04800090e047cd432b0244a48dc72c92b0cb39a62364630c00e0e",
+      "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/planning.py",
+      "local_file": "audit/.cache/github_review/repos/yulin-luo__RoboBench/files/src/robobench/evaluation/planning.py"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/point.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "sha256": "1c8587c301cd88fb42817222534bcae06538a6f9a0b3aacbce249349ce600996",
+      "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/point.py",
+      "local_file": "audit/.cache/github_review/repos/yulin-luo__RoboBench/files/src/robobench/evaluation/point.py"
+    },
+    {
+      "repo": "yulin-luo/RoboBench",
+      "path": "src/robobench/evaluation/iou.py",
+      "commit": "08314edc65800086656a0ff93332b023180eaa35",
+      "sha256": "0c73bf696a92a1461777edf780d41fa76e2c07f45762000e201e511d079ba6cf",
+      "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/iou.py",
+      "local_file": "audit/.cache/github_review/repos/yulin-luo__RoboBench/files/src/robobench/evaluation/iou.py"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "paper_id": "P023",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoProceL 是程式學習資料與 CnC 方法的共同發布；它明確重用 CMU-MMAC、EGTEA、MECCANO、EPIC-Tent 並加入電腦組拆。已核讀資料來源、PC Assembly loader 和主評分呼叫。",
+  "reading_order": [
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "README.md",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "ranges": [
+        [
+          1,
+          96
+        ],
+        [
+          126,
+          158
+        ]
+      ],
+      "why": "精確論文身份、原生 task 與四項父資料"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "EgoProceL-download-README.md",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "ranges": [
+        [
+          1,
+          93
+        ]
+      ],
+      "why": "逐來源取得與 CSV 單位"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "datasets/PC_Assembly.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "ranges": [
+        [
+          1,
+          95
+        ]
+      ],
+      "why": "實際 PC 子集 loader 與 split 限制"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "RepLearn/TCC/procedure_learning.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "ranges": [
+        [
+          1,
+          29
+        ],
+        [
+          31,
+          43
+        ],
+        [
+          121,
+          127
+        ],
+        [
+          160,
+          171
+        ]
+      ],
+      "why": "主流程及子集 key-step 配置"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "RepLearn/TCC/utils.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "ranges": [
+        [
+          8,
+          26
+        ],
+        [
+          143,
+          206
+        ]
+      ],
+      "why": "主入口呼叫哪個 evaluator"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "evaluate/metrics.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "ranges": [
+        [
+          1,
+          243
+        ]
+      ],
+      "why": "Hungarian assignment 與聚合差異"
+    }
+  ],
+  "environment": "烹飪、玩具／電腦組拆、帳篷搭建等人類程式影片；parent dataset→category→video 需要保留。16 個原生 task 是程式活動，不是 16 個獨立房間或全部錄製環境。",
+  "tasks": "由同一程式多段影片學習 key-step 與次序，包含缺步、重複步和背景。重用父資料的影片被加上程式標註，不可和父庫相加當全新影片。",
+  "data": "CSV 與原影片同名，三欄為 step 起始秒、結束秒、step 名；子集按來源／category 分目錄。PC_Assembly loader 配對影片與標註、抽 HDF5 frames/labels；train/val/test 分支尚為 NotImplemented，真正公開路徑是 mode=all。",
+  "evaluation": "procedure_learning→gen_print_results→compute_align_MoF_UoI，以 GT/pred frame overlap 做 Hungarian cluster-label assignment，再計 MoF/IoU/precision；per_keystep 模式排除無 GT 類別並平均。另有 procl_eval 函式實作補上未配對類別的 P/R/F1，但不是本主入口呼叫，二者不混用。GT 用於事後 cluster 對齊不代表模型已輸出語義標籤。",
+  "standardization": {
+    "profile": "procedure_discovery_video",
+    "reuse": "父資料重用清單、原生秒制 step CSV、PC 組裝新來源與聚類評分。",
+    "transform": "source→parent video→新 annotation 建 ancestry；task 記來源內 category，case 是指定多影片集合／取樣與合法 GT 使用範圍。cluster ID 儲存 Hungarian assignment 作評分證據；K、背景、per_keystep 與全體聚合明列。",
+    "missing": "尚未取得影片／標註、產生 HDF5 或執行。需要逐子集對應原影片及相同 frame 取樣；不能自行發明 train/test split 或把 mode=all 的結果標為未見環境泛化。"
+  },
+  "version_note": "download README 明列舊 OneDrive 過期與新 Google Drive，並說父庫只有部分影片被使用；以新程式標註清單作 subset 證據。PC_Assembly.py 開頭註解仍寫 MECCANO，但類別及配置實際為 PC_Assembly。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "README.md",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "sha256": "76059a8b9b74f5f81f799970d6cd1a8e67d124f5a784526d529fa101bba4863c",
+      "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/README.md",
+      "local_file": "audit/.cache/github_review/repos/Sid2697__EgoProceL-egocentric-procedure-learning/files/README.md"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "EgoProceL-download-README.md",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "sha256": "20753ce1b411cb670c5ad7ac5651a60a51831ea29bccb4780ed7f2572fc1e3d5",
+      "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/EgoProceL-download-README.md",
+      "local_file": "audit/.cache/github_review/repos/Sid2697__EgoProceL-egocentric-procedure-learning/files/EgoProceL-download-README.md"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "datasets/PC_Assembly.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "sha256": "782673095bd99219615995554635b700665a4bf5dab5d26cd86619afc36009cb",
+      "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/datasets/PC_Assembly.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/Sid2697__EgoProceL-egocentric-procedure-learning/datasets/PC_Assembly.py"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "RepLearn/TCC/procedure_learning.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "sha256": "4ed651ff8be3cc04a330be80bf79588d22b102c89c83b2165b2bb935bb52011d",
+      "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/RepLearn/TCC/procedure_learning.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/Sid2697__EgoProceL-egocentric-procedure-learning/RepLearn/TCC/procedure_learning.py"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "RepLearn/TCC/utils.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "sha256": "b77cf50c84a14f361cd6f872822462a9e345b1ddf193084fa6f4f521d1ea9ccd",
+      "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/RepLearn/TCC/utils.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/Sid2697__EgoProceL-egocentric-procedure-learning/RepLearn/TCC/utils.py"
+    },
+    {
+      "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "path": "evaluate/metrics.py",
+      "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+      "sha256": "5d9e5b1525892f2a6d869a23ef5d811d53448c712782dbd0e26508aa88675b4e",
+      "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/evaluate/metrics.py",
+      "local_file": "audit/.cache/github_review/repos/Sid2697__EgoProceL-egocentric-procedure-learning/files/evaluate/metrics.py"
+    }
+  ]
+}

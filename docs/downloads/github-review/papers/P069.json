@@ -1,0 +1,886 @@
+{
+  "paper_id": "P069",
+  "name": "robosuite",
+  "title": "robosuite: A Modular Simulation Framework and Benchmark for Robot Learning",
+  "year": 2020,
+  "paper_url": "https://arxiv.org/abs/2009.12293",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P069",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "robosuite 提供可配置任務與狀態判定；論文的 SAC 圖表來自另一個 v1.0 benchmark 倉庫。已核讀 Lift、示範序列化及 return 統計鏈，不能把現行 v1.5 環境直接當原實驗版本。",
+    "identity_note": "對應 arXiv:2009.12293v3（2025-01-18），題名與作者以固定論文首頁為準；雖收錄年份為2020，本 PDF 明述 v1.5。PDF 第15頁直接連到 robosuite-benchmark；主倉庫 README 指回同一論文。",
+    "discovery_evidence": [
+      {
+        "kind": "pinned_primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P069/pages.json",
+        "pages": [
+          1,
+          15,
+          16
+        ],
+        "pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4"
+      },
+      {
+        "kind": "paper_repository_link",
+        "local_file": "audit/.cache/github_review/P069-discovery.json",
+        "pages": [
+          15
+        ]
+      }
+    ],
+    "environment": "MuJoCo 的 robot＋arena＋objects 組合。已讀 Lift 使用0.8×0.8公尺桌面，桌高0.8公尺；cube 的 xy 初態在桌面原點附近各±0.03公尺抽樣。模型數、任務數與初始化 case 數分開。",
+    "tasks": "論文九個標準環境；實驗細化到 PickPlaceCan、NutAssemblyRound 等子型，雙臂設定另存。Lift 的具體 checker 只要求 cube 中心 z 大於桌面 z＋0.04公尺；不額外要求持續抓握或停留。其餘八個 checker 未逐一核讀。",
+    "data": "原生 observation 是具名感測 dict；Lift 有 cube_pos、公尺制相對位置與 xyzw cube_quat，感測率跟 control_freq。HDF5 data/demo_N 存 states、actions 與 model_file XML；data attrs 存 env、env_info、repository_version、date/time。寫入前刪掉最後一筆 state 以對齊 actions，只收成功示範；此格式本身不含 RGB。20 Hz 是已讀基線設定，動作維度／縮放須保留各 controller 設定。",
+    "evaluation": "基線鏈為 train→experiment→MdpPathCollector→CustomBatchRLAlgorithm._log_stats→get_custom_generic_path_information→eval_util。Returns 是每回合 reward 總和，ExplReturns 截至 exploration horizon；統計函式的 reward_scale 參數沒有執行除法，縮放在環境端。例示 run 每epoch收2500步、每回合500步，通常為5回合；論文另對5個訓練 seeds 報均值與標準差。現行 base.done 是 horizon 條件且 info 為空，不能當 task success。",
+    "standardization": {
+      "profile": "interactive_task_definitions_and_robot_episodes",
+      "reuse": "任務 class、版本化 controller/env 設定、初態抽樣、HDF5 模型／狀態與具體 checker，以及原生 return 統計。",
+      "transform": "source 保存論文v3與兩倉庫commit；environment 保存robot/arena；task 保存子型；case 保存seed、初態、horizon/control_freq；evaluator 分列二元checker、shaped reward、episode return。模型XML與資產引用需閉合。",
+      "missing": "原實驗所用 robosuite 精確commit仍未鎖定；尚需其餘任務checker、控制器動作約定及資產／重播驗證，不能宣稱已重現原圖。"
+    },
+    "version_note": "主程式固定5ce6643f3092639d08f7b0f90ed1c6a84f50552c；SAC固定b229f7442f3590dd0e0cad21dc6ae52f410a34bc，依賴rlkit b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab。SAC requirements 只寫robosuite>=1.0.1，卻使用mujoco-py/Gym舊API。notebook第89–100行把Wipe與Door都寫成NutAssemblyRound；Door示例variant為2000 epochs，論文／文件為500。載入variant後，亂數初始化仍取CLI args.seed，不能只相信JSON seed。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite",
+        "requested_repo": "ARISE-Initiative/robosuite",
+        "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            5,
+            22
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 51,
+        "sha256": "598d8346889d54454a89c164bdb2551aef416f806af3327e0e81e1168d00b767",
+        "url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/README.md",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/README.md#L5-L22",
+        "why": "確認 v1.5 與論文連結。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite",
+        "requested_repo": "ARISE-Initiative/robosuite",
+        "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+        "ref": null,
+        "path": "docs/algorithms/benchmarking.md",
+        "ranges": [
+          [
+            5,
+            13
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 18,
+        "sha256": "fc86c1cc54f533a92e2abffb2f6175f31825eee79157cafe4a92fb6b6cdfdb5f",
+        "url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/docs/algorithms/benchmarking.md",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/docs/algorithms/benchmarking.md#L5-L13",
+        "why": "辨識基線仍標為 v1.0，報500步 return 與5個訓練 seeds。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            5
+          ],
+          [
+            23,
+            29
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 89,
+        "sha256": "38d37d12467d2677f16cd983fe0e0199907e3a5b9b96976f2678a560d8a55ff7",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/README.md",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/README.md#L1-L5",
+        "why": "確認 SAC 倉庫角色及 rlkit 固定依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "requirements.txt",
+        "ranges": [
+          [
+            1,
+            6
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 15,
+        "sha256": "bd5e85ed8591e452c1b5fe0512ab504374196fd28d490b8a26867efae4c25a48",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/requirements.txt",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/requirements.txt#L1-L6",
+        "why": "核對舊 mujoco-py／Gym 與未鎖上限的 robosuite。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "notebooks/create_benchmark_environments.ipynb",
+        "ranges": [
+          [
+            7,
+            19
+          ],
+          [
+            36,
+            50
+          ],
+          [
+            75,
+            125
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 159,
+        "sha256": "932c881ffd831df68bf767934c6c338049b5c56022690d9bbf64867c851a00a9",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/notebooks/create_benchmark_environments.ipynb",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/notebooks/create_benchmark_environments.ipynb#L7-L19",
+        "why": "九任務實驗子型、共同設定及兩處錯誤 env_name。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite",
+        "requested_repo": "ARISE-Initiative/robosuite",
+        "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+        "ref": null,
+        "path": "robosuite/environments/manipulation/lift.py",
+        "ranges": [
+          [
+            145,
+            193
+          ],
+          [
+            224,
+            273
+          ],
+          [
+            275,
+            344
+          ],
+          [
+            356,
+            415
+          ],
+          [
+            433,
+            444
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 444,
+        "sha256": "2d88a5e350a68d32461e08b3f24d00bdf5d269257b33f9db5da86e8aea19ce7e",
+        "url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/environments/manipulation/lift.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/environments/manipulation/lift.py#L145-L193",
+        "why": "實際初態、物件感測、reward 與物件中心高於桌面4公分的判定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite",
+        "requested_repo": "ARISE-Initiative/robosuite",
+        "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+        "ref": null,
+        "path": "robosuite/environments/base.py",
+        "ranges": [
+          [
+            429,
+            465
+          ],
+          [
+            467,
+            548
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 853,
+        "sha256": "5a8265704f91c4f7ac1a9cf07f8f532ba9df28b8d13eb5c08255acd2c9ca1c40",
+        "url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/environments/base.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/environments/base.py#L429-L465",
+        "why": "step→reward→task checker；done 僅反映 horizon。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite",
+        "requested_repo": "ARISE-Initiative/robosuite",
+        "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+        "ref": null,
+        "path": "robosuite/scripts/collect_human_demonstrations.py",
+        "ranges": [
+          [
+            148,
+            207
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 383,
+        "sha256": "d688893f00b41686a375c33fce9d02ef55fd75cf1c2ec6b23b0275b0a5f9b385",
+        "url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/scripts/collect_human_demonstrations.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/scripts/collect_human_demonstrations.py#L148-L207",
+        "why": "HDF5 寫入欄位、僅保存成功軌跡及 state/action 對齊。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite",
+        "requested_repo": "ARISE-Initiative/robosuite",
+        "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+        "ref": null,
+        "path": "robosuite/scripts/playback_demonstrations_from_hdf5.py",
+        "ranges": [
+          [
+            41,
+            108
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "8764420e4194b1378f28e26772179775ab8fc6b3cd2b17b7bad0ee66933bff7b",
+        "url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/scripts/playback_demonstrations_from_hdf5.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite/blob/5ce6643f3092639d08f7b0f90ed1c6a84f50552c/robosuite/scripts/playback_demonstrations_from_hdf5.py#L41-L108",
+        "why": "以 env_info、模型 XML、states/actions 還原；分開狀態重播與動作重播。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "scripts/train.py",
+        "ranges": [
+          [
+            51,
+            104
+          ],
+          [
+            107,
+            113
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 134,
+        "sha256": "669e5aeca0c0baac58446d4700218863c1715eb9b85919f42231c3d6729bf864",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/scripts/train.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/scripts/train.py#L51-L104",
+        "why": "variant 載入與實際亂數 seed 來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "util/rlkit_utils.py",
+        "ranges": [
+          [
+            31,
+            62
+          ],
+          [
+            90,
+            106
+          ],
+          [
+            139,
+            163
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 273,
+        "sha256": "e696b001eb41a235fed43922da5ad81c3749d9d580a1377e7f32fc9a16368965",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/util/rlkit_utils.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/util/rlkit_utils.py#L31-L62",
+        "why": "建環境、確定性 SAC policy、collector 與統計入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "util/rlkit_custom.py",
+        "ranges": [
+          [
+            199,
+            217
+          ],
+          [
+            275,
+            290
+          ],
+          [
+            312,
+            374
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 473,
+        "sha256": "d84bfbc748ae501d6a6383d6bd94de464c92f18bfe3656f6807130c21cb57d3a",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/util/rlkit_custom.py",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/util/rlkit_custom.py#L199-L217",
+        "why": "採樣預算及 Returns／ExplReturns 的具體加總。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rail-berkeley/rlkit",
+        "requested_repo": "rail-berkeley/rlkit",
+        "commit": "b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab",
+        "ref": null,
+        "path": "rlkit/samplers/data_collector/path_collector.py",
+        "ranges": [
+          [
+            29,
+            59
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 174,
+        "sha256": "7be89dadcd435933281484af3b35b2e1976d543ef68cfb0c3a0f9febca482a4e",
+        "url": "https://github.com/rail-berkeley/rlkit/blob/b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab/rlkit/samplers/data_collector/path_collector.py",
+        "reading_url": "https://github.com/rail-berkeley/rlkit/blob/b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab/rlkit/samplers/data_collector/path_collector.py#L29-L59",
+        "why": "檢查依步數收集完整 episode 的邏輯。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rail-berkeley/rlkit",
+        "requested_repo": "rail-berkeley/rlkit",
+        "commit": "b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab",
+        "ref": null,
+        "path": "rlkit/core/eval_util.py",
+        "ranges": [
+          [
+            65,
+            113
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 114,
+        "sha256": "512bdb1bb5ac1299c841baeba2ac23fdaf281897d175241cf6ed227525ea2158",
+        "url": "https://github.com/rail-berkeley/rlkit/blob/b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab/rlkit/core/eval_util.py",
+        "reading_url": "https://github.com/rail-berkeley/rlkit/blob/b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab/rlkit/core/eval_util.py#L65-L113",
+        "why": "return 平均、標準差與極值的真正實作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ARISE-Initiative/robosuite-benchmark",
+        "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+        "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+        "ref": null,
+        "path": "runs/Door-Panda-OSC-POSE-SEED17/Door_Panda_OSC_POSE_SEED17_2020_09_13_00_26_44_0000--s-0/variant.json",
+        "ranges": [
+          [
+            1,
+            35
+          ],
+          [
+            49,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 61,
+        "sha256": "eeb0f57046a17c5af184ad84527e2fa1f5e71d0d3415f7ef1ff64258eea4a053",
+        "url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/runs/Door-Panda-OSC-POSE-SEED17/Door_Panda_OSC_POSE_SEED17_2020_09_13_00_26_44_0000--s-0/variant.json",
+        "reading_url": "https://github.com/ARISE-Initiative/robosuite-benchmark/blob/b229f7442f3590dd0e0cad21dc6ae52f410a34bc/runs/Door-Panda-OSC-POSE-SEED17/Door_Panda_OSC_POSE_SEED17_2020_09_13_00_26_44_0000--s-0/variant.json#L1-L35",
+        "why": "具體 run 的2000 epochs、2500 eval steps、20 Hz與seed17。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ba693eb9395f870a53759f809d75a9ef19d34e938fbaa73a5cdcc89af89908fb"
+  },
+  "repository_binding_review_sha256": "ba693eb9395f870a53759f809d75a9ef19d34e938fbaa73a5cdcc89af89908fb",
+  "repository_bindings": [
+    {
+      "requested_repo": "ARISE-Initiative/robosuite",
+      "resolved_repo": "ARISE-Initiative/robosuite",
+      "aliases_in_this_review": [
+        "arise-initiative/robosuite"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c",
+          "reviewed_files": [
+            "README.md",
+            "docs/algorithms/benchmarking.md",
+            "robosuite/environments/base.py",
+            "robosuite/environments/manipulation/lift.py",
+            "robosuite/scripts/collect_human_demonstrations.py",
+            "robosuite/scripts/playback_demonstrations_from_hdf5.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite",
+          "link_label": "Fork me on GitHub",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite",
+          "link_label": "Code Release",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite/releases/tag/v1.5.0",
+          "link_label": "[release notes]",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite/releases/tag/v1.4.0",
+          "link_label": "[release notes]",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite/releases/tag/v1.3",
+          "link_label": "[release notes]",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite/releases/tag/v1.2",
+          "link_label": "[release notes]",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite/releases/tag/v1.1",
+          "link_label": "[release notes]",
+          "project_url": "https://robosuite.ai",
+          "page_sha256": "03c10cb2ca0e4a17b19fe543ed21e6aae6a6854ddeb1ae7ba9b22148e227fe48"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P069",
+          "review_file": "content/github_review/reviews/P069.json",
+          "review_sha256": "ba693eb9395f870a53759f809d75a9ef19d34e938fbaa73a5cdcc89af89908fb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "ARISE-Initiative/robosuite-benchmark",
+      "resolved_repo": "ARISE-Initiative/robosuite-benchmark",
+      "aliases_in_this_review": [
+        "arise-initiative/robosuite-benchmark"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b229f7442f3590dd0e0cad21dc6ae52f410a34bc",
+          "reviewed_files": [
+            "README.md",
+            "notebooks/create_benchmark_environments.ipynb",
+            "requirements.txt",
+            "runs/Door-Panda-OSC-POSE-SEED17/Door_Panda_OSC_POSE_SEED17_2020_09_13_00_26_44_0000--s-0/variant.json",
+            "scripts/train.py",
+            "util/rlkit_custom.py",
+            "util/rlkit_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/ARISE-Initiative/robosuite-benchmark",
+          "pdf_page": 15,
+          "pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P069",
+          "review_file": "content/github_review/reviews/P069.json",
+          "review_sha256": "ba693eb9395f870a53759f809d75a9ef19d34e938fbaa73a5cdcc89af89908fb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "rail-berkeley/rlkit",
+      "resolved_repo": "rail-berkeley/rlkit",
+      "aliases_in_this_review": [
+        "rail-berkeley/rlkit"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b7f97b2463df1c5a1ecd2d293cfcc7a4971dd0ab",
+          "reviewed_files": [
+            "rlkit/core/eval_util.py",
+            "rlkit/samplers/data_collector/path_collector.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P069",
+          "review_file": "content/github_review/reviews/P069.json",
+          "review_sha256": "ba693eb9395f870a53759f809d75a9ef19d34e938fbaa73a5cdcc89af89908fb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P069",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "robosuite，arXiv 2009.12293v3，討論v1.5。",
+    "scope_read": "平台、robots/controllers、全部9 benchmark descriptions與標準評測。",
+    "pages_read": [
+      1,
+      7,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬平台與任務套件",
+    "environment": "9標準task環境，共用可配置arena／robot；10robot模型不是10場域。",
+    "tasks": "Lift、Stack、PickPlace、NutAssembly、Door、Wipe、TwoArmLift、TwoArmPegInHole、TwoArmHandover。",
+    "cases": "程序隨機初始化，未固定全庫題量；基線9環境×robot/controller組合，5 seeds是訓練重複，不增加task。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "標準benchmark環境",
+        "pages": [
+          13,
+          14,
+          15,
+          16
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 10,
+        "unit": "robot models",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "標準SAC實驗報normalized episode return，500step horizon；task success條件依具體任務，不能把return當百分比成功率。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "原作比較Panda/Sawyer與OSC/joint velocity，建議固定Panda OSC；未提出全域held-out task split。",
+    "lineage": "MuJoCo模組平台；LIBERO、RoboCasa、MimicGen等重用，平台與下游bench不可當完全独立環境源。",
+    "related_paper_ids": [
+      "P064",
+      "P070"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "locator": "§3.1–3.2、圖4",
+        "supports": "9任務完整清單與評分"
+      }
+    ],
+    "unresolved": [
+      "repo v1.5可用的其餘task是否超過本文9個標準評測需分清，不以註冊class數覆蓋論文結果。"
+    ],
+    "reuse": "提供共通模擬／控制器／task介面；平台功能與benchmark實績分開。",
+    "reviewed_pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4",
+    "reviewed_on": "2026-10-02",
+    "name": "robosuite",
+    "year": 2020,
+    "title": "robosuite: A Modular Simulation Framework and Benchmark for Robot Learning",
+    "source_url": "https://arxiv.org/abs/2009.12293",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "組裝與拆解",
+      "表面清潔"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P069",
+      "domain_ids": [
+        "home",
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P069",
+          "domain_ids": [
+            "home",
+            "industry"
+          ],
+          "pages": [
+            1,
+            7,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "Lift、Stack、PickPlace、NutAssembly、Door、Wipe、TwoArmLift、TwoArmPegInHole、TwoArmHandover。",
+            "9標準task環境，共用可配置arena／robot；10robot模型不是10場域。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4"
+        },
+        {
+          "paper_id": "P069",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            7,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "Lift、Stack、PickPlace等通用作業與装配／清潔並存。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4",
+      "previous_domain_ids": [
+        "home",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P069",
+      "name": "robosuite",
+      "expected_title": "robosuite: A Modular Simulation Framework and Benchmark for Robot Learning",
+      "source_url": "https://arxiv.org/abs/2009.12293",
+      "pdf_url": "https://arxiv.org/pdf/2009.12293",
+      "retrieved_at": "2026-10-02T21:33:38.178092+00:00",
+      "pdf_sha256": "3da1cc7ba84ee487a90d7013325dd6045eea7c2920bc50cdb8ff37db67426fd4",
+      "text_sha256": "7469206527997b06291c52a7a25bf2b301f6774f2f080383a40e26160532649e",
+      "pdf_bytes": 18253350,
+      "pages": 19,
+      "text_characters": 54537,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2009.12293v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2009.12293v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "標準benchmark環境",
+        "pages": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "record_id": "review10:P069:1",
+        "paper_id": "P069",
+        "benchmark": "robosuite",
+        "native_term": "標準benchmark環境",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2009.12293v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2009.12293v3",
+            "locator": "PDF pp. 13, 14, 15, 16",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 10,
+        "unit": "robot models",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P069:2",
+        "paper_id": "P069",
+        "benchmark": "robosuite",
+        "native_term": "robot models",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2009.12293v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2009.12293v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "ARISE-Initiative/robosuite",
+    "ARISE-Initiative/robosuite-benchmark",
+    "rail-berkeley/rlkit"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,118 @@
+{
+  "paper_id": "P039",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RoboVQA 公開 GitHub 是資料讀取與示範評分 notebook，並非完整實機控制評測平臺。已讀所有 notebook source cells，包含 SequenceExample schema、任務tag解析和 mock eval。",
+  "reading_order": [
+    {
+      "repo": "google-deepmind/robovqa",
+      "path": "README.md",
+      "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+      "ranges": [
+        [
+          1,
+          45
+        ]
+      ],
+      "why": "官方 example-code 身份與精確論文"
+    },
+    {
+      "repo": "google-deepmind/robovqa",
+      "path": "data_loading_and_eval.ipynb",
+      "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+      "ranges": [
+        [
+          8,
+          22
+        ],
+        [
+          29,
+          46
+        ],
+        [
+          53,
+          55
+        ],
+        [
+          65,
+          88
+        ],
+        [
+          98,
+          375
+        ],
+        [
+          384,
+          389
+        ],
+        [
+          399,
+          403
+        ],
+        [
+          412,
+          428
+        ],
+        [
+          435,
+          437
+        ],
+        [
+          447,
+          452
+        ],
+        [
+          461,
+          492
+        ],
+        [
+          501,
+          503
+        ],
+        [
+          512,
+          514
+        ]
+      ],
+      "why": "所有 source cells；未執行、不把 notebook outputs 當驗證"
+    }
+  ],
+  "environment": "已核原論文第1頁：資料來自3棟辦公大樓，含機器人、人、人持抓取工具的多 embodiment。公開 notebook 本身只讀 images/texts，未提供可直接重設的場景或 robot dynamics。",
+  "tasks": "長程／中程指令與高階 VQA，例如成功、affordance、離散進度及文字推理。<task:...> 是問題／標註型別，同一影片可帶多個 QA；29,520 unique instructions 與829,502 video-text pairs 是原論文報告的不同單位，不是本次取得或可執行題數。",
+  "data": "Google Storage train/val TFRecord 裡是 tf.train.SequenceExample，feature_lists 的 images 為 JPEG bytes，texts[0] 為包含多個 task/pred/speaker tags 的UTF-8字串。Tasks 分成 tag→文字，再用 A: 分離輸入／答案；隨機抽 task 與 split 需儲存實際選到的內容。",
+  "evaluation": "run_eval 只取 validation 第一筆 SequenceExample，對其中 QA 呼叫 mock_call_model 並示範 sentence_bleu，無全量平均或實機 intervention 統計。程式呼叫為 sentence_bleu(answer,pred_answer)，需按鎖定 SacreBLEU 核對候選／參考順序及型別，不能直接把示範印出的數字當正式 benchmark 成績。",
+  "standardization": {
+    "profile": "robot_human_video_tagged_qa",
+    "reuse": "原生多tag語料、TFRecord images/texts schema 與 task/source-target parser。",
+    "transform": "source 記 embodiment／episode／building 若來源metadata可取得；case 用record ID+task tag+該tag內QA序號，frame sequence 只儲存一次。raw text/tag 與去tag的prompt/answer同存；VQA字串評分與實機 intervention evaluator 分別建檔。",
+    "missing": "尚未下載 TFRecords、執行 notebook 或機器人試驗。需要全量 ID/split/embodiment metadata、正式 BLEU 協定與 intervention 原始軌跡；get_splits 的 binary/discrete 路由引用未定義常數，使用時需修正並測試，A:範例不受該路由影響。"
+  },
+  "version_note": "公開 notebook 的 mock 範例與論文的真實機器人／人工介入實驗不同。程式授權與其餘資料授權在 README 分開列示，後續來源表應各自儲存。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "google-deepmind/robovqa",
+      "path": "README.md",
+      "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+      "sha256": "c0f04b532782582cc962b47bb89360400f89dd365630f5e39dde3a9d93154957",
+      "url": "https://github.com/google-deepmind/robovqa/blob/93f183129a224a6ca48b1eb26025422c418ff7f2/README.md",
+      "local_file": "audit/.cache/github_review/repos/google-deepmind__robovqa/files/README.md"
+    },
+    {
+      "repo": "google-deepmind/robovqa",
+      "path": "data_loading_and_eval.ipynb",
+      "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+      "sha256": "8d5bb81cf5ca01d8b8fcc5b2455f317cd2c7b51d9e57e4ae2ccd0d44ecdafefa",
+      "url": "https://github.com/google-deepmind/robovqa/blob/93f183129a224a6ca48b1eb26025422c418ff7f2/data_loading_and_eval.ipynb",
+      "local_file": "audit/.cache/github_review/repos/google-deepmind__robovqa/files/data_loading_and_eval.ipynb"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "kind": "pinned_paper_page",
+      "local_file": "audit/.cache/fulltext_review/P039/pages.json",
+      "page": 1,
+      "basis": "實際閱讀摘要的場地、embodiment及兩種計數單位；非本次程式／資料執行結果"
+    }
+  ]
+}

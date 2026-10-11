@@ -1,0 +1,854 @@
+{
+  "paper_id": "P074",
+  "name": "RoboTwin 2.0",
+  "title": "RoboTwin 2.0: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2506.18088",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P074",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboTwin 2.0 的50項任務清單與逐task步數上限可直接核對；現行main已有XPolicyLab評測及新版HDF5。已閉合Lift Pot的幾何checker、seed篩選、action計數、資料時間對齊與影像解碼，須與2025論文版區分。",
+    "identity_note": "對應arXiv:2506.18088v2（2025-08-27），題名／作者以固定PDF為準。官方README連同一arXiv，並記錄2025-08論文更新；本次main commit ea8b21121ebb3cd201ff5b3fe361944ac94eda3f則是2026-09-24的後續整合版。",
+    "discovery_evidence": [
+      {
+        "kind": "pinned_primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P074/pages.json",
+        "pages": [
+          1,
+          11
+        ],
+        "pdf_sha256": "316ae82a97968e1a2d88540665401645a190d2699d7d8652e8fc0053ba609bda"
+      },
+      {
+        "kind": "pinned_gitlink",
+        "local_file": "audit/.cache/github_review/repos/RoboTwin-Platform__RoboTwin/tree.json",
+        "source_manifest": "audit/.cache/github_review/repos/RoboTwin-Platform__RoboTwin/manifest.json",
+        "path": "XPolicyLab",
+        "commit": "fa431ecd893ee706883e64fe5fe1464ec8cd928d"
+      }
+    ],
+    "environment": "SAPIEN桌面雙臂，論文正式設定為Aloha AgileX。現行clean與randomized不是兩個生活場域；randomized包含clutter、背景、光照，table_z_bias實際抽[-0.03,0]公尺，並改用unseen語言。兩份YAML都將depth/pointcloud關閉，不能把論文DP3使用的完美點雲當所有方法共同輸入。",
+    "tasks": "all_tasks與step-limit檔各列50個原生task；左右／數量變體按原清單保留。Lift Pot從兩個060_kitchenpot模型抽樣；成功需世界z>0.82公尺、兩TCP各距指定contact point<0.03公尺，以及pot局部z軸與世界z軸內積>0.8。此check不另測雙臂接觸力或持續時間。",
+    "data": "原生PKL仍是observation/joint_action/endpose字典；關節讀值來自drive targets，非real_jointState。現行轉檔輸出HDF5 data_format_version=\"v1.0\"、instructions JSON字串、additional_info/frequency、state/action與vision；state=values[:-1]、action=values[1:]，只保留N−1組。joint欄位用left/right_arm_joint_states及left/right_ee_joint_states，pose用left/right_ee_poses；vision含cam_head/cam_left_wrist/cam_right_wrist的colors定長JPEG bytes、shape、可選depths與矩陣。線上adapter用單數joint_state鍵，且EE/TCP有不同原點。",
+    "evaluation": "main→eval_remote_policy→take_action→lift_pot.check_success→eval_success；逐task成功數除以test_num（預設100）。從100000×(1+seed)往後找候選；expert_check預設開啟，先play_once且要求plan_success與checker通過，再重置同seed評policy。unstable、setup錯誤及首個action前的rollout錯誤會被略過；因此100是有效試驗數，不是連續100個初態。期限按take_action_cnt而非physics frames；每次action內部再規劃／插值，達條件即鎖定成功。論文50 clean示範訓練、Easy/Hard各自100rollouts的結果不由本輪執行重現。",
+    "standardization": {
+      "profile": "bimanual_tasks_with_versioned_hdf5_and_policy_adapter",
+      "reuse": "50 task IDs、逐task步數、clean/randomized設定、物件contact-point資料模型、具體checker與seed篩選loop。",
+      "transform": "source固定主repo及XPolicyLab gitlink；case存embodiment、語言分割、隨機化、被接受／略過seed、action計數與checkpoint。分開PKL命令、HDF5 t/t+1配對、線上單數鍵，保留EE/TCP、pose/quaternion與JPEG marker約定。",
+      "missing": "2025論文對應的程式／asset版本閉合、所有50 checker逐項覆核、XPolicyLab與policy模型依賴取得、正式accepted-seed manifest及時間／座標schema驗證。"
+    },
+    "version_note": "XPolicyLab實際gitlink為fa431ecd893ee706883e64fe5fe1464ec8cd928d；.gitmodules的branch=main不是版本pin。本次只讀RoboTwin端整合與本地codec。具體schema風險：save_freq用作每N個控制步抽幀，卻原值寫入frequency；還另插入端點幀，不能據此重建固定Hz時間軸。extrinsics_matrix優先寫cam2world_gl，缺少時才寫extrinsic_cv，座標方向不由欄位名保證。JPEG有legacy色序與XPL-RGB1兩制，不能無條件再交換RGB/BGR。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            8,
+            31
+          ],
+          [
+            35,
+            49
+          ],
+          [
+            59,
+            78
+          ],
+          [
+            249,
+            256
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 298,
+        "sha256": "08bd114a0de29a5b797a80cd993b6689211df86531612e4121fc057a9a8f3114",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/README.md",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/README.md#L8-L31",
+        "why": "核對2.0作品、legacy分支、DP3修正與2026 XPolicyLab整合。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": ".gitmodules",
+        "ranges": [
+          [
+            1,
+            4
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 4,
+        "sha256": "0c5a43bb9e9eb87e5080014bdebce30a46a1838c26991b6e82139277832748b5",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/.gitmodules",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/.gitmodules#L1-L4",
+        "why": "子模組repo與追蹤分支；實際pin另以git tree為準。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "env_cfg/eval/all_tasks.yml",
+        "ranges": [
+          [
+            9,
+            59
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 59,
+        "sha256": "948931440aef34ba856c67a957aabfd75b798363bc6577af92353b602922507f",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/eval/all_tasks.yml",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/eval/all_tasks.yml#L9-L59",
+        "why": "實讀50個評測task IDs。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "env_cfg/task_config/_eval_step_limit.yml",
+        "ranges": [
+          [
+            1,
+            50
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 50,
+        "sha256": "41c62bd26184977bae45aee555edd0cc21de5cddf560c2595921fc23a1e3b551",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/task_config/_eval_step_limit.yml",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/task_config/_eval_step_limit.yml#L1-L50",
+        "why": "50個task各自的action上限，lift_pot為400。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "env_cfg/task_config/demo_clean.yml",
+        "ranges": [
+          [
+            3,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "3acfcd508078a51e3a48fd7e2f6e61c1b9a6ced0cc44dedd149b55114248e2ab",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/task_config/demo_clean.yml",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/task_config/demo_clean.yml#L3-L38",
+        "why": "clean條件、50 demonstrations、語言與模態設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "env_cfg/task_config/demo_randomized.yml",
+        "ranges": [
+          [
+            3,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "2c4637952d5c80b521e4d24a3f9f5257262abcd2f15933616b1e58d2430473c0",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/task_config/demo_randomized.yml",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/env_cfg/task_config/demo_randomized.yml#L3-L38",
+        "why": "randomized改背景／clutter／高度／光照，並切unseen指令。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/lift_pot.py",
+        "ranges": [
+          [
+            7,
+            58
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 58,
+        "sha256": "347e06f3f9f82b1bc35882671bbbdea50b6e3c77fff0f7fb4449b024875402eb",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/lift_pot.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/lift_pot.py#L7-L58",
+        "why": "實際兩種pot資產、雙臂expert及高度／TCP距離／方向checker。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/utils/actor_utils.py",
+        "ranges": [
+          [
+            16,
+            62
+          ],
+          [
+            100,
+            144
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 176,
+        "sha256": "252d43c526b23adcf4ba549fec64a49f037fc4a24e9edd1998e5f60d3e13d5d9",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/actor_utils.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/actor_utils.py#L16-L62",
+        "why": "contact point由資產局部matrix與scale轉成世界點，含articulation覆寫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/utils/transforms.py",
+        "ranges": [
+          [
+            523,
+            530
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 530,
+        "sha256": "b8ec2a27275868dc476ca1e2c2c8264fdc2f8a907278ed531b53d13e82b338ca",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/transforms.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/transforms.py#L523-L530",
+        "why": "pot方向分數的實際旋轉與內積。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/robot/robot.py",
+        "ranges": [
+          [
+            494,
+            506
+          ],
+          [
+            557,
+            603
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 714,
+        "sha256": "3dcd80acc8cab489a4c5edb507cc460dab1724be0226b8d5c4c1b218dee605cb",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/robot/robot.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/robot/robot.py#L494-L506",
+        "why": "jointState是drive targets；EE與TCP原點有0.12公尺差異。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/_base_task.py",
+        "ranges": [
+          [
+            55,
+            153
+          ],
+          [
+            201,
+            224
+          ],
+          [
+            438,
+            501
+          ],
+          [
+            608,
+            624
+          ],
+          [
+            1480,
+            1550
+          ],
+          [
+            1552,
+            1640
+          ],
+          [
+            1704,
+            1740
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1796,
+        "sha256": "76a12a3ce2254c019e5c291e29c99b421dabbb0c6e0b9ec24db9155b2dcf81f5",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/_base_task.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/_base_task.py#L55-L153",
+        "why": "隨機化、obs、儲存間隔、action計數與成功鎖定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/utils/pkl2hdf5.py",
+        "ranges": [
+          [
+            79,
+            168
+          ],
+          [
+            171,
+            220
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 220,
+        "sha256": "c19a77f69d9b5c624c73f0162c2fee7b5f5979bdfddf9fdef3dda020912371bf",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/pkl2hdf5.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/pkl2hdf5.py#L79-L168",
+        "why": "t/t+1成對欄位、版本、指令、相機matrix與JPEG欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "envs/utils/parse_hdf5.py",
+        "ranges": [
+          [
+            11,
+            53
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 53,
+        "sha256": "ad54ffd19b189916de8d6aa0d2d4bff52b625b45f8dfe0297396d54f4bbf0d84",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/parse_hdf5.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/envs/utils/parse_hdf5.py#L11-L53",
+        "why": "HDF5 reader到decode_image_bit。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "data/decode_image_bit.py",
+        "ranges": [
+          [
+            14,
+            46
+          ],
+          [
+            164,
+            223
+          ],
+          [
+            272,
+            299
+          ],
+          [
+            423,
+            442
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 442,
+        "sha256": "90df99c52d3f127a09f5960680113f17e8b3e25b2e3cb9117abdeb249d7a337e",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/data/decode_image_bit.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/data/decode_image_bit.py#L14-L46",
+        "why": "legacy與XPL-RGB1 JPEG的不同色彩解碼規則。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "scripts/eval_policy_xpolicylab.py",
+        "ranges": [
+          [
+            270,
+            332
+          ],
+          [
+            774,
+            851
+          ],
+          [
+            877,
+            999
+          ],
+          [
+            1041,
+            1064
+          ],
+          [
+            1093,
+            1168
+          ],
+          [
+            1214,
+            1245
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1444,
+        "sha256": "78821388d58daf8aa65db55c5952df3742486dd93e717ce6a96374a3795dfc7a",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/scripts/eval_policy_xpolicylab.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/scripts/eval_policy_xpolicylab.py#L270-L332",
+        "why": "種子／expert篩選、實際success統計與XPolicyLab觀測動作映射。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f32c4242a99fc6c8738f6a048393c53bfa52b35787a09896a028a25d4185bab7"
+  },
+  "repository_binding_review_sha256": "f32c4242a99fc6c8738f6a048393c53bfa52b35787a09896a028a25d4185bab7",
+  "repository_bindings": [
+    {
+      "requested_repo": "RoboTwin-Platform/RoboTwin",
+      "resolved_repo": "RoboTwin-Platform/RoboTwin",
+      "aliases_in_this_review": [
+        "robotwin-platform/robotwin"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+          "reviewed_files": [
+            ".gitmodules",
+            "README.md",
+            "data/decode_image_bit.py",
+            "env_cfg/eval/all_tasks.yml",
+            "env_cfg/task_config/_eval_step_limit.yml",
+            "env_cfg/task_config/demo_clean.yml",
+            "env_cfg/task_config/demo_randomized.yml",
+            "envs/_base_task.py",
+            "envs/lift_pot.py",
+            "envs/robot/robot.py",
+            "envs/utils/actor_utils.py",
+            "envs/utils/parse_hdf5.py",
+            "envs/utils/pkl2hdf5.py",
+            "envs/utils/transforms.py",
+            "scripts/eval_policy_xpolicylab.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/robotwin-Platform/RoboTwin",
+          "link_label": "Code",
+          "project_url": "https://robotwin-platform.github.io/",
+          "page_sha256": "307c4151d281b73157b4744bfe1d480c9dce77e728b1819d3ba26fb3aad38076"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/RoboTwin-Platform/RoboTwin",
+          "link_label": "GitHub",
+          "project_url": "https://robotwin-platform.github.io/doc/",
+          "page_sha256": "ef576f7d66a7387d308954de6b3ffaf690e89cf1bf143f2e4d594b6c1a40bc5a"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "http://github.com/robotwin-Platform/RoboTwin",
+          "link_label": "Repo",
+          "project_url": "https://robotwin-platform.github.io/doc/",
+          "page_sha256": "ef576f7d66a7387d308954de6b3ffaf690e89cf1bf143f2e4d594b6c1a40bc5a"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/robotwin-Platform/RoboTwin",
+          "link_label": "Code",
+          "project_url": "https://robotwin-platform.github.io",
+          "page_sha256": "307c4151d281b73157b4744bfe1d480c9dce77e728b1819d3ba26fb3aad38076"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboTwin-Platform/RoboTwin",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "6dde57155eafa3e4ebf6ad1f93a7cf7d5d41a755"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboTwin-Platform/RoboTwin",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "6dde57155eafa3e4ebf6ad1f93a7cf7d5d41a755"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P074",
+          "review_file": "content/github_review/reviews/P074.json",
+          "review_sha256": "f32c4242a99fc6c8738f6a048393c53bfa52b35787a09896a028a25d4185bab7",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P074",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboTwin2.0，arXiv 2506.18088v2。",
+    "scope_read": "MLLM產生器、物件庫、50task benchmark、Easy/Hard及real驗證。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      6,
+      10,
+      11,
+      19
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "模擬與真實操作benchmark",
+    "environment": "雙臂桌面程序配置；Easy/Hard為clutter／光照／texture／高度分布，不是兩個生活domain。",
+    "tasks": "50 benchmark tasks；另外真實實驗4task×4conditions；RoboTwin-OD 147類731物件。",
+    "cases": "每task50 clean train demos，測試100rollouts於Easy/Hard條件；真實測試training另10real+1,000synthetic。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 50,
+        "unit": "simulation benchmark tasks",
+        "pages": [
+          11
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 731,
+        "unit": "RoboTwin-OD物件",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "真實驗證tasks",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task設定的rollouts",
+        "pages": [
+          11
+        ]
+      }
+    ],
+    "evaluation": [
+      "simulation／real task success；Easy和Hard分開。",
+      "MLLM observer的failure detection／localization是產生器輔助診斷，不能替代所有物理success checker。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "single-task training，Easy到Hard分布外；DP3在模擬可得完美point clouds／clean segmentation，跨方法需標明。",
+    "lineage": "RoboTwin延伸，Rodin資產、skill API和sim-in-loop expert生成。",
+    "related_paper_ids": [
+      "P073"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          6,
+          10,
+          11
+        ],
+        "locator": "RoboTwin-OD、§4.4–4.5",
+        "supports": "731／50、train/eval及real子集"
+      },
+      {
+        "pages": [
+          19
+        ],
+        "locator": "Observer analysis",
+        "supports": "產生器judge侷限"
+      }
+    ],
+    "unresolved": [
+      "100rollouts的公開seed列表與兩條件是否完全對應需eval script核。"
+    ],
+    "reuse": "可借雙臂流程與有物理回饋的產題；50task不因兩種難度變成100語義task。",
+    "reviewed_pdf_sha256": "316ae82a97968e1a2d88540665401645a190d2699d7d8652e8fc0053ba609bda",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboTwin 2.0",
+    "year": 2025,
+    "title": "RoboTwin 2.0: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation",
+    "source_url": "https://arxiv.org/abs/2506.18088",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用",
+      "人機協作",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P074",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P074",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            6,
+            10,
+            11,
+            19
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "50 benchmark tasks；另外真實實驗4task×4conditions；RoboTwin-OD 147類731物件。",
+            "雙臂桌面程序配置；Easy/Hard為clutter／光照／texture／高度分布，不是兩個生活domain。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "316ae82a97968e1a2d88540665401645a190d2699d7d8652e8fc0053ba609bda"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "316ae82a97968e1a2d88540665401645a190d2699d7d8652e8fc0053ba609bda",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P074",
+      "name": "RoboTwin 2.0",
+      "expected_title": "RoboTwin 2.0: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation",
+      "source_url": "https://arxiv.org/abs/2506.18088",
+      "pdf_url": "https://arxiv.org/pdf/2506.18088",
+      "retrieved_at": "2026-10-02T21:33:45.729859+00:00",
+      "pdf_sha256": "316ae82a97968e1a2d88540665401645a190d2699d7d8652e8fc0053ba609bda",
+      "text_sha256": "f10d9e92f2fb6b51ff2702ce6fb2a98a1dc5e22bdb14fba75c442632422963e3",
+      "pdf_bytes": 7993708,
+      "pages": 24,
+      "text_characters": 105332,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2506.18088v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2506.18088v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 50,
+        "unit": "simulation benchmark tasks",
+        "pages": [
+          11
+        ],
+        "record_id": "review10:P074:1",
+        "paper_id": "P074",
+        "benchmark": "RoboTwin 2.0",
+        "native_term": "simulation benchmark tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.18088v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.18088v2",
+            "locator": "PDF pp. 11",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 731,
+        "unit": "RoboTwin-OD物件",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P074:2",
+        "paper_id": "P074",
+        "benchmark": "RoboTwin 2.0",
+        "native_term": "RoboTwin-OD物件",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.18088v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.18088v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "真實驗證tasks",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P074:3",
+        "paper_id": "P074",
+        "benchmark": "RoboTwin 2.0",
+        "native_term": "真實驗證tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.18088v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.18088v2",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task設定的rollouts",
+        "pages": [
+          11
+        ],
+        "record_id": "review10:P074:4",
+        "paper_id": "P074",
+        "benchmark": "RoboTwin 2.0",
+        "native_term": "每task設定的rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.18088v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.18088v2",
+            "locator": "PDF pp. 11",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "RoboTwin-Platform/RoboTwin"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,30 @@
+{
+  "paper_id": "P217",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "TRS+RVG在既有EGTEA/EPIC feature pipeline上研究缺幀/噪聲魯棒預測；原文特別說明其EPIC標籤和split與官方榜單不同。未確認官方code。",
+  "reading_order": [],
+  "environment": "既有EGTEA Gaze+、EPIC-KITCHENS影片/預抽TSN features；新增的是feature corruption與解碼協定，不產生新物理場景。",
+  "tasks": "下一verb–noun joint action預測；TRS處理temporal可靠度、RVG用training-label compatibility graph重排組合。19×51=969候選scores不是969種實際觀測task。",
+  "data": "原文EGTEA19verbs/51nouns/106actions、processed split1共10321clips；EPIC pipeline125verb/352noun indexes且public-train videos再90/10 video-disjoint分割，明說不能與official97/300榜單直接比較。input為10個1024D TSN tokens，非直接對raw pixels加噪。",
+  "evaluation": "joint top1要求verb與noun同對；AvgC跨corruption平均、RR=100×AvgC/clean accuracy應連同絕對accuracy看。PMI graph只用training labels，weight由EGTEAval校準後移到EPIC；高強度mask/drop等作用於6/10tokens，缺code還需核定具體indices與seed。",
+  "standardization": {
+    "profile": "corruption_robust_egocentric_action_anticipation",
+    "reuse": "原文corruption定義、training-only graph、native feature label space及group metrics。",
+    "transform": "source關聯原EPIC/EGTEA；case固定feature提取器/hash、clip/observed timestamps、corruption mask/seed與label vocabulary；official和within-pipeline兩種結果分表。",
+    "missing": "官方repo/features/split ID與graph資料、精確corruptor/scorer、missing/zero-denominator處理與同協定基線。"
+  },
+  "version_note": "已讀2609.13293v1 p6–7；本文processed EPIC index space與官方taxonomy不同，不把其125/352當EPIC官方類別數。cachedTRS/RVG題名搜尋未確認code。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2609.13293",
+    "pdf_sha256": "13aaaf69bfbfa5c99ef154700c56eb0f34385c23b6bb5503a53965250a5e7e6a",
+    "paper_pages_read": [
+      6,
+      7
+    ],
+    "search_receipts": [
+      "audit/.cache/github_review/search/P217.json"
+    ]
+  }
+}

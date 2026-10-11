@@ -1,0 +1,120 @@
+{
+  "paper_id": "P189",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "GPT-Fabric的folding、smoothing與physical分三庫。Folding比較多種合法expert終態，smoothing衡量覆蓋；這些不能合併成同一成功率。",
+  "reading_order": [
+    {
+      "repo": "slurm-lab-usc/GPT-fabric-folding",
+      "commit": "102f4cec4fa7e2b4e3601c9ae3e6db982340a70d",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          43,
+          71
+        ]
+      ],
+      "why": "論文身分、Foldsformer父初態/子目標、多合法expert結果"
+    },
+    {
+      "repo": "slurm-lab-usc/GPT-fabric-folding",
+      "commit": "102f4cec4fa7e2b4e3601c9ae3e6db982340a70d",
+      "path": "slurm_utils.py",
+      "ranges": [
+        [
+          71,
+          117
+        ]
+      ],
+      "why": "8/9/16種expert終態的最小粒子誤差"
+    },
+    {
+      "repo": "slurm-lab-usc/GPT-fabric-folding",
+      "commit": "102f4cec4fa7e2b4e3601c9ae3e6db982340a70d",
+      "path": "eval.py",
+      "ranges": [
+        [
+          234,
+          279
+        ]
+      ],
+      "why": "run×config結果與最終mean非best-of-run"
+    },
+    {
+      "repo": "slurm-lab-usc/GPT-Fabric-Smoothing",
+      "commit": "06d9592abf7c6ea20b713edcc6d8dac19baade6d",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          39,
+          75
+        ]
+      ],
+      "why": "smoothing入口、trails是動作數、GIF速度"
+    },
+    {
+      "repo": "slurm-lab-usc/GPT-Fabric-Smoothing",
+      "commit": "06d9592abf7c6ea20b713edcc6d8dac19baade6d",
+      "path": "softgym/envs/cloth_flatten.py",
+      "ranges": [
+        [
+          180,
+          214
+        ]
+      ],
+      "why": "面積/正規化改善/相對最大面積的三種度量"
+    },
+    {
+      "repo": "slurm-lab-usc/GPT-Fabric-Smoothing",
+      "commit": "06d9592abf7c6ea20b713edcc6d8dac19baade6d",
+      "path": "RGBD_manipulation.py",
+      "ranges": [
+        [
+          1432,
+          1459
+        ],
+        [
+          1658,
+          1687
+        ],
+        [
+          1699,
+          1713
+        ]
+      ],
+      "why": "primitive執行、歷史/輸出、coverage CSV及GIF抽frame"
+    },
+    {
+      "repo": "slurm-lab-usc/gpt-fabric-physical-experiments",
+      "commit": "e0e619560474884e158b49eedc48f2eaf712746c",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "why": "實機專用入口，非可直接移植到別人的平臺"
+    }
+  ],
+  "environment": "SoftGym/PyFlex方形/矩形布料，沿用Foldsformer初態與demonstration sub-goals；相同config與expert reference保持父來源關聯。實機庫另有平臺專用程式。",
+  "tasks": "4種原生folding樣式及smoothing；每個fold可有多個合法終態。smoothing的trails參數是pick-place步數，並非多次獨立episode或題數。",
+  "data": "cached配置、expert info-*.pkl、model info.pkl、示範子目標與query訊息構成評測資料；每種reference fold只是同題多解。smoothing輸出message_step.jsonl和[coverage,improvement] CSV，3位小數為輸出格式；GIF跳frame倍速不代表控制時間。",
+  "evaluation": "fold每次run對8/9/16個expert粒子終態取最小平均距離，再對run和config平均，輸出乘1000為mm；不取最低run當主結果。smoothing分(A−A0)/(Amax−A0)與A/Amax，前者Amax=A0需處理。naive loop傳last_step_info=None，即使回傳history也不能假設每模式有上一動作提示；LLM model/prompt/API失敗處理須固定。",
+  "standardization": {
+    "profile": "vlm_driven_cloth_folding_and_smoothing",
+    "reuse": "多合法目標、原生粒子/coverage metrics、VLM訊息與幾何primitive的接線範例。",
+    "transform": "case固定init/config、合法示範/提示、expert目標集合、動作與query預算；來源渲染/示範去重；物理結果、VLM格式有效性、延遲/查詢次數分開報。",
+    "missing": "完整資料取得、歷史模型/提示版本、API失敗分母、coverage零分母、實機成品scorer/平臺標定與重現。"
+  },
+  "version_note": "folding102f4ce、smoothing06d9592、physical e0e6195；README提舊model版本變動只是歷史資訊，本次未呼叫LLM API或執行robot。實機庫本輪只核對README入口，核心核讀限兩個模擬分支。",
+  "runtime_executed": false
+}

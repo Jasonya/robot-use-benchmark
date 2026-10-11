@@ -1,0 +1,504 @@
+{
+  "paper_id": "P148",
+  "name": "Assistax",
+  "title": "Assistax: A Multi-Agent Hardware-Accelerated Reinforcement Learning Benchmark for Assistive Robotics",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2507.21638",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "care",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P148",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Assistax有明確的JAX/Brax/MJX環境、雙agent觀測/動作與獎勵介面；feeding原始done固定0，累積回報不能當成餵食完成率。",
+    "environment": "目前registry有scratchitch、bedbathing、armmanipulation、pushcoop、handover、feeding、teethbrushing共7個環境類別；這是程式註冊名稱數，非房間/layout數。",
+    "tasks": "生活照護與協作控制；不同task指定human/robot或robot1/robot2。disability、preference及sparse reward是可選協定設定，不自行增加語義任務。",
+    "data": "功能式reset/step使用JAX key和state，按agent分obs/action/reward/done。feeding機器人7 actuator、人類頭部2 actuator；觀測含pose、force與joint angle，屬state-based而非預設RGB視覺題。episode_length預設1000、action_repeat預設1。",
+    "evaluation": "feeding混合距離、姿態、速度、口部接觸力與控制成本；原始done=0，結束依外層episode wrapper。MASAC回報mask在首次done後截斷；__all__在heterogeneous模式取agent reward平均。使用者偏好/身體受限設定改變score，必須隨case記錄。",
+    "standardization": {
+      "profile": "assistive_multiagent_simulation",
+      "reuse": "registry、actuator/observation映射、wrapper參數、具體獎勵與return聚合。",
+      "transform": "source固定commit；environment保存task類別/MJX資產與控制設定；case保存人類policy、preference、disability、seed與時限；evaluator分原生return和另定的任務完成條件。",
+      "missing": "其餘6環境完整checker、資產/控制接口實測、統一測例清單、各方法在相同人類策略/偏好下的基線。"
+    },
+    "version_note": "固定a7d94f4；目前registry多於README頂部5張照護示意圖，應以註冊清單標明當前版本。未執行JAX、訓練或臨床評估。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "assistive-autonomy/assistax",
+        "requested_repo": "assistive-autonomy/assistax",
+        "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 223,
+        "sha256": "bc9d754a1d62c450f81f5bbde98a40cf28e4d20c5597b1b741d38147f5f8c3f0",
+        "url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/README.md",
+        "reading_url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/README.md#L1-L85",
+        "why": "官方題名、套件用途及multi-agent接口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assistive-autonomy/assistax",
+        "requested_repo": "assistive-autonomy/assistax",
+        "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+        "ref": null,
+        "path": "assistax/envs/__init__.py",
+        "ranges": [
+          [
+            28,
+            97
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 97,
+        "sha256": "8e93a350c9435758680c791ae9281b7565eec7c3d595a7137d303f11f0c4569b",
+        "url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/envs/__init__.py",
+        "reading_url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/envs/__init__.py#L28-L97",
+        "why": "7個registry名稱及episode/auto-reset/preference wrapper順序",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assistive-autonomy/assistax",
+        "requested_repo": "assistive-autonomy/assistax",
+        "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+        "ref": null,
+        "path": "assistax/envs/base_env.py",
+        "ranges": [
+          [
+            20,
+            69
+          ],
+          [
+            104,
+            121
+          ],
+          [
+            215,
+            241
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 348,
+        "sha256": "eff110cf1e2630d29de4ef0f41b7adfda9dcd841f23414f0e9b136aaae1ede14",
+        "url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/envs/base_env.py",
+        "reading_url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/envs/base_env.py#L20-L69",
+        "why": "agent actuator索引、全域狀態分流與shared/heterogeneous reward",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assistive-autonomy/assistax",
+        "requested_repo": "assistive-autonomy/assistax",
+        "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+        "ref": null,
+        "path": "assistax/envs/feeding.py",
+        "ranges": [
+          [
+            175,
+            204
+          ],
+          [
+            245,
+            310
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 370,
+        "sha256": "aedd600d98437c4960c74805a0c440353cf84f205196916982e93bead4741989",
+        "url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/envs/feeding.py",
+        "reading_url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/envs/feeding.py#L175-L204",
+        "why": "feeding觀測、距離/速度/力等獎勵及done=0",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assistive-autonomy/assistax",
+        "requested_repo": "assistive-autonomy/assistax",
+        "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+        "ref": null,
+        "path": "assistax/baselines/MASAC/eval_masac.py",
+        "ranges": [
+          [
+            69,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 155,
+        "sha256": "c29dc6f9b057a28de0512badbc983da6359421c137fd3e96b15cbe42d33b0355",
+        "url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/baselines/MASAC/eval_masac.py",
+        "reading_url": "https://github.com/assistive-autonomy/assistax/blob/a7d94f4e20636b9b0c07370344b8a2b521db58b2/assistax/baselines/MASAC/eval_masac.py#L69-L80",
+        "why": "只累計第一次episode結束以前的未折扣回報",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a4146f69c0be3957919b5c1d612b267a4c43282ce5d392c4c4a2fe635c2cbe44"
+  },
+  "repository_binding_review_sha256": "a4146f69c0be3957919b5c1d612b267a4c43282ce5d392c4c4a2fe635c2cbe44",
+  "repository_bindings": [
+    {
+      "requested_repo": "assistive-autonomy/assistax",
+      "resolved_repo": "assistive-autonomy/assistax",
+      "aliases_in_this_review": [
+        "assistive-autonomy/assistax"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "a7d94f4e20636b9b0c07370344b8a2b521db58b2",
+          "reviewed_files": [
+            "README.md",
+            "assistax/baselines/MASAC/eval_masac.py",
+            "assistax/envs/__init__.py",
+            "assistax/envs/base_env.py",
+            "assistax/envs/feeding.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/assistive-autonomy/assistax",
+          "pdf_page": 2,
+          "pdf_sha256": "53953a170eca350244258f44b0b043e960f2bcece29e1074e805ab251bc95547",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P148",
+          "review_file": "content/github_review/reviews/P148.json",
+          "review_sha256": "a4146f69c0be3957919b5c1d612b267a4c43282ce5d392c4c4a2fe635c2cbe44",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "個人照護",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P148",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Assistax，arXiv 2507.21638v3／RLJ2026。",
+    "scope_read": "5assistive tasks、robot/human控制、preferences、630partner池與MARL/AHT評測。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "domains": [
+      "個人照護",
+      "協助、交接與陪伴"
+    ],
+    "role": "協作控制benchmark",
+    "environment": "MJX/JAX五種assistive配置，使用簡化rigid geometry；不是臨床或柔性皮膚物理驗證。",
+    "tasks": "Scratch、Tooth Brushing、Feeding、Bed Bathing、Arm Assist；force/speed/contact偏好另外參數化。",
+    "cases": "每task630pretrained humanoids；AHT以5train/625unseen partners；MARL每曲線16seeds與64eval episodes。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "assistive tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 630,
+        "unit": "每task partner policies",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 625,
+        "unit": "每task unseen partners（非episodes）",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "case",
+        "value": 64,
+        "unit": "MARL每次評測episodes",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task/preference return分開，跨任務min-max normalized mean、bootstrap95%CI；新partner泛化。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "partner-disjoint；挑5個高speed preference為train是刻意困難設定；精確episode/context數不等於625新task。",
+    "lineage": "Assistive Gym inspired任務，Brax humanoid與MJX；原始Assistive Gym需補為上游來源。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "locator": "§3–4、圖2–5",
+        "supports": "5/630/625/64、rigid簡化與returns"
+      }
+    ],
+    "unresolved": [
+      "不同partner/preferences的物理對應與真实使用者有效性未等同验证。"
+    ],
+    "reuse": "補個人照護、人類偏好及協作適應；沒有固定統一題庫上限。",
+    "reviewed_pdf_sha256": "53953a170eca350244258f44b0b043e960f2bcece29e1074e805ab251bc95547",
+    "reviewed_on": "2026-10-02",
+    "name": "Assistax",
+    "year": 2025,
+    "title": "Assistax: A Multi-Agent Hardware-Accelerated Reinforcement Learning Benchmark for Assistive Robotics",
+    "source_url": "https://arxiv.org/abs/2507.21638",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "care",
+      "assistance"
+    ],
+    "review_tags": [
+      "照護與個人活動",
+      "人機協作"
+    ],
+    "domain_names": [
+      "個人照護",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P148",
+      "domain_ids": [
+        "care",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P148",
+          "domain_ids": [
+            "care"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "Scratch、Tooth Brushing、Feeding、Bed Bathing、Arm Assist；force/speed/contact偏好另外參數化。",
+            "MJX/JAX五種assistive配置，使用簡化rigid geometry；不是臨床或柔性皮膚物理驗證。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "53953a170eca350244258f44b0b043e960f2bcece29e1074e805ab251bc95547"
+        },
+        {
+          "paper_id": "P148",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "餵食、刷牙、擦身與手臂協助等服務。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "53953a170eca350244258f44b0b043e960f2bcece29e1074e805ab251bc95547"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "53953a170eca350244258f44b0b043e960f2bcece29e1074e805ab251bc95547",
+      "previous_domain_ids": [
+        "care"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P148",
+      "name": "Assistax",
+      "expected_title": "Assistax: A Multi-Agent Hardware-Accelerated Reinforcement Learning Benchmark for Assistive Robotics",
+      "source_url": "https://arxiv.org/abs/2507.21638",
+      "pdf_url": "https://arxiv.org/pdf/2507.21638",
+      "retrieved_at": "2026-10-02T21:34:31.570288+00:00",
+      "pdf_sha256": "53953a170eca350244258f44b0b043e960f2bcece29e1074e805ab251bc95547",
+      "text_sha256": "a335a9e1fb42172fd88abc6114f78c0e80b977b3bc3854ab98903a47f2700848",
+      "pdf_bytes": 4869117,
+      "pages": 38,
+      "text_characters": 124422,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2507.21638v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2507.21638v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "assistive tasks",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P148:1",
+        "paper_id": "P148",
+        "benchmark": "Assistax",
+        "native_term": "assistive tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21638v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21638v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 630,
+        "unit": "每task partner policies",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P148:2",
+        "paper_id": "P148",
+        "benchmark": "Assistax",
+        "native_term": "每task partner policies",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21638v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21638v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 625,
+        "unit": "每task unseen partners（非episodes）",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P148:3",
+        "paper_id": "P148",
+        "benchmark": "Assistax",
+        "native_term": "每task unseen partners（非episodes）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21638v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21638v3",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 64,
+        "unit": "MARL每次評測episodes",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P148:4",
+        "paper_id": "P148",
+        "benchmark": "Assistax",
+        "native_term": "MARL每次評測episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21638v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21638v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "assistive-autonomy/assistax"
+  ],
+  "external_repositories": []
+}

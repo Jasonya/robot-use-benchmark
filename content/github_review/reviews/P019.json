@@ -1,0 +1,118 @@
+{
+  "paper_id": "P019",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoBody 官方倉庫主要是資料檔案與視覺化／座標轉換工具；它有真實來源程式，但沒有在此釘選 tree 找到公開 challenge evaluator。",
+  "reading_order": [
+    {
+      "repo": "sanweiliti/EgoBody",
+      "path": "README.md",
+      "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+      "ranges": [
+        [
+          1,
+          90
+        ],
+        [
+          96,
+          185
+        ],
+        [
+          209,
+          263
+        ]
+      ],
+      "why": "資料身份、scene/sequence/subset、欄位與 evaluator 可見範圍"
+    },
+    {
+      "repo": "sanweiliti/EgoBody",
+      "path": "release_renderer_fpv_gaze.py",
+      "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+      "ranges": [
+        [
+          37,
+          46
+        ],
+        [
+          65,
+          77
+        ],
+        [
+          94,
+          109
+        ],
+        [
+          116,
+          137
+        ],
+        [
+          139,
+          157
+        ],
+        [
+          175,
+          183
+        ],
+        [
+          192,
+          198
+        ],
+        [
+          214,
+          220
+        ],
+        [
+          225,
+          237
+        ],
+        [
+          246,
+          260
+        ],
+        [
+          272,
+          278
+        ],
+        [
+          287,
+          301
+        ],
+        [
+          324,
+          332
+        ]
+      ],
+      "why": "split 與 frame 邊界、校準、座標方向與可見性"
+    }
+  ],
+  "environment": "HoloLens 與 Azure Kinect 同步拍攝室內雙人互動。檔案分 125 sequences、36 subjects、15 scenes；環境以 scene_name/mesh 追溯，EgoSet、MVSet、interactee-visible 子集不是三批新場景。",
+  "tasks": "第一人稱觀察互動物件／穿戴者的 3D 人體 pose、shape、motion。Motion-X 的後加文字描述是衍生標註，不能直接視為原版任務或機器人協作成功。",
+  "data": "data_info_release.csv 含 recording_name、body_idx_fpv、start/end_frame、scene_name，data_splits.csv 定義 sequence split。PV 影像名以 timestamp_frame 連 Kinect frame；pv.txt 提供每 frame 的 fx/fy/pv2world，keypoints.npz 有 BODY_25、center、scale；valid_frame 以至少 6 個 OpenPose 關節為可見條件。SMPL/SMPL-X 引數在 master Kinect RGB 座標。",
+  "evaluation": "README 列 MPJPE、PA-MPJPE、V2V、PA-V2V 原作者結果與 challenge 連結；本次沒有取得其精確 scoring 實作，因此不能由渲染器推定對齊／遮罩／單位的評分規則。核讀渲染器確認 Kinect→HoloLens world→PV 變換及 OpenCV/OpenGL Y/Z 翻轉。",
+  "standardization": {
+    "profile": "multiview_human_pose_motion",
+    "reuse": "場景／recording/split 索引、時間同步、有效影格、人體引數與相機轉換流程。",
+    "transform": "scene_name 作 environment 關聯，recording 與人物角色分開；case 保留 timestamp/frame、相機和 body index。EgoSet_interactee 作同源 subset；範圍外 frame 依 start/end 丟棄，另記 valid 遮罩。pose shape profile 保留 SMPL 與 SMPL-X 模型版本。",
+    "missing": "尚未取得註冊後資料與人體模型，亦未執行或取得 challenge evaluator。需補齊原作的關節集合、對齊、可見性與 mesh error 協定，再標可評測。"
+  },
+  "version_note": "README 包含 2022 全模態釋出與 2023 Motion-X 文字擴充；主程式 calibration 路徑多一層 cal_trans，需以實際下載版本核對。讀過視覺化程式不等於重現 README 的 baseline 成績。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "sanweiliti/EgoBody",
+      "path": "README.md",
+      "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+      "sha256": "2784a476bbb7026ece41b61c478d9b3d8a8f3474c76a4872d3e4a37a68a5b29b",
+      "url": "https://github.com/sanweiliti/EgoBody/blob/e3ecbb839d3d7d2fcd758cb311661105975840d1/README.md",
+      "local_file": "audit/.cache/github_review/repos/sanweiliti__EgoBody/files/README.md"
+    },
+    {
+      "repo": "sanweiliti/EgoBody",
+      "path": "release_renderer_fpv_gaze.py",
+      "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+      "sha256": "585629a841cc4ba8e1a8632a9d4adff71fa430d8c94972c840fa4f6b948394a5",
+      "url": "https://github.com/sanweiliti/EgoBody/blob/e3ecbb839d3d7d2fcd758cb311661105975840d1/release_renderer_fpv_gaze.py",
+      "local_file": "audit/.cache/github_review/repos/sanweiliti__EgoBody/files/release_renderer_fpv_gaze.py"
+    }
+  ]
+}

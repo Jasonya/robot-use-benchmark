@@ -1,0 +1,52 @@
+{
+  "paper_id": "P193",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "GRIP有柔性/剛性抓取HDF5結構和Finray視覺化程式；整體10萬姿態與8子集是不同於目前公開Finray範圍的聲明。完整生成/評分pipeline尚未發布。",
+  "reading_order": [
+    {
+      "repo": "BeLl0o/GRIP_Dataset",
+      "commit": "56a45201677d4637467f96ab14937c0caa8c9314",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          35
+        ],
+        [
+          61,
+          100
+        ],
+        [
+          107,
+          188
+        ]
+      ],
+      "why": "原作、公開計畫、object/hand/material階層與成功過濾軌跡"
+    },
+    {
+      "repo": "BeLl0o/GRIP_Dataset",
+      "commit": "56a45201677d4637467f96ab14937c0caa8c9314",
+      "path": "scripts/finray_h5_visualizer.py",
+      "ranges": [
+        [
+          143,
+          227
+        ]
+      ],
+      "why": "真實HDF5路徑、pose/time索引、剛/柔分支與渲染clock"
+    }
+  ],
+  "environment": "IPC柔性–剛性耦合抓取，手型與material分子集；overview記1200objects/100000poses。finray_soft_837與finray_rigid_710可能共用object ID，不直接相加當獨立物件或環境。",
+  "tasks": "抓取及stress-field等下游學習來源；每個pose/手型/材質形成具體抓取設定。雙手/單手子集與物件變體不直接增加語義task。",
+  "data": "HDF5分object_config(密度、Young模數、Poisson比、摩擦)和trajectories(關節/SE3/mesh/contact)。Finray文件稱每H5有20個成功trajectory、每條100frame，前40抓取、後60作重力驗證；是已篩成功的資料，不可從此推未篩候選的成功率。未下載大archive。",
+  "evaluation": "本庫沒有完整生成/失敗判定程式，不能重現10萬候選的過濾率。visualizer有soft分支rajectories/object_points拼字，object_type在README稱類別但程式用rigid判material；contacts文件語義與viewer向量相加用法仍需核定。record_fps24只決定輸出影片，不是simulation timebase。",
+  "standardization": {
+    "profile": "deformable_rigid_grasp_trajectories",
+    "reuse": "object/material參數、pose/time結構、mesh及contact紀錄，作柔性物task/資產來源。",
+    "transform": "用objectUID+hand/material+poseID形成instance，frame作其軌跡；記successful-only選擇條件、未篩樣本來源和力/位置/時間單位；修正或版本化reader而不更改原始bytes。",
+    "missing": "完整/已公開子集manifest、生成/驗收器、失敗資料、HDF5型別/單位實測、viewer路徑和object_type對應。"
+  },
+  "version_note": "固定56a4520；README計畫僅勾Finray，其他子集/生成pipeline未勾，雖寫完整dataset連結仍需依實際發布manifest核對。未把100frames或renderer輸出當獨立case。",
+  "runtime_executed": false
+}

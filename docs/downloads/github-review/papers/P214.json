@@ -1,0 +1,307 @@
+{
+  "paper_id": "P214",
+  "name": "COIN（interactive）",
+  "title": "Chain Of Interaction Benchmark (COIN): When Reasoning meets Embodied Interaction",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2604.16886",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "general"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P214",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "此COIN是2026 Chain of Interaction，與P003的2019影片COIN不同。論文定義90個互動推理task及6類指標，但目前未確認官方GitHub。",
+    "environment": "ManiSkill3/Panda桌面操作，PartNet-Mobility與其他物件資產；5個camera views與depth/segmentation/proprio是觀測設定，不是5環境。",
+    "tasks": "COIN-Primitive20、COIN-Composition20、COIN-50共50，合計90task。原作三種reasoning domains是物件中心、robot理解、組合推理，不直接當生活用途。VQA probes和子任務序列另有層級。",
+    "data": "原文20primitive各50teleop demos共1000，不能當全90task都各50demo。兩action space：VLA delta EEF+gripper；CodeAsPolicy7joint absolute+gripper。完整case/split、teleop原檔及scorer尚未取得。",
+    "evaluation": "原文SR、CSR、VQA score、trajectory stability(TS)、gripper stability(GS)、GCS=SRcomposition/SRprimitive；TS使用速度/加速度/jerk變異係數的指數分項，GS有預期切換次數等依賴。缺code時不能核對零分母、取樣頻率與穩定性實作，也不能把TS/GS當物理安全。",
+    "standardization": {
+      "profile": "interactive_reasoning_manipulation_and_qa",
+      "reuse": "90task三層設計、部分可觀測互動、兩種policy動作界面與6類原作指標。",
+      "transform": "task維持原生20/20/50集合；case分清操控、subtask planning與VQA，固定camera/segmentation是否合法、action轉換和score版本；新規則另列衍生關係。",
+      "missing": "官方repo/全部task與示範/合法split、動作轉換、TS/GS/GCS精確grader與原生baseline。"
+    },
+    "version_note": "2604.16886v1；原文引用ERQA、MuJoCoAR等他作repo不是此COIN code。原作名稱同P003但題名/ID/資料皆不同，維持獨立source。",
+    "runtime_executed": false,
+    "identity_note": "P214=Chain Of Interaction (2026)；P003=COIN instructional video dataset (2019)。",
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2604.16886",
+      "pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c",
+      "paper_pages_read": [
+        4,
+        6
+      ],
+      "search_receipts": [
+        "audit/.cache/github_review/search/P214-refined.json",
+        "audit/.cache/github_review/search/P214.json"
+      ]
+    },
+    "reading_order": [],
+    "review_sha256": "6b046b48eda1a69ed9d337490f7acf3013667b3662549a90ad65dce9d9ed5abe"
+  },
+  "repository_binding_review_sha256": "6b046b48eda1a69ed9d337490f7acf3013667b3662549a90ad65dce9d9ed5abe",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P214",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "COIN（Chain Of Interaction），arXiv 2604.16886v1；不同於P003 COIN影片資料。",
+    "scope_read": "90tasks分層、ManiSkill3規格、1000demo、六metrics、10trials及不同model inputs。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      15
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業"
+    ],
+    "role": "互動推理與操作benchmark",
+    "environment": "ManiSkill3桌面Panda，PartNet/Sketchfab等assets；3reasoning domains是能力類別，不是生活用途。",
+    "tasks": "20Primitive＋20Composition＋50interactive reasoning＝90task definitions；含partialobservability下互動取得資訊。",
+    "cases": "Primitive每task50demo＝1,000trajectories、5views；主SR平均10trials，views不把traj變五倍。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "task definitions across three suites",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "Primitive demonstrations",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "SR evaluation trials",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "SR/類別SR、VQA、trajectory/gripper穩定、Composition/Primitive success ratio；六metrics分母不同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "VLA在Primitive fine-tune、validationSR選checkpoint；model用1/3views不同，Voxposer有GTobjectlist，需保留資訊條件。",
+    "lineage": "ManiSkill3資產與task擴充；expertVQA看示範不等於執行時在線推理成績。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          15
+        ],
+        "locator": "§3–4、human evaluation appendix",
+        "supports": "90/1000/10、sixmetrics、subset及modelinputs"
+      }
+    ],
+    "unresolved": [
+      "人類只10task代表subset、3people×2trials；不可把40%sim/100%real當全50task人類上限。"
+    ],
+    "reuse": "可借Primitive→composition→interactivegoal的父子關係；我們的規模優勢需超出這種單桌面推理範圍。",
+    "reviewed_pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c",
+    "reviewed_on": "2026-10-02",
+    "name": "COIN（interactive）",
+    "year": 2026,
+    "title": "Chain Of Interaction Benchmark (COIN): When Reasoning meets Embodied Interaction",
+    "source_url": "https://arxiv.org/abs/2604.16886",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "food",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用",
+      "跨域控制"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P214",
+      "summary": "開櫃、找書、操作微波爐都有可辨認用途；純互動推理與幾何控制題保留在通用作業。",
+      "evidence": [
+        {
+          "paper_id": "P214",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            20,
+            23
+          ],
+          "locator": "Appendix H.2任務表",
+          "observed_tasks": [
+            "Open-Drawer／Open-Cabinet",
+            "Open-Microwave／Close-Microwave",
+            "FindBook-FromShelf"
+          ],
+          "reasoning": "收納取物、設備使用及餐飲器具操作可從task ID與goal直接歸納。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c"
+        },
+        {
+          "paper_id": "P214",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            4,
+            17
+          ],
+          "locator": "§3.2、Appendix H.2",
+          "observed_tasks": [
+            "根據互動取得隱藏資訊，再調整操作",
+            "object-centric／robot-centric／compositional reasoning"
+          ],
+          "reasoning": "抽象的物件／本體控制題有明確作業目標，歸入跨場域基礎作業。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c"
+        }
+      ],
+      "domain_ids": [
+        "home",
+        "food",
+        "general"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process",
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P214",
+      "name": "COIN（interactive）",
+      "expected_title": "Chain Of Interaction Benchmark (COIN): When Reasoning meets Embodied Interaction",
+      "source_url": "https://arxiv.org/abs/2604.16886",
+      "pdf_url": "https://arxiv.org/pdf/2604.16886",
+      "retrieved_at": "2026-10-02T21:35:10.459123+00:00",
+      "pdf_sha256": "0e8f4586f184eb25ae2bd4bc596b3385b4e27319784a61dfa8c67bd98ba07f3c",
+      "text_sha256": "55c52e78db272b87abad1bc5974341809a32c8d3c1b786dc9e3ca580eda59ecd",
+      "pdf_bytes": 25700034,
+      "pages": 30,
+      "text_characters": 78969,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2604.16886v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2604.16886v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "task definitions across three suites",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P214:1",
+        "paper_id": "P214",
+        "benchmark": "COIN（interactive）",
+        "native_term": "task definitions across three suites",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.16886v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.16886v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "Primitive demonstrations",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P214:2",
+        "paper_id": "P214",
+        "benchmark": "COIN（interactive）",
+        "native_term": "Primitive demonstrations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.16886v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.16886v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "SR evaluation trials",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P214:3",
+        "paper_id": "P214",
+        "benchmark": "COIN（interactive）",
+        "native_term": "SR evaluation trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.16886v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.16886v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

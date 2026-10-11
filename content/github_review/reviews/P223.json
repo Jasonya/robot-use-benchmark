@@ -1,0 +1,505 @@
+{
+  "paper_id": "P223",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "精確INSIGHT舊網址已轉址至iLearn-Lab/AAAI26-INSIGHT；已讀feature reader、stage1分類、具體序列ED與GRPO reward。ED只平均有GT對應的prediction records、沒有強制五候選或20步；另有reader語法錯誤及reward/plugin命名缺口，尚不能直接執行完整流程。",
+  "identity_note": "論文為 Intention-Guided Cognitive Reasoning for Egocentric Long-Term Action Anticipation，Qiaohui Chu、Haoyu Zhang、Meng Liu、Yisen Feng、Haoxiang Shi、Liqiang Nie；cached PDF為arXiv:2508.01742v2（2025-11-15），第1頁直接指向CorrineQiu/INSIGHT。GitHub metadata依repository ID轉址後full_name為iLearn-Lab/AAAI26-INSIGHT，README題名/作者與AAAI26引用一致；這是搬移別名，不是另一篇同名專案。 舊入口CorrineQiu/INSIGHT的已保存GitHub metadata回應指向iLearn-Lab/AAAI26-INSIGHT，按倉庫別名保留，不另外算成未讀的第二個倉庫。",
+  "environment": "離線人類第一人稱影片，Ego4D-v2 LTA及EPIC-Kitchens-55／EGTEA Gaze+；stage1讀full-frame與hand-object區域的預抽特徵。不存在可供policy rollout的互動環境。",
+  "tasks": "stage1是verb/noun action recognition，stage2產生think/intention/answer文字與未來verb-noun序列。Ego4D論文協定觀測8個action segments、預測5條各20個action的序列；8不是8張frame。EK55/EGTEA則預測影片前25/50/75%之後會出現的verb集合，報All/Freq/Rare mAP，不是同一ED題型。",
+  "data": "ActionDataset按train.json／val.json／fho_lta_test_unannotated.json的clips分組clip_uid，再依action_idx排序；長clip切window_size=8、stride=1重疊視窗，短clip逐action成例。每action讀split/<clip_uid>_<action_idx>.pt兩路特徵，標籤verb_label/noun_label；缺feature會使不完整視窗被捨棄。main配置input_dim=1408、117 verb／521 noun，collate再攤平視窗，因此同action可能重複計數。reader未提供原影格時間/fps/feature取樣manifest；test就算is_test=True仍會在getitem讀mask feature。stage2依外部ms-swift chat JSONL，messages assistant含<answer>與<intention>，images提供路徑；cal_ED把images[0]父目錄當clip_uid，GT同ID會覆寫。pred JSONL用clip_uid、res_list；沒有公開的完整stage1→chat/prediction轉換與split資產。",
+  "evaluation": "stage1 train/validate是分類正確action occurrences除以flattened有效標籤數×100；main的co-occurrence validation在各top5 verb/noun組閤中挑raw_cooccurrence>0且機率乘積最大的pair。prior缺檔時只由train建立，但重疊視窗會重複action。cal_ED以逗號分動作、第一個詞為verb，其餘為noun；保留大小寫，不做taxonomy ID校驗。具體DP允許插入/刪除/替換及相鄰交換（受限交換遞迴，未證明與官方Damerau實作等價）。對每條res_list候選截至GT長度L，分別取最小action/verb/noun距離，三項可來自不同候選，再各除L、最後按處理到的prediction records平均。候選數不強制5、L不強制20；缺GT的prediction被跳過，完全缺prediction的GT不進分母，重複prediction ID可重複計數，L=0給0，空res_list會使min失敗。reward不是此ED：只接受兩個英文字token的pair並lowercase，至少20對才開gate，內容分數分母固定20；intention為MiniLM cosine經β=0.8、γ=40 sigmoid映射，R=gate×(0.85內容+0.05意圖+0.05語言+0.05格式)，shell再以0.9此R+0.1外部soft_overlong組合。意圖reward不是意圖分類accuracy；EK55/EGTEA的All/Freq/Rare mAP scorer未在此版本公開。",
+  "standardization": {
+    "profile": "offline_long_term_action_sequences_and_intention_reward",
+    "reuse": "保留clip/action身份、兩路feature schema、stage1 taxonomy與train-only co-occurrence規格、離線ED的實際parser/DP，以及reward各分量。公開來源以canonical repo記錄並保留舊alias。",
+    "transform": "分開source、action-occurrence、8-action context window、20-action forecast case與多候選輸出；case鍵應包含clip_uid+最後觀測action_idx，不能只用image父目錄。evaluator分列stage1 accuracy、各自best-of-K normalized ED、intention相似度reward及論文mAP；保留實際K、L、分母、缺失/重複UID與大小寫/多詞noun策略。",
+    "missing": "完整annotation/features與chat生成/預測腳本、8→20對齊及五候選驗證；需對所有GT補齊失敗case並核驗官方ED一致性。靜態ast.parse確認HandObject/dataset.py第25行assert末尾逗號造成SyntaxError；plugin匯入my_rewards_new_intention但樹只有my_rewards_intention.py，shell指plugin_new_in_log_intention.py但樹只有plugin_in_log_intention.py；reward使用nullcontext卻未匯入。需修正這些執行缺口及補EK55/EGTEA mAP實作。"
+  },
+  "version_note": "commit ab9495968b80ccae7a905ecb663a9d101873cf75（canonical iLearn-Lab/AAAI26-INSIGHT）。read-only靜態解析沒有匯入/執行上游程式；全部模型、ms-swift與MiniLM均未運行。README稱完整兩階段，但本輪只核讀所列來源段，未認定論文分數可重現。",
+  "additional_repo_proposals": [
+    {
+      "requested_repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "replaces_alias": "CorrineQiu/INSIGHT",
+      "role": "official_code_redirect",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "reason": "cached GitHub metadata轉址、精確README身份一致；請母代理整合別名，勿重複計repo。"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "kind": "cached_primary_paper",
+      "url": "https://arxiv.org/pdf/2508.01742",
+      "pdf_sha256": "9f24b3c9a32723d7e7f0dee73b74c2d242de43febba9e3a549c23acd8e549e09",
+      "local_file": "audit/.cache/fulltext_review/P223/pages.json",
+      "sha256": "e92acd7b3ab08d338660f331d9bea0ce55a91db550c1e590faf8541d066ffc63",
+      "json_pointers": [
+        "/0/text",
+        "/4/text",
+        "/8/text"
+      ],
+      "finding": "精確paper/code連結、8-context/20-step/5-sequence、EK55/EGTEA horizon-mAP及reward權重。"
+    },
+    {
+      "kind": "cached_github_repository_redirect",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/manifest.json",
+      "sha256": "d12601c132c0421871ca85970aff37d55f554a77763f72ecbc5004061f098a88",
+      "finding": "requested alias與canonical full_name、同一repository ID及固定commit已核對。",
+      "json_pointers": [
+        "/requested_repo",
+        "/metadata_receipt",
+        "/resolved_repo",
+        "/commit"
+      ]
+    },
+    {
+      "kind": "pinned_repository_tree",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/tree.json",
+      "sha256": "13c6036b0e7d207421014daaf7825a8dcb8f8155c6defc5bed2b39ce8787f16c",
+      "finding": "完整樹驗證可用plugin/reward檔名，沒有額外EK55/EGTEA mAP程式。",
+      "json_pointers": [
+        "/tree",
+        "/truncated"
+      ]
+    }
+  ],
+  "reading_order": [
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/README.md",
+      "sha256": "6d8f8b1d3240f3b71c0e20d67d45fd5d835201e3d2e41b0b5680d61a722909eb",
+      "ranges": [
+        [
+          1,
+          36
+        ],
+        [
+          123,
+          140
+        ],
+        [
+          146,
+          172
+        ],
+        [
+          204,
+          223
+        ]
+      ],
+      "why": "核對精確論文身份、兩階段範圍與外部特徵依存。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/README.md",
+      "git_blob_sha": "31a53903ea524a61683770f2538572639d3b94a1"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/README.md",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/HandObject/README.md",
+      "sha256": "867548fc563c65067569e417c980a482554ae02b3e2eb604f98c506d49c59df6",
+      "ranges": [
+        [
+          1,
+          31
+        ],
+        [
+          43,
+          70
+        ]
+      ],
+      "why": "確認feature與annotation檔案命名、stage1輸出用途。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/README.md",
+      "git_blob_sha": "682f6338d656ba8a18c028a04afbac56131a720f"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/HandObject/dataset.py",
+      "sha256": "3a0640b207a474b1b12c3a7a42183649a0bf1b497678a863551efd35d3b94669",
+      "ranges": [
+        [
+          10,
+          134
+        ]
+      ],
+      "why": "讀clip/action_idx視窗、資料過濾與實際feature載入；第25行語法錯誤已靜態確認。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/dataset.py",
+      "git_blob_sha": "c6f8ea31895d1ff68d5d81400678a2dd76e838aa"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/main.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/HandObject/main.py",
+      "sha256": "d69ef85ff387c5aa1e4a621c66dad91854c657121fd59e7ba69f6a90bce65353",
+      "ranges": [
+        [
+          30,
+          113
+        ],
+        [
+          126,
+          213
+        ],
+        [
+          350,
+          427
+        ]
+      ],
+      "why": "追到flattened action分母、co-occurrence重排、train-only prior與val/test設定。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/main.py",
+      "git_blob_sha": "e3233e67b939a0a4d2a3e72d518e4e119dbc622c"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/train.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/HandObject/train.py",
+      "sha256": "ddf3fff13a0eb2c96b836155e4fd9c16e52312c839fb79d99a6d3056d8502350",
+      "ranges": [
+        [
+          14,
+          105
+        ]
+      ],
+      "why": "區分stage1分類accuracy與長期序列評測。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/train.py",
+      "git_blob_sha": "12a5da648b699741cb14bc4fea5402d92f58bdd8"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/README.md",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/README.md",
+      "sha256": "fc3600c33a17642e72a79aa1d99714709b5e789aba9081328f6d2aa2896db288",
+      "ranges": [
+        [
+          1,
+          43
+        ],
+        [
+          65,
+          70
+        ]
+      ],
+      "why": "確認chat標籤schema及GRPO reward與離線ED分工。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/README.md",
+      "git_blob_sha": "bf7dff5353d0963222f810df9c2260c8982d2ded"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/cal_ED.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/CognitiveReasoning/cal_ED.py",
+      "sha256": "79d36681e23c5199b2ad4c19a5fb9b5b7b1384134b6f24b7a7ffeee3f70becf4",
+      "ranges": [
+        [
+          8,
+          159
+        ]
+      ],
+      "why": "核對實際字串parser、相鄰交換DP、best候選、GT長度分母與缺失case處理。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/cal_ED.py",
+      "git_blob_sha": "0fd5d22d0d090332fa2f7378db7ebfb80fab7df4"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/my_rewards_intention.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/my_rewards_intention.py",
+      "sha256": "c82f3182cfa74382a2d7383803e9d74971677b838d16d041a212d87cb3cb966a",
+      "ranges": [
+        [
+          2,
+          15
+        ],
+        [
+          22,
+          105
+        ],
+        [
+          149,
+          217
+        ],
+        [
+          220,
+          318
+        ]
+      ],
+      "why": "具體reward：20-pair gate、ED/20、MiniLM intention sigmoid、格式與語言項。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/my_rewards_intention.py",
+      "git_blob_sha": "e9800475cfda315ba3eaf7b6efe88f32a4e74da2"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/plugin_in_log_intention.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/plugin_in_log_intention.py",
+      "sha256": "a1dc6a175360df491e5d2ff31a151b940b29829a14876caf10c3b4c494aaabe6",
+      "ranges": [
+        [
+          1,
+          20
+        ],
+        [
+          665,
+          677
+        ]
+      ],
+      "why": "核對reward registry及與實際檔名不同的my_rewards_new_intention匯入。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/plugin_in_log_intention.py",
+      "git_blob_sha": "b1a4f4135ce56f053ca78043ae8d37f68db19035"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/run_external_reward_func_7B_qwen_intention.sh",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/run_external_reward_func_7B_qwen_intention.sh",
+      "sha256": "ad992e0c2e0b448b93f3b5cc2f4bd6804bb1b3a1a389fda9e0f2470b62f877ee",
+      "ranges": [
+        [
+          6,
+          42
+        ]
+      ],
+      "why": "確認GRPO五個generation、0.9/0.1權重與尚未具體化的data/plugin路徑。",
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/run_external_reward_func_7B_qwen_intention.sh",
+      "git_blob_sha": "5fd3ae01683b7793626314a5c77ab4ae961cfce8"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/README.md",
+      "sha256": "6d8f8b1d3240f3b71c0e20d67d45fd5d835201e3d2e41b0b5680d61a722909eb",
+      "ranges": [
+        [
+          1,
+          36
+        ],
+        [
+          123,
+          140
+        ],
+        [
+          146,
+          172
+        ],
+        [
+          204,
+          223
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/README.md",
+      "git_blob_sha": "31a53903ea524a61683770f2538572639d3b94a1"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/README.md",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/HandObject/README.md",
+      "sha256": "867548fc563c65067569e417c980a482554ae02b3e2eb604f98c506d49c59df6",
+      "ranges": [
+        [
+          1,
+          31
+        ],
+        [
+          43,
+          70
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/README.md",
+      "git_blob_sha": "682f6338d656ba8a18c028a04afbac56131a720f"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/HandObject/dataset.py",
+      "sha256": "3a0640b207a474b1b12c3a7a42183649a0bf1b497678a863551efd35d3b94669",
+      "ranges": [
+        [
+          10,
+          134
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/dataset.py",
+      "git_blob_sha": "c6f8ea31895d1ff68d5d81400678a2dd76e838aa"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/main.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/HandObject/main.py",
+      "sha256": "d69ef85ff387c5aa1e4a621c66dad91854c657121fd59e7ba69f6a90bce65353",
+      "ranges": [
+        [
+          30,
+          113
+        ],
+        [
+          126,
+          213
+        ],
+        [
+          350,
+          427
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/main.py",
+      "git_blob_sha": "e3233e67b939a0a4d2a3e72d518e4e119dbc622c"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "HandObject/train.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/HandObject/train.py",
+      "sha256": "ddf3fff13a0eb2c96b836155e4fd9c16e52312c839fb79d99a6d3056d8502350",
+      "ranges": [
+        [
+          14,
+          105
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/HandObject/train.py",
+      "git_blob_sha": "12a5da648b699741cb14bc4fea5402d92f58bdd8"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/README.md",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/README.md",
+      "sha256": "fc3600c33a17642e72a79aa1d99714709b5e789aba9081328f6d2aa2896db288",
+      "ranges": [
+        [
+          1,
+          43
+        ],
+        [
+          65,
+          70
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/README.md",
+      "git_blob_sha": "bf7dff5353d0963222f810df9c2260c8982d2ded"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/cal_ED.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__INSIGHT/files/CognitiveReasoning/cal_ED.py",
+      "sha256": "79d36681e23c5199b2ad4c19a5fb9b5b7b1384134b6f24b7a7ffeee3f70becf4",
+      "ranges": [
+        [
+          8,
+          159
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/cal_ED.py",
+      "git_blob_sha": "0fd5d22d0d090332fa2f7378db7ebfb80fab7df4"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/my_rewards_intention.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/my_rewards_intention.py",
+      "sha256": "c82f3182cfa74382a2d7383803e9d74971677b838d16d041a212d87cb3cb966a",
+      "ranges": [
+        [
+          2,
+          15
+        ],
+        [
+          22,
+          105
+        ],
+        [
+          149,
+          217
+        ],
+        [
+          220,
+          318
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/my_rewards_intention.py",
+      "git_blob_sha": "e9800475cfda315ba3eaf7b6efe88f32a4e74da2"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/plugin_in_log_intention.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/plugin_in_log_intention.py",
+      "sha256": "a1dc6a175360df491e5d2ff31a151b940b29829a14876caf10c3b4c494aaabe6",
+      "ranges": [
+        [
+          1,
+          20
+        ],
+        [
+          665,
+          677
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/plugin_in_log_intention.py",
+      "git_blob_sha": "b1a4f4135ce56f053ca78043ae8d37f68db19035"
+    },
+    {
+      "provider": "github",
+      "repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "commit": "ab9495968b80ccae7a905ecb663a9d101873cf75",
+      "path": "CognitiveReasoning/run_external_reward_func_7B_qwen_intention.sh",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/iLearn-Lab__AAAI26-INSIGHT/CognitiveReasoning/run_external_reward_func_7B_qwen_intention.sh",
+      "sha256": "ad992e0c2e0b448b93f3b5cc2f4bd6804bb1b3a1a389fda9e0f2470b62f877ee",
+      "ranges": [
+        [
+          6,
+          42
+        ]
+      ],
+      "url": "https://github.com/iLearn-Lab/AAAI26-INSIGHT/blob/ab9495968b80ccae7a905ecb663a9d101873cf75/CognitiveReasoning/run_external_reward_func_7B_qwen_intention.sh",
+      "git_blob_sha": "5fd3ae01683b7793626314a5c77ab4ae961cfce8"
+    }
+  ],
+  "runtime_executed": false,
+  "repository_aliases": [
+    {
+      "repo": "CorrineQiu/INSIGHT",
+      "canonical_repo": "iLearn-Lab/AAAI26-INSIGHT",
+      "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+      "evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/CorrineQiu/INSIGHT",
+          "retrieved_at": "2026-10-10T07:44:52.591108+00:00",
+          "status": 200,
+          "resolved_url": "https://api.github.com/repositories/1092230028",
+          "content_type": "application/json; charset=utf-8",
+          "bytes": 6666,
+          "sha256": "5eaafb34f74d94d1e1001da53e576aefbf01214ac210de875962bd1d206a5379"
+        }
+      ]
+    }
+  ]
+}

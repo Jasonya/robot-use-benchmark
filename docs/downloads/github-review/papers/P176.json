@@ -1,0 +1,496 @@
+{
+  "paper_id": "P176",
+  "name": "AutoBio",
+  "title": "AutoBio: A Simulation and Benchmark for Robotic Automation in Digital Biology Laboratory",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2505.14030",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "lab"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P176",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "AutoBio初步版有真實task/evaluator程式與LeRobot資料；MuJoCo和Blender是同任務的兩種渲染版本。必須保留render lineage與各task具體量測，不能只拿生成影片數當題數。",
+    "environment": "MuJoCo生物實驗室資產與Blender Cycles外觀渲染；pipette例為雙UR5e和靈巧手/夾爪。physics scene、相機和render edition分別記錄，Blender不另增物理環境。",
+    "tasks": "當前factory接受13個原生task名稱，README列9種dataset各有MuJoCo/Blender版本；這兩個範圍不是同一清單。原子操作與完整儀器任務需要按原作版本對照；pickup匯入模組未在固定tree找到。",
+    "data": "LeRobot v2.0每episode parquet與videos，meta包含episodes/info/stats/tasks；README影片224²@50fps。runtime使用observation/state、影像與prompt，task_info指定state_indices/action_indices/camera_mapping。RDT資料用fps建立action/history timestamps並保存缺影像mask；不可將補0當真實sensor。",
+    "evaluation": "每action保持10個MuJoCo physics步，chunk外檢查time_limit/early_stop，可能超出名義budget到chunk末；不健康模擬回False。pipette checker追蹤tip入液麵、拇指命令變化與最後抬離液麵，未直接對抽取體積作容差檢查。history deque追加qpos未明確copy，也需驗證歷史狀態是否別名。",
+    "standardization": {
+      "profile": "laboratory_simulation_with_render_variants",
+      "reuse": "明確task/serializer/factory、LeRobot結構、paired renderer來源、具體task checker與seed協定。",
+      "transform": "source+task+episode為底層ID，render variant作observation版本；case固定physics/action時間、joint順序、初態及scorer；量化體積/精度可作新增規則，保持原版可比。",
+      "missing": "preliminary版本缺件、13factory與原作task清單對齊、完整資產/資料、command/state normalizer、history/budget驗證與全部task重現。"
+    },
+    "version_note": "固定0850421，README明列Preliminary Version。未安裝MuJoCo/Blender或執行policy；未將renderer份數當新任務或獨立示範。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "autobio-bench/AutoBio",
+        "requested_repo": "autobio-bench/AutoBio",
+        "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 104,
+        "sha256": "4f4b68cb37b777f412488b5cc7b421a2b3b880bf088e97252926cf42837d6ae9",
+        "url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/README.md",
+        "reading_url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/README.md#L1-L80",
+        "why": "preliminary身分、9類資料的兩種render與LeRobot2.0",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "autobio-bench/AutoBio",
+        "requested_repo": "autobio-bench/AutoBio",
+        "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+        "ref": null,
+        "path": "autobio/task.py",
+        "ranges": [
+          [
+            16,
+            83
+          ],
+          [
+            90,
+            146
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 146,
+        "sha256": "0519a13c6efd39a2acd7d49292c49e75e4e50f7aa903a2eda9f03e517ff83edb",
+        "url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/task.py",
+        "reading_url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/task.py#L16-L83",
+        "why": "task factory原生名稱、state/step/serializer接口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "autobio-bench/AutoBio",
+        "requested_repo": "autobio-bench/AutoBio",
+        "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+        "ref": null,
+        "path": "autobio/evaluate.py",
+        "ranges": [
+          [
+            18,
+            21
+          ],
+          [
+            43,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 100,
+        "sha256": "6149ec311dbc6824e13793a02cd70e7eca221828fe89f3d36db57fcdc15fab19",
+        "url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/evaluate.py",
+        "reading_url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/evaluate.py#L18-L21",
+        "why": "master seed生成每episode seed、結果bool列表",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "autobio-bench/AutoBio",
+        "requested_repo": "autobio-bench/AutoBio",
+        "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+        "ref": null,
+        "path": "autobio/evaluator.py",
+        "ranges": [
+          [
+            174,
+            266
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 266,
+        "sha256": "845eb2a877289184b0ef4c119e2108e1c07d917a7b2761ad12cc92f8c19e80b6",
+        "url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/evaluator.py",
+        "reading_url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/evaluator.py#L174-L266",
+        "why": "合法觀測、10physics步/action、健康/時間/成功條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "autobio-bench/AutoBio",
+        "requested_repo": "autobio-bench/AutoBio",
+        "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+        "ref": null,
+        "path": "autobio/mani_pipette.py",
+        "ranges": [
+          [
+            132,
+            239
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 346,
+        "sha256": "35c64f2b2c2965169fe9d2072576523cbeae69aad0c8fae5509aee7b42ebfa3e",
+        "url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/mani_pipette.py",
+        "reading_url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/autobio/mani_pipette.py#L132-L239",
+        "why": "雙UR5e task_info、初態、液麵/操作條件的具體checker",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "autobio-bench/AutoBio",
+        "requested_repo": "autobio-bench/AutoBio",
+        "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+        "ref": null,
+        "path": "RoboticsDiffusionTransformer/data/lerobot_vla_dataset.py",
+        "ranges": [
+          [
+            12,
+            45
+          ],
+          [
+            181,
+            240
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 250,
+        "sha256": "5ca4ca481cd6fc67dcf86c2deebbf22004047028e73cd389442f5f8f65aad90f",
+        "url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/RoboticsDiffusionTransformer/data/lerobot_vla_dataset.py",
+        "reading_url": "https://github.com/autobio-bench/AutoBio/blob/08504213356cbfe9a82bcd33a43cd282945a45df/RoboticsDiffusionTransformer/data/lerobot_vla_dataset.py#L12-L45",
+        "why": "FPS相對timestamp、圖像history/padding、state/action正規化",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "9c0cbc5bd6b7ffd8f96ebb77c2bddebfb313bcf8e3f009872ec962fbe34513b6"
+  },
+  "repository_binding_review_sha256": "9c0cbc5bd6b7ffd8f96ebb77c2bddebfb313bcf8e3f009872ec962fbe34513b6",
+  "repository_bindings": [
+    {
+      "requested_repo": "autobio-bench/AutoBio",
+      "resolved_repo": "autobio-bench/AutoBio",
+      "aliases_in_this_review": [
+        "autobio-bench/autobio"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "08504213356cbfe9a82bcd33a43cd282945a45df",
+          "reviewed_files": [
+            "README.md",
+            "RoboticsDiffusionTransformer/data/lerobot_vla_dataset.py",
+            "autobio/evaluate.py",
+            "autobio/evaluator.py",
+            "autobio/mani_pipette.py",
+            "autobio/task.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/autobio-bench/AutoBio",
+          "pdf_page": 1,
+          "pdf_sha256": "987d557fe26642e96a1d4c9b3021c3d373717d4a5bc3f9eae48b5bc9de84df91",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P176",
+          "review_file": "content/github_review/reviews/P176.json",
+          "review_sha256": "9c0cbc5bd6b7ffd8f96ebb77c2bddebfb313bcf8e3f009872ec962fbe34513b6",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "實驗室操作"
+  ],
+  "source_review": {
+    "paper_id": "P176",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "AutoBio，arXiv 2505.14030v3。",
+    "scope_read": "特殊儀器physics/render、16task與9實測subset、100episode與mixed metric。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "MuJoCo/Blender，single/dual-arm工作站；Aloha及UR5e不同end-effectors。",
+    "tasks": "16定義分3difficulty levels；實驗每level3項，共9tasks，非全部16。",
+    "cases": "9tasks各100demo＝900train、792K+frames；每task100eval episodes、3runs。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "task definitions",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "實驗task子集",
+        "qualifier": "3levels×3tasks",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 900,
+        "unit": "train demonstrations",
+        "qualifier": "9×100",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task eval episodes／run",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "大多binary success；thermal mixer panel用relative progress，平均表不全是success percentage。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "20/100demo資料規模比較；held-out初態參數泛化；render兩版本共享軌跡。",
+    "lineage": "實驗室asset digitization；quasi-static liquid不模擬波/倒水，DexHand主要只控制thumb作簡化gripper。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "Physics plugins、§4–5、表3",
+        "supports": "16vs9、900/100、液體/hand簡化"
+      }
+    ],
+    "unresolved": [
+      "16task的全部IDs与模型可用support需最終code核；不要把9task成績外推全16。"
+    ],
+    "reuse": "補螺紋、旋鈕、顯示面板與精度規則；光學外觀逼真不能替代完整材料動力學。",
+    "reviewed_pdf_sha256": "987d557fe26642e96a1d4c9b3021c3d373717d4a5bc3f9eae48b5bc9de84df91",
+    "reviewed_on": "2026-10-02",
+    "name": "AutoBio",
+    "year": 2025,
+    "title": "AutoBio: A Simulation and Benchmark for Robotic Automation in Digital Biology Laboratory",
+    "source_url": "https://arxiv.org/abs/2505.14030",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "lab"
+    ],
+    "review_tags": [
+      "實驗室操作"
+    ],
+    "domain_names": [
+      "實驗室操作"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P176",
+      "domain_ids": [
+        "lab"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P176",
+          "domain_ids": [
+            "lab"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "16定義分3difficulty levels；實驗每level3項，共9tasks，非全部16。",
+            "MuJoCo/Blender，single/dual-arm工作站；Aloha及UR5e不同end-effectors。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "987d557fe26642e96a1d4c9b3021c3d373717d4a5bc3f9eae48b5bc9de84df91"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "987d557fe26642e96a1d4c9b3021c3d373717d4a5bc3f9eae48b5bc9de84df91",
+      "previous_domain_ids": [
+        "lab"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P176",
+      "name": "AutoBio",
+      "expected_title": "AutoBio: A Simulation and Benchmark for Robotic Automation in Digital Biology Laboratory",
+      "source_url": "https://arxiv.org/abs/2505.14030",
+      "pdf_url": "https://arxiv.org/pdf/2505.14030",
+      "retrieved_at": "2026-10-02T21:34:46.257708+00:00",
+      "pdf_sha256": "987d557fe26642e96a1d4c9b3021c3d373717d4a5bc3f9eae48b5bc9de84df91",
+      "text_sha256": "f77b54bd3629064cc2fafd2ab6426fb868ff35a1a2f93931664a63bd45c951c1",
+      "pdf_bytes": 18837548,
+      "pages": 19,
+      "text_characters": 69070,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2505.14030v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2505.14030v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "task definitions",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P176:1",
+        "paper_id": "P176",
+        "benchmark": "AutoBio",
+        "native_term": "task definitions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.14030v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.14030v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "實驗task子集",
+        "qualifier": "3levels×3tasks",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P176:2",
+        "paper_id": "P176",
+        "benchmark": "AutoBio",
+        "native_term": "實驗task子集",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.14030v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.14030v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 900,
+        "unit": "train demonstrations",
+        "qualifier": "9×100",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P176:3",
+        "paper_id": "P176",
+        "benchmark": "AutoBio",
+        "native_term": "train demonstrations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.14030v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.14030v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task eval episodes／run",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P176:4",
+        "paper_id": "P176",
+        "benchmark": "AutoBio",
+        "native_term": "每task eval episodes／run",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.14030v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.14030v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "autobio-bench/AutoBio"
+  ],
+  "external_repositories": []
+}

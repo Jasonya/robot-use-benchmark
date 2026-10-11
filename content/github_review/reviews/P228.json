@@ -1,0 +1,113 @@
+{
+  "paper_id": "P228",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "SFHand／EgoHaFL 有可讀取的手部串流預測資料與 evaluator；目前 README 仍把 Franka Kitchen 評測與 3D 標註產生程式列為 Coming soon。已沿 loader→stream→模型輸入→matching→metric 查核，將人體預測與機器人實作分開。",
+  "reading_order": [
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          92
+        ]
+      ],
+      "why": "確認原生資料來自 Ego4D v1，發布範圍與未發布元件。"
+    },
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "configs/config/clip_base_eval.yml",
+      "ranges": [
+        [
+          1,
+          42
+        ]
+      ],
+      "why": "固定 test CSV、clip 長度、max_hand 與深度有效範圍。"
+    },
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "dataset/egodataset.py",
+      "ranges": [
+        [
+          20,
+          194
+        ]
+      ],
+      "why": "讀取 clip／caption／LMDB、16-frame 子取樣、深度篩選與最多 10 手的截斷。"
+    },
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "engine_pretrain.py",
+      "ranges": [
+        [
+          90,
+          288
+        ]
+      ],
+      "why": "追蹤每步新增影像、autoregressive hand state、matching-only 分母與誤差。"
+    },
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "model/matcher.py",
+      "ranges": [
+        [
+          21,
+          92
+        ]
+      ],
+      "why": "確認 Hungarian 一對一匹配只保留 min(predictions,targets) 對。"
+    },
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "model/clip.py",
+      "ranges": [
+        [
+          274,
+          317
+        ]
+      ],
+      "why": "核對名為 future 的參數在這個 forward 中沒有被使用，避免憑變數名誤判。"
+    },
+    {
+      "repo": "ut-vision/SFHand",
+      "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+      "path": "main.py",
+      "ranges": [
+        [
+          135,
+          164
+        ]
+      ],
+      "why": "查核 distributed 包裝、eval 儲存的原生統計。"
+    }
+  ],
+  "environment": "Ego4D v1 真實活動短片／自動 MANO 標註；EgoHaFL 為衍生 annotations，不是 247K 個模擬環境。Franka Kitchen 下游環境須追到父 benchmark，公開源碼尚未完整涵蓋。",
+  "tasks": "串流、語言引導的 hand type／2D box／3D pose／3D trajectory 四類輸出，共用同一 clip。每步餵入截至當下的新影像，hand state 由前次預測接續；不是一次只看首幀的全盲長期預測。",
+  "data": "論文報告約 247K 個 3 秒 clips（242K train／5K test）、每 clip 16 個 annotated frames，約 3.95M 標註幀；不是 3.95M 獨立問題。eval config clip_length=8、max_hand=10、camera depth 0<z<2.5。loader 保留前 10 個有效 hand，LMDB uid／video_id／start/end／caption 與 native split 一起保存。",
+  "evaluation": "Hungarian matching 後，以 IoU>−1／0.5 及手別正確篩選，再計 camera translation ADE／最後一步 FDE、wrist-aligned MPJPE／PA-MPJPE，輸出 cm。precision=matched 中達 IoU 且手別正確／matched 中達 IoU；recall 分母也是 matched pairs 數，未匹配額外預測不在該分母。誤差是條件於匹配及分類正確的子集合，不能當完整 detection precision/recall 或所有手的平均誤差。err_data 未看到跨 rank gather，正式分散式評測需核對匯總。",
+  "standardization": {
+    "profile": "streaming_language_conditioned_3d_hand_forecasting",
+    "reuse": "重用 EgoHaFL CSV／LMDB uid、原始 clip 時間窗、有效手數與原生匹配 evaluator。；保留 4 類預測輸出及 IoU 門檻，同列呈現 coverage／條件誤差。",
+    "transform": "標準 case 寫明 rolling RGB observation、autoregressive hand input、文字來源、clip horizon／frame stride、深度過濾與 hand cap。；保留原始 metrics；若要完整 detection precision／recall，另建版本並將所有未匹配預測／GT 納入分母。；跨 Ego4D 衍生資料以 video／時間交集去重，不將標註幀數乘成新增題數。",
+    "missing": "本次未下載 Ego4D 影片／MANO 權重，未執行模型或確認論文分數。；embodied evaluation 與 annotation pipeline 尚未公開於本次 revision；matching error 空集合與多 rank 匯總需要 adapter 驗證。"
+  },
+  "version_note": "閱讀版本為 pinned GitHub commit；DATA／MODEL 外部儲存庫另需固定 revision。論文尺度與程式 clip 子取樣各自登記，不把新觀測幀或四種輸出當新任務。",
+  "runtime_executed": false,
+  "discovery_evidence": [
+    {
+      "kind": "paper",
+      "url": "https://arxiv.org/abs/2511.18127",
+      "checked_sections": [
+        "第 4 節與第 5.2 節，頁 5：247K clips、242K／5K split、16 annotation frames。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,626 @@
+{
+  "paper_id": "P126",
+  "name": "DROID",
+  "title": "DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2403.12945",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P126",
+    "summary": "DROID有原始蒐集平臺與policy-learning兩個官方倉庫；raw/RLDS、更新語言與相機標定是同一來源的不同發行物。實機成功由人員標記。",
+    "environment": "多站點DROID robot及相機配置；schema有lab/building/scene_id/robot_serial與外參，不用平臺數代替環境數。scene_id=-1表示未提供值，須保留未知而非新場景。",
+    "tasks": "language/goal條件物件操作；示範、失敗、下游自選任務和eval trials不同集合。三句語言描述對同episode不增加實體軌跡。",
+    "data": "raw為trajectory.h5、metadata與多視角MP4/SVO；RLDS有episode_metadata和steps含3圖、state、action_dict、多語言與episode flags。training transform用cartesian_position轉pos3+rot6+gripper1，另移除第一action；預設只取success路徑及有語言資料。",
+    "evaluation": "實機GUI由人員按鍵保存success/failure，metadata未提供success時為None。RobotEnv的step返回action_info，不能當task success。文件flat action7D註解提6joint velocities，但RobotEnv區分cartesian7/joint8，使用時應以明確action_dict及converter核對語義。",
+    "standardization": {
+      "profile": "distributed_robot_episode_and_training_views",
+      "reuse": "UUID/lab/scene/version、原始與RLDS對映、相機標定、action_dict、人評標籤。",
+      "transform": "一個parent episode連raw/RLDS/語言更新/標定版本；case固定模型可見相機、座標/control mode、初態與人評rubric；training選樣不得當完整benchmark分母。",
+      "missing": "大型素材、UUID至更新標定/語言的全量join、原成功標籤和case集合、原生評分者一致性、實機或匹配模擬執行。"
+    },
+    "version_note": "2024-12新增75k成功episodes的多語言、2025-04更新36k標定為作者公佈更新，不新增獨立資料集。policy loader依賴Octo85b83fc，不能自動換成目前HEAD。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid",
+        "requested_repo": "droid-dataset/droid",
+        "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            22
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 22,
+        "sha256": "9a36b4fafef078dbb2405755c8fae758257a123e1edb499b8cd9ba700b380a47",
+        "url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/README.md",
+        "reading_url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/README.md#L1-L22",
+        "why": "平臺、論文與官方policy-learning連結",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid_policy_learning",
+        "requested_repo": "droid-dataset/droid_policy_learning",
+        "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            43
+          ],
+          [
+            46,
+            74
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 103,
+        "sha256": "017b89f99a2f1d122ec1dcb5d13f32ad07e854432bd4ba12d242f2d49da2a3eb",
+        "url": "https://github.com/droid-dataset/droid_policy_learning/blob/9a29c832b4c81bf38401111f5e4cdddaca217581/README.md",
+        "reading_url": "https://github.com/droid-dataset/droid_policy_learning/blob/9a29c832b4c81bf38401111f5e4cdddaca217581/README.md#L1-L43",
+        "why": "語言/標定更新、RLDS與Octo固定依賴",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid",
+        "requested_repo": "droid-dataset/droid",
+        "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7",
+        "ref": null,
+        "path": "docs/the-droid-dataset.md",
+        "ranges": [
+          [
+            44,
+            82
+          ],
+          [
+            84,
+            103
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 108,
+        "sha256": "d38519acabd1d15e839cb8632ca97c51627ee85db6e8cb955673e183afbef158",
+        "url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/docs/the-droid-dataset.md",
+        "reading_url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/docs/the-droid-dataset.md#L44-L82",
+        "why": "RLDS與原HDF5/MP4/SVO層級",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid",
+        "requested_repo": "droid-dataset/droid",
+        "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7",
+        "ref": null,
+        "path": "droid/postprocessing/schema.py",
+        "ranges": [
+          [
+            12,
+            89
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 144,
+        "sha256": "b81be1b4c2e03d7bb14a59df411749cd5f53b281854cb8ee77df65974811cf86",
+        "url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/droid/postprocessing/schema.py",
+        "reading_url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/droid/postprocessing/schema.py#L12-L89",
+        "why": "UUID/lab/scene、success未知值、版本與相機標定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid",
+        "requested_repo": "droid-dataset/droid",
+        "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7",
+        "ref": null,
+        "path": "droid/robot_env.py",
+        "ranges": [
+          [
+            16,
+            33
+          ],
+          [
+            49,
+            63
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 133,
+        "sha256": "41cff898b9e3c3b465c3465fd4b9889db70edd9da4c083af1789ea335ad6e116",
+        "url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/droid/robot_env.py",
+        "reading_url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/droid/robot_env.py#L16-L33",
+        "why": "cartesian7D/joint8D、15Hz與velocity範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid_policy_learning",
+        "requested_repo": "droid-dataset/droid_policy_learning",
+        "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581",
+        "ref": null,
+        "path": "examples/droid_dataloader.py",
+        "ranges": [
+          [
+            14,
+            79
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 94,
+        "sha256": "78bab3a44359c2aceaf2d77f6a4cb38b5d7cb6f9aab6e3406d79756830a7b24d",
+        "url": "https://github.com/droid-dataset/droid_policy_learning/blob/9a29c832b4c81bf38401111f5e4cdddaca217581/examples/droid_dataloader.py",
+        "reading_url": "https://github.com/droid-dataset/droid_policy_learning/blob/9a29c832b4c81bf38401111f5e4cdddaca217581/examples/droid_dataloader.py#L14-L79",
+        "why": "過濾/視角/窗口/normalization的訓練view",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid_policy_learning",
+        "requested_repo": "droid-dataset/droid_policy_learning",
+        "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581",
+        "ref": null,
+        "path": "robomimic/utils/rlds_utils.py",
+        "ranges": [
+          [
+            1,
+            65
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 96,
+        "sha256": "97c26f0cae681f9f48e0a040872451d080a54be3bcbbbb5d86466b778519de3c",
+        "url": "https://github.com/droid-dataset/droid_policy_learning/blob/9a29c832b4c81bf38401111f5e4cdddaca217581/robomimic/utils/rlds_utils.py",
+        "reading_url": "https://github.com/droid-dataset/droid_policy_learning/blob/9a29c832b4c81bf38401111f5e4cdddaca217581/robomimic/utils/rlds_utils.py#L1-L65",
+        "why": "success路徑篩選、絕對10D動作與action時間截取",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "droid-dataset/droid",
+        "requested_repo": "droid-dataset/droid",
+        "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7",
+        "ref": null,
+        "path": "droid/user_interface/eval_gui.py",
+        "ranges": [
+          [
+            552,
+            578
+          ],
+          [
+            611,
+            625
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 641,
+        "sha256": "a58d2e9c31538b34e5a3d4182c48b2b67a76a03f5ab66540fba719ee17f56f3c",
+        "url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/droid/user_interface/eval_gui.py",
+        "reading_url": "https://github.com/droid-dataset/droid/blob/33ae6a67274f36d2e29525b86f23a56616ef43a7/droid/user_interface/eval_gui.py#L552-L578",
+        "why": "A/B按鍵標記成功/失敗與實機eval來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "d6fa005c6cffdc45f3e8363fb39cf60a10ddf65193a20c49c7dd9fa6e8f0096e"
+  },
+  "repository_binding_review_sha256": "d6fa005c6cffdc45f3e8363fb39cf60a10ddf65193a20c49c7dd9fa6e8f0096e",
+  "repository_bindings": [
+    {
+      "requested_repo": "droid-dataset/droid",
+      "resolved_repo": "droid-dataset/droid",
+      "aliases_in_this_review": [
+        "droid-dataset/droid"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7",
+          "reviewed_files": [
+            "README.md",
+            "docs/the-droid-dataset.md",
+            "droid/postprocessing/schema.py",
+            "droid/robot_env.py",
+            "droid/user_interface/eval_gui.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/droid-dataset/droid",
+          "link_label": "Hardware Code",
+          "project_url": "https://droid-dataset.github.io",
+          "page_sha256": "48e7283e8fa77441818ac74f833e7b2529b78ba750cd3808750fc63a45e84b20"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P126",
+          "review_file": "content/github_review/reviews/P126.json",
+          "review_sha256": "d6fa005c6cffdc45f3e8363fb39cf60a10ddf65193a20c49c7dd9fa6e8f0096e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "droid-dataset/droid_policy_learning",
+      "resolved_repo": "droid-dataset/droid_policy_learning",
+      "aliases_in_this_review": [
+        "droid-dataset/droid_policy_learning"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581",
+          "reviewed_files": [
+            "README.md",
+            "examples/droid_dataloader.py",
+            "robomimic/utils/rlds_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/droid-dataset/droid_policy_learning",
+          "link_label": "Policy Learning Code",
+          "project_url": "https://droid-dataset.github.io",
+          "page_sha256": "48e7283e8fa77441818ac74f833e7b2529b78ba750cd3808750fc63a45e84b20"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P126",
+          "review_file": "content/github_review/reviews/P126.json",
+          "review_sha256": "d6fa005c6cffdc45f3e8363fb39cf60a10ddf65193a20c49c7dd9fa6e8f0096e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P126",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      7
+    ],
+    "role": "真實操作benchmark",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育"
+    ],
+    "environment": "564workspace scenes分52buildings；換物件擺位不增加scene。",
+    "tasks": "86是unique verb/task口徑；下游主實驗6tasks/4locations，不是全86實測。",
+    "cases": "76Kdemonstrations/350h；6task各50–150in-domain demos，混合DROID訓練。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 564,
+        "unit": "unique robot workspaces",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 52,
+        "unit": "buildings",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 86,
+        "unit": "verb-based task labels",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "downstream evaluation tasks",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 76000,
+        "unit": "robot demonstration trajectories（約數）",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "ID/OOD task success；nativepolicyrollouts分母需appendix/manifest另核。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "主task各有distractor/novelobject/cameravariation；不是564場所全部held-out驗證。",
+    "lineage": "新distributedcapture；DROID表I與RH20T用unique multi-view trajectory重算，不能代替RH20T原作報告數。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "18researchlabs/13institutions/18robots是不同口徑；主規模不能稱86完整獨立工作流程。"
+    ],
+    "reuse": "提供workspaces與objectrandomization的清楚環境定義；大資料與小評測子集須並列。",
+    "reviewed_pdf_sha256": "9e40a9c934ce78ea315d2c05593d60f9e18edf6dcd3785cd66439518965c3b07",
+    "reviewed_on": "2026-10-02",
+    "name": "DROID",
+    "year": 2024,
+    "title": "DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset",
+    "source_url": "https://arxiv.org/abs/2403.12945",
+    "primary_type": "G",
+    "category_name": "機器人資料與通用策略",
+    "domain_ids": [
+      "home",
+      "food",
+      "office"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P126",
+      "domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P126",
+          "domain_ids": [
+            "home",
+            "food",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "86是unique verb/task口徑；下游主實驗6tasks/4locations，不是全86實測。",
+            "564workspace scenes分52buildings；換物件擺位不增加scene。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "9e40a9c934ce78ea315d2c05593d60f9e18edf6dcd3785cd66439518965c3b07"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "9e40a9c934ce78ea315d2c05593d60f9e18edf6dcd3785cd66439518965c3b07",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P126",
+      "name": "DROID",
+      "expected_title": "DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset",
+      "source_url": "https://arxiv.org/abs/2403.12945",
+      "pdf_url": "https://arxiv.org/pdf/2403.12945",
+      "retrieved_at": "2026-10-02T22:13:47.475291+00:00",
+      "pdf_sha256": "9e40a9c934ce78ea315d2c05593d60f9e18edf6dcd3785cd66439518965c3b07",
+      "text_sha256": "181d4af065cbca8fe96a17ecb9534668e407ec8828ee1f7af9048ea5198f8269",
+      "pdf_bytes": 9707714,
+      "pages": 26,
+      "text_characters": 129276,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2403.12945v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2403.12945v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 564,
+        "unit": "unique robot workspaces",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P126:1",
+        "paper_id": "P126",
+        "benchmark": "DROID",
+        "native_term": "unique robot workspaces",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.12945v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.12945v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 52,
+        "unit": "buildings",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P126:2",
+        "paper_id": "P126",
+        "benchmark": "DROID",
+        "native_term": "buildings",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.12945v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.12945v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 86,
+        "unit": "verb-based task labels",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P126:3",
+        "paper_id": "P126",
+        "benchmark": "DROID",
+        "native_term": "verb-based task labels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.12945v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.12945v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "downstream evaluation tasks",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P126:4",
+        "paper_id": "P126",
+        "benchmark": "DROID",
+        "native_term": "downstream evaluation tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.12945v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.12945v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 76000,
+        "unit": "robot demonstration trajectories（約數）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P126:5",
+        "paper_id": "P126",
+        "benchmark": "DROID",
+        "native_term": "robot demonstration trajectories（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.12945v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.12945v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "droid-dataset/droid",
+    "droid-dataset/droid_policy_learning"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,516 @@
+{
+  "paper_id": "P207",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "GitHub DStardust/EgoCoT 是本篇官方補充網站，HF 另有公開 dev／test 標註、媒體重建 manifest 與實際 reconstruction reader。已核程式只有媒體處理與網站示例，未找到正式 Acc／R／SCR scorer 或 test 正解；不能把網站題目點選函式當成 benchmark evaluator。",
+  "identity_note": "pinned arXiv:2605.19559v1 連到 dstardust.github.io/EgoCoT，固定 repo index.html 與既有 website cache 的 SHA256 相同；其 Dataset 按鈕連 DStardust/EgoCoT-Bench，dataset card 反連同一 paper／project。PDF 作者有 Yang Dai、Dian Jiao、Tianwei Lin、Wenqiao Zhang；網站頁首隻列前三人，文獻作者以 PDF 為準。搜尋的 EmbodiedGPT/EgoCOT_Dataset 是 2023 年另一候選，未將同名視為本篇；頁尾 Academic Project Page Template 亦非 benchmark。",
+  "reading_order": [
+    {
+      "repo": "DStardust/EgoCoT",
+      "path": "index.html",
+      "ranges": [
+        [
+          510,
+          585
+        ],
+        [
+          865,
+          905
+        ],
+        [
+          2580,
+          2599
+        ]
+      ],
+      "why": "核對作者、官方 dataset 連結、dev/test 可見資訊及提交欄位。",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "ref": "main"
+    },
+    {
+      "repo": "DStardust/EgoCoT",
+      "path": "index.html",
+      "ranges": [
+        [
+          229,
+          298
+        ],
+        [
+          302,
+          465
+        ]
+      ],
+      "why": "追真正 JavaScript：只排序已寫好的分數並比對四個示例題，沒有模型結果的 benchmark 聚合。",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "ref": "main"
+    },
+    {
+      "repo": "DStardust/EgoCoT",
+      "path": "static/js/index.js",
+      "ranges": [
+        [
+          1,
+          142
+        ]
+      ],
+      "why": "核對其餘 JS 是網站互動與影片輪播。",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "ref": "main"
+    },
+    {
+      "repo": "datasets/DStardust/EgoCoT-Bench",
+      "provider": "huggingface_dataset",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "path": "scripts/reconstruct_media.py",
+      "ranges": [
+        [
+          18,
+          103
+        ],
+        [
+          106,
+          147
+        ]
+      ],
+      "why": "追 CSV reader、來源影片定位、fps／resize／逐影格處理與重複輸出去重；不執行程式。"
+    },
+    {
+      "repo": "datasets/DStardust/EgoCoT-Bench",
+      "provider": "huggingface_dataset",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "path": "manifests/media_reconstruction.csv",
+      "ranges": [
+        [
+          1,
+          4
+        ],
+        [
+          109,
+          109
+        ],
+        [
+          2472,
+          2472
+        ],
+        [
+          3171,
+          3173
+        ]
+      ],
+      "why": "核 qid／來源／處理版本／座標欄及同來源兩個不同解析度輸出。"
+    }
+  ],
+  "environment": "五個公共人類第一人稱父來源 Ego4D、EPIC-KITCHENS、Charades-Ego、MECCANO、HD-EPIC 加自錄影片，涵蓋生活、廚房及組裝操作；沒有可互動的機器人環境。pinned reconstruction CSV 清點為 351 個 (source_dataset,source_video_id)，但有 352 個 processed_clip_id／output paths；MECCANO 0001_part1 有 416×234 與 588×331 兩版，必須保留版本關係。",
+  "tasks": "4 groups／12 subtasks：Egocentric Grounding & Perception＝Active Object Grounding、Hand-Object Association、Manipulation State Perception；Spatio-Temporal Retrospection＝State Retrospection、Location/Visibility Retrospection、Hand-Object Temporal Retrospection；Predictive & Causal Inference＝Next State Anticipation、Next Action Anticipation、Local Cause-Outcome Inference；High-level Grounded Reasoning＝Progress Reasoning、Hand-Object Grounded CoT、Goal-Oriented Object Tracking。均是四選一影片理解及公開解釋／證據品質，不是可執行操作技能。",
+  "data": "HF pinned tree 的實際資料檔為 data/dev-00000-of-00001.parquet 與 data/test-00000-of-00001.parquet；card 指定 load_dataset 後取 dev／test，300／2,872 題。小型官方 viewer 回應各抽一列：qid、question、choices[{label,text}]、answer、cot[{step,text}]、media_id、source、big_category_en、sub_category_en、type；dev 有答案與解釋，test 範例 answer=\"\"、cot=[]。兩份 viewer 的 features 沒有獨立 evidence／bbox 欄，不能依 card 的 may include 自造結構化證據。pinned CSV 實際 3,172 個唯一 qid；columns 含 processed_clip_id、source_dataset/video_id、source_start_sec/end_sec、target_width/height、resize_mode、fps、preprocess_version、expected_local_output_path、coordinate_system。所有 start/end 為空、resize_mode=stretch、座標系 processed_clip；2,859 QA 引用 4 fps、313 QA 引用 8 fps，這是題目列數而非影格數。63 個自錄輸出與第三方待重建媒體分開。",
+  "evaluation": "paper §3.2.4 的 Acc 為四選一 exact match／全部評測題；R 是 Qwen-Max 對公開生成解釋與參考解釋的 0–5 分；SCR = 答對且 R≤2 的題數／所有答對題數×100，分母不是全題數，零答對的處置未由公開程式核實。paper 的 3,172 題結果不可當作 public hidden-test 2,872 題分數；card 的 dev 193 個 video、test 351 個 video 與總 351 個來源顯示不能假定 video-disjoint。paper 另以 2,800 responses 核對 judge，人類一致性樣本不是額外 benchmark cases。GitHub handleAnswer 只對四個寫死示例比字母，leaderboard 只排序 HTML；HF scripts tree 唯一程式 reconstruct_media.py 沒有模型推論、judge、R／SCR 聚合或提交驗證。正式 test scorer／labels 在本輪已核來源中未公開。",
+  "standardization": {
+    "profile": "egocentric_mcq_rationale_and_media_reconstruction",
+    "reuse": "可重用 qid、group／subtask／type、選項及 public dev 解釋、來源／processed clip 映射、重建 CSV 與實際 reader；paper 的 Acc／R／SCR 保留各自定義。",
+    "transform": "source 同時記 paper v1、website commit、HF revision 與五父資料來源；task 按四群十二類，case 按 qid 保留 dev/test、media_id、options，將 cot 記公開參考解釋而非模型私有思考。environment 記 human-egocentric context；媒體引用需帶來源 ID、processed resolution／fps／coordinate_system，351 sources 與 352 processed variants 分開。evaluator 分別記 Acc 的 N、R 的判讀數及 SCR 的答對分母；test 空正解標為 withheld，不能轉成錯誤標籤或零分。",
+    "missing": "正式 evaluator／submission runner、hidden test labels、judge prompt與精確版本／解析／失敗處置、完整結構化時空 evidence、父素材取得與重建驗證。reconstruction script 用整段 source_video_id 影片，未使用 start/end／resize_mode 欄；CSV 的 start/end 全空，對含切段後綴的 source_video_id 仍須外部定位到正確已裁素材。讀影格失敗時 continue 而不補位，可能改變輸出時間軸；需校核處理後 timestamps／bbox。"
+  },
+  "version_note": "GitHub 71e6114c155c7a593fa39e2af801b51e836b53ca 是網站；HF 31c4aa4adc88632c6efe984cf8c5399cc75f6fc3 是 clean public release，只重發自錄媒體，不能將其與較早含第三方處理片的版本混用。raw README／CSV／reconstruction script 均固定 HF revision。viewer/rows endpoint 未回傳 dataset revision，本輪只保存帶時間與 SHA256 的一列 dev／test 與 features 作輔助欄位核對，不聲稱已核 pinned Parquet 全體內容；未下載影片或執行 reconstruction。",
+  "additional_repo_proposals": [
+    {
+      "repo": "DStardust/EgoCoT",
+      "role": "official_project_website_only",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "proposal": "可補登官方網站來源；HF dataset 應另建 data／preprocessing 來源，不能綁為正式 scorer。"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/tree.json",
+      "json_pointers": [
+        "/sha",
+        "/truncated"
+      ],
+      "finding": "完整 43-entry GitHub tree 僅頁面、UI JS、圖片／PDF／示例影片，未含 benchmark Python evaluator。"
+    },
+    {
+      "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_tree_scripts.json",
+      "json_pointers": [
+        "/0"
+      ],
+      "finding": "HF scripts 僅 reconstruct_media.py；LICENSE 的 evaluation scripts 字樣不能證明實際 scorer 已發布。"
+    },
+    {
+      "source": "audit/.cache/github_review/search/P207-refined.json",
+      "json_pointers": [
+        "/query",
+        "/results"
+      ],
+      "finding": "兩個 EgoCoT 同名候選已依 paper／primary project 鏈區分。"
+    },
+    {
+      "kind": "unversioned_official_viewer_schema_sample",
+      "provider": "huggingface_dataset_viewer",
+      "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_dev_one_row.json",
+      "sha256": "a3ed34588ce92f0cbff2c6a6c7ad94f9b1e5f34004befcad22476f40907ae681",
+      "url": "https://datasets-server.huggingface.co/rows?dataset=DStardust%2FEgoCoT-Bench&config=default&split=dev&offset=0&length=1",
+      "json_pointers": [
+        "/features",
+        "/rows/0",
+        "/num_rows_total"
+      ],
+      "finding": "dev 的一列與欄位快照；endpoint 未回傳 revision，只作輔助核對，不當作固定 commit 的 GitHub 檔案。"
+    },
+    {
+      "kind": "unversioned_official_viewer_schema_sample",
+      "provider": "huggingface_dataset_viewer",
+      "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_test_one_row.json",
+      "sha256": "dadb158ccf45792b8a3b7b97e123865d4955029706a40ccf2cf96fb9c110abcb",
+      "url": "https://datasets-server.huggingface.co/rows?dataset=DStardust%2FEgoCoT-Bench&config=default&split=test&offset=0&length=1",
+      "json_pointers": [
+        "/features",
+        "/rows/0",
+        "/num_rows_total"
+      ],
+      "finding": "test 的一列與欄位快照；endpoint 未回傳 revision，只作輔助核對，不當作固定 commit 的 GitHub 檔案。"
+    },
+    {
+      "kind": "pinned_dataset_revision",
+      "provider": "huggingface_dataset",
+      "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_refs.json",
+      "json_pointers": [
+        "/branches/0/targetCommit"
+      ],
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "finding": "公開 refs API 固定 main 的40字元revision；reader與CSV的固定revision下載receipt、SHA256及HF tree blob OID均已對齊。"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P207/pages.json",
+      "sha256": "78e4bb441caf9ce1895ede9bcfbd53a63336508f6554274d821bce656be155d4",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P207/paper.pdf",
+      "pdf_sha256": "98ac34ca6c5e5e85367bbc76844e70d30939b29b4c58188ffdbe431af5e9b237",
+      "url": "https://arxiv.org/abs/2605.19559"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/files/index.html",
+      "sha256": "224d9c70a16d7e8463ab34267bcb12aa02d376b88d7d025a35922447c946e286",
+      "repo": "DStardust/EgoCoT",
+      "path": "index.html",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "git_blob_sha": "3b95bce86f2f3edb9c38878c2e731d164e84f4ca",
+      "url": "https://raw.githubusercontent.com/DStardust/EgoCoT/71e6114c155c7a593fa39e2af801b51e836b53ca/index.html",
+      "ranges": [
+        [
+          229,
+          298
+        ],
+        [
+          302,
+          465
+        ],
+        [
+          510,
+          585
+        ],
+        [
+          865,
+          905
+        ],
+        [
+          2580,
+          2599
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/files/index.html.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/files/static/js/index.js",
+      "sha256": "cda22b63ac751c525390e19f702dba8c87ca8005a57c829d9872e349ba6f8a6c",
+      "repo": "DStardust/EgoCoT",
+      "path": "static/js/index.js",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "git_blob_sha": "de8c42c6c3274336262542420a92c19f16913a2e",
+      "url": "https://raw.githubusercontent.com/DStardust/EgoCoT/71e6114c155c7a593fa39e2af801b51e836b53ca/static/js/index.js",
+      "ranges": [
+        [
+          1,
+          142
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/files/static/js/index.js.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/metadata.json",
+      "sha256": "a06070464817f81af75e817120123056eedbf1eb968cb00adc5fcea007d985ed",
+      "url": "https://api.github.com/repos/DStardust/EgoCoT",
+      "json_pointers": [
+        "/full_name",
+        "/description",
+        "/default_branch",
+        "/pushed_at"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/ref.json",
+      "sha256": "2c76acf2df8f26845ebdb826af01a2ece881d7dce43b94f94a75fa721e877222",
+      "url": "https://api.github.com/repos/DStardust/EgoCoT/git/ref/heads/main",
+      "json_pointers": [
+        "/ref",
+        "/object"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/DStardust__EgoCoT/tree.json",
+      "sha256": "9da1a141a366f8c34f9e8804cb45bfbcaf467c162988fbefcb029d4c2c0d4788",
+      "repo": "DStardust/EgoCoT",
+      "commit": "71e6114c155c7a593fa39e2af801b51e836b53ca",
+      "url": "https://api.github.com/repos/DStardust/EgoCoT/git/trees/71e6114c155c7a593fa39e2af801b51e836b53ca?recursive=1",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree/0/path",
+        "/tree/1/path",
+        "/tree/2/path",
+        "/tree/3/path",
+        "/tree/4/path",
+        "/tree/5/path",
+        "/tree/6/path",
+        "/tree/7/path",
+        "/tree/8/path",
+        "/tree/9/path",
+        "/tree/10/path",
+        "/tree/11/path",
+        "/tree/12/path",
+        "/tree/13/path",
+        "/tree/14/path",
+        "/tree/15/path",
+        "/tree/16/path",
+        "/tree/17/path",
+        "/tree/18/path",
+        "/tree/19/path",
+        "/tree/20/path",
+        "/tree/21/path",
+        "/tree/22/path",
+        "/tree/23/path",
+        "/tree/24/path",
+        "/tree/25/path",
+        "/tree/26/path",
+        "/tree/27/path",
+        "/tree/28/path",
+        "/tree/29/path",
+        "/tree/30/path",
+        "/tree/31/path",
+        "/tree/32/path",
+        "/tree/33/path",
+        "/tree/34/path",
+        "/tree/35/path",
+        "/tree/36/path",
+        "/tree/37/path",
+        "/tree/38/path",
+        "/tree/39/path",
+        "/tree/40/path",
+        "/tree/41/path",
+        "/tree/42/path"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_README.md",
+      "sha256": "45470e189f869ae599fab4be5319a75f30b21e827d6a0a8e53cbdfd819a0da83",
+      "repo": "datasets/DStardust/EgoCoT-Bench",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "path": "README.md",
+      "url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/resolve/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/README.md",
+      "ranges": [
+        [
+          1,
+          135
+        ]
+      ],
+      "git_blob_sha": "39b1549284cf92ec32ffa6439f892e792df2a8ef",
+      "provider": "huggingface_dataset",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_reconstruct_media.py",
+      "sha256": "705fc0d548844566c4edfe106833a48d30f9c3a20b988806927ee9ca04ed119d",
+      "repo": "datasets/DStardust/EgoCoT-Bench",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "path": "scripts/reconstruct_media.py",
+      "url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/resolve/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/scripts/reconstruct_media.py",
+      "ranges": [
+        [
+          1,
+          147
+        ]
+      ],
+      "git_blob_sha": "9830fdc1db9fc2cba2e9700314f59bb4791fc1fe",
+      "provider": "huggingface_dataset",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_media_reconstruction.csv",
+      "sha256": "08d85c4a1bbbc6bd205b46e7c6d57adb9f03435b4ecab01a05fd4e75f831a034",
+      "repo": "datasets/DStardust/EgoCoT-Bench",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "path": "manifests/media_reconstruction.csv",
+      "url": "https://huggingface.co/datasets/DStardust/EgoCoT-Bench/resolve/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/manifests/media_reconstruction.csv",
+      "ranges": [
+        [
+          1,
+          4
+        ],
+        [
+          109,
+          109
+        ],
+        [
+          2472,
+          2472
+        ],
+        [
+          3171,
+          3173
+        ]
+      ],
+      "git_blob_sha": "68114d85a352f84daf49a2f8d4a9131199961829",
+      "inspection": "全 CSV 機械清點 qid、source pair、processed versions、fps 與空起訖；人工讀列另列 ranges。",
+      "provider": "huggingface_dataset",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/reconstruction_inspection.json",
+      "sha256": "1e8820cb7f82ca527ad473dd7059be0e83b387a24e2228525c554937d1259746",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_refs.json",
+      "sha256": "96eab5853fc33aec8b50d1fa5b104402d461c402d580c0e903ff10699fc94f06",
+      "url": "https://huggingface.co/api/datasets/DStardust/EgoCoT-Bench/refs",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_tree_root.json",
+      "sha256": "7841d9ae9c1bf293a2abb459d9316140b32783411b91e794e1db0a337a413052",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "url": "https://huggingface.co/api/datasets/DStardust/EgoCoT-Bench/tree/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "json_pointers": [
+        ""
+      ],
+      "provider": "huggingface_dataset_api",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_tree_data.json",
+      "sha256": "509828497324d7aa7ae86c3d5a7e694317b311f412116e5920989eb0d94efbbc",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "url": "https://huggingface.co/api/datasets/DStardust/EgoCoT-Bench/tree/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/data",
+      "json_pointers": [
+        ""
+      ],
+      "provider": "huggingface_dataset_api",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_tree_scripts.json",
+      "sha256": "f46793af2f87d5e66c9dd45b079cf51ca2a85083a10e9b2d38462a800486d476",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "url": "https://huggingface.co/api/datasets/DStardust/EgoCoT-Bench/tree/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/scripts",
+      "json_pointers": [
+        ""
+      ],
+      "provider": "huggingface_dataset_api",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/hf_tree_manifests.json",
+      "sha256": "aa1524cff44ef78e91d6b9ccd9f6e5a2e5bcd8b56fff87be0cb7c129a1d0bcd9",
+      "ref": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3",
+      "url": "https://huggingface.co/api/datasets/DStardust/EgoCoT-Bench/tree/31c4aa4adc88632c6efe984cf8c5399cc75f6fc3/manifests",
+      "json_pointers": [
+        ""
+      ],
+      "provider": "huggingface_dataset_api",
+      "commit": "31c4aa4adc88632c6efe984cf8c5399cc75f6fc3"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_dev_one_row.json",
+      "sha256": "a3ed34588ce92f0cbff2c6a6c7ad94f9b1e5f34004befcad22476f40907ae681",
+      "role": "unversioned_official_viewer_schema_sample",
+      "url": "https://datasets-server.huggingface.co/rows?dataset=DStardust%2FEgoCoT-Bench&config=default&split=dev&offset=0&length=1",
+      "json_pointers": [
+        "/features",
+        "/rows/0",
+        "/num_rows_total"
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_dev_one_row.json.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_test_one_row.json",
+      "sha256": "dadb158ccf45792b8a3b7b97e123865d4955029706a40ccf2cf96fb9c110abcb",
+      "role": "unversioned_official_viewer_schema_sample",
+      "url": "https://datasets-server.huggingface.co/rows?dataset=DStardust%2FEgoCoT-Bench&config=default&split=test&offset=0&length=1",
+      "json_pointers": [
+        "/features",
+        "/rows/0",
+        "/num_rows_total"
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P207/viewer_test_one_row.json.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/206"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/P207-discovery.json",
+      "sha256": "ee485317adabcaeb7bcdd0198ce3d7b6b1297eb0ff2bd7741d97df8afa3df980",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0",
+        "/candidates/1",
+        "/code_contexts"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P207.json",
+      "sha256": "cb589ced47d4cd787b7ffc2a23e0c79418e4ebda0cadd7d17c5f2efecb66292f",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P207-refined.json",
+      "sha256": "4ac04de34fff3322fc73c2b8333550cefde85db08ddb10b4c301a7d35386e97d",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

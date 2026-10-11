@@ -1,0 +1,597 @@
+{
+  "paper_id": "P021",
+  "name": "Ego-ExoLearn",
+  "title": "EgoExoLearn: A Dataset for Bridging Asynchronous Ego- and Exo-centric View of Procedural Activities in Real World",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2403.16182",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "lab"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P021",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoExoLearn 的核心是不同時間、不同視角的人類示範跟隨。已核讀標註、跨視角 association 的選項評分和 skill assessment 的成對排序，兩者不是同一種成功率。",
+    "environment": "資料列 kitchen／lab，用於日常協助與實驗室程式；scene 是粗場景用途，video_uid 才是影片 ID。ego/exo 是非同步示範關係，不可當同步多相機標定資料。",
+    "tasks": "跨視角 association、動作分割／anticipation／planning、參考示範的 skill assessment／captioning；2024-08 又加入 VQA。能力題型與程式活動類別分開。",
+    "data": "fine CSV 保留 video_uid、annotation_uid、subset、view、scene、start/end_sec、人工 narration_en；hand/no-hand prompt 文字是 GPT 改寫。skill list 每列 better/worse 影片，NPZ arr_0 提供特徵，use_exo 時依 action 從 exo 檔案隨機選一參考。association loader 回 query、options、answer、q_type、uid。",
+    "evaluation": "association 對 query/options 特徵相似度 argmax，按 Ego→Exo／Exo→Ego 分組 accuracy；skill train.py 的 accuracy 是 better 分數嚴格大於 worse 的配對比例，平手不算對。RankingAttentionLoss 為訓練 loss，不能拿它代替評測 accuracy。",
+    "standardization": {
+      "profile": "asynchronous_demo_skill_comparison",
+      "reuse": "原生標註／改寫來源、跨視角配對、better/worse 排序與兩種核心評分。",
+      "transform": "保留 demo_reference 邊及不同 video 時間線；同一影片多問答／配對透過 uid 共用，不能重算成新環境。case 儲存配對順序、選項、exo reference 與抽樣 seed；人工與生成字幕 provenance 分開。",
+      "missing": "尚未取得影片／gaze／特徵或執行。完整 segmentation/planning/captioning 與新增 VQA evaluator 尚未核讀；若比較參考示範版本，需鎖定具體 exo reference，不能每次隨機抽而不留紀錄。"
+    },
+    "version_note": "annotations README 開頭仍說只有 train/val，結尾與 root 更新已提供 test GT；標準化應鎖定實際檔案，不直接採信舊段落。VQA 與 full-size videos 為後續更新，不能併稱首發版本。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "OpenGVLab/EgoExoLearn",
+        "requested_repo": "OpenGVLab/EgoExoLearn",
+        "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "df9b9d01c9544eae59c79a74bf352c00928f3844d14d8afe4f6ccfbe6e592248",
+        "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/README.md",
+        "reading_url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/README.md#L1-L78",
+        "why": "精確論文身份、場景與發布範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "OpenGVLab/EgoExoLearn",
+        "requested_repo": "OpenGVLab/EgoExoLearn",
+        "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+        "ref": null,
+        "path": "annotations/README.md",
+        "ranges": [
+          [
+            1,
+            31
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 31,
+        "sha256": "e0fe9cf36fc0fca0692264cafb9dbfab2f812de5dcdf0fcbda7574c36209d89c",
+        "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/annotations/README.md",
+        "reading_url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/annotations/README.md#L1-L31",
+        "why": "原生 CSV、生成文字與 test 版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "OpenGVLab/EgoExoLearn",
+        "requested_repo": "OpenGVLab/EgoExoLearn",
+        "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+        "ref": null,
+        "path": "association_benchmark/main.py",
+        "ranges": [
+          [
+            33,
+            51
+          ],
+          [
+            54,
+            84
+          ],
+          [
+            102,
+            110
+          ],
+          [
+            137,
+            147
+          ],
+          [
+            166,
+            181
+          ],
+          [
+            275,
+            336
+          ],
+          [
+            342,
+            364
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 366,
+        "sha256": "bc7313e4ab5f23304226166e07f7fba30cd54d5dbffa3989263fe3f3ed49d7e6",
+        "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/association_benchmark/main.py",
+        "reading_url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/association_benchmark/main.py#L33-L51",
+        "why": "實際 association 輸入與雙向 accuracy",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "OpenGVLab/EgoExoLearn",
+        "requested_repo": "OpenGVLab/EgoExoLearn",
+        "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+        "ref": null,
+        "path": "skill_benchmark/dataset.py",
+        "ranges": [
+          [
+            1,
+            117
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 117,
+        "sha256": "7c50f81ac73392eb974c6c85069fae34f84ab28160707e5950df01bb878716d0",
+        "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/dataset.py",
+        "reading_url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/dataset.py#L1-L117",
+        "why": "better/worse 與隨機 exo 讀取",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "OpenGVLab/EgoExoLearn",
+        "requested_repo": "OpenGVLab/EgoExoLearn",
+        "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+        "ref": null,
+        "path": "skill_benchmark/train.py",
+        "ranges": [
+          [
+            147,
+            166
+          ],
+          [
+            230,
+            253
+          ],
+          [
+            260,
+            281
+          ],
+          [
+            298,
+            313
+          ],
+          [
+            353,
+            361
+          ],
+          [
+            381,
+            420
+          ],
+          [
+            463,
+            476
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 558,
+        "sha256": "07a7856856836f7e9817f489e3bbef5c658fee2a84d7d3a8272214724cbcd299",
+        "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/train.py",
+        "reading_url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/train.py#L147-L166",
+        "why": "validation 聚合與嚴格成對比較",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "OpenGVLab/EgoExoLearn",
+        "requested_repo": "OpenGVLab/EgoExoLearn",
+        "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+        "ref": null,
+        "path": "skill_benchmark/losses.py",
+        "ranges": [
+          [
+            1,
+            22
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 22,
+        "sha256": "7e7af2cf9728170dae87c05b3b0e0cc97fe3c1cc50a87fb23400a02281e4ae4c",
+        "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/losses.py",
+        "reading_url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/losses.py#L1-L22",
+        "why": "辨別訓練 ranking loss",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "761363284ba865de11dbeb78a3e1664b7de660f053b4f0cf5849e87b4241c329"
+  },
+  "repository_binding_review_sha256": "761363284ba865de11dbeb78a3e1664b7de660f053b4f0cf5849e87b4241c329",
+  "repository_bindings": [
+    {
+      "requested_repo": "OpenGVLab/EgoExoLearn",
+      "resolved_repo": "OpenGVLab/EgoExoLearn",
+      "aliases_in_this_review": [
+        "opengvlab/egoexolearn"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+          "reviewed_files": [
+            "README.md",
+            "annotations/README.md",
+            "association_benchmark/main.py",
+            "skill_benchmark/dataset.py",
+            "skill_benchmark/losses.py",
+            "skill_benchmark/train.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/OpenGVLab/EgoExoLearn",
+          "pdf_page": 1,
+          "pdf_sha256": "bca30af05c678a221e17c8ff0fa92006870fc0b46f569e824b52c98aefc8a15b",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P021",
+          "review_file": "content/github_review/reviews/P021.json",
+          "review_sha256": "761363284ba865de11dbeb78a3e1664b7de660f053b4f0cf5849e87b4241c329",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "實驗室操作"
+  ],
+  "source_review": {
+    "paper_id": "P021",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoExoLearn，arXiv 2403.16182v3。",
+    "scope_read": "資料／來源、四大benchmark、association、anticipation／planning、skill，及專用split附錄。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      11,
+      12,
+      14,
+      16
+    ],
+    "domains": [
+      "餐飲與烹飪",
+      "實驗室操作"
+    ],
+    "role": "跨視角程序學習",
+    "environment": "4個廚房＋3個lab；ego示範跟做與exo教程非同步、非同一環境。",
+    "tasks": "8程序＝5日常＋3實驗室；4大benchmark含association、action understanding、skill ranking、captioning；39粗步驟，planning取27類；anticipation取19 verbs／31 nouns。",
+    "cases": "432 ego影片96.5小時＋315 exo影片23.5小時；34,239有效skill比較對，從40,191候選對篩選。ego anticipation test約17.3K片段。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 7,
+        "unit": "ego錄製場地（4廚房+3lab）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "程序任務",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 747,
+        "unit": "ego+exo影片",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 34239,
+        "unit": "有效skill比較對（含所有split）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 17300,
+        "unit": "ego anticipation test片段",
+        "qualifier": "原文17.3K，約數",
+        "pages": [
+          12
+        ]
+      }
+    ],
+    "evaluation": [
+      "association：20候選top-1；anticipation：1秒前class-mean top-5 recall。",
+      "planning：8步ED@K、5條預測序列；skill：pairwise ranking accuracy；supervised recognition：macro mAP。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "端點採專用過濾集；保留ego→exo、exo→ego、UDA、distillation、co-training不同資訊條件。",
+    "lineage": "日常exo取網路影片，lab exo由資深人員錄製；動詞／名詞taxonomy借Ego4D再擴充，不表示影片皆來自Ego4D。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§3與§4.2",
+        "supports": "7場地、8程序、影片／比較對及來源"
+      },
+      {
+        "pages": [
+          7,
+          8,
+          12
+        ],
+        "locator": "表4–5、附錄S6.2.3",
+        "supports": "預測／planning／skill評分與過濾量"
+      }
+    ],
+    "unresolved": [
+      "captioning及segmentation專用metric／完整case ID仍需資料端核對。",
+      "附錄planning兩組split重複寫egocentric，保留原文歧義，未擅改。"
+    ],
+    "reuse": "對示範到robot的跨視角程序轉移很相關；實驗室程序補生活操作庫缺域。",
+    "reviewed_pdf_sha256": "bca30af05c678a221e17c8ff0fa92006870fc0b46f569e824b52c98aefc8a15b",
+    "reviewed_on": "2026-10-02",
+    "name": "Ego-ExoLearn",
+    "year": 2024,
+    "title": "EgoExoLearn: A Dataset for Bridging Asynchronous Ego- and Exo-centric View of Procedural Activities in Real World",
+    "source_url": "https://arxiv.org/abs/2403.16182",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "food",
+      "lab"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "實驗室操作"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "實驗室操作"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P021",
+      "domain_ids": [
+        "food",
+        "lab"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P021",
+          "domain_ids": [
+            "food",
+            "lab"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            11,
+            12,
+            14,
+            16
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "8程序＝5日常＋3實驗室；4大benchmark含association、action understanding、skill ranking、captioning；39粗步驟，planning取27類；anticipation取19 verbs／31 nouns。",
+            "4個廚房＋3個lab；ego示範跟做與exo教程非同步、非同一環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "bca30af05c678a221e17c8ff0fa92006870fc0b46f569e824b52c98aefc8a15b"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "bca30af05c678a221e17c8ff0fa92006870fc0b46f569e824b52c98aefc8a15b",
+      "previous_domain_ids": [
+        "food",
+        "lab"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P021",
+      "name": "Ego-ExoLearn",
+      "expected_title": "EgoExoLearn: A Dataset for Bridging Asynchronous Ego- and Exo-centric View of Procedural Activities in Real World",
+      "source_url": "https://arxiv.org/abs/2403.16182",
+      "pdf_url": "https://arxiv.org/pdf/2403.16182",
+      "retrieved_at": "2026-10-02T21:33:12.380013+00:00",
+      "pdf_sha256": "bca30af05c678a221e17c8ff0fa92006870fc0b46f569e824b52c98aefc8a15b",
+      "text_sha256": "5b73a0af59e6d963adeca57f1ec33caff30046bc66d4d30bccc39dd63a57686c",
+      "pdf_bytes": 11565380,
+      "pages": 30,
+      "text_characters": 210819,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2403.16182v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2403.16182v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 7,
+        "unit": "ego錄製場地（4廚房+3lab）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P021:1",
+        "paper_id": "P021",
+        "benchmark": "Ego-ExoLearn",
+        "native_term": "ego錄製場地（4廚房+3lab）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.16182v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.16182v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "程序任務",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P021:2",
+        "paper_id": "P021",
+        "benchmark": "Ego-ExoLearn",
+        "native_term": "程序任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.16182v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.16182v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 747,
+        "unit": "ego+exo影片",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P021:3",
+        "paper_id": "P021",
+        "benchmark": "Ego-ExoLearn",
+        "native_term": "ego+exo影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.16182v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.16182v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 34239,
+        "unit": "有效skill比較對（含所有split）",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P021:4",
+        "paper_id": "P021",
+        "benchmark": "Ego-ExoLearn",
+        "native_term": "有效skill比較對（含所有split）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.16182v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.16182v3",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 17300,
+        "unit": "ego anticipation test片段",
+        "qualifier": "原文17.3K，約數",
+        "pages": [
+          12
+        ],
+        "record_id": "review10:P021:5",
+        "paper_id": "P021",
+        "benchmark": "Ego-ExoLearn",
+        "native_term": "ego anticipation test片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.16182v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.16182v3",
+            "locator": "PDF pp. 12",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "OpenGVLab/EgoExoLearn"
+  ],
+  "external_repositories": []
+}

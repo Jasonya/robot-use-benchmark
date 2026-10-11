@@ -1,0 +1,266 @@
+{
+  "paper_id": "P022",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "CaptainCook4D 主倉庫是入口；已追到官方 annotations 與 error_recognition 程式，核讀原始步驟 JSON、mug cake 圖、loader 及實際 step/sub-step metrics。",
+  "reading_order": [
+    {
+      "repo": "CaptainCook4D/CaptainCook4D",
+      "path": "README.md",
+      "commit": "1137b884e038cc128589c18eab215024018fb642",
+      "ranges": [
+        [
+          1,
+          75
+        ],
+        [
+          112,
+          173
+        ],
+        [
+          230,
+          320
+        ]
+      ],
+      "why": "論文身份、真正的標註及 baseline 連結"
+    },
+    {
+      "repo": "Error-Dataset/annotations",
+      "path": "README.md",
+      "commit": "a8a920a3293c4db27099a20ddbe3a3a9be1283e3",
+      "ranges": [
+        [
+          1,
+          131
+        ]
+      ],
+      "why": "官方 annotation 倉庫與版本"
+    },
+    {
+      "repo": "Error-Dataset/annotations",
+      "path": "annotation_json/step_annotations.json",
+      "commit": "a8a920a3293c4db27099a20ddbe3a3a9be1283e3",
+      "ranges": [
+        [
+          1,
+          54
+        ]
+      ],
+      "why": "原生步驟 JSON 樣本"
+    },
+    {
+      "repo": "Error-Dataset/annotations",
+      "path": "task_graphs/mugcake.json",
+      "commit": "a8a920a3293c4db27099a20ddbe3a3a9be1283e3",
+      "ranges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "why": "完整單一 recipe steps/edges 範例"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "README.md",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "ranges": [
+        [
+          1,
+          36
+        ]
+      ],
+      "why": "評測 split 與作者閾值"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "dataloader/CaptainCookStepDataset.py",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "ranges": [
+        [
+          1,
+          4
+        ],
+        [
+          8,
+          20
+        ],
+        [
+          22,
+          32
+        ],
+        [
+          34,
+          53
+        ],
+        [
+          59,
+          145
+        ],
+        [
+          149,
+          169
+        ],
+        [
+          171,
+          376
+        ]
+      ],
+      "why": "步驟／錯誤欄位、時間取樣與 split"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "core/evaluate.py",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "ranges": [
+        [
+          1,
+          59
+        ],
+        [
+          71,
+          138
+        ],
+        [
+          148,
+          164
+        ],
+        [
+          171,
+          179
+        ]
+      ],
+      "why": "入口、閾值掃描與 checkpoint 條件"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "base.py",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "ranges": [
+        [
+          10,
+          20
+        ],
+        [
+          75,
+          93
+        ],
+        [
+          117,
+          130
+        ],
+        [
+          179,
+          189
+        ],
+        [
+          342,
+          400
+        ],
+        [
+          406,
+          425
+        ],
+        [
+          427,
+          437
+        ],
+        [
+          440,
+          463
+        ]
+      ],
+      "why": "真正的 step/sub-step 聚合與 metric 輸入"
+    }
+  ],
+  "environment": "真實廚房中遵循食譜或刻意誘發錯誤的錄製。recording、recipe、person、environment split 分別管理；同一食譜多錄製是 case，不自動增加獨立任務。",
+  "tasks": "error recognition、early error recognition、多步定位／程式學習；task_graph 的 steps/edges 可保留先後與選擇限制。loader 另有五類錯誤 one-vs-rest 標籤及 has_errors，未出現／負時間步驟不當作已觀察完成。",
+  "data": "step_annotations 以 recording_id 連 steps 的 step_id、start/end_time、description、has_errors；error_annotations 另連多個 errors.tag。ImageBind 特徵按 2 秒索引，其他 backbone 按 1 秒；floor/ceil 後切片，同一 step 多次出現會串接。early 只取前半特徵；recording 12_6 在 ImageBind 分支因無特徵跳過。",
+  "evaluation": "base.py sub-step 以 sigmoid>.5 算 accuracy/P/R/F1，ROC-AUC 用連續分數，但 PR-AUC 實際餵二值預測。step 層取每個 loader batch 的平均分數，再可選全測試集 min-max 正規化，以 threshold 判斷；GT 平均>.95 才當 error。README 報 step split=.6、recording=.4，core/evaluate.py 目前掃 .5/.6，需固定原作條件。",
+  "standardization": {
+    "profile": "procedural_errors_task_graph",
+    "reuse": "24 份 recipe graph 的路徑清單、逐步錯誤 schema、split 型別及 error／early 的資料流程。mugcake.json 作為已逐項閱讀的 task graph 範例；其他 graph 不能據此宣稱內容全審。",
+    "transform": "case ID 用 recording+step+occurrence，保留完整秒數、重複片段及合併規則；source 關聯原始影片、特徵與 graph。error labels、early prefix、step/recording/person/environment split 分欄；評分儲存閾值、min-max、batch_size 和二值 PR-AUC 的原始行為。",
+    "missing": "尚未取得影片／特徵、執行評分或核讀 zero-shot/multi_step_localization 全實作。step 切分內 phase=test/val 對應片段命名互換，應以實際索引存檔；batch 必須維持單一步驟，否則 collate 後 batch 被當 step。程式保留作者絕對路徑、手選 epoch 表和 start-end>1 條件，均需 adapter 驗證與差異記錄。"
+  },
+  "version_note": "Error-Dataset/annotations 轉向 CaptainCook4D/annotations；2023 初版與 2024 最終 baseline／2025 衍生工作分開。主 repo 無 Python 不能推定整項無程式，實作在其明確連結的子倉庫。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "CaptainCook4D/CaptainCook4D",
+      "path": "README.md",
+      "commit": "1137b884e038cc128589c18eab215024018fb642",
+      "sha256": "7a4e5566619bb4a85f83113a182e3b1731a65609acb4e46b4ddbfb3ed02c4a1c",
+      "url": "https://github.com/CaptainCook4D/CaptainCook4D/blob/1137b884e038cc128589c18eab215024018fb642/README.md",
+      "local_file": "audit/.cache/github_review/repos/CaptainCook4D__CaptainCook4D/files/README.md"
+    },
+    {
+      "repo": "Error-Dataset/annotations",
+      "path": "README.md",
+      "commit": "a8a920a3293c4db27099a20ddbe3a3a9be1283e3",
+      "sha256": "cc303fa31a50ea42d56aa0b2657137a64363a36fc40d1587cd0b2984e2744053",
+      "url": "https://github.com/CaptainCook4D/annotations/blob/a8a920a3293c4db27099a20ddbe3a3a9be1283e3/README.md",
+      "local_file": "audit/.cache/github_review_worker/early/files/Error-Dataset__annotations/README.md"
+    },
+    {
+      "repo": "Error-Dataset/annotations",
+      "path": "annotation_json/step_annotations.json",
+      "commit": "a8a920a3293c4db27099a20ddbe3a3a9be1283e3",
+      "sha256": "c9f3050b7f7487bbcf5f798f22a232a1030c92b8825da26b2dc08c889bb182cf",
+      "url": "https://github.com/CaptainCook4D/annotations/blob/a8a920a3293c4db27099a20ddbe3a3a9be1283e3/annotation_json/step_annotations.json",
+      "local_file": "audit/.cache/github_review_worker/early/files/Error-Dataset__annotations/annotation_json/step_annotations.json"
+    },
+    {
+      "repo": "Error-Dataset/annotations",
+      "path": "task_graphs/mugcake.json",
+      "commit": "a8a920a3293c4db27099a20ddbe3a3a9be1283e3",
+      "sha256": "60ac7eadb62b806d4012d915391d17497f8efed1a86e12383656472e70c3147c",
+      "url": "https://github.com/CaptainCook4D/annotations/blob/a8a920a3293c4db27099a20ddbe3a3a9be1283e3/task_graphs/mugcake.json",
+      "local_file": "audit/.cache/github_review_worker/early/files/Error-Dataset__annotations/task_graphs/mugcake.json"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "README.md",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "sha256": "6150719857afba992e84d4529ba43c214146371e6661513d179aee40e0005148",
+      "url": "https://github.com/CaptainCook4D/error_recognition/blob/35ef284a673230a3df09dd971fc5163414f23b2b/README.md",
+      "local_file": "audit/.cache/github_review_worker/early/files/CaptainCook4D__error_recognition/README.md"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "dataloader/CaptainCookStepDataset.py",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "sha256": "d59fa321d72f729690d8bc67f295686550380fe4f88dffa72e189fe4115ccd8b",
+      "url": "https://github.com/CaptainCook4D/error_recognition/blob/35ef284a673230a3df09dd971fc5163414f23b2b/dataloader/CaptainCookStepDataset.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/CaptainCook4D__error_recognition/dataloader/CaptainCookStepDataset.py"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "core/evaluate.py",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "sha256": "35fe95289a129d2e0b1dcd85702c2270e1811a93ffcf1cb86dbb52c1998708f6",
+      "url": "https://github.com/CaptainCook4D/error_recognition/blob/35ef284a673230a3df09dd971fc5163414f23b2b/core/evaluate.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/CaptainCook4D__error_recognition/core/evaluate.py"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "path": "base.py",
+      "commit": "35ef284a673230a3df09dd971fc5163414f23b2b",
+      "sha256": "4c4d9c1c52d59d3973357cd0418b4f37898885ca7ce8c149b32c546953cc5732",
+      "url": "https://github.com/CaptainCook4D/error_recognition/blob/35ef284a673230a3df09dd971fc5163414f23b2b/base.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/CaptainCook4D__error_recognition/base.py"
+    }
+  ],
+  "additional_repo_proposals": [
+    {
+      "repo": "Error-Dataset/annotations",
+      "role": "官方標註與 task graphs",
+      "evidence": "主 README 第154、244–245行，解析為 CaptainCook4D/annotations"
+    },
+    {
+      "repo": "CaptainCook4D/error_recognition",
+      "role": "官方 error/early baseline 與 metrics",
+      "evidence": "主 README 第265行"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "paper_id": "P093",
+  "summary": "MoDeSuite有8種移動柔性物任務；具體Spot-Place程式可追到9維控制、觀測組合與on_table判定，但結束訊號及README命令需要核對。",
+  "reading_order": [
+    {
+      "repo": "carolzyy/MoDeSuite",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          150
+        ]
+      ],
+      "why": "核對精確論文、8種任務、兩種機體及外部資料",
+      "commit": "470681a7ff117e487060ad52bc4f199e3fa34474"
+    },
+    {
+      "repo": "carolzyy/MoDeSuite",
+      "path": "task/Drag/__init__.py",
+      "ranges": [
+        [
+          1,
+          49
+        ]
+      ],
+      "why": "同一任務因機體／演算法出現不同Gym ID",
+      "commit": "470681a7ff117e487060ad52bc4f199e3fa34474"
+    },
+    {
+      "repo": "carolzyy/MoDeSuite",
+      "path": "task/Place/spot_place_env.py",
+      "ranges": [
+        [
+          25,
+          98
+        ],
+        [
+          171,
+          204
+        ],
+        [
+          249,
+          365
+        ]
+      ],
+      "why": "資產、步頻、控制／觀測、原生成功條件與done順序",
+      "commit": "470681a7ff117e487060ad52bc4f199e3fa34474"
+    },
+    {
+      "repo": "carolzyy/MoDeSuite",
+      "path": "script/play.py",
+      "ranges": [
+        [
+          168,
+          218
+        ]
+      ],
+      "why": "rollout記錄與輸出格式；不是已驗證總表評分器",
+      "commit": "470681a7ff117e487060ad52bc4f199e3fa34474"
+    }
+  ],
+  "environment": "Isaac Sim 4.2／Isaac Lab，Spot帶臂與輪式Franka；含桿、帶、布等及桌面、走廊、障礙。Spot-Place使用USD桌與桿，num_envs=4是平行複本，不是4種不同環境。",
+  "tasks": "README列Place/Bend/Transport/Drag/Lift/Uncover/Cover/Curtain共8種，分5彈性／3塑性；Gym的機體與PPO/SAC註冊不能當新語義任務。Cover文字誤重複Uncover描述，需以各具體程式與論文釐清。",
+  "data": "Spot-Place配置9維動作=3基座+6手臂，sim.dt=1/200、decimation=2；policy觀測拼桿節點位置、機體位置／四元數、桌中心、關節位置／速度。play記action/obs/reward/timestep至pickle；不可把58維配置宣告當已驗證實際tensor形狀。",
+  "evaluation": "on_table要求桿端落在桌中心x±0.38、y±0.54、z至z+0.08內且桿中點高於桌面；reward另外含距離、成功bonus及失衡罰分。_get_dones返回(time_out, on_table或失衡)，對DirectRLEnv介面的terminated/truncated及wrapper需專門驗證，不能直接把done當成功。",
+  "standardization": {
+    "profile": "sim_mobile_deformable_control",
+    "reuse": "8種原生任務標籤、機體／USD配置、各task class、控制與成功predicate。",
+    "transform": "task連原生class，environment拆資產/初態/機體；case記seed、步頻、控制約定及資訊預算；evaluator獨立保留success、失衡、timeout與reward。",
+    "missing": "USD／示範資料閉合、Isaac Lab精確版本、各8類具體predicate逐項接線、done順序與實際obs維度執行驗證；本機未執行。"
+  },
+  "version_note": "README連2507.21796，倉庫2026發布。README寫scripts/，實際程式在script/；安裝／授權需讀正式檔案，不僅靠MIT徽章。本筆以Spot-Place為具體程式抽讀，不宣稱8類所有程式都逐行核讀。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

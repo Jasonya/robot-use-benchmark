@@ -1,0 +1,108 @@
+{
+  "paper_id": "P116",
+  "summary": "OopsieVerse把機體／物件損傷追蹤加到既有模擬器；任務成功和健康值是兩條評分線。已核對thermal公式、health累積及觀測／HDF5對映。",
+  "reading_order": [
+    {
+      "repo": "UT-Austin-RobIn/oopsieverse",
+      "path": "README.md",
+      "ranges": [
+        [
+          9,
+          38
+        ]
+      ],
+      "why": "精確論文與BEHAVIOR/RoboCasa/RoboSuite父來源",
+      "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480"
+    },
+    {
+      "repo": "UT-Austin-RobIn/oopsieverse",
+      "path": "damagesim/core/damageable_env.py",
+      "ranges": [
+        [
+          43,
+          77
+        ],
+        [
+          240,
+          269
+        ]
+      ],
+      "why": "damage啟用/鎖定、health觀測欄位",
+      "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480"
+    },
+    {
+      "repo": "UT-Austin-RobIn/oopsieverse",
+      "path": "damagesim/core/damageable_mixin.py",
+      "ranges": [
+        [
+          69,
+          99
+        ],
+        [
+          129,
+          174
+        ]
+      ],
+      "why": "初始100、各part累積扣損與最小part健康",
+      "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480"
+    },
+    {
+      "repo": "UT-Austin-RobIn/oopsieverse",
+      "path": "damagesim/core/evaluators/thermal.py",
+      "ranges": [
+        [
+          24,
+          75
+        ]
+      ],
+      "why": "過熱/過冷損傷確切公式",
+      "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480"
+    },
+    {
+      "repo": "UT-Austin-RobIn/oopsieverse",
+      "path": "damagesim/omnigibson/evaluators/thermal.py",
+      "ranges": [
+        [
+          1,
+          60
+        ]
+      ],
+      "why": "具體OG Temperature讀取及缺值行為",
+      "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480"
+    },
+    {
+      "repo": "UT-Austin-RobIn/oopsieverse",
+      "path": "damagesim/omnigibson/damageable_env.py",
+      "ranges": [
+        [
+          233,
+          290
+        ],
+        [
+          437,
+          472
+        ],
+        [
+          1087,
+          1125
+        ]
+      ],
+      "why": "step與damage更新、task completion、序列化健康部件索引",
+      "commit": "a739f99e94f32c3229ae6932299e2e0e8c065480"
+    }
+  ],
+  "environment": "BEHAVIOR-1K/OmniGibson及RoboCasa/RoboSuite父環境＋damageable物件／機體部件；損傷模型擴充不自動產生新的生活場域。",
+  "tasks": "完成原操作目標並控制損傷；需要記錄允許的damage條件、閾值及破壞後能力改變。各任務具體completion function仍由其配置提供。",
+  "data": "obs.health為float32部件向量；info.damage_info分object/part/evaluator，HDF5 attr health_list_link_names固定向量對映，另存task_completion/reward。health是真實可見感測或僅sim特權訊號需在protocol聲明。",
+  "evaluation": "各part由100開始，每次update扣各evaluator damage並下界0，object health取最小part。thermal超出閾值按scale×溫差且cap100；OG取Temperature，讀取失敗回0。step有init_skip_steps和可覆寫reward_fn；計量必須固定步頻/暖機/scale，損傷分數是模擬模型輸出。",
+  "standardization": {
+    "profile": "damage_augmented_robot_simulation",
+    "reuse": "父task＋damage配置、各part健康與細項診斷、HDF5部件字典。",
+    "transform": "case固定機體/材料/損傷參數/步頻/初始health與合法觀測；evaluator分task completion、damage trajectory、約束違反，原先無損傷與擴充協定分版。",
+    "missing": "全任務completion predicates與assets對齊、機械/電氣子模型逐項接線、步頻與真實損傷校準、回放T/T+1及狀態閉合驗證。"
+  },
+  "version_note": "固定2026-10公開碼；本次深入熱損傷及共同health流程，未宣稱所有損傷機制、全部任務或真實安全效能已驗證。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

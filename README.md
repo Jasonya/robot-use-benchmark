@@ -1,6 +1,13 @@
 # Robot-use Benchmark：逐篇來源審閱與任務聯集
 
-目前版本 **v0.11（用途歸納更新2026-10-04）**：先閱讀原作，再分類與比較，最後建立任務聯集及規則擴充。
+目前整理快照 **2026-10-11**。用途分類沿用 **v0.11（2026-10-04）**，新增250篇逐筆GitHub／資料核讀、共同格式說明與完整報告。研究主線是先閱讀原作，再分類與比較，最後建立任務聯集及規則擴充。
+
+- `zh-hant/github-review.html`／`zh-hans/github-review.html`：250篇逐筆結果，183份主來源與67篇方法／綜述可分開篩選。
+- `github/Pxxx.html`：原作五欄、固定倉庫版本、實際閱讀檔案與行段、資料／判分、可重用／需轉換／待補內容。舊網址別名、後續世代、無法取得與無關同名來源各留理由。
+- `github-standard.html`：三層結構、兩個實例、欄位與接口、難度校準及限速更新方法。接口草案0.2不代表所有runtime adapter已實作。
+- `github-report.html`：整體數字、用途與文獻分布、里程碑、共同格式及全部逐篇內容。完整繁中／簡中PDF和CSV／JSON在`downloads/github-review/`；舊PDF仍保留原日期。
+
+閱讀範圍限定每篇列出的來源片段；未公開程式的作品保留原文及查核結果。本輪沒有新增上游模型／機器人執行。核讀倉庫與檔案數不當作任務、環境或題數。
 
 - 現有250篇書目完成初篩；原143來源加40個補入來源，共183份有關鍵章節閱讀紀錄。其餘67篇方法／原作實驗／survey參考保留篩查理由。
 - 672筆數量摘錄附原文單位、PDF頁碼、版本與SHA256；每份來源都有領域、環境、任務、題數、判分、split、重用關係和限制。
@@ -17,10 +24,13 @@ v0.9先訂的1,000場景／5,000任務／100萬題配額已撤回；目標欄為
 npm ci
 npm run build
 npm run verify
+npm run verify:github
 npm run serve
 ```
 
-`docs/`為GitHub Pages發布目錄；push main後自動建置、驗證、發布。瀏覽器檢查：`ROBOT_TEST_URL=http://127.0.0.1:8798/robot-use-benchmark/ node scripts/browser-check.mjs`（需Chrome）。
+`docs/`為GitHub Pages發布目錄；push main後自動建置、驗證、發布。瀏覽器檢查：`ROBOT_TEST_URL=http://127.0.0.1:8808/robot-use-benchmark/ node scripts/browser-check.mjs`（需以`ROBOT_SITE_PORT=8808 npm run serve`啟動預覽，並安裝Chrome）。
+
+逐篇核讀與更新方法見[audit/github_review/README.md](audit/github_review/README.md)。本機原始來源快取不發布；CI驗證公開紀錄、原稿雜湊、格式、來源位置與PDF對應，不會在每次部署時重新下載所有GitHub或執行上游模型。
 
 用途歸納方法和原22份對照表在 `coverage.html#domain-method` 與 `coverage.html#domain-reclassifications`。舊 `domain=unspecified` 連結會顯示這22份已完成歸類的來源。v0.10的18類／22未歸類快照及109頁PDF已移至歷史檔案。
 

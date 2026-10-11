@@ -1,0 +1,51 @@
+{
+  "paper_id": "P170",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "MotionForge原文定義動態操作與延遲感知評測；已排除同名Blender動畫工具倉庫，精確paper-ID與robot關鍵字搜尋仍未確認本篇官方code。",
+  "reading_order": [],
+  "environment": "原文分Factory Conveyor、Circular Motion、Home Tabletop、Embodied Interaction四個scene family，各10task；families代表場景/動態配置，非四個完全獨立生活用途。",
+  "tasks": "40個semantic task families中17個long-horizon，11種primary motion pattern；只改速度的variants在原文計數協定合併，這點可直接用來對齊我們的task granularity。",
+  "data": "生成約20kepisodes，訓練每task只取50successful demo、共2000；每scene family訓練一個model，所以每policy方法有4個family-specific模型。80k訓練steps×batch32不是獨立資料題量。",
+  "evaluation": "每task每方法50個固定seed，對40task macro-average；R1環境120Hz獨立於推論前進，action execution horizon預設16，latency按方法原生pipeline量測。ID/OOD只改指定因素，測例需要保存連續時間/延遲規則，不可換同步step後沿用原作分數。",
+  "standardization": {
+    "profile": "dynamic_manipulation_with_realtime_latency",
+    "reuse": "原文40task/17long/11motion分類、速度variant去重口徑與R1時間協定。",
+    "transform": "task以語義family去重，case另含動態因果/速度/物件/外觀與seed；result保留latency、policy-family training scope與真實時間控制規則。",
+    "missing": "官方repo、task與motion生成器、固定case/scene/asset manifest、R1 scheduler/scorer及來源實測。"
+  },
+  "version_note": "原文2609.25689v1；同名mayalhc/motionforge是Blender動畫工具，與作者/任務不同。2026-10-11兩個精確GitHub查詢均無結果；只宣稱本次未確認，不宣稱程式永久不存在。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2609.25689",
+    "pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a",
+    "paper_pages_read": [
+      3,
+      6
+    ],
+    "excluded_candidate_evidence": {
+      "repo": "mayalhc/motionforge",
+      "commit": "d902da1352848b478e7976b8587cefd14396a8a4",
+      "path": "docs/index.md",
+      "sha256": "7f8ed3890bde70d5e715cf9c388bdecd70069e08d9b203917415d9e1b20f7c48",
+      "ranges": [
+        [
+          1,
+          30
+        ]
+      ],
+      "finding": "Blender character-animation guide using ARDY/MotionBricks; not the dynamic-object manipulation paper"
+    },
+    "search_receipts": [
+      "audit/.cache/github_review/search/P170-paper-id.json",
+      "audit/.cache/github_review/search/P170.json",
+      "audit/.cache/github_review/search/P170-robot.json"
+    ]
+  },
+  "excluded_repositories": [
+    {
+      "repo": "mayalhc/motionforge",
+      "reason": "Blender/ARDY角色動畫工具，非2609.25689動態機器人操作benchmark。"
+    }
+  ]
+}

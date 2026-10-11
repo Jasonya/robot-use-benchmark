@@ -1,0 +1,718 @@
+{
+  "paper_id": "P184",
+  "name": "DLO-Lab",
+  "title": "DLO-Lab: Benchmarking Deformable Linear Object Manipulations with Differentiable Physics",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.04206",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P184",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+    "identity_note": "arXiv:2606.04206v1 → dlo-lab-26.github.io第一方[Code] → UMass-Embodied-AGI/DLO-Lab；README列相同六位作者與2606.04206。專案頁另一個zzyunzhi/template只是網頁模板，不納入benchmark source。",
+    "summary": "已核讀8-task registry、原生RL/DiffRL action與時間約定、coiling/lifting/wrapping的具體reward、trajectory aggregation，以及LeRobot匯出／讀取。原生episodic return、存活到horizon的diagnostic success及論文影片人工success三者不同；生成示範的過濾也只排除absorbing，不證明任務完成。",
+    "environment": "Genesis衍生的Taichi differentiable rod simulator，ROD material可設E/G、segment radius/mass、接觸friction與塑性；場景配Franka、cones/posts、rings等。coiling具體為60個rod vertices、間距0.02 m、radius0.01 m與固定cone，control_idx=[1]在reset直接attached_to_gripper，不能視為已包含自由抓取成功。scene dt=0.001 s、substeps=5；一次policy action跨steps_interval個scene steps，須另保留此數與split，不以影片fps推控制頻率。",
+    "tasks": "registry正好8個固定horizon任務：coiling、gathering、lifting、separation、slingshot、unknotting、wiring_post、wrapping。論文第6頁另列Letter Art與Wiring-ring，屬DLO agent的長時程分解實驗，未在此8-task registry中，分開建task來源／協定。grasp候選、rod nodes、posts、robot arms與rollout次數都不是task數；未取得固定case manifest，案例總數不填虛構值。",
+    "data": "RL privileged observation按(rope vertices+additional objects)×6+grasp points×14，包含位置／速度、末端pose及arm joints；RL action每control point 6D，先乘_act_magnitude、clip、L2限制，再拆xyz／rotation，Pink controller預設translation=m、rotation=degrees。DiffRL只有每point3D translation並從rope vertex反傳，不能共享同一action schema。資料匯出另統一為observation.state float32[16]、action[12]、action.joint[18]，單臂左側zero padding；action排列[right_xyz,left_xyz,right_rot,left_rot]。相機front/wrist_right/wrist_left，單臂wrist_left為黑圖，不是第三個真實視角。timestamp=step_idx×scene.dt×n_substeps_per_step；初frame有zero action，之後capture在step之後，末frame action/action.joint又複製前frame，必須保留原對齊。匯出data/chunk-000/file-000.parquet、meta/info.json/stats.json/tasks.parquet、meta/episodes/...與videos/chunk-*/observation.images.<cam>/episode_*.mp4，split只宣告train。filter reader只讀consolidated file-000；需保持其前置條件。",
+    "evaluation": "coiling reward=exp(−0.1Σv||v−(0,0,0.15)||)，是距離proxy而非繞圈成功。lifting reward=5×兩環高度和+rope相對抬高項−0.5×rope到兩環最近距離−100×末端距環小於0.08 m的penalty；loss_criterion另外含stretch loss，不能當相同分數。wrapping以xy-plane角度和／2π的絕對winding、與1圈的平方誤差及到三柱最近距離超出0.015 m的penalty計reward。coiling eval_traj累加substep reward，另回final_reward及forward_time，NaN/failed final用survival_ratio−100；CMA可選cum或final做最佳化。PPO儲存undiscounted return及末reward，diagnostic success_rate=(episode_length==n_outer_steps)，只是未提前失效。論文主表報固定budget內最大episodic return、3 seeds；附錄影片人工success用每RL方法15條、GD1條、CMA最佳checkpoint的top15條。這些不是同一個自動success metric。",
+    "standardization": {
+      "profile": "differentiable_dlo_tasks_and_generated_robot_episodes",
+      "reuse": "8-task registry、具體reward/loss、scene／material／control-point參數、macro/micro-step約定、LeRobot欄位與frame/video reader。",
+      "transform": "source保存此Genesis衍生commit及外部dependency／asset來源；environment按DLO拓樸、材料、fixture、robot/grasp attachment建立；task保存原goal文字與reward program。case保存seed、randomization、grasp indices、horizon、algorithm、sampling budget及checkpoint；evaluator分cum_return/final_reward、simulation-survival及人工task success。資料另記arm_present／camera_present mask、原raw action及縮放後物理action、前後state/action對齊，task名稱去重不靠生成episode數。",
+      "missing": "assets與Mushroom-RL/Pink等依賴的完整pin／驗證；論文影片success rubric／標註及top15選擇名冊；完整task checker覆蓋；LeRobot產生資料的action-time與SHAC格式驗證；data generation僅依absorbing過濾且在n_envs>1時用obs0選action後tile給各env，不能直接視為獨立閉迴路成功示範。"
+    },
+    "version_note": "固定2026-10-08的4af05620，晚於June2026 PDF，包含新的LeRobot輸出及registry整理；未宣稱與論文原始程式完全一致。envs/README稱reward非負／loss近似負reward是設計指南，具體lifting/wrapping程式有penalty與不同loss，標準化以實作為準。README的SharePoint資產與Mushroom-RL fork未下載；未執行模擬／policy。",
+    "integration_issues": [
+      "PPO字面success_rate是存活率，生成器saved successful也是註解；不可寫入本庫task-success欄。",
+      "RL每point6D且rotation預設degrees；DiffRL每point3D，export另有16/12/18D與padding，需分profile。",
+      "八個固定tasks與兩個agent長時程tasks、cum/final return／人工success、資料post-step對齊及多env動作broadcast均需保持可追溯。"
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            3,
+            39
+          ],
+          [
+            68,
+            81
+          ],
+          [
+            154,
+            209
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 213,
+        "sha256": "8b90975525574e0d021195247989613d884bf685110e4ee1cdbd30cd6f39f58c",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/README.md",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/README.md#L3-L39",
+        "why": "確認論文、外部assets、八task與本版新增資料匯出流程。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/envs/registry.py",
+        "ranges": [
+          [
+            16,
+            50
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 50,
+        "sha256": "45c81141fcaaf1eed8c5b198f6b43839d857f4d7de82d2f222d4e01c5d899a6d",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/registry.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/registry.py#L16-L50",
+        "why": "實際唯一task→Train_Env subclass清單。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/envs/base.py",
+        "ranges": [
+          [
+            30,
+            108
+          ],
+          [
+            298,
+            353
+          ],
+          [
+            418,
+            439
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 722,
+        "sha256": "7b79c79a185488831a304eea0c281d3fa4069a8a4c3cb559007c420293ca4f72",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/base.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/base.py#L30-L108",
+        "why": "scene dt／substeps、RL觀測/action sizing、DiffRL的3D vertex控制。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/envs/env_coiling.py",
+        "ranges": [
+          [
+            42,
+            80
+          ],
+          [
+            111,
+            134
+          ],
+          [
+            149,
+            204
+          ],
+          [
+            326,
+            351
+          ],
+          [
+            353,
+            469
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 647,
+        "sha256": "317f9955143123755bf6cebc83a338e5b25334ce101ae87db46f29ec4515f643",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_coiling.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_coiling.py#L42-L80",
+        "why": "60節點scene、指定grasp vertex、exp-distance reward、NaN failure、sum/final return與observation。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/envs/env_lifting.py",
+        "ranges": [
+          [
+            188,
+            272
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 863,
+        "sha256": "3bb2291b9aa47e952d90034950fb031c8f64a42d74e57eacfb5371bace3b9ac9",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_lifting.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_lifting.py#L188-L272",
+        "why": "兩環高度／rope距離與gripper近距離penalty；differentiable loss不等於負reward。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/envs/env_wrapping.py",
+        "ranges": [
+          [
+            211,
+            262
+          ],
+          [
+            341,
+            414
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1002,
+        "sha256": "43f01621a6ef4373ee7cead1bc7b532309423f3531d101dc96397c717c17e037",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_wrapping.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/envs/env_wrapping.py#L211-L262",
+        "why": "封閉rope winding number、15mm柱半徑距離penalty及不同優化loss。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/utils/controller.py",
+        "ranges": [
+          [
+            501,
+            580
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 926,
+        "sha256": "2bacebff2f39a07db0b810bc5110e590e0ac0e6c73881e95fcf2390a2f9f293e",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/utils/controller.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/utils/controller.py#L501-L580",
+        "why": "Pink IK的translation公尺、rotation預設degrees與world target更新。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/trajopt/cmaes.py",
+        "ranges": [
+          [
+            90,
+            123
+          ],
+          [
+            292,
+            334
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 524,
+        "sha256": "398c3c7441ac648280d3029cdaf5ce699386904a4c51a2fa791cc5c0b7a9145e",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/trajopt/cmaes.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/trajopt/cmaes.py#L90-L123",
+        "why": "由eval_traj取得cum/final reward，依use_last_state_reward選CMA最佳軌跡。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/rl/rudinppo.py",
+        "ranges": [
+          [
+            299,
+            358
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 458,
+        "sha256": "506aab4ffe6a62ef48e26bcdf82b6ec0cd397f30797f8a011fa0ebff4bd6e55e",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/rl/rudinppo.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/rl/rudinppo.py#L299-L358",
+        "why": "PPO使用undiscounted return；success_rate欄其實只是episode_length==horizon。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/datagen/config.py",
+        "ranges": [
+          [
+            10,
+            30
+          ],
+          [
+            100,
+            153
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 153,
+        "sha256": "8a844f5aaf58ca634f744d32b4b838f5cd2c0aedbf69d6bacc25e25600e6a76f",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/config.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/config.py#L10-L30",
+        "why": "16D state／12D action／18D joints及單臂padding、相機欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/datagen/generate_dataset.py",
+        "ranges": [
+          [
+            77,
+            126
+          ],
+          [
+            135,
+            211
+          ],
+          [
+            335,
+            417
+          ],
+          [
+            570,
+            608
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 662,
+        "sha256": "efe6faeea6de747968e67b86fbd00ce5e899c5098caf50dfea749d7c49896c5a",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/generate_dataset.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/generate_dataset.py#L77-L126",
+        "why": "run_config reader、post-step資料擷取、failed filter、T+1紀錄與action時序。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/datagen/export.py",
+        "ranges": [
+          [
+            54,
+            132
+          ],
+          [
+            388,
+            440
+          ],
+          [
+            610,
+            630
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 638,
+        "sha256": "a911d0f0d101a862d7697ea0f35d58c94782e79b171f737a960b173bad8ec3aa",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/export.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/export.py#L54-L132",
+        "why": "實際parquet schema、影片template、v3 metadata與train-only split。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMass-Embodied-AGI/DLO-Lab",
+        "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+        "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+        "ref": null,
+        "path": "experiments/datagen/filter_dataset.py",
+        "ranges": [
+          [
+            40,
+            73
+          ],
+          [
+            197,
+            255
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 285,
+        "sha256": "89b5539de5847b7be4291d71ab14f6a0e77fe4b92398d2a4075d1a8aa5a760a1",
+        "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/filter_dataset.py",
+        "reading_url": "https://github.com/UMass-Embodied-AGI/DLO-Lab/blob/4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8/experiments/datagen/filter_dataset.py#L40-L73",
+        "why": "單一consolidated parquet reader與episode/frame/video重編號。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7bf8289b345e3f1df2c0eaafb00a9cebb9db8a6664b058cf5669e5201d13b250"
+  },
+  "repository_binding_review_sha256": "7bf8289b345e3f1df2c0eaafb00a9cebb9db8a6664b058cf5669e5201d13b250",
+  "repository_bindings": [
+    {
+      "requested_repo": "UMass-Embodied-AGI/DLO-Lab",
+      "resolved_repo": "UMass-Embodied-AGI/DLO-Lab",
+      "aliases_in_this_review": [
+        "umass-embodied-agi/dlo-lab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "4af05620a9b3c28c0fc8bd80ceb4f1edd56fd3e8",
+          "reviewed_files": [
+            "README.md",
+            "experiments/datagen/config.py",
+            "experiments/datagen/export.py",
+            "experiments/datagen/filter_dataset.py",
+            "experiments/datagen/generate_dataset.py",
+            "experiments/envs/base.py",
+            "experiments/envs/env_coiling.py",
+            "experiments/envs/env_lifting.py",
+            "experiments/envs/env_wrapping.py",
+            "experiments/envs/registry.py",
+            "experiments/rl/rudinppo.py",
+            "experiments/trajopt/cmaes.py",
+            "experiments/utils/controller.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/UMass-Embodied-AGI/DLO-Lab",
+          "link_label": "[Code]",
+          "project_url": "https://dlo-lab-26.github.io/",
+          "page_sha256": "1c7445766b2055b7373402bc4b6b3aa777cc230d2195b80bef31b4fb2d21824c"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P184",
+          "review_file": "content/github_review/reviews/P184.json",
+          "review_sha256": "7bf8289b345e3f1df2c0eaafb00a9cebb9db8a6664b058cf5669e5201d13b250",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P184",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DLO-Lab，arXiv 2606.04206v1。",
+    "scope_read": "10tasks、differentiable physics、演算法資訊條件、success appendix。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      18,
+      19
+    ],
+    "domains": [
+      "裝配與生產作業"
+    ],
+    "role": "線材操作與物理benchmark",
+    "environment": "Taichi/Genesis的rod與rigid/MPM coupling；近點kinematic抓持簡化，不是完整摩擦抓持。",
+    "tasks": "10tasks：8固定horizon與2長流程Letter Art/Wiring Ring；主要實驗state-based，不全是視覺策略。",
+    "cases": "main optimization/RL比較3seeds、預算內最高return。附錄RL每task15trajectories，GD單一optimized，CMA-ES選best checkpoint的top15。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "DLO task definitions",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主固定horizon評測tasks",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "附錄RL每task evaluation trajectories",
+        "pages": [
+          18,
+          19
+        ]
+      }
+    ],
+    "evaluation": [
+      "return與goal success；RL/GD/CMA-ES的資訊、樣本挑選與動力學梯度存取不同，不能視為統一closed-loop protocol。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "主比較沒有一套統一held-out visual split；VLM長流程與SmolVLA4task子集另列。",
+    "lineage": "物理模組及task設計；letter/rope shapes是幾何目標，非完整日常領域。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          18,
+          19
+        ],
+        "locator": "Simulator、Tasks、Main Results、Appendix Success Rate",
+        "supports": "10/8、資訊條件與15trials挑選差異"
+      }
+    ],
+    "unresolved": [
+      "需release IDs才能建立所有randomized cases；不同algorithm native evaluation不可直接相加。"
+    ],
+    "reuse": "可借線材task定義，但做all-in-one比較需要先統一觀測、重置、預算與selection。",
+    "reviewed_pdf_sha256": "91128b16d310632077dd23caa908483ba75b8851a77808b98368fbce1dcea0b0",
+    "reviewed_on": "2026-10-02",
+    "name": "DLO-Lab",
+    "year": 2026,
+    "title": "DLO-Lab: Benchmarking Deformable Linear Object Manipulations with Differentiable Physics",
+    "source_url": "https://arxiv.org/abs/2606.04206",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "industry"
+    ],
+    "review_tags": [
+      "工具使用",
+      "工業製造",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P184",
+      "domain_ids": [
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P184",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            18,
+            19
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "10tasks：8固定horizon與2長流程Letter Art/Wiring Ring；主要實驗state-based，不全是視覺策略。",
+            "Taichi/Genesis的rod與rigid/MPM coupling；近點kinematic抓持簡化，不是完整摩擦抓持。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "91128b16d310632077dd23caa908483ba75b8851a77808b98368fbce1dcea0b0"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "91128b16d310632077dd23caa908483ba75b8851a77808b98368fbce1dcea0b0",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P184",
+      "name": "DLO-Lab",
+      "expected_title": "DLO-Lab: Benchmarking Deformable Linear Object Manipulations with Differentiable Physics",
+      "source_url": "https://arxiv.org/abs/2606.04206",
+      "pdf_url": "https://arxiv.org/pdf/2606.04206",
+      "retrieved_at": "2026-10-02T21:34:54.018507+00:00",
+      "pdf_sha256": "91128b16d310632077dd23caa908483ba75b8851a77808b98368fbce1dcea0b0",
+      "text_sha256": "c9ff3e334ccf853f0348cde7578bcc474c73a3ba0b184b35b78f06b05f1b6441",
+      "pdf_bytes": 6967699,
+      "pages": 25,
+      "text_characters": 129202,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.04206v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.04206v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "DLO task definitions",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P184:1",
+        "paper_id": "P184",
+        "benchmark": "DLO-Lab",
+        "native_term": "DLO task definitions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.04206v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.04206v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主固定horizon評測tasks",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P184:2",
+        "paper_id": "P184",
+        "benchmark": "DLO-Lab",
+        "native_term": "主固定horizon評測tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.04206v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.04206v1",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "附錄RL每task evaluation trajectories",
+        "pages": [
+          18,
+          19
+        ],
+        "record_id": "review10:P184:3",
+        "paper_id": "P184",
+        "benchmark": "DLO-Lab",
+        "native_term": "附錄RL每task evaluation trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.04206v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.04206v1",
+            "locator": "PDF pp. 18, 19",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "UMass-Embodied-AGI/DLO-Lab"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,99 @@
+{
+  "paper_id": "P225",
+  "reviewed_on": "2026-10-11",
+  "status": "public_readme_only",
+  "summary": "已確認精確Exo2EgoPose論文與作者repo；固定版本完整樹只有四行README，明示source code與benchmark仍在準備。可核讀論文任務/資料/指標定義，沒有pinned data reader、MPJPE/MPJVE或CALVIN成功checker可檢查。",
+  "identity_note": "Zhaofeng Shi、Heqian Qiu、Lanxiao Wang、Xiang Li、Hongliang Li，Exo2EgoPose: Leveraging Exocentric Demonstrations for Vision-Language guided Egocentric 3D Hand Pose Forecasting，cached PDF為arXiv:2607.15890v2（2026-08-05）。PDF第1頁直接指向ZhaofengSHI/Exo2EgoPose，README精確題名一致；因此是已確認作者庫的placeholder，不是repo找不到或無關同名庫。",
+  "environment": "離線AssemblyHands/Assembly101玩具組裝、Ego-Exo4D活動與EgoMe正確模仿配對影片；AssemblyHands/Ego-Exo4D有同步多視角，EgoMe-pose的Ego/Exo配對可能不同步。CALVIN ABC→D是另行teacher-to-policy蒸餾的robot下游實驗。",
+  "tasks": "VL-EHPF在t時刻輸入1–10步Ego影格、語言instruction與同段手姿，輸出t+1至t+10的42×3座標（兩手各21點）及42點validity。論文DERM把涵蓋觀測與未來的配對Exo影片當訓練監督，從Ego輸入重建Exo表徵，再交GLMM；推論公式只含Ego/語言/pose，不能把實際未來Exo影格加入test條件。它預測人體pose，不直接輸出robot動作。",
+  "data": "論文報AssemblyHands衍生episode train/val/test=6,120/355/355，Ego-Exo4D=10,869/1,540/1,540，EgoMe-pose=6,067/1,344/2,648；這是episode數，不是10-frame forecast windows、joint數或實際可下載case數。AssemblyHands/EgoMe-pose為15FPS、Ego-Exo4D為30FPS，RGB resize224×224，10步預測因此有不同時間長度。AssemblyHands保留每手>10個valid joints且root有效的frame，world→Ego camera並依共用frame ID連Assembly101文字；隨機Exo view配對，從原val隨機切50%作test。Ego-Exo4D須Aria去畸變、world→camera及joint-order映射，文字window為atomic timestamp前0.5秒至後1秒且每frame pose有效，也將原val隨機半分作test。EgoMe-pose以InterHand相對姿態+RootNet root-depth轉絕對座標，剔除false imitation、hand confidence<0.6或有效frame比例≤95%的episode；非同步Exo以片段相對位置線性對齊。上述隨機seed、episode/frame清單、joint permutation、標註檔schema均無公開reader可核。",
+  "evaluation": "僅論文§4.1.2：MPJPE比較root-aligned predicted/GT關節的Euclidean距離；MPJVE比較關節位移，論文單位寫mm，沒有可核程式證明另除Δt，不能改記mm/s。這與EMPIRE的absolute-camera MPJPE不同。雖模型預測validity，實際scorer使用GT或pred mask、兩手/root是否計入、分母是有效joint-frame或先逐episode平均、位移是否包含最後觀測點及缺失鄰接frame處理均待程式確認，不能用10×42固定分母填空。CALVIN表列連續完成1–5任務比例、Avg.L.與Avg.R.，採ABC訓練→D測試及Exo2EgoPose teacher蒸餾GR-1類student；本版無robot action adapter、trial manifest或具體success checker可讀，不能把手姿誤差換成robot成功率。",
+  "standardization": {
+    "profile": "offline_cross_view_supervised_3d_hand_pose_paper_only",
+    "reuse": "重用已確認paper/repo身份、三個衍生資料集的母來源、42點/10步/validity任務契約及論文明列的split/取樣條件；repo僅提供發布狀態證據。",
+    "transform": "case以母資料版本+衍生episode+query frame+split+FPS識別；保存world/camera/root-aligned三層座標、兩手joint-order與validity。另記train-only Exo監督、同步/相對時間線性對齊、原val→新val/test關係；CALVIN蒸餾獨立為下游reuse關係，metric保留pose與robot兩類原生單位。",
+    "missing": "程式與EgoMe-pose benchmark尚未發布；缺前處理、reader、精確split/seed、有效case manifest、MPJPE/MPJVE具體分母與root/mask約定、weights及CALVIN蒸餾/執行成功判定。不能執行或聲稱本輪重現論文分數。"
+  },
+  "version_note": "repo固定commit 17c1d8c09e357045aadcdad13708ce48b30cff2e（2026-09-22），tree未truncated且只有README.md。論文摘要寫code available，而此快照README仍為will be released soon；依實際程式狀態列public_readme_only。論文未提供真正benchmark檔案，未以同名repo或母資料現行版本補成已發布。",
+  "discovery_evidence": [
+    {
+      "kind": "cached_primary_paper",
+      "url": "https://arxiv.org/pdf/2607.15890",
+      "pdf_sha256": "de7fddd04e06fecbb6bf89e299b81ad55b49b90cbbb5d57ec0856fd8cd1a5c43",
+      "local_file": "audit/.cache/fulltext_review/P225/pages.json",
+      "sha256": "347cc92ce1ba9fd60fca6354e4a33c4327126d1f5ebe5814458052edafdbdc9b",
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/7/text",
+        "/11/text",
+        "/12/text"
+      ],
+      "finding": "精確paper/repo、exo僅訓練監督、42-joint任務、衍生split與time/frame/root-aligned metric、CALVIN蒸餾範圍。"
+    },
+    {
+      "kind": "cached_primary_pdf_repository_link",
+      "local_file": "audit/.cache/github_review/P225-discovery.json",
+      "sha256": "d0bf28a34b0db5350414bbc36dbec02ffe57cef4a115c1d034eca21a0457b042",
+      "finding": "PDF第1頁直接指向作者repo，title與README一致。",
+      "json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates"
+      ]
+    },
+    {
+      "kind": "pinned_repository_tree",
+      "local_file": "audit/.cache/github_review/repos/ZhaofengSHI__Exo2EgoPose/tree.json",
+      "sha256": "72734ba670c62415c760610a4284fdc4fe9a5cc2bd9c68e6388df266a3f12c74",
+      "finding": "完整樹只有README.md；未確認可讀模型、data或scorer程式。",
+      "json_pointers": [
+        "/sha",
+        "/tree",
+        "/truncated"
+      ]
+    }
+  ],
+  "reading_order": [
+    {
+      "provider": "github",
+      "repo": "ZhaofengSHI/Exo2EgoPose",
+      "commit": "17c1d8c09e357045aadcdad13708ce48b30cff2e",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/ZhaofengSHI__Exo2EgoPose/files/README.md",
+      "sha256": "5c7ce76d9e75c0fd80e850cb7da95cb75d3908e8551acbee9ed7b029b3488534",
+      "ranges": [
+        [
+          1,
+          4
+        ]
+      ],
+      "why": "精確題名與source code/benchmark尚在準備的公開狀態。",
+      "url": "https://github.com/ZhaofengSHI/Exo2EgoPose/blob/17c1d8c09e357045aadcdad13708ce48b30cff2e/README.md",
+      "git_blob_sha": "087f128b4b03efc384581d0d404c3add185b6489"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "ZhaofengSHI/Exo2EgoPose",
+      "commit": "17c1d8c09e357045aadcdad13708ce48b30cff2e",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/ZhaofengSHI__Exo2EgoPose/files/README.md",
+      "sha256": "5c7ce76d9e75c0fd80e850cb7da95cb75d3908e8551acbee9ed7b029b3488534",
+      "ranges": [
+        [
+          1,
+          4
+        ]
+      ],
+      "url": "https://github.com/ZhaofengSHI/Exo2EgoPose/blob/17c1d8c09e357045aadcdad13708ce48b30cff2e/README.md",
+      "git_blob_sha": "087f128b4b03efc384581d0d404c3add185b6489"
+    }
+  ],
+  "runtime_executed": false
+}

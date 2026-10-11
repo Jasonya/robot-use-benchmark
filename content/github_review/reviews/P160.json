@@ -1,0 +1,72 @@
+{
+  "paper_id": "P160",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "rliable可為已有的多run、多task結果加上分佈與不確定性；它不定義robot任務，也不能讓不同原生metric自動變可比。",
+  "reading_order": [
+    {
+      "repo": "google-research/rliable",
+      "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          38
+        ],
+        [
+          62,
+          83
+        ]
+      ],
+      "why": "原論文身分與run×task矩陣使用方法"
+    },
+    {
+      "repo": "google-research/rliable",
+      "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+      "path": "rliable/metrics.py",
+      "ranges": [
+        [
+          20,
+          95
+        ]
+      ],
+      "why": "mean/median/IQM/optimality gap/提升機率的具體公式"
+    },
+    {
+      "repo": "google-research/rliable",
+      "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+      "path": "rliable/library.py",
+      "ranges": [
+        [
+          26,
+          49
+        ],
+        [
+          71,
+          122
+        ],
+        [
+          211,
+          283
+        ],
+        [
+          301,
+          323
+        ]
+      ],
+      "why": "stratified resampling、固定task或task-bootstrap、CI與profile接口"
+    }
+  ],
+  "environment": "方法評估庫，不新增環境；原展示使用Atari/ALE/DM Control/Procgen。robot使用時仍保留原environment/source lineage。",
+  "tasks": "對既有task結果作聚合、bootstrap與performance profile，不是新增task registry或case dataset。",
+  "data": "輸入每個algorithm的num_runs×num_tasks(×其他維度)矩陣，需固定同一task列順序、metric尺度與missing值策略。不能把不同分佈的未知/不適用填0。",
+  "evaluation": "mean先按task平均再總平均；median是task均值的中位數；IQM將所有run×task分數flatten後trim25%；optimality gap=gamma−mean(min(score,gamma))。bootstrap預設只重抽run，task_bootstrap才同時抽task；機率提升按task算Mann–Whitney再平均。不同方法同case配對與共享source的相依性需另設計。",
+  "standardization": {
+    "profile": "statistical_evaluation_aggregation",
+    "reuse": "原生公式、CI與performance profiles、固定task集合/未知task母體兩種推論區分。",
+    "transform": "先對同協定同單位結果建立可比score矩陣；保存run/case/scene群組與分層權重，再報per-domain及整體CI。公式不直接混合SR、距離與LPIPS。",
+    "missing": "真實policy結果矩陣、不同來源群聚重抽樣策略、缺失結果規則、正規化依據；所讀update_indices使用全域np.random，重現時需驗證RNG設定。"
+  },
+  "version_note": "固定3ccd9f4；API標示archived。這是來源實作核讀，未安裝套件或宣稱CI已計算。",
+  "runtime_executed": false
+}

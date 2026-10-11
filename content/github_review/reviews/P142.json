@@ -1,0 +1,72 @@
+{
+  "paper_id": "P142",
+  "summary": "Habitat3.0把人類avatar和機器人互動加入同一平臺；已深入核對social navigation配置與成功判定，其他協作場景仍需各自的task配置。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "path": "README.md",
+      "ranges": [
+        [
+          14,
+          78
+        ]
+      ],
+      "why": "三代Habitat同庫、HITL與multi-agent角色",
+      "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e"
+    },
+    {
+      "repo": "facebookresearch/habitat-sim",
+      "path": "README.md",
+      "ranges": [
+        [
+          14,
+          27
+        ],
+        [
+          47,
+          70
+        ]
+      ],
+      "why": "模擬器／資產角色和三代引用",
+      "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "path": "habitat-lab/habitat/config/benchmark/multi_agent/hssd_spot_human_social_nav.yaml",
+      "ranges": [
+        [
+          1,
+          66
+        ]
+      ],
+      "why": "Spot+human、HSSD、actions/sensors與kinematic模式",
+      "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "path": "habitat-lab/habitat/tasks/rearrange/social_nav/social_nav_sensors.py",
+      "ranges": [
+        [
+          469,
+          551
+        ]
+      ],
+      "why": "距離/朝向/累積跟隨步數的具體成功條件",
+      "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e"
+    }
+  ],
+  "environment": "HSSD等父資產中的Spot和human avatar，含互動/協作設定；Habitat3是平臺版本，不新增整份與Habitat2不重疊的房屋資料。",
+  "tasks": "social navigation、人機共同場景與協作重排；本筆以social navigation深入讀code，不能由平臺支援列表計所有可評task。",
+  "data": "YAML固定agent0 Spot/agent1 human，分別有velocity/停止/oracle等actions，局部定位、另一agent資訊、humanoid detection與RGB-D/深度等配置。所列sensor與policy實際obs_keys要分別保存。",
+  "evaluation": "SocialNavSeekSuccess在安全距離區間且朝向條件成立時累加following_step，未在離開區間時歸零；達門檻後可再要求當前角度。不是連續跟隨時長；use_geo_distance、min/max距離、face/look配置及機體索引均影響判定。",
+  "standardization": {
+    "profile": "human_avatar_robot_social_simulation",
+    "reuse": "agent/機體/資產配置、互動action/sensor契約、具體social success與細項measure。",
+    "transform": "environment連HSSD父來源，case固定各agent可見資訊、控制/模擬模式及人類行為來源；metric存累積步數/距離/朝向與時間單位。",
+    "missing": "原Habitat3論文版本的全episode/asset組合、其他協作task predicates、真實human traces與共同protocol、原生執行驗證。"
+  },
+  "version_note": "本次讀現有Lab0fb6f43/Sim57ee494固定快照，不能當2023原文全部實驗的精確重現；HSSD Spot範例明確採kinematic模式。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

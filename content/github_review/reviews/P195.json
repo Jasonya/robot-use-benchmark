@@ -1,0 +1,64 @@
+{
+  "paper_id": "P195",
+  "reviewed_on": "2026-10-11",
+  "status": "website_only",
+  "summary": "已找到與論文題名、三位作者相符的專案網站repo；其方法/結果區仍是模板文字，未包含Unity/Obi/DreamerV2實作。",
+  "reading_order": [
+    {
+      "repo": "jrome5/Learning-to-unfold-cloth.github.io",
+      "commit": "a7b0550ec3e205e2c11d827d69ec309401c41b5b",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          2
+        ]
+      ],
+      "why": "網站repo題名"
+    },
+    {
+      "repo": "jrome5/Learning-to-unfold-cloth.github.io",
+      "commit": "a7b0550ec3e205e2c11d827d69ec309401c41b5b",
+      "path": "docs/index.html",
+      "ranges": [
+        [
+          7,
+          30
+        ],
+        [
+          33,
+          68
+        ]
+      ],
+      "why": "作者/abstract相符，主要內容仍為placeholder"
+    }
+  ],
+  "environment": "論文Unity/RFUniverse Gym介面與ObiCloth，固定一個cloth corner、Franka在空中展開；與桌面flattening有不同物理設定和目標。",
+  "tasks": "主目標為in-air unfolding，5種garment types×4種agent設定=20個trained agents，不能稱20種新任務。",
+  "data": "原文每step兩張64×64×3影像，加EEF xyz/gripper width/張力boolean；action為4維[-1,1]位移與jaw控制。RGB/normal image及replay-buffer版本分開；每agent1M訓練step不是1M評測case，完整資料/episodes未取得。",
+  "evaluation": "原文用4×4網格估計unfold面積proxy、除最大值並加時間penalty；失敗/近成功/成功按episode內最高unfold量分類，與末態/持續成功不同。沒有scorer程式就無法核驗門檻與投影/面積實作。",
+  "standardization": {
+    "profile": "in_air_cloth_unfolding_world_model",
+    "reuse": "原文action/observation介面、固定角約束、5garment×4agent對照與最高進度評估。",
+    "transform": "case固定pinned corner/cloth parameters、輸入RGB或normals、張力資訊來源與budget；保存maximum progress和final state分項，標明privileged observation。",
+    "missing": "真正方法repo、Unity/Obi資產/接口、demo/replay與split、成功界線/scorer、原生重現與跨backend可比性。"
+  },
+  "version_note": "網站a7b0550為2024版本，論文2602.16675於2026收錄；題名/作者相符但網站不能證明2026實驗程式已公開。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2602.16675",
+    "pdf_sha256": "bd88e04642c648e26f19e4921e0ae8010c8fec3d28619a15320f0ec96776531d",
+    "paper_pages_read": [
+      3,
+      5
+    ],
+    "discovery_record": "audit/.cache/github_review/P195-discovery.json"
+  },
+  "additional_repo_proposals": [
+    {
+      "repo": "jrome5/Learning-to-unfold-cloth.github.io",
+      "role": "matching_project_website_only",
+      "basis": "docs/index.html精確題名與Jack Rome、Stephen James、Subramanian Ramamoorthy相符。"
+    }
+  ]
+}

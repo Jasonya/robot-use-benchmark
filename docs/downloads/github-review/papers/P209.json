@@ -1,0 +1,844 @@
+{
+  "paper_id": "P209",
+  "name": "HUI360",
+  "title": "HUI360: A 360{\\deg} Egocentric Dataset and Baselines for Human-Robot Interaction Anticipation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2608.11051",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "public",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P209",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "HUI360 已核官方 baseline 與 Interact360 標註／CSV 管線。論文結果必須對應 baseline legacy 分支與固定 HF dataset revision；新版 main 的 32-frame／16-frame cutoff、資料 main 及最佳 F1 threshold 搜尋不能直接當論文 30／15 協定。已追到實際 track reader、視窗標籤、AUROC／F1／AP scorer，未執行模型或下載大型資料。",
+    "identity_note": "arXiv:2608.11051v1 的官方 project 明確分開 Code (Baselines)=hucebot/HUI360-Baselines 與 Code (Pipeline)=RaphaelLorenzo/Interact360；前者 README 直接連同一 arXiv 並要求論文使用 legacy，後者雖仍有 arXiv TDB placeholder，但官方 project、HAL 與題名均指向本篇。SSUP-HRI 是重用父資料，不另當 HUI360 新收集來源。",
+    "environment": "robot-egocentric 360° equirectangular 觀測。paper 的新 HUI360 有 9 真實場所、30 robot setups、68 recordings；71.3 小時原始資料裁成 1,937 episodes／11.3 小時（15 fps）。4,310 person tracks 中 375 有物理互動；另 SSUP-A 是 SSUP-HRI 兩個 field sessions 的重標註，27,698 tracks／419 interactions，不可當獨立新捕捉資料。本輪沒有可互動 robot policy 環境，評的是離線 anticipation。",
+    "tasks": "預測人是否即將與平臺發生物理 interaction；positive onset 依投放、拿取等實際事件與人工修訂，並非對 gaze／社交意圖的通用判定。RF／MLP／LSTM 是模型，T_ADV horizons 5/10/15/20/30 frames（15 Hz 下約0.33/0.67/1/1.33/2秒）與輸入降採樣是同一 task 的條件。論文 HUI locations1–7 train、8–9 test，SSUP 第一／二場次 train/test；實際程式依 checkpoint 的 include_recordings_val 等清單選樣，變數 val 不能擅自解讀成另有第三份驗證集。",
+    "data": "Interact360 讀 episodes/<id>/annotations_360.json 的 image_file/image_shape/detections；track_id 可由 associated_track_id 合併，含 validity、bbox、mask_rle、mask_size、engagement_level、17點 ViTPose 與308點 Sapiens。bbox／pose 是原全景像素，x 可跨影像寬度邊界，不能直接裁成普通2D box。detect_interactions 的相交面積>min_pixels_intersection（預設10,000）給 level3，否則0，之後允許人工修訂。export 只收 checked/valid 類 flags，依validity與quality連續段篩選，寫 data-<recording>-<index>-of-<total>.csv；unique_track_identifier=recording_episode_track。timestamp 由檔名 %Y_%m_%d_%H_%M_%S_%f 解析；另存 timestamp_sec、相對track秒、time_to_first_interaction秒，無互動用99999.0 sentinel。缺 Sapiens 資料可填0，需視作缺失而非真座標。baseline CSV reader 把 engagement／時間／ID 列列為 metadata，指定LSTM features為 mask area+bbox+17×(x,y,score)，即56維／frame；keypoints先box-normalize再用固定HUI mean/std。",
+    "evaluation": "legacy get_track_input_possible_indices 將 image_index 連續存在、validity、至少9個ViTPose score≥0.5與mask_size篩選做AND，再找連續段。第一個 engagement>0 定義 onset；interaction_cutoff／positive_cutoff 以frame計。非互動 track 可截到最大mask面積（近距離proxy），並依設定把視窗對齊該處。force_positive_samples 會排除互動track的早期負窗。__len__ 是合格track數，__getitem__ 為各track固定或隨機選一個候選視窗；固定索引清單與subsample必須保存。legacy infer 對每個視窗得到 sigmoid(logit) 或 RF predict_proba[:,1]，用>0.5算 binary P/R/F1，整個pass的分數送 roc_auc_score；training.evaluate 另算 average_precision_score。其 N 是實際送入的合格track視窗，AUROC 比較正負樣本排序，F1分母為2TP+FP+FN，不是4,310 raw tracks、375 interactions或百萬detections。new main 可用 stride 展開多視窗，需重記樣本數；main infer 直接算 AUROC/AP，並在同一集合用100個threshold搜尋最佳F1。未下載實際CSV，因此不宣稱驗算任何eligible test case數。",
+    "implementation_findings": [
+      {
+        "finding": "legacy infer 的所有hard predictions相同分支直接把accuracy/P/R/F1/AUC設0，即使raw scores可能仍有排序資訊。legacy training.evaluate 同分支也將AP設0，卻未初始化 best_threshold／best_f1 就回傳，存在可由控制流程確定的未綁定變數問題；未實際執行。",
+        "sources": [
+          "legacy infer.py:430-443,537-549",
+          "legacy training.py:168-185"
+        ]
+      },
+      {
+        "finding": "main 的 F1 threshold 是對當次evaluation labels最適化，不是獨立validation選好再凍結的operating point；必須將此F1與threshold-free AUROC/AP分開記錄。",
+        "sources": [
+          "main infer.py:343-356",
+          "main utils/eval_utils.py:10-34"
+        ]
+      },
+      {
+        "finding": "main 嘗試相容舊checkpoint時，只要原本沒有config便會exit，即使有hyperparameters也一樣；不能直接承諾legacy checkpoint可供main重現。main evaluate 還無條件使用CUDA timing，CPU-only路徑未驗證。",
+        "sources": [
+          "main infer.py:68-70,167-169,190-195"
+        ]
+      },
+      {
+        "finding": "paper 明說 mean/std 由全HUI360估計，legacy使用固定HUI_NORMALIZATION_VALUES。若共同協定要求train-only normalization，需另建版本而非默默更換原生成績。原標註export以engagement==3定位，baseline以>0定位；須保留原release的label集合與人工修訂。",
+        "sources": [
+          "paper p.6",
+          "legacy datasets/HUIDataset.py:299-304,759-833",
+          "Interact360 export/export_to_dataset_plain_csv.py:274-295"
+        ]
+      }
+    ],
+    "standardization": {
+      "profile": "robot_egocentric_person_track_interaction_anticipation",
+      "reuse": "可重用兩倉庫原生track/frame結構、人工curation flags、mask-intersection標籤、legacy reader／window selector／score path及固定normalization；SSUP重用關係獨立記錄。",
+      "transform": "source 必須同存 paper v1、baseline legacy或main commit、dataset revision、Interact360 commit。environment 區分location／setup／recording；task 保存物理interaction定義與horizon。case 用dataset+recording+episode+track+window起訖／sample index，另保留raw track與條件化window父子關係；frame index、檔名時間、relative seconds、panorama seam／pose confidence／缺失標記分開。evaluator 保存正負樣本N、filters、取樣seed／stride、threshold來源、AUROC/AP/F1及normalization版本，不能轉成機器人完成工作成功率。",
+      "missing": "固定revision的完整CSV／track manifest與checkpoint protocol對齊、eligible windows實際清點、SSUP跨全景邊界與missing-pose處理驗證、legacy邊界分支修正、獨立threshold選擇、原始影像／curation與標註版本閉合。只做靜態核讀；snapshot_download、大型骨架／影像、模型、GUI與模擬均未執行。"
+    },
+    "version_note": "主核論文baseline legacy=32a90eb716e503ef8a0daabc052ce7c34ba36a95，README／config 指定 dataset rlorlou/HUI360@3c8a342548534b6b92d32b0099e266962facdf45，30-frame輸入、15-frame兩cutoff、25epochs。另讀 main=a6bd61c8539061242cbf756a18847c0900a8707c（2026-08-29）新版核心設定／reader入口／scorer，預設32frames／16cutoff／75epochs及hf_dataset_revision: main，不能混用數字。Interact360=d11ec02d666965968293813b9c17501cf1568cf6（2026-05-06），其README的CSV教學雖TBD，實際export程式已存在且已核。以上是選定核心區段，不是全基線架構／整個標註模型codebase已審完。",
+    "additional_repo_proposals": [
+      {
+        "repo": "hucebot/HUI360-Baselines",
+        "ref": "legacy",
+        "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+        "role": "paper_baseline_version",
+        "proposal": "協調者應將論文baseline綁到此分支快照與固定HF dataset revision，main另保留新版關係；既有兩repo binding不需擴到其他模型倉庫。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+        "ref": "main",
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            18
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 168,
+        "sha256": "068d4071a7c52e18a240366b46acaccbe0c3010e633ae56d88f3f9135942deca",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/README.md",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/README.md#L1-L18",
+        "why": "確認本篇身分及 legacy 才對應論文結果。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+        "ref": "legacy",
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            3
+          ],
+          [
+            47,
+            52
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 52,
+        "sha256": "4215cc7f7a99b0e891a274cff6676ab4645402a8ee4e573f68919158341048f5",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/README.md",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/README.md#L1-L3",
+        "why": "確認 legacy 與論文使用的固定 HF 資料版。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RaphaelLorenzo/Interact360",
+        "requested_repo": "RaphaelLorenzo/Interact360",
+        "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+        "ref": "main",
+        "path": "process/detect_interactions.py",
+        "ranges": [
+          [
+            23,
+            52
+          ],
+          [
+            81,
+            105
+          ],
+          [
+            148,
+            157
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 174,
+        "sha256": "0808eab5cba755323f766087f97a1ba8562525e3eebbb8e2a6b23edfdba4cfaa",
+        "url": "https://github.com/RaphaelLorenzo/Interact360/blob/d11ec02d666965968293813b9c17501cf1568cf6/process/detect_interactions.py",
+        "reading_url": "https://github.com/RaphaelLorenzo/Interact360/blob/d11ec02d666965968293813b9c17501cf1568cf6/process/detect_interactions.py#L23-L52",
+        "why": "核實 mask intersection 的 level 3 標註與預設 pixel 門檻。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RaphaelLorenzo/Interact360",
+        "requested_repo": "RaphaelLorenzo/Interact360",
+        "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+        "ref": "main",
+        "path": "export/export_utils.py",
+        "ranges": [
+          [
+            9,
+            36
+          ],
+          [
+            78,
+            126
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 244,
+        "sha256": "f77134561120561e0d91e288f7b95d16aa98edf36c243e25ec6417f7f4cfea08",
+        "url": "https://github.com/RaphaelLorenzo/Interact360/blob/d11ec02d666965968293813b9c17501cf1568cf6/export/export_utils.py",
+        "reading_url": "https://github.com/RaphaelLorenzo/Interact360/blob/d11ec02d666965968293813b9c17501cf1568cf6/export/export_utils.py#L9-L36",
+        "why": "核日期字串、人工檢查 flags、associated track 合併及 invalid 標記。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RaphaelLorenzo/Interact360",
+        "requested_repo": "RaphaelLorenzo/Interact360",
+        "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+        "ref": "main",
+        "path": "export/export_to_dataset_plain_csv.py",
+        "ranges": [
+          [
+            128,
+            295
+          ],
+          [
+            298,
+            394
+          ],
+          [
+            396,
+            445
+          ],
+          [
+            595,
+            624
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 624,
+        "sha256": "d1e79f3b1e754dda45db976bb3dea82d7f11fbb47153a432a5c3c2e417bdee06",
+        "url": "https://github.com/RaphaelLorenzo/Interact360/blob/d11ec02d666965968293813b9c17501cf1568cf6/export/export_to_dataset_plain_csv.py",
+        "reading_url": "https://github.com/RaphaelLorenzo/Interact360/blob/d11ec02d666965968293813b9c17501cf1568cf6/export/export_to_dataset_plain_csv.py#L128-L295",
+        "why": "追逐 detection→track/frame CSV、onset、時間單位、quality 篩選與輸出檔名。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+        "ref": "legacy",
+        "path": "experiments/configs/expe_classifier/lstm_config.yaml",
+        "ranges": [
+          [
+            1,
+            29
+          ],
+          [
+            65,
+            156
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 231,
+        "sha256": "c8994899993a1c534c481c0372de8142f5c9732f14469b80756b85c536ce1ec6",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/experiments/configs/expe_classifier/lstm_config.yaml",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/experiments/configs/expe_classifier/lstm_config.yaml#L1-L29",
+        "why": "核資料 revision、30-frame 輸入、15-frame cutoffs、recording split 及固定取樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+        "ref": "legacy",
+        "path": "datasets/HUIDataset.py",
+        "ranges": [
+          [
+            130,
+            217
+          ],
+          [
+            248,
+            451
+          ],
+          [
+            486,
+            574
+          ],
+          [
+            612,
+            701
+          ],
+          [
+            759,
+            896
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 896,
+        "sha256": "0e180f9a16d80dadbc30e916abed19e0cbd0e85141077ed94c6589a4e87690c6",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/datasets/HUIDataset.py",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/datasets/HUIDataset.py#L130-L217",
+        "why": "追 CSV reader、連續有效影格、正／負例視窗、normalize、每 track 一個樣本的分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+        "ref": "legacy",
+        "path": "infer.py",
+        "ranges": [
+          [
+            396,
+            443
+          ],
+          [
+            530,
+            637
+          ],
+          [
+            670,
+            700
+          ],
+          [
+            771,
+            804
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 885,
+        "sha256": "93ee13462a0727be26fcf7ce6b21a6a8ec16b80d25982aa96d1bb64b31498ca6",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/infer.py",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/infer.py#L396-L443",
+        "why": "核 checkpoint 協定、實際 inference、AUROC／binary F1 與全同硬分類分支。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+        "ref": "legacy",
+        "path": "training.py",
+        "ranges": [
+          [
+            55,
+            68
+          ],
+          [
+            131,
+            185
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 785,
+        "sha256": "ed4ac35e97af8eb9b0b1faf8b77185b12d9f8f34f1907b66e3e6677e75042c6b",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/training.py",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/32a90eb716e503ef8a0daabc052ce7c34ba36a95/training.py#L55-L68",
+        "why": "核 validation AP、threshold sweep 及全同預測時未初始化回傳值。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+        "ref": "main",
+        "path": "experiments/configs/in_hui/lstm_base.yaml",
+        "ranges": [
+          [
+            36,
+            46
+          ],
+          [
+            82,
+            113
+          ],
+          [
+            260,
+            267
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 267,
+        "sha256": "03856bb09fcafe77ffbb2256318ea6100fcf57c65415552cb705a0194d002760",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/experiments/configs/in_hui/lstm_base.yaml",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/experiments/configs/in_hui/lstm_base.yaml#L36-L46",
+        "why": "分開記新版 32／16、stride 與可變動 HF main。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+        "ref": "main",
+        "path": "infer.py",
+        "ranges": [
+          [
+            61,
+            83
+          ],
+          [
+            152,
+            177
+          ],
+          [
+            188,
+            227
+          ],
+          [
+            339,
+            359
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 384,
+        "sha256": "16c7dba5d741bc1a398bf821cdb35831dc3851f5b1e483b2e393b13e2a550c98",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/infer.py",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/infer.py#L61-L83",
+        "why": "核新版 per-input metric、同集合最佳 threshold 與 checkpoint 版本限制。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "hucebot/HUI360-Baselines",
+        "requested_repo": "hucebot/HUI360-Baselines",
+        "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+        "ref": "main",
+        "path": "utils/eval_utils.py",
+        "ranges": [
+          [
+            10,
+            34
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 34,
+        "sha256": "fc95d20efeb60b3562c5672d510b9e077f79fa28929c2df7538430731b46f6c5",
+        "url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/utils/eval_utils.py",
+        "reading_url": "https://github.com/hucebot/HUI360-Baselines/blob/a6bd61c8539061242cbf756a18847c0900a8707c/utils/eval_utils.py#L10-L34",
+        "why": "確認新版以100個threshold求同一label集合的最高binary F1。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f14c11f303a3fca725cee529f90a66489851a8c1de358d86bbd56804e3346a88"
+  },
+  "repository_binding_review_sha256": "f14c11f303a3fca725cee529f90a66489851a8c1de358d86bbd56804e3346a88",
+  "repository_bindings": [
+    {
+      "requested_repo": "hucebot/HUI360-Baselines",
+      "resolved_repo": "hucebot/HUI360-Baselines",
+      "aliases_in_this_review": [
+        "hucebot/hui360-baselines"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+          "reviewed_files": [
+            "README.md",
+            "datasets/HUIDataset.py",
+            "experiments/configs/expe_classifier/lstm_config.yaml",
+            "infer.py",
+            "training.py"
+          ]
+        },
+        {
+          "commit": "a6bd61c8539061242cbf756a18847c0900a8707c",
+          "reviewed_files": [
+            "README.md",
+            "experiments/configs/in_hui/lstm_base.yaml",
+            "infer.py",
+            "utils/eval_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/hucebot/HUI360-Baselines/",
+          "link_label": "Code (Baselines)",
+          "project_url": "https://hucebot.github.io/hui360",
+          "page_sha256": "dcc1db06bd1c92d492bdd470ec39fc4bb4f6fae609bbdef9562de75c7097d729"
+        },
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P209",
+          "review_sha256": "f14c11f303a3fca725cee529f90a66489851a8c1de358d86bbd56804e3346a88",
+          "proposal": {
+            "repo": "hucebot/HUI360-Baselines",
+            "ref": "legacy",
+            "commit": "32a90eb716e503ef8a0daabc052ce7c34ba36a95",
+            "role": "paper_baseline_version",
+            "proposal": "協調者應將論文baseline綁到此分支快照與固定HF dataset revision，main另保留新版關係；既有兩repo binding不需擴到其他模型倉庫。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P209",
+          "review_file": "content/github_review/reviews/P209.json",
+          "review_sha256": "f14c11f303a3fca725cee529f90a66489851a8c1de358d86bbd56804e3346a88",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "RaphaelLorenzo/Interact360",
+      "resolved_repo": "RaphaelLorenzo/Interact360",
+      "aliases_in_this_review": [
+        "raphaellorenzo/interact360"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d11ec02d666965968293813b9c17501cf1568cf6",
+          "reviewed_files": [
+            "export/export_to_dataset_plain_csv.py",
+            "export/export_utils.py",
+            "process/detect_interactions.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/RaphaelLorenzo/Interact360/",
+          "link_label": "Code (Pipeline)",
+          "project_url": "https://hucebot.github.io/hui360",
+          "page_sha256": "dcc1db06bd1c92d492bdd470ec39fc4bb4f6fae609bbdef9562de75c7097d729"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/RaphaelLorenzo/Interact360/",
+          "link_label": "Interact360",
+          "project_url": "https://hucebot.github.io/hui360",
+          "page_sha256": "dcc1db06bd1c92d492bdd470ec39fc4bb4f6fae609bbdef9562de75c7097d729"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P209",
+          "review_file": "content/github_review/reviews/P209.json",
+          "review_sha256": "f14c11f303a3fca725cee529f90a66489851a8c1de358d86bbd56804e3346a88",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "公共場館與服務",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P209",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HUI360，arXiv 2608.11051v1。",
+    "scope_read": "9場所/30setup、原始與裁切時數、SSUP重標、physical interaction定義及anticipation協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "公共場館與服務",
+      "協助、交接與陪伴"
+    ],
+    "role": "人機互動預測benchmark",
+    "environment": "HUI360有9真實場所、30robot placements/setups；SSUP-A兩public-space field sessions另列。",
+    "tasks": "預測是否將發生與平台的物理interaction；不是廣義社交意圖。不同anticipation horizons重評同tracks。",
+    "cases": "HUI360 68recordings/71.3h原始→1,937episodes/11.3h有效人像片段，4,310tracks含375interaction。SSUP-A 27,698tracks為重標舊資料。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 9,
+        "unit": "real locations",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 30,
+        "unit": "robot setups within locations",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1937,
+        "unit": "HUI360 extracted episodes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4310,
+        "unit": "HUI360 person tracks",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "AUROC主、F1/AP另報；跨location、跨dataset、0.33–2秒horizons及input-frequency robustness。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "HUI360 locations1–7train、8–9test；SSUP第一/二場次train/test。近onset窗口排除，negative以最近距離proxy挑選。",
+    "lineage": "新HUI360＋既有SSUP-HRI重標；1Mannotations不是1M獨立interaction。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          8
+        ],
+        "locator": "TableII、Problem statement、Experiments、Limitations",
+        "supports": "9/30/1937/4310、split與物理interaction邊界"
+      }
+    ],
+    "unresolved": [
+      "本文normalization用全HUI360均值/標準差，若嚴格train-only協定需修正；最終eligible test窗口量需manifest。"
+    ],
+    "reuse": "擴到公共空間互動預測，場地與擺位可獨立記錄；自動contact proxy應保留人工修正。",
+    "reviewed_pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f",
+    "reviewed_on": "2026-10-02",
+    "name": "HUI360",
+    "year": 2026,
+    "title": "HUI360: A 360{\\deg} Egocentric Dataset and Baselines for Human-Robot Interaction Anticipation",
+    "source_url": "https://arxiv.org/abs/2608.11051",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "public",
+      "assistance"
+    ],
+    "review_tags": [
+      "公共服務",
+      "人機協作"
+    ],
+    "domain_names": [
+      "公共場館與服務",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P209",
+      "domain_ids": [
+        "public",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P209",
+          "domain_ids": [
+            "public"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "預測是否將發生與平台的物理interaction；不是廣義社交意圖。不同anticipation horizons重評同tracks。",
+            "HUI360有9真實場所、30robot placements/setups；SSUP-A兩public-space field sessions另列。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f"
+        },
+        {
+          "paper_id": "P209",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            8
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "預測人將對服務平台取放或接觸，支援合時互動。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f",
+      "previous_domain_ids": [
+        "public"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P209",
+      "name": "HUI360",
+      "expected_title": "HUI360: A 360{\\deg} Egocentric Dataset and Baselines for Human-Robot Interaction Anticipation",
+      "source_url": "https://arxiv.org/abs/2608.11051",
+      "pdf_url": "https://arxiv.org/pdf/2608.11051",
+      "retrieved_at": "2026-10-02T21:35:12.321118+00:00",
+      "pdf_sha256": "9b4575648e06d38fb681f06af41179b35afb217270d1526216532130f6c3026f",
+      "text_sha256": "c052a80bc176af643d90c30dbe4db717f941ec57f649f703dec21cc39fb0b402",
+      "pdf_bytes": 22449167,
+      "pages": 15,
+      "text_characters": 94456,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2608.11051v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2608.11051v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 9,
+        "unit": "real locations",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P209:1",
+        "paper_id": "P209",
+        "benchmark": "HUI360",
+        "native_term": "real locations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.11051v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.11051v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 30,
+        "unit": "robot setups within locations",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P209:2",
+        "paper_id": "P209",
+        "benchmark": "HUI360",
+        "native_term": "robot setups within locations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.11051v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.11051v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1937,
+        "unit": "HUI360 extracted episodes",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P209:3",
+        "paper_id": "P209",
+        "benchmark": "HUI360",
+        "native_term": "HUI360 extracted episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.11051v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.11051v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4310,
+        "unit": "HUI360 person tracks",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P209:4",
+        "paper_id": "P209",
+        "benchmark": "HUI360",
+        "native_term": "HUI360 person tracks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.11051v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.11051v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "hucebot/HUI360-Baselines",
+    "RaphaelLorenzo/Interact360"
+  ],
+  "external_repositories": []
+}

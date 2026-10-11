@@ -1,0 +1,497 @@
+{
+  "paper_id": "P019",
+  "name": "EgoBody",
+  "title": "EgoBody: Human Body Shape and Motion of Interacting People from Head-Mounted Devices",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2112.07642",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "leisure",
+    "social",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P019",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoBody 官方倉庫主要是資料檔案與視覺化／座標轉換工具；它有真實來源程式，但沒有在此釘選 tree 找到公開 challenge evaluator。",
+    "environment": "HoloLens 與 Azure Kinect 同步拍攝室內雙人互動。檔案分 125 sequences、36 subjects、15 scenes；環境以 scene_name/mesh 追溯，EgoSet、MVSet、interactee-visible 子集不是三批新場景。",
+    "tasks": "第一人稱觀察互動物件／穿戴者的 3D 人體 pose、shape、motion。Motion-X 的後加文字描述是衍生標註，不能直接視為原版任務或機器人協作成功。",
+    "data": "data_info_release.csv 含 recording_name、body_idx_fpv、start/end_frame、scene_name，data_splits.csv 定義 sequence split。PV 影像名以 timestamp_frame 連 Kinect frame；pv.txt 提供每 frame 的 fx/fy/pv2world，keypoints.npz 有 BODY_25、center、scale；valid_frame 以至少 6 個 OpenPose 關節為可見條件。SMPL/SMPL-X 引數在 master Kinect RGB 座標。",
+    "evaluation": "README 列 MPJPE、PA-MPJPE、V2V、PA-V2V 原作者結果與 challenge 連結；本次沒有取得其精確 scoring 實作，因此不能由渲染器推定對齊／遮罩／單位的評分規則。核讀渲染器確認 Kinect→HoloLens world→PV 變換及 OpenCV/OpenGL Y/Z 翻轉。",
+    "standardization": {
+      "profile": "multiview_human_pose_motion",
+      "reuse": "場景／recording/split 索引、時間同步、有效影格、人體引數與相機轉換流程。",
+      "transform": "scene_name 作 environment 關聯，recording 與人物角色分開；case 保留 timestamp/frame、相機和 body index。EgoSet_interactee 作同源 subset；範圍外 frame 依 start/end 丟棄，另記 valid 遮罩。pose shape profile 保留 SMPL 與 SMPL-X 模型版本。",
+      "missing": "尚未取得註冊後資料與人體模型，亦未執行或取得 challenge evaluator。需補齊原作的關節集合、對齊、可見性與 mesh error 協定，再標可評測。"
+    },
+    "version_note": "README 包含 2022 全模態釋出與 2023 Motion-X 文字擴充；主程式 calibration 路徑多一層 cal_trans，需以實際下載版本核對。讀過視覺化程式不等於重現 README 的 baseline 成績。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "sanweiliti/EgoBody",
+        "requested_repo": "sanweiliti/EgoBody",
+        "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            90
+          ],
+          [
+            96,
+            185
+          ],
+          [
+            209,
+            263
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 268,
+        "sha256": "2784a476bbb7026ece41b61c478d9b3d8a8f3474c76a4872d3e4a37a68a5b29b",
+        "url": "https://github.com/sanweiliti/EgoBody/blob/e3ecbb839d3d7d2fcd758cb311661105975840d1/README.md",
+        "reading_url": "https://github.com/sanweiliti/EgoBody/blob/e3ecbb839d3d7d2fcd758cb311661105975840d1/README.md#L1-L90",
+        "why": "資料身份、scene/sequence/subset、欄位與 evaluator 可見範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "sanweiliti/EgoBody",
+        "requested_repo": "sanweiliti/EgoBody",
+        "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+        "ref": null,
+        "path": "release_renderer_fpv_gaze.py",
+        "ranges": [
+          [
+            37,
+            46
+          ],
+          [
+            65,
+            77
+          ],
+          [
+            94,
+            109
+          ],
+          [
+            116,
+            137
+          ],
+          [
+            139,
+            157
+          ],
+          [
+            175,
+            183
+          ],
+          [
+            192,
+            198
+          ],
+          [
+            214,
+            220
+          ],
+          [
+            225,
+            237
+          ],
+          [
+            246,
+            260
+          ],
+          [
+            272,
+            278
+          ],
+          [
+            287,
+            301
+          ],
+          [
+            324,
+            332
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 377,
+        "sha256": "585629a841cc4ba8e1a8632a9d4adff71fa430d8c94972c840fa4f6b948394a5",
+        "url": "https://github.com/sanweiliti/EgoBody/blob/e3ecbb839d3d7d2fcd758cb311661105975840d1/release_renderer_fpv_gaze.py",
+        "reading_url": "https://github.com/sanweiliti/EgoBody/blob/e3ecbb839d3d7d2fcd758cb311661105975840d1/release_renderer_fpv_gaze.py#L37-L46",
+        "why": "split 與 frame 邊界、校準、座標方向與可見性",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a29278807a054c55329a2ef127841df0cf2d90311d11e996f331b5fcb5952ed5"
+  },
+  "repository_binding_review_sha256": "a29278807a054c55329a2ef127841df0cf2d90311d11e996f331b5fcb5952ed5",
+  "repository_bindings": [
+    {
+      "requested_repo": "sanweiliti/EgoBody",
+      "resolved_repo": "sanweiliti/EgoBody",
+      "aliases_in_this_review": [
+        "sanweiliti/egobody"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "e3ecbb839d3d7d2fcd758cb311661105975840d1",
+          "reviewed_files": [
+            "README.md",
+            "release_renderer_fpv_gaze.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/sanweiliti/EgoBody",
+          "link_label": "Code",
+          "project_url": "https://sanweiliti.github.io/egobody/egobody.html",
+          "page_sha256": "f923e2e3597ebe0535cefbab5890cde1d139b925c5684dfa572a11ba9b07963f"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/sanweiliti/EgoBody",
+          "link_label": "here",
+          "project_url": "https://sanweiliti.github.io/egobody/egobody.html",
+          "page_sha256": "f923e2e3597ebe0535cefbab5890cde1d139b925c5684dfa572a11ba9b07963f"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P019",
+          "review_file": "content/github_review/reviews/P019.json",
+          "review_sha256": "a29278807a054c55329a2ef127841df0cf2d90311d11e996f331b5fcb5952ed5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "休閒與運動",
+    "社交與溝通",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P019",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoBody，arXiv 2112.07642v3。",
+    "scope_read": "互動分類、capture、資料與split、3DHPS metric。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "domains": [
+      "休閒與運動",
+      "社交與溝通",
+      "穿戴互動與動作介面"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "15個室內scene，有掃描mesh；每次兩人互動，一人佩戴HoloLens2。",
+    "tasks": "5種社會互動分類用於蒐集；主benchmark為interactee的3D人體形狀／姿態估計，不是5個機器人任務。",
+    "cases": "125 sequences／36人；219,731多視角timestamps、199,111 ego影格；可見interactee子集175,611影格，其中62,155 test。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 15,
+        "unit": "室內scene",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 125,
+        "unit": "sequences",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 175611,
+        "unit": "EgoSet-interactee影格",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "case",
+        "value": 62155,
+        "unit": "interactee test影格",
+        "pages": [
+          10
+        ]
+      }
+    ],
+    "evaluation": [
+      "MPJPE、vertex-to-vertex error；pelvis translation alignment與Procrustes alignment分开。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "subject不重疊；interactee train／val／test＝90,124／23,332／62,155。",
+    "lineage": "自行蒐集；同時有MVSet、EgoSet、可見interactee三個相依子集，不能相加。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          9,
+          10
+        ],
+        "locator": "表2、§4",
+        "supports": "互動／環境及split"
+      },
+      {
+        "pages": [
+          11
+        ],
+        "locator": "§5.1",
+        "supports": "pose與mesh評分"
+      }
+    ],
+    "unresolved": [
+      "掃描資產是否可直接用於互動模擬未驗證。"
+    ],
+    "reuse": "補社交互動、遮擋與人體觀測；不提供完成生活工作的robot action evaluator。",
+    "reviewed_pdf_sha256": "2e3713a6294f2f6db2fb815fc25f0ce080ce1fec87b663ccac54ff669c7de501",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoBody",
+    "year": 2021,
+    "title": "EgoBody: Human Body Shape and Motion of Interacting People from Head-Mounted Devices",
+    "source_url": "https://arxiv.org/abs/2112.07642",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "leisure",
+      "social",
+      "wearable"
+    ],
+    "review_tags": [
+      "社交與溝通",
+      "運動與身體技能"
+    ],
+    "domain_names": [
+      "休閒與運動",
+      "社交與溝通",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P019",
+      "domain_ids": [
+        "leisure",
+        "social",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P019",
+          "domain_ids": [
+            "leisure",
+            "social"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "5種社會互動分類用於蒐集；主benchmark為interactee的3D人體形狀／姿態估計，不是5個機器人任務。",
+            "15個室內scene，有掃描mesh；每次兩人互動，一人佩戴HoloLens2。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "2e3713a6294f2f6db2fb815fc25f0ce080ce1fec87b663ccac54ff669c7de501"
+        },
+        {
+          "paper_id": "P019",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "穿戴視角下互動對象的3D人體形狀與姿態。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "2e3713a6294f2f6db2fb815fc25f0ce080ce1fec87b663ccac54ff669c7de501"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2e3713a6294f2f6db2fb815fc25f0ce080ce1fec87b663ccac54ff669c7de501",
+      "previous_domain_ids": [
+        "leisure",
+        "social"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P019",
+      "name": "EgoBody",
+      "expected_title": "EgoBody: Human Body Shape and Motion of Interacting People from Head-Mounted Devices",
+      "source_url": "https://arxiv.org/abs/2112.07642",
+      "pdf_url": "https://arxiv.org/pdf/2112.07642",
+      "retrieved_at": "2026-10-02T21:33:11.944902+00:00",
+      "pdf_sha256": "2e3713a6294f2f6db2fb815fc25f0ce080ce1fec87b663ccac54ff669c7de501",
+      "text_sha256": "961a48f145f6c08162989eccc87db4fcbfb8869888a7bac1c81553358da2390c",
+      "pdf_bytes": 10316911,
+      "pages": 30,
+      "text_characters": 88801,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2112.07642v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2112.07642v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 15,
+        "unit": "室內scene",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P019:1",
+        "paper_id": "P019",
+        "benchmark": "EgoBody",
+        "native_term": "室內scene",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.07642v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.07642v3",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 125,
+        "unit": "sequences",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P019:2",
+        "paper_id": "P019",
+        "benchmark": "EgoBody",
+        "native_term": "sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.07642v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.07642v3",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 175611,
+        "unit": "EgoSet-interactee影格",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P019:3",
+        "paper_id": "P019",
+        "benchmark": "EgoBody",
+        "native_term": "EgoSet-interactee影格",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.07642v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.07642v3",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 62155,
+        "unit": "interactee test影格",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P019:4",
+        "paper_id": "P019",
+        "benchmark": "EgoBody",
+        "native_term": "interactee test影格",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2112.07642v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2112.07642v3",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "sanweiliti/EgoBody"
+  ],
+  "external_repositories": []
+}

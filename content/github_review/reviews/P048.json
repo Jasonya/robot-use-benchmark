@@ -1,0 +1,134 @@
+{
+  "paper_id": "P048",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EGO-TOPO把影片中的活動區域建成圖，再用於動作預測；圖節點不是已重建且可操作的房屋場景。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          95
+        ]
+      ],
+      "why": "確認論文身份、父資料與建圖/預測流程。",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42"
+    },
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "build_graph/README.md",
+      "ranges": [
+        [
+          1,
+          51
+        ]
+      ],
+      "why": "確認graph及pairwise score產物。",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42"
+    },
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "anticipation/anticipation/datasets/epic_utils.py",
+      "ranges": [
+        [
+          13,
+          19
+        ],
+        [
+          23,
+          33
+        ],
+        [
+          35,
+          53
+        ],
+        [
+          68,
+          74
+        ],
+        [
+          95,
+          101
+        ],
+        [
+          105,
+          115
+        ],
+        [
+          117,
+          154
+        ],
+        [
+          165,
+          169
+        ]
+      ],
+      "why": "核對frame範圍、訪問標籤與歷史圖選擇。",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42"
+    },
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "anticipation/anticipation/utils/metrics.py",
+      "ranges": [
+        [
+          1,
+          55
+        ]
+      ],
+      "why": "核對accuracy、macro recall和TTA。",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42"
+    }
+  ],
+  "environment": "EPIC55與EGTEA影片、推斷的活動區域及訪問圖；保存video來源與時間關係。",
+  "tasks": "拓撲活動圖與長期動作預測，是既有資料上的方法／表示，不新增獨立資料集。",
+  "data": "每影片graph.pth、locnet特徵與配對分數；epic_utils用video、start/end frame、labels及圖歷史選出指定frame的圖。",
+  "evaluation": "metrics.py提供top-k accuracy、逐類平均top-k recall與TTA；圖建構品質和動作預測分數需分項。",
+  "standardization": {
+    "profile": "video_graph_and_action_anticipation",
+    "reuse": "父影片ID、圖／visit時間、特徵引用與動作評測。",
+    "transform": "圖存context衍生資源，保留產生器和source hash；用觀測截止點取圖歷史，不把完整未來圖自動暴露給模型。",
+    "missing": "原片與預計算特徵、建圖窗口/切分核對及evaluator接線。"
+  },
+  "version_note": "EPIC/EGTEA資料與其後AntGPT等工作重用，不能將圖或模型論文各自的資料量相加。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "README.md",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42",
+      "sha256": "494f5ff7cc7bf388f49e74af6553f8d9e6061aa9b5631a6c74ebd2b4bd92a486",
+      "url": "https://raw.githubusercontent.com/facebookresearch/ego-topo/81b5396e2a6ecc44f4d541d48cf4777670e36e42/README.md",
+      "permalink": "https://github.com/facebookresearch/ego-topo/blob/81b5396e2a6ecc44f4d541d48cf4777670e36e42/README.md",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__ego-topo/files/README.md"
+    },
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "build_graph/README.md",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42",
+      "sha256": "6f40f6f5dd42b4be6164a90b49315d37690771ee9dd31b6f896ea87a9d4182be",
+      "url": "https://raw.githubusercontent.com/facebookresearch/ego-topo/81b5396e2a6ecc44f4d541d48cf4777670e36e42/build_graph/README.md",
+      "permalink": "https://github.com/facebookresearch/ego-topo/blob/81b5396e2a6ecc44f4d541d48cf4777670e36e42/build_graph/README.md",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__ego-topo/files/build_graph/README.md"
+    },
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "anticipation/anticipation/datasets/epic_utils.py",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42",
+      "sha256": "43e29146adda1ff636150d6c735450503027ec9a13fc633c46e3c9eddaff739b",
+      "url": "https://raw.githubusercontent.com/facebookresearch/ego-topo/81b5396e2a6ecc44f4d541d48cf4777670e36e42/anticipation/anticipation/datasets/epic_utils.py",
+      "permalink": "https://github.com/facebookresearch/ego-topo/blob/81b5396e2a6ecc44f4d541d48cf4777670e36e42/anticipation/anticipation/datasets/epic_utils.py",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__ego-topo/files/anticipation/anticipation/datasets/epic_utils.py"
+    },
+    {
+      "repo": "facebookresearch/ego-topo",
+      "path": "anticipation/anticipation/utils/metrics.py",
+      "commit": "81b5396e2a6ecc44f4d541d48cf4777670e36e42",
+      "sha256": "4ac010c7c29e44192d1583c9ff33c610a6d3e0423b7c345410313f054ac8c617",
+      "url": "https://raw.githubusercontent.com/facebookresearch/ego-topo/81b5396e2a6ecc44f4d541d48cf4777670e36e42/anticipation/anticipation/utils/metrics.py",
+      "permalink": "https://github.com/facebookresearch/ego-topo/blob/81b5396e2a6ecc44f4d541d48cf4777670e36e42/anticipation/anticipation/utils/metrics.py",
+      "local_path": "audit/.cache/github_review/repos/facebookresearch__ego-topo/files/anticipation/anticipation/utils/metrics.py"
+    }
+  ]
+}

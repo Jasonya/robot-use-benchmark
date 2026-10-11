@@ -1,0 +1,430 @@
+{
+  "paper_id": "P132",
+  "name": "RT-1",
+  "title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2212.06817",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P132",
+    "summary": "RT-1官方庫主要公開策略網路、action tokenizer和checkpoint。700-task是其中模型的訓練標籤說明，並非可直接下載的700題評測清單。",
+    "environment": "原研究Google robot實機工作脈絡；庫中三個checkpoint分主模型、多機體、sim-real資料訓練，checkpoint數不是環境數。",
+    "tasks": "語言條件robot控制方法；每個原生任務／held-out評測case需另接原資料與實驗協定，不能從README700-task標籤推定可執行task registry。",
+    "data": "動作TensorSpec指定順序、shape、dtype、min/max。int32 one-hot轉一token，float每維clip/normalize後離散分桶；detokenize按相同順序還原，部分越界離散token預設0。token值本身不代表物理單位。",
+    "evaluation": "此選讀庫提供模型與tokenizer測試，未由公開元件取得通用task成功checker、完整reset/split清單。checkpoint/API可載入不等於原作實機評測可重現。",
+    "standardization": {
+      "profile": "language_conditioned_policy_tokenization_reference",
+      "reuse": "官方模型介面、action spec/order/量化與checkpoint來源。",
+      "transform": "列為策略/訓練參考，case另連來源dataset/robot/goal；保存token↔action轉換的vocab_size、bounds、dtype及控制模式，不硬寫統一7D。",
+      "missing": "逐任務資料/資產、原實機成功rubric與split、感測/時間/動作物理語義以及匹配模型部署驗證。"
+    },
+    "version_note": "固定4569641封存快照，README明示初期元件發行；RT-1-X/OXE是相關但不同版本與資料發行，不能合併成同一份獨立benchmark。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "google-research/robotics_transformer",
+        "requested_repo": "google-research/robotics_transformer",
+        "commit": "4569641b8111f3f402c32d8e24becd2a6e952ecc",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            14
+          ],
+          [
+            37,
+            54
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 54,
+        "sha256": "c1997780d18d2482894f1b61e7d5e8f9ed844059c4fe246af3089b445119f41d",
+        "url": "https://github.com/google-research/robotics_transformer/blob/4569641b8111f3f402c32d8e24becd2a6e952ecc/README.md",
+        "reading_url": "https://github.com/google-research/robotics_transformer/blob/4569641b8111f3f402c32d8e24becd2a6e952ecc/README.md#L1-L14",
+        "why": "方法元件、checkpoint角色與發行範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/robotics_transformer",
+        "requested_repo": "google-research/robotics_transformer",
+        "commit": "4569641b8111f3f402c32d8e24becd2a6e952ecc",
+        "ref": null,
+        "path": "tokenizers/action_tokenizer.py",
+        "ranges": [
+          [
+            42,
+            89
+          ],
+          [
+            103,
+            157
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 157,
+        "sha256": "bb543a0f1c7342c7907d8f58dcd8ccc82e9d37eb9a9f60eb9235e9dca7ca1e8b",
+        "url": "https://github.com/google-research/robotics_transformer/blob/4569641b8111f3f402c32d8e24becd2a6e952ecc/tokenizers/action_tokenizer.py",
+        "reading_url": "https://github.com/google-research/robotics_transformer/blob/4569641b8111f3f402c32d8e24becd2a6e952ecc/tokenizers/action_tokenizer.py#L42-L89",
+        "why": "action_order/各field範圍、one-hot/浮點tokenization及反轉",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b523eb65458044b8065140e0c92b157e1d7ca00cb1505a87704570796ec7c907"
+  },
+  "repository_binding_review_sha256": "b523eb65458044b8065140e0c92b157e1d7ca00cb1505a87704570796ec7c907",
+  "repository_bindings": [
+    {
+      "requested_repo": "google-research/robotics_transformer",
+      "resolved_repo": "google-research/robotics_transformer",
+      "aliases_in_this_review": [
+        "google-research/robotics_transformer"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "4569641b8111f3f402c32d8e24becd2a6e952ecc",
+          "reviewed_files": [
+            "README.md",
+            "tokenizers/action_tokenizer.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "http://github.com/google-research/robotics_transformer",
+          "pdf_page": 15,
+          "pdf_sha256": "81efe669c8fa50ffc7097886dc78a442fa7a8f7f2451684b93069cb9fbeda767",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P132",
+          "review_file": "content/github_review/reviews/P132.json",
+          "review_sha256": "b523eb65458044b8065140e0c92b157e1d7ca00cb1505a87704570796ec7c907",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P132",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RT-1: Robotics Transformer for Real-World Control at Scale；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      7,
+      8,
+      9
+    ],
+    "role": "通用策略的原作任務評測",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "environment": "三evalenvironments：robotclassroom與兩個realofficekitchens；13robots不是13獨立場景。",
+    "tasks": "Table1有744language instructions，依verb分skill；不等同744工作家族。",
+    "cases": "約130Kdemonstrations；主seen>200instructions、unseen21、robustness30/22、long15；全研究>3,000trials。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 3,
+        "unit": "evaluation environments",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 744,
+        "unit": "language instructions",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "held-out novel instructions",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "long-horizon instructions",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3000,
+        "unit": "全研究real trials（>3000）",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task SR與SayCan長流程成功；architectures在相同RT1資料重訓。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "novelinstructions保持object/skill可在別的training組合看過；OOD場景另列。",
+    "lineage": "自收Google/EverydayRobot資料，後被OXE/其他策略重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          4,
+          5,
+          7,
+          8,
+          9
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      ">3,000是跨method/condition執行次數；不能當3,000獨立test cases。"
+    ],
+    "reuse": "說明前作也能有數百instructiontasks；比較規模必須對齊語義粒度。",
+    "reviewed_pdf_sha256": "81efe669c8fa50ffc7097886dc78a442fa7a8f7f2451684b93069cb9fbeda767",
+    "reviewed_on": "2026-10-02",
+    "name": "RT-1",
+    "year": 2022,
+    "title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+    "source_url": "https://arxiv.org/abs/2212.06817",
+    "primary_type": "G",
+    "category_name": "機器人資料與通用策略",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P132",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P132",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            7,
+            8,
+            9
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "Table1有744language instructions，依verb分skill；不等同744工作家族。",
+            "三evalenvironments：robotclassroom與兩個realofficekitchens；13robots不是13獨立場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "81efe669c8fa50ffc7097886dc78a442fa7a8f7f2451684b93069cb9fbeda767"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "81efe669c8fa50ffc7097886dc78a442fa7a8f7f2451684b93069cb9fbeda767",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P132",
+      "name": "RT-1",
+      "expected_title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+      "source_url": "https://arxiv.org/abs/2212.06817",
+      "pdf_url": "https://arxiv.org/pdf/2212.06817",
+      "retrieved_at": "2026-10-02T22:13:49.880695+00:00",
+      "pdf_sha256": "81efe669c8fa50ffc7097886dc78a442fa7a8f7f2451684b93069cb9fbeda767",
+      "text_sha256": "76293e6a6971f8ac1099f44bf058352fdcd0dbd467448c10c4ed3bc389964841",
+      "pdf_bytes": 14672588,
+      "pages": 31,
+      "text_characters": 125019,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2212.06817v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2212.06817v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 3,
+        "unit": "evaluation environments",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P132:1",
+        "paper_id": "P132",
+        "benchmark": "RT-1",
+        "native_term": "evaluation environments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2212.06817v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2212.06817v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 744,
+        "unit": "language instructions",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P132:2",
+        "paper_id": "P132",
+        "benchmark": "RT-1",
+        "native_term": "language instructions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2212.06817v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2212.06817v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "held-out novel instructions",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P132:3",
+        "paper_id": "P132",
+        "benchmark": "RT-1",
+        "native_term": "held-out novel instructions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2212.06817v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2212.06817v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "long-horizon instructions",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P132:4",
+        "paper_id": "P132",
+        "benchmark": "RT-1",
+        "native_term": "long-horizon instructions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2212.06817v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2212.06817v2",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3000,
+        "unit": "全研究real trials（>3000）",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P132:5",
+        "paper_id": "P132",
+        "benchmark": "RT-1",
+        "native_term": "全研究real trials（>3000）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2212.06817v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2212.06817v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "google-research/robotics_transformer"
+  ],
+  "external_repositories": []
+}

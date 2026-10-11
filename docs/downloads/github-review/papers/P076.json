@@ -1,0 +1,716 @@
+{
+  "paper_id": "P076",
+  "name": "Ravens / Transporter Networks",
+  "title": "Transporter Networks: Rearranging the Visual World for Robotic Manipulation",
+  "year": 2020,
+  "paper_url": "https://arxiv.org/abs/2010.14406",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "industry",
+    "logistics",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P076",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Ravens的具體評測鏈是task goal→delta reward→test累積return→plot平均，包含部分分數。已核讀插入、清掃及資料writer/reader；done不是統一成功旗標，圖表的百分比標籤也不能直接當原生分數單位。",
+    "identity_note": "對應Transporter Networks: Rearranging the Visual World for Robotic Manipulation，arXiv:2010.14406v3（2022-01-05；CoRL 2020作品）。README明稱此論文的reference repository；正式作者清單以固定PDF為準。固定程式4752ffab487ebd387781ad7890aa540ae2780970為2024-03-14快照，非2020原始版本。",
+    "discovery_evidence": [
+      {
+        "kind": "pinned_primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P076/pages.json",
+        "pages": [
+          1,
+          6
+        ],
+        "pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228"
+      },
+      {
+        "kind": "pinned_repository_metadata",
+        "local_file": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+        "archived": true
+      }
+    ],
+    "environment": "PyBullet／UR5桌面，工作區0.5×1公尺；三個RealSenseD415模擬視角、640×480 RGB-D。環境預設240 Hz，demos/test腳本明設480 Hz；這是physics頻率，不是示範frame或policy primitive頻率。相機參數在固定cameras.py，沒有逐episode嵌入color/depth檔。",
+    "tasks": "論文十項桌面任務；當前registry有15個ID，包含五個額外子型，不能回填成15項原始benchmark。BlockInsertion的goal是object/match-matrix/target-pose與pose metric，最多3次動作；SweepingPiles配置50個小方塊，最多20次push，以zone內物件取樣點比例給部分分數。",
+    "data": "Dataset分color/depth/action/reward/info五個資料夾，用相同NNNNNN-seed.pkl連接；color uint8、depth float32公尺。每個episode是(obs,act,reward,info)序列，最後一筆act=None。demos先保存當前obs/action與既有reward，才env.step，因此第t筆reward對應前一動作；匯出transition時應將action[t]對上reward[t+1]。info保存GT物件position/quaternion/dimensions；test還會將末筆goal傳給agent，資訊可見性須按policy另記。action含pose0/pose1，各為xyz公尺＋xyzw四元數，並非VIMA的2D位置介面。",
+    "evaluation": "Environment.step→task.primitive→Task.reward/done；pose metric用xy距離<0.01公尺及對稱修正後yaw差<15°。zone metric將每物件局部取樣點轉入zone，算合法點比例；點集由visual-shape尺寸以0.02公尺網格建立，並非精確mesh體積。reward是累積進度差值；test加總成completion return，goal完結或_rewards>0.99才由Task.done回True，primitive timeout也可使env.done=True。論文每task100 unseen runs；程式實際遍歷test Dataset.n_episodes。test資料只收oracle return>0.99的奇數seed，訓練為偶數seed。",
+    "standardization": {
+      "profile": "robot_primitive_episodes_with_partial_credit_goals",
+      "reuse": "十項原始task與變體映射、goal tuple、pose/zone evaluator、seed編碼、RGB-D與原生pick-place/push。",
+      "transform": "source分論文v3與2024commit；case記task變體、seed、goal、primitive步數與physics頻率。保留terminal None action及reward後移配對；evaluator分開二元goal完成、delta reward、0–1累積完成度和展示用×100比例，不能全叫success rate。",
+      "missing": "原論文checkpoint選擇及完整100-case資料manifest、其餘任務checker逐一覆核、相機／資產／seed閉合；6DOF及continuous變體需獨立評測協定。"
+    },
+    "version_note": "固定manifest顯示倉庫已封存。具體問題：plot.py把0–1 mean/std直接印成%且ylabel寫Task Success，沒有×100，也掩蓋partial credit；6DOF插入子類設sixdof與pos_eps=0.02，仍繼承只看xy/yaw的is_match，未增加z/roll/pitch判定。test預設task=hanoi但registry為towers-of-hanoi，應明設task。Dataset.sample是先等機率選episode再選非末步，不是全庫frame均勻抽樣。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            28
+          ],
+          [
+            76,
+            103
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 137,
+        "sha256": "2ce991f08fb04e08043bf3203993cf6dab38b5be2fd1989ea3ec629ae30ea8ad",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/README.md",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/README.md#L1-L28",
+        "why": "十項原始任務、論文關係及data/train/test/plot流程。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/tasks/__init__.py",
+        "ranges": [
+          [
+            18,
+            51
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 51,
+        "sha256": "24d7645181dd89c0fc42c17358ffeb385a305faaf487068305971468280b9bf6",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/__init__.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/__init__.py#L18-L51",
+        "why": "原生ID與額外easy/translation/sixdof等變體。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/tasks/block_insertion.py",
+        "ranges": [
+          [
+            25,
+            64
+          ],
+          [
+            82,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 143,
+        "sha256": "53c9be731c304b2f2c4800b7d63c21c19029cf1dccfca221c1aed7bd09b2fe62",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/block_insertion.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/block_insertion.py#L25-L64",
+        "why": "L形物件／fixture、goal tuple、3次primitive上限及6DOF子類。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/tasks/sweeping_piles.py",
+        "ranges": [
+          [
+            25,
+            63
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 63,
+        "sha256": "f95f56988f8430fe71f80760a36bae503a06f6772ffd84e43acacd799bd4e841",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/sweeping_piles.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/sweeping_piles.py#L25-L63",
+        "why": "50小物件、0.12×0.12公尺目標區與zone評分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/tasks/task.py",
+        "ranges": [
+          [
+            39,
+            75
+          ],
+          [
+            211,
+            320
+          ],
+          [
+            341,
+            364
+          ],
+          [
+            396,
+            404
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 461,
+        "sha256": "5b1b7d2aa16f60e12acef9004ebf63220ac08d2694bf63a4f1f931849964f905",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/task.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/task.py#L39-L75",
+        "why": "完整pose/zone reward、goal消耗、done與取樣點定義。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/environments/environment.py",
+        "ranges": [
+          [
+            45,
+            103
+          ],
+          [
+            179,
+            255
+          ],
+          [
+            270,
+            341
+          ],
+          [
+            398,
+            406
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 531,
+        "sha256": "b3519616d42d78dc5e5a9b83853f133db287175be2dbe94b09a72d79b5a7f6a5",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/environments/environment.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/environments/environment.py#L45-L103",
+        "why": "觀測／action schema、primitive dispatch、timeout與公尺深度重建。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/tasks/primitives.py",
+        "ranges": [
+          [
+            22,
+            128
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 169,
+        "sha256": "be2c026cbbcdf6ede3a2756686ae2b4e164d90f8cb835897b01c9601025b2586",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/primitives.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/primitives.py#L22-L128",
+        "why": "實際吸盤pick-place與spatula push，區分高階動作與physics步。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/tasks/cameras.py",
+        "ranges": [
+          [
+            22,
+            62
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 82,
+        "sha256": "e1a15569b739a77ac7f7d52b01aea0f36e27bc2414f705c79e9c2a4c7cb3cda7",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/cameras.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/cameras.py#L22-L62",
+        "why": "三個640×480 RGB-D視角及固定intrinsics/extrinsics。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/demos.py",
+        "ranges": [
+          [
+            43,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 95,
+        "sha256": "f108bb2994ccd4dc2a99ae57ceebe4e68bd782be5c7227cb6b1e4908ad5ef1a4",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/demos.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/demos.py#L43-L92",
+        "why": "even/odd seed、oracle成功篩選與末筆None action。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/dataset.py",
+        "ranges": [
+          [
+            26,
+            90
+          ],
+          [
+            96,
+            169
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 169,
+        "sha256": "bf6b6ce26199a669bf517298948ee4818825ffeb9067d26b1501b08bb9b2d9e9",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/dataset.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/dataset.py#L26-L90",
+        "why": "五類PKL分檔、seed解析、tuple還原及episode/step抽樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/test.py",
+        "ranges": [
+          [
+            30,
+            40
+          ],
+          [
+            61,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 119,
+        "sha256": "a4379937a3385fafa7392e8da0baf8b1f1837696e049afdcd9843856d78395c4",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/test.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/test.py#L30-L40",
+        "why": "逐test dataset episode還原seed、執行task.max_steps及累積return。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/ravens",
+        "requested_repo": "google-research/ravens",
+        "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+        "ref": null,
+        "path": "ravens/plot.py",
+        "ranges": [
+          [
+            36,
+            67
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 71,
+        "sha256": "90e3bbadab88b33f41993c6dc2f7f206f90b8fca3160e28444e58b2fe8c79737",
+        "url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/plot.py",
+        "reading_url": "https://github.com/google-research/ravens/blob/4752ffab487ebd387781ad7890aa540ae2780970/ravens/plot.py#L36-L67",
+        "why": "真正的mean/std與未乘100的百分比顯示。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c361c1526a82f474e075106504cef06458a0e561804af21fe4794b1570ff5839"
+  },
+  "repository_binding_review_sha256": "c361c1526a82f474e075106504cef06458a0e561804af21fe4794b1570ff5839",
+  "repository_bindings": [
+    {
+      "requested_repo": "google-research/ravens",
+      "resolved_repo": "google-research/ravens",
+      "aliases_in_this_review": [
+        "google-research/ravens"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+          "reviewed_files": [
+            "README.md",
+            "ravens/dataset.py",
+            "ravens/demos.py",
+            "ravens/environments/environment.py",
+            "ravens/plot.py",
+            "ravens/tasks/__init__.py",
+            "ravens/tasks/block_insertion.py",
+            "ravens/tasks/cameras.py",
+            "ravens/tasks/primitives.py",
+            "ravens/tasks/sweeping_piles.py",
+            "ravens/tasks/task.py",
+            "ravens/test.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/google-research/ravens",
+          "link_label": "Github",
+          "project_url": "https://transporternets.github.io/",
+          "page_sha256": "45acad68fcac2793ac3e8102038da1fe47227b4fe1a140b824506301d530f043"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/google-research/ravens",
+          "link_label": "Github",
+          "project_url": "https://transporternets.github.io",
+          "page_sha256": "45acad68fcac2793ac3e8102038da1fe47227b4fe1a140b824506301d530f043"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P076",
+          "review_file": "content/github_review/reviews/P076.json",
+          "review_sha256": "c361c1526a82f474e075106504cef06458a0e561804af21fe4794b1570ff5839",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "裝配與生產作業",
+    "包裝、倉儲與物流",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P076",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Transporter Networks / Ravens，arXiv 2010.14406v3。",
+    "scope_read": "全部10simulation task清單、動作／觀測、訓練量、test與真機驗證。",
+    "pages_read": [
+      1,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "包裝、倉儲與物流",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "UR5e＋0.5×1m桌面，3 RGB-D視角；real kit assembly／sweeping為額外實驗。",
+    "tasks": "10task：block insertion、red-in-green、Hanoi、align corner、pyramid、palletizing、kits、packing、rope、sweeping。",
+    "cases": "每task訓練1/10/100/1,000 demonstrations；每task100 unseen test runs＝一方法設定1,000runs。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "simulation tasks",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task unseen test runs",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "real驗證tasks",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "0–100 performance，多步task給partial credit；非所有表中的分數都是binary success percentage。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "物件／goal位置朝向train/test隨機，3task含未見objects；two-pose動作primitive及suction降低控制負担。",
+    "lineage": "PyBullet桌面，自帶script oracle；VIMA、DeformableRavens等衍生共享task與介面。",
+    "related_paper_ids": [
+      "P075",
+      "P086"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§3.3、§4.1、表1",
+        "supports": "10清單、100test、primitive與partial credit"
+      },
+      {
+        "pages": [
+          8
+        ],
+        "locator": "§4.2",
+        "supports": "real獨立驗證"
+      }
+    ],
+    "unresolved": [
+      "task各自partial credit及物理predicate嚴格程度需具體code映射，不以同名插入直接對比ManiSkill2。"
+    ],
+    "reuse": "包裝、堆疊、繩索、清掃可作source tasks；需標記primitive與成功判準。",
+    "reviewed_pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228",
+    "reviewed_on": "2026-10-02",
+    "name": "Ravens / Transporter Networks",
+    "year": 2020,
+    "title": "Transporter Networks: Rearranging the Visual World for Robotic Manipulation",
+    "source_url": "https://arxiv.org/abs/2010.14406",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "industry",
+      "logistics",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "包裝與倉儲",
+      "組裝與拆解",
+      "柔性物與流體操作",
+      "表面清潔"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "包裝、倉儲與物流",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P076",
+      "domain_ids": [
+        "home",
+        "industry",
+        "logistics",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P076",
+          "domain_ids": [
+            "home",
+            "industry",
+            "logistics"
+          ],
+          "pages": [
+            1,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "10task：block insertion、red-in-green、Hanoi、align corner、pyramid、palletizing、kits、packing、rope、sweeping。",
+            "UR5e＋0.5×1m桌面，3 RGB-D視角；real kit assembly／sweeping為額外實驗。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228"
+        },
+        {
+          "paper_id": "P076",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "幾何插入、Hanoi、對齊等通用題與packing／palletizing並存。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228",
+      "previous_domain_ids": [
+        "home",
+        "industry",
+        "logistics"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P076",
+      "name": "Ravens / Transporter Networks",
+      "expected_title": "Transporter Networks: Rearranging the Visual World for Robotic Manipulation",
+      "source_url": "https://arxiv.org/abs/2010.14406",
+      "pdf_url": "https://arxiv.org/pdf/2010.14406",
+      "retrieved_at": "2026-10-02T21:33:45.962784+00:00",
+      "pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228",
+      "text_sha256": "41cc2a9d9ac233ddc0af9fe139cc1b71cc84baca0a3c58ab0c4678de6e25b2da",
+      "pdf_bytes": 3781112,
+      "pages": 23,
+      "text_characters": 106446,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2010.14406v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2010.14406v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "simulation tasks",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P076:1",
+        "paper_id": "P076",
+        "benchmark": "Ravens / Transporter Networks",
+        "native_term": "simulation tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.14406v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.14406v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每task unseen test runs",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P076:2",
+        "paper_id": "P076",
+        "benchmark": "Ravens / Transporter Networks",
+        "native_term": "每task unseen test runs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.14406v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.14406v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "real驗證tasks",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P076:3",
+        "paper_id": "P076",
+        "benchmark": "Ravens / Transporter Networks",
+        "native_term": "real驗證tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2010.14406v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2010.14406v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "google-research/ravens"
+  ],
+  "external_repositories": []
+}

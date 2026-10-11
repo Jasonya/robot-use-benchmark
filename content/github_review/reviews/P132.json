@@ -1,0 +1,52 @@
+{
+  "paper_id": "P132",
+  "summary": "RT-1官方庫主要公開策略網路、action tokenizer和checkpoint。700-task是其中模型的訓練標籤說明，並非可直接下載的700題評測清單。",
+  "reading_order": [
+    {
+      "repo": "google-research/robotics_transformer",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          14
+        ],
+        [
+          37,
+          54
+        ]
+      ],
+      "why": "方法元件、checkpoint角色與發行範圍",
+      "commit": "4569641b8111f3f402c32d8e24becd2a6e952ecc"
+    },
+    {
+      "repo": "google-research/robotics_transformer",
+      "path": "tokenizers/action_tokenizer.py",
+      "ranges": [
+        [
+          42,
+          89
+        ],
+        [
+          103,
+          157
+        ]
+      ],
+      "why": "action_order/各field範圍、one-hot/浮點tokenization及反轉",
+      "commit": "4569641b8111f3f402c32d8e24becd2a6e952ecc"
+    }
+  ],
+  "environment": "原研究Google robot實機工作脈絡；庫中三個checkpoint分主模型、多機體、sim-real資料訓練，checkpoint數不是環境數。",
+  "tasks": "語言條件robot控制方法；每個原生任務／held-out評測case需另接原資料與實驗協定，不能從README700-task標籤推定可執行task registry。",
+  "data": "動作TensorSpec指定順序、shape、dtype、min/max。int32 one-hot轉一token，float每維clip/normalize後離散分桶；detokenize按相同順序還原，部分越界離散token預設0。token值本身不代表物理單位。",
+  "evaluation": "此選讀庫提供模型與tokenizer測試，未由公開元件取得通用task成功checker、完整reset/split清單。checkpoint/API可載入不等於原作實機評測可重現。",
+  "standardization": {
+    "profile": "language_conditioned_policy_tokenization_reference",
+    "reuse": "官方模型介面、action spec/order/量化與checkpoint來源。",
+    "transform": "列為策略/訓練參考，case另連來源dataset/robot/goal；保存token↔action轉換的vocab_size、bounds、dtype及控制模式，不硬寫統一7D。",
+    "missing": "逐任務資料/資產、原實機成功rubric與split、感測/時間/動作物理語義以及匹配模型部署驗證。"
+  },
+  "version_note": "固定4569641封存快照，README明示初期元件發行；RT-1-X/OXE是相關但不同版本與資料發行，不能合併成同一份獨立benchmark。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

@@ -1,0 +1,133 @@
+{
+  "paper_id": "P218",
+  "reviewed_on": "2026-10-11",
+  "status": "public_readme_only",
+  "summary": "已核對 arXiv:2605.20388v1、作者專案頁及同實驗室 TrajPilot 候選庫；固定版本的完整檔案樹只有一行 README，沒有 data reader、模型或 metric 實作。以下任務與協定來自論文，不能視為已完成程式評測整合。",
+  "identity_note": "論文題名 How You Move Tells What You’ll Do: Trajectory-Conditioned Egocentric Prediction，作者 Sejoon Jun、Hai Nguyen-Truong、Luigi Seminara、Lorenzo Torresani。PDF 連到 farsightlab.github.io/TrajPilot，頁面題名、作者與 arXiv ID 一致；farsightlab/TrajPilot 與該專案共用命名空間，但公開 README 只有名稱，專案頁未提供可核驗的方法程式連結。排除搜尋中的 mimozing3003/TrajPilot-AI-Autonomous-Driving-Research-Platform：它描述自動駕駛，與本篇論文不符。",
+  "environment": "離線人類第一人稱影片：Ego-Exo4D atomic／Keystep、Ego4D GoalStep、EgoPER，另做 EPIC-KITCHENS-100 anticipation 與 Ego-Exo4D 籃球投籃結果分類。相機運動是觀測／條件訊號，並非可直接執行的機器人控制。",
+  "tasks": "分開記錄提供 start+goal 的程序規劃、移除 goal 的未來動作預測，以及 made／missed 二分類。規劃 horizon H=3–8 是動作序列長度；8,472 個 atomic 文字標籤、1,165 類 closed collapse、375 個 Keystep 標籤、310 個 GoalStep 標籤和57個 EgoPER 標籤均為各自詞彙表，不能加總成任務數。Scorer 使用訓練集候選未來軌跡，Oracle 使用實際未來軌跡，兩者資訊條件分開。",
+  "data": "論文附錄 A.1：atomic 為 take-disjoint 的140,413 train segments／2,237 takes 與11,425 validation segments／312 takes；連續 segment 形成 H=3–8 windows，但未提供公開 window manifests。每段16張 RGB，384×384，V-JEPA 池化為1664維特徵；atomic 區間以相鄰時間戳中點決定，其餘以標註區間中點與邊界取樣。Aria 或 PI3 相機姿態對齊影片時間並轉成相對 [Δx,Δy,Δz,Δrx,Δry,Δrz]，旋轉為 rotation vector；實際 tensor schema、尺度／單位與插值實作未公開。籃球子集294 train／74 test events、42／10 takes，test 為37 made+37 missed；模型僅看平均1秒的出手前片段，16張取樣自30 fps來源影片。",
+  "evaluation": "沒有具體 metric/scorer 程式可讀。論文區分 middle-step R@1/5 與 full-sequence R@1/5，MSeq/FSeq 為整段全對比例；Full 包含觀測端點，Future 不含 observed Start。Closed-vocabulary 另報 Mid/Full mAcc、exact-sequence SR、mIoU、Levenshtein，實際 macro/micro、重複標籤與跨 horizon 權重須等程式確認。EK100 的 verb/noun/action 為 mean-class Recall@5，另列 instance accuracy；籃球 accuracy 分母為74個事件，balanced accuracy 為兩類 recall 平均，各類 recall 分母37。模型內部 Scorer 的候選排序／fallback 不是 benchmark 成功判定，不能取代 evaluator。",
+  "standardization": {
+    "profile": "offline_trajectory_conditioned_action_forecasting",
+    "reuse": "重用論文所界定的來源資料集、take 層級 split、原生動作詞彙與規劃／anticipation／outcome 任務分類；repo 僅可重用身份與版本證據。",
+    "transform": "source 連回各母資料集；case 以 take_id+segment/window+H+split+詞彙版本識別，保存 start/goal 可見性與 No-Traj／Scorer／Oracle。camera_pose 另存來源 Aria/PI3、時間軸與相對6DoF格式；evaluation 分列 step retrieval、sequence exact match、class recall、event accuracy及其分母。",
+    "missing": "公開 reader、window／label-bank manifests、軌跡取樣與單位、實際 scorer/gating 和全部 metric 實作；尚不能核驗論文指標或形成可執行套件。"
+  },
+  "version_note": "固定 repo commit 85afac4ae7a800fc104a4499c349b09979c34941 的完整樹只有 README.md；未將作者網頁算成模型程式。論文附錄稱 atomic/Keystep 等使用 validation takes，但結果表稱 test split，需保留原文標示差異並取得 manifest 才能對齊。Aria pose 與 RGB估計 PI3 的 oracle 條件也不可混同。",
+  "discovery_evidence": [
+    {
+      "kind": "cached_pdf_identity_and_links",
+      "local_file": "audit/.cache/github_review/P218-discovery.json",
+      "sha256": "009baab5294a06cb571b1a426769de45cd34e4eb210fbbdc1ce6d1a17516f4fe",
+      "finding": "題名、作者開頭文字與作者專案頁連結已核對。",
+      "json_pointers": [
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/opening_text"
+      ]
+    },
+    {
+      "kind": "cached_primary_paper",
+      "url": "https://arxiv.org/pdf/2605.20388",
+      "pdf_sha256": "f95e0cc2c341982f4ed16a8fc27585c034b681a09bf64a6abb6f5436e30d7056",
+      "local_file": "audit/.cache/fulltext_review/P218/pages.json",
+      "sha256": "595aef753715c5f64e6bb21c1b2cfd843d252afff7120eaaca3f3ec3253bd597",
+      "json_pointers": [
+        "/6/text",
+        "/12/text",
+        "/13/text",
+        "/20/text",
+        "/22/text"
+      ],
+      "finding": "讀取 setup、split、frame/pose preprocessing、future/full 指標定義與籃球分母。"
+    },
+    {
+      "kind": "cached_primary_project_link",
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "finding": "作者頁與候選 repo 關係；repository_links 為空。",
+      "json_pointers": [
+        "/217"
+      ]
+    },
+    {
+      "kind": "cached_primary_project",
+      "local_file": "audit/.cache/github_review/projects/b8253f6159124894ce82e3a04a583b09f923e95916566a205ecba3741da5ddc8.txt",
+      "sha256": "8b56953cb620ce4a7bdbad09fbf4c593ff5a55f27801e6db3dd5da4d326adca7",
+      "finding": "頁面題名、作者、arXiv ID與任務敘述一致，未提供方法程式連結。",
+      "ranges": [
+        [
+          482,
+          551
+        ],
+        [
+          616,
+          670
+        ]
+      ],
+      "url": "https://farsightlab.github.io/TrajPilot/"
+    },
+    {
+      "kind": "cached_repository_search",
+      "local_file": "audit/.cache/github_review/search/P218.json",
+      "sha256": "5f79e1751b50bf10f1a4529dbf4d99e219869de96da8ec71a9f13429804d4ec6",
+      "finding": "TrajPilot 搜尋的另一候選為不相關自動駕駛平台。",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    },
+    {
+      "kind": "pinned_repository_tree",
+      "local_file": "audit/.cache/github_review/repos/farsightlab__TrajPilot/tree.json",
+      "sha256": "506259535a6ee956f3aee3a612c16967ef9b6f30c86968910b5734fa67bddea9",
+      "finding": "完整樹只有 README.md；commit=85afac4ae7a800fc104a4499c349b09979c34941。",
+      "json_pointers": [
+        "/tree",
+        "/truncated"
+      ]
+    }
+  ],
+  "reading_order": [
+    {
+      "provider": "github",
+      "repo": "farsightlab/TrajPilot",
+      "commit": "85afac4ae7a800fc104a4499c349b09979c34941",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/farsightlab__TrajPilot/files/README.md",
+      "sha256": "503edc11d2cdc4518251154e8773df510010ead0dc4430ef01efd44fc7048c63",
+      "ranges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "why": "確認公開 pinned repo 只有名稱，沒有 data／task／metric 程式。",
+      "url": "https://github.com/farsightlab/TrajPilot/blob/85afac4ae7a800fc104a4499c349b09979c34941/README.md",
+      "git_blob_sha": "4aa67f9ffda8030914d22373b59b9dbf6beeaa89"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "farsightlab/TrajPilot",
+      "commit": "85afac4ae7a800fc104a4499c349b09979c34941",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/farsightlab__TrajPilot/files/README.md",
+      "sha256": "503edc11d2cdc4518251154e8773df510010ead0dc4430ef01efd44fc7048c63",
+      "ranges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "url": "https://github.com/farsightlab/TrajPilot/blob/85afac4ae7a800fc104a4499c349b09979c34941/README.md",
+      "git_blob_sha": "4aa67f9ffda8030914d22373b59b9dbf6beeaa89"
+    }
+  ],
+  "runtime_executed": false
+}

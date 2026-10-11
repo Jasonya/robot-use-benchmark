@@ -1,0 +1,285 @@
+{
+  "paper_id": "P131",
+  "name": "Mobile ALOHA",
+  "title": "Mobile ALOHA: Learning Bimanual Mobile Manipulation with Low-Cost Whole-Body Teleoperation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2401.02117",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P131",
+    "summary": "Mobile ALOHA擴充雙臂示範為14D手臂＋2D底盤；共訓練的靜態資料會補零底盤，部署還有13步對齊，不能與原ALOHA時間／動作表達混用。",
+    "environment": "Mobile ALOHA真實底盤/雙臂與沿用ACT的兩個桌面模擬場景；不能把legacy sim當已提供全部移動任務的模擬版。",
+    "tasks": "全身雙臂移動操作與靜態資料共訓練；原sim transfer/insertion是父來源重用。新物理任務應追到實機活動/場景與具體目標。",
+    "data": "HDF5原action14D、base_action2D；有JPEG壓縮長度。loader串為16D，沒有base_action時補2維零，並5步卷積平滑base。缺少底盤標註和真的靜止需要metadata區分。",
+    "evaluation": "real部署將手臂chunk[:-13]與底盤chunk[13:]拼接，query頻率同步調整；temporal_agg還改採樣方式。最高reward評估沿用ACT，real reward與max_reward均0，不能直接作實機任務成功。實際移動任務評分仍需原文／人評協定。",
+    "standardization": {
+      "profile": "mobile_bimanual_cotraining",
+      "reuse": "機體/動作分量、示範來源、壓縮schema、base smoothing與延遲對齊。",
+      "transform": "case保存原14+2與模型16D表示、base有效mask、時間偏移/控制頻率、靜態/移動父資料及實機判分來源；重用legacy tasks不增聯集。",
+      "missing": "原移動任務初態/goal/rubric、素材與校準、13步時序假設及temporal_agg互作用驗證、對應可執行sim資產。"
+    },
+    "version_note": "mobile-aloha和act-plus-plus各自固定版本，README稱兩個sim為LEGACY。未跑VINN/ACT/diffusion或機器人。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "MarkFzp/mobile-aloha",
+        "requested_repo": "MarkFzp/mobile-aloha",
+        "commit": "0e403249c76054a68e757e590d4da4dba401c9e3",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            13
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 207,
+        "sha256": "16bd54c1236a94b70744203b8b21fbe71b6ef0ea0d6159bd3380ef1401f699eb",
+        "url": "https://github.com/MarkFzp/mobile-aloha/blob/0e403249c76054a68e757e590d4da4dba401c9e3/README.md",
+        "reading_url": "https://github.com/MarkFzp/mobile-aloha/blob/0e403249c76054a68e757e590d4da4dba401c9e3/README.md#L1-L13",
+        "why": "原作、ALOHA父庫與ACT++官方連結",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MarkFzp/act-plus-plus",
+        "requested_repo": "MarkFzp/act-plus-plus",
+        "commit": "26bab0789d05b7496bacef04f5c6b2541a4403b5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            23
+          ],
+          [
+            55,
+            67
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 85,
+        "sha256": "1bf4fea985485e3f2124f0dc4f94be5d9d0fe051ae2d437dda906e4bb51873ec",
+        "url": "https://github.com/MarkFzp/act-plus-plus/blob/26bab0789d05b7496bacef04f5c6b2541a4403b5/README.md",
+        "reading_url": "https://github.com/MarkFzp/act-plus-plus/blob/26bab0789d05b7496bacef04f5c6b2541a4403b5/README.md#L1-L23",
+        "why": "共訓練與沿用的兩個legacy模擬任務",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MarkFzp/mobile-aloha",
+        "requested_repo": "MarkFzp/mobile-aloha",
+        "commit": "0e403249c76054a68e757e590d4da4dba401c9e3",
+        "ref": null,
+        "path": "aloha_scripts/record_episodes.py",
+        "ranges": [
+          [
+            90,
+            107
+          ],
+          [
+            203,
+            229
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 294,
+        "sha256": "ec99c01d02390147623711b29e586e869562e4badae87e997f2d2e35b25ef6b5",
+        "url": "https://github.com/MarkFzp/mobile-aloha/blob/0e403249c76054a68e757e590d4da4dba401c9e3/aloha_scripts/record_episodes.py",
+        "reading_url": "https://github.com/MarkFzp/mobile-aloha/blob/0e403249c76054a68e757e590d4da4dba401c9e3/aloha_scripts/record_episodes.py#L90-L107",
+        "why": "控制時間、14D action＋2D base與JPEG metadata",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MarkFzp/act-plus-plus",
+        "requested_repo": "MarkFzp/act-plus-plus",
+        "commit": "26bab0789d05b7496bacef04f5c6b2541a4403b5",
+        "ref": null,
+        "path": "utils.py",
+        "ranges": [
+          [
+            48,
+            98
+          ],
+          [
+            282,
+            291
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 360,
+        "sha256": "a5f76bfda95b2f257d906a882d0220da4b616d2e7d66dcd29eebdd467d20feda",
+        "url": "https://github.com/MarkFzp/act-plus-plus/blob/26bab0789d05b7496bacef04f5c6b2541a4403b5/utils.py",
+        "reading_url": "https://github.com/MarkFzp/act-plus-plus/blob/26bab0789d05b7496bacef04f5c6b2541a4403b5/utils.py#L48-L98",
+        "why": "缺底盤補零、平滑、real action時間偏移與padding",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MarkFzp/act-plus-plus",
+        "requested_repo": "MarkFzp/act-plus-plus",
+        "commit": "26bab0789d05b7496bacef04f5c6b2541a4403b5",
+        "ref": null,
+        "path": "imitate_episodes.py",
+        "ranges": [
+          [
+            294,
+            321
+          ],
+          [
+            395,
+            421
+          ],
+          [
+            442,
+            462
+          ],
+          [
+            498,
+            509
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 666,
+        "sha256": "2cba525684ab68994e2d68ff805a58bfd1f2f91b288771914ee70ef164cce504",
+        "url": "https://github.com/MarkFzp/act-plus-plus/blob/26bab0789d05b7496bacef04f5c6b2541a4403b5/imitate_episodes.py",
+        "reading_url": "https://github.com/MarkFzp/act-plus-plus/blob/26bab0789d05b7496bacef04f5c6b2541a4403b5/imitate_episodes.py#L294-L321",
+        "why": "13步base/arm對齊、temporal aggregation與real reward限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MarkFzp/mobile-aloha",
+        "requested_repo": "MarkFzp/mobile-aloha",
+        "commit": "0e403249c76054a68e757e590d4da4dba401c9e3",
+        "ref": null,
+        "path": "aloha_scripts/real_env.py",
+        "ranges": [
+          [
+            170,
+            171
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 277,
+        "sha256": "97ae95d545379c3409dbad22b8307ba35d32fc4a0439dc2d03a62ab9a459f829",
+        "url": "https://github.com/MarkFzp/mobile-aloha/blob/0e403249c76054a68e757e590d4da4dba401c9e3/aloha_scripts/real_env.py",
+        "reading_url": "https://github.com/MarkFzp/mobile-aloha/blob/0e403249c76054a68e757e590d4da4dba401c9e3/aloha_scripts/real_env.py#L170-L171",
+        "why": "真實reward固定0的接口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a643c8d6b20fa1b10cb08fcdbda815e2c261e0cc3389c570892cff6ca2494832"
+  },
+  "repository_binding_review_sha256": "a643c8d6b20fa1b10cb08fcdbda815e2c261e0cc3389c570892cff6ca2494832",
+  "repository_bindings": [
+    {
+      "requested_repo": "MarkFzp/act-plus-plus",
+      "resolved_repo": "MarkFzp/act-plus-plus",
+      "aliases_in_this_review": [
+        "markfzp/act-plus-plus"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "26bab0789d05b7496bacef04f5c6b2541a4403b5",
+          "reviewed_files": [
+            "README.md",
+            "imitate_episodes.py",
+            "utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/MarkFzp/act-plus-plus",
+          "link_label": "ML Code",
+          "project_url": "https://mobile-aloha.github.io",
+          "page_sha256": "aa73955fee07017cc439bcf3771fcbc398918ecc3051ba052ee94bd0cf0d9a07"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P131",
+          "review_file": "content/github_review/reviews/P131.json",
+          "review_sha256": "a643c8d6b20fa1b10cb08fcdbda815e2c261e0cc3389c570892cff6ca2494832",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "MarkFzp/mobile-aloha",
+      "resolved_repo": "MarkFzp/mobile-aloha",
+      "aliases_in_this_review": [
+        "markfzp/mobile-aloha"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0e403249c76054a68e757e590d4da4dba401c9e3",
+          "reviewed_files": [
+            "README.md",
+            "aloha_scripts/real_env.py",
+            "aloha_scripts/record_episodes.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/MarkFzp/mobile-aloha",
+          "link_label": "Hardware Code",
+          "project_url": "https://mobile-aloha.github.io",
+          "page_sha256": "aa73955fee07017cc439bcf3771fcbc398918ecc3051ba052ee94bd0cf0d9a07"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P131",
+          "review_file": "content/github_review/reviews/P131.json",
+          "review_sha256": "a643c8d6b20fa1b10cb08fcdbda815e2c261e0cc3389c570892cff6ca2494832",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "MarkFzp/mobile-aloha",
+    "MarkFzp/act-plus-plus"
+  ],
+  "external_repositories": []
+}

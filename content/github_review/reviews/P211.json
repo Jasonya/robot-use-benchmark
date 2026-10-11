@@ -1,0 +1,92 @@
+{
+  "paper_id": "P211",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "AssemblyGrid提供明確的問題/instance/schema與KPI，可借鏡標準化設計；其canonical環境是無量綱任務層幾何，不能直接當接觸式robot物理操作。",
+  "reading_order": [
+    {
+      "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+      "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          90
+        ]
+      ],
+      "why": "9個官方scenario與3family×3level"
+    },
+    {
+      "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+      "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+      "path": "docs/BENCHMARK_SPEC.md",
+      "ranges": [
+        [
+          1,
+          199
+        ]
+      ],
+      "why": "normative範圍、recipe有效性、local資訊、regime、KPI與統計單位"
+    },
+    {
+      "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+      "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+      "path": "Experiments/env/benchmark.py",
+      "ranges": [
+        [
+          74,
+          112
+        ],
+        [
+          149,
+          204
+        ],
+        [
+          264,
+          310
+        ]
+      ],
+      "why": "擴充tracks與instance hash欄位、canonical/legacy metric字典"
+    },
+    {
+      "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+      "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+      "path": "Experiments/env/core.py",
+      "ranges": [
+        [
+          925,
+          955
+        ],
+        [
+          995,
+          1005
+        ],
+        [
+          1465,
+          1474
+        ],
+        [
+          1797,
+          1838
+        ],
+        [
+          2310,
+          2416
+        ]
+      ],
+      "why": "實際completion/flow/makespan、terminal/truncation及conditional KPI"
+    }
+  ],
+  "environment": "official abstract-v1 geometry，tick無量綱；固定robot base/reach/payload及操作位置，沒有joint、grasp/contact或collision-free軌跡保證。UR10派生驗證是另一非canonical profile。",
+  "tasks": "Flow、Coalition、Concurrency各easy/medium/hard，共9官方scenario；recipe規定材料/先後/XOR選項/coalition角色。歷史Geometry及AG-*擴充tracks不直接加進官方9。",
+  "data": "instance_definition保存grid/topology、robot population、recipe、資源、demand、時間、合作、local資訊及generation_seed；演算法/執行seed另存。local proposal_support是聚合支持比例，不是free-form message或global可行性oracle。",
+  "evaluation": "completion=delivered/spawned，throughput=delivered/ticks；delivered-only mean flow需連unfinished count看。restricted flow把未完成者截尾到目前t；batch_makespan只在batch全部完成時有效，generic makespan仍可回局部值，不能混用。coalition成功分母committed+expired；utilization只對exact-capacity且有機會的狀態平均，approx upper bounds分開。",
+  "standardization": {
+    "profile": "decentralized_production_and_coalition_gridworld",
+    "reuse": "規範recipe/schema/semantic/realizability三層驗證、instance hash、訓練seed與execution seed分離、canonical KPI明確化。",
+    "transform": "source固定v1/abstract profile；task按recipe目標，environment按grid與geometry配置，case加generation/execution seeds與資訊契約；維持tick及抽象reach單位，實體秒/碰撞另驗證。",
+    "missing": "官方instance全量manifest取得、neural candidate-slot/identity alias上限測試、與物理robot的適配/抽象誤差驗證、同seed範圍的基線。"
+  },
+  "version_note": "固定3bb72dd；easy/medium/hard只在同family內排序。doc規則與core的legacy同名欄位須選canonical口徑，未執行training或simulation。",
+  "runtime_executed": false
+}

@@ -1,0 +1,195 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KinDER｜GitHub怎么读与整理 · Robot-use Benchmark</title>
+  <meta name="description" content="KinDER将程序化环境与baselines分两repo；已读ClutteredRetrieval2D／Motion2D的具体几何成功、5D动作与vector schema，再追到demo保存／IL reader及MPC评测CSV。非成功demo可被手动保存却未被reader筛除；MPC steps漏算成功那一步，execution_time也不是环境运行时间。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P084.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P084.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P084.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="KinDER｜GitHub怎么读与整理 · Robot-use Benchmark"><meta property="og:description" content="KinDER将程序化环境与baselines分两repo；已读ClutteredRetrieval2D／Motion2D的具体几何成功、5D动作与vector schema，再追到demo保存／IL reader及MPC评测CSV。非成功demo可被手动保存却未被reader筛除；MPC steps漏算成功那一步，execution_time也不是环境运行时间。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P084.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"github/P084.html","title":"KinDER｜GitHub怎么读与整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hans.js?v=081237f01e25","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原作定义／设置","staticOnly":"本卡记录来源索引；任务环境规格的对齐和运行验证分别记录。","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"索引出处与对应细节","empty":"没有符合的索引条目","showing":"显示","records":"笔索引条目","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原作任务ID","native_task_class":"原作任务类别","native_task_registration":"原作任务注册","native_task_module":"原作任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务schema","generator_configuration":"生成器设置","integration_registration_group":"框架注册组","evaluation_protocol":"评测协定","video_task_schema":"视频／任务题型","human_sim_task_mapping":"人类／模拟任务对应","native_task_template":"任务模板","instructional_activity_definition":"人类活动定义","native_task_definition":"原作任务定义","information_task_schema":"信息题型定义"},"buckets":{"native_task_candidates":"原作robot任务条目（待对齐）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类活动／流程定义（视频来源）","information_task_definitions":"信息任务／问答题型定义"},"recordMeaning":"索引型态","meaningByBucket":{"native_task_candidates":"原作者列出的robot任务条目；在本库等待共同规格与来源对齐。","human_activity_definitions":"人类活动类别与流程来源，可对应多部视频；任务环境另建对应。","integration_or_protocol":"框架注册、协定或生成设置，可指向多个任务／样本；一条索引不等于一个环境。","video_pairing":"视频题型或人类／模拟任务对应；观测数据与物理环境规格分开。","documented_examples":"示范程序入口；可作定义与实作线索，尚不直接代表独立环境。","information_task_definitions":"原作的信息任务或问题类型；题目实数另外按question_id或case_id计数。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../coverage.html">覆盖与比较</a><a href="../native-tasks.html">任务清单</a><a href="../survey-union.html">来源名录</a><a href="../design.html">整体设计</a><a href="../collection-pipeline.html">数据流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核读</a><a href="../library.html">文献</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/github/P084.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="P084.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>P084 · KinDER</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P084 · KinDER</h1><p class="lede">KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇总表</a><span class="github-status core">内核内容已核读</span>
+      <span>benchmark／数据／评测主来源</span><a href="https://arxiv.org/abs/2604.25788" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p084">用途与原生规模依据</a>
+    </div>
+    <p class="github-scope">核读快照 2026-10-11。已读范围限所列片段；本轮未运行上游程序。</p>
+    <p class="github-summary">KinDER将程序化环境与baselines分两repo；已读ClutteredRetrieval2D／Motion2D的具体几何成功、5D动作与vector schema，再追到demo保存／IL reader及MPC评测CSV。非成功demo可被手动保存却未被reader筛除；MPC steps漏算成功那一步，execution_time也不是环境运行时间。</p>
+    <aside class="github-version"><b>版本与身份</b><p>主repo固定5b2dbac482142b879b48449b3fa2af63f641aed3（2026-09-11，pyproject 0.2.5），baselines固定f763946435c9ed8ab0f89e645f1014b07c1a1e8a（2026-09-15），均晚于paper v2。env ID的-v0不表示reset/碰撞实作从未变更；registry还会因backend导入失败而跳过整组环境，本机可用ID数不能作全库case/env数。paper的25/13与现行README添加项目分开保留；本轮未安装、run CI、重播、训练或运行planner。</p><p>固定paper为Huang、Li、Saxena等人的KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning，arXiv:2604.25788v2（2026-05-04）。PDF首页指prpl-group.com/kinder-site；已读该项目页快照中精确title、arXiv、kindergarden主repo及kinder-baselines companion链接，避免只靠作者页上的其他研究链接。主repo提供KinDERGarden/Gym，companion提供KinDERBench方法，不是两份独立benchmark。</p></aside>
+    <dl class="github-five-fields"><div><dt>领域</dt><dd>居家整理与清洁、包装、仓储与物流、通用对象与机动作业</dd></div><div><dt>环境</dt><dd>paper v2声明25个程序化环境／13 baselines，跨Kinematic2D、Dynamic2D、Kinematic3D、Dynamic3D；现行0.2.5另列kinematic3d_v2/Vega等内容，须依paper版本选子集。已读两个Kinematic2D环境的world=[0,2.5]²，原点左下、x向右、y向上；使用2D原生长度座标与theta弧度，不把render DPI当物理尺度。CRV robot是圆形底座、伸缩臂与吸盘；kinematic转移没有速度积分。观测排除固定墙面等initial_constant_state，planner可透过专用state API取得；allow_state_access是方法可见信息条件。</dd></div><div><dt>任务</dt><dd>ClutteredRetrieval2D需把target_block完整放入target_region；o1/o10/o25代表阻挡物数，registry保存同一class的variant_ids，并非固定case数。最初robot必须在最大free-space连通分量，目标不得已与region重叠；这是初态有效性检查，不等于已证明全局可解。Motion2D-p0-v0是MPC预设task，成功只要求robot的(x,y)参考位置在target rectangle内；与完整block包含判定不同。每步reward均-1，包含成功那一步，不能当正向成功奖励。</dd></div><div><dt>题数与数据</dt><dd>ConstantObjectKinDEREnv由exemplar与type_features产生可逆vectorize/devectorize；ClutteredRetrieval-o1文档具体39维：robot9维，target_block/target_region/obstruction各10维（x,y,theta,static,color_rgb,z_order,width,height）。名称及feature顺序需保留，不能按任意字典排序重新编号。action=[dx,dy,dtheta,darm,vac]：位移±0.05、角度±π/16、臂长增量±0.1、vac∈[0,1]；吸附对象按前一步gripper相对变换搬移，碰撞则整个候选state不采用。demo写{sanitized_env_id}/{seed}/{timestamp}.p（dill），有env_id/timestamp/seed/observations/actions/rewards/terminated/truncated，T actions通常配T+1 observations；timestamp是保存时间，不是逐frame时间。GUI render_fps=20不能证明每action间隔固定。IL reader依数字seed目录排序、每目录取glob第一个.p，zip(observations[:-1],actions)生成observation.state/action/episode_index/frame_index；预设无images，render_images=True才以同seed和actions重播产生图像，本轮未运行。</dd></div><div><dt>评估方式</dt><dd>ClutteredRetrieval chain为vector wrapper.step→ObjectCentricKinematic2DRobotEnv.step→_get_reward_and_done→is_inside，逐一检查target rectangle顶点是否在goal rectangle；base回truncated=False、无原生maximum horizon。MPC另一条完整路径：run_experiment依Motion2D-p0配置创建eval env及allow_state_access=True的独立sim env→TrajOptAgent/PredictiveSampling→KinderTrajOptProblem.get_transition→Motion2D.contains_point，实际eval success直接取env.step的terminated。预设每cfg seed50 episodes、max_eval_steps=200；planning horizon=100、num_rollouts=10、replan_interval=3是规划预算，不是trial数。results.csv记success、steps、planning_time、execution_time、reward及正常episode的eval_episode；例外直接插入失败／零数值列。evaluate_stats读config.env.env_id、seed与CSV success，先取每job成功率，再对收集到的job rates平均与sample std(ddof=1)。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作数字：保留论文的单位与页码</summary><p>下列为既有原文审阅摘录；GitHub快照和本库取得范围另见上文，不互相代替。</p><ul><li><strong>25</strong> procedural task-environments · 原文页 4, 5</li><li><strong>8</strong> 主实验环境 · 原文页 6</li><li><strong>50</strong> 每环境每seed eval episodes · 原文页 7</li></ul></details>
+    <h2 id="reading">依这个顺序读</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/README.md#L7-L16" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>官方主环境、object-centric/vector API、backend版本与外部assets／demos。</p><small>L7–16 · L26–57 · L79–99 · L124–147 · L149–194</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 aaf7f0b80cd6bbcf754f769fcc39536f998f97af6e54808db2c1e5f15049e7cb</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/README.md#L1-L31" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>companion baselines与model/skill套件角色。</p><small>L1–31</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 de1a74ea8173e46a2bdb4939021706dfb761fb0a81b00bfe6875d6054cab9563</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/pyproject.toml#L5-L43" target="_blank" rel="noopener noreferrer"><code>pyproject.toml</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>package 0.2.5、Pymunk/MuJoCo与未锁精确版次的几何依赖。</p><small>L5–43</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 cebbd20989daa5bedcca7d4cbcc9062f48d9f60b04e52f1e986a050ade101ad3</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/__init__.py#L34-L96" target="_blank" rel="noopener noreferrer"><code>src/kinder/__init__.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>按backend注册、o1/o10/o25 variants及metadata，不从本机注册结果推全库数量。</p><small>L34–96 · L119–136 · L560–592 · L647–654</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 18921c796b28b353633ea8ce7773fc97441d001f91ba739c68176ce6d7a982b9</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/core.py#L124-L199" target="_blank" rel="noopener noreferrer"><code>src/kinder/core.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>vector/object映射、state-access权限与planner内部transition。</p><small>L124–199 · L215–267 · L300–318 · L344–350 · L376–407</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 46d64f7ba12ed06f45bb546365e27ed79ed9a6602b6486e1f83b57fc582241b2</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/clutteredretrieval2d.py#L36-L86" target="_blank" rel="noopener noreferrer"><code>src/kinder/envs/kinematic2d/clutteredretrieval2d.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>原生2D座标、对象初态、碰撞采样、完整包含checker与固定feature顺序。</p><small>L36–86 · L137–248 · L306–438</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 83fe2315ce0694a4b79fb325e150975101c05c26c0f6995b5eba9506f0f9f8ea</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/base_env.py#L99-L199" target="_blank" rel="noopener noreferrer"><code>src/kinder/envs/kinematic2d/base_env.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>5D action、上一时刻吸附对象转换、碰撞回退、reward/termination与无预设horizon。</p><small>L99–199 · L206–249</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 3f915eacb6aa5db037e0ec1c7549cd4be2e8613a61fa738839f9b05366475e85</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/utils.py#L422-L437" target="_blank" rel="noopener noreferrer"><code>src/kinder/envs/kinematic2d/utils.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>真正包含判定：inner rectangle的每个顶点皆在outer rectangle内。</p><small>L422–437</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 273895b460c0c76f1139c2a0309617af7986eabe630caee74ae2847b17b024ed</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/motion2d.py#L34-L55" target="_blank" rel="noopener noreferrer"><code>src/kinder/envs/kinematic2d/motion2d.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>MPC预设Motion2D的实际goal：robot参考位置落入region。</p><small>L34–55 · L117–145 · L261–297</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 4c4e467f82ceb3b69b08b0050100490c9b3bb310a2e8886ccd12121743e74a40</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/docs/envs/ClutteredRetrieval2D.md#L7-L43" target="_blank" rel="noopener noreferrer"><code>docs/envs/ClutteredRetrieval2D.md</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>task/variant及action字段说明；25-step random-action展示不是评测预算。</p><small>L7–43</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 d34d60a8bf54571f3c3d79b8502b2685452d291314eb722b91c43b85dfba7d9d</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/docs/envs/variants/ClutteredRetrieval2D/ClutteredRetrieval2D-o1.md#L24-L66" target="_blank" rel="noopener noreferrer"><code>docs/envs/variants/ClutteredRetrieval2D/ClutteredRetrieval2D-o1.md</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>o1版本的39维feature索引。</p><small>L24–66</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 482d7158fb0037015d1339b0c2c847755f3dd81ad6b79d06a1036cf212fbe0af</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/scripts/collect_demos.py#L1-L10" target="_blank" rel="noopener noreferrer"><code>scripts/collect_demos.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kindergarden · 5b2dbac482</span></div>
+      <p>dill .p字段、T+1观测、手动保存非成功轨迹与20fps GUI。</p><small>L1–10 · L95–119 · L152–195 · L233–260 · L348–372</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 ae00cdbd88a5955cc306da1a54cd065e1c40192d4c8f6358190f7f9edd7c02bc</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-imitation-learning/src/kinder_imitation_learning/dataset.py#L18-L174" target="_blank" rel="noopener noreferrer"><code>kinder-imitation-learning/src/kinder_imitation_learning/dataset.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>实际.p reader、首档选择、obs/action对齐、可选重播图像与丢弃flags。</p><small>L18–174</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 6f67af1765de28c6d25921874ecdd4c9461506ccac52d3317f964ead01a4a3c6</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/conf/config.yaml#L17-L28" target="_blank" rel="noopener noreferrer"><code>kinder-trajopt/experiments/conf/config.yaml</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>50评测episodes、100步planning horizon、10候选rollouts。</p><small>L17–28</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 9414fa0877078ead547ffcf54f30fd375adc8b23332e5fcc2b559c3c7bc1b78c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/conf/env/motion2d-p0.yaml#L1-L5" target="_blank" rel="noopener noreferrer"><code>kinder-trajopt/experiments/conf/env/motion2d-p0.yaml</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>Motion2D-p0-v0、200运行步、每3步replan及不用world-model checkpoint。</p><small>L1–5</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 72f238ca929d22ca11f6444f34ca0ca2779d0bda6ef5d841917a28adcef7c1fd</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/src/kinder_trajopt/agent.py#L26-L80" target="_blank" rel="noopener noreferrer"><code>kinder-trajopt/src/kinder_trajopt/agent.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>PredictiveSampling/MPC设置、观测到action与可选world-model。</p><small>L26–80</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 9321140f6b9f9e8535dac16b61623fbc10e09cc42b1a4d528dae5a8696afcea0</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/src/kinder_trajopt/trajopt_problem.py#L18-L44" target="_blank" rel="noopener noreferrer"><code>kinder-trajopt/src/kinder_trajopt/trajopt_problem.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>simulated candidate成本为到termination前的负累积reward；可选world-model仍用env reward。</p><small>L18–44 · L68–108</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 618c1cc76011479354534e39967a72bfe018135e298542e4aeaed9f121cad270</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/run_experiment.py#L33-L107" target="_blank" rel="noopener noreferrer"><code>kinder-trajopt/experiments/run_experiment.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>实际eval loop、seed、success CSV、exception fallback及时间／步数指针范围。</p><small>L33–107 · L110–146</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 fe15472ac742cc192fb610177768ba80a3b272803f3e24207edda3e5764d6c59</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/scripts/evaluate_stats.py#L17-L67" target="_blank" rel="noopener noreferrer"><code>kinder-trajopt/scripts/evaluate_stats.py</code> ↗</a><span>GitHub · Princeton-Robot-Planning-and-Learning/kinder-baselines · f763946435</span></div>
+      <p>每job success平均与job间ddof=1标准差；不是独立重评审。</p><small>L17–67</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 77ca3c9f4437f455a97882675fbe0e68a067e5f15c3bfc06ef59d85ab1b869fb</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎么接入我们的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>环境class/variant registry、程序化reset、object/feature映射、action bounds、几何checker、.p轨迹schema及具体MPC success CSV。</p></section><section><h3>需要转换</h3><p>source锁paper v2与两repo commit，environment再绑backend/package版本与完整config；task家族、variant对象数、reset seed/case和method trial分开。case保存初态vector+feature manifest及父demo文件hash，保留T/T+1关系。evaluator保存terminated/truncated、execution步数、planning rollout预算、state-access／world-model设置；rendered images标为重播衍生数据，连回原seed与code版本。</p></section><section><h3>仍需补齐</h3><p>collector手动G键可保存terminated=False，但IL loader不检查terminated/truncated，并任选同seed第一个.p、未验证各episode env_id一致；需明确挑档及成功标签。重播图像只依seed、未比对stored observations，环境修订后不能宣称画面仍对齐。MPC steps在done前break而少算成功步；execution_time只包agent.update，不含env.step；抽到的实际episode seed未写CSV，例外列又缺eval_episode。summarizer不依seed去重，重复job可冒充更多独立seed。需补paper环境／baseline清单、外部3D资产及prpl_utils/relational_structs/tomsgeoms2d精确版本；未验证其余dynamic tasks或真实mobile-manipulator实验。</p></section></div>
+    <details class="github-discovery"><summary>查看来源确认纪录</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P084-discovery.json&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;
+    ],
+    &quot;paper_version&quot;: &quot;2604.25788v2&quot;,
+    &quot;pdf_sha256&quot;: &quot;39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900&quot;,
+    &quot;sha256&quot;: &quot;3c9963672f69cc68bc6e0a31443348f56c4061260deb584c3a44bb6ce9bccab6&quot;,
+    &quot;text_excerpts&quot;: [
+      {
+        &quot;json_pointer&quot;: &quot;/opening_text&quot;,
+        &quot;character_range&quot;: [
+          665,
+          702
+        ],
+        &quot;text&quot;: &quot;arXiv:2604.25788v2 [cs.RO] 4 May 2026&quot;,
+        &quot;scope&quot;: &quot;僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。&quot;
+      }
+    ]
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/http/12d8be66cd5af315ad933f24e055d95ee328048b90c48e06af859cf5f766dd40.body&quot;,
+    &quot;url&quot;: &quot;https://prpl-group.com/kinder-site/&quot;,
+    &quot;sha256&quot;: &quot;e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81&quot;,
+    &quot;read_ranges&quot;: [
+      [
+        6,
+        8
+      ],
+      [
+        69,
+        71
+      ],
+      [
+        77,
+        79
+      ],
+      [
+        260,
+        262
+      ],
+      [
+        288,
+        290
+      ],
+      [
+        292,
+        294
+      ],
+      [
+        359,
+        361
+      ],
+      [
+        532,
+        534
+      ],
+      [
+        533,
+        535
+      ]
+    ],
+    &quot;source_manifest&quot;: &quot;audit/.cache/github_review_worker/P077-P084/P084-primary-identity.json&quot;,
+    &quot;finding&quot;: &quot;專用project page的title／arXiv與兩repo之直接連結。&quot;
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P084/pages.json&quot;,
+    &quot;sha256&quot;: &quot;7a3e287563b1f1cc14c4b4ec7c41f46f67b862237fa4e8ba3d73642d0e6d5c94&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/4/text&quot;
+    ],
+    &quot;finding&quot;: &quot;paper Kinematic3D與Dynamic3D的不同轉移／grasping模型，及TidyBot++、Kinova、Robotiq設定；不能把現行新增Vega backend倒算至paper。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同结构与格式说明 →</a><a href="../../downloads/github-review/papers/P084.json" download>本篇JSON与证据 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇阅读"><a href="P083.html">← 上一篇 · RoboDojo</a><a href="P085.html">下一篇 → · SoftGym</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理与逐篇报告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hans.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆盖总览与前作比较</a><a href="../design.html">目前主设计</a><a href="../research.html">文献与分类</a><a href="../counting.html">计数细节与旧代号</a><a href="../../downloads/source-review/source-review-zh-hans.pdf">用途归纳PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">历史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初筛、183份关键章节审阅、672笔原生数量摘录；183/183份来源完成21类用途归纳；4类判分分项保留。GitHub核读增补：250/250篇有处理结果，范围与程序运行分开。旧配额已撤回，全库任务与环境去重仍待完成。 <a href="../github-review.html">逐篇GitHub与标准化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

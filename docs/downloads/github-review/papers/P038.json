@@ -1,0 +1,536 @@
+{
+  "paper_id": "P038",
+  "name": "OpenEQA",
+  "title": "OpenEQA: Embodied Question Answering in the Era of Foundation Models",
+  "year": 2024,
+  "paper_url": "https://openaccess.thecvf.com/content/CVPR2024/html/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.html",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P038",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "OpenEQA 的 question/answer/history 格式和文字裁判已可具體追溯；本次核讀一筆原始 QA、歷史取得方式、兩種 prompt 與完整評分指令碼。",
+    "environment": "episode histories 來自 HM3D 與 ScanNet；HM3D 用 Habitat 重播 agent states，ScanNet 從原掃描資料抽取。episode_history 路徑連回 scene/source；RGB、depth、pose 是同歷史不同觀測，不新增場景。",
+    "tasks": "開放詞彙環境問答，可討論 episodic memory 和 active exploration；此核讀 evaluator 判文字答案，沒有證明某 agent 已完成探索或操作。",
+    "data": "open-eqa-v0.json 例含 question_id、question、answer、category、episode_history，可另有 extra_answers。HM3D 版本為 hm3d-v0/場景路徑，資料檔案提供 RGB-only 或 RGB-D+intrinsics+pose；原 scan/agent state 與 extraction 版本要隨 case 儲存。",
+    "evaluation": "llm_match 預設 gpt-4-1106-preview/seed1234/temperature.2/max_tokens32，以原參考與可選 extra_answers 判1–5；parse Your mark 後整數。evaluate-predictions 先核 ID/數量、截掉最後句點後的尾文、逐題快取，再將clip(score,1,5)線性映成0–100平均。prediction=None 回0後映為0；force 只對提供的 result 遍歷，dry-run 只取前5，均不能報全量分數。",
+    "standardization": {
+      "profile": "environment_open_ended_qa",
+      "reuse": "穩定 question_id、scene/history 路徑、參考答案與替代答案、原始 judge prompt／正規化。",
+      "transform": "environment 儲存父 HM3D/ScanNet scene 和 extraction release；case 綁 question_id/history/modalities/觀測 budget。evaluator 固定裁判版本、prompt hash、預處理、cached score 來源；完整資料／結果 ID 一對一，force/dry-run 和缺題另標。",
+      "missing": "尚未取得 histories、執行 simulator／baseline／付費裁判。只讀 QA /0 schema 範例，未逐題驗證全庫；若更換模型或 prediction，舊 metrics 快取需按輸入hash區分，並另外驗證裁判與人工一致性。"
+    },
+    "version_note": "data README prose 寫 simulator2.5，但實際安裝命令是 habitat-sim0.2.5；以明確套件版本和歷史版本為準。RGB直接下載被作者標為第三方hosting，官方來源身份與實際分發者需分欄。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 72,
+        "sha256": "f277c320c47f30856a7437786c5b21389d8c02a6296ca2721626f134a310f2c4",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/README.md",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/README.md#L1-L72",
+        "why": "原生 Q/A/history 及兩種應用情境",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "data/README.md",
+        "ranges": [
+          [
+            1,
+            101
+          ],
+          [
+            127,
+            168
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 168,
+        "sha256": "1d8dbef54e15ccafdae5f05a2d8f8193a983713d89fa2806656c4c0c71c6259e",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/data/README.md",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/data/README.md#L1-L101",
+        "why": "HM3D/ScanNet、感測與 extraction 版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "data/open-eqa-v0.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/0"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/0",
+            "selected_value_sha256": "2e7d266260316fa6b50f865ae3be2fb2dc55ec93c59cc2413a8e440599a524c5"
+          }
+        ],
+        "read_scope": "Only selected JSON entries read; no full-file or full-line review claimed",
+        "line_count": 13032,
+        "sha256": "a64dd101133213fa3b5ca31e5af8216662471aa34894b443d803f497757557ee",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/data/open-eqa-v0.json",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/data/open-eqa-v0.json",
+        "why": "JSON /0 原始 QA 範例",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "prompts/mmbench.txt",
+        "ranges": [
+          [
+            1,
+            27
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 27,
+        "sha256": "a63274694c309114cbd5176d2f9b94b62cf1f5148027f0020b30c1c18003d2b2",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/prompts/mmbench.txt",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/prompts/mmbench.txt#L1-L27",
+        "why": "1–5文字匹配裁判",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "prompts/mmbench-extra.txt",
+        "ranges": [
+          [
+            1,
+            31
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 31,
+        "sha256": "fd48618d80170815174387ae64592038cba3e412a8de0cea16b3e35064cab71c",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/prompts/mmbench-extra.txt",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/prompts/mmbench-extra.txt#L1-L31",
+        "why": "替代答案裁判",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "openeqa/evaluation/llm_match.py",
+        "ranges": [
+          [
+            1,
+            82
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 82,
+        "sha256": "0d33bf9e93473731a5b843d140b3818a3dabc9d86ab05e635708090de0365c55",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/openeqa/evaluation/llm_match.py",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/openeqa/evaluation/llm_match.py#L1-L82",
+        "why": "裁判引數、空回答與解析",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/open-eqa",
+        "requested_repo": "facebookresearch/open-eqa",
+        "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+        "ref": null,
+        "path": "evaluate-predictions.py",
+        "ranges": [
+          [
+            1,
+            122
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 122,
+        "sha256": "7d8376653ae15e758184a67d5f7fb9e6d42cc8356bd7193ae68ff41cd8cb64a2",
+        "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/evaluate-predictions.py",
+        "reading_url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/evaluate-predictions.py#L1-L122",
+        "why": "ID、force/dry-run、快取和0–100對映",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "330058625650df2b1914db2fe60a332875b5fa662efa2dd41cc067ea1a150e04"
+  },
+  "repository_binding_review_sha256": "330058625650df2b1914db2fe60a332875b5fa662efa2dd41cc067ea1a150e04",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/open-eqa",
+      "resolved_repo": "facebookresearch/open-eqa",
+      "aliases_in_this_review": [
+        "facebookresearch/open-eqa"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+          "reviewed_files": [
+            "README.md",
+            "data/README.md",
+            "data/open-eqa-v0.json",
+            "evaluate-predictions.py",
+            "openeqa/evaluation/llm_match.py",
+            "prompts/mmbench-extra.txt",
+            "prompts/mmbench.txt"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/open-eqa",
+          "link_label": "Code",
+          "project_url": "https://open-eqa.github.io",
+          "page_sha256": "a039ab114ecfa573dbf823439c7d5f392491f4e461fee1663d8cf4894afd3a2e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/open-eqa",
+          "link_label": "Benchmark",
+          "project_url": "https://open-eqa.github.io",
+          "page_sha256": "a039ab114ecfa573dbf823439c7d5f392491f4e461fee1663d8cf4894afd3a2e"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P038",
+          "review_file": "content/github_review/reviews/P038.json",
+          "review_sha256": "330058625650df2b1914db2fe60a332875b5fa662efa2dd41cc067ea1a150e04",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P038",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "OpenEQA，CVPR 2024正式PDF。",
+    "scope_read": "EM／Active定義、資料來源與生成、題數及LLM-Match協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "role": "具身問答與探索",
+    "environment": "蒐集階段100個ScanNet scenes＋87個HM3D scans；這是生成候選history範圍，非已验证題目引用的152個history IDs。",
+    "tasks": "7問答類別；兩種設定EM-EQA／A-EQA。Active只允許導航探索，未包括開櫃等操作。",
+    "cases": "正式1,636題＝1,079 ScanNet＋557 HM3D；A-EQA重用這557題，不能加成2,193獨立QA。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 187,
+        "unit": "蒐集候選scenes／scans",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "問答類別",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1636,
+        "unit": "EM-EQA題",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 557,
+        "unit": "重用於A-EQA的題子集",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "LLM-Match給1–5分再正規化；不是字串match或MC accuracy。",
+      "Active另按路徑長度折算效率；object localization有多個合理reference答案。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審",
+      "數值誤差與相似度"
+    ],
+    "split": "來源ScanNet val/test、HM3D val場景；相同QA跨EM與Active，只改可用資訊／探索權限。",
+    "lineage": "ScanNet／HM3D＋Habitat。與本庫固定manifest的152 history IDs口徑不同，187候選不等於187已取得互動環境。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "圖2、§2.1–2.5",
+        "supports": "1,636／557／187、共享QA、評分"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "LLM-Match validation",
+        "supports": "judge與人工對照"
+      }
+    ],
+    "unresolved": [
+      "Active公開資產／執行入口和本文可評557題的可重現範圍需另核；已取得QA metadata不代表所有素材到位。"
+    ],
+    "reuse": "是同一問題在記憶與可探索環境兩種設定的明確先例；應以共享query而非雙倍題數表示。",
+    "reviewed_pdf_sha256": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+    "reviewed_on": "2026-10-02",
+    "name": "OpenEQA",
+    "year": 2024,
+    "title": "OpenEQA: Embodied Question Answering in the Era of Foundation Models",
+    "source_url": "https://openaccess.thecvf.com/content/CVPR2024/html/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.html",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "office"
+    ],
+    "review_tags": [
+      "居家生活",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P038",
+      "domain_ids": [
+        "home",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P038",
+          "domain_ids": [
+            "home",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "7問答類別；兩種設定EM-EQA／A-EQA。Active只允許導航探索，未包括開櫃等操作。",
+            "蒐集階段100個ScanNet scenes＋87個HM3D scans；這是生成候選history範圍，非已验证題目引用的152個history IDs。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+      "previous_domain_ids": [
+        "home",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "judge",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P038",
+      "name": "OpenEQA",
+      "expected_title": "OpenEQA: Embodied Question Answering in the Era of Foundation Models",
+      "source_url": "https://openaccess.thecvf.com/content/CVPR2024/html/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.html",
+      "pdf_url": "https://openaccess.thecvf.com/content/CVPR2024/papers/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.pdf",
+      "retrieved_at": "2026-10-02T21:33:27.461179+00:00",
+      "pdf_sha256": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+      "text_sha256": "32fbea98d8410d060f3f2dbe5b015b84937686d4a44c1bc1c5103028a3f44351",
+      "pdf_bytes": 4252266,
+      "pages": 11,
+      "text_characters": 417641,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_pdf_url": "https://openaccess.thecvf.com/content/CVPR2024/papers/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.pdf"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 187,
+        "unit": "蒐集候選scenes／scans",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P038:1",
+        "paper_id": "P038",
+        "benchmark": "OpenEQA",
+        "native_term": "蒐集候選scenes／scans",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://openaccess.thecvf.com/content/CVPR2024/papers/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.pdf",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "問答類別",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P038:2",
+        "paper_id": "P038",
+        "benchmark": "OpenEQA",
+        "native_term": "問答類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://openaccess.thecvf.com/content/CVPR2024/papers/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.pdf",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1636,
+        "unit": "EM-EQA題",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P038:3",
+        "paper_id": "P038",
+        "benchmark": "OpenEQA",
+        "native_term": "EM-EQA題",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://openaccess.thecvf.com/content/CVPR2024/papers/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.pdf",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 557,
+        "unit": "重用於A-EQA的題子集",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P038:4",
+        "paper_id": "P038",
+        "benchmark": "OpenEQA",
+        "native_term": "重用於A-EQA的題子集",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "d2c714b7cfdcee8fe6cde607296c15689ecff298b752611c913458fd3964ca48",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://openaccess.thecvf.com/content/CVPR2024/papers/Majumdar_OpenEQA_Embodied_Question_Answering_in_the_Era_of_Foundation_Models_CVPR_2024_paper.pdf",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/open-eqa"
+  ],
+  "external_repositories": []
+}

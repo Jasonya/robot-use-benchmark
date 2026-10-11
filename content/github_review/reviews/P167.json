@@ -1,0 +1,84 @@
+{
+  "paper_id": "P167",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "DexGarmentLab的15個衣物任務場景與2500+衣物資產可擴充柔性物覆蓋；所讀Fold Tops驗收主要看終態點雲的XY範圍比例，尚不能單獨證明指定摺法。",
+  "reading_order": [
+    {
+      "repo": "wayrise/DexGarmentLab",
+      "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          114
+        ]
+      ],
+      "why": "原作、IsaacSim版本、15task與衣物/環境互動分組"
+    },
+    {
+      "repo": "wayrise/DexGarmentLab",
+      "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+      "path": "Validation_Core.md",
+      "ranges": [
+        [
+          1,
+          72
+        ]
+      ],
+      "why": "HALO/DP3/DP不同觀測介面"
+    },
+    {
+      "repo": "wayrise/DexGarmentLab",
+      "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+      "path": "Model_HALO/SADP/structure_aware_diffusion_policy/dataset/robot_dataset.py",
+      "ranges": [
+        [
+          1,
+          109
+        ]
+      ],
+      "why": "Zarr state/action/點雲/affordance、序列取樣與normalizer"
+    },
+    {
+      "repo": "wayrise/DexGarmentLab",
+      "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+      "path": "Env_Validation/Fold_Tops_HALO.py",
+      "ranges": [
+        [
+          207,
+          261
+        ],
+        [
+          384,
+          443
+        ]
+      ],
+      "why": "雙手各30joint目標、物理子步/重力、最後驗收及時間seed"
+    },
+    {
+      "repo": "wayrise/DexGarmentLab",
+      "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+      "path": "Env_Config/Utils_Project/Position_Judge.py",
+      "ranges": [
+        [
+          1,
+          75
+        ]
+      ],
+      "why": "RGB yellow比例與點雲XY box比例checker，實際選用後者"
+    }
+  ],
+  "environment": "IsaacSim4.5.0、雙UR10e/靈巧手、衣物與衣架/人體/收納等資產。README的15 task scenes、8衣物類別、2500+garments屬不同計量，不能相乘作已測環境量。",
+  "tasks": "6種衣物自身任務(fling/fold×tops/dress/trousers)與9種衣物–環境互動(hang/wear/store)。衣物位置/形狀、材質與環境資產設定是case條件。",
+  "data": "Zarr原生keys為state/action/object_point_cloud/garment_point_cloud/environment_point_cloud/points_affordance_feature；SequenceSampler有horizon/padding/episode mask。Fold Tops控制以action前30維/後30維分雙手joint position，每個action執行5physics步；HALO含腳本接近/離開和分stage策略，不能只截神經網路輸出當完整policy。",
+  "evaluation": "Fold Tops依預測操作點定義XY boundary，終態分割點雲至少88%在該範圍即通過；不看Z/層拓撲/邊緣對應。腳本中還有暫時gravity_scale=10再還原，需納入protocol。隨機位置/asset取time.time種子，未固定測例不能只靠run次數重現。",
+  "standardization": {
+    "profile": "dexterous_deformable_garment_simulation",
+    "reuse": "15任務原生列表、Zarr特徵、分stage控制、現有點雲/影像判分規則。",
+    "transform": "environment保存衣物mesh/材料/接觸與robot關節規格；case明定asset/seed/實際初態及全部scripted stage；evaluator保留原88%區域標準，另版本化指定摺法/拓撲/穩定檢查。",
+    "missing": "資產和測試衣物split取得、固定seed/metadata、全部task checker、joint單位/物理時間、真實摺疊正確性標註與原生基線。"
+  },
+  "version_note": "固定e4e298e；論文2505.11032v3。只核讀Fold Tops實際判分鏈和共用reader；公開15任務不表示本次已逐場執行，未下載大資產或權重。",
+  "runtime_executed": false
+}

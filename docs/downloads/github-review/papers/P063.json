@@ -1,0 +1,570 @@
+{
+  "paper_id": "P063",
+  "name": "Meta-World",
+  "title": "Meta-World: A Benchmark and Evaluation for Multi-Task and Meta Reinforcement Learning",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1910.10897",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft",
+    "industry",
+    "leisure",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P063",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "原作倉庫已轉到Farama的現行Meta-World。當前代碼可以核讀任務、動作和評測接口，但README已引用MetaWorld+，必須保留與2019原作協議的版本差異。",
+    "environment": "Sawyer/MuJoCo任務環境；source task/env ID不等於獨立家居場景。",
+    "tasks": "MT與ML清單保留原生任務和train/test成員；現行v3任務與2019版不可僅刪掉版本後綴就宣稱等價。",
+    "data": "四維動作是xyz增量控制加gripper；set_xyz_action另乘action_scale。基礎觀測為當前18維、前一觀測18維與目標3維，goal可被遮蔽；benchmark還可加task ID。",
+    "evaluation": "evaluation.py在成功時終止episode，用info.success按任務計成功率，再對任務平均。meta評測另外包含適應步數、適應episode和evaluation episode預算。",
+    "standardization": {
+      "profile": "interactive_task_definitions",
+      "reuse": "版本化task IDs、train/test清單、reset參數、info.success與正式evaluation流程。",
+      "transform": "記下v3、reward版本、goal可見性、action_scale、觀測stack和適應預算；共同ActionSpec保留原生4維與轉換規則，不強塞成7維。",
+      "missing": "2019原作相符release的獨立重現、跨來源task/scene對齊及統一case清單。"
+    },
+    "version_note": "發現現行state_space.md仍寫9D且表格列18維，但程式_get_obs明確組成39維；欄位標準化以固定程式與測試查核，不能只抄說明頁。",
+    "runtime_executed": false,
+    "repository_aliases": [
+      {
+        "repo": "rlworkgroup/metaworld",
+        "canonical_repo": "Farama-Foundation/Metaworld",
+        "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/rlworkgroup/metaworld",
+            "retrieved_at": "2026-10-10T07:46:20.423326+00:00",
+            "status": 200,
+            "resolved_url": "https://api.github.com/repositories/207383121",
+            "content_type": "application/json; charset=utf-8",
+            "bytes": 7064,
+            "sha256": "bca4e430f09ccdda6d25229793b4326df970e81f6ad47174d01c1e4914a857b3"
+          }
+        ]
+      }
+    ],
+    "identity_note": "舊入口rlworkgroup/metaworld的已保存GitHub metadata回應指向Farama-Foundation/Metaworld，按倉庫別名保留，不另外算成未讀的第二個倉庫。",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Farama-Foundation/Metaworld",
+        "requested_repo": "Farama-Foundation/Metaworld",
+        "commit": "c0dafaf1557f31cad3b96ba2b62462f45638f5a5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 195,
+        "sha256": "7a58d200be86c2143939090ea003f5757f99085b135d7236d57236e576fc4a6d",
+        "url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/README.md",
+        "reading_url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/README.md#L1-L55",
+        "why": "核對現行論文連結、Gymnasium API及MT/ML任務分割。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Farama-Foundation/Metaworld",
+        "requested_repo": "Farama-Foundation/Metaworld",
+        "commit": "c0dafaf1557f31cad3b96ba2b62462f45638f5a5",
+        "ref": null,
+        "path": "metaworld/env_dict.py",
+        "ranges": [
+          [
+            80,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 465,
+        "sha256": "f9e6380a04d5c5c64f4d2e595a591692ec2a92af2613bb2ddd10d1567e61edf6",
+        "url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/env_dict.py",
+        "reading_url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/env_dict.py#L80-L110",
+        "why": "任務名稱如何映到class及train/test清單。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Farama-Foundation/Metaworld",
+        "requested_repo": "Farama-Foundation/Metaworld",
+        "commit": "c0dafaf1557f31cad3b96ba2b62462f45638f5a5",
+        "ref": null,
+        "path": "metaworld/sawyer_xyz_env.py",
+        "ranges": [
+          [
+            320,
+            336
+          ],
+          [
+            475,
+            527
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 858,
+        "sha256": "4282580b80befc557f67d25acffffec737ad0dae2c440601be76fc09139f351d",
+        "url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/sawyer_xyz_env.py",
+        "reading_url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/sawyer_xyz_env.py#L320-L336",
+        "why": "以程式確認動作縮放、frame stack與39維基礎觀測。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Farama-Foundation/Metaworld",
+        "requested_repo": "Farama-Foundation/Metaworld",
+        "commit": "c0dafaf1557f31cad3b96ba2b62462f45638f5a5",
+        "ref": null,
+        "path": "metaworld/envs/sawyer_drawer_open_v3.py",
+        "ranges": [
+          [
+            66,
+            88
+          ],
+          [
+            115,
+            188
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 188,
+        "sha256": "412196bd16b1e0990d7d4c03e21608fdb654de40976347a05adae12d418f5aa1",
+        "url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/envs/sawyer_drawer_open_v3.py",
+        "reading_url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/envs/sawyer_drawer_open_v3.py#L66-L88",
+        "why": "核對info.success與不同reward版本，避免用reward替代成功。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Farama-Foundation/Metaworld",
+        "requested_repo": "Farama-Foundation/Metaworld",
+        "commit": "c0dafaf1557f31cad3b96ba2b62462f45638f5a5",
+        "ref": null,
+        "path": "metaworld/evaluation.py",
+        "ranges": [
+          [
+            48,
+            103
+          ],
+          [
+            106,
+            169
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 178,
+        "sha256": "6c3fcaf4e814229e3b0b67085ccd311b85517ff9e26c8b7bd9fc3abe8fa8b5ad",
+        "url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/evaluation.py",
+        "reading_url": "https://github.com/Farama-Foundation/Metaworld/blob/c0dafaf1557f31cad3b96ba2b62462f45638f5a5/metaworld/evaluation.py#L48-L103",
+        "why": "核對每任務episode數、成功終止、平均方式及meta適應預算。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "80e4ee4a3242ffd57f4eaad78a6cc2eaa7dd0ebb7afb01222af16c46b53ce0f8"
+  },
+  "repository_binding_review_sha256": "80e4ee4a3242ffd57f4eaad78a6cc2eaa7dd0ebb7afb01222af16c46b53ce0f8",
+  "repository_bindings": [
+    {
+      "requested_repo": "Farama-Foundation/Metaworld",
+      "resolved_repo": "Farama-Foundation/Metaworld",
+      "aliases_in_this_review": [
+        "farama-foundation/metaworld",
+        "rlworkgroup/metaworld"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c0dafaf1557f31cad3b96ba2b62462f45638f5a5",
+          "reviewed_files": [
+            "README.md",
+            "metaworld/env_dict.py",
+            "metaworld/envs/sawyer_drawer_open_v3.py",
+            "metaworld/evaluation.py",
+            "metaworld/sawyer_xyz_env.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/rlworkgroup/metaworld",
+          "pdf_page": 1,
+          "pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_repository_alias",
+          "paper_id": "P063",
+          "review_sha256": "80e4ee4a3242ffd57f4eaad78a6cc2eaa7dd0ebb7afb01222af16c46b53ce0f8",
+          "alias": {
+            "repo": "rlworkgroup/metaworld",
+            "canonical_repo": "Farama-Foundation/Metaworld",
+            "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+            "evidence": [
+              {
+                "requested_url": "https://api.github.com/repos/rlworkgroup/metaworld",
+                "retrieved_at": "2026-10-10T07:46:20.423326+00:00",
+                "status": 200,
+                "resolved_url": "https://api.github.com/repositories/207383121",
+                "content_type": "application/json; charset=utf-8",
+                "bytes": 7064,
+                "sha256": "bca4e430f09ccdda6d25229793b4326df970e81f6ad47174d01c1e4914a857b3"
+              }
+            ]
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P063",
+          "review_file": "content/github_review/reviews/P063.json",
+          "review_sha256": "80e4ee4a3242ffd57f4eaad78a6cc2eaa7dd0ebb7afb01222af16c46b53ce0f8",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "裝配與生產作業",
+    "休閒與運動",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P063",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Meta-World，arXiv 1910.10897v2（2021）。",
+    "scope_read": "50任務定義、觀測／動作／reward及MT／ML協定。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      12
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "裝配與生產作業",
+      "休閒與運動",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "50個task environment配置，共用Sawyer桌面；不能解讀為50種生活場域。",
+    "tasks": "50個非參數性操作類型；原文又把位置／goal參數化實例稱task，需保留兩種含義。",
+    "cases": "MT10含10環境×50參數配置＝500；MT50為50×50＝2,500訓練task instances。這不是500／2,500個新語義任務，也不是正式test QA。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 50,
+        "unit": "操作task types",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2500,
+        "unit": "MT50訓練參數化instances",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "ML10／ML45保留test任務",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "各task成功predicate／目標距離門檻，success與dense reward分開。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "MT同已見任務學習；ML10／ML45各有5保留task適應；ML1只在同一task變換50train／50test goal。",
+    "lineage": "MuJoCo、Multiworld及Gym介面；後續MetaWorld+等為其擴充，不可把上游再次全加。",
+    "related_paper_ids": [
+      "P106"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§4.1–4.3",
+        "supports": "原作task双義、50／2,500、泛化split與success"
+      }
+    ],
+    "unresolved": [
+      "不同v1／v2／後續release成功predicate細節與本地歷史pilot須以commit分開。"
+    ],
+    "reuse": "提供桌面操作任務底座；位置擴樣容易，生活用途拓寬有限。",
+    "reviewed_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8",
+    "reviewed_on": "2026-10-02",
+    "name": "Meta-World",
+    "year": 2019,
+    "title": "Meta-World: A Benchmark and Evaluation for Multi-Task and Meta Reinforcement Learning",
+    "source_url": "https://arxiv.org/abs/1910.10897",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft",
+      "industry",
+      "leisure",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "裝配與生產作業",
+      "休閒與運動",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P063",
+      "summary": "50個任務已有明確的用途線索：家居設備、餐飲、修繕／裝配、球類操作，以及通用取放。",
+      "evidence": [
+        {
+          "paper_id": "P063",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            18
+          ],
+          "locator": "Appendix A, Table 2：50項任務定義",
+          "observed_tasks": [
+            "開關門窗／抽屜、水龍頭、掃除與上架"
+          ],
+          "reasoning": "任務目標對應家居設備使用與整理。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8"
+        },
+        {
+          "paper_id": "P063",
+          "domain_ids": [
+            "food"
+          ],
+          "pages": [
+            18
+          ],
+          "locator": "Appendix A, Table 2：50項任務定義",
+          "observed_tasks": [
+            "咖啡機按鈕、杯子移入／移出咖啡機、餐盤取放"
+          ],
+          "reasoning": "餐飲器具的使用與準備可由具體任務歸納。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8"
+        },
+        {
+          "paper_id": "P063",
+          "domain_ids": [
+            "craft",
+            "industry"
+          ],
+          "pages": [
+            18
+          ],
+          "locator": "Appendix A, Table 2：50項任務定義",
+          "observed_tasks": [
+            "鎚打螺絲、螺帽裝卸、插栓與拔栓"
+          ],
+          "reasoning": "分別支援修繕與装配用途。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8"
+        },
+        {
+          "paper_id": "P063",
+          "domain_ids": [
+            "leisure"
+          ],
+          "pages": [
+            18
+          ],
+          "locator": "Appendix A, Table 2：50項任務定義",
+          "observed_tasks": [
+            "籃球入框、足球入門的簡化任務"
+          ],
+          "reasoning": "歸入球類操作用途；原作仍是桌面簡化任務。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8"
+        },
+        {
+          "paper_id": "P063",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            18
+          ],
+          "locator": "Appendix A, Table 2：50項任務定義",
+          "observed_tasks": [
+            "伸手至座標、推／拉puck、繞障取放"
+          ],
+          "reasoning": "這些基礎作業直接以幾何目標定義，屬跨場域技能測試。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8"
+        }
+      ],
+      "domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "industry",
+        "leisure",
+        "general"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P063",
+      "name": "Meta-World",
+      "expected_title": "Meta-World: A Benchmark and Evaluation for Multi-Task and Meta Reinforcement Learning",
+      "source_url": "https://arxiv.org/abs/1910.10897",
+      "pdf_url": "https://arxiv.org/pdf/1910.10897",
+      "retrieved_at": "2026-10-02T21:33:35.403599+00:00",
+      "pdf_sha256": "8ea4fd9e7a2f7a2cfc475ae7e7021e7a6c03b99ae3932b455def9197ff1197e8",
+      "text_sha256": "88dd06f1f3f44ba2dccb06a2d86839ec79be8cba749b2a01a449b97e3b001a4c",
+      "pdf_bytes": 6237424,
+      "pages": 40,
+      "text_characters": 123154,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1910.10897v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1910.10897v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 50,
+        "unit": "操作task types",
+        "pages": [
+          1,
+          4
+        ],
+        "record_id": "review10:P063:1",
+        "paper_id": "P063",
+        "benchmark": "Meta-World",
+        "native_term": "操作task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1910.10897v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1910.10897v2",
+            "locator": "PDF pp. 1, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2500,
+        "unit": "MT50訓練參數化instances",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P063:2",
+        "paper_id": "P063",
+        "benchmark": "Meta-World",
+        "native_term": "MT50訓練參數化instances",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1910.10897v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1910.10897v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "ML10／ML45保留test任務",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P063:3",
+        "paper_id": "P063",
+        "benchmark": "Meta-World",
+        "native_term": "ML10／ML45保留test任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1910.10897v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1910.10897v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Farama-Foundation/Metaworld"
+  ],
+  "external_repositories": []
+}

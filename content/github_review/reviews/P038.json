@@ -1,0 +1,165 @@
+{
+  "paper_id": "P038",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "OpenEQA 的 question/answer/history 格式和文字裁判已可具體追溯；本次核讀一筆原始 QA、歷史取得方式、兩種 prompt 與完整評分指令碼。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "README.md",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [
+        [
+          1,
+          72
+        ]
+      ],
+      "why": "原生 Q/A/history 及兩種應用情境"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "data/README.md",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [
+        [
+          1,
+          101
+        ],
+        [
+          127,
+          168
+        ]
+      ],
+      "why": "HM3D/ScanNet、感測與 extraction 版本"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "data/open-eqa-v0.json",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [],
+      "why": "JSON /0 原始 QA 範例",
+      "json_pointers": [
+        "/0"
+      ],
+      "scope": "Only selected JSON entries read; no full-file or full-line review claimed"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "prompts/mmbench.txt",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [
+        [
+          1,
+          27
+        ]
+      ],
+      "why": "1–5文字匹配裁判"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "prompts/mmbench-extra.txt",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [
+        [
+          1,
+          31
+        ]
+      ],
+      "why": "替代答案裁判"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "openeqa/evaluation/llm_match.py",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [
+        [
+          1,
+          82
+        ]
+      ],
+      "why": "裁判引數、空回答與解析"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "evaluate-predictions.py",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "ranges": [
+        [
+          1,
+          122
+        ]
+      ],
+      "why": "ID、force/dry-run、快取和0–100對映"
+    }
+  ],
+  "environment": "episode histories 來自 HM3D 與 ScanNet；HM3D 用 Habitat 重播 agent states，ScanNet 從原掃描資料抽取。episode_history 路徑連回 scene/source；RGB、depth、pose 是同歷史不同觀測，不新增場景。",
+  "tasks": "開放詞彙環境問答，可討論 episodic memory 和 active exploration；此核讀 evaluator 判文字答案，沒有證明某 agent 已完成探索或操作。",
+  "data": "open-eqa-v0.json 例含 question_id、question、answer、category、episode_history，可另有 extra_answers。HM3D 版本為 hm3d-v0/場景路徑，資料檔案提供 RGB-only 或 RGB-D+intrinsics+pose；原 scan/agent state 與 extraction 版本要隨 case 儲存。",
+  "evaluation": "llm_match 預設 gpt-4-1106-preview/seed1234/temperature.2/max_tokens32，以原參考與可選 extra_answers 判1–5；parse Your mark 後整數。evaluate-predictions 先核 ID/數量、截掉最後句點後的尾文、逐題快取，再將clip(score,1,5)線性映成0–100平均。prediction=None 回0後映為0；force 只對提供的 result 遍歷，dry-run 只取前5，均不能報全量分數。",
+  "standardization": {
+    "profile": "environment_open_ended_qa",
+    "reuse": "穩定 question_id、scene/history 路徑、參考答案與替代答案、原始 judge prompt／正規化。",
+    "transform": "environment 儲存父 HM3D/ScanNet scene 和 extraction release；case 綁 question_id/history/modalities/觀測 budget。evaluator 固定裁判版本、prompt hash、預處理、cached score 來源；完整資料／結果 ID 一對一，force/dry-run 和缺題另標。",
+    "missing": "尚未取得 histories、執行 simulator／baseline／付費裁判。只讀 QA /0 schema 範例，未逐題驗證全庫；若更換模型或 prediction，舊 metrics 快取需按輸入hash區分，並另外驗證裁判與人工一致性。"
+  },
+  "version_note": "data README prose 寫 simulator2.5，但實際安裝命令是 habitat-sim0.2.5；以明確套件版本和歷史版本為準。RGB直接下載被作者標為第三方hosting，官方來源身份與實際分發者需分欄。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "README.md",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "f277c320c47f30856a7437786c5b21389d8c02a6296ca2721626f134a310f2c4",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/README.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__open-eqa/files/README.md"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "data/README.md",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "1d8dbef54e15ccafdae5f05a2d8f8193a983713d89fa2806656c4c0c71c6259e",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/data/README.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__open-eqa/files/data/README.md"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "data/open-eqa-v0.json",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "a64dd101133213fa3b5ca31e5af8216662471aa34894b443d803f497757557ee",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/data/open-eqa-v0.json",
+      "local_file": "audit/.cache/github_review_worker/early/files/facebookresearch__open-eqa/data/open-eqa-v0.json"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "prompts/mmbench.txt",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "a63274694c309114cbd5176d2f9b94b62cf1f5148027f0020b30c1c18003d2b2",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/prompts/mmbench.txt",
+      "local_file": "audit/.cache/github_review_worker/early/files/facebookresearch__open-eqa/prompts/mmbench.txt"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "prompts/mmbench-extra.txt",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "fd48618d80170815174387ae64592038cba3e412a8de0cea16b3e35064cab71c",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/prompts/mmbench-extra.txt",
+      "local_file": "audit/.cache/github_review_worker/early/files/facebookresearch__open-eqa/prompts/mmbench-extra.txt"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "openeqa/evaluation/llm_match.py",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "0d33bf9e93473731a5b843d140b3818a3dabc9d86ab05e635708090de0365c55",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/openeqa/evaluation/llm_match.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__open-eqa/files/openeqa/evaluation/llm_match.py"
+    },
+    {
+      "repo": "facebookresearch/open-eqa",
+      "path": "evaluate-predictions.py",
+      "commit": "cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b",
+      "sha256": "7d8376653ae15e758184a67d5f7fb9e6d42cc8356bd7193ae68ff41cd8cb64a2",
+      "url": "https://github.com/facebookresearch/open-eqa/blob/cfa3fce4595c1622bb2f8a38ae2ca9aae9eb685b/evaluate-predictions.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__open-eqa/files/evaluate-predictions.py"
+    }
+  ]
+}

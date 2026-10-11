@@ -1,0 +1,572 @@
+{
+  "paper_id": "P068",
+  "name": "ManiSkill3",
+  "title": "ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2410.00425",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P068",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "ManiSkill3的核心是向量化場景／任務API，資料以HDF5+JSON連結episode、env kwargs和觀測。讀取訓練loader時還要檢查它是否刪掉最終觀測或改寫label。",
+    "environment": "SAPIEN向量化環境可變機體、scene與物件；環境ID、asset場景與並行env數不是同一個數量。",
+    "tasks": "具體task子類提供evaluate，基底scene evaluate可能是空字典。PickCube成功為物件到位且機器人靜止；is_grasped則另列。",
+    "data": "JSON記episodes/env_info/env_id/env_kwargs；HDF5保存traj_ID和多模態obs/actions/terminated/truncated，reward/success/fail可選。訓練Dataset會裁掉最後一筆obs，不適合作為原始保存格式。",
+    "evaluation": "BaseEnv將success/fail合成terminated，time limit另由外層處理。baseline可輸出回報、成功和失敗；必須保留各自定義及向量化episode邊界。",
+    "standardization": {
+      "profile": "robot_episodes_with_reset_contract",
+      "reuse": "Task/evaluate、JSON episode metadata、HDF5資料與原生控制／觀測模式。",
+      "transform": "以原始檔建立可逆episode view，再提供訓練／評測視圖；保留T+1末態、資訊白名單、control mode、機體與逐episode指標。",
+      "missing": "完整素材、跨版本任務對齊、GPU/CPU實測與adapter回讀一致性驗證。"
+    },
+    "version_note": "固定commit62ff3a58…。發現trajectory/dataset.py的device分支把success指定成terminated、fail指定成truncated；本庫匯入應保留原始label並針對此分支驗證，不能盲用loader輸出。本輪為靜態核讀，未執行重現此問題。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "mani-skill/ManiSkill",
+        "requested_repo": "mani-skill/ManiSkill",
+        "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            94
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 94,
+        "sha256": "304da9c2fdf69bf8944e1293a5c1bf146c434b2e6acd7604a46b3cfbfdfac10f",
+        "url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/README.md",
+        "reading_url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/README.md#L1-L94",
+        "why": "核對RSS2025論文、版本、機體與執行平臺範圍。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mani-skill/ManiSkill",
+        "requested_repo": "mani-skill/ManiSkill",
+        "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3",
+        "ref": null,
+        "path": "mani_skill/envs/tasks/tabletop/pick_cube.py",
+        "ranges": [
+          [
+            132,
+            159
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 216,
+        "sha256": "53bfed0229cd4de2c7e363e7f3c531d5c5c84803c28e1345a2aea1a4972f3168",
+        "url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/mani_skill/envs/tasks/tabletop/pick_cube.py",
+        "reading_url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/mani_skill/envs/tasks/tabletop/pick_cube.py#L132-L159",
+        "why": "讀實際extra observation與success組合。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mani-skill/ManiSkill",
+        "requested_repo": "mani-skill/ManiSkill",
+        "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3",
+        "ref": null,
+        "path": "mani_skill/envs/sapien_env.py",
+        "ranges": [
+          [
+            1050,
+            1079
+          ],
+          [
+            1155,
+            1165
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1511,
+        "sha256": "bb9ab4983182a1c6d96c6bfe8bd7af5a2c5abe5b4fd4a8457c41cbb7e55b0017",
+        "url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/mani_skill/envs/sapien_env.py",
+        "reading_url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/mani_skill/envs/sapien_env.py#L1050-L1079",
+        "why": "追get_info/evaluate及success/fail/terminated的關係。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mani-skill/ManiSkill",
+        "requested_repo": "mani-skill/ManiSkill",
+        "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3",
+        "ref": null,
+        "path": "mani_skill/trajectory/dataset.py",
+        "ranges": [
+          [
+            13,
+            20
+          ],
+          [
+            36,
+            154
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 154,
+        "sha256": "9eb1b78e485dcd1a80763c42fdcf19e05c6992f5b703d5cfbd4a7df94c7fbb7f",
+        "url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/mani_skill/trajectory/dataset.py",
+        "reading_url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/mani_skill/trajectory/dataset.py#L13-L20",
+        "why": "核對HDF5/JSON、動作與觀測長度、label及device分支。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "mani-skill/ManiSkill",
+        "requested_repo": "mani-skill/ManiSkill",
+        "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3",
+        "ref": null,
+        "path": "examples/baselines/tdmpc2/evaluate.py",
+        "ranges": [
+          [
+            21,
+            61
+          ],
+          [
+            82,
+            122
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "ccdacd5a97b3c7900bed8be14915a77c538e0b7499450aa7017b4bb8c63e8b35",
+        "url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/examples/baselines/tdmpc2/evaluate.py",
+        "reading_url": "https://github.com/mani-skill/ManiSkill/blob/62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3/examples/baselines/tdmpc2/evaluate.py#L21-L61",
+        "why": "核對實際baseline的checkpoint、eval episode和成功／失敗／回報輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "236cb9678c2ef0b71102b0efe4560dfaa3e1e68683e0510873414baaabc587d8"
+  },
+  "repository_binding_review_sha256": "236cb9678c2ef0b71102b0efe4560dfaa3e1e68683e0510873414baaabc587d8",
+  "repository_bindings": [
+    {
+      "requested_repo": "mani-skill/ManiSkill",
+      "resolved_repo": "mani-skill/ManiSkill",
+      "aliases_in_this_review": [
+        "mani-skill/maniskill"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3",
+          "reviewed_files": [
+            "README.md",
+            "examples/baselines/tdmpc2/evaluate.py",
+            "mani_skill/envs/sapien_env.py",
+            "mani_skill/envs/tasks/tabletop/pick_cube.py",
+            "mani_skill/trajectory/dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/releases",
+          "link_label": "Changelog",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/index.html",
+          "page_sha256": "1078c3197e3939deb49fd7724e9064b92a2628ec43d6a775f7b5e23a8d1db353"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill",
+          "link_label": "GitHub",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/index.html",
+          "page_sha256": "1078c3197e3939deb49fd7724e9064b92a2628ec43d6a775f7b5e23a8d1db353"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/issues/",
+          "link_label": "GitHub issues",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/index.html",
+          "page_sha256": "1078c3197e3939deb49fd7724e9064b92a2628ec43d6a775f7b5e23a8d1db353"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/discussions/",
+          "link_label": "GitHub discussions",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/index.html",
+          "page_sha256": "1078c3197e3939deb49fd7724e9064b92a2628ec43d6a775f7b5e23a8d1db353"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/tree/v0.5.3",
+          "link_label": "v0.5.3 tag",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/index.html",
+          "page_sha256": "1078c3197e3939deb49fd7724e9064b92a2628ec43d6a775f7b5e23a8d1db353"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/edit/main/docs/source/user_guide/index.md",
+          "link_label": "Edit on GitHub",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/index.html",
+          "page_sha256": "1078c3197e3939deb49fd7724e9064b92a2628ec43d6a775f7b5e23a8d1db353"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/releases",
+          "link_label": "Changelog",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/demos/gallery.html",
+          "page_sha256": "0a202f6a39e16e0d8a5b01c451af662696f5877f5bf4c8adf4ce8ca9b20dd434"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill",
+          "link_label": "GitHub",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/demos/gallery.html",
+          "page_sha256": "0a202f6a39e16e0d8a5b01c451af662696f5877f5bf4c8adf4ce8ca9b20dd434"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/mani-skill/ManiSkill/edit/main/docs/source/user_guide/demos/gallery.md",
+          "link_label": "Edit on GitHub",
+          "project_url": "https://maniskill.readthedocs.io/en/latest/user_guide/demos/gallery.html",
+          "page_sha256": "0a202f6a39e16e0d8a5b01c451af662696f5877f5bf4c8adf4ce8ca9b20dd434"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "mani-skill/ManiSkill",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "mani-skill/ManiSkill",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P068",
+          "review_file": "content/github_review/reviews/P068.json",
+          "review_sha256": "236cb9678c2ef0b71102b0efe4560dfaa3e1e68683e0510873414baaabc587d8",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P068",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ManiSkill3，arXiv 2410.00425v2；新版標題以Demonstrating GPU Parallelized…開頭。",
+    "scope_read": "12種類型、平台與task生成、性能和learning評测段落。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      8,
+      21,
+      22,
+      28
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬平台與任務套件",
+    "environment": "GPU異質並行模擬；1024平行instances／cameras是運行規模，非1024不同生活場景。",
+    "tasks": "原作12 task categories包含tabletop/mobile、room-scale、locomotion、bimanual、multi-agent、drawing/cleaning、dexterous、tactile、classic control、digital twins、soft-body；這12類不是12生活domain。",
+    "cases": "擴展中的環境註冊表與demo來源，無單一固定全庫test題數；例如SIMPLER轉接4種環境。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "技術task categories",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 20,
+        "unit": "robot models",
+        "qualifier": "超過",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "SIMPLER轉接環境",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "task success／return、sample efficiency與wall-clock分開；渲染FPS／VRAM是系統性能，非任務成功率。",
+      "本文GPU rasterization與IsaacLab ray tracing比較非完全同畫質，原作有明示。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "不同RL／IL／VLA／sim2real設定各有來源；應固定demo數、生成方式與控制器。",
+    "lineage": "ManiSkill2平台與任務延伸，另接SIMPLER等；不能把platform release當完全獨立benchmark family。",
+    "related_paper_ids": [
+      "P066",
+      "P067",
+      "P104"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§III-A/B",
+        "supports": "12類與性能範圍"
+      },
+      {
+        "pages": [
+          7,
+          8,
+          22
+        ],
+        "locator": "§IV與VLA附錄",
+        "supports": "learning評測、demo與轉接來源"
+      }
+    ],
+    "unresolved": [
+      "目前API註冊task總量隨版本變動，需固定commit再盤點；本文不提供永續固定總數。"
+    ],
+    "reuse": "可作執行底座；廣泛技術支援不等同每種生活用途已有完整任務與cases。",
+    "reviewed_pdf_sha256": "0482cef460af5ca0dd09d2b1d0f499b996287d9dadec31b13ca60377a49ee80c",
+    "reviewed_on": "2026-10-02",
+    "name": "ManiSkill3",
+    "year": 2024,
+    "title": "ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI",
+    "source_url": "https://arxiv.org/abs/2410.00425",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活",
+      "室內導航",
+      "戶外移動",
+      "組裝與拆解",
+      "柔性物與流體操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P068",
+      "domain_ids": [
+        "home",
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P068",
+          "domain_ids": [
+            "home",
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            8,
+            21,
+            22,
+            28
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "原作12 task categories包含tabletop/mobile、room-scale、locomotion、bimanual、multi-agent、drawing/cleaning、dexterous、tactile、classic control、digital twins、soft-body；這12類不是12生活domain。",
+            "GPU異質並行模擬；1024平行instances／cameras是運行規模，非1024不同生活場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "0482cef460af5ca0dd09d2b1d0f499b996287d9dadec31b13ca60377a49ee80c"
+        },
+        {
+          "paper_id": "P068",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            8,
+            21,
+            22,
+            28
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "經典控制、locomotion、桌面與移動操作的通用任務平台。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "0482cef460af5ca0dd09d2b1d0f499b996287d9dadec31b13ca60377a49ee80c"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "0482cef460af5ca0dd09d2b1d0f499b996287d9dadec31b13ca60377a49ee80c",
+      "previous_domain_ids": [
+        "home",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P068",
+      "name": "ManiSkill3",
+      "expected_title": "ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI",
+      "source_url": "https://arxiv.org/abs/2410.00425",
+      "pdf_url": "https://arxiv.org/pdf/2410.00425",
+      "retrieved_at": "2026-10-02T21:33:45.464079+00:00",
+      "pdf_sha256": "0482cef460af5ca0dd09d2b1d0f499b996287d9dadec31b13ca60377a49ee80c",
+      "text_sha256": "681753120cd6bcfdff586d98b696c5319dcd39f4773da3d73fccbcfb6b61ff85",
+      "pdf_bytes": 24411426,
+      "pages": 30,
+      "text_characters": 145011,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2410.00425v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2410.00425v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "技術task categories",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P068:1",
+        "paper_id": "P068",
+        "benchmark": "ManiSkill3",
+        "native_term": "技術task categories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00425v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00425v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 20,
+        "unit": "robot models",
+        "qualifier": "超過",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P068:2",
+        "paper_id": "P068",
+        "benchmark": "ManiSkill3",
+        "native_term": "robot models",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00425v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00425v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "SIMPLER轉接環境",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P068:3",
+        "paper_id": "P068",
+        "benchmark": "ManiSkill3",
+        "native_term": "SIMPLER轉接環境",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.00425v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.00425v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "mani-skill/ManiSkill"
+  ],
+  "external_repositories": []
+}

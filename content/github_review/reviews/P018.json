@@ -1,0 +1,375 @@
+{
+  "paper_id": "P018",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "HOT3D 官方 toolkit 同時服務完整 VRS 序列與 HOT3D-Clips 子集；已核讀 schema、DataProvider 和 BOP 轉換，不把工具可讀取誤寫成已完成評測。 2026-10-11 補讀官方連結的 hand_tracking_toolkit 提交、GT writer 與實際指標 caller；BOP evaluator 仍未核讀。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "README.md",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "ranges": [
+        [
+          1,
+          78
+        ],
+        [
+          115,
+          162
+        ],
+        [
+          207,
+          248
+        ]
+      ],
+      "why": "完整序列與 clips 工具身份／入口"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "hot3d/clips/README.md",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "ranges": [
+        [
+          1,
+          150
+        ]
+      ],
+      "why": "tar schema、GT 可見性與 split 聯集"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "hot3d/dataset_api.py",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "ranges": [
+        [
+          37,
+          115
+        ],
+        [
+          192,
+          240
+        ]
+      ],
+      "why": "必需資產檢查與 providers"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "hot3d/clips/bop_format_converters/hot3d_clips_to_bop_scenewise.py",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "ranges": [
+        [
+          104,
+          114
+        ],
+        [
+          125,
+          154
+        ],
+        [
+          183,
+          219
+        ],
+        [
+          223,
+          244
+        ],
+        [
+          246,
+          276
+        ],
+        [
+          301,
+          311
+        ],
+        [
+          320,
+          337
+        ],
+        [
+          346,
+          369
+        ]
+      ],
+      "why": "座標／單位／visibility 的實際轉換"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "VERSIONS.md",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "ranges": [
+        [
+          1,
+          9
+        ]
+      ],
+      "why": "v1–v3 標註版本"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "README.md",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          64,
+          80
+        ],
+        [
+          148,
+          260
+        ]
+      ],
+      "why": "官方 hand challenge 身份、HOT3D 每十影格的提交範圍、pose／shape 分軌與本地驗證限制。"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "scripts/run_evaluation.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          15,
+          48
+        ]
+      ],
+      "why": "真實命令入口呼叫 evaluation.evaluate；README 的 .par 範例與檔案 .py 不同。"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/submissions.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          27,
+          105
+        ]
+      ],
+      "why": "實際 JSON writer：mano_theta 15 維、wrist_xform 6 維、mano_beta 10 維、hand_side 和 20 點 GT。"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "scripts/write_annotations_files.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          38,
+          142
+        ]
+      ],
+      "why": "GT 由 UmeTrack FK 產生，按 clip_splits 選 Aria／Quest3；every-n-frames 預設 1，每序列只存一次 shape。"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/evaluation.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          50,
+          110
+        ],
+        [
+          113,
+          237
+        ],
+        [
+          280,
+          311
+        ]
+      ],
+      "why": "追完整 pose／shape caller、GT shape 注入、依 GT 列數或依序列聚合，以及缺少 dataset 結果檔的跳過規則。"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/metrics.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          30,
+          56
+        ],
+        [
+          59,
+          321
+        ]
+      ],
+      "why": "核讀實際回傳指標、19 點去腕／五指尖、米→毫米、0–50 mm PCK 曲線與 canonical shape MPVPE。"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/hand_models/mano_hand_model.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "ranges": [
+        [
+          52,
+          120
+        ],
+        [
+          137,
+          174
+        ],
+        [
+          233,
+          274
+        ]
+      ],
+      "why": "MANO PCA pose、6 維 global transform 的位置／方向分量、21→20 點原生對映及左右手 FK。"
+    }
+  ],
+  "environment": "Aria／Quest3 頭戴裝置記錄的手與物件互動；sequence、participant、clip、device、stream 分層。HOT3D-Clips 為同一資料的 5 秒／150 frame 子序列，多個 image streams 不是獨立環境。",
+  "tasks": "3D 手／物件追蹤與姿態、手形估計；BOP object pose 與手部 pose/shape challenge 使用不同 GT 可見性。動態 object onboarding 只給首影格 GT，靜態 onboarding 每影格給 GT。",
+  "data": "完整資料用 VRS+CSV providers；clip tar 含 image_STREAM、cameras/hands/hand_crops/objects/info JSON，__hand_shapes 跨 frame 共享。clip_definitions 連原 sequence/device/timestamp；clip_splits 有 train、test_ht_pose、test_ht_shape，test_bop 是兩個 test 的聯集。相機有 fisheye 模型、projection_params、wxyz quaternion，時間為 ns。 2026-10-11 補讀：實際 pose JSON 使用 sequence_name、frame_id、mano_theta[15]、wrist_xform[6]、hand_side（0 左／1 右）；wrist 前三項送 global_orient，後三項是米制平移。shape JSON 用 mano_beta[10]，GT writer 每 clip 只存一份左右手共用 shape。HOT3D README 規定 frame_id=0,10,20…；GT writer 的 --every-n-frames 預設 1，須顯式對齊 challenge 抽樣。",
+  "evaluation": "已核公開格式轉換及hand_tracking_toolkit所列pose／shape評分鏈；完整BOP評分器不在本篇列出的閱讀範圍。BOP converter 實際以 inverse(T_world_from_camera) @ T_world_from_object 得模型到相機姿態，平移乘 1000 成毫米，XYXY 轉 XYWH；visib_fract 取 modeled/predicted 可見性的最小值。不在 stream 範圍的物件以 -1 pose、空 mask、0 visibility 佔位，不能當真實姿態。 Hand tracking的實際呼叫鏈為 scripts/run_evaluation.py→evaluate→compute_overall_*→compute_pose_metrics/compute_shape_metrics。pose 用 GT mano_beta 搭配預測 pose／wrist 做 MANO FK，20 點移除 wrist 後評 19 點並乘 1000 成毫米；實際回傳 MPJPE、PCK_AUC、FINGERTIP_PCK_AUC，沒有 docstring 所列的 MPVPE。PCK 用誤差≤閾值，0–50 mm 共 101 點，曲線乘 100 後以梯形面積除 50，保留 0–100 尺度；五指尖另算。pose 依 GT landmarks 列數（手／影格樣本，未必是唯一影格數）加權；shape 在零 pose／零 wrist 的左手模型算 MPVPE(mm)，再等權平均序列。未提交某 dataset 的整份結果檔會略過，不是零分。",
+  "standardization": {
+    "profile": "multiview_hand_object_pose",
+    "reuse": "VRS/clip schema、物件／手模型、同步時間、GT 可見性 split 與 BOP 轉換。 可另接手部提交 writer、原生 19 點／指尖 PCK 和 canonical shape MPVPE；各自保留聚合單位。",
+    "transform": "保留 full→clip→frame→stream ancestry，BOP scene_id 映回 clip_id 而非新增實體場景。座標轉換記明方向、米／毫米、相機畸變模型和 visibility 來源；測試缺 GT 依 track 顯式標 unknown，不填零。 手部 case 保留 clip/sequence_name、frame_id、hand_side、抽樣步長、GT shape 是否已知、PCA pose／wrist 向量格式及 mm/AUC 尺度；不與 BOP 物件姿態合成共同成功率。",
+    "missing": "尚未取得 VRS、tar、物件／MANO 模型、外部 BOP／手評測套件或執行。需為外部 evaluator 另釘選提交，驗證相機畸變、時間同步和 -1 佔位規則。 更新：手 evaluator 的選定原始碼已取得並釘選，但隱藏 GT、MANO 資產、BOP 套件與執行仍未完成。caller 僅按 sequence_name 分組及 frame_id 排序後逐列相減，未顯式按 frame_id/hand_side join；接線須驗證缺列、重複影格與同影格左右手順序。本地自選 train 子集也不是官方 validation split。"
+  },
+  "version_note": "VERSIONS.md 列 v2 修正 MANO 拇指、v3 更新 visibility，metadata.json 的 version 需隨資料保留。Clips README 對 T_world_from_object 的文字方向與欄位名不一致，已用實際 converter 確認為 model→world 再轉 camera，不直接複製文字說明。 官方專案頁區分 2024 whitepaper／ECCV 2024 hand challenge 與 CVPR 2025 完整論文；此補讀固定 hand_tracking_toolkit@bc628e9286c18444b47a0971a89d075ea6f00747，不宣稱今日 snapshot 就是 2024 伺服器提交或論文全部實驗。README 的 pose 欄名和 run_evaluation.par 與程式的 mano_theta／run_evaluation.py 不同，以已讀 caller/writer 為準；資料 v1–v3、論文 edition 與 evaluator commit 分開保存。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "README.md",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "sha256": "5ee257419aa2bd19f02f1769c12e732b709e4265cb0b74c4fb75e518feee2348",
+      "url": "https://github.com/facebookresearch/hot3d/blob/146b34afef8c1a32adeef7e981c070109f225c87/README.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__hot3d/files/README.md"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "hot3d/clips/README.md",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "sha256": "fe2ed1e758fa297ba24e1a73996629b77893c376eb49b8f62eeb1a26875ecdba",
+      "url": "https://github.com/facebookresearch/hot3d/blob/146b34afef8c1a32adeef7e981c070109f225c87/hot3d/clips/README.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__hot3d/files/hot3d/clips/README.md"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "hot3d/dataset_api.py",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "sha256": "a85daddca8cac014b230603f96452ae8d1fa61497d72b2c3169d5083e1c82959",
+      "url": "https://github.com/facebookresearch/hot3d/blob/146b34afef8c1a32adeef7e981c070109f225c87/hot3d/dataset_api.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__hot3d/files/hot3d/dataset_api.py"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "hot3d/clips/bop_format_converters/hot3d_clips_to_bop_scenewise.py",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "sha256": "71012110bb8ef2c282b0d6240686795ec5677fc5950905bf40544ea2fc1f5cfe",
+      "url": "https://github.com/facebookresearch/hot3d/blob/146b34afef8c1a32adeef7e981c070109f225c87/hot3d/clips/bop_format_converters/hot3d_clips_to_bop_scenewise.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__hot3d/files/hot3d/clips/bop_format_converters/hot3d_clips_to_bop_scenewise.py"
+    },
+    {
+      "repo": "facebookresearch/hot3d",
+      "path": "VERSIONS.md",
+      "commit": "146b34afef8c1a32adeef7e981c070109f225c87",
+      "sha256": "a2e10ad4369b31320af84e83aaae0101023137faa8e55e761476ca137c88603e",
+      "url": "https://github.com/facebookresearch/hot3d/blob/146b34afef8c1a32adeef7e981c070109f225c87/VERSIONS.md",
+      "local_file": "audit/.cache/github_review_worker/early/files/facebookresearch__hot3d/VERSIONS.md"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "README.md",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "8240e8f3d221510c1b6e4997ba296156f97f4dbc96660d7d5e38a66849546244",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/README.md",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/README.md"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "scripts/run_evaluation.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "f74ce018c8a1b86a73f4e84118a0d4010ce3d8a461546b2dbd91aea576cc6058",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/scripts/run_evaluation.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/scripts/run_evaluation.py"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/submissions.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "26ae4af83ad6a62fb03a8825619c14a8432c32d71e24abc41edeec1d0940bfb0",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/submissions.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/submissions.py"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "scripts/write_annotations_files.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "6c125a464bf9aef0fb543a3beea2569bdade4150a2ab76d366aa85e06fcee564",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/scripts/write_annotations_files.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/scripts/write_annotations_files.py"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/evaluation.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "51d2ee003c024d98e566f1ee8b4be5716e39162971d9825d5b7d11a7cea6ffca",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/evaluation.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/evaluation.py"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/metrics.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "570f3417d5ecf68ba4c0e20a2f9380ed0d0dc403daff5024b68702f05815869f",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/metrics.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/metrics.py"
+    },
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "path": "hand_tracking_toolkit/hand_models/mano_hand_model.py",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "sha256": "1a9c49ee35fb009fcf0ca6c4d8c86e3c4bd23e1ed32392120ceac97819d23eb9",
+      "url": "https://raw.githubusercontent.com/facebookresearch/hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/hand_models/mano_hand_model.py",
+      "local_file": "audit/.cache/github_review_worker/bounded-five-20261011/files/facebookresearch__hand_tracking_toolkit/bc628e9286c18444b47a0971a89d075ea6f00747/hand_tracking_toolkit/hand_models/mano_hand_model.py"
+    }
+  ],
+  "additional_repo_proposals": [
+    {
+      "repo": "facebookresearch/hand_tracking_toolkit",
+      "role": "官方連結的手部 challenge evaluator，尚未核讀（此為 2026-10-10 狀態；2026-10-11 已補讀上述提交、GT 及指標 caller）",
+      "evidence": "README.md 與 hot3d/clips/README.md 的 evaluation 連結",
+      "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+      "review_status": "source_sections_reviewed"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "url": "https://facebookresearch.github.io/hot3d/",
+      "receipt": {
+        "requested_url": "https://facebookresearch.github.io/hot3d/",
+        "retrieved_at": "2026-10-10T07:37:47.832403+00:00",
+        "status": 200,
+        "resolved_url": "https://facebookresearch.github.io/hot3d/",
+        "content_type": "text/html; charset=utf-8",
+        "bytes": 22311,
+        "sha256": "92ee64a80e4e5cba30b91816b2bef3b540aa68ce10d4a437f6a77a1a638f363c"
+      },
+      "ranges": [
+        [
+          77,
+          88
+        ],
+        [
+          201,
+          207
+        ],
+        [
+          248,
+          253
+        ]
+      ],
+      "finding": "官方 News 將 2024 whitepaper／ECCV 2024 hand challenge 與 2025 camera-ready 論文分開；challenge 指向與 toolkit README 相同的 EvalAI 2333。"
+    }
+  ],
+  "follow_up": {
+    "reviewed_on": "2026-10-11",
+    "repo": "facebookresearch/hand_tracking_toolkit",
+    "commit": "bc628e9286c18444b47a0971a89d075ea6f00747",
+    "status": "source_sections_reviewed",
+    "scope": "官方 2024 hand challenge 連結所指工具的 pose／shape 提交與指標實作；保留論文、資料版與 evaluator 版差異。"
+  }
+}

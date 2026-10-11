@@ -1,0 +1,183 @@
+{
+  "paper_id": "P231",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "MADiff 是重用多個既有 Ego 資料集的手軌跡方法。已讀到的官方版本提供 H2O／EgoPAT3D 兩個 backend，並附 ACT 條件輸入教學；論文五個資料集的覆蓋、目前程式入口與新增機器人教學分開登記。",
+  "reading_order": [
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          121
+        ]
+      ],
+      "why": "核對官方論文、目前兩個 backend、USST 資料和 ACT 延伸。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "traineval.py",
+      "ranges": [
+        [
+          17,
+          141
+        ]
+      ],
+      "why": "查核 backend dispatch、test tuple 只取第一個 loader、原生種子與推論入口。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "configs/h2o.yml",
+      "ranges": [
+        [
+          1,
+          16
+        ]
+      ],
+      "why": "固定 H2O 2D 64-frame 設定。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "configs/egopat3d.yml",
+      "ranges": [
+        [
+          1,
+          15
+        ]
+      ],
+      "why": "固定 EgoPAT3D 2D 40-frame 設定。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "src/H2OLoader.py",
+      "ranges": [
+        [
+          28,
+          89
+        ],
+        [
+          93,
+          137
+        ],
+        [
+          294,
+          375
+        ]
+      ],
+      "why": "追蹤 split、2D／3D normalization、未來 motion feature 的觀測值延用與 padding。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "src/EgoPAT3DLoader.py",
+      "ranges": [
+        [
+          41,
+          99
+        ],
+        [
+          273,
+          350
+        ]
+      ],
+      "why": "辨識 scene/recording split、novel scene test、有效長度與輸出。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "netscripts/epoch_feat_h2o.py",
+      "ranges": [
+        [
+          1,
+          31
+        ],
+        [
+          426,
+          523
+        ],
+        [
+          543,
+          576
+        ]
+      ],
+      "why": "核對固定 60% 觀測、single sample、純未來 ADE／FDE、跨 rank 儲存。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "netscripts/epoch_feat_egopat.py",
+      "ranges": [
+        [
+          1,
+          33
+        ],
+        [
+          419,
+          489
+        ]
+      ],
+      "why": "核對 EgoPAT3D 的噪聲填入、333 gap 與誤差路徑。"
+    },
+    {
+      "repo": "IRMVLab/MADiff",
+      "commit": "9f13e5a703b01f9ae5d369171693323eb161dae9",
+      "path": "docs/MADiff_for_Robotics.md",
+      "ranges": [
+        [
+          1,
+          70
+        ]
+      ],
+      "why": "區分人體預測、固定 forecast token 與 ACT 實體操作教學。"
+    },
+    {
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          38
+        ],
+        [
+          161,
+          216
+        ]
+      ],
+      "why": "補讀MADiff官方連結的3D延伸身分及CABH資料角色；它有不同arXiv，完整配套程式核讀另見P222。"
+    }
+  ],
+  "environment": "父資料 EK55、EK100、EGTEA Gaze+、EgoPAT3D-DT、H2O-PT；目前公開入口主要為後兩個。EgoPAT3D loader 有 11 個已見 scene IDs 與 novel 13／14／15；ID 是父資料場景，不能當 MADiff 新建環境。",
+  "tasks": "同一手部軌跡 forecasting 方法在不同資料與觀測配置測試。現行兩個 backend 設定 target=2d、observation ratio=0.6；H2O max_frames=64，EgoPAT3D=40。ACT 教學將 forecast 作額外 token，沒有提供一套新的正式 robot benchmark 題單／判分器。",
+  "data": "原生資料與權重需外部下載，來源依賴 USST 預處理。讀取 native filename、scene/recording split、有效幀數、trajectory／GLIP／motion features；論文五資料集的 train/test 樣本表不能算為五批全新原始影片。",
+  "evaluation": "實際 H2O／EgoPAT3D eval loop 對純未來區間逐序列計 normalized-image ADE 與末點 FDE，並非檔內未用 helper 的 weighted error。H2O 每題 1 次抽樣、gap=999；EgoPAT3D gap=333。test_novel 雖有 loader，traineval 對 tuple 取 [0]，預設入口只評 test。H2O rank 檔只彙整 ADE、檔名需隔離執行以免讀到舊檔。",
+  "standardization": {
+    "profile": "egocentric_2d_hand_trajectory_forecasting",
+    "reuse": "重用父資料 split、scene IDs、有效長度、座標轉換與實際呼叫的 ADE／FDE。；ACT forecast-token 教學可作 human-to-robot 接口參考，與正式測題清單分開。",
+    "transform": "case 包含 dataset revision、backend、filename、60% boundary、max_frames、normalization 與 feature revision。；novel test 建獨立入口和完整 expected-case manifest；抽樣次數、diffusion gap 各自固定。；把論文五資料集與目前兩 backend／MMTwin 3D 延伸保留版本關係，不合併報為新環境。",
+    "missing": "未跑模型、未取得特徵／checkpoint；沒有重現論文數字。；機器人教學缺可下載任務／示範／evaluator；MMTwin本次僅補讀README；其EgoPAT3D程式核讀見P222，不把CABH待發布模型當成已可用。"
+  },
+  "version_note": "目前 README 為 T-PAMI 2025、引用同一 arXiv；版本新增 H2O／EgoPAT3D backend 與 ACT 教學。已讀原生程式與論文範圍不相同，必須按版本列出。 補查MMTwin README：它對應2504.07375，CABH列三種人類操作任務，CABH專用模型仍待發布；EgoPAT3D配套程式已在P222核讀。這是相關延伸，不改寫MADiff本篇的任務或可執行範圍。",
+  "runtime_executed": false,
+  "additional_repo_proposals": [
+    {
+      "repo": "IRMVLab/MMTwin",
+      "reason": "官方連結的獨立3D延伸；本次已補讀README，EgoPAT3D核心程式另見P222。"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "kind": "paper",
+      "url": "https://arxiv.org/abs/2409.02638",
+      "checked_sections": [
+        "第 5.1 節及表 1，五父資料集、各自時間窗與 training/test 數量。"
+      ]
+    }
+  ]
+}

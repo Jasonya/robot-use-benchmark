@@ -1,0 +1,123 @@
+{
+  "paper_id": "P205",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "CapMem 的 pinned paper 有完整標註、單一 evaluation split、caption／frame 協定與 retrieve-and-verify 規則，Appendix G 亦宣稱發布程式；但已收錄 PDF／project／搜尋來源未提供可確認的本篇 GitHub release。未把同名記憶遊戲或 CapMemUtils 當成實作，也未假造 loader／scorer 檔案。",
+  "identity_note": "核對 arXiv:2609.17688v1（2026-09-15），Dingli Liang、Yiqiao Xie 等九位作者。project_candidates 的本篇沒有 project 或 repo；既有 CapMem egocentric 搜尋為 0，廣義 CapMem 搜尋的前 8／10 個結果未建立作者或論文對應。因此狀態是尚未確認程式倉庫，不是證明全網無 code 或 repository 404。",
+  "reading_order": [],
+  "environment": "75 段既有公共人類第一人稱影片，共 33.7 小時，來源為 Ego4D、EgoLife、EgoPet、EPIC-KITCHENS、HoloAssist、ENIGMA-51、CASTLE2024。四用途是 Daily Life & Domestic、Outdoor & Mobility、Work & Procedural、Pet Related；16 scenario labels 不等於 16 個已去重可執行世界。",
+  "tasks": "主題是 Episodic Memory Video Caption QA；CleanQA（僅問題／選項）、Direct VideoQA（抽樣影格）、CaptionQA（時間化文字記憶）是同題三種資訊條件。Ego／Exo × Who／What／Where／When／How 為問題分類，50 templates 是出題樣板；Object、Attribute、Spatial、Action 為可重疊標記，不是額外物理任務。",
+  "data": "論文 Appendix E 的 2,109 人工 candidates 經雙 reviewer 留 1,276，文字捷徑 filter 刪 352 後剩 924，再復核恢復 76，得到 1,000 題。Appendix G 指定每題包含 question identifier、父資料／影片 ID、四選項與正解、evidence timestamps、domain／scenario、Ego／Exo、4W1H、evidence-location、多視覺 tags；此為論文所述內容，沒有實際檔案可驗證 JSON key 名稱或 loader。單一 1,000-question evaluation split，無獨立 dev；來源影音／原庫標註不重發。影格 cache 是 1 fps，full-coverage caption 用連續 30／60 秒窗；caption 完成後以文字回答同影片各題。",
+  "evaluation": "論文用四選一 QA accuracy（正確題／實際評測題）及每題 token 成本；主設定 N=1,000，Gemini 3 Flash Direct VideoQA 僅 N=786，相關配對比較須對齊這 786 題。duration 子集 208／792 題，evidence-location 子集 348／507／145 題；multi-label tags 的分母重疊。CleanQA 15%–35% 是 model 進入主評測的 gate，不是 case 成功門檻。Direct 的 InternVL／Qwen frame caps 為 128／768；full-caption 無 video-level cap，六 Qwen 的 frame-aligned control 才用與 direct 相同的 frames。Appendix D 的 retrieve-and-verify 最多三 seed、neighbor=1、NMS 45 秒，最多三段各四個影格驗證；僅 strong 視覺支持、合法字母且無 clock-time cue 才覆蓋原 CaptionQA。該 override policy 在全 benchmark 錯誤分析後選定，作者明示屬 post-hoc proof of concept。未取得 concrete scorer，答案 parser、無效輸出、例外／遺漏題入分母方式及實際 filter 實作均未核實。",
+  "standardization": {
+    "profile": "caption_memory_mcq_protocol_without_confirmed_release",
+    "reuse": "可重用原生用途／題型／多標籤、單一 evaluation split 的論文統計、公開 prompt 文字、input-budget 對照與 post-hoc 限制。",
+    "transform": "source 綁 paper v1 並保留七個父媒體來源；domain／environment 保留四用途與 scenario labels。case 用 CapMem QA ID 關聯 parent video／evidence 與選項，三種資訊條件及 30／60 秒 caption 版本作同題條件；evaluator 保存 matched question IDs、完整或 786 子集、frame IDs／captioner／QA model、caption 一次性成本與逐題攤提成本。retrieve-and-verify 另記 override／wrong→correct／correct→wrong，不能與無視覺 CaptionQA 混記。",
+    "missing": "作者可驗證 release URL、官方 annotations／question IDs／split manifest、JSON schema、reader、caption cache 索引、各協定實際 scorer 與可追溯排除清單；還需獨立 dev／held-out policy 驗證。未取得的 LICENSE-DATA／LICENSE-CODE 僅是論文宣告，不列成已讀檔案。"
+  },
+  "version_note": "全篇依 pinned 2609.17688v1 與既有 2026-10-10 搜尋／project cache；沒有已確認 repo commit 可記。論文 p.24 的 release 聲明不能替代可讀原始碼。沒有新批次搜尋、模型執行或資產下載。",
+  "discovery_evidence": [
+    {
+      "source": "audit/.cache/github_review/P205-discovery.json",
+      "json_pointers": [
+        "/candidates/0",
+        "/code_contexts"
+      ],
+      "finding": "版本指向 v1；可用性內容指向 Appendix G 聲明，沒有可供核讀的本篇 GitHub 連結。"
+    },
+    {
+      "source": "audit/.cache/github_review/project_candidates.json",
+      "json_pointers": [
+        "/204"
+      ],
+      "finding": "本篇已收錄 project／repo candidates 均空。"
+    },
+    {
+      "source": "audit/.cache/github_review/search/P205-refined.json",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "CapMem egocentric 搜尋成功回傳 0；不是 rate-limit 或 HTTP 失敗。"
+    },
+    {
+      "source": "audit/.cache/github_review/search/P205.json",
+      "json_pointers": [
+        "/query",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "CapMem 廣義搜尋只保存前 8／10 個結果；已核描述，不能從這些結果確認本篇。"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P205/pages.json",
+      "sha256": "6565d16022c78b16f1403521bfb24e4c5e3640640a2b6f6fb4b0cf171f11b9ec",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        3,
+        4,
+        5,
+        16,
+        17,
+        18,
+        24
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/15/text",
+        "/16/text",
+        "/17/text",
+        "/23/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P205/paper.pdf",
+      "pdf_sha256": "f65b30af25bbaa68d3825316d901fac09df58f2fe57b133428750addc1aeec4e",
+      "url": "https://arxiv.org/abs/2609.17688"
+    },
+    {
+      "local_file": "audit/.cache/github_review/P205-discovery.json",
+      "sha256": "ba2f93384ccccd5b2ae3e7c57dc1c4c3e0f215d6b370020150057686d0419e87",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0",
+        "/code_contexts"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/204"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P205.json",
+      "sha256": "b7037dc2e360844566baba2376cbc7ecd73892d93044be28aea0e86b496378de",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P205-refined.json",
+      "sha256": "337908f05714105f448774335f101e5ec609f7e53a1847ae42c53f7540305d82",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

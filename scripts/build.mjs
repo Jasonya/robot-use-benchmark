@@ -15,11 +15,12 @@ import {linkDefinitionSymbols,renderSymbolReaderNote} from './symbol-guide.mjs';
 import {buildCoverageModel,coverageCSV,coverageRowsCSV,coverageMarkdown} from './coverage-model.mjs';
 import {renderCoveragePage,renderCoverageOverview,renderCoverageNotice,renderCoverageDesign} from './source-review-page.mjs';
 import {validateNumbers,quantityRows,applySourceOverlay,currentQuantityRecords,sourceBridgeCSV,quantityReportMarkdown} from './quantified-model.mjs';
-import {loadSourceReview,applyFulltextReview,sourceReviewCSV,sourceReviewMarkdown,domainClassificationCSV} from './source-review-model.mjs';
+import {loadSourceReview,applyFulltextReview,sourceReviewCSV,sourceReviewMarkdown,domainClassificationCSV,wholeReviewRows} from './source-review-model.mjs';
 import {renderSourceReport} from './source-review-report.mjs';
 import {renderCollectionPipeline} from './collection-pipeline-page.mjs';
 import {loadPipelineWalkthrough,buildPipelineFigures} from './collection-pipeline-figures.mjs';
 import {loadWorkedExamples,workedExamplesMarkdown} from './collection-pipeline-examples.mjs';
+import {loadGithubReview,githubReviewCSV,githubReviewMarkdown,renderGithubReview,renderGithubPaper,renderGithubReport,renderGithubStandard} from './github-review.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROJECT = path.dirname(ROOT);
@@ -156,6 +157,21 @@ const [coveragePlan,coverageSupplement,coverageScoring,coverageReviews,typedCoun
 const coverageModel=buildCoverageModel({plan:coveragePlan,registry:unionRegistry,comparison:comparisonModel,typed:typedCounts,supplement:[...coverageSupplement,...currentQuantityRecords(numbers,numberSourcePins)],scoring:coverageScoring,reviews:coverageReviews,displayNotes:coverageDisplayNotes,unionStats,taxonomy,tasks,families,numbers});
 const fulltextReview=await loadSourceReview(ROOT,papers);
 applyFulltextReview(coverageModel,fulltextReview,unionRegistry,unionStats);
+const githubReview=await loadGithubReview(ROOT,fulltextReview);
+githubReview.overview={
+  classification_version:fulltextReview.version,
+  inventory_date:numberContract.source_inventory_as_of,
+  review_date:githubReview.date,
+  fields:wholeReviewRows(coverageModel),
+  domains:fulltextReview.domains.map(({id,name,source_count,paper_ids})=>({id,name,source_count,paper_ids})),
+  categories:fulltextReview.categories.map(({id,name,reviewed_sources,bibliography_records})=>({id,name,reviewed_sources,bibliography_records})),
+  evaluation_methods:coveragePlan.evaluation_methods.map(m=>({...m,source_count:fulltextReview.statistics.evaluation_source_counts[m.id]})),
+  milestones:fulltextReview.codebook.milestones,
+  canonical_task_union:null,
+  deduplicated_environment_union:null,
+  fully_integrated_union_evaluation_cases:null,
+  scope:'Fixed250-paper source audit. Native source-ID inventory and code review are distinct; no new upstream runtime trials.'
+};
 const PIPELINE_DIR=path.join(ROOT,'benchmark/collection');
 const PIPELINE_DOWNLOADS=path.join(ROOT,'static/downloads/collection-pipeline');
 const [pipelineMarkdown,pipelineReport,pipelineReferences]=await Promise.all([
@@ -189,6 +205,10 @@ assetHasher.update(JSON.stringify(symbolGuide));
 assetHasher.update(JSON.stringify(coverageModel));
 assetHasher.update(JSON.stringify(numbers));
 assetHasher.update(JSON.stringify(pipelineModel));
+assetHasher.update(JSON.stringify(githubReview.ledger));
+assetHasher.update(githubReview.guide);
+for(const name of ['scripts/github-review.mjs','static/assets/github-review.js','static/assets/github-review.css'])
+  assetHasher.update(await fs.readFile(path.join(ROOT,name)));
 assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-page.mjs')));
 assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-figures.mjs')));
 assetHasher.update(await fs.readFile(path.join(ROOT,'scripts/collection-pipeline-examples.mjs')));
@@ -351,11 +371,12 @@ const pdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/cur
 const historicalPdfHref = (route, locale) => relative(`${locale}/${route}`, 'downloads/full-report-zh-hant.pdf');
 function navHTML(route, locale) {
   const links = [
-    ['coverage.html','覆蓋總覽與前作比較',route==='coverage.html'],
+    ['coverage.html','覆蓋與比較',route==='coverage.html'],
     ['native-tasks.html','任務清單',route==='native-tasks.html'],
     ['survey-union.html','來源名錄',route==='survey-union.html'],
     ['design.html','整體設計',route==='design.html'],
     ['collection-pipeline.html','資料流程',route==='collection-pipeline.html'],
+    ['github-review.html','GitHub核讀',route.startsWith('github')],
     ['library.html','文獻',route==='library.html'],
   ];
   return `<header class="site-header"><div class="wrap header-inner">
@@ -367,8 +388,8 @@ function navHTML(route, locale) {
 }
 function footerHTML(route, locale) {
   return `<footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>${t('前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。',locale)}</div>
-  <div class="footer-links"><a href="${routeLink(route,'coverage.html',locale)}">${t('覆蓋總覽與前作比較',locale)}</a><a href="${routeLink(route,'design.html',locale)}">${t('目前主設計',locale)}</a><a href="${routeLink(route,'research.html',locale)}">${t('文獻與分類',locale)}</a><a href="${routeLink(route,'counting.html',locale)}">${t('計數細節與舊代號',locale)}</a><a href="${relative(`${locale}/${route}`,`downloads/source-review/source-review-${locale}.pdf`)}">${t('目前來源審閱與用途歸納PDF',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
-  <p class="footer-note">${t(`v${config.designVersion}：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成${fulltextReview.statistics.domains}類用途歸納；4類判分分項保留。舊配額已撤回，來源ID清單和整合可評量分開。全庫任務與環境去重仍待完成。`,locale)}</p></div></footer>`;
+  <div class="footer-links"><a href="${routeLink(route,'github-report.html',locale)}">${t('完整整理與逐篇報告',locale)}</a>${githubReview.reportAssets?`<a href="${relative(`${locale}/${route}`,`downloads/github-review/robot-use-source-atlas-${locale}.pdf`)}">${t(`完整整理PDF · ${githubReview.date}`,locale)}</a>`:''}<a href="${routeLink(route,'coverage.html',locale)}">${t('覆蓋總覽與前作比較',locale)}</a><a href="${routeLink(route,'design.html',locale)}">${t('目前主設計',locale)}</a><a href="${routeLink(route,'research.html',locale)}">${t('文獻與分類',locale)}</a><a href="${routeLink(route,'counting.html',locale)}">${t('計數細節與舊代號',locale)}</a><a href="${relative(`${locale}/${route}`,`downloads/source-review/source-review-${locale}.pdf`)}">${t('用途歸納PDF · v0.11快照',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a><a href="https://github.com/${config.repository}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">${t(`v${config.designVersion}：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成${fulltextReview.statistics.domains}類用途歸納；4類判分分項保留。GitHub核讀增補：${githubReview.statistics.validated_review_records}/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。`,locale)} <a href="${routeLink(route,'github-review.html',locale)}">${t('逐篇GitHub與標準化',locale)} →</a></p></div></footer>`;
 }
 const strings = {
   copied:'已複製連結',copyFallback:'請複製瀏覽器網址列的連結',searchMatches:'符合的結果：',
@@ -403,6 +424,8 @@ function shell({route,locale,title,description,body,kind='page'}) {
   <link rel="stylesheet" href="${relative(current,'assets/coverage.css')}?v=${assetRevision}">
 ${route==='compare.html'?`<link rel="stylesheet" href="${relative(current,'assets/comparison.css')}?v=${assetRevision}"><script defer src="${relative(current,'assets/comparison.js')}?v=${assetRevision}"></script>`:''}
 ${route==='collection-pipeline.html'?`<script defer src="${relative(current,'assets/pipeline-examples.js')}?v=${assetRevision}"></script>`:''}
+${route.startsWith('github')?`<link rel="stylesheet" href="${relative(current,'assets/github-review.css')}?v=${assetRevision}">`:''}
+${route==='github-review.html'?`<script defer src="${relative(current,'assets/github-review.js')}?v=${assetRevision}"></script>`:''}
   <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE=${jsonSafe(jsConfig)};</script>
   ${route==='native-tasks.html'?`<script defer src="${relative(current,'assets/native-source-data.js')}?v=${assetRevision}"></script><script defer src="${relative(current,'assets/native-browser.js')}?v=${assetRevision}"></script>`:''}<script defer src="${relative(current,'assets/site.js')}?v=${assetRevision}"></script></head>
   <body><a class="skip-link" href="#main-content">${t('跳至主要內容',locale)}</a>${navHTML(route,locale)}${body}${footerHTML(route,locale)}
@@ -476,7 +499,7 @@ function overallDesignPage(locale){
   <div class="cta-row"><a class="button" href="${routeLink(route,'coverage.html',locale)}">${t('看全庫總覽與前作五欄表',locale)} →</a><a class="button secondary" href="#coverage-design">${t('看完成條件',locale)} ↓</a></div>
   <div class="prose">${renderCoverageDesign(locale,coverageModel,{t,routeLink,relative},route)}</div>
   <div class="reader-actions"><a class="text-button" href="${relative(`${locale}/${route}`,'downloads/coverage/COVERAGE_REPORT.md')}" download>${t('下載新版Coverage整理',locale)}</a><a class="text-button" href="${dl}/extension_grammar.json" download>${t('任務規則細節',locale)}</a><button class="text-button print-page">${t('列印本頁',locale)}</button></div>
-  <details class="union-legacy" id="previous-union-design"><summary>${t('來源聯集與規則擴充方法原稿：v0.7',locale)}</summary><p class="source-note">${t(`保留研究來源與完整方法；量化目標以上方v${config.designVersion}為準。`,locale)}</p><div class="prose">${unionContent}</div><p><a href="${dl}/UNION_FIRST_DESIGN_V0_7.md">${t('下載原稿',locale)}</a> · <a href="${relative(`${locale}/${route}`,`downloads/source-review/source-review-${locale}.pdf`)}">${t('目前來源審閱與用途歸納PDF',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p></details>
+  <details class="union-legacy" id="previous-union-design"><summary>${t('來源聯集與規則擴充方法原稿：v0.7',locale)}</summary><p class="source-note">${t(`保留研究來源與完整方法；量化目標以上方v${config.designVersion}為準。`,locale)}</p><div class="prose">${unionContent}</div><p><a href="${dl}/UNION_FIRST_DESIGN_V0_7.md">${t('下載原稿',locale)}</a> · <a href="${relative(`${locale}/${route}`,`downloads/source-review/source-review-${locale}.pdf`)}">${t('用途歸納PDF · v0.11快照',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p></details>
   <details class="union-legacy" id="historical-design-plans"><summary>${t('歷史設計與容量模型：v0.4／v0.5（保留原引用）',locale)}</summary><p class="source-note">${t('以下保留舊預算、配額和當時的工程順序。舊數字不是目前完整聯集的總量或上限。',locale)}</p><div class="prose">${latestContent}${content}</div>${capacityExplorer(locale)}</details>
   </main><aside class="on-this-page"><div class="sidebar-label">${t('本頁內容',locale)}</div>${headings.map(h=>`<a href="#${escape(h.id)}">${escape(h.title)}</a>`).join('')}<a href="#historical-design-plans">${t('歷史設計與容量模型',locale)}</a></aside></div>`;
   return shell({route,locale,title:`主設計v${config.designVersion}：本版目標與目前實數`,description:'前作比較與全庫聯集用領域、環境、任務、題數和評估方式呈現；詳細規則與舊分類放入附錄。',body,kind:'design'});
@@ -692,6 +715,7 @@ function cardHTML(card,key,locale,route){
   const details=$('<details><summary>完整資料與來源</summary><div class="detail-content"></div></details>');
   paragraphs.filter(p=>!visible.has(p)).forEach(p=>details.find('.detail-content').append($(p)));
   article.append(details);
+  if(key==='literature')article.append(`<p><a href="${routeLink(route,`github/${card.id}.html`,locale)}">GitHub核讀：怎麼讀與標準化 →</a></p>`);
   article.prepend(`<span class="entry-badge">${escape(info.badge)}</span>`);
   return transform($.html(),locale,route,`card-${card.id}`);
 }
@@ -729,13 +753,14 @@ function towelSVG(){
 function homePage(locale){
   const route='index.html';
   const diagram=`<svg class="union-flow-svg" viewBox="0 0 480 330" role="img" aria-label="${t('多個benchmark經分類形成任務聯集，再擴充任務與規則',locale)}"><defs><marker id="union-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#44846b"/></marker></defs><g fill="#fff" stroke="#c4d9c7"><rect x="12" y="22" width="142" height="56" rx="12"/><rect x="169" y="22" width="142" height="56" rx="12"/><rect x="326" y="22" width="142" height="56" rx="12"/><rect x="59" y="133" width="362" height="64" rx="12"/><rect x="59" y="249" width="362" height="64" rx="12"/></g><g font-family="sans-serif" font-size="14" fill="#215a46" text-anchor="middle"><text x="83" y="47">${t('操作／材料',locale)}</text><text x="83" y="66">${t('既有任務',locale)}</text><text x="240" y="47">${t('導航／協作',locale)}</text><text x="240" y="66">${t('既有規則',locale)}</text><text x="397" y="47">${t('Ego／影片',locale)}</text><text x="397" y="66">${t('理解與預測',locale)}</text><text x="240" y="158">${t('Survey分類 → 完整任務聯集',locale)}</text><text x="240" y="181" font-size="12">${t('領域、環境、任務、題數、評估方式',locale)}</text><text x="240" y="275">${t('擴充目標、規則、流程與組合',locale)}</text><text x="240" y="298" font-size="12">${t('綜合任務庫 ＋ 統一比較',locale)}</text></g><g fill="none" stroke="#44846b" stroke-width="1.8" marker-end="url(#union-arrow)"><path d="M83 79L160 132"/><path d="M240 79V132"/><path d="M397 79L320 132"/><path d="M240 198V247"/></g></svg>`;
-  const cards=[['01','先比較所有前作','每列一個benchmark，看環境、任務、題數、判分方式及出處。','coverage.html#benchmarks','看183份原作審閱'],['02','再看整合後的全庫','同一頁交代領域、環境、任務、題數、評估方式；明示哪些總數還在整理。','coverage.html#whole','看全庫總覽'],['03','需要細節再展開','原生任務、家族、規則、觀測與執行紀錄保留可查，支援後續整合。','native-tasks.html','查任務來源與定義']];
+  const cards=[['01','先比較所有前作','每列一個benchmark，看環境、任務、題數、判分方式及出處。','coverage.html#benchmarks','看183份原作審閱'],['02','再看整合後的全庫','同一頁交代領域、環境、任務、題數、評估方式；明示哪些總數還在整理。','coverage.html#whole','看全庫總覽'],['03','逐篇讀GitHub與資料','查固定版本、實際閱讀檔案、資料格式、評分規則，以及如何接進共同benchmark。','github-review.html','看逐篇核讀與標準化']];
   const body=`<main id="main-content"><div class="wrap"><section class="hero"><div><div class="eyebrow">COVERAGE · v${config.designVersion}</div><h1>${t('逐篇查清前作，',locale)}<br><em>${t('建立大而廣的任務庫。',locale)}</em></h1><p class="lede">${t('把機器人與Ego相關benchmark整理成一個大而廣的任務庫。只用領域、環境、任務、題數、評估方式五個欄位，說清楚前作規模和整合進度。',locale)}</p><div class="cta-row"><a class="button" href="${routeLink(route,'coverage.html',locale)}">${t('看Coverage總覽與前作比較',locale)} →</a><a class="button secondary" href="${routeLink(route,'design.html',locale)}">${t('看整體設計',locale)}</a></div><p class="note">${t('原作公布量、已收集量與整合後可評量分開。來源聯集與任務／規則擴充仍是研究主線。',locale)}</p></div><div class="hero-visual"><div class="visual-top"><span>COLLECT · CLASSIFY · UNIFY · EXTEND</span></div>${diagram}<p class="demo-message">${t('保留各前作的互補任務，再擴充目標、規則和流程；詳細分類留在資料內。',locale)}</p></div></section>
   ${renderCoverageOverview(locale,coverageModel,{t,routeLink},{route,compact:true})}
   <section class="section" id="quick-start"><div class="section-head"><div><div class="eyebrow">ONE COVERAGE VIEW</div><h2>${t('先看兩張表，再深入資料。',locale)}</h2><p>${t('先看目標與實數，再按需要查來源和舊版對照。',locale)}</p></div></div><div class="card-grid">${cards.map(([n,title,text,url,label])=>`<a class="overview-card" href="${routeLink(route,url,locale)}"><span class="card-icon">${n}</span><h3>${t(title,locale)}</h3><p>${t(text,locale)}</p><span class="bottom-link">${t(label,locale)} →</span></a>`).join('')}</div></section>
   <section class="section"><div class="section-head"><div><div class="eyebrow">COMPLETE THE UNION</div><h2>${t('接下來的工作集中在三件事。',locale)}</h2><p>${t('補齊前作數量與來源，產生任務聯集，再建立測例與判分。',locale)}</p></div><a class="section-link" href="${routeLink(route,'coverage.html#coverage-work',locale)}">${t('看完成條件',locale)} →</a></div><ol class="coverage-milestones">${coveragePlan.milestones.map(m=>`<li><b>${t(m.name,locale)}</b><p>${t(m.deliverable,locale)}</p></li>`).join('')}</ol></section>
   <div class="download-band"><div><h2>${t('下載統一口徑的前作比較表。',locale)}</h2><p>${t('一列一個benchmark，數字附單位、版本、範圍與出處。完整整理報告也在Coverage頁提供。',locale)}</p></div><a class="button" href="${relative(`${locale}/${route}`,'downloads/coverage/benchmark_summary.csv')}">${t('前作總表 CSV',locale)} ↓</a></div>
-  <details class="explainer" id="home-engineering-appendix"><summary>${t('詳細分類、工程附錄與歷史完整報告',locale)}</summary><p>${t('原生執行器、小型聯合資料與180個情境種子，保留支援後續整合。',locale)}</p><p><a href="${routeLink(route,'execution.html',locale)}">${t('Meta-World原生執行',locale)}</a> · <a href="${routeLink(route,'joint-pilot.html',locale)}">${t('小型聯合流程試作',locale)}</a> · <a href="${routeLink(route,'explore/tasks.html',locale)}">${t('180個情境種子',locale)}</a> · <a href="${routeLink(route,'counting.html',locale)}">${t('計數與代號細節',locale)}</a> · <a href="${relative(`${locale}/${route}`,`downloads/source-review/source-review-${locale}.pdf`)}">${t('目前來源審閱與用途歸納PDF',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p><details id="home-legacy-demo"><summary>${t('歷史概念例：同一條毛巾的兩個目標',locale)}</summary><div class="goal-switch"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div><div class="towel-scene">${translate(towelSVG(),locale)}</div><p id="fold-pairs">D → A · C → B</p><p id="demo-message">${t(strings.demoA,locale)}</p></details></details>
+  <div class="download-band"><div><h2>${t('一本讀完目前整理。',locale)}</h2><p>${t('整體數字、用途分布、比較口徑、兩個流程實例，以及250篇GitHub／資料的逐篇證據。',locale)}</p></div><div class="cta-row"><a class="button" href="${routeLink(route,'github-report.html',locale)}">${t('完整整理報告',locale)} →</a>${githubReview.reportAssets?`<a class="button secondary" href="${relative(`${locale}/${route}`,`downloads/github-review/robot-use-source-atlas-${locale}.pdf`)}">${t('下載PDF',locale)} ↓</a>`:''}</div></div>
+  <details class="explainer" id="home-engineering-appendix"><summary>${t('詳細分類、工程附錄與歷史完整報告',locale)}</summary><p>${t('原生執行器、小型聯合資料與180個情境種子，保留支援後續整合。',locale)}</p><p><a href="${routeLink(route,'execution.html',locale)}">${t('Meta-World原生執行',locale)}</a> · <a href="${routeLink(route,'joint-pilot.html',locale)}">${t('小型聯合流程試作',locale)}</a> · <a href="${routeLink(route,'explore/tasks.html',locale)}">${t('180個情境種子',locale)}</a> · <a href="${routeLink(route,'counting.html',locale)}">${t('計數與代號細節',locale)}</a> · <a href="${relative(`${locale}/${route}`,`downloads/source-review/source-review-${locale}.pdf`)}">${t('用途歸納PDF · v0.11快照',locale)}</a><a href="${pdfHref(route,locale)}">${t('歷史完整PDF · 9/29快照',locale)}</a></p><details id="home-legacy-demo"><summary>${t('歷史概念例：同一條毛巾的兩個目標',locale)}</summary><div class="goal-switch"><button data-demo-goal="a" aria-pressed="true">${t('目標 A · 沿長軸摺',locale)}</button><button data-demo-goal="b" aria-pressed="false">${t('目標 B · 沿短軸摺',locale)}</button></div><div class="towel-scene">${translate(towelSVG(),locale)}</div><p id="fold-pairs">D → A · C → B</p><p id="demo-message">${t(strings.demoA,locale)}</p></details></details>
   </div></main>`;
   return shell({route,locale,title:'五個欄位看懂前作與全庫Coverage',description:'領域、環境、任務、題數與評估方式：同一頁比較前作規模和全庫整合狀態，再深入任務來源與規則。',body,kind:'home'});
 }
@@ -789,6 +814,12 @@ function searchPage(locale){
 }
 function searchData(locale){
   const result=[];
+  result.push({kind:'reference',title:translate('GitHub逐篇核讀與標準化',locale),path:'github-review.html',summary:translate('250篇的倉庫身份、固定版本、閱讀檔案、資料／判分與標準化路線。',locale),search:'github repo code benchmark collection standardization source audit GitHub 倉庫 仓库 核讀 核读 格式 標準化 标准化'});
+  result.push({kind:'reference',title:translate('我們的benchmark怎麼整理：三層共同結構',locale),path:'github-standard.html',summary:translate('來源快照、共同目錄、可評測子集；讀懂原生任務、資料和真正的評分程式。',locale),search:'benchmark structure standardize pipeline adapter schema 目錄 目录 結構 结构 原生 判分'});
+  for(const row of githubReview.rows){
+    const content=[row.name,row.title,...row.repositories,row.review?.summary,row.review?.tasks,row.review?.data,row.review?.evaluation,...(row.review?.reading_order||[]).map(read=>read.path)].filter(Boolean).join(' ');
+    result.push({kind:'reference',title:translate('GitHub｜'+row.name,locale),path:`github/${row.paper_id}.html`,summary:translate(row.review?.summary||'待核讀',locale),search:tc(content)+' '+sc(tc(content))+' '+row.paper_id+' github code source'});
+  }
   result.push({kind:'reference',title:translate('標準化蒐集與整合流程',locale),path:'collection-pipeline.html',summary:translate('八步流程、共同資料格式、來源版本、任務與環境對齊、切分及可重跑匯入。',locale),search:'standardized pipeline collection schema data format adapter provenance lineage RLDS LeRobot Ego4D Croissant 標準化 标准化 蒐集 收集 整合 資料流程 数据流程'});
   result.push({kind:'reference',title:translate('Coverage總覽：領域、環境、任務、題數、評估方式',locale),path:'coverage.html',summary:translate('183份原作關鍵章節審閱；五欄比較與原文頁碼、來源重用、待核紀錄。',locale),search:'coverage whole domain environment task count audit evaluation 覆蓋 覆盖 整體 整体 領域 领域 環境 环境 任務 任务 題數 题数 評估 评估 審核 审核 143 2062'});
   for(const row of coverageModel.rows)result.push({kind:'reference',title:translate('Coverage｜'+row.name,locale),path:`coverage.html#source-${row.paper_id.toLowerCase()}`,summary:translate(row.tasks+'；'+row.environments,locale),search:tc([row.name,row.title,row.domains,row.tasks,row.native_evaluation].join(' '))+' '+sc(tc([row.name,row.title,row.domains,row.tasks,row.native_evaluation].join(' ')))+' coverage count 覆蓋 覆盖 數量 数量'});
@@ -844,6 +875,14 @@ async function copyStatic(dir,relativeDir=''){
   }
 }
 await copyStatic(path.join(ROOT,'static'));
+await write('downloads/github-review/compiled_reviews.json',JSON.stringify(githubReview.ledger,null,2)+'\n');
+await write('downloads/github-review/validation.json',JSON.stringify(githubReview.validation,null,2)+'\n');
+await write('downloads/github-review/github-review.csv',githubReviewCSV(githubReview));
+await write('downloads/github-review/GITHUB_REVIEW_REPORT.md',githubReviewMarkdown(githubReview));
+await write('downloads/github-review/REPO_TO_STANDARD.md',githubReview.guide);
+await write('downloads/github-review/atlas-summary.json',JSON.stringify(githubReview.overview,null,2)+'\n');
+if(githubReview.reportAssets)await write('downloads/github-review/report_assets.json',JSON.stringify(githubReview.reportAssets,null,2)+'\n');
+for(const row of githubReview.rows)await write(`downloads/github-review/papers/${row.paper_id}.json`,JSON.stringify(row,null,2)+'\n');
 await fs.mkdir(path.join(PIPELINE_DIR,'figures'),{recursive:true});
 for(const figure of pipelineModel.figures)for(const locale of LOCALES)for(const layout of ['desktop','mobile']){
   const name=`${figure.file}-${locale}${layout==='mobile'?'-mobile':''}.svg`;
@@ -870,6 +909,10 @@ for(const locale of LOCALES){
   await write(`${locale}/coverage.html`,renderCoveragePage(locale,coverageModel,{t,escape,translate,relative,routeLink,head,shell,assetRevision}));
   await write(`${locale}/source-report.html`,renderSourceReport(locale,coverageModel,{t,shell}));
   await write(`${locale}/collection-pipeline.html`,renderCollectionPipeline(locale,pipelineModel,{t,escape,shell,head}));
+  await write(`${locale}/github-review.html`,renderGithubReview(locale,githubReview,{t,escape,translate,shell,head}));
+  await write(`${locale}/github-standard.html`,renderGithubStandard(locale,githubReview,{t,escape,shell,head}));
+  await write(`${locale}/github-report.html`,renderGithubReport(locale,githubReview,{t,escape,shell,head}));
+  for(const row of githubReview.rows)await write(`${locale}/github/${row.paper_id}.html`,renderGithubPaper(row,locale,githubReview,{t,escape,shell,head}));
   await write(`${locale}/compare.html`,renderComparisonPage(locale,comparisonModel,{t,escape,translate,relative,routeLink,head,shell,auditStatistics:comparisonStats}));
   await write(`${locale}/readiness.html`,renderReadinessPage(locale,readinessModel,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell,implementation:implementationModel}));
   await write(`${locale}/execution.html`,renderExecutionPage(locale,executionModel,implementationModel,{t,escape,relative,routeLink,breadcrumb,chapterNav,shell}));
@@ -1014,6 +1057,10 @@ const manifest={
   counting:{version:countingContract.version,taskEnvironmentDefinitions:null,sceneLayouts:null,sourceSampleTotals:null,extractedSourceIndices:unionStats.total_source_records,definitionsRequireLocalExecution:false},
   symbols:{version:symbolGuide.version,gLevels:symbolGuide.granularity_levels.length,tModules:Object.keys(taxonomy.tracks).length,schemeOrigin:'project_defined'},
   coverage:coverageModel.statistics,
+  githubSourceReview:{date:githubReview.date,statistics:githubReview.statistics,
+    currentOverview:githubReview.overview.fields.map(f=>({field:f.id,value:f.current,unit:f.unit})),
+    reportAssets:githubReview.reportAssets?.assets||[],
+    scope:'Fixed250-paper primary-source audit; selected source sections only, no new runtime trials.'},
   quantified:{version:numberContract.version,targets:quantityRows(numbers).map(f=>({field:f.id,value:f.target,unit:f.target_unit})),current:quantityRows(numbers).map(f=>({field:f.id,value:f.current,unit:f.current_unit})),caseFiles:numberInventory.files,completeLocalCaseInputs:numberInventory.new_case_complete_local_input_count,newModelTrials:numberInventory.new_case_runtime_trials},
   note:'Main research: comprehensive source survey, taxonomy, task union and task/rule extensions. Runtime pilots are engineering appendices; collection and execution have separate counts.'
 };

@@ -1,0 +1,333 @@
+{
+  "paper_id": "P216",
+  "name": "HAP",
+  "title": "HAP: A Hand-Driven Active Perception Framework for Egocentric Head Motion Prediction",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.18548",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "wearable"
+  ],
+  "status": "public_readme_only",
+  "review": {
+    "paper_id": "P216",
+    "reviewed_on": "2026-10-11",
+    "status": "public_readme_only",
+    "summary": "HAP官方GitHub目前只有接受後公開的承諾。原文可提供hand-driven head-motion prediction的格式與評估參考，但沒有可核讀的模型/資料處理實作。",
+    "environment": "EgoPAT3Dv2與新增Bottle的ego RGB-D；Bottle382clips來自12sessions，10train/1val/1test。session不是直接可執行robot environment。",
+    "tasks": "以觀測手部motion、target intention與occlusion context預測未來6-DoF頭部運動；不是已完成robot active-camera control或grasping benchmark。",
+    "data": "原文用camera motion作head proxy，DA3估計/平滑、另以ORB-SLAM3對照；9D輸出含translation與rotation representation。Bottle手/物件由視覺模型和depth處理，需保留estimated標記、split與觀測窗口。",
+    "evaluation": "四指標tADE/tFDE(毫米)、rADE/rFDE(SO3 geodesic角度)。不同pose-estimation backend、平滑/觀測長度/預測horizon必須固定；沒有code時不能確認causal preprocessing或masked未來步的計分。",
+    "standardization": {
+      "profile": "hand_conditioned_egocentric_head_motion_prediction",
+      "reuse": "Bottle session split、6DoF/9D表示、角度/位置分項誤差與遮擋條件。",
+      "transform": "case保存camera/head proxy來源、hand/object annotation方法、observed prefix/horizon/有效未來mask；head motion prediction與控制攝影機效益另分evaluator。",
+      "missing": "公開implementation、Bottle clip IDs/annotations、表示/尺度/clock與scorer、causal feature處理及基線重現。"
+    },
+    "version_note": "固定525d603 README6行；原作2609.18548明說code will be released。未因repo存在就計為核心程式已公開。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.18548",
+      "pdf_sha256": "0cbfc4268916f842b362862865080ed9f76fbefdab51c290d6e567b9e03abf8a",
+      "paper_pages_read": [
+        5,
+        6
+      ],
+      "search_receipts": []
+    },
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "HAP-ego/HAP",
+        "requested_repo": "HAP-ego/HAP",
+        "commit": "525d603983f492aea36359c87a2451e262ce2ebb",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            6
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 6,
+        "sha256": "aee0023193ff7d5f02e5df397c010e2716fa861f23ddb264cb754cee1c7c70db",
+        "url": "https://github.com/HAP-ego/HAP/blob/525d603983f492aea36359c87a2451e262ce2ebb/README.md",
+        "reading_url": "https://github.com/HAP-ego/HAP/blob/525d603983f492aea36359c87a2451e262ce2ebb/README.md#L1-L6",
+        "why": "目前只承諾paper接受後發布程式/重現資料",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "95eefe5503de872a0e170db1b2d9d318a780ecc7f8678594c79dd24dfda1f547"
+  },
+  "repository_binding_review_sha256": "95eefe5503de872a0e170db1b2d9d318a780ecc7f8678594c79dd24dfda1f547",
+  "repository_bindings": [
+    {
+      "requested_repo": "HAP-ego/HAP",
+      "resolved_repo": "HAP-ego/HAP",
+      "aliases_in_this_review": [
+        "hap-ego/hap"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "public_readme_only",
+      "versions": [
+        {
+          "commit": "525d603983f492aea36359c87a2451e262ce2ebb",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/HAP-ego/HAP",
+          "link_label": "View code",
+          "project_url": "https://HAP-ego.github.io/HAP",
+          "page_sha256": "831fbdb31cccdb6f1da46694a3ea1bec63e1854b1e99d377258df91b3216f236"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/HAP-ego/HAP#readme",
+          "link_label": "Documentation",
+          "project_url": "https://HAP-ego.github.io/HAP",
+          "page_sha256": "831fbdb31cccdb6f1da46694a3ea1bec63e1854b1e99d377258df91b3216f236"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P216",
+          "review_file": "content/github_review/reviews/P216.json",
+          "review_sha256": "95eefe5503de872a0e170db1b2d9d318a780ecc7f8678594c79dd24dfda1f547",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P216",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HAP: A Hand-Driven Active Perception Framework for Egocentric Head Motion Prediction；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "穿戴互動與動作介面"
+    ],
+    "environment": "Bottle12RGB-Drecordingsessions，clutter/reach變化；camera估計作headmotionproxy。",
+    "tasks": "預測6DoFheadmotion；EgoPAT3Dv2父benchmark另列。",
+    "cases": "Bottle382clips，sessions10train/1val/1test；單一testsession不是廣泛場地泛化證明。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 382,
+        "unit": "Bottle clips",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 12,
+        "unit": "recording sessions",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1,
+        "unit": "held-out test session",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "translationADE/FDE(mm)、rotationADE/FDE(degrees)；DA3/ORB3感知backend敏感性另測。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "sessiondisjoint；各模型同window/horizon/smoothedpose。",
+    "lineage": "新Bottlecapture＋EgoPAT3D、pseudo3Dheadtargets。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "camera pose proxy不等於獨立mocapGT；dataset完整releaseID待核。"
+    ],
+    "reuse": "補視角移動/遮擋規則與activeperception預測，而非只評手部。",
+    "reviewed_pdf_sha256": "0cbfc4268916f842b362862865080ed9f76fbefdab51c290d6e567b9e03abf8a",
+    "reviewed_on": "2026-10-02",
+    "name": "HAP",
+    "year": 2026,
+    "title": "HAP: A Hand-Driven Active Perception Framework for Egocentric Head Motion Prediction",
+    "source_url": "https://arxiv.org/abs/2609.18548",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "wearable"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "人體動作與身體感知"
+    ],
+    "domain_names": [
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P216",
+      "summary": "預測頭部轉向以看到被遮擋的操作目標，歸入穿戴觀察與動作介面。",
+      "evidence": [
+        {
+          "paper_id": "P216",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            5
+          ],
+          "locator": "Fig.1、Introduction、Bottle資料",
+          "observed_tasks": [
+            "目標被遮擋時預測適當head reorientation",
+            "頭手協同的6DoF頭部動作預測"
+          ],
+          "reasoning": "由使用者的視線取得與頭戴相機動作需求歸納。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "0cbfc4268916f842b362862865080ed9f76fbefdab51c290d6e567b9e03abf8a"
+        }
+      ],
+      "domain_ids": [
+        "wearable"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "0cbfc4268916f842b362862865080ed9f76fbefdab51c290d6e567b9e03abf8a",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P216",
+      "name": "HAP",
+      "expected_title": "HAP: A Hand-Driven Active Perception Framework for Egocentric Head Motion Prediction",
+      "source_url": "https://arxiv.org/abs/2609.18548",
+      "pdf_url": "https://arxiv.org/pdf/2609.18548",
+      "retrieved_at": "2026-10-02T22:14:19.626841+00:00",
+      "pdf_sha256": "0cbfc4268916f842b362862865080ed9f76fbefdab51c290d6e567b9e03abf8a",
+      "text_sha256": "e77dd7013d4c13ee7f2a0f38f08120b6f4f0eb94f39e2114660c066fd8df46ea",
+      "pdf_bytes": 9926003,
+      "pages": 8,
+      "text_characters": 57864,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.18548v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.18548v1"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 382,
+        "unit": "Bottle clips",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P216:1",
+        "paper_id": "P216",
+        "benchmark": "HAP",
+        "native_term": "Bottle clips",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.18548v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.18548v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 12,
+        "unit": "recording sessions",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P216:2",
+        "paper_id": "P216",
+        "benchmark": "HAP",
+        "native_term": "recording sessions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.18548v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.18548v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1,
+        "unit": "held-out test session",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P216:3",
+        "paper_id": "P216",
+        "benchmark": "HAP",
+        "native_term": "held-out test session",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.18548v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.18548v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "HAP-ego/HAP"
+  ],
+  "external_repositories": []
+}

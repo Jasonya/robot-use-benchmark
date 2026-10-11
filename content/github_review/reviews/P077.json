@@ -1,0 +1,523 @@
+{
+  "paper_id": "P077",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "CLIPort已追到Ravens/PyBullet的bowl／rope任務、示範讀寫與Task.reward/is_match。mean_reward可含部分分數；bowl文字目標與checker有一對一配對落差，且eval沒有按episode seed重設Python random，不能保證完全重建示範語義變體。",
+  "identity_note": "固定論文為 Shridhar、Manuelli、Fox 的 CLIPort: What and Where Pathways for Robotic Manipulation，arXiv:2109.12098v1／CoRL 2021。PDF 的 code-availability 指向 cliport.github.io；倉庫 README 1–9 同時吻合題名、三位作者、arXiv 與專案網址，足以確認 cliport/cliport 為本論文官方程式。openai/CLIP 與 Ravens 是重用依賴，不能另算 CLIPort benchmark。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P077-discovery.json",
+      "selected_json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/code_contexts/1"
+      ],
+      "paper_version": "2109.12098v1",
+      "pdf_sha256": "3cc19664beabda203cb1a1ad86659f75f60a099189820d92d59d20067c9ab003",
+      "finding": "論文作者／版次與 benchmark、code availability 文字相符；README 交叉確認官方身份。",
+      "sha256": "618eb5eed4f937847728c2982cba6e15040a5f984e1cbfb58cf7ea7e9c19c79f",
+      "text_excerpts": [
+        {
+          "json_pointer": "/opening_text",
+          "character_range": [
+            860,
+            898
+          ],
+          "text": "arXiv:2109.12098v1 [cs.RO] 24 Sep 2021",
+          "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+        }
+      ]
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "cliport/cliport",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          18
+        ],
+        [
+          121,
+          148
+        ],
+        [
+          273,
+          284
+        ],
+        [
+          319,
+          331
+        ]
+      ],
+      "why": "身份、四階段 train/val/test 流程、重複訓練集與 SE(2) augmentation 限制。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/tasks/README.md",
+      "ranges": [
+        [
+          1,
+          58
+        ],
+        [
+          60,
+          66
+        ]
+      ],
+      "why": "10 個 goal-conditioned 原生任務家族與 seen/unseen/full/seq 標籤、Ravens 重用及修改 COM 的資產。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/tasks/put_block_in_bowl.py",
+      "ranges": [
+        [
+          11,
+          99
+        ]
+      ],
+      "why": "具體語言、物件數、goal tuple、5cm XY 容差、步數和顏色切分。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/tasks/align_rope.py",
+      "ranges": [
+        [
+          14,
+          104
+        ]
+      ],
+      "why": "20 節繩、四個方向描述、可反向 match matrix 與20步上限；不是20個獨立case。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/tasks/cameras.py",
+      "ranges": [
+        [
+          7,
+          58
+        ]
+      ],
+      "why": "三個480×640 RGB-D視角與只供oracle使用的俯視相機。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/environments/environment.py",
+      "ranges": [
+        [
+          20,
+          84
+        ],
+        [
+          149,
+          151
+        ],
+        [
+          198,
+          233
+        ],
+        [
+          250,
+          301
+        ],
+        [
+          305,
+          323
+        ]
+      ],
+      "why": "pose0/pose1執行、settle後計分、timeout終止、depth還原與特權info。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/demos.py",
+      "ranges": [
+        [
+          15,
+          89
+        ]
+      ],
+      "why": "偶／奇seed與test偏移、macro-action步記錄、只保存總reward>0.99的示範。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/dataset.py",
+      "ranges": [
+        [
+          24,
+          208
+        ],
+        [
+          243,
+          263
+        ],
+        [
+          395,
+          449
+        ]
+      ],
+      "why": "五個pickle欄位、seed命名、heightmap/角度標籤、sequential goal選擇與多任務切分。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/tasks/task.py",
+      "ranges": [
+        [
+          19,
+          54
+        ],
+        [
+          165,
+          227
+        ],
+        [
+          229,
+          270
+        ],
+        [
+          316,
+          323
+        ]
+      ],
+      "why": "pose與zone的真正checker、delta reward、goal推進及done語義。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/eval.py",
+      "ranges": [
+        [
+          16,
+          49
+        ],
+        [
+          83,
+          165
+        ],
+        [
+          168,
+          215
+        ]
+      ],
+      "why": "依示範seed重建case、累積reward平均與val最佳checkpoint挑選。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/cfg/eval.yaml",
+      "ranges": [
+        [
+          10,
+          38
+        ]
+      ],
+      "why": "預設100個val instances、一次repeat與路徑依賴。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    },
+    {
+      "repo": "cliport/cliport",
+      "path": "cliport/utils/utils.py",
+      "ranges": [
+        [
+          773,
+          780
+        ]
+      ],
+      "why": "確認Python random只隨train_run初始化；eval每case的env.seed只改局部NumPy RNG。",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad"
+    }
+  ],
+  "environment": "PyBullet 桌面 UR5／預設吸盤；agent有三個480×640無噪RGB-D視角，oracle另有俯視影像與segmentation。示範與評測入口將physics設為480Hz，但每筆資料是完成pick/place primitive並等待物體靜止後的決策步，不能當480fps影片。工作區x=[0.25,0.75]、y=[-0.5,0.5]公尺；Task bounds的z上限0.3，dataset/action bounds為0.28，需按用途保留。實機Franka結果不等於此UR5環境可直接重播。",
+  "tasks": "任務文件的10個goal-conditioned家族需與seen/unseen/full屬性子集及seq流程分開。已讀PutBlockInBowl：隨機1–3個碗、1至碗數個block、6個distractor，語言指定兩種顏色；goal=(objects,matches,target_poses,replace,rotations,metric,params,max_reward)，步數重設為blocks+1。seen與unseen類別在train均取TRAIN_COLORS，unseen只在非train改EVAL_COLORS。AlignRope是20節繩／四種邊方向、可正反向匹配；節數、語句變化與生成seed均不能當新增任務數。",
+  "data": "RavensDataset把同一episode寫成color/depth/action/reward/info五個目錄下的{episode_id:06d}-{seed}.pkl；color為uint8、depth為float32公尺。序列元素為(obs,act,reward,info)，最後一筆act=None；reward是到達該obs的前一步回饋。act.pose0/pose1各是(position_xyz公尺,quaternion_xyzw)；info含lang_goal及object_id→(pos,rot,dimensions)特權狀態。讀入後以3.125mm/pixel融合成320×160×6 RGB+重複三次height，p0_theta固定0、p1_theta為相對負yaw（弧度）。seq以i+1為goal，其他任務用末幀。train seed從0每次+2，val從1、test從10001每次+2；只保存oracle總reward>0.99，實際case數須列舉落地檔案，不能用要求生成的n或README估計值替代。",
+  "evaluation": "callchain：eval.main→ds.load(i)/seed→env.reset（Python random非逐case重設）→最多task.max_steps次env.step→Task.reward→is_match或zone點覆蓋。pose逐object在可配對target中找到任一匹配即加max_reward/objects；is_match只看XY距離與對稱性處理的z-yaw，不看高度，bowl容差0.05m、rope0.02m。zone算局部座標點落入矩形範圍且低於z上限的比例。reward為累計完成度差值，完成當前goal後彈出相應語言；done是goals空或_rewards>0.99，primitive timeout也會直接done=True且reward=0。結果JSON保存episodes=(total_reward,last_info)與mean_reward；預設n_demos=100、n_repeats=1，test_best依val mean_reward選模型（未找到則last.ckpt）。因此不得把done、mean_reward與二元success混用。",
+  "standardization": {
+    "profile": "language_conditioned_tabletop_macro_action_episodes",
+    "reuse": "重用task class與原生屬性切分、goal tuple、語言順序、episode seed、相機與pose-action欄位、具體reward/checker。",
+    "transform": "source綁paper edition+commit；environment綁資產／相機／物理設定；task保留家族及seen/unseen/full/seq；case以task+mode+seed+示範檔案識別並保存五檔引用；evaluator分列delta_reward、total_reward、done及終止原因。把世界座標、公尺、xyzw、heightmap投影和特權info可見性寫入profile；同一train資料的seen/unseen別名記reuse關係。",
+    "missing": "尚未閉合Google Scanned Objects修改COM後資產、所有case檔與實機採集格式。PutBlockInBowl註解要求每block放不同碗，goal也設replace=False，但reward丟棄replace並逐物件獨立匹配，不消耗target；加上只驗XY，需協調者明列原生checker限制，不能宣稱嚴格一對一裝碗或3D落碗驗證。val_best只取目錄第一個匹配results-val檔，且n_repeats共用同checkpoint／case seed，需固定檔案與replicate定義才能可比較。另有seed再現性缺口：demos.py同時以episode seed重設np.random與Python random；eval.py只在repeat開始用train_run呼叫utils.set_seed，逐case僅重設np.random及env.seed，而env.seed只建立self._random。PutBlockInBowl等任務的random.sample顏色未按case重設，因此存下seed不等於已驗證同一示範場景／語句；需保存或修訂完整RNG協定。"
+  },
+  "version_note": "本輪固定cliport/cliport@2be5c47b5bb9bb7040ad90693288b87b1e18e7ad（2023-05-22），晚於2021v1；未取得論文實驗的逐項commit對照。README承認部分seen/unseen train相同、多任務Google物件訓練集較小及旋轉augmentation與方向語句衝突。記錄的是所列選讀區段；不聲稱全倉庫／完整資料／實機實驗已驗證。",
+  "runtime_executed": false,
+  "reviewed_on": "2026-10-11",
+  "source_files": [
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/README.md",
+      "sha256": "78b0cb666583ae89c57f1b56dc26875eac3c0abd3b4df39289715f09c4ca56b8",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          18
+        ],
+        [
+          121,
+          148
+        ],
+        [
+          273,
+          284
+        ],
+        [
+          319,
+          331
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/tasks/README.md",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/tasks/README.md",
+      "sha256": "b3b656e4aafd231c0dc45f3cf431d9b5981ea8458f0e3120ee1ccd0b68688393",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          58
+        ],
+        [
+          60,
+          66
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/tasks/put_block_in_bowl.py",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/put_block_in_bowl.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/cliport__cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/put_block_in_bowl.py",
+      "sha256": "13530c4909bc76cbd6a1b1493b2a9bebb836c9870e21272783ba8cff49d0c4f8",
+      "lines": 99,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/put_block_in_bowl.py",
+        "retrieved_at": "2026-10-11T00:12:59.737911+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/put_block_in_bowl.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 3573,
+        "sha256": "13530c4909bc76cbd6a1b1493b2a9bebb836c9870e21272783ba8cff49d0c4f8"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          11,
+          99
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/tasks/align_rope.py",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/tasks/align_rope.py",
+      "sha256": "f43fc2a0a9514b06b41de1bfdda72b96bb0ad4bc1bd519f743327b8ca617d5b3",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/align_rope.py",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          14,
+          104
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/tasks/cameras.py",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/tasks/cameras.py",
+      "sha256": "346563c741af91abae8b7af5945e2dd7c1f591d835e936374dc03e13ebba0dab",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/cameras.py",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          7,
+          58
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/environments/environment.py",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/environments/environment.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/cliport__cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/environments/environment.py",
+      "sha256": "7e5cfb7247c5b12ff60685648d3aab7297194b44d73b3efe603ec2ae4ae94fee",
+      "lines": 520,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/environments/environment.py",
+        "retrieved_at": "2026-10-11T00:12:58.734710+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/environments/environment.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 19192,
+        "sha256": "7e5cfb7247c5b12ff60685648d3aab7297194b44d73b3efe603ec2ae4ae94fee"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          20,
+          84
+        ],
+        [
+          149,
+          151
+        ],
+        [
+          198,
+          233
+        ],
+        [
+          250,
+          301
+        ],
+        [
+          305,
+          323
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/demos.py",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/demos.py",
+      "sha256": "938dd9e385554da6c47084102a9504ff4333d4858822f8bc7c072a91ec0a1c9a",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/demos.py",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          15,
+          89
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/dataset.py",
+      "sha256": "30f21291a194722284892fa57bf7f67ecaa86d57d7c39fffbf94da34c82a517d",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/dataset.py",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          24,
+          208
+        ],
+        [
+          243,
+          263
+        ],
+        [
+          395,
+          449
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/tasks/task.py",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/tasks/task.py",
+      "sha256": "5dd28eefa22925f949edf575d3b85084111c9ca74674c92ca8d5debf5d9d4109",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/task.py",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          19,
+          54
+        ],
+        [
+          165,
+          227
+        ],
+        [
+          229,
+          270
+        ],
+        [
+          316,
+          323
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/eval.py",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/eval.py",
+      "sha256": "559a37fe368dd9d0209b7d7ee46ff49fde52509762f9dd160a4d559f52807c13",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/eval.py",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          16,
+          49
+        ],
+        [
+          83,
+          165
+        ],
+        [
+          168,
+          215
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/cfg/eval.yaml",
+      "local_file": "audit/.cache/github_review/repos/cliport__cliport/files/cliport/cfg/eval.yaml",
+      "sha256": "2385d67cd065e2efd5eb2ab8a33948500c2c866a6eadb0b3486ea884c39eb36e",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/cfg/eval.yaml",
+      "source_manifest": "audit/.cache/github_review/repos/cliport__cliport/manifest.json",
+      "read_ranges": [
+        [
+          10,
+          38
+        ]
+      ]
+    },
+    {
+      "repo": "cliport/cliport",
+      "commit": "2be5c47b5bb9bb7040ad90693288b87b1e18e7ad",
+      "path": "cliport/utils/utils.py",
+      "url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/utils/utils.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/cliport__cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/utils/utils.py",
+      "sha256": "930285f2ae9155a4e867143d6a92cbced96e961c10b3fe39b242316eb12139ea",
+      "lines": 790,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/utils/utils.py",
+        "retrieved_at": "2026-10-11T00:40:30.033486+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/cliport/cliport/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/utils/utils.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 28292,
+        "sha256": "930285f2ae9155a4e867143d6a92cbced96e961c10b3fe39b242316eb12139ea"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          773,
+          780
+        ]
+      ]
+    }
+  ]
+}

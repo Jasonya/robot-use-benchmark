@@ -1,0 +1,165 @@
+{
+  "paper_id": "P239",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "已核精確MVP論文與第一作者官方頁；作者頁該篇的Code/Project連結是空href，兩筆GitHub查詢均零結果，作者公開repo名單也無可確認MVP實作。未發現已能固定版本並核讀的官方方法repo；保留paper-level資料／評測規格，不借用同名MVP或其他方法程式。",
+  "identity_note": "Multiscale Video Pretraining for Long-Term Activity Forecasting，Reuben Tan、Matthias De Lange、Michael Iuzzolino、Bryan A. Plummer、Kate Saenko、Karl Ridgeway、Lorenzo Torresani。快取PDF為arXiv:2307.12854v1（2023-07-24）；作者頁同名項目列Submission, 2023，未提供足以確認後續會議版的連結。MVP指Multiscale Video Pretraining，不是任何同縮寫的機器人預訓練或重建repo。",
+  "reading_order": [],
+  "environment": "論文研究離線人類第一人稱影片：Ego4D多種日常活動及EPIC-KITCHENS-55/100廚房活動。不是可reset的機器人環境；未取得作者實際reader，沒有把母資料集全庫時數當MVP有效樣本數。",
+  "tasks": "方法是self-supervised multiscale video pretraining，轉移到三種分開的任務：order-agnostic未來verb/noun集合、order-specific未來verb–noun序列、video-summary forecasting。最後一種是從候選文字摘要檢索正確摘要，不是生成文字摘要。訓練用future clip representation作target，不能當測試時可見未來影格。",
+  "data": "已核論文§3.1及附錄B.1：video以10FPS抽樣，每clip8frames（約0.8秒），observed/future clip序列以N_O/N_F表示，K是兩序列的時間offset、S是timescale stride、N_P=N_F/S是預測尺度數。保留上述clip/time單位，K不能誤當Ego4D常見的5候選。order-agnostic label是N_verb與N_noun兩個multi-hot向量；order-specific是每預測位置的verb/noun ID；summary task是observed clip序列與整段摘要文字配對。附錄A說Ego4D沿用官方train/validation，test為held-out challenge，且各split出現的類別不一致；EK55/100是不同版本，沒有提供足以固定case清單的檔案。原生序列化key、annotation檔名、category ID對照、觀測百分比清單、summary候選集合與split manifest均未公開可核。正文泛定義預測剩餘影片，而§4.2.1實驗提next8 timesteps，不能未加分辨地套Ego4D Z=20。",
+  "evaluation": "只有paper-level規格，未核到作者scorer。order-agnostic按verb與noun類別報mAP（presence within future span，非box IoU AP）；零positive類別是否納入、AP積分／tie及樣本權重規則未能核實。order-specific報verb/noun/action edit distance，action為verb–noun組合；精確distance實作、正規化分母、候選數及選樣規則沒有code可確認，不能直接移植P234/P238的best-of-5。summary forecasting以R@1/5/10評估：分子是正確摘要進topK的video query數，分母是被評query數；完整候選池大小、同影片多摘要及重複處理未能核實。預訓練contrastive region accuracy是另一個訓練診斷，不是下游action成功率。附錄B.2稱下游凍結video model、訓練linear probes，應保留這一轉移設定。",
+  "standardization": {
+    "profile": "paper_only_multiscale_video_pretraining_and_forecasting",
+    "reuse": "可重用論文定義的pretraining→downstream關係、三種task區分、8frame/10FPS clip與時間尺度概念，以及各評測名稱；沒有可直接重用的已核reader/scorer。",
+    "transform": "source記arXiv v1、PDF SHA及author-page固定commit，作者網站明確標為publication evidence；domain/environment保存人類Ego4D與EK版本；task分unordered multi-label、ordered sequence、summary retrieval。case/evaluator先保存描述性規格與未解析欄位，不虛建案例、秒座標或通用success。未來若取得實作，須另建observed/future窗口、label vocabulary、summary candidate-set與training-only target可見性。",
+    "missing": "需要有作者或primary paper明確連回的官方repo與40位commit、small example annotations/loader、split/category manifest，以及三種實際scorer及分母。另需釐清order-agnostic實驗的8步與剩餘全片定義、ordered ED的正規化/候選預算、summary retrieval候選集合。不能用Ego4D/EPIC資料本身或rxtan2的網站模板repo補成MVP實作。"
+  },
+  "version_note": "無confirmed method-code commit可提供；已固定的1210bac9afe61febf68d5a205a31285254ee1141只屬第一作者網站index.html，不計為方法repo。查詢範圍限下列PDF、官方頁、兩筆GitHub repository search與第一作者14個公開repo metadata，結論是尚未確認，不是聲稱全球不存在程式。補查均HTTP200，沒有429／403 rate limit或deferred；未重試、未下載模型／資料資產。",
+  "discovery_evidence": [
+    {
+      "provider": "primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P239/pages.json",
+      "sha256": "4f374cb917c9334be12971977538249d9211a89076c182d1a7685cb488028bae",
+      "url": "https://arxiv.org/pdf/2307.12854",
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text",
+        "/7/text",
+        "/10/text",
+        "/11/text",
+        "/12/text"
+      ],
+      "version": "arXiv:2307.12854v1",
+      "pdf_local_file": "audit/.cache/fulltext_review/P239/paper.pdf",
+      "pdf_sha256": "822b8ed2025c4050aa87fc55ba5b403375e42289e65cbdaf71887a35f7bb3803",
+      "pages": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "provider": "cached_paper_discovery",
+      "local_file": "audit/.cache/github_review/P239-discovery.json",
+      "sha256": "dd952725988ad8433aaf2233f238db5c0a054db49304c3e71ddb444fbabdeb2b",
+      "json_pointers": [
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ],
+      "note": "PDF全篇連結抽取未找到code/project候選；以實際PDF核讀補足，非僅靠抽取。"
+    },
+    {
+      "provider": "cached_github_search",
+      "local_file": "audit/.cache/github_review/search/P239.json",
+      "sha256": "8c8e6821ea379104c881164e3915932518a76fded5a64b11416fbf01605fee0a",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "note": "既有查詢 MVP action anticipation，0結果。"
+    },
+    {
+      "provider": "github_search_receipt",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/exact_title_search.receipt.json",
+      "sha256": "add2187aef4d7e4b9ddfb3c63b944dd2cef5f81a8b2dac11fcb4a195cf132cd6",
+      "json_pointers": [
+        "/requested_url",
+        "/status",
+        "/sha256"
+      ],
+      "note": "共享network.fetch節流；查詢精確片語 \"Multiscale Video Pretraining\"。"
+    },
+    {
+      "provider": "github_search_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/exact_title_search.json",
+      "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+      "json_pointers": [
+        "/total_count",
+        "/incomplete_results",
+        "/items"
+      ],
+      "note": "HTTP200、total_count=0、incomplete_results=false，僅證明這筆query無repo候選。"
+    },
+    {
+      "provider": "github_api_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/author_repositories.json",
+      "sha256": "5e0f2f8df46db2cacce74592299951560986c95fd302ad551cb3ef24537abaf3",
+      "json_pointers": [
+        ""
+      ],
+      "note": "第一作者官方頁連rxtan2；讀取其owner公開repo metadata共14筆，無同論文可确认候選；test_anonymous metadata size=0，不作實作來源。"
+    },
+    {
+      "provider": "github_api_receipt",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/author_repositories.receipt.json",
+      "sha256": "81b590a51bdf088ffd208d9eb8b2be3aac35eb2b10f23c0fc1cbd7520a7328c5",
+      "json_pointers": [
+        "/requested_url",
+        "/status",
+        "/sha256"
+      ]
+    },
+    {
+      "provider": "github_ref_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/author_page_ref.json",
+      "sha256": "485558dc7d6a561906e1c701a018ddfa13f9df151869508161a94a6148f3695d",
+      "json_pointers": [
+        "/ref",
+        "/object/sha"
+      ]
+    },
+    {
+      "provider": "github_content_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/author_page_content.json",
+      "sha256": "2f063a7996d46761f0f4007a7fb99c023da4c23746d98080ca96128107d70e39",
+      "json_pointers": [
+        "/path",
+        "/sha",
+        "/html_url"
+      ],
+      "commit": "1210bac9afe61febf68d5a205a31285254ee1141"
+    }
+  ],
+  "additional_repo_proposals": [],
+  "source_files": [
+    {
+      "provider": "github",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P239/author_page_index.html",
+      "sha256": "c1576bf9b3dc0a49bda3a49339d0bb4f5d42578ad2a71d63718e0bb72757ad89",
+      "url": "https://github.com/rxtan2/rxtan2.github.io/blob/1210bac9afe61febf68d5a205a31285254ee1141/index.html",
+      "ranges": [
+        [
+          19,
+          32
+        ],
+        [
+          203,
+          227
+        ]
+      ],
+      "repo": "rxtan2/rxtan2.github.io",
+      "commit": "1210bac9afe61febf68d5a205a31285254ee1141",
+      "path": "index.html",
+      "git_blob_sha": "b864c86b5972a96b6831a1a5f8062682664b71e3",
+      "repo_role": "author_publication_page_not_method_code",
+      "why": "第一作者官方頁列精確題名及七名作者，Project page/Code/arXiv三個href均為空；此repo僅作身分及空連結證據。"
+    }
+  ],
+  "runtime_executed": false
+}

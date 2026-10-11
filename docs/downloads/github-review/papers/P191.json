@@ -1,0 +1,323 @@
+{
+  "paper_id": "P191",
+  "name": "ClothesNet",
+  "title": "ClothesNet: An Information-Rich 3D Garment Model Repository with Simulated Clothes Environment",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2308.09987",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P191",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "ClothesNet官方頁面可核對3D衣物及標註格式，下載須走作者表單；目前沒有確認其官方GitHub，Google Sites依賴和同名舊研究已排除。",
+    "environment": "約4400個3D garment models、11衣物類別，作模擬場景的資產來源；garment model不是robot環境或完整評測episode。",
+    "tasks": "衣物感知：分類、boundary segmentation、keypoint detection；robot互動方向：rearranging/folding/hanging/dressing。用途方向與11衣物類別不相乘當已定義task數。",
+    "data": "每衣物folder含mesh OBJ/MTL/texture、邊界OBJ/MTL、10個keypoint的PCD與2048個sampled mesh points。官網約4400是原作量，未下載資產，沒有據此生成4400case。官方資料條款限非商業科學研究且禁止轉發/分發。",
+    "evaluation": "官網說明感知及robot互動基準，但未確認可取的完整evaluator/code；需原作split、keypoint語義對應、成功predicate及物理參數才可接入完整robot評測。",
+    "standardization": {
+      "profile": "annotated_garment_assets_and_perception",
+      "reuse": "原始衣物UID、類別/邊界/關鍵點等標註結構與可引用的原作下載入口。",
+      "transform": "以source+garment ID登錄asset並關聯environment/task；metadata與我們的規格獨立發布，原始衣物資料包保留官方下載方式與條款，未獲允許前不納入再分發包。",
+      "missing": "作者資料取得、確切檔案manifest/單位/標註順序/物理參數、split/evaluator、原始資料再分發授權。"
+    },
+    "version_note": "官方Google Sites頁與2023原作題名/作者相符；google/safevalues是網站依賴，lixiangbao/ClothesNet_PyTorch自述為另一篇2018人體衣著生成實作，皆未當作本篇code。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2308.09987",
+      "pdf_sha256": "bdbcb57fbe8831c335e596f96e984f928bbd504a8bdd7e0be8ec0bcb191f02c9",
+      "author_project": {
+        "requested_url": "https://sites.google.com/view/clothesnet",
+        "retrieved_at": "2026-10-10T07:37:53.259688+00:00",
+        "status": 200,
+        "resolved_url": "https://sites.google.com/view/clothesnet",
+        "content_type": "text/html; charset=utf-8",
+        "bytes": 128039,
+        "sha256": "273b44e9133986fb6b9cecdb33941064f95eab76ae71a48579c4df65f00d5080"
+      },
+      "project_text_cache": "audit/.cache/github_review/projects/0394b2af7e33bb85fd8bb075d6a6320501a0ebad86ab61a744b83afa9de2cfa5.txt",
+      "search_receipts": [
+        "audit/.cache/github_review/search/P191-refined.json"
+      ],
+      "exclusions": [
+        {
+          "repo": "google/safevalues",
+          "reason": "Google Sites script dependency"
+        },
+        {
+          "repo": "lixiangbao/ClothesNet_PyTorch",
+          "reason": "A Generative Model of People in Clothing, unrelated older work"
+        }
+      ]
+    },
+    "reading_order": [],
+    "review_sha256": "78e7c660bb80af832850f5a3b064fc7aaba89e6eb66b680cc3338bb00dc9f158"
+  },
+  "repository_binding_review_sha256": "78e7c660bb80af832850f5a3b064fc7aaba89e6eb66b680cc3338bb00dc9f158",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P191",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ClothesNet: An Information-Rich 3D Garment Model Repository with Simulated Clothes Environment；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      6,
+      7,
+      8
+    ],
+    "role": "柔性物資料與感知評測",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "約4,400garment meshes/11categories；ClothesNetM3,051可用subset，mesh不是環境。",
+    "tasks": "分類、boundarysegmentation、keypoints三感知端點；simfold直接控制vertices，dressing/hanging多為可支援用途。",
+    "cases": "3Dclassification1,984train/496testmeshes；2D2,455meshes渲染9,820images再80/20。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 4400,
+        "unit": "garment meshes（約數）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 3051,
+        "unit": "ClothesNetM meshes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 496,
+        "unit": "3D classification test meshes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "clothes-understanding endpoints",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "classificationaccuracy、segmentationmIoU、keypoint品質；simfoldnegativevertexdistance，非完整robotgraspcontrol。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "2D按images切80/20，未在已讀段保證same-mesh views不跨split；3D子集量和3051全集不同。",
+    "lineage": "CGTrader等mesh整理，後被RGBench/GarmentLab等重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          4,
+          6,
+          7,
+          8
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "資產種類不等於全部執行任務已驗證；不能把4400meshes稱4400robotcases。"
+    ],
+    "reuse": "補garment資產/語义標籤，清楚區分perceptionvalidation與可交互環境。",
+    "reviewed_pdf_sha256": "bdbcb57fbe8831c335e596f96e984f928bbd504a8bdd7e0be8ec0bcb191f02c9",
+    "reviewed_on": "2026-10-02",
+    "name": "ClothesNet",
+    "year": 2023,
+    "title": "ClothesNet: An Information-Rich 3D Garment Model Repository with Simulated Clothes Environment",
+    "source_url": "https://arxiv.org/abs/2308.09987",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P191",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P191",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "分類、boundarysegmentation、keypoints三感知端點；simfold直接控制vertices，dressing/hanging多為可支援用途。",
+            "約4,400garment meshes/11categories；ClothesNetM3,051可用subset，mesh不是環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "bdbcb57fbe8831c335e596f96e984f928bbd504a8bdd7e0be8ec0bcb191f02c9"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "bdbcb57fbe8831c335e596f96e984f928bbd504a8bdd7e0be8ec0bcb191f02c9",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P191",
+      "name": "ClothesNet",
+      "expected_title": "ClothesNet: An Information-Rich 3D Garment Model Repository with Simulated Clothes Environment",
+      "source_url": "https://arxiv.org/abs/2308.09987",
+      "pdf_url": "https://arxiv.org/pdf/2308.09987",
+      "retrieved_at": "2026-10-02T22:14:11.814017+00:00",
+      "pdf_sha256": "bdbcb57fbe8831c335e596f96e984f928bbd504a8bdd7e0be8ec0bcb191f02c9",
+      "text_sha256": "a8a79d61eadee1af080c7e555e25848ab50ce2bc609129a74808ef08f8297794",
+      "pdf_bytes": 9405793,
+      "pages": 11,
+      "text_characters": 57764,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2308.09987v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2308.09987v1"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 4400,
+        "unit": "garment meshes（約數）",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P191:1",
+        "paper_id": "P191",
+        "benchmark": "ClothesNet",
+        "native_term": "garment meshes（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.09987v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.09987v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 3051,
+        "unit": "ClothesNetM meshes",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P191:2",
+        "paper_id": "P191",
+        "benchmark": "ClothesNet",
+        "native_term": "ClothesNetM meshes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.09987v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.09987v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 496,
+        "unit": "3D classification test meshes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P191:3",
+        "paper_id": "P191",
+        "benchmark": "ClothesNet",
+        "native_term": "3D classification test meshes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.09987v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.09987v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "clothes-understanding endpoints",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P191:4",
+        "paper_id": "P191",
+        "benchmark": "ClothesNet",
+        "native_term": "clothes-understanding endpoints",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.09987v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.09987v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

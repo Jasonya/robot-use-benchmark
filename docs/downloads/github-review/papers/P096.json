@@ -1,0 +1,526 @@
+{
+  "paper_id": "P096",
+  "name": "ALFRED",
+  "title": "ALFRED: A Benchmark for Interpreting Grounded Instructions for Everyday Tasks",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1912.01734",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P096",
+    "summary": "ALFRED把家務類型、具體場景／物件／軌跡和語言repeat分開；成功取決於終態條件，與每步API成功、reward和示範長度加權分數不同。",
+    "environment": "AI2-THOR室內場景與物件狀態；原生目錄tuple包含scene_num，具體軌跡還需原始初態與版本。現行README仍指THOR2.1.0資料／文件。",
+    "tasks": "評測器分7種家務類型：直接放置、清潔後放置、加熱後放置、冷卻後放置、放兩物、持物照燈、透過可移容器放置。物件／場景／語言repeat是下層條件，不與7種直接混算。",
+    "data": "traj task_id/task_type、pddl_params、plan.high_pddl/low_actions、turk_annotations.anns[repeat_idx].task_desc；模型輸出離散action與互動mask。原生trial名稱不等於本庫policy重跑trial。",
+    "evaluation": "EvalTask從視覺和語言rollout，STOP／max_steps／max_fails可終止，再取get_goal_satisfied與條件滿足數。例：照燈要求持有目標且燈可見並開啟。GC全局累加條件分母，PLW按原示範low_actions長度加權，非導航圖最短距離SPL。t=0的除法及被exception跳過的題需adapter明確處理。",
+    "standardization": {
+      "profile": "language_conditioned_household_interaction",
+      "reuse": "7種native task類別、PDDL參數、初態／低層操作與終態條件、language repeats。",
+      "transform": "原task_id/scene/repeat_idx拆為source instance與case鍵，留示範／語言父子關係；原生SR/GC/PLW分開記錄，失敗和未產出題也入分母清單。",
+      "missing": "完整THOR初態重播、資產版本、split與合法模型資訊、missing/error題處理和原生/共同協定對照。"
+    },
+    "version_note": "主程式同時保留原論文與後續model links；不把所有外部model repo當新benchmark。ALFWorld是同系環境的不同介面，需顯式重用關係。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "askforalfred/alfred",
+        "requested_repo": "askforalfred/alfred",
+        "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            53
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 302,
+        "sha256": "bad85c7830804d40a76d0899d0ead6429ab230c048937bf0d40e8730d4380f24",
+        "url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/README.md",
+        "reading_url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/README.md#L1-L53",
+        "why": "原始論文、資料版本與環境依賴",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "askforalfred/alfred",
+        "requested_repo": "askforalfred/alfred",
+        "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b",
+        "ref": null,
+        "path": "models/eval/eval_task.py",
+        "ranges": [
+          [
+            1,
+            206
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 224,
+        "sha256": "41239df00048e88b46981d1926e85768b795992de0e79e880691b8825b35e213",
+        "url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/models/eval/eval_task.py",
+        "reading_url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/models/eval/eval_task.py#L1-L206",
+        "why": "完整具體rollout評測、task/repeat身份、停止與分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "askforalfred/alfred",
+        "requested_repo": "askforalfred/alfred",
+        "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b",
+        "ref": null,
+        "path": "env/tasks.py",
+        "ranges": [
+          [
+            75,
+            124
+          ],
+          [
+            126,
+            155
+          ],
+          [
+            237,
+            272
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 476,
+        "sha256": "710a17085fa174f17f5cb06f11bcf9eafa8ba3be8d40defac8b006dc02694575",
+        "url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/env/tasks.py",
+        "reading_url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/env/tasks.py#L75-L124",
+        "why": "reward與成功分離，拿物照燈的具體條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "askforalfred/alfred",
+        "requested_repo": "askforalfred/alfred",
+        "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b",
+        "ref": null,
+        "path": "gen/utils/dataset_management_util.py",
+        "ranges": [
+          [
+            5,
+            51
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 69,
+        "sha256": "bc2317ef74bd4491407d47263cfdabdbed0a84ef512d84c3a09011e129ee42fa",
+        "url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/gen/utils/dataset_management_util.py",
+        "reading_url": "https://github.com/askforalfred/alfred/blob/f91f4c0c96c7a29f33d0557f86b0a21035379b3b/gen/utils/dataset_management_util.py#L5-L51",
+        "why": "goal/物件/容器/scene與多trial目錄身份",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b9612af98bb05abcdbec62f91728864eca01677ccc211d98c4faaeba2eefd124"
+  },
+  "repository_binding_review_sha256": "b9612af98bb05abcdbec62f91728864eca01677ccc211d98c4faaeba2eefd124",
+  "repository_bindings": [
+    {
+      "requested_repo": "askforalfred/alfred",
+      "resolved_repo": "askforalfred/alfred",
+      "aliases_in_this_review": [
+        "askforalfred/alfred"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b",
+          "reviewed_files": [
+            "README.md",
+            "env/tasks.py",
+            "gen/utils/dataset_management_util.py",
+            "models/eval/eval_task.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "previous_inventory",
+          "repo": "askforalfred/alfred",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "askforalfred/alfred",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P096",
+          "review_file": "content/github_review/reviews/P096.json",
+          "review_sha256": "b9612af98bb05abcdbec62f91728864eca01677ccc211d98c4faaeba2eefd124",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P096",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ALFRED，arXiv 1912.01734v2。",
+    "scope_read": "7task types、參數／demo／directive層級、scene及split表、success與partial goal評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "室內長流程操作",
+    "environment": "AI2-THOR120 rooms＝kitchen/bathroom/bedroom/living各30；不是120房屋。",
+    "tasks": "7types：pick-place、stack-place、pick-two、clean-place、heat-place、cool-place、examine-in-light；2,685 task parameter combinations。",
+    "cases": "8,055 expert episodes、概述25,743 directives；表2split為21,023／820／821／1,533／1,529（合25,726），原文存在17差異。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 120,
+        "unit": "rooms",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "task types",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2685,
+        "unit": "task parameter combinations",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 8055,
+        "unit": "expert demonstration episodes",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 25743,
+        "unit": "概述language directives",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1529,
+        "unit": "表2 test-unseen directives",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "全部goal condition成功／部分goal-condition比例；另以action length折算效率。",
+      "subgoal評測可先強制走expert歷史，不能與end-to-end成功混同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "108train rooms，4val-unseen，8test-unseen；seen folds是train場景子集。",
+    "lineage": "AI2-THOR2.0＋PDDL planner；TEACh沿同floorplans/splits，兩者場景不可重加。",
+    "related_paper_ids": [
+      "P097"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§3.1、圖2、表2（layout text已核）",
+        "supports": "7/2685/8055/120與directive差異"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "Evaluation",
+        "supports": "goal/partial/trajectory-weighted"
+      }
+    ],
+    "unresolved": [
+      "25,743概述與表2合計25,726需release IDs釐清，不靜默選方便的數字。"
+    ],
+    "reuse": "提供家务状态变更／工具切割／熱冷清潔程序；符號動作語義不等於低階接觸控制。",
+    "reviewed_pdf_sha256": "84b314c06de82f5a1ff853676d391e05394a2e517986b03faadcbca325c9ee0b",
+    "reviewed_on": "2026-10-02",
+    "name": "ALFRED",
+    "year": 2019,
+    "title": "ALFRED: A Benchmark for Interpreting Grounded Instructions for Everyday Tasks",
+    "source_url": "https://arxiv.org/abs/1912.01734",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "室內導航"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P096",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P096",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "7types：pick-place、stack-place、pick-two、clean-place、heat-place、cool-place、examine-in-light；2,685 task parameter combinations。",
+            "AI2-THOR120 rooms＝kitchen/bathroom/bedroom/living各30；不是120房屋。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "84b314c06de82f5a1ff853676d391e05394a2e517986b03faadcbca325c9ee0b"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "84b314c06de82f5a1ff853676d391e05394a2e517986b03faadcbca325c9ee0b",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P096",
+      "name": "ALFRED",
+      "expected_title": "ALFRED: A Benchmark for Interpreting Grounded Instructions for Everyday Tasks",
+      "source_url": "https://arxiv.org/abs/1912.01734",
+      "pdf_url": "https://arxiv.org/pdf/1912.01734",
+      "retrieved_at": "2026-10-02T21:34:03.216861+00:00",
+      "pdf_sha256": "84b314c06de82f5a1ff853676d391e05394a2e517986b03faadcbca325c9ee0b",
+      "text_sha256": "f02b9910c28e457f7e63e967154651022ec0ce0a534350fae594df3ffd7a034f",
+      "pdf_bytes": 7539412,
+      "pages": 18,
+      "text_characters": 132764,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1912.01734v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1912.01734v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 120,
+        "unit": "rooms",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P096:1",
+        "paper_id": "P096",
+        "benchmark": "ALFRED",
+        "native_term": "rooms",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1912.01734v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1912.01734v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "task types",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P096:2",
+        "paper_id": "P096",
+        "benchmark": "ALFRED",
+        "native_term": "task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1912.01734v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1912.01734v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2685,
+        "unit": "task parameter combinations",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P096:3",
+        "paper_id": "P096",
+        "benchmark": "ALFRED",
+        "native_term": "task parameter combinations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1912.01734v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1912.01734v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 8055,
+        "unit": "expert demonstration episodes",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P096:4",
+        "paper_id": "P096",
+        "benchmark": "ALFRED",
+        "native_term": "expert demonstration episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1912.01734v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1912.01734v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 25743,
+        "unit": "概述language directives",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P096:5",
+        "paper_id": "P096",
+        "benchmark": "ALFRED",
+        "native_term": "概述language directives",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1912.01734v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1912.01734v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1529,
+        "unit": "表2 test-unseen directives",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P096:6",
+        "paper_id": "P096",
+        "benchmark": "ALFRED",
+        "native_term": "表2 test-unseen directives",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1912.01734v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1912.01734v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "askforalfred/alfred"
+  ],
+  "external_repositories": []
+}

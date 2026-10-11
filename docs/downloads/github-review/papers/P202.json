@@ -1,0 +1,468 @@
+{
+  "paper_id": "P202",
+  "name": "EgoMonth",
+  "title": "EgoMonth: A Month-Level Egocentric Video Benchmark for Long-Term Spatiotemporal Memory",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2608.13113",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "office",
+    "retail",
+    "transport",
+    "leisure"
+  ],
+  "status": "website_only",
+  "review": {
+    "paper_id": "P202",
+    "reviewed_on": "2026-10-11",
+    "status": "website_only",
+    "summary": "susu801/EgoMonth 的 README 與網站對應同名論文的 301 小時／738 clips／1,443 QA／14 題型，但 pinned 完整 tree 只有靜態頁面與圖片。文件聲稱存在的 scripts/ 與評測程式均不在此 commit；尚不能視為已公開可執行 benchmark。",
+    "identity_note": "核對 arXiv:2608.13113v1 首頁題名、作者及正文。候選倉庫完整題名、統計與題型一致，足以確認內容所指論文；但 pinned PDF 未連到該倉庫，README/index.html 僅署名 EgoMonth Team，未提供作者名單或 arXiv 反向連結，因此 susu801 的作者官方身分仍未獨立證實。",
+    "environment": "人類日常第一人稱錄影，20 名參與者各跨 20–120 天、室內外與不同裝置；論文有學習工作、交通、飲食、購物、休閒、家務六種活動分類，沒有可執行 scene registry 或實體場所去重總數。",
+    "tasks": "保留 Table 1 的 14 QA 類型：Habit Inference、Personality Inference；Detail Retrieval、Spatial Relation、Self-localization、Temporal Ordering、Event Time、Object Location；Procedure Planning、Event Counting、Object Counting、Route Reasoning、Cross-view Spatial Reasoning、Direction Judgement。三組分別是 Schema Consolidation、Episodic Indexing、Cascading Reasoning；它們是影片記憶／推理題型，非機器人動作任務。",
+    "data": "已讀到的 schema 僅是 README 文件示例：JSON list，每筆 video_path 為一至多個相對影片路徑，question、四個 options、correct_options 字母與 task_type；文件稱以 CONFIG[\"video_root\"] 接路徑，但沒有可核對的 loader。論文報 738 clips、18,072 分鐘與 1,443 人工四選一題；這些是論文統計，未取得 QA manifest，不能宣稱已清點實際 release。跨日參與者／session ID、時間戳格式、每類實際題數與 split 檔均未見。",
+    "evaluation": "論文 §4.1 與 README 定義 micro Acc = 全部答對題數／全部題數（完整論文集合 N=1,443），macro Avg = 14 個題型各自 accuracy 的等權平均；直接比對正解，無 LLM judge。各模型觀測預算不同，例如 16／64／256／512 frames 或 1 fps，需保留。固定 tree 未含 README 所稱的 Qwen 等腳本，因此無法核對答案字母 parser、多影片拼接／抽幀、錯誤／空回答如何入分母，也沒有可追的 concrete scorer。",
+    "standardization": {
+      "profile": "longitudinal_egocentric_mcq_documentation",
+      "reuse": "可重用有來源的 14 題型、三認知層級、論文統計、文件示例 schema，以及 macro／micro 的分開定義；倉庫先列文件來源。",
+      "transform": "source 保留 paper v1 與候選 repo commit／身分狀態；environment 用參與者與生活錄影脈絡；task 保留原生 task_type。release 到位後，case 以原始 QA ID 關聯有序 video_path[]、question/options/correct_options，另保存 participant/day/session、媒體時間及觀測預算；單片與跨片同屬一題，不能按片重複計數。evaluator 分列 micro 與每類及 macro 分母。",
+      "missing": "作者官方連結、QA／split／影片 manifest、可讀 loader、實際答案解析與 scorer、跨日時間對齊、抽幀及例外處理。現階段不能產生已驗證可執行 case 清單。"
+    },
+    "version_note": "程式來源固定 81143141d98b4511ff1adcae9a5ccf3a9f0f9606（2026-09-22），PDF 為 2608.13113v1。非截斷 tree 的 15 個 entries 中沒有 scripts/、.py 或資料 JSON；README/index.html 的存在宣告與此版本實物不一致。未嘗試用別人的同名倉庫填補。",
+    "discovery_evidence": [
+      {
+        "source": "audit/.cache/github_review/search/P202.json",
+        "json_pointers": [
+          "/query",
+          "/receipt",
+          "/results/0"
+        ],
+        "finding": "既有精確 EgoMonth 搜尋只回傳 susu801/EgoMonth；搜尋候選本身不等於官方證明。"
+      },
+      {
+        "source": "audit/.cache/github_review/P202-discovery.json",
+        "json_pointers": [
+          "/candidates",
+          "/code_contexts"
+        ],
+        "finding": "已核 pinned PDF 連結集合，沒有此 repo／project 連結。"
+      },
+      {
+        "source": "audit/.cache/github_review/repos/susu801__EgoMonth/tree.json",
+        "json_pointers": [
+          "/sha",
+          "/truncated",
+          "/tree"
+        ],
+        "finding": "已核完整 tree；缺失檔案不是只因 heuristic cache 未下載。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "susu801/EgoMonth",
+        "requested_repo": "susu801/EgoMonth",
+        "commit": "81143141d98b4511ff1adcae9a5ccf3a9f0f9606",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            9
+          ],
+          [
+            35,
+            99
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 99,
+        "sha256": "48e4787f96128d8a7244dcd1677e0a81ccc10318b8749275fc170fd9ed39ca0a",
+        "url": "https://github.com/susu801/EgoMonth/blob/81143141d98b4511ff1adcae9a5ccf3a9f0f9606/README.md",
+        "reading_url": "https://github.com/susu801/EgoMonth/blob/81143141d98b4511ff1adcae9a5ccf3a9f0f9606/README.md#L1-L9",
+        "why": "確認論文對應、文件宣告的資料鍵、macro/micro 及缺失 scripts 宣告。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "susu801/EgoMonth",
+        "requested_repo": "susu801/EgoMonth",
+        "commit": "81143141d98b4511ff1adcae9a5ccf3a9f0f9606",
+        "ref": null,
+        "path": "index.html",
+        "ranges": [
+          [
+            27,
+            73
+          ],
+          [
+            86,
+            112
+          ],
+          [
+            181,
+            218
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 218,
+        "sha256": "7a45458d9d4dd4bf38ccf33b550735a67411a12c6f2a17bbc87ece757f919c48",
+        "url": "https://github.com/susu801/EgoMonth/blob/81143141d98b4511ff1adcae9a5ccf3a9f0f9606/index.html",
+        "reading_url": "https://github.com/susu801/EgoMonth/blob/81143141d98b4511ff1adcae9a5ccf3a9f0f9606/index.html#L27-L73",
+        "why": "核對網站題型、Code 按鈕與所列評測命令；Code 僅回到同一倉庫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "3c4a12d3dda6d4ca7f72666ea65160d154a4865dd0a8a96adc91374b942a7495"
+  },
+  "repository_binding_review_sha256": "3c4a12d3dda6d4ca7f72666ea65160d154a4865dd0a8a96adc91374b942a7495",
+  "repository_bindings": [
+    {
+      "requested_repo": "susu801/EgoMonth",
+      "resolved_repo": "susu801/EgoMonth",
+      "aliases_in_this_review": [
+        "susu801/egomonth"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "project_or_leaderboard_website",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "website_only",
+      "versions": [
+        {
+          "commit": "81143141d98b4511ff1adcae9a5ccf3a9f0f9606",
+          "reviewed_files": [
+            "README.md",
+            "index.html"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "EgoMonth",
+          "search_receipt_sha256": "79d6ed6bcdb6a5d060e17e3e4c6862fecdb52acfb82cad0f68a759684934f450",
+          "url": "https://github.com/susu801/EgoMonth",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P202",
+          "review_file": "content/github_review/reviews/P202.json",
+          "review_sha256": "3c4a12d3dda6d4ca7f72666ea65160d154a4865dd0a8a96adc91374b942a7495",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "辦公與教育",
+    "零售與購物",
+    "交通移動與車輛維修",
+    "休閒與運動"
+  ],
+  "source_review": {
+    "paper_id": "P202",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoMonth，arXiv 2608.13113v1。",
+    "scope_read": "收集/篩選、14題型全表、738clips/301h、人工QA、macro/micro與sampling。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      19
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育",
+      "零售與購物",
+      "交通移動與車輛維修",
+      "休閒與運動"
+    ],
+    "role": "長期記憶影片benchmark",
+    "environment": "20participants各20–120天生活紀錄；室內外場景無可去重實體場所總數。",
+    "tasks": "14QA types、3認知層級；6activity用途類別。層級是作者設計，不是已校準的機器人難度。",
+    "cases": "738clips、18,072minutes≈301h、1,443四選一人工QA；原始30人400+h篩到20人300+h。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "memory QA types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "domain",
+        "value": 6,
+        "unit": "作者activity categories",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1443,
+        "unit": "human-authored MCQs",
+        "pages": [
+          6,
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 738,
+        "unit": "video clips",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "14類macro平均與全部QA micro；直接答案比對，無LLM judge。人類評測3annotators，κ0.78。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "benchmark zero-shot evaluation，非training dataset；固定sampling但model frame上限不同。",
+    "lineage": "新收集長期生活影片，與EgoLife是不同capture來源；一人多日仍屬群聚資料。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3、Table1–2、§4.1",
+        "supports": "20/738/1443/14、macro/micro"
+      }
+    ],
+    "unresolved": [
+      "跨日task所需實際視覺覆蓋與每model frame cap要並列；人格推論題不等於客觀人格ground truth。"
+    ],
+    "reuse": "擴到長期生活記憶與跨日狀態，預算應固定並用participant群聚估計不確定性。",
+    "reviewed_pdf_sha256": "6747ddc4c6f9303ea3e7ed2e427b1e8707235e60cd4cf05e45abfd4d13cdffc1",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoMonth",
+    "year": 2026,
+    "title": "EgoMonth: A Month-Level Egocentric Video Benchmark for Long-Term Spatiotemporal Memory",
+    "source_url": "https://arxiv.org/abs/2608.13113",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "office",
+      "retail",
+      "transport",
+      "leisure"
+    ],
+    "review_tags": [
+      "居家生活",
+      "教育與辦公",
+      "交通與移動",
+      "零售與購物",
+      "休閒與運動",
+      "烹飪與飲食"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育",
+      "零售與購物",
+      "交通移動與車輛維修",
+      "休閒與運動"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P202",
+      "domain_ids": [
+        "home",
+        "food",
+        "office",
+        "retail",
+        "transport",
+        "leisure"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P202",
+          "domain_ids": [
+            "home",
+            "food",
+            "office",
+            "retail",
+            "transport",
+            "leisure"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            19
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "14QA types、3認知層級；6activity用途類別。層級是作者設計，不是已校準的機器人難度。",
+            "20participants各20–120天生活紀錄；室內外場景無可去重實體場所總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "6747ddc4c6f9303ea3e7ed2e427b1e8707235e60cd4cf05e45abfd4d13cdffc1"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "6747ddc4c6f9303ea3e7ed2e427b1e8707235e60cd4cf05e45abfd4d13cdffc1",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "office",
+        "retail",
+        "transport",
+        "leisure"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P202",
+      "name": "EgoMonth",
+      "expected_title": "EgoMonth: A Month-Level Egocentric Video Benchmark for Long-Term Spatiotemporal Memory",
+      "source_url": "https://arxiv.org/abs/2608.13113",
+      "pdf_url": "https://arxiv.org/pdf/2608.13113",
+      "retrieved_at": "2026-10-02T21:35:03.095398+00:00",
+      "pdf_sha256": "6747ddc4c6f9303ea3e7ed2e427b1e8707235e60cd4cf05e45abfd4d13cdffc1",
+      "text_sha256": "330163d6ca731a3ddede87431bee5d03b482c33338f54243d8fb869329ec82d5",
+      "pdf_bytes": 6327505,
+      "pages": 21,
+      "text_characters": 73334,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2608.13113v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2608.13113v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "memory QA types",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P202:1",
+        "paper_id": "P202",
+        "benchmark": "EgoMonth",
+        "native_term": "memory QA types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.13113v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.13113v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "domain",
+        "value": 6,
+        "unit": "作者activity categories",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P202:2",
+        "paper_id": "P202",
+        "benchmark": "EgoMonth",
+        "native_term": "作者activity categories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.13113v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.13113v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1443,
+        "unit": "human-authored MCQs",
+        "pages": [
+          6,
+          7
+        ],
+        "record_id": "review10:P202:3",
+        "paper_id": "P202",
+        "benchmark": "EgoMonth",
+        "native_term": "human-authored MCQs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.13113v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.13113v1",
+            "locator": "PDF pp. 6, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 738,
+        "unit": "video clips",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P202:4",
+        "paper_id": "P202",
+        "benchmark": "EgoMonth",
+        "native_term": "video clips",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.13113v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.13113v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "susu801/EgoMonth"
+  ],
+  "external_repositories": []
+}

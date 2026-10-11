@@ -1,0 +1,463 @@
+{
+  "paper_id": "P115",
+  "name": "RoboMME-Interference",
+  "title": "RoboMME-Interference: Benchmarking Robot Memory Under Interference",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.22338",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "general",
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P115",
+    "summary": "RoboMME-Interference在既有RoboMME任務上新增跨session幹擾規則；已取得並結構核對25,200列發布結果，這些是多方法rollouts，不是25,200種任務。",
+    "environment": "重用RoboMME場景與任務；lesson session、k個幹擾session、query是歷史條件，不是增加k個新的場景種類。",
+    "tasks": "9native任務家族，no-history/k0/k1/k3/k7；同一query跨memory系統重跑屬trial比較。原作者easy/medium/hard另為來源標籤。",
+    "data": "CSV已結構計數25,200rows，含variant/family/split/episode/seed/difficulty/condition/success/status、buffer構成與latency欄位；前2例latency等欄位為空。取得結果CSV不等於取得每次影像／狀態或獨立驗證執行。",
+    "evaluation": "analysis以字串true轉success_bool，按variant/condition及family分組計分母與Wilson CI。視覺gate利用lesson_span/filler真實邊界校準閾值，再以query相似度選segment；校準集合須和最終test分開，purity/coverage是檢索品質，不是物理成功。",
+    "standardization": {
+      "profile": "cross_session_memory_interference",
+      "reuse": "query/lesson/distractor protocol、發布結果表與原生聚合、檢索選框證據。",
+      "transform": "case固定query父episode、歷史session有序列表、memory budget與k；trial才連variant/result。原task來源仍是RoboMME，不重算為獨立新任務庫。",
+      "missing": "底層RoboMME環境/政策版本與可執行資產、歷史影像/embedding、校準split證據、相同query配對不確定性及完整執行回執。"
+    },
+    "version_note": "此repo主要提供cross-session分析與檢索擴充，README重現指令能重算發布CSV圖表，不代表重新跑25,200個機器人試驗。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "SoumilRathi/robomme-interference",
+        "requested_repo": "SoumilRathi/robomme-interference",
+        "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            24
+          ],
+          [
+            58,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 109,
+        "sha256": "045c1a4a87ac0b12f66ba72a3691fe6fce013193b92bbef8cf98cbff9315cdb3",
+        "url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/README.md",
+        "reading_url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/README.md#L1-L24",
+        "why": "父benchmark、9家族/5條件/方法網格及重現範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SoumilRathi/robomme-interference",
+        "requested_repo": "SoumilRathi/robomme-interference",
+        "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d",
+        "ref": null,
+        "path": "results/canonical_rollouts.csv",
+        "ranges": [
+          [
+            1,
+            3
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 25201,
+        "sha256": "8c18c38813fcc835edea1f5daa5d7874a1d04a81cbbd00e63810160f8708a3c2",
+        "url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/results/canonical_rollouts.csv",
+        "reading_url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/results/canonical_rollouts.csv#L1-L3",
+        "why": "只讀表頭與前2列；全量25,200列做結構計數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SoumilRathi/robomme-interference",
+        "requested_repo": "SoumilRathi/robomme-interference",
+        "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d",
+        "ref": null,
+        "path": "scripts/analyze_cross_session_results.py",
+        "ranges": [
+          [
+            98,
+            128
+          ],
+          [
+            147,
+            192
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 381,
+        "sha256": "86fbf92ae4f267b5983f1a16afe1171bf4589bfebef9b1b78770817642749a62",
+        "url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/scripts/analyze_cross_session_results.py",
+        "reading_url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/scripts/analyze_cross_session_results.py#L98-L128",
+        "why": "success字串處理、groupby分母與Wilson區間",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SoumilRathi/robomme-interference",
+        "requested_repo": "SoumilRathi/robomme-interference",
+        "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d",
+        "ref": null,
+        "path": "retrieval/robomme_visual_gate.py",
+        "ranges": [
+          [
+            1,
+            96
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 96,
+        "sha256": "7dcb5303975e58f2dfcd66db665329c221b9458acbfbf37d702927106e72a559",
+        "url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/retrieval/robomme_visual_gate.py",
+        "reading_url": "https://github.com/SoumilRathi/robomme-interference/blob/3536f63bbd483654cdd50ef86a656572a03fb72d/retrieval/robomme_visual_gate.py#L1-L96",
+        "why": "檢索分段、threshold校準與purity/coverage gate",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "fd2fe02599732a4b8d5c21c4d0643405712e61de0d5fa11b6cd2f075f99d2b8c"
+  },
+  "repository_binding_review_sha256": "fd2fe02599732a4b8d5c21c4d0643405712e61de0d5fa11b6cd2f075f99d2b8c",
+  "repository_bindings": [
+    {
+      "requested_repo": "SoumilRathi/robomme-interference",
+      "resolved_repo": "SoumilRathi/robomme-interference",
+      "aliases_in_this_review": [
+        "soumilrathi/robomme-interference"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d",
+          "reviewed_files": [
+            "README.md",
+            "results/canonical_rollouts.csv",
+            "retrieval/robomme_visual_gate.py",
+            "scripts/analyze_cross_session_results.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SoumilRathi/robomme-interference",
+          "link_label": "Code",
+          "project_url": "https://robotmemorybench.com",
+          "page_sha256": "57f9d62de73142d23f13a1f62f7f686e8e6aa5365a081aaa3faf716d5fcf029e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SoumilRathi/robomme-interference/tree/main/results",
+          "link_label": "Data",
+          "project_url": "https://robotmemorybench.com",
+          "page_sha256": "57f9d62de73142d23f13a1f62f7f686e8e6aa5365a081aaa3faf716d5fcf029e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SoumilRathi/robomme-interference",
+          "link_label": "GitHub repository",
+          "project_url": "https://robotmemorybench.com",
+          "page_sha256": "57f9d62de73142d23f13a1f62f7f686e8e6aa5365a081aaa3faf716d5fcf029e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SoumilRathi/robomme-interference/blob/main/results/canonical_rollouts.csv",
+          "link_label": "Canonical rollout CSV",
+          "project_url": "https://robotmemorybench.com",
+          "page_sha256": "57f9d62de73142d23f13a1f62f7f686e8e6aa5365a081aaa3faf716d5fcf029e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SoumilRathi/robomme-interference/blob/main/results/analysis/tables/main_success_rates.csv",
+          "link_label": "Main success table",
+          "project_url": "https://robotmemorybench.com",
+          "page_sha256": "57f9d62de73142d23f13a1f62f7f686e8e6aa5365a081aaa3faf716d5fcf029e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SoumilRathi/robomme-interference/blob/main/README.md#results",
+          "link_label": "Results summary",
+          "project_url": "https://robotmemorybench.com",
+          "page_sha256": "57f9d62de73142d23f13a1f62f7f686e8e6aa5365a081aaa3faf716d5fcf029e"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P115",
+          "review_file": "content/github_review/reviews/P115.json",
+          "review_sha256": "fd2fe02599732a4b8d5c21c4d0643405712e61de0d5fa11b6cd2f075f99d2b8c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "通用物件與機動作業",
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P115",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboMME-Interference，arXiv 2606.22338v3。",
+    "scope_read": "9/16task選擇、history干擾規則、完整系統網格與50episode評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "domains": [
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "長期記憶與生活助理",
+    "environment": "沿RoboMME配置，新增跨session history；不是新物理環境。",
+    "tasks": "16原task中選9個有可分離demo的families：4程序、3object、2spatial memory；其餘7不適用。",
+    "cases": "9×50＝450基底test episodes；history條件no-history及k=0/1/3/7；11memory systems＋無memory baseline造成25,200核心rollouts，非同量獨立題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "適用的原task families",
+        "pages": [
+          2,
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 450,
+        "unit": "基底test episodes",
+        "qualifier": "9×50",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 25200,
+        "unit": "核心grid policy rollouts",
+        "qualifier": "450×(11×5+1)，由協定推算",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "成功率與Wilson95%CI；隨干擾增加的退化曲線；retrieval改進另列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不重訓released checkpoint，僅變history；每distractor32stored frames且來自不同family，避免混入相互矛盾資訊。",
+    "lineage": "RoboMME的9-family子集加history規則；非全新9task。",
+    "evidence": [
+      {
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "locator": "§3–5、表1–3",
+        "supports": "9/16、450、history條件與系統網格"
+      }
+    ],
+    "unresolved": [
+      "原始RoboMME benchmark須獨立登記檢查；跨history條件query IDs應保留父關係。"
+    ],
+    "reuse": "展示規則擴充可增加可評条件而不改語義task數；記憶干擾可做本庫共通延伸。",
+    "reviewed_pdf_sha256": "95baa91cdd2a1d6c0791a31627a8daee1d9e9ff70d58d60e76f53e4e3d142c40",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboMME-Interference",
+    "year": 2026,
+    "title": "RoboMME-Interference: Benchmarking Robot Memory Under Interference",
+    "source_url": "https://arxiv.org/abs/2606.22338",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P115",
+      "summary": "依示範選物、搬方塊、重畫路徑與插栓，歸入通用作業復現與装配基礎作業。",
+      "evidence": [
+        {
+          "paper_id": "P115",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            2,
+            3
+          ],
+          "locator": "§3、Table 1",
+          "observed_tasks": [
+            "VideoRepick／VideoPlaceOrder／VideoUnmask",
+            "MoveCube／PatternLock／RouteStick"
+          ],
+          "reasoning": "把記憶測驗還原成要完成的選物、搬運、路徑與操作步驟。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "95baa91cdd2a1d6c0791a31627a8daee1d9e9ff70d58d60e76f53e4e3d142c40"
+        },
+        {
+          "paper_id": "P115",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            3
+          ],
+          "locator": "Table 1",
+          "observed_tasks": [
+            "InsertPeg：記住哪個插栓及如何插入"
+          ],
+          "reasoning": "插栓目標提供装配用途的直接任務例子。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "95baa91cdd2a1d6c0791a31627a8daee1d9e9ff70d58d60e76f53e4e3d142c40"
+        }
+      ],
+      "domain_ids": [
+        "general",
+        "industry"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "95baa91cdd2a1d6c0791a31627a8daee1d9e9ff70d58d60e76f53e4e3d142c40",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P115",
+      "name": "RoboMME-Interference",
+      "expected_title": "RoboMME-Interference: Benchmarking Robot Memory Under Interference",
+      "source_url": "https://arxiv.org/abs/2606.22338",
+      "pdf_url": "https://arxiv.org/pdf/2606.22338",
+      "retrieved_at": "2026-10-02T21:34:20.705268+00:00",
+      "pdf_sha256": "95baa91cdd2a1d6c0791a31627a8daee1d9e9ff70d58d60e76f53e4e3d142c40",
+      "text_sha256": "69a95e6b0f6d590604f2b91fc4036e5a67f031c82cf828f73295dac7dafd8a8c",
+      "pdf_bytes": 404665,
+      "pages": 9,
+      "text_characters": 35260,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.22338v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.22338v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "適用的原task families",
+        "pages": [
+          2,
+          3
+        ],
+        "record_id": "review10:P115:1",
+        "paper_id": "P115",
+        "benchmark": "RoboMME-Interference",
+        "native_term": "適用的原task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.22338v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.22338v3",
+            "locator": "PDF pp. 2, 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 450,
+        "unit": "基底test episodes",
+        "qualifier": "9×50",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P115:2",
+        "paper_id": "P115",
+        "benchmark": "RoboMME-Interference",
+        "native_term": "基底test episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.22338v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.22338v3",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 25200,
+        "unit": "核心grid policy rollouts",
+        "qualifier": "450×(11×5+1)，由協定推算",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P115:3",
+        "paper_id": "P115",
+        "benchmark": "RoboMME-Interference",
+        "native_term": "核心grid policy rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.22338v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.22338v3",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "SoumilRathi/robomme-interference"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,361 @@
+{
+  "paper_id": "P181",
+  "name": "RoboFolDeX",
+  "title": "RoboFolDeX: A Physical-World Benchmark for Long-Horizon Robotic Manipulation of Deformable Objects",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.10243",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "garment"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P181",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "identity_note": "RoboFolDeX 指 Chenhuan Liu、Yi Xu 等的 arXiv:2609.10243v2，機構為 Fudan／Midea／CMU。PDF第1頁給出的第一方平臺為 ai.midea.com/#/fold-challenge。FoldChallenge 是這篇的實體評測平臺名稱，不是可據以自動推定的 GitHub owner/repo。",
+    "summary": "完成 pinned PDF、GitHub 搜尋快取與官方 challenge 頁的限量身分查找，仍未確認作者授權的公開程式倉庫或資料 reader。保留長時程實體折衣任務、人工品質評分與 FoldScore 的論文規格；不以其他 cloth benchmark 或通用VLA程式替代。",
+    "paper_reading_order": [
+      {
+        "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+        "json_pointers": [
+          "/0/text",
+          "/2/text"
+        ],
+        "why": "精確作者／論文身分、FoldChallenge來源與版本中的匿名化殘留說明。"
+      },
+      {
+        "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+        "json_pointers": [
+          "/3/text",
+          "/4/text"
+        ],
+        "why": "任務與觀測／action語義、四種資料重用track、評分公式。"
+      },
+      {
+        "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+        "json_pointers": [
+          "/5/text",
+          "/6/text",
+          "/7/text",
+          "/8/text"
+        ],
+        "why": "30次實體trial／人工評審協定、局部task baseline不可比，以及PDF結尾未附rubric。"
+      }
+    ],
+    "discovery_evidence": [
+      {
+        "source_file": "audit/.cache/github_review/P181-discovery.json",
+        "json_pointers": [
+          "/candidates"
+        ],
+        "finding": "PDF只找到自己的arXiv與Midea FoldChallenge，無GitHub超連結。"
+      },
+      {
+        "source_file": "audit/.cache/github_review/search/P181.json",
+        "json_pointers": [
+          "/query",
+          "/receipt",
+          "/total_count",
+          "/results"
+        ],
+        "finding": "2026-10-10 GitHub repositories搜尋RoboFolDeX回200、total_count=0；不等同證明全網不存在。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/P181-bounded-web-discovery.json",
+        "json_pointers": [
+          "/queries",
+          "/returned_primary_pages",
+          "/finding"
+        ],
+        "finding": "2026-10-11兩個精確網頁查詢只建立原論文來源，未找到可確認的作者repo。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/challenge.html",
+        "ranges": [
+          [
+            1,
+            14
+          ]
+        ],
+        "finding": "官方HTML回200，但只是載入index.D-y8NsRs.js的SPA外殼，不能據此斷言平台沒有登入後資料或程式。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/index.D-y8NsRs.js.receipt.json",
+        "json_pointers": [
+          "/requested_url",
+          "/status"
+        ],
+        "finding": "第一方JS超過本輪512 KiB小文字上限，結果over_size_limit；停止擴大抓取。這是bounded discovery限制，不是404、429或repo不存在。"
+      }
+    ],
+    "environment": "真實雙臂長時程衣物整理，從籃中取衣、桌面翻轉／攤平、多次折疊到最後放置／堆疊。資料涵蓋桌面／家庭場景與照明、背景、layout變化；論文列Aloha、YAM、Piper、Astribot、Franka、UR5、自研移動雙臂、AgiBot G2等，10+是宣稱的embodiment規模，未取得完整registry。",
+    "tasks": "主題是衣物折疊，參考實驗分Shirt、Skirt、Pants、Towel；完整資料另外含其他deformable及少量rigid任務。20+是論文來源層task宣稱，不是已枚舉的可執行task數。四個track為recovery-data utilization、cross-task、cross-scene、cross-embodiment；它們是訓練／轉移協定，不另計為四項操作技能。",
+    "data": "論文宣稱2,000+小時真實robot trajectories。觀測為兩腕相機+外部workspace相機RGB、自然語言指令、proprioception；action為未來end-effector pose trajectory。論文描述共用metadata語義：task、object category/instance、scene、embodiment、operator、data source、completion及failure/termination reason；本輪未取得實際檔名／keys、action維度與座標系、時間頻率或split名冊，因此不能將這些概念冒寫成已驗證JSON schema。hours、tasks、robot embodiments與episode/case數分開，case總數保持未知。",
+    "evaluation": "論文標準完整episode需無人工介入且無不可恢復失敗，通常每衣物類別30次獨立實體trials、初態隨機化；品質由至少兩名相同評審跨方法獨立評定，達成一致才記錄。neatness等級0–5檢視形狀、緊密、平整、穩定與邊緣；FoldScore=35×平均正規化品質Q̄+35×完整success rate R+30×max(0,1−t/Tmax)，t只在成功trials平均，無成功時時間項為0。PDF稱quality mapping及細rubric在Appendix，但固定版本共9頁、第8–9頁為references，未附該表；Tmax也未給數值。故不能自行用neatness/5或任意時限做『官方scorer』。π0.5的pre-flattened短流程baseline與basket-to-stack完整流程須分開。",
+    "standardization": {
+      "profile": "paper_specified_physical_garment_folding_with_hosted_evaluation",
+      "reuse": "已明確的實體任務流程、四track設計、observations/action的語義、0–5品質尺度及FoldScore公式。",
+      "transform": "source記PDF v2與FoldChallenge第一方平臺；environment保存實體硬體／相機／場景；task保存衣物類別與完整或局部流程；case待原生trial/garment instance/init metadata公開後建立。evaluator先標人工評分及paper_specified_formula，品質／success／成功trial時間三項分存，資料重用track保留訓練來源與target embodiment。",
+      "missing": "作者確認的程式repo、可檢驗reader/schema、公開資料manifest／授權／split、完整品質rubric及Q映射、Tmax、submission/execution介面與實體trial結果。SPA大型JS及可能需互動的頁面內容本輪未展開，平臺『operational』僅依論文聲明。"
+    },
+    "version_note": "以2026-09-18 v2 PDF為準；第3頁仍稱review期間省略access links，與首頁已列Midea網址並存，不能據此補猜程式網址。無repo commit可記；各PDF/搜尋/HTML/HTTP receipt均記本地SHA256及read範圍。未執行JS、提交policy、聯絡作者或下載模型／資料。",
+    "integration_issues": [
+      "主binding維持未確認repo；不要以FoldChallenge同名搜尋結果或其他折衣倉庫補位。",
+      "FoldScore的Q映射／Tmax缺件，暫只可編目描述，不能標成可執行scorer。",
+      "2,000+小時／20+tasks／10+embodiments與四類參考實驗、30次trial、未知episode總數須分開。"
+    ],
+    "runtime_executed": false,
+    "reading_order": [],
+    "review_sha256": "743c54a828945b4df29cf0c23c9d2b9613a913fae3a59267a5e6821bc368ae19"
+  },
+  "repository_binding_review_sha256": "743c54a828945b4df29cf0c23c9d2b9613a913fae3a59267a5e6821bc368ae19",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "居家整理與清潔",
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P181",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboFolDeX，arXiv 2609.10243v2。",
+    "scope_read": "資料來源、四track、完整摺疊流程、30實機回合及FoldScore。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "衣物與洗護"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "多個真實robot平台/場景，10+embodiments；精確獨立工作站數未報。",
+    "tasks": "資料20+tasks；主摺疊評測4類衣物Shirt/Skirt/Pants/Towel，涵蓋取出、翻整、攤平、摺疊和堆疊。",
+    "cases": "2,000+hours實機資料；主評測每衣物類別30trials，完整workflow須無人工介入。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "real-robot data hours",
+        "qualifier": "下限／2,000+",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "資料task種類",
+        "qualifier": "20+，非全數主評測",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "每衣物類別物理trials",
+        "pages": [
+          5,
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "SR、成功回合時間、0–5neatness由至少2評者一致評分。FoldScore組合品質35%、可靠性35%、速度30%。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人類或模型判讀",
+      "數值誤差與相似度"
+    ],
+    "split": "recovery、cross-task、cross-scene、cross-embodiment四tracks；場景泛化不能只用主4類成績代表。",
+    "lineage": "多robot原始收集與統一格式；長workflow可切subtasks，切片不能再視為獨立長示範。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "Dataset、Benchmark、FoldScore",
+        "supports": "2000+hours、20+tasks、4類/30與判分"
+      }
+    ],
+    "unresolved": [
+      "2,000+hours對應的unique episode IDs及工作站去重需要資料manifest；複合分數權重不是通用難度尺。"
+    ],
+    "reuse": "提供完整衣物處理流程、人工外觀品質與自動成功率並列的設計。",
+    "reviewed_pdf_sha256": "b7760baa843b43e164d224d5132fc13f534cb5e4bd834d7276340ee3f7d65553",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboFolDeX",
+    "year": 2026,
+    "title": "RoboFolDeX: A Physical-World Benchmark for Long-Horizon Robotic Manipulation of Deformable Objects",
+    "source_url": "https://arxiv.org/abs/2609.10243",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "home",
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P181",
+      "domain_ids": [
+        "home",
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P181",
+          "domain_ids": [
+            "home",
+            "garment"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "資料20+tasks；主摺疊評測4類衣物Shirt/Skirt/Pants/Towel，涵蓋取出、翻整、攤平、摺疊和堆疊。",
+            "多個真實robot平台/場景，10+embodiments；精確獨立工作站數未報。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b7760baa843b43e164d224d5132fc13f534cb5e4bd834d7276340ee3f7d65553"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b7760baa843b43e164d224d5132fc13f534cb5e4bd834d7276340ee3f7d65553",
+      "previous_domain_ids": [
+        "home",
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "judge",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P181",
+      "name": "RoboFolDeX",
+      "expected_title": "RoboFolDeX: A Physical-World Benchmark for Long-Horizon Robotic Manipulation of Deformable Objects",
+      "source_url": "https://arxiv.org/abs/2609.10243",
+      "pdf_url": "https://arxiv.org/pdf/2609.10243",
+      "retrieved_at": "2026-10-02T21:34:48.042305+00:00",
+      "pdf_sha256": "b7760baa843b43e164d224d5132fc13f534cb5e4bd834d7276340ee3f7d65553",
+      "text_sha256": "91b5bfd4395b676d5df94d80c7dcc183753c9f504126bb2557a383b67774cc1c",
+      "pdf_bytes": 9164057,
+      "pages": 9,
+      "text_characters": 59168,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.10243v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.10243v2"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "real-robot data hours",
+        "qualifier": "下限／2,000+",
+        "pages": [
+          1,
+          4
+        ],
+        "record_id": "review10:P181:1",
+        "paper_id": "P181",
+        "benchmark": "RoboFolDeX",
+        "native_term": "real-robot data hours",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.10243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.10243v2",
+            "locator": "PDF pp. 1, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "資料task種類",
+        "qualifier": "20+，非全數主評測",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P181:2",
+        "paper_id": "P181",
+        "benchmark": "RoboFolDeX",
+        "native_term": "資料task種類",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.10243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.10243v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "每衣物類別物理trials",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P181:3",
+        "paper_id": "P181",
+        "benchmark": "RoboFolDeX",
+        "native_term": "每衣物類別物理trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.10243v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.10243v2",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

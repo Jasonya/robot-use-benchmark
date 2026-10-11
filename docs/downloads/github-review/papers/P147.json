@@ -1,0 +1,308 @@
+{
+  "paper_id": "P147",
+  "name": "HRIBench",
+  "title": "HRIBench: Benchmarking Interaction-Centric Human-Robot Collaboration",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2607.13056",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "assistance"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P147",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "此篇2026 HRIBench研究互動型人機協作，與2025年的同名感知benchmark不同；目前核對的原文與搜尋未確認其官方程式庫。",
+    "environment": "論文設計動態人類、物件與robot共處的模擬互動場景；可變layout/人類動作/時序/視角，尚無取得的scene asset或instance manifest。",
+    "tasks": "論文p4分Instructor、Collaborator、Intruder三角色，13個task，每task超過50trajectory variants，合計超過650episode；數量屬論文聲明。",
+    "data": "論文scenario script將每個act寫為(role,goal,temporal/causal constraints,human-motion distribution,reward/success)。生成經腳本、場景、motion synthesis與simulation filtering；尚未取得序列/標註與可解析schema。",
+    "evaluation": "論文p5列Effectiveness(CSR/CT/IR)、Coordination(TSync/Rsp/OC)、Safety/robustness(CFR/HCS/CIR/DSR)；未取得對應實作，因此只作原作協定記錄，不宣稱已跑或可直接整合。",
+    "standardization": {
+      "profile": "interaction_centric_human_robot_collaboration",
+      "reuse": "角色/互動腳本分解、13任務與650+episode的原作規模及多維評估構想。",
+      "transform": "task保存人類角色/目標/允許介入，case固定motion/timing seed；每個指標指向其原文公式和未來scorer；不可合併P168同名HRIBench。",
+      "missing": "官方repo/資料入口、13task清單與case manifest、成功/安全/恢復checker、生成資產與執行重現。"
+    },
+    "version_note": "核對2607.13056v1及cached exact-title/HRIBench搜尋；命中interaction-lab/HRIBench對應另一篇2025感知工作，未作此篇實作。no_confirmed_code_repository是本次有界查核結果。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2607.13056",
+      "pdf_sha256": "d779bea84ddd0cbca254797e628b09dbf95118efa086cfe333dd6156a4a2ded2",
+      "paper_pages_read": [
+        4,
+        5
+      ],
+      "search_receipts": [
+        "audit/.cache/github_review/search/P147-refined.json",
+        "audit/.cache/github_review/search/P147.json"
+      ],
+      "scope": "Primary paper and cached discovery; no code implementation confirmed"
+    },
+    "identity_note": "P147是Interaction-Centric Human-Robot Collaboration；P168是2025 robot perception，兩者保留不同source ID。",
+    "reading_order": [],
+    "review_sha256": "6c855577aeec7bafbff0dd5d49e6ce3179e8ce6099efb309d9e78b649f592f1c"
+  },
+  "repository_binding_review_sha256": "6c855577aeec7bafbff0dd5d49e6ce3179e8ce6099efb309d9e78b649f592f1c",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P147",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HRIBench interaction-centric，arXiv 2607.13056v1；與USC2025感知HRIBench不同。",
+    "scope_read": "role scripts、13tasks、786過濾池、50/10真實split与coordination metrics。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "協助、交接與陪伴"
+    ],
+    "role": "對話協作與任務完成",
+    "environment": "Franka simulation結合合成人類骨架/trajectory；候選由2K生成並篩。",
+    "tasks": "13 role-conditioned tasks；Instructor／Collaborator／Intruder三角色。",
+    "cases": "2,000候選中786通過；正文實驗每task50adaptation+10held-out，因此650adaptation／130held-out。摘要『>650 evaluation episodes』不等於主實測test量。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 13,
+        "unit": "role-conditioned tasks",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 786,
+        "unit": "驗證trajectory pool",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 650,
+        "unit": "adaptation trajectories",
+        "qualifier": "13×50",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 130,
+        "unit": "主held-out eval trajectories",
+        "qualifier": "13×10",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "CSR/time/idle、temporal sync/latency/order、collision/contact/contradiction/disruption；partial安全summary需按適用component。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "固定policy無關Intruder擾動時序；real3task各10trials，只是adaptation驗證。",
+    "lineage": "生成scripts/human motion並sim驗證；兩個同名HRIBench不得合成同一來源或版本。",
+    "related_paper_ids": [
+      "P168"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3–5、表2–3",
+        "supports": "13/786、50+10、指標及real範圍"
+      }
+    ],
+    "unresolved": [
+      "786與13×60=780剩6條用途未明，需manifest；摘要650eval與正文130held-out須分列。"
+    ],
+    "reuse": "加入等待、同步、角色及干預恢復規則；数据候選通過不等於全部是test。",
+    "reviewed_pdf_sha256": "d779bea84ddd0cbca254797e628b09dbf95118efa086cfe333dd6156a4a2ded2",
+    "reviewed_on": "2026-10-02",
+    "name": "HRIBench",
+    "year": 2026,
+    "title": "HRIBench: Benchmarking Interaction-Centric Human-Robot Collaboration",
+    "source_url": "https://arxiv.org/abs/2607.13056",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "assistance"
+    ],
+    "review_tags": [
+      "人機協作",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P147",
+      "summary": "按人的指令、時機和動作完成協作，涵蓋交接、同步、讓行及受干預後續作。",
+      "evidence": [
+        {
+          "paper_id": "P147",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            3,
+            4
+          ],
+          "locator": "§3 Benchmark Design／Scope and Task Relevance",
+          "observed_tasks": [
+            "Instructor／Collaborator／Intruder角色",
+            "handover timing、shared-object synchronization、yielding、recovery"
+          ],
+          "reasoning": "以明確的人際協作目標歸類，並保留13項任務的角色差異。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "d779bea84ddd0cbca254797e628b09dbf95118efa086cfe333dd6156a4a2ded2"
+        }
+      ],
+      "domain_ids": [
+        "assistance"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d779bea84ddd0cbca254797e628b09dbf95118efa086cfe333dd6156a4a2ded2",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P147",
+      "name": "HRIBench",
+      "expected_title": "HRIBench: Benchmarking Interaction-Centric Human-Robot Collaboration",
+      "source_url": "https://arxiv.org/abs/2607.13056",
+      "pdf_url": "https://arxiv.org/pdf/2607.13056",
+      "retrieved_at": "2026-10-02T21:34:28.990532+00:00",
+      "pdf_sha256": "d779bea84ddd0cbca254797e628b09dbf95118efa086cfe333dd6156a4a2ded2",
+      "text_sha256": "ea0cb2a7ee55b0f5bf430700ea50f92f7bc89daf0e9a55da4c5419aea516e777",
+      "pdf_bytes": 3375293,
+      "pages": 11,
+      "text_characters": 43115,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2607.13056v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2607.13056v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 13,
+        "unit": "role-conditioned tasks",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P147:1",
+        "paper_id": "P147",
+        "benchmark": "HRIBench",
+        "native_term": "role-conditioned tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.13056v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.13056v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 786,
+        "unit": "驗證trajectory pool",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P147:2",
+        "paper_id": "P147",
+        "benchmark": "HRIBench",
+        "native_term": "驗證trajectory pool",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.13056v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.13056v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 650,
+        "unit": "adaptation trajectories",
+        "qualifier": "13×50",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P147:3",
+        "paper_id": "P147",
+        "benchmark": "HRIBench",
+        "native_term": "adaptation trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.13056v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.13056v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 130,
+        "unit": "主held-out eval trajectories",
+        "qualifier": "13×10",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P147:4",
+        "paper_id": "P147",
+        "benchmark": "HRIBench",
+        "native_term": "主held-out eval trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.13056v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.13056v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

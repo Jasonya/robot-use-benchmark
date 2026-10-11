@@ -1,0 +1,150 @@
+{
+  "paper_id": "P016",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "IKEA ASM 的 GitHub 包含影片／姿態／零件處理工具與多項視覺 baseline。本次核讀動作資料庫、片段轉 frame 和具體評分，另確認 tracking 入口依賴 MOT evaluator。",
+  "reading_order": [
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "README.md",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "ranges": [
+        [
+          1,
+          78
+        ]
+      ],
+      "why": "精確論文身份、多模態資產與子任務"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/README.md",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "ranges": [
+        [
+          1,
+          64
+        ]
+      ],
+      "why": "baseline 輸入與原生 split"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/IKEAActionDataset.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "ranges": [
+        [
+          22,
+          100
+        ],
+        [
+          160,
+          226
+        ],
+        [
+          310,
+          346
+        ]
+      ],
+      "why": "SQLite、字典排序、frame labels 與相機"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/evaluation/evaluate.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "ranges": [
+        [
+          1,
+          112
+        ]
+      ],
+      "why": "實際指標與聚合"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/evaluation/eval_utils.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "ranges": [
+        [
+          1,
+          92
+        ]
+      ],
+      "why": "top-k、tIoU 與 AP 核心公式"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "part-tracking/eval.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "why": "MOT 子任務入口"
+    }
+  ],
+  "environment": "人類組裝 IKEA 傢俱的多視角 RGB/depth 影片；scan_path 與 dev1/dev2/dev3 相機分開，預設 train_cross_env/test_cross_env 是來源切分條件。",
+  "tasks": "原子動作辨識與時間定位、人體姿態、零件分割／追蹤。frame/clip/pose-based 是模型輸入方式，不是三批新任務。背景 NA 不算傢俱組裝任務。",
+  "data": "SQLite videos/annotations 表以 video_id 關聯；indexing_files 的動作與動作物件關係共同排序，索引 0 插入 NA。ActivityNet 外形 JSON 的 database/annotation 或 results 內 segment 在此 loader 直接切 current_labels[start:end]，實際為 frame index，不能因格式名稱就當秒。",
+  "evaluation": "動作 evaluator 對每影片先算 frame top-1/top-3 和 balanced accuracy 再平均，並呼叫 ANET detection/classification AP。tIoU 閾值為 .1,.2,.3,.4,.5,.55 至 .95；eval_utils 以真正交集／聯集及 interpolated P/R 積分。tracking 入口採 dev3 的 MOT 格式並呼叫 motmetrics，細部 matching 尚未完整核讀。",
+  "standardization": {
+    "profile": "multiview_assembly_perception",
+    "reuse": "SQLite／split 索引、動作字典、frame segment 轉換及原生動作評分流程。",
+    "transform": "scan→camera→frame 建來源關聯，任務字典保留排序與 NA。case 記原始 frame 邊界與相機、輸出 logits 和片段分數；每影片平均與全 frame pooled 的統計分開，pose/tracking 另建 evaluator。",
+    "missing": "尚未取得 SQLite、影片、校準與標註或執行。姿態、分割與完整 MOT matching 需後續獨立 adapter。README 的 evaluate 路徑與 tree 中 evaluation 不同；入口解析 testset_filename 但建立 Dataset 時未顯式傳入，需確認實際 split 生效方式。"
+  },
+  "version_note": "倉庫解析名稱為 IkeaASM/IKEA_ASM_Dataset；README 保留早期 dev wording，但已存在實際處理／評分程式，不能標為只有計畫。物理組裝成功不由影格辨識 accuracy 證明。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "README.md",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "sha256": "f25497d46f4119f1d6e5a2a85ee3be62929eab6c610500f86b1bf4301b4dcdc6",
+      "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/README.md",
+      "local_file": "audit/.cache/github_review/repos/IkeaASM__ikea_asm_dataset/files/README.md"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/README.md",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "sha256": "4cad8127448f0913a23ca9c071c55635e4b71296614b29792828f4c1293674b9",
+      "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/README.md",
+      "local_file": "audit/.cache/github_review/repos/IkeaASM__ikea_asm_dataset/files/action/README.md"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/IKEAActionDataset.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "sha256": "8178c0f321230af92f716986b2eb4f5367b28cff9e4cf73bb962b3793ed92ea1",
+      "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/IKEAActionDataset.py",
+      "local_file": "audit/.cache/github_review/repos/IkeaASM__ikea_asm_dataset/files/action/IKEAActionDataset.py"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/evaluation/evaluate.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "sha256": "0f0419c4c8a143355691989b88a75598074d64ce8261774c93c297746b71bc87",
+      "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/evaluation/evaluate.py",
+      "local_file": "audit/.cache/github_review/repos/IkeaASM__ikea_asm_dataset/files/action/evaluation/evaluate.py"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "action/evaluation/eval_utils.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "sha256": "ec04d8f2fb74f5da5e5557668add377e002a39231ab4db3761424f9574c7e6e2",
+      "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/evaluation/eval_utils.py",
+      "local_file": "audit/.cache/github_review/repos/IkeaASM__ikea_asm_dataset/files/action/evaluation/eval_utils.py"
+    },
+    {
+      "repo": "IkeaASM/ikea_asm_dataset",
+      "path": "part-tracking/eval.py",
+      "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+      "sha256": "ef4ef2978e92139a3841c5879f7d67214609861b616d93f6515fb68d04c35342",
+      "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/part-tracking/eval.py",
+      "local_file": "audit/.cache/github_review/repos/IkeaASM__ikea_asm_dataset/files/part-tracking/eval.py"
+    }
+  ]
+}

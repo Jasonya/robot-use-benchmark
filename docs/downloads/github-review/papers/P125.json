@@ -1,0 +1,464 @@
+{
+  "paper_id": "P125",
+  "name": "Open X-Embodiment",
+  "title": "Open X-Embodiment: Robotic Learning Datasets and RT-X Models",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2310.08864",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P125",
+    "summary": "Open X-Embodiment提供共用RLDS容器與資料讀取示例；相同tensor形狀並不自動統一不同機體動作的物理意義，父資料集也不能重複計數。",
+    "environment": "聚合多來源、多機體的robot episodes，包括Bridge、RoboNet等；每個子資料原有場景和授權/版本，OXE不是額外一份完全獨立的環境資料。",
+    "tasks": "主要是跨機體訓練資料與RT-X方法；不能把資料集數、機體數、skill labels和實際評測題數互換。",
+    "data": "RLDS episode含steps，notebook以TFDS builder從固定dataset/version讀取。Kuka示例拼world_vector/rotation_delta/gripper_closedness_action，Mutex直接取action；影像resize128。另一例保留is_first/is_last/is_terminal且只對齊影像，並未對齊所有action語義。",
+    "evaluation": "倉庫讀取／混合示例和RT-1-X inference不是覆蓋全部子資料的通用成功checker。README指出7個控制變量可能是absolute/delta/velocity；相等TensorSpec只是形狀檢查。tf.data.repeat重複採樣不增加獨立資料；train[:10]也是示例subset。",
+    "standardization": {
+      "profile": "cross_embodiment_episode_container",
+      "reuse": "RLDS episode/step結構、子資料dataset/version引用與來源引用規則。",
+      "transform": "source維持OXE→子dataset→原episode lineage，case保留子來源ID與split；另補ActionSpec的座標/單位/absolute-delta-velocity/夾爪約定及task-specific evaluator。",
+      "missing": "全子資料素材與精確manifest、跨來源重複episode、任務語義對齊、共同測試split與各機體可執行成功判定。"
+    },
+    "version_note": "固定9eeb68b；README的3Hz/單workspace RGB是RT-1-X模型接口，不代表所有OXE資料的原採樣率和可見模態。Notebook source cells與輸出分開核讀。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "google-deepmind/open_x_embodiment",
+        "requested_repo": "google-deepmind/open_x_embodiment",
+        "commit": "9eeb68b989efbcf474e8fb9019e01d02b962a604",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            37
+          ],
+          [
+            45,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 73,
+        "sha256": "e7dbf6bb04559e981b7eab2e0f4510579bf82b09948a0fe6471ba1794f86ae59",
+        "url": "https://github.com/google-deepmind/open_x_embodiment/blob/9eeb68b989efbcf474e8fb9019e01d02b962a604/README.md",
+        "reading_url": "https://github.com/google-deepmind/open_x_embodiment/blob/9eeb68b989efbcf474e8fb9019e01d02b962a604/README.md#L1-L37",
+        "why": "資料聚合角色、RLDS、RT-1-X輸入與native action差異",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-deepmind/open_x_embodiment",
+        "requested_repo": "google-deepmind/open_x_embodiment",
+        "commit": "9eeb68b989efbcf474e8fb9019e01d02b962a604",
+        "ref": null,
+        "path": "colabs/Open_X_Embodiment_Datasets.ipynb",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/cells/5/source",
+          "/cells/7/source",
+          "/cells/13/source",
+          "/cells/16/source",
+          "/cells/17/source",
+          "/cells/26/source",
+          "/cells/34/source",
+          "/cells/35/source"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/cells/5/source",
+            "selected_value_sha256": "c05f1d206ae3e0f0d7e9b6f103e59eac2e4215c1450a4a9d7282f97acffc11f1"
+          },
+          {
+            "pointer": "/cells/7/source",
+            "selected_value_sha256": "0c2b12b9e49e90e7d8096980b070f6da1a2bf10fe8e3b3a7cbcce8190689bc94"
+          },
+          {
+            "pointer": "/cells/13/source",
+            "selected_value_sha256": "ecc8e89283f12a91e81808fb9976988826d111d9e6dfd285299243396a731516"
+          },
+          {
+            "pointer": "/cells/16/source",
+            "selected_value_sha256": "7b55c7f27078a063a45e2a082496206dda979465e6257b211d45c54d9f1d5a5f"
+          },
+          {
+            "pointer": "/cells/17/source",
+            "selected_value_sha256": "d52070a211a17d304cdff2d5492e11c201fa633072fe6c0b7536eb3e611f301e"
+          },
+          {
+            "pointer": "/cells/26/source",
+            "selected_value_sha256": "f3093a50b2c2658455e9692ebe307a5303d432a11aa99a0a5921d30d825da54d"
+          },
+          {
+            "pointer": "/cells/34/source",
+            "selected_value_sha256": "a77a4f9180038aa431e78694e5cbc4f78b0393bbe01b4b78dadd34f8f9dac473"
+          },
+          {
+            "pointer": "/cells/35/source",
+            "selected_value_sha256": "0c7d8f32d8d10d84cb5406caa505d7208e7184e6cadadc9d2b7026bcf2f1fc17"
+          }
+        ],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1850,
+        "sha256": "07a018e72fb100daa19c6e1422e0a26daeaffb26050bd8ab0a08037bd20b8eb3",
+        "url": "https://github.com/google-deepmind/open_x_embodiment/blob/9eeb68b989efbcf474e8fb9019e01d02b962a604/colabs/Open_X_Embodiment_Datasets.ipynb",
+        "reading_url": "https://github.com/google-deepmind/open_x_embodiment/blob/9eeb68b989efbcf474e8fb9019e01d02b962a604/colabs/Open_X_Embodiment_Datasets.ipynb",
+        "why": "只讀列出的code cells：資料版本、Kuka/Mutex讀取與軌跡容器；未讀大型嵌入輸出或執行notebook",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "1cd674ca3954cf17c2a4a27860437467d8ae21c73a47d384c40cf529bbd768b9"
+  },
+  "repository_binding_review_sha256": "1cd674ca3954cf17c2a4a27860437467d8ae21c73a47d384c40cf529bbd768b9",
+  "repository_bindings": [
+    {
+      "requested_repo": "google-deepmind/open_x_embodiment",
+      "resolved_repo": "google-deepmind/open_x_embodiment",
+      "aliases_in_this_review": [
+        "google-deepmind/open_x_embodiment"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "9eeb68b989efbcf474e8fb9019e01d02b962a604",
+          "reviewed_files": [
+            "README.md",
+            "colabs/Open_X_Embodiment_Datasets.ipynb"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/google-deepmind/open_x_embodiment",
+          "link_label": "the github repo",
+          "project_url": "https://robotics-transformer-x.github.io",
+          "page_sha256": "cfc69260794ec363d14bf899ac9ec38013c09727215a52a037add457aeb4b02b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/google-deepmind/open_x_embodiment",
+          "link_label": "Code",
+          "project_url": "https://robotics-transformer-x.github.io",
+          "page_sha256": "cfc69260794ec363d14bf899ac9ec38013c09727215a52a037add457aeb4b02b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P125",
+          "review_file": "content/github_review/reviews/P125.json",
+          "review_sha256": "1cd674ca3954cf17c2a4a27860437467d8ae21c73a47d384c40cf529bbd768b9",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P125",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Open X-Embodiment: Robotic Learning Datasets and RT-X Models；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      6
+    ],
+    "role": "跨資料集整合與評測方法",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業"
+    ],
+    "environment": "60來源datasets、22embodiments；場所數由各dataset metadata而來，非60新環境。",
+    "tasks": "結論報527skills／160,266tasks；方法用語言抽取skills，不能直接當160,266正規化goal definitions。",
+    "cases": "1M+robottrajectories；主RT-X混合只選9manipulators，非全22都等量實測。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 60,
+        "unit": "pooled source datasets（本PDF版本）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 22,
+        "unit": "robot embodiments",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 527,
+        "unit": "作者報告skills",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 160266,
+        "unit": "作者報告tasks，語言語義去重待核",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "跨robot實機tasksuccess、OOD／emergent skills與移除Bridge對照。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同experiment的hosttask/robot子集不同；dataset-wide規模與policy實測範圍分開。",
+    "lineage": "整合既有datasets到RLDS；不統一所有action坐標，absolute/relative/velocity仍可能不同。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "160,266的逐task IDs與同義/粒度規則未在已讀段完備；21institutions／34labs的口徑也需保留。"
+    ],
+    "reuse": "all-in-one最重要對照之一：我們不能以合併資料夾或粗7Dactionformat宣稱首次通用benchmark。",
+    "reviewed_pdf_sha256": "13f16aff5afdee583dc25b3c570e9bb0cf6baefb59b539928d919588cd8d9246",
+    "reviewed_on": "2026-10-02",
+    "name": "Open X-Embodiment",
+    "year": 2023,
+    "title": "Open X-Embodiment: Robotic Learning Datasets and RT-X Models",
+    "source_url": "https://arxiv.org/abs/2310.08864",
+    "primary_type": "G",
+    "category_name": "機器人資料與通用策略",
+    "domain_ids": [
+      "home",
+      "food",
+      "general"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "工具使用",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P125",
+      "domain_ids": [
+        "home",
+        "food",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P125",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "結論報527skills／160,266tasks；方法用語言抽取skills，不能直接當160,266正規化goal definitions。",
+            "60來源datasets、22embodiments；場所數由各dataset metadata而來，非60新環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "13f16aff5afdee583dc25b3c570e9bb0cf6baefb59b539928d919588cd8d9246"
+        },
+        {
+          "paper_id": "P125",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "多機體、技能與物件的通用robot作業資料整合。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "13f16aff5afdee583dc25b3c570e9bb0cf6baefb59b539928d919588cd8d9246"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "13f16aff5afdee583dc25b3c570e9bb0cf6baefb59b539928d919588cd8d9246",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P125",
+      "name": "Open X-Embodiment",
+      "expected_title": "Open X-Embodiment: Robotic Learning Datasets and RT-X Models",
+      "source_url": "https://arxiv.org/abs/2310.08864",
+      "pdf_url": "https://arxiv.org/pdf/2310.08864",
+      "retrieved_at": "2026-10-02T22:13:45.379623+00:00",
+      "pdf_sha256": "13f16aff5afdee583dc25b3c570e9bb0cf6baefb59b539928d919588cd8d9246",
+      "text_sha256": "fe670efc41faef029ead44495377aec6d12941048bddd0cbe376da7b33bab06b",
+      "pdf_bytes": 4011306,
+      "pages": 12,
+      "text_characters": 90716,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2310.08864v9",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2310.08864v9"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 60,
+        "unit": "pooled source datasets（本PDF版本）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P125:1",
+        "paper_id": "P125",
+        "benchmark": "Open X-Embodiment",
+        "native_term": "pooled source datasets（本PDF版本）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.08864v9",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.08864v9",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 22,
+        "unit": "robot embodiments",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P125:2",
+        "paper_id": "P125",
+        "benchmark": "Open X-Embodiment",
+        "native_term": "robot embodiments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.08864v9",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.08864v9",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 527,
+        "unit": "作者報告skills",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P125:3",
+        "paper_id": "P125",
+        "benchmark": "Open X-Embodiment",
+        "native_term": "作者報告skills",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.08864v9",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.08864v9",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 160266,
+        "unit": "作者報告tasks，語言語義去重待核",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P125:4",
+        "paper_id": "P125",
+        "benchmark": "Open X-Embodiment",
+        "native_term": "作者報告tasks，語言語義去重待核",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.08864v9",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.08864v9",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "google-deepmind/open_x_embodiment"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,622 @@
+{
+  "paper_id": "P080",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "DexArt已追到四個具體RL task的state／success、底層contact、物件annotation reader與paper評測入口。原生success是episode內曾達is_eval_done的比例；bucket的成功比early_done寬鬆，laptop reset又隨機抽物件，不能將eval_per_instance名稱當每個物件精確等量試驗的證據。",
+  "identity_note": "固定論文為Bao、Xu、Qin、Wang的DexArt: Benchmarking Generalizable Dexterous Manipulation with Articulated Objects，arXiv:2305.05706v1／CVPR 2023。README 1–13和171–176吻合完整題名、作者及arXiv，確認Kami-code/dexart-release為官方模擬環境／訓練程式；不是同名搜尋命中即視為官方。DexPoint及vendored Stable-Baselines3是重用實作。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P080-discovery.json",
+      "selected_json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256"
+      ],
+      "paper_version": "2305.05706v1",
+      "pdf_sha256": "44354c0496a14f9ef90e19cd93f1521075adb6daff5f0a882cc045a649fbff7e",
+      "finding": "論文身份與倉庫README的作者／arXiv精確交叉確認。",
+      "sha256": "bdfbdf99f00b730c31bca4d63ba8f5a9d227e33c3e1aec534bddf19b6b673241",
+      "text_excerpts": [
+        {
+          "json_pointer": "/opening_text",
+          "character_range": [
+            511,
+            548
+          ],
+          "text": "arXiv:2305.05706v1 [cs.RO] 9 May 2023",
+          "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+        }
+      ]
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          35,
+          48
+        ],
+        [
+          110,
+          118
+        ],
+        [
+          165,
+          182
+        ]
+      ],
+      "why": "精確作者／arXiv、外部assets、paper評測入口與DexPoint重用。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/task_setting.py",
+      "ranges": [
+        [
+          8,
+          13
+        ],
+        [
+          20,
+          89
+        ],
+        [
+          116,
+          152
+        ]
+      ],
+      "why": "四task的seen/unseen/half物件ID、相機、點雲與初態隨機化。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/create_env.py",
+      "ranges": [
+        [
+          13,
+          62
+        ]
+      ],
+      "why": "xArm6+Allegro、task dispatch、frame_skip、pc_seg/noise與robot imagination。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/sim_env/laptop_env.py",
+      "ranges": [
+        [
+          13,
+          141
+        ]
+      ],
+      "why": "實際mobility/annotation讀取、hinge辨識、scale、0.004s物理步與隨機object reset。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/rl_env/base.py",
+      "ranges": [
+        [
+          99,
+          139
+        ],
+        [
+          153,
+          176
+        ],
+        [
+          198,
+          229
+        ],
+        [
+          465,
+          482
+        ],
+        [
+          484,
+          544
+        ],
+        [
+          565,
+          595
+        ],
+        [
+          598,
+          646
+        ]
+      ],
+      "why": "控制與觀測callchain、camera→robot點雲、seg_gt、history及TimeLimit標記。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/rl_env/pc_processing.py",
+      "ranges": [
+        [
+          21,
+          73
+        ]
+      ],
+      "why": "過濾／抽樣／padding／noise與xyz+四類mask的真實順序。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/sim_env/base.py",
+      "ranges": [
+        [
+          67,
+          72
+        ],
+        [
+          110,
+          132
+        ]
+      ],
+      "why": "env seed範圍與接觸impulse門檻，而非只用幾何接近。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/rl_env/laptop_env.py",
+      "ranges": [
+        [
+          38,
+          148
+        ]
+      ],
+      "why": "progress公式、兩指加palm接觸、成功／reward／annotation及250步上限。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/rl_env/faucet_env.py",
+      "ranges": [
+        [
+          37,
+          141
+        ]
+      ],
+      "why": "絕對joint角度>1.5rad且接觸，與shaped reward分離。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/rl_env/bucket_env.py",
+      "ranges": [
+        [
+          54,
+          100
+        ],
+        [
+          123,
+          174
+        ],
+        [
+          194,
+          199
+        ]
+      ],
+      "why": "eval與early_done門檻不同、lift高度、reward及僅horizon終止。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "dexart/env/rl_env/toilet_env.py",
+      "ranges": [
+        [
+          56,
+          144
+        ],
+        [
+          164,
+          169
+        ]
+      ],
+      "why": "95% annotation progress與兩指接觸、0.1m近距離判定。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "examples/evaluate_policy.py",
+      "ranges": [
+        [
+          14,
+          81
+        ]
+      ],
+      "why": "總trial迴圈、deterministic PPO、episode任一步成功及最終mean。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "examples/pretrain/generate_dataset.py",
+      "ranges": [
+        [
+          10,
+          45
+        ],
+        [
+          49,
+          103
+        ]
+      ],
+      "why": "random-state點雲樣本與.npy merge reader；不是專家action示範。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "path": "stable_baselines3/common/evaluation.py",
+      "ranges": [
+        [
+          11,
+          35
+        ],
+        [
+          72,
+          131
+        ]
+      ],
+      "why": "通用mean_reward evaluator與paper的success入口不同。",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149"
+    }
+  ],
+  "environment": "SAPIEN articulated objects與xArm6腕接Allegro手；create_env預設frame_skip=10，已讀laptop scene timestep=0.004s，即該配置每control step為0.04s。policy相機64×64，另外1000×1000的viz_only相機不算policy觀測。四task各有point-cloud裁切bound和rand_pos/rand_degree；例如laptop位置擾動為每軸[0,0.1)m、yaw±60度，不是對稱±0.1m。基底pose、物件scale、摩擦、handle與joint annotation都是case重建依賴。",
+  "tasks": "四個原生task labels是faucet、bucket、laptop、toilet；TRAIN_CONFIG的seen/unseen ID數分別11/7、11/8、11/6、17/11（共82個配置中的物件ID），不是82個task或實測episodes。*_half只是訓練物件子集。laptop reader讀assets/sapien/{id}/mobility.urdf與mobility_v2.json的joint欄位，結合annotation/laptop_scale.json、laptop_joint_annotation.json中left/middle及robot-relative position。外部asset包未下載，僅核對程式期待的欄位，未聲稱這些JSON內容已讀。",
+  "data": "BaseRLEnv.step依序控制、update_cached_state、更新robot imagination、讀觀測、算reward與done。action為[-1,1]的robot.dof向量：前六維還原Cartesian速度，Jacobian IK得arm速度並裁至±π，再積分成joint target；後段映射到hand joint位置limits，不能當全向量都是joint velocity。obs含state/oracle_state（所讀laptop為joint qpos+palm線/角速度+位置+step/horizon）、instance_1-point_cloud(512,3)、instance_1-seg_gt(512,4)及imagination_robot。點雲由camera轉robot座標後裁切，少點時重複第一點，空雲補零；四mask順序handle/instance_body/hand/arm。pretrain生成器把512個感知點及96個robot imagination點組成(608,7)樣本，保存{task}/{train|val|test}_{id}.npy，再np.load合併；seen同時產生train與val，unseen產生test。其內容是random-action／random-joint-state感知樣本，不是成功操作軌跡或固定時間同步action標籤。",
+  "evaluation": "入口examples/evaluate_policy.py→create_env→BaseRLEnv.step→task.update_cached_state→sim contact checker。contact以scene contact的sum(abs(impulse))>=1e-2認定。laptop：progress=1-|q-middle|/(|left-middle|-init_open_rad)，需>0.95且palm距handle<=0.2m、至少兩指及palm接觸；toilet相似progress>0.95，但距離<=0.1m、兩指接觸即可。faucet需|hinge qpos|>1.5rad，距離<=0.2m及兩指+palm接觸。bucket eval需progress>0.7且base-link升高>0.25m；early_done則>0.9、state=3及>0.3m，且is_done實際只看250步horizon。四個task的horizon均250；faucet、laptop、toilet在各自成功條件成立時提早結束。主迴圈只要任一步is_eval_done為真就鎖定episode成功，即使bucket之後落下仍記成功。最終印mean(success_list)，shaped reward另累加但不作該成功率。通用SB3 evaluate_policy回mean/std reward，不能替代此入口。",
+  "standardization": {
+    "profile": "articulated_dexterous_simulation_with_pointcloud_pretraining",
+    "reuse": "四task checker、contact門檻、native object ID/split、物件annotation loader、robot/point-cloud觀測profile與episode-any-success聚合。",
+    "transform": "task記動作目標；environment綁SAPIEN、robot、資產/annotation版本；case記task+object ID+split+初態+seed，不以渲染幀或pretrain樣本數當case。evaluator分開is_eval_done、early_done、reward、done、any_step_success及horizon；保留每task不同的角度／progress／接觸與高度門檻。點雲、seg_gt、imagination及可選previous觀測需標示來源與policy可見性。",
+    "missing": "外部assets的URDF、scale、joint left/middle及relative-position JSON尚未閉合或驗證，須固定asset版本／hash。eval_per_instance預設10、README示例100，總數為該值×instance_list長度；但已讀laptop reset用random.randint抽ID，沒有逐ID均衡控制或per-ID結果保存，需記實際抽樣頻數。程式stdout只有總成功率，缺trial明細與失敗／落下後狀態。BaseRLEnv在horizon處因task.is_done已為True而寫TimeLimit.truncated=False，需協調者分離超時與成功，不能把done當成功。"
+  },
+  "version_note": "固定d6ab75e1a0b81384d1ac918cbfd4d97b1f230149（2026-05-11），晚於2023v1；README的2023-11checkpoint發布也晚於論文。所讀門檻只代表此commit；無論文精確experiment lock或assets版本對照，不宣稱重現paper表格。未執行PPO、感知預訓練或SAPIEN。",
+  "runtime_executed": false,
+  "reviewed_on": "2026-10-11",
+  "source_files": [
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/README.md",
+      "sha256": "546e382d8a52d8dce1228a1ffd940928d8453541c3ee475ddeb655faf52d6957",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          35,
+          48
+        ],
+        [
+          110,
+          118
+        ],
+        [
+          165,
+          182
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/task_setting.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/dexart/env/task_setting.py",
+      "sha256": "36328a7f7927eb968975f7947530a4d1e5868b29789d612601d054ced7754541",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/task_setting.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          8,
+          13
+        ],
+        [
+          20,
+          89
+        ],
+        [
+          116,
+          152
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/create_env.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/dexart/env/create_env.py",
+      "sha256": "71267242c37b0e2401e97a051ae0ca101e66bdb8b4f55c2e6bbd2d84c164ab5e",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/create_env.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          13,
+          62
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/sim_env/laptop_env.py",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/sim_env/laptop_env.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/Kami-code__dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/sim_env/laptop_env.py",
+      "sha256": "89cbdeff2d4f504d11842a51940ac841972955eefd9b7dc23b2f98adab90fc56",
+      "lines": 180,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/sim_env/laptop_env.py",
+        "retrieved_at": "2026-10-11T00:19:28.313884+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/sim_env/laptop_env.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 9068,
+        "sha256": "89cbdeff2d4f504d11842a51940ac841972955eefd9b7dc23b2f98adab90fc56"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          13,
+          141
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/rl_env/base.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/dexart/env/rl_env/base.py",
+      "sha256": "341c1f10e212b2e20c67f73d5d56ce937dcee134852c33106194d25cf2c7d4b4",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/base.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          99,
+          139
+        ],
+        [
+          153,
+          176
+        ],
+        [
+          198,
+          229
+        ],
+        [
+          465,
+          482
+        ],
+        [
+          484,
+          544
+        ],
+        [
+          565,
+          595
+        ],
+        [
+          598,
+          646
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/rl_env/pc_processing.py",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/pc_processing.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/Kami-code__dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/pc_processing.py",
+      "sha256": "2ea0ea2ef9e2c80d7a67a0381c435506e2e03e2da583d288b04dccee0b802340",
+      "lines": 79,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/pc_processing.py",
+        "retrieved_at": "2026-10-11T00:19:30.312814+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/pc_processing.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 3586,
+        "sha256": "2ea0ea2ef9e2c80d7a67a0381c435506e2e03e2da583d288b04dccee0b802340"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          21,
+          73
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/sim_env/base.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/dexart/env/sim_env/base.py",
+      "sha256": "c3af8e1f1c81a943d905f9a4294dc8ad829ddf10f7dfda318ddfb56570eec664",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/sim_env/base.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          67,
+          72
+        ],
+        [
+          110,
+          132
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/rl_env/laptop_env.py",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/laptop_env.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/Kami-code__dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/laptop_env.py",
+      "sha256": "f8bd1d57592b6b23633fd523a8b260dcb2f3ce3939aadd9162986f9678862f6d",
+      "lines": 148,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/laptop_env.py",
+        "retrieved_at": "2026-10-11T00:19:22.306561+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/laptop_env.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 6969,
+        "sha256": "f8bd1d57592b6b23633fd523a8b260dcb2f3ce3939aadd9162986f9678862f6d"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          38,
+          148
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/rl_env/faucet_env.py",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/faucet_env.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/Kami-code__dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/faucet_env.py",
+      "sha256": "cb8f0c03883bbdd652df518e4fe21a8847407e516a217c54b79c18f9480bc58a",
+      "lines": 141,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/faucet_env.py",
+        "retrieved_at": "2026-10-11T00:19:23.309857+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/faucet_env.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 6572,
+        "sha256": "cb8f0c03883bbdd652df518e4fe21a8847407e516a217c54b79c18f9480bc58a"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          37,
+          141
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/rl_env/bucket_env.py",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/bucket_env.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/Kami-code__dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/bucket_env.py",
+      "sha256": "2c28f73eca7a2ca05d5a78e9e2375a978791fa0c8274eb0fd88508fccb504f0f",
+      "lines": 199,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/bucket_env.py",
+        "retrieved_at": "2026-10-11T00:19:24.317866+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/bucket_env.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 10060,
+        "sha256": "2c28f73eca7a2ca05d5a78e9e2375a978791fa0c8274eb0fd88508fccb504f0f"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          54,
+          100
+        ],
+        [
+          123,
+          174
+        ],
+        [
+          194,
+          199
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "dexart/env/rl_env/toilet_env.py",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/toilet_env.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/Kami-code__dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/toilet_env.py",
+      "sha256": "f4078c64d159c50224e3933e20fb8559dc9630c46b03fa38438c6f16a22c1429",
+      "lines": 169,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/toilet_env.py",
+        "retrieved_at": "2026-10-11T00:19:26.314792+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/dexart/env/rl_env/toilet_env.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 7617,
+        "sha256": "f4078c64d159c50224e3933e20fb8559dc9630c46b03fa38438c6f16a22c1429"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          56,
+          144
+        ],
+        [
+          164,
+          169
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "examples/evaluate_policy.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/examples/evaluate_policy.py",
+      "sha256": "f5f7b11557547ba82983cfd2d4695dca70385e82b0441e0f35da846b6e8d8023",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/examples/evaluate_policy.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          14,
+          81
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "examples/pretrain/generate_dataset.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/examples/pretrain/generate_dataset.py",
+      "sha256": "7a2b060b57d8a2b8528814b51f56c0236552d0893283504a16dedb27e151dde8",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/examples/pretrain/generate_dataset.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          10,
+          45
+        ],
+        [
+          49,
+          103
+        ]
+      ]
+    },
+    {
+      "repo": "Kami-code/dexart-release",
+      "commit": "d6ab75e1a0b81384d1ac918cbfd4d97b1f230149",
+      "path": "stable_baselines3/common/evaluation.py",
+      "local_file": "audit/.cache/github_review/repos/Kami-code__dexart-release/files/stable_baselines3/common/evaluation.py",
+      "sha256": "77b1098893d8166d7810bf2904d2bea0a2139a525936440f89bb8fbb60b96810",
+      "url": "https://raw.githubusercontent.com/Kami-code/dexart-release/d6ab75e1a0b81384d1ac918cbfd4d97b1f230149/stable_baselines3/common/evaluation.py",
+      "source_manifest": "audit/.cache/github_review/repos/Kami-code__dexart-release/manifest.json",
+      "read_ranges": [
+        [
+          11,
+          35
+        ],
+        [
+          72,
+          131
+        ]
+      ]
+    }
+  ]
+}

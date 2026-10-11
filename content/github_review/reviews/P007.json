@@ -1,0 +1,87 @@
+{
+  "paper_id": "P007",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Charades-Ego原文引用gsig的Charades演算法；這是沿用Charades的baseline框架，不是完整ego/exo配對資料發布。程式本身明示Python mAP只是近似官方MATLAB評分。",
+  "reading_order": [
+    {
+      "repo": "gsig/charades-algorithms",
+      "path": "README.md",
+      "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+      "ranges": [
+        [
+          1,
+          35
+        ]
+      ],
+      "why": "確認baseline用途與原Charades引用關係。"
+    },
+    {
+      "repo": "gsig/charades-algorithms",
+      "path": "pytorch/datasets/charadesrgb.py",
+      "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+      "ranges": [
+        [
+          1,
+          65
+        ],
+        [
+          78,
+          188
+        ]
+      ],
+      "why": "CSV schema、frame換算及video取樣。"
+    },
+    {
+      "repo": "gsig/charades-algorithms",
+      "path": "pytorch/utils/map.py",
+      "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+      "ranges": [
+        [
+          1,
+          39
+        ]
+      ],
+      "why": "近似mAP實作與官方評分限制。"
+    }
+  ],
+  "environment": "同一人類活動的第一/第三人稱錄製為成對觀測；相機視角不能算兩套互動環境。",
+  "tasks": "Charades多標籤活動識別，需另保留Ego配對與跨視角設定；原倉庫157類不能當157個機器人工作。",
+  "data": "CSV id/actions含class/start/end；loader以24FPS換算時間，video驗證均勻取25個影格，train/val使用不同取樣與label格式。",
+  "evaluation": "map.py逐類排序算AP，無正例類別為NaN；charades_map把沒有任何GT的影片分數壓至負無限。原碼要求精確排名使用官方MATLAB指令碼，這個近似不能靜默替代。",
+  "standardization": {
+    "profile": "paired_ego_exo_activity_recognition",
+    "reuse": "原生影片/活動ID、時間段、RGB/flow讀取和baseline預測格式。",
+    "transform": "補ego/exo對應與subject/session血緣，分開frame、video和跨視角評測；儲存原生取樣及評分版本。",
+    "missing": "Ego配對資料/split、精確官方MATLAB evaluator及當前執行環境。"
+  },
+  "version_note": "原文PDF第2頁明列此baseline來源；不要把其README上的原Charades結果當Charades-Ego本次實測。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "gsig/charades-algorithms",
+      "path": "README.md",
+      "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+      "sha256": "3976e5488dc35716f242b72dd23b1a0b7fff33ad8d8990de964b69ea591275a3",
+      "url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/README.md",
+      "local_file": "audit/.cache/github_review/repos/gsig__charades-algorithms/files/README.md"
+    },
+    {
+      "repo": "gsig/charades-algorithms",
+      "path": "pytorch/datasets/charadesrgb.py",
+      "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+      "sha256": "3c18559b8e4c5c61ba39c6c8683e62def6e6271c84371cee3d8b984c44a09630",
+      "url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/pytorch/datasets/charadesrgb.py",
+      "local_file": "audit/.cache/github_review/repos/gsig__charades-algorithms/files/pytorch/datasets/charadesrgb.py"
+    },
+    {
+      "repo": "gsig/charades-algorithms",
+      "path": "pytorch/utils/map.py",
+      "commit": "927794cd04c588f1e749e96f5c0e69d81a1576e0",
+      "sha256": "da32c39274ed6721dd6bc3f579a981f9a361655a32e070fae41a6ab3917aa7a8",
+      "url": "https://github.com/gsig/charades-algorithms/blob/927794cd04c588f1e749e96f5c0e69d81a1576e0/pytorch/utils/map.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/gsig__charades-algorithms/pytorch/utils/map.py"
+    }
+  ],
+  "identity_note": "原作PDF裸網址github.com/gsig/charades-algorithms及作者挑戰頁共同支援；倉庫明示自己是Charades starter code。"
+}

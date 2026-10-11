@@ -1,0 +1,220 @@
+{
+  "paper_id": "P140",
+  "name": "VIP",
+  "title": "VIP: Towards Universal Visual Reward and Representation via Value-Implicit Pre-Training",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2210.00030",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P140",
+    "summary": "VIP學習的是視覺reward/表示；embedding距離和環境任務成功是不同評估。程式的success門檻是episode累積solved次數，並非連續穩定時間。",
+    "environment": "Ego4D人類訓練影片、實機示例和MuJoCo系下游環境；原場景與資料仍屬各父來源。",
+    "tasks": "以goal-image/embedding引導robot任務與reward learning；fold_towel等展示是應用例子，不能由曲線距離直接認定任務語義正確。",
+    "data": "自訂影片依video資料夾存frames；model依影像shape resize/crop224和normalization，max>2時除255。sim=-L2(embedding1,embedding2)，此單位是特徵距離而非幾何公尺。",
+    "evaluation": "MPPI讀goal_embedding並用H/paths_per_cpu/num_cpu/kappa配置優化；env.evaluate_success預設判sum(solved)>5再按paths算百分比，未要求連續。embedding reward、原生solved與工程時間分開保存。",
+    "standardization": {
+      "profile": "visual_reward_learning_reference",
+      "reuse": "表示/goal資料接口、原reward數學定義、MPPI配置與環境成功引用。",
+      "transform": "evaluator標明learned reward或ground-truth環境條件；case固定goal frame、相機、normalization、planner預算和solved門檻，避免將reward作通用正解。",
+      "missing": "各task實際solved predicate、原素材/goal設定、planner與環境版本、reward與任務正確性的反例校準。"
+    },
+    "version_note": "固定81b0520；前述sum門檻屬目前公開env基底，具體task可能另override，整合每task時仍需沿具體class核對。未跑MPPI。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vip",
+        "requested_repo": "facebookresearch/vip",
+        "commit": "81b052014591bb157cfb036fc3bd0b213653e86b",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            9
+          ],
+          [
+            24,
+            38
+          ],
+          [
+            68,
+            82
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 107,
+        "sha256": "c0f38cea42fe5909562f210e967fb1e65511e784736874c7af7f2b7c4d733892",
+        "url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/README.md",
+        "reading_url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/README.md#L1-L9",
+        "why": "原作、Ego4D/自訂影片與reward用途",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vip",
+        "requested_repo": "facebookresearch/vip",
+        "commit": "81b052014591bb157cfb036fc3bd0b213653e86b",
+        "ref": null,
+        "path": "vip/models/model_vip.py",
+        "ranges": [
+          [
+            68,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 91,
+        "sha256": "c58416b627e91e10a37b0fb98ce82dc4dc7e15d799c244b4d52f0b922b054e91",
+        "url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/vip/models/model_vip.py",
+        "reading_url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/vip/models/model_vip.py#L68-L91",
+        "why": "圖像預處理及負Euclidean embedding距離",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vip",
+        "requested_repo": "facebookresearch/vip",
+        "commit": "81b052014591bb157cfb036fc3bd0b213653e86b",
+        "ref": null,
+        "path": "evaluation/trajopt/trajopt/run_mppi.py",
+        "ranges": [
+          [
+            27,
+            67
+          ],
+          [
+            94,
+            103
+          ],
+          [
+            126,
+            134
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 138,
+        "sha256": "a465e22e68d90e70a4298b32899264299e5288c03b70bc289e967adce74e6531",
+        "url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/evaluation/trajopt/trajopt/run_mppi.py",
+        "reading_url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/evaluation/trajopt/trajopt/run_mppi.py#L27-L67",
+        "why": "目標embedding、MPPI取樣預算與trajectory儲存",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vip",
+        "requested_repo": "facebookresearch/vip",
+        "commit": "81b052014591bb157cfb036fc3bd0b213653e86b",
+        "ref": null,
+        "path": "evaluation/mj_envs/mj_envs/envs/env_base.py",
+        "ranges": [
+          [
+            260,
+            282
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 560,
+        "sha256": "7525da7bd02064cb9fb8d13b4aae5d97b995b14ce41eea25ec084a9b49309a03",
+        "url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/evaluation/mj_envs/mj_envs/envs/env_base.py",
+        "reading_url": "https://github.com/facebookresearch/vip/blob/81b052014591bb157cfb036fc3bd0b213653e86b/evaluation/mj_envs/mj_envs/envs/env_base.py#L260-L282",
+        "why": "原environment success百分比及solved數門檻",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c153b72d7c3512a6ff6cbcd3917346e58829f7ccca55e4f41302f6575ca89201"
+  },
+  "repository_binding_review_sha256": "c153b72d7c3512a6ff6cbcd3917346e58829f7ccca55e4f41302f6575ca89201",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/vip",
+      "resolved_repo": "facebookresearch/vip",
+      "aliases_in_this_review": [
+        "facebookresearch/vip"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "81b052014591bb157cfb036fc3bd0b213653e86b",
+          "reviewed_files": [
+            "README.md",
+            "evaluation/mj_envs/mj_envs/envs/env_base.py",
+            "evaluation/trajopt/trajopt/run_mppi.py",
+            "vip/models/model_vip.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/facebookresearch/vip",
+          "pdf_page": 11,
+          "pdf_sha256": "edbb18810968bd564cfb5bdd04a7c6a01fbd142aabd195255b7dce638b38e353",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/vip",
+          "link_label": "Code",
+          "project_url": "https://sites.google.com/view/vip-rl",
+          "page_sha256": "872cfa50353aa598f8cbcc4c23110e3f79f698e727102c1b42c86a37659e4c81"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/vip/blob/main/vip/examples/plot_reward_curves_video.py",
+          "link_label": "here",
+          "project_url": "https://sites.google.com/view/vip-rl",
+          "page_sha256": "872cfa50353aa598f8cbcc4c23110e3f79f698e727102c1b42c86a37659e4c81"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/vip",
+          "link_label": "official code release",
+          "project_url": "https://sites.google.com/view/vip-rl",
+          "page_sha256": "872cfa50353aa598f8cbcc4c23110e3f79f698e727102c1b42c86a37659e4c81"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/vip",
+          "link_label": "https://github.com/facebookresearch/vip",
+          "project_url": "https://sites.google.com/view/vip-rl",
+          "page_sha256": "872cfa50353aa598f8cbcc4c23110e3f79f698e727102c1b42c86a37659e4c81"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P140",
+          "review_file": "content/github_review/reviews/P140.json",
+          "review_sha256": "c153b72d7c3512a6ff6cbcd3917346e58829f7ccca55e4f41302f6575ca89201",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "facebookresearch/vip"
+  ],
+  "external_repositories": []
+}

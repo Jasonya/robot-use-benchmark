@@ -1,0 +1,197 @@
+{
+  "paper_id": "P181",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "identity_note": "RoboFolDeX 指 Chenhuan Liu、Yi Xu 等的 arXiv:2609.10243v2，機構為 Fudan／Midea／CMU。PDF第1頁給出的第一方平臺為 ai.midea.com/#/fold-challenge。FoldChallenge 是這篇的實體評測平臺名稱，不是可據以自動推定的 GitHub owner/repo。",
+  "summary": "完成 pinned PDF、GitHub 搜尋快取與官方 challenge 頁的限量身分查找，仍未確認作者授權的公開程式倉庫或資料 reader。保留長時程實體折衣任務、人工品質評分與 FoldScore 的論文規格；不以其他 cloth benchmark 或通用VLA程式替代。",
+  "reading_order": [],
+  "paper_reading_order": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+      "json_pointers": [
+        "/0/text",
+        "/2/text"
+      ],
+      "why": "精確作者／論文身分、FoldChallenge來源與版本中的匿名化殘留說明。"
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+      "json_pointers": [
+        "/3/text",
+        "/4/text"
+      ],
+      "why": "任務與觀測／action語義、四種資料重用track、評分公式。"
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+      "json_pointers": [
+        "/5/text",
+        "/6/text",
+        "/7/text",
+        "/8/text"
+      ],
+      "why": "30次實體trial／人工評審協定、局部task baseline不可比，以及PDF結尾未附rubric。"
+    }
+  ],
+  "discovery_evidence": [
+    {
+      "source_file": "audit/.cache/github_review/P181-discovery.json",
+      "json_pointers": [
+        "/candidates"
+      ],
+      "finding": "PDF只找到自己的arXiv與Midea FoldChallenge，無GitHub超連結。"
+    },
+    {
+      "source_file": "audit/.cache/github_review/search/P181.json",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "2026-10-10 GitHub repositories搜尋RoboFolDeX回200、total_count=0；不等同證明全網不存在。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/P181-bounded-web-discovery.json",
+      "json_pointers": [
+        "/queries",
+        "/returned_primary_pages",
+        "/finding"
+      ],
+      "finding": "2026-10-11兩個精確網頁查詢只建立原論文來源，未找到可確認的作者repo。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/challenge.html",
+      "ranges": [
+        [
+          1,
+          14
+        ]
+      ],
+      "finding": "官方HTML回200，但只是載入index.D-y8NsRs.js的SPA外殼，不能據此斷言平台沒有登入後資料或程式。"
+    },
+    {
+      "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/index.D-y8NsRs.js.receipt.json",
+      "json_pointers": [
+        "/requested_url",
+        "/status"
+      ],
+      "finding": "第一方JS超過本輪512 KiB小文字上限，結果over_size_limit；停止擴大抓取。這是bounded discovery限制，不是404、429或repo不存在。"
+    }
+  ],
+  "environment": "真實雙臂長時程衣物整理，從籃中取衣、桌面翻轉／攤平、多次折疊到最後放置／堆疊。資料涵蓋桌面／家庭場景與照明、背景、layout變化；論文列Aloha、YAM、Piper、Astribot、Franka、UR5、自研移動雙臂、AgiBot G2等，10+是宣稱的embodiment規模，未取得完整registry。",
+  "tasks": "主題是衣物折疊，參考實驗分Shirt、Skirt、Pants、Towel；完整資料另外含其他deformable及少量rigid任務。20+是論文來源層task宣稱，不是已枚舉的可執行task數。四個track為recovery-data utilization、cross-task、cross-scene、cross-embodiment；它們是訓練／轉移協定，不另計為四項操作技能。",
+  "data": "論文宣稱2,000+小時真實robot trajectories。觀測為兩腕相機+外部workspace相機RGB、自然語言指令、proprioception；action為未來end-effector pose trajectory。論文描述共用metadata語義：task、object category/instance、scene、embodiment、operator、data source、completion及failure/termination reason；本輪未取得實際檔名／keys、action維度與座標系、時間頻率或split名冊，因此不能將這些概念冒寫成已驗證JSON schema。hours、tasks、robot embodiments與episode/case數分開，case總數保持未知。",
+  "evaluation": "論文標準完整episode需無人工介入且無不可恢復失敗，通常每衣物類別30次獨立實體trials、初態隨機化；品質由至少兩名相同評審跨方法獨立評定，達成一致才記錄。neatness等級0–5檢視形狀、緊密、平整、穩定與邊緣；FoldScore=35×平均正規化品質Q̄+35×完整success rate R+30×max(0,1−t/Tmax)，t只在成功trials平均，無成功時時間項為0。PDF稱quality mapping及細rubric在Appendix，但固定版本共9頁、第8–9頁為references，未附該表；Tmax也未給數值。故不能自行用neatness/5或任意時限做『官方scorer』。π0.5的pre-flattened短流程baseline與basket-to-stack完整流程須分開。",
+  "standardization": {
+    "profile": "paper_specified_physical_garment_folding_with_hosted_evaluation",
+    "reuse": "已明確的實體任務流程、四track設計、observations/action的語義、0–5品質尺度及FoldScore公式。",
+    "transform": "source記PDF v2與FoldChallenge第一方平臺；environment保存實體硬體／相機／場景；task保存衣物類別與完整或局部流程；case待原生trial/garment instance/init metadata公開後建立。evaluator先標人工評分及paper_specified_formula，品質／success／成功trial時間三項分存，資料重用track保留訓練來源與target embodiment。",
+    "missing": "作者確認的程式repo、可檢驗reader/schema、公開資料manifest／授權／split、完整品質rubric及Q映射、Tmax、submission/execution介面與實體trial結果。SPA大型JS及可能需互動的頁面內容本輪未展開，平臺『operational』僅依論文聲明。"
+  },
+  "version_note": "以2026-09-18 v2 PDF為準；第3頁仍稱review期間省略access links，與首頁已列Midea網址並存，不能據此補猜程式網址。無repo commit可記；各PDF/搜尋/HTML/HTTP receipt均記本地SHA256及read範圍。未執行JS、提交policy、聯絡作者或下載模型／資料。",
+  "integration_issues": [
+    "主binding維持未確認repo；不要以FoldChallenge同名搜尋結果或其他折衣倉庫補位。",
+    "FoldScore的Q映射／Tmax缺件，暫只可編目描述，不能標成可執行scorer。",
+    "2,000+小時／20+tasks／10+embodiments與四類參考實驗、30次trial、未知episode總數須分開。"
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/github_review/P181-discovery.json",
+      "sha256": "ee5204a84f8a75be3febe1c969a818e8778e34cf7831804f2aa31323006e14c9",
+      "json_pointers": [
+        "/candidates",
+        "/code_contexts",
+        "/paper_url",
+        "/pdf_sha256",
+        "/title"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P181.json",
+      "sha256": "b2f4a9af12317a4778485c7576298848bec2d5c0006940408241c1f20cba1b6a",
+      "kind": "cached_discovery_search",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/180"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/projects/446dcd6b22e1b3e9cc5705524aba5270006801592a925ad7855cfd29816ff9e5.txt",
+      "sha256": "df509bce8bed65a2b81b1cb2658e74330a006cc1c415bc430864cc10cc5239d6",
+      "kind": "cached_primary_project_text",
+      "url": "https://ai.midea.com/#/fold-challenge",
+      "read_ranges": [
+        [
+          1,
+          37
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P181/pages.json",
+      "sha256": "f9aff4b8434866c0cad83bd90a48d21cd2ecf320416d6dcf6e7f9436e6156d27",
+      "kind": "pinned_pdf_text",
+      "pdf_pages": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text",
+        "/7/text",
+        "/8/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P181/paper.pdf",
+      "pdf_sha256": "b7760baa843b43e164d224d5132fc13f534cb5e4bd834d7276340ee3f7d65553"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/challenge.html",
+      "sha256": "adb8f529e033b4b5ec9cededf50d0e223ad2dfbcfb9f2fcf9dd56f90239a67f6",
+      "kind": "primary_remote_text",
+      "url": "https://ai.midea.com/#/fold-challenge",
+      "retrieved_at": "2026-10-10T07:37:43.543842+00:00",
+      "receipt_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/challenge.html.receipt.json",
+      "read_ranges": [
+        [
+          1,
+          57
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/P181-bounded-web-discovery.json",
+      "sha256": "f5514ab9fa45d5df63582c272b62414001ddd93fe86bcc4e7466c695bfd8d469",
+      "kind": "bounded_primary_discovery_log",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P181/index.D-y8NsRs.js.receipt.json",
+      "sha256": "27a27fca7f88a151d195aa3270d2bb9650969aef22550e2ff2e0329b4c78b13d",
+      "kind": "discovery_http_receipt",
+      "url": "https://ai.midea.com/aiopen-station/assets/index.D-y8NsRs.js",
+      "json_pointers": [
+        ""
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

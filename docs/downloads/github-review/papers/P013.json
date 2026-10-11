@@ -1,0 +1,1092 @@
+{
+  "paper_id": "P013",
+  "name": "Ego4D",
+  "title": "Ego4D: Around the World in 3,000 Hours of Egocentric Video",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2110.07058",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft",
+    "retail",
+    "transport",
+    "garden",
+    "leisure",
+    "social",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P013",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Ego4D 是多項挑戰共用的人類第一人稱影片庫。本次核讀五類官方倉庫入口，以及 NLQ、VQ3D、狀態變化、長期預測和音訊的核心格式／指標；各子挑戰的完成度分開記錄。",
+    "environment": "多種真實日常與工作觀測；video_uid、clip_uid 與實體環境須分層。五個挑戰倉庫不是五批互不重疊的影片或機器人環境。",
+    "tasks": "episodic memory 包含 NLQ、MQ、VQ2D、VQ3D；手物件包含 PNR、狀態變化分類與物件定位；其他入口涵蓋 looking/talking-to-me、說話者與轉錄、短期／長期動作及未來手／移動預測。子任務數不可當做動作類別或 case 數。",
+    "data": "NLQ 原生 videos→clips→annotations→language_queries，case ID 應用 clip_uid+annotation_uid+query_idx；保留 clip/video 的起迄秒與 feature-rate 對映。測試預處理填入的 0,0 是未知答案佔位，不是 GT。音訊 CTM 使用 channel/tb/dur/word，GT STM 另含 speaker/te/txt；RTTM 用於 diarization。",
+    "evaluation": "NLQ 逐預測計算時間 overlap 與 top-K 超過閾值的比例，程式只列出 evaluated/GT 數，外層必須檢查缺題與重複。PNR 僅對 GT 狀態變化為真的片段，以 16-bin 映回 frame 再換秒。LTA 使用 N×Z×K 序列、每筆取 K 個預測中最小 editdistance.eval/Z，積分字首 ED 得 AUED。VQ3D 提供 L2、角度與依兩位標註者框大小／差異的閾值。轉錄先 lower-case/GLM 過濾後呼叫 SCTK WER；audio-only DER 用 pyannote，另外輸出逐檔平均。",
+    "standardization": {
+      "profile": "ego_video_multitrack",
+      "reuse": "官方子挑戰入口、NLQ 複合 ID／時窗、PNR／LTA 指標實作，以及音訊格式轉換。",
+      "transform": "一個父 source 下建各 challenge 的 task/case/evaluator；精確保留輸入可見範圍、label/feature/frame/second 單位、K／Z／閾值及 GT 有效遮罩。原生影片重用以 uid 連結，評分逐項儲存，不合成一個成功率。",
+      "missing": "尚未取得影片或執行 evaluator。社交任務實作在 lam、ttm 分支，本次只讀主分支入口，不能說無程式；VQ2D、MQ、STA、未來手／移動與社交的完整實作仍須逐支整合。SCTK／pyannote 外部實作未執行。"
+    },
+    "version_note": "各倉庫固定提交仍有 2022 挑戰說明；不得自動視為所有後續版本的同一協定。episodic-memory 列出近零 NLQ 時窗問題，需固定 annotation release。PNR 無正例 batch 預設回 0，evaluate_trained 可回 None，統計時應保留。LTA 註解名稱與實際使用函式應依賴鎖定的 editdistance 版本核實。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "EGO4D/episodic-memory",
+        "requested_repo": "EGO4D/episodic-memory",
+        "commit": "5275b9570a3d77884e8685bad474309f7778db1f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            42
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 42,
+        "sha256": "db3faa3be87b6e3edc37496ea6a32fcdf318a619cfa42ce229bba1c28a6b8094",
+        "url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/README.md",
+        "reading_url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/README.md#L1-L42",
+        "why": "四項 memory 任務與已知標註問題",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/episodic-memory",
+        "requested_repo": "EGO4D/episodic-memory",
+        "commit": "5275b9570a3d77884e8685bad474309f7778db1f",
+        "ref": null,
+        "path": "NLQ/VSLNet/utils/prepare_ego4d_dataset.py",
+        "ranges": [
+          [
+            28,
+            78
+          ],
+          [
+            95,
+            141
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 157,
+        "sha256": "b5ab3ba7fa5a8ecc7c54e2b6fae4b53d837d3fc2ec7235d4aab08db9778d7d0f",
+        "url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/NLQ/VSLNet/utils/prepare_ego4d_dataset.py",
+        "reading_url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/NLQ/VSLNet/utils/prepare_ego4d_dataset.py#L28-L78",
+        "why": "複合 ID、時間窗及測試佔位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/episodic-memory",
+        "requested_repo": "EGO4D/episodic-memory",
+        "commit": "5275b9570a3d77884e8685bad474309f7778db1f",
+        "ref": null,
+        "path": "NLQ/VSLNet/utils/evaluate_ego4d_nlq.py",
+        "ranges": [
+          [
+            13,
+            119
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 159,
+        "sha256": "46f49da5054e09349e949f2e885193e9a7f04259eccc258a9143f3e61b42181c",
+        "url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/NLQ/VSLNet/utils/evaluate_ego4d_nlq.py",
+        "reading_url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/NLQ/VSLNet/utils/evaluate_ego4d_nlq.py#L13-L119",
+        "why": "原生閾值、分母與輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/episodic-memory",
+        "requested_repo": "EGO4D/episodic-memory",
+        "commit": "5275b9570a3d77884e8685bad474309f7778db1f",
+        "ref": null,
+        "path": "VQ3D/VQ3D/API/metrics.py",
+        "ranges": [
+          [
+            1,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 43,
+        "sha256": "5dbda14c519cc21d7f384ad5b835af11e5930c96292f7cb920e11691dc82fd36",
+        "url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/VQ3D/VQ3D/API/metrics.py",
+        "reading_url": "https://github.com/EGO4D/episodic-memory/blob/5275b9570a3d77884e8685bad474309f7778db1f/VQ3D/VQ3D/API/metrics.py#L1-L43",
+        "why": "空間誤差與標註不確定性閾值",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/hands-and-objects",
+        "requested_repo": "EGO4D/hands-and-objects",
+        "commit": "0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            32
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 32,
+        "sha256": "2079446f170ec5a84a3be08b27fec924e76532ed7b4087bd80168eec9d272d1a",
+        "url": "https://github.com/EGO4D/hands-and-objects/blob/0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7/README.md",
+        "reading_url": "https://github.com/EGO4D/hands-and-objects/blob/0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7/README.md#L1-L32",
+        "why": "狀態變化任務",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/hands-and-objects",
+        "requested_repo": "EGO4D/hands-and-objects",
+        "commit": "0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7",
+        "ref": null,
+        "path": "state-change-localization-classification/i3d-resnet50/evaluation/metrics.py",
+        "ranges": [
+          [
+            1,
+            53
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 53,
+        "sha256": "7f1f19981a85d27a64d991d2887671082b36ef2844eb35c1db8ad6a6d50c2d69",
+        "url": "https://github.com/EGO4D/hands-and-objects/blob/0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7/state-change-localization-classification/i3d-resnet50/evaluation/metrics.py",
+        "reading_url": "https://github.com/EGO4D/hands-and-objects/blob/0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7/state-change-localization-classification/i3d-resnet50/evaluation/metrics.py#L1-L53",
+        "why": "PNR 秒制距離與分類 accuracy",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/social-interactions",
+        "requested_repo": "EGO4D/social-interactions",
+        "commit": "033fefb2b15518ebd634e034780f405994f00744",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            41
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 41,
+        "sha256": "2a90d37a6d965759eafe8e38c99a63d00bc61c587f54fa5f283c49e4d5e55dad",
+        "url": "https://github.com/EGO4D/social-interactions/blob/033fefb2b15518ebd634e034780f405994f00744/README.md",
+        "reading_url": "https://github.com/EGO4D/social-interactions/blob/033fefb2b15518ebd634e034780f405994f00744/README.md#L1-L41",
+        "why": "lam／ttm 分支角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/forecasting",
+        "requested_repo": "EGO4D/forecasting",
+        "commit": "38d1931b543decab420abc991577e30a5b6ccfc7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            64
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 64,
+        "sha256": "d0ba75b897f2a12fbd06de37aa437c01c7b043e123ae2ac9824210199c34fdf2",
+        "url": "https://github.com/EGO4D/forecasting/blob/38d1931b543decab420abc991577e30a5b6ccfc7/README.md",
+        "reading_url": "https://github.com/EGO4D/forecasting/blob/38d1931b543decab420abc991577e30a5b6ccfc7/README.md#L1-L64",
+        "why": "四類預測入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/forecasting",
+        "requested_repo": "EGO4D/forecasting",
+        "commit": "38d1931b543decab420abc991577e30a5b6ccfc7",
+        "ref": null,
+        "path": "ego4d_forecasting/evaluation/lta_metrics.py",
+        "ranges": [
+          [
+            1,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 115,
+        "sha256": "3dab0fb933611363f5b845919153bdb3f02ec56825bdb29c5fd88280e80f80dd",
+        "url": "https://github.com/EGO4D/forecasting/blob/38d1931b543decab420abc991577e30a5b6ccfc7/ego4d_forecasting/evaluation/lta_metrics.py",
+        "reading_url": "https://github.com/EGO4D/forecasting/blob/38d1931b543decab420abc991577e30a5b6ccfc7/ego4d_forecasting/evaluation/lta_metrics.py#L1-L115",
+        "why": "best-of-K ED 與 AUED",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/audio-visual",
+        "requested_repo": "EGO4D/audio-visual",
+        "commit": "da19e63569758186bacfca4f53d92b211f6e373a",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "a70118be22273baebdc447187617d46a722d825e28de072ef1071152627e584f",
+        "url": "https://github.com/EGO4D/audio-visual/blob/da19e63569758186bacfca4f53d92b211f6e373a/README.md",
+        "reading_url": "https://github.com/EGO4D/audio-visual/blob/da19e63569758186bacfca4f53d92b211f6e373a/README.md#L1-L38",
+        "why": "影音子任務",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/audio-visual",
+        "requested_repo": "EGO4D/audio-visual",
+        "commit": "da19e63569758186bacfca4f53d92b211f6e373a",
+        "ref": null,
+        "path": "transcription/eval_ai_scoring.py",
+        "ranges": [
+          [
+            5,
+            28
+          ],
+          [
+            32,
+            40
+          ],
+          [
+            60,
+            73
+          ],
+          [
+            107,
+            117
+          ],
+          [
+            123,
+            132
+          ],
+          [
+            136,
+            142
+          ],
+          [
+            156,
+            162
+          ],
+          [
+            165,
+            171
+          ],
+          [
+            211,
+            218
+          ],
+          [
+            240,
+            254
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 258,
+        "sha256": "4da1f5bd90cbb8ef81dc25e831b11633f156274ca9ed5a9d2807cbd5480b2534",
+        "url": "https://github.com/EGO4D/audio-visual/blob/da19e63569758186bacfca4f53d92b211f6e373a/transcription/eval_ai_scoring.py",
+        "reading_url": "https://github.com/EGO4D/audio-visual/blob/da19e63569758186bacfca4f53d92b211f6e373a/transcription/eval_ai_scoring.py#L5-L28",
+        "why": "STM／CTM、GLM 與 WER 介面",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EGO4D/audio-visual",
+        "requested_repo": "EGO4D/audio-visual",
+        "commit": "da19e63569758186bacfca4f53d92b211f6e373a",
+        "ref": null,
+        "path": "diarization/audio-only/diarization/score_pyannote.py",
+        "ranges": [
+          [
+            1,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 61,
+        "sha256": "c09d1929e3af160f1732923df25a014faf3940613ec60630645d72f6602008c8",
+        "url": "https://github.com/EGO4D/audio-visual/blob/da19e63569758186bacfca4f53d92b211f6e373a/diarization/audio-only/diarization/score_pyannote.py",
+        "reading_url": "https://github.com/EGO4D/audio-visual/blob/da19e63569758186bacfca4f53d92b211f6e373a/diarization/audio-only/diarization/score_pyannote.py#L1-L61",
+        "why": "RTTM 排序配對及 DER 聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb"
+  },
+  "repository_binding_review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb",
+  "repository_bindings": [
+    {
+      "requested_repo": "EGO4D/audio-visual",
+      "resolved_repo": "EGO4D/audio-visual",
+      "aliases_in_this_review": [
+        "ego4d/audio-visual"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "da19e63569758186bacfca4f53d92b211f6e373a",
+          "reviewed_files": [
+            "README.md",
+            "diarization/audio-only/diarization/score_pyannote.py",
+            "transcription/eval_ai_scoring.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/EGO4D/audio-visual",
+          "link_label": "Audio-Visual Diarization",
+          "project_url": "https://ego4d-data.org/",
+          "page_sha256": "4963e63d21caf8906ca0f2061daa730f592b2e7b74b452d4262e2f11437ec6c2"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P013",
+          "review_file": "content/github_review/reviews/P013.json",
+          "review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/episodic-memory",
+      "resolved_repo": "EGO4D/episodic-memory",
+      "aliases_in_this_review": [
+        "ego4d/episodic-memory"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5275b9570a3d77884e8685bad474309f7778db1f",
+          "reviewed_files": [
+            "NLQ/VSLNet/utils/evaluate_ego4d_nlq.py",
+            "NLQ/VSLNet/utils/prepare_ego4d_dataset.py",
+            "README.md",
+            "VQ3D/VQ3D/API/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/EGO4D/episodic-memory",
+          "link_label": "Episodic Memory",
+          "project_url": "https://ego4d-data.org/",
+          "page_sha256": "4963e63d21caf8906ca0f2061daa730f592b2e7b74b452d4262e2f11437ec6c2"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P013",
+          "review_file": "content/github_review/reviews/P013.json",
+          "review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/forecasting",
+      "resolved_repo": "EGO4D/forecasting",
+      "aliases_in_this_review": [
+        "ego4d/forecasting"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "38d1931b543decab420abc991577e30a5b6ccfc7",
+          "reviewed_files": [
+            "README.md",
+            "ego4d_forecasting/evaluation/lta_metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/EGO4D/forecasting",
+          "link_label": "Forecasting",
+          "project_url": "https://ego4d-data.org/",
+          "page_sha256": "4963e63d21caf8906ca0f2061daa730f592b2e7b74b452d4262e2f11437ec6c2"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P013",
+          "review_file": "content/github_review/reviews/P013.json",
+          "review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/hands-and-objects",
+      "resolved_repo": "EGO4D/hands-and-objects",
+      "aliases_in_this_review": [
+        "ego4d/hands-and-objects"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0aea0a4ed6ed1de4ffcb6b0cfa555da5c3c08bd7",
+          "reviewed_files": [
+            "README.md",
+            "state-change-localization-classification/i3d-resnet50/evaluation/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/EGO4D/hands-and-objects",
+          "link_label": "Hand + Object Interaction",
+          "project_url": "https://ego4d-data.org/",
+          "page_sha256": "4963e63d21caf8906ca0f2061daa730f592b2e7b74b452d4262e2f11437ec6c2"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P013",
+          "review_file": "content/github_review/reviews/P013.json",
+          "review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "EGO4D/social-interactions",
+      "resolved_repo": "EGO4D/social-interactions",
+      "aliases_in_this_review": [
+        "ego4d/social-interactions"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "033fefb2b15518ebd634e034780f405994f00744",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/EGO4D/social-interactions",
+          "link_label": "Social Interactions",
+          "project_url": "https://ego4d-data.org/",
+          "page_sha256": "4963e63d21caf8906ca0f2061daa730f592b2e7b74b452d4262e2f11437ec6c2"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P013",
+          "review_file": "content/github_review/reviews/P013.json",
+          "review_sha256": "c7224b5884b12604842f9af84ac797ca10dd005b858f52f4bab44adab0b057eb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "零售與購物",
+    "交通移動與車輛維修",
+    "農業與園藝",
+    "休閒與運動",
+    "社交與溝通",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P013",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Ego4D，arXiv 2110.07058v3；本文2022初版benchmark數字，不套用後續官網擴充量。",
+    "scope_read": "正文五大benchmark全段；附錄資料split、episodic memory規模、short／long anticipation協定與統計。",
+    "pages_read": [
+      1,
+      6,
+      7,
+      8,
+      9,
+      24,
+      29,
+      30,
+      48,
+      49,
+      70,
+      71,
+      72,
+      73,
+      75,
+      77,
+      79
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "零售與購物",
+      "交通移動與車輛維修",
+      "農業與園藝",
+      "休閒與運動",
+      "社交與溝通",
+      "穿戴互動與動作介面"
+    ],
+    "role": "綜合第一人稱資料與評測",
+    "environment": "74個全球location／9國；location不是去重後可載入場景ID。VQ3D專用子集另只使用4個掃描。",
+    "tasks": "5大benchmark：episodic memory、手物狀態變化、影音說話者、社交互動、forecasting。MQ有110活動類別，NLQ有13模板；都不是整個Ego4D的domain／任務總量。",
+    "cases": "3,670小時、931佩戴者為資料規模。NLQ約19.2K query（test約4K）；VQ 22,602 query；MQ 22.2K活動實例；short anticipation 64,798樣本（test 19,780）。各端點母影片重疊，不能相加為獨立episode。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 74,
+        "unit": "原作地理locations",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "benchmark families",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 110,
+        "unit": "MQ活動類別",
+        "pages": [
+          7,
+          30
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3670,
+        "unit": "影片小時",
+        "pages": [
+          1,
+          24
+        ]
+      },
+      {
+        "field": "case",
+        "value": 19200,
+        "unit": "NLQ queries",
+        "qualifier": "原文19.2K，約數",
+        "pages": [
+          29
+        ]
+      },
+      {
+        "field": "case",
+        "value": 22602,
+        "unit": "VQ queries",
+        "pages": [
+          29
+        ]
+      },
+      {
+        "field": "case",
+        "value": 64798,
+        "unit": "short-term anticipation樣本",
+        "pages": [
+          75
+        ]
+      },
+      {
+        "field": "case",
+        "value": 19780,
+        "unit": "short-term anticipation test樣本",
+        "pages": [
+          75
+        ]
+      }
+    ],
+    "evaluation": [
+      "NLQ用recall@k／tIoU；MQ用mAP與recall；VQ用時空AP及搜索效率。",
+      "PNR用秒級絕對時間誤差、狀態分類accuracy、物件偵測AP。",
+      "說話者追蹤／diarization／轉錄用MOT、speaker error、DER、WER；社交LAM／TTM用mAP、accuracy。",
+      "forecasting：軌跡／手部位置誤差；short anticipation top-5 mAP；long anticipation以20步序列edit distance等設定報告。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "同family內一致（forecasting與hands共用；memory內共用），不同family不保證同一切分。NLQ約60/20/20；forecasting原協定40/30/30，另有locomotion切分。test標註及相交narrations不公開。",
+    "lineage": "上游多機構錄製資料；EgoSchema／EgoPlan等後續題庫常重用它。主表與附錄部分過濾前後數字不同，保留端點與版本。",
+    "related_paper_ids": [
+      "P028",
+      "P030"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "locator": "§5.1–5.5",
+        "supports": "五大family、任務與metric"
+      },
+      {
+        "pages": [
+          24,
+          29,
+          30
+        ],
+        "locator": "附錄E、表3與6–8",
+        "supports": "切分關係與memory量"
+      },
+      {
+        "pages": [
+          71,
+          73,
+          75,
+          79
+        ],
+        "locator": "附錄J",
+        "supports": "預測split、樣本與評分"
+      }
+    ],
+    "unresolved": [
+      "不同端點的跨family影片洩漏需逐ID審核。",
+      "本文內MQ表3與過濾後表8、forecasting110.5／120小時等口徑不能靜默合併。"
+    ],
+    "reuse": "是跨日常場域及過去／現在／未來題型的重要上游；覆蓋廣度和正式robot控制任務量需分開。",
+    "reviewed_pdf_sha256": "d33d9e7a1d4a93ab8e9137e62966b3e2b7d631f4c5b98e481f6fc2220739c2fc",
+    "reviewed_on": "2026-10-02",
+    "name": "Ego4D",
+    "year": 2021,
+    "title": "Ego4D: Around the World in 3,000 Hours of Egocentric Video",
+    "source_url": "https://arxiv.org/abs/2110.07058",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft",
+      "retail",
+      "transport",
+      "garden",
+      "leisure",
+      "social",
+      "wearable"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "零售與購物",
+      "工藝與修繕",
+      "園藝與戶外",
+      "交通與移動",
+      "社交與溝通",
+      "休閒活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "零售與購物",
+      "交通移動與車輛維修",
+      "農業與園藝",
+      "休閒與運動",
+      "社交與溝通",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P013",
+      "domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "retail",
+        "transport",
+        "garden",
+        "leisure",
+        "social",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P013",
+          "domain_ids": [
+            "home",
+            "food",
+            "craft",
+            "retail",
+            "transport",
+            "garden",
+            "leisure",
+            "social"
+          ],
+          "pages": [
+            1,
+            6,
+            7,
+            8,
+            9,
+            24,
+            29,
+            30,
+            48,
+            49,
+            70,
+            71,
+            72,
+            73,
+            75,
+            77,
+            79
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "5大benchmark：episodic memory、手物狀態變化、影音說話者、社交互動、forecasting。MQ有110活動類別，NLQ有13模板；都不是整個Ego4D的domain／任務總量。",
+            "74個全球location／9國；location不是去重後可載入場景ID。VQ3D專用子集另只使用4個掃描。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "d33d9e7a1d4a93ab8e9137e62966b3e2b7d631f4c5b98e481f6fc2220739c2fc"
+        },
+        {
+          "paper_id": "P013",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            6,
+            7,
+            8,
+            9,
+            24,
+            29,
+            30,
+            48,
+            49,
+            70,
+            71,
+            72,
+            73,
+            75,
+            77,
+            79
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "第一人稱手物狀態、人體互動與未來動作等交互訊號。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "d33d9e7a1d4a93ab8e9137e62966b3e2b7d631f4c5b98e481f6fc2220739c2fc"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d33d9e7a1d4a93ab8e9137e62966b3e2b7d631f4c5b98e481f6fc2220739c2fc",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "retail",
+        "transport",
+        "garden",
+        "leisure",
+        "social"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P013",
+      "name": "Ego4D",
+      "expected_title": "Ego4D: Around the World in 3,000 Hours of Egocentric Video",
+      "source_url": "https://arxiv.org/abs/2110.07058",
+      "pdf_url": "https://arxiv.org/pdf/2110.07058",
+      "retrieved_at": "2026-10-02T21:33:03.343846+00:00",
+      "pdf_sha256": "d33d9e7a1d4a93ab8e9137e62966b3e2b7d631f4c5b98e481f6fc2220739c2fc",
+      "text_sha256": "987b75f6441cc3fd364b5a340f9277b50ed24d26466ce3f49ffacb1b50cfedc6",
+      "pdf_bytes": 46002718,
+      "pages": 91,
+      "text_characters": 656769,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2110.07058v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2110.07058v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 74,
+        "unit": "原作地理locations",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P013:1",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "原作地理locations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "benchmark families",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P013:2",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "benchmark families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 110,
+        "unit": "MQ活動類別",
+        "pages": [
+          7,
+          30
+        ],
+        "record_id": "review10:P013:3",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "MQ活動類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 7, 30",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3670,
+        "unit": "影片小時",
+        "pages": [
+          1,
+          24
+        ],
+        "record_id": "review10:P013:4",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "影片小時",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 1, 24",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 19200,
+        "unit": "NLQ queries",
+        "qualifier": "原文19.2K，約數",
+        "pages": [
+          29
+        ],
+        "record_id": "review10:P013:5",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "NLQ queries",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 29",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 22602,
+        "unit": "VQ queries",
+        "pages": [
+          29
+        ],
+        "record_id": "review10:P013:6",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "VQ queries",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 29",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 64798,
+        "unit": "short-term anticipation樣本",
+        "pages": [
+          75
+        ],
+        "record_id": "review10:P013:7",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "short-term anticipation樣本",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 75",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 19780,
+        "unit": "short-term anticipation test樣本",
+        "pages": [
+          75
+        ],
+        "record_id": "review10:P013:8",
+        "paper_id": "P013",
+        "benchmark": "Ego4D",
+        "native_term": "short-term anticipation test樣本",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.07058v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.07058v3",
+            "locator": "PDF pp. 75",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "EGO4D/episodic-memory",
+    "EGO4D/hands-and-objects",
+    "EGO4D/social-interactions",
+    "EGO4D/forecasting",
+    "EGO4D/audio-visual"
+  ],
+  "external_repositories": []
+}

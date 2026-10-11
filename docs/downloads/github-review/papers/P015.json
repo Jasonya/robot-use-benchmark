@@ -1,0 +1,940 @@
+{
+  "paper_id": "P015",
+  "name": "Assembly101",
+  "title": "Assembly101: A Large-Scale Multi-View Video Dataset for Understanding Procedural Activities",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2203.14712",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P015",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Assembly101 的原生粗／細粒度和錄製／視角可以明確分開；六個官方倉庫分別是下載、標註、錯誤標註及三種理解 baseline。",
+    "environment": "人類組裝／拆卸玩具車；recording/sequence 與 8 固定 RGB、4 頭戴單色視角分層。toy_id 是物件身份與泛化切分依據，不直接等於場景數。",
+    "tasks": "標註檔案列 202 coarse actions（61 物件、11 verbs）與 1,380 fine-grained actions（90 物件、24 verbs），是原生類別數。粗標註供 temporal segmentation，細標註供 recognition/anticipation；mistake/correction 是另外的程式標籤。",
+    "data": "fine CSV 含 id、video、start/end_frame、action/verb/noun_id、toy_id/name、is_shared、is_RGB；coarse labels 為片段 frame 邊界與 action_cls，coarse_splits 分 assembly/disassembly。影片原始 60fps，動作標註 frame 為 30fps；手 pose 又為 60fps。mistake CSV 含 start/end、verb、this/that、label、remark。",
+    "evaluation": "temporal utils.py 將連續同類影格折成片段，計正規化 edit、全影格 MoF、tIoU=.1/.25/.5 下逐 GT 至多匹配一次的 F1。anticipation 先對 action 分數 marginalize 得 verb/object，再算逐類平均 top-k recall，另列 tail/unseen；不是逐題 accuracy。TSM loader 以 start_frame+片段內取樣位置讀圖。",
+    "standardization": {
+      "profile": "multiview_procedural_action",
+      "reuse": "原生粗／細字典、toy/view/sequence 身份、跨 toy 切分、錯誤原因與 temporal evaluator。",
+      "transform": "一個 recording 連多視角 case，分開 fine/coarse/mistake annotation schema；30fps 動作與 60fps pose 顯式對時。evaluator 儲存 label universe、背景類別、tail/unseen、augmentation 及 macro/micro 聚合，錯誤與修正另連到原程式上下文。",
+      "missing": "尚未取得影片、LMDB、cleaned pose 或執行指標。mistake 倉庫 tree 無 Python，發布的是標註並指向後續論文，不能當成已提供錯誤檢測 baseline。anticipation 固定 1064 actions／17 verbs／90 objects，需核對其 CSV 子集，不能直接套用完整 1380／24 字典；缺題檢查被註解，需 adapter 外層驗證。"
+    },
+    "version_note": "下載 README 已加入 2026-05 Hugging Face 與更新的 AssemblyPoses.zip；不要把新特徵／pose 視為 2022 原始實驗。mistake 註釋指向 2023 Every Mistake Counts in Assembly，與原始三項理解評測需建立衍生關係。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-download-scripts",
+        "requested_repo": "assembly-101/assembly101-download-scripts",
+        "commit": "01835b08aebe563148bea21a7be7a7674bc432cb",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            29
+          ],
+          [
+            67,
+            103
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 109,
+        "sha256": "7ec798d9f4b7f7a78429145bd8b518e731404997e1695ca80ac77762371dc098",
+        "url": "https://github.com/assembly-101/assembly101-download-scripts/blob/01835b08aebe563148bea21a7be7a7674bc432cb/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-download-scripts/blob/01835b08aebe563148bea21a7be7a7674bc432cb/README.md#L1-L29",
+        "why": "recording／camera 與感測版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-annotations",
+        "requested_repo": "assembly-101/assembly101-annotations",
+        "commit": "01651287eec9778bdf1de20e91e4b3162cccd770",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            25
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 25,
+        "sha256": "a45eb98a2306be94351e0e7bdbbb48c59a44cc0a3614b9deee6af2bb2f06d8ad",
+        "url": "https://github.com/assembly-101/assembly101-annotations/blob/01651287eec9778bdf1de20e91e4b3162cccd770/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-annotations/blob/01651287eec9778bdf1de20e91e4b3162cccd770/README.md#L1-L25",
+        "why": "兩種標註粒度與 30fps",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-annotations",
+        "requested_repo": "assembly-101/assembly101-annotations",
+        "commit": "01651287eec9778bdf1de20e91e4b3162cccd770",
+        "ref": null,
+        "path": "coarse-annotations/README.md",
+        "ranges": [
+          [
+            1,
+            87
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 87,
+        "sha256": "8c1881ba8f42a9f3732b851f656da9ef5ebfb998b1ac072c9539adc2c3377b0f",
+        "url": "https://github.com/assembly-101/assembly101-annotations/blob/01651287eec9778bdf1de20e91e4b3162cccd770/coarse-annotations/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-annotations/blob/01651287eec9778bdf1de20e91e4b3162cccd770/coarse-annotations/README.md#L1-L87",
+        "why": "coarse 字典、toy split 與片段格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-annotations",
+        "requested_repo": "assembly-101/assembly101-annotations",
+        "commit": "01651287eec9778bdf1de20e91e4b3162cccd770",
+        "ref": null,
+        "path": "fine-grained-annotations/README.md",
+        "ranges": [
+          [
+            1,
+            56
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 56,
+        "sha256": "1834b9018536859c3089b447eff96642fe584b92f5422639e6a9a8004890edd6",
+        "url": "https://github.com/assembly-101/assembly101-annotations/blob/01651287eec9778bdf1de20e91e4b3162cccd770/fine-grained-annotations/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-annotations/blob/01651287eec9778bdf1de20e91e4b3162cccd770/fine-grained-annotations/README.md#L1-L56",
+        "why": "fine 字典與欄位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-mistake-detection",
+        "requested_repo": "assembly-101/assembly101-mistake-detection",
+        "commit": "6f3a953267ffb86cdeabf6751af05a75a011a4f8",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            81
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 81,
+        "sha256": "422eb737c212de35e5977aaea80134d12db237cdac4229e029e5fed958609d71",
+        "url": "https://github.com/assembly-101/assembly101-mistake-detection/blob/6f3a953267ffb86cdeabf6751af05a75a011a4f8/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-mistake-detection/blob/6f3a953267ffb86cdeabf6751af05a75a011a4f8/README.md#L1-L81",
+        "why": "後續錯誤標註及其來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-temporal-action-segmentation",
+        "requested_repo": "assembly-101/assembly101-temporal-action-segmentation",
+        "commit": "1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 72,
+        "sha256": "13d0b470d595d4bf49e6f0b10f8cc2a7f87fd57a354b79d0474464b739ea9633",
+        "url": "https://github.com/assembly-101/assembly101-temporal-action-segmentation/blob/1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-temporal-action-segmentation/blob/1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5/README.md#L1-L72",
+        "why": "feature 與 augmentation 條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-temporal-action-segmentation",
+        "requested_repo": "assembly-101/assembly101-temporal-action-segmentation",
+        "commit": "1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5",
+        "ref": null,
+        "path": "utils.py",
+        "ranges": [
+          [
+            68,
+            78
+          ],
+          [
+            89,
+            99
+          ],
+          [
+            107,
+            154
+          ],
+          [
+            165,
+            231
+          ],
+          [
+            271,
+            312
+          ],
+          [
+            383,
+            416
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 416,
+        "sha256": "f1b57933b6e7157e10359e88e745d2b3e432ca4fad53ce308bbf0ded4a74ee44",
+        "url": "https://github.com/assembly-101/assembly101-temporal-action-segmentation/blob/1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5/utils.py",
+        "reading_url": "https://github.com/assembly-101/assembly101-temporal-action-segmentation/blob/1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5/utils.py#L68-L78",
+        "why": "MoF／edit／segment F1 實作",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-action-anticipation",
+        "requested_repo": "assembly-101/assembly101-action-anticipation",
+        "commit": "7ae5cf6328bc4413a279b2664318dafe2845ce36",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            16
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 16,
+        "sha256": "d69aaf8604384fa8ec871acf5d878a127a4e29ecbe154e24b9cc777e177f8148",
+        "url": "https://github.com/assembly-101/assembly101-action-anticipation/blob/7ae5cf6328bc4413a279b2664318dafe2845ce36/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-action-anticipation/blob/7ae5cf6328bc4413a279b2664318dafe2845ce36/README.md#L1-L16",
+        "why": "預測倉庫身份",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-action-anticipation",
+        "requested_repo": "assembly-101/assembly101-action-anticipation",
+        "commit": "7ae5cf6328bc4413a279b2664318dafe2845ce36",
+        "ref": null,
+        "path": "tempAgg-action-anticipation/evaluate.py",
+        "ranges": [
+          [
+            1,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 105,
+        "sha256": "e8972e6b3a6eff80758391a29e297f0116edc1b3e1114706fd3bbe701d9c08f2",
+        "url": "https://github.com/assembly-101/assembly101-action-anticipation/blob/7ae5cf6328bc4413a279b2664318dafe2845ce36/tempAgg-action-anticipation/evaluate.py",
+        "reading_url": "https://github.com/assembly-101/assembly101-action-anticipation/blob/7ae5cf6328bc4413a279b2664318dafe2845ce36/tempAgg-action-anticipation/evaluate.py#L1-L105",
+        "why": "評分維度與分數格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-action-anticipation",
+        "requested_repo": "assembly-101/assembly101-action-anticipation",
+        "commit": "7ae5cf6328bc4413a279b2664318dafe2845ce36",
+        "ref": null,
+        "path": "tempAgg-action-anticipation/utils/challenge.py",
+        "ranges": [
+          [
+            1,
+            17
+          ],
+          [
+            35,
+            56
+          ],
+          [
+            111,
+            128
+          ],
+          [
+            145,
+            161
+          ],
+          [
+            169,
+            187
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 187,
+        "sha256": "a01a2498b022ea9f3ddf3482dfc3c23073513c1233031408de8cd698a4c31d8a",
+        "url": "https://github.com/assembly-101/assembly101-action-anticipation/blob/7ae5cf6328bc4413a279b2664318dafe2845ce36/tempAgg-action-anticipation/utils/challenge.py",
+        "reading_url": "https://github.com/assembly-101/assembly101-action-anticipation/blob/7ae5cf6328bc4413a279b2664318dafe2845ce36/tempAgg-action-anticipation/utils/challenge.py#L1-L17",
+        "why": "逐類 top-k recall 與子集",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-action-recognition",
+        "requested_repo": "assembly-101/assembly101-action-recognition",
+        "commit": "00d3c3bb3af75ce38ae406614a7cb034aecdebc0",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            16
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 16,
+        "sha256": "9a1238e90c286645a94e77afaa8230c21c15ab04aa77c10fac5cc10a050f18ab",
+        "url": "https://github.com/assembly-101/assembly101-action-recognition/blob/00d3c3bb3af75ce38ae406614a7cb034aecdebc0/README.md",
+        "reading_url": "https://github.com/assembly-101/assembly101-action-recognition/blob/00d3c3bb3af75ce38ae406614a7cb034aecdebc0/README.md#L1-L16",
+        "why": "recognition 倉庫身份",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "assembly-101/assembly101-action-recognition",
+        "requested_repo": "assembly-101/assembly101-action-recognition",
+        "commit": "00d3c3bb3af75ce38ae406614a7cb034aecdebc0",
+        "ref": null,
+        "path": "TSM-action-recognition/ops/dataset.py",
+        "ranges": [
+          [
+            14,
+            45
+          ],
+          [
+            49,
+            99
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 127,
+        "sha256": "310087ffee45a0a4806f86c8b0967a1e0b06818a8e19da6dc96295211a5aeaa3",
+        "url": "https://github.com/assembly-101/assembly101-action-recognition/blob/00d3c3bb3af75ce38ae406614a7cb034aecdebc0/TSM-action-recognition/ops/dataset.py",
+        "reading_url": "https://github.com/assembly-101/assembly101-action-recognition/blob/00d3c3bb3af75ce38ae406614a7cb034aecdebc0/TSM-action-recognition/ops/dataset.py#L14-L45",
+        "why": "片段 frame 取樣",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008"
+  },
+  "repository_binding_review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+  "repository_bindings": [
+    {
+      "requested_repo": "assembly-101/assembly101-action-anticipation",
+      "resolved_repo": "assembly-101/assembly101-action-anticipation",
+      "aliases_in_this_review": [
+        "assembly-101/assembly101-action-anticipation"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "7ae5cf6328bc4413a279b2664318dafe2845ce36",
+          "reviewed_files": [
+            "README.md",
+            "tempAgg-action-anticipation/evaluate.py",
+            "tempAgg-action-anticipation/utils/challenge.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-action-anticipation",
+          "link_label": "github",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P015",
+          "review_file": "content/github_review/reviews/P015.json",
+          "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "assembly-101/assembly101-action-recognition",
+      "resolved_repo": "assembly-101/assembly101-action-recognition",
+      "aliases_in_this_review": [
+        "assembly-101/assembly101-action-recognition"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "00d3c3bb3af75ce38ae406614a7cb034aecdebc0",
+          "reviewed_files": [
+            "README.md",
+            "TSM-action-recognition/ops/dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-action-recognition",
+          "link_label": "github",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P015",
+          "review_file": "content/github_review/reviews/P015.json",
+          "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "assembly-101/assembly101-annotations",
+      "resolved_repo": "assembly-101/assembly101-annotations",
+      "aliases_in_this_review": [
+        "assembly-101/assembly101-annotations"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "01651287eec9778bdf1de20e91e4b3162cccd770",
+          "reviewed_files": [
+            "README.md",
+            "coarse-annotations/README.md",
+            "fine-grained-annotations/README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-annotations",
+          "link_label": "annotations repo",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-annotations",
+          "link_label": "github",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P015",
+          "review_file": "content/github_review/reviews/P015.json",
+          "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "assembly-101/assembly101-download-scripts",
+      "resolved_repo": "assembly-101/assembly101-download-scripts",
+      "aliases_in_this_review": [
+        "assembly-101/assembly101-download-scripts"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "01835b08aebe563148bea21a7be7a7674bc432cb",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-download-scripts",
+          "link_label": "file_download Dataset",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-download-scripts",
+          "link_label": "github",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P015",
+          "review_file": "content/github_review/reviews/P015.json",
+          "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "assembly-101/assembly101-mistake-detection",
+      "resolved_repo": "assembly-101/assembly101-mistake-detection",
+      "aliases_in_this_review": [
+        "assembly-101/assembly101-mistake-detection"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "6f3a953267ffb86cdeabf6751af05a75a011a4f8",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-mistake-detection",
+          "link_label": "github",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P015",
+          "review_file": "content/github_review/reviews/P015.json",
+          "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "assembly-101/assembly101-temporal-action-segmentation",
+      "resolved_repo": "assembly-101/assembly101-temporal-action-segmentation",
+      "aliases_in_this_review": [
+        "assembly-101/assembly101-temporal-action-segmentation"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "1ef3e0abbb27f92d8eae72c51a7f2cefdc72d6c5",
+          "reviewed_files": [
+            "README.md",
+            "utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/assembly-101/assembly101-temporal-action-segmentation",
+          "link_label": "github",
+          "project_url": "https://assembly-101.github.io/",
+          "page_sha256": "b23b2c9c99d2eb60c58862a7f1f1e3d7107b0c3ccda4619ac3da143ad9b39ab5"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P015",
+          "review_file": "content/github_review/reviews/P015.json",
+          "review_sha256": "72f99697cf3fea706e321304d1ddc648c0fec9b7ea718674022b3d27ea2c1008",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P015",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Assembly101正文標題相符，arXiv 2203.14712。",
+    "scope_read": "蒐集、粗細動作統計、split及四端點實驗。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      15
+    ],
+    "domains": [
+      "裝配與生產作業"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "固定多視角錄製配置；8外部＋4ego相機不是12個環境。",
+    "tasks": "101種take-apart玩具，15玩具類別；202粗動作、1,380細動作標籤；4端點為識別、預測、分段、錯誤偵測。",
+    "cases": "362次拆裝sequence，產生4,321視角影片、513視角小時；1,013,523細片段及104,759粗片段含多視角重複。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 101,
+        "unit": "玩具型號",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 202,
+        "unit": "粗動作類別",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1380,
+        "unit": "細動作類別",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 362,
+        "unit": "獨立拆裝sequences",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4321,
+        "unit": "視角影片",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1013523,
+        "unit": "細動作視角片段",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "識別top-1；提前1秒預測用class-mean top-5 recall。",
+      "分段MoF／edit／F1@10,25,50；錯誤／corrective分類precision與recall，early模式只看半段。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "60/15/25%；有seen／unseen玩具，25玩具跨split；視角與片段應繼承原sequence。",
+    "lineage": "自行蒐集；多視角是同次拆裝，不能用4,321宣稱同量獨立任務。其細標籤與3D手pose專用表又有不同子集。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5
+        ],
+        "locator": "§4與表1–4",
+        "supports": "sequence／視角／粗細標籤"
+      },
+      {
+        "pages": [
+          6,
+          8
+        ],
+        "locator": "§5.1、5.7",
+        "supports": "指標與錯誤觀測條件"
+      }
+    ],
+    "unresolved": [
+      "資料表中姿態專用1,456標籤與一般1,380標籤的完整映射待manifest核對。"
+    ],
+    "reuse": "可引入裝配依赖、順序變化、犯錯與糾正；應保留玩具、步驟、觀測端點三層單位。",
+    "reviewed_pdf_sha256": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+    "reviewed_on": "2026-10-02",
+    "name": "Assembly101",
+    "year": 2022,
+    "title": "Assembly101: A Large-Scale Multi-View Video Dataset for Understanding Procedural Activities",
+    "source_url": "https://arxiv.org/abs/2203.14712",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "industry"
+    ],
+    "review_tags": [
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P015",
+      "domain_ids": [
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P015",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "101種take-apart玩具，15玩具類別；202粗動作、1,380細動作標籤；4端點為識別、預測、分段、錯誤偵測。",
+            "固定多視角錄製配置；8外部＋4ego相機不是12個環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P015",
+      "name": "Assembly101",
+      "expected_title": "Assembly101: A Large-Scale Multi-View Video Dataset for Understanding Procedural Activities",
+      "source_url": "https://arxiv.org/abs/2203.14712",
+      "pdf_url": "https://arxiv.org/pdf/2203.14712",
+      "retrieved_at": "2026-10-02T21:33:07.696771+00:00",
+      "pdf_sha256": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+      "text_sha256": "8c2bfbe96ea261ecd4dd6ac1a1157f371b90d273c51a3de43567fd4021f3cdfe",
+      "pdf_bytes": 6732898,
+      "pages": 20,
+      "text_characters": 117733,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": null,
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2203.14712"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 101,
+        "unit": "玩具型號",
+        "pages": [
+          1,
+          4
+        ],
+        "record_id": "review10:P015:1",
+        "paper_id": "P015",
+        "benchmark": "Assembly101",
+        "native_term": "玩具型號",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.14712",
+            "locator": "PDF pp. 1, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 202,
+        "unit": "粗動作類別",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P015:2",
+        "paper_id": "P015",
+        "benchmark": "Assembly101",
+        "native_term": "粗動作類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.14712",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1380,
+        "unit": "細動作類別",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P015:3",
+        "paper_id": "P015",
+        "benchmark": "Assembly101",
+        "native_term": "細動作類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.14712",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 362,
+        "unit": "獨立拆裝sequences",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P015:4",
+        "paper_id": "P015",
+        "benchmark": "Assembly101",
+        "native_term": "獨立拆裝sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.14712",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4321,
+        "unit": "視角影片",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P015:5",
+        "paper_id": "P015",
+        "benchmark": "Assembly101",
+        "native_term": "視角影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.14712",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1013523,
+        "unit": "細動作視角片段",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P015:6",
+        "paper_id": "P015",
+        "benchmark": "Assembly101",
+        "native_term": "細動作視角片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "f115520e2f1cb8ec65ecf3e197be18dd91e8f34b1ee58fcb36d18e1346d24c1e",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2203.14712",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "assembly-101/assembly101-download-scripts",
+    "assembly-101/assembly101-annotations",
+    "assembly-101/assembly101-mistake-detection",
+    "assembly-101/assembly101-temporal-action-segmentation",
+    "assembly-101/assembly101-action-anticipation",
+    "assembly-101/assembly101-action-recognition"
+  ],
+  "external_repositories": []
+}

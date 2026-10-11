@@ -1,0 +1,292 @@
+{
+  "paper_id": "P052",
+  "name": "StillFast",
+  "title": "StillFast: An End-to-End Approach for Short-Term Object Interaction Anticipation",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2304.03959",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P052",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "StillFast在Ego4D STA上預測下一個互動物件、動作與接觸時間；官方測試提交和本機validation必須分開記錄。",
+    "environment": "Ego4D影片的觀測影格及短歷史片段，無互動模擬環境。",
+    "tasks": "共同預測box、noun、verb、time_to_contact；四種STA指標組合不是四份獨立素材。",
+    "data": "annotation以uid、video_id、frame和objects索引；objects含box／noun_category_id／verb_category_id／time_to_contact。訓練標籤有noun+1與依ROI版本決定的verb offset，輸出JSON再還原。",
+    "evaluation": "實際validation呼叫OverallMeanAveragePrecision(top_k=5)：IoU嚴格大於0.5、TTC誤差不超過0.25；依GT數折免(K−1)×GT個高分false positives。正式成績依README指定的Ego4D evaluator／隱藏test。",
+    "standardization": {
+      "profile": "short_term_object_interaction_anticipation",
+      "reuse": "STA annotation、uid結果格式、類別offset還原及原生匹配規則。",
+      "transform": "case保留版本、frame／歷史窗口、物件GT與TTC單位；box數與影片題數分開，evaluator保存top_k、IoU/TTC及類別平均規則。",
+      "missing": "影片／LMDB與split閉合、官方evaluator版本對照及空預測／標籤offset邊界案例核對。"
+    },
+    "version_note": "本機Overall mAP有更多診斷組合，不等於官方只報的STA欄位；靜態核讀還發現add的空字典分支有不可達的內層len(preds)>0條件，整合前須核對空輸出對分母的影響。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/stillfast",
+        "requested_repo": "fpv-iplab/stillfast",
+        "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            102
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 102,
+        "sha256": "54e738e945f097e7e3b13000493280b8cb1278f6a5de0b829c286f052b05ad01",
+        "url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/README.md",
+        "reading_url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/README.md#L1-L102",
+        "why": "確認Ego4D v1/v2、資料與官方評分入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/stillfast",
+        "requested_repo": "fpv-iplab/stillfast",
+        "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+        "ref": null,
+        "path": "stillfast/datasets/ego4d_sta_still.py",
+        "ranges": [
+          [
+            17,
+            23
+          ],
+          [
+            34,
+            41
+          ],
+          [
+            48,
+            54
+          ],
+          [
+            56,
+            67
+          ],
+          [
+            78,
+            84
+          ],
+          [
+            93,
+            136
+          ],
+          [
+            144,
+            154
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 154,
+        "sha256": "bbad2974754df6fa2ef4a4c1b6f05c7b3050207539d1ba71c6518eabfc590a22",
+        "url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/datasets/ego4d_sta_still.py",
+        "reading_url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/datasets/ego4d_sta_still.py#L17-L23",
+        "why": "讀UID、影格、objects和類別offset。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/stillfast",
+        "requested_repo": "fpv-iplab/stillfast",
+        "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+        "ref": null,
+        "path": "stillfast/tasks/sta.py",
+        "ranges": [
+          [
+            1,
+            178
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 178,
+        "sha256": "af9a8e58613ed72e38d8000f37ec8a9671645f0eafe01543c56fc1c689875e6d",
+        "url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/tasks/sta.py",
+        "reading_url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/tasks/sta.py#L1-L178",
+        "why": "追到validation metric與提交JSON的類別還原。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/stillfast",
+        "requested_repo": "fpv-iplab/stillfast",
+        "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+        "ref": null,
+        "path": "stillfast/evaluation/sta_metrics.py",
+        "ranges": [
+          [
+            2,
+            6
+          ],
+          [
+            15,
+            19
+          ],
+          [
+            32,
+            40
+          ],
+          [
+            61,
+            203
+          ],
+          [
+            205,
+            217
+          ],
+          [
+            233,
+            237
+          ],
+          [
+            266,
+            270
+          ],
+          [
+            288,
+            292
+          ],
+          [
+            294,
+            298
+          ],
+          [
+            308,
+            312
+          ],
+          [
+            359,
+            363
+          ],
+          [
+            368,
+            378
+          ],
+          [
+            380,
+            388
+          ],
+          [
+            398,
+            402
+          ],
+          [
+            407,
+            411
+          ],
+          [
+            414,
+            420
+          ],
+          [
+            428,
+            439
+          ],
+          [
+            463,
+            467
+          ],
+          [
+            487,
+            491
+          ],
+          [
+            496,
+            500
+          ],
+          [
+            523,
+            529
+          ],
+          [
+            532,
+            543
+          ],
+          [
+            551,
+            555
+          ],
+          [
+            566,
+            592
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 665,
+        "sha256": "0b797ca8729203c5ebb9d3c7df468c81bcdf4f291c7136cbd54c54c27ec3c794",
+        "url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/evaluation/sta_metrics.py",
+        "reading_url": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/evaluation/sta_metrics.py#L2-L6",
+        "why": "讀匹配、K個false-positive折免及STA具體條件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "eb900a54501e773100a8aae9ccb5d13d566d4c0ad365572e20bd830677dcf9d9"
+  },
+  "repository_binding_review_sha256": "eb900a54501e773100a8aae9ccb5d13d566d4c0ad365572e20bd830677dcf9d9",
+  "repository_bindings": [
+    {
+      "requested_repo": "fpv-iplab/stillfast",
+      "resolved_repo": "fpv-iplab/stillfast",
+      "aliases_in_this_review": [
+        "fpv-iplab/stillfast"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+          "reviewed_files": [
+            "README.md",
+            "stillfast/datasets/ego4d_sta_still.py",
+            "stillfast/evaluation/sta_metrics.py",
+            "stillfast/tasks/sta.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/fpv-iplab/stillfast",
+          "link_label": "github repository.",
+          "project_url": "https://iplab.dmi.unict.it/stillfast/",
+          "page_sha256": "94aa6ec5c7a3d7a930ed8409d0d08fcb5548275edb1c955ed61b9f02bfbed7c8"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P052",
+          "review_file": "content/github_review/reviews/P052.json",
+          "review_sha256": "eb900a54501e773100a8aae9ccb5d13d566d4c0ad365572e20bd830677dcf9d9",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "fpv-iplab/stillfast"
+  ],
+  "external_repositories": []
+}

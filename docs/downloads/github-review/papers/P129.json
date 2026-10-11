@@ -1,0 +1,499 @@
+{
+  "paper_id": "P129",
+  "name": "RH20T",
+  "title": "RH20T: A Comprehensive Robotic Dataset for Learning Diverse Skills in One-Shot",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2307.00595",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P129",
+    "summary": "RH20T API能按時間對齊多相機、TCP和力矩，但不同機體有不同前處理；tactile原始資料可載入，按時間查詢接口仍是佔位。",
+    "environment": "多機器人配置與相機序列的實拍操作場景；scene folder是資料record脈絡，機體/攝影機數不能當獨立環境數。",
+    "tasks": "多樣操作示範與多模態學習資料；此庫主要提供loader/visualizer/online preprocessor，任務目標與評測協定需連原文／來源metadata。",
+    "data": "時間查詢以毫秒，影像選最近low-frequency timestamp，TCP/FT/關節/夾爪值另線性插值。TCP7D四元數、FT6D；Kuka位置除1000，Franka/UR5姿態及不同gripper各有processor；標定和raw/zeroed FT不能混用。",
+    "evaluation": "沒有從此資料API取得通用task成功scorer。get_tactile(timestamp)與detect_outlier仍NotImplemented，高頻gripper getter也未實作；不能由tactile.npy存在推定整套評測介面可用。",
+    "standardization": {
+      "profile": "multimodal_robot_sensor_demonstration",
+      "reuse": "配置ID、相機serial、raw/aligned資料、毫秒時間與機體/相機轉換參數。",
+      "transform": "source/native scene與實際workspace分開；case保存各模態原始時間/插值方式/資料缺失、TCP encoding、FT零偏和gripper單位；sensor trace不是直接可執行action。",
+      "missing": "全量metadata/素材、任務goal及split、四元數插值有效性、tactile/高頻gripper接線與原生評測判分。"
+    },
+    "version_note": "固定aa31244 API版；README列出的接口和實作範圍分開。未下載大資料或進行online機器人投影執行。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "rh20t/rh20t_api",
+        "requested_repo": "rh20t/rh20t_api",
+        "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            60
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 130,
+        "sha256": "87e1a73d9f5df592691ad1bbc3313e9a19b0405586c00381b19eb1356077faba",
+        "url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/README.md",
+        "reading_url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/README.md#L1-L60",
+        "why": "資料API、相機/TCP/FT與毫秒查詢入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rh20t/rh20t_api",
+        "requested_repo": "rh20t/rh20t_api",
+        "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb",
+        "ref": null,
+        "path": "rh20t_api/configurations.py",
+        "ranges": [
+          [
+            1,
+            83
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 167,
+        "sha256": "c590ff6ca70c20c13a4c3d0967e6621b8bd721611f338b834cc5f403dbd0ae85",
+        "url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/rh20t_api/configurations.py",
+        "reading_url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/rh20t_api/configurations.py#L1-L83",
+        "why": "機體單位/姿態/夾爪轉換及標定矩陣",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rh20t/rh20t_api",
+        "requested_repo": "rh20t/rh20t_api",
+        "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb",
+        "ref": null,
+        "path": "rh20t_api/scene.py",
+        "ranges": [
+          [
+            38,
+            75
+          ],
+          [
+            114,
+            115
+          ],
+          [
+            467,
+            489
+          ],
+          [
+            528,
+            550
+          ],
+          [
+            563,
+            592
+          ],
+          [
+            617,
+            639
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 689,
+        "sha256": "4a0dfd7f8eba6640d029c7316b842c46b04490826c20e25f73cc9cdabd879975",
+        "url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/rh20t_api/scene.py",
+        "reading_url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/rh20t_api/scene.py#L38-L75",
+        "why": "最近影格、連續值插值、原始tactile與未實作接口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rh20t/rh20t_api",
+        "requested_repo": "rh20t/rh20t_api",
+        "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb",
+        "ref": null,
+        "path": "rh20t_api/online.py",
+        "ranges": [
+          [
+            127,
+            155
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 203,
+        "sha256": "b98dc695a29960fcf67407735d108c0d2a514174142f466493345da5af937a0d",
+        "url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/rh20t_api/online.py",
+        "reading_url": "https://github.com/rh20t/rh20t_api/blob/aa3124434729ed622109a29b2cbb9f3bbb1c5eeb/rh20t_api/online.py#L127-L155",
+        "why": "機體base到相機的TCP/FT投影",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "566d79cd80566cfcf21b38cead6447e193526842d4c268ff8dbd039185ef89bb"
+  },
+  "repository_binding_review_sha256": "566d79cd80566cfcf21b38cead6447e193526842d4c268ff8dbd039185ef89bb",
+  "repository_bindings": [
+    {
+      "requested_repo": "rh20t/rh20t_api",
+      "resolved_repo": "rh20t/rh20t_api",
+      "aliases_in_this_review": [
+        "rh20t/rh20t_api"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "aa3124434729ed622109a29b2cbb9f3bbb1c5eeb",
+          "reviewed_files": [
+            "README.md",
+            "rh20t_api/configurations.py",
+            "rh20t_api/online.py",
+            "rh20t_api/scene.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "RH20T",
+          "search_receipt_sha256": "5645e6f033aae58f78dba2040938da62b8be7b1b96740c879c09a353d7adbe32",
+          "url": "https://github.com/rh20t/rh20t_api",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P129",
+          "review_file": "content/github_review/reviews/P129.json",
+          "review_sha256": "566d79cd80566cfcf21b38cead6447e193526842d4c268ff8dbd039185ef89bb",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P129",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RH20T正式PDF標題相符，arXiv 2307.00595。",
+    "scope_read": "147task來源、7硬體配置、pairing階層、110K數據与實際few-shot實驗。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "7robot configurations、>50table covers；covers不是不同場景layout。",
+    "tasks": "147tasks＝48選自RLBench＋29MetaWorld＋70自定義；42verbs是skill標籤，不是147完全獨立新設計。",
+    "cases": ">110K robot sequences與等量human sequences；hierarchy可配出數百萬pairs但不是同量獨立影片。本文ACT主實驗只在1個block-to-weight任務，每configuration20trials。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 147,
+        "unit": "task definitions",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 42,
+        "unit": "skill verbs",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 110000,
+        "unit": "robot sequences",
+        "qualifier": "超過；另等量human sequences",
+        "pages": [
+          2,
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "主實驗每configuration trials",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "人類收集時0–9quality、成功/失敗約10:1；ACT實驗分reach/grasp/place success，60秒上限。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人工或模型評審"
+    ],
+    "split": "新環境含新camera/tablecover/robot；pretrain335同task＋195相近task，fine-tune75demo起，再縮小資料。",
+    "lineage": "RLBench與MetaWorld任務規格被實拍移植；新實拍数据是新素材，但goal定義有上游來源。",
+    "related_paper_ids": [
+      "P062",
+      "P063"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§III-A/B、§IV",
+        "supports": "48+29+70、110K與主實驗1task/20trials"
+      }
+    ],
+    "unresolved": [
+      "paired影片之精確實例對應與跨機體可比性需原生metadata匯入。",
+      "DROID原作表I將RH20T依unique multi-view trajectories記為約13K，與RH20T原作110K口徑不同；保留兩種出處，未完成原始manifest去重。"
+    ],
+    "reuse": "是從前作選task再擴新task、兼有人類影片與robot軌跡的重要前例。",
+    "reviewed_pdf_sha256": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+    "reviewed_on": "2026-10-02",
+    "name": "RH20T",
+    "year": 2023,
+    "title": "RH20T: A Comprehensive Robotic Dataset for Learning Diverse Skills in One-Shot",
+    "source_url": "https://arxiv.org/abs/2307.00595",
+    "primary_type": "G",
+    "category_name": "機器人資料與通用策略",
+    "domain_ids": [
+      "home",
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用",
+      "組裝與拆解",
+      "居家生活",
+      "人機協作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P129",
+      "domain_ids": [
+        "home",
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P129",
+          "domain_ids": [
+            "home",
+            "industry"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "147tasks＝48選自RLBench＋29MetaWorld＋70自定義；42verbs是skill標籤，不是147完全獨立新設計。",
+            "7robot configurations、>50table covers；covers不是不同場景layout。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755"
+        },
+        {
+          "paper_id": "P129",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "包含RLBench、Meta-World及自定義的147項操作。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+      "previous_domain_ids": [
+        "home",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P129",
+      "name": "RH20T",
+      "expected_title": "RH20T: A Comprehensive Robotic Dataset for Learning Diverse Skills in One-Shot",
+      "source_url": "https://arxiv.org/abs/2307.00595",
+      "pdf_url": "https://arxiv.org/pdf/2307.00595",
+      "retrieved_at": "2026-10-02T21:34:24.238248+00:00",
+      "pdf_sha256": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+      "text_sha256": "dd9d2fa5d2f1b4a5bcdf4a32b346a39d8e8530fd4e00699bafc9efd8bb9fece8",
+      "pdf_bytes": 5022182,
+      "pages": 15,
+      "text_characters": 101065,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": null,
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2307.00595"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 147,
+        "unit": "task definitions",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P129:1",
+        "paper_id": "P129",
+        "benchmark": "RH20T",
+        "native_term": "task definitions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.00595",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 42,
+        "unit": "skill verbs",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P129:2",
+        "paper_id": "P129",
+        "benchmark": "RH20T",
+        "native_term": "skill verbs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.00595",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 110000,
+        "unit": "robot sequences",
+        "qualifier": "超過；另等量human sequences",
+        "pages": [
+          2,
+          3
+        ],
+        "record_id": "review10:P129:3",
+        "paper_id": "P129",
+        "benchmark": "RH20T",
+        "native_term": "robot sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.00595",
+            "locator": "PDF pp. 2, 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "主實驗每configuration trials",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P129:4",
+        "paper_id": "P129",
+        "benchmark": "RH20T",
+        "native_term": "主實驗每configuration trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "6156500a1340a2e976681f0f8deea8ce493fb4af227d8a5b2696cb3c384bb755",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2307.00595",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "rh20t/rh20t_api"
+  ],
+  "external_repositories": []
+}

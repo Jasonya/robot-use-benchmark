@@ -1,0 +1,568 @@
+{
+  "paper_id": "P020",
+  "name": "EgoHumans",
+  "title": "EgoHumans: An Egocentric 3D Multi-Human Benchmark",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2305.16487",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "leisure",
+    "social",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P020",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoHumans 官方倉庫提供多人體資料處理、COCO-video 轉換與追蹤評測。已沿 tracking 檔案追到內含 MMTracking 的 dataset evaluator 與 MOT matching。",
+    "environment": "穿戴 Aria 與外部相機同步記錄多人活動，含網球、擊劍等；big_sequence/subsequence、相機與人物分層。拼接 COCO video 或增加 ego_slam/exo 視角不新增實體環境。",
+    "tasks": "多人偵測、2D/3D pose、mesh 和身份追蹤；主要 tracking 比較以 ego_rgb 和指定 detector 條件進行。GT bbox 與 YOLOX bbox 是不同合法輸入條件。",
+    "data": "coco_video_format.py 以 parent_sequence+sequence+camera+mode 建 video_name；image 有 image_id/video_id/frame_id，annotation 保留 human_name/camera_name/camera_mode/time_stamp，instance_id 由 aria 人名解析，bbox 用 XYWH。frame_id 在可納入影像序列內重新編號；無有效人框的 frame 會被跳過。MiDaS 深度／3D root 是加工輸出，不是直接測量深度。",
+    "evaluation": "CocoVideoDataset 按 frame_id==0 分影片並檢查 track_bboxes 長度；eval_mot 用 1-IoU 距離、預設 .5 門檻、ignore IoF 和 MOTAccumulator，輸出 IDF1/MOTA/MOTP/FP/FN/IDSw 等。MOTP 在此轉成 1-distance，方向與底層距離不同；全體累積結果與逐類平均需分開。",
+    "standardization": {
+      "profile": "multiview_multihuman_tracking",
+      "reuse": "COCO-video 轉換、原人物 ID／時間、tracking 輸入條件與內含 MOT adapter。",
+      "transform": "environment 留真實錄製／subsequence，video ID 只作觀測序列；維持原 time_stamp 到重編 frame_id 的對照。case/evaluator 記 detector、GT bbox 可用性、ego_rgb/ego_slam/exo、深度來源、忽略區域與匹配閾值，跨拼接需重新命名 instance ID 並儲存原值。",
+      "missing": "尚未取得影像、pose、MiDaS 加工資料／模型或執行；主要驗證流程需固定設定檔與 detector 輸出。2D/3D pose 和 mesh benchmark 的完整 evaluator 不包含在這次 tracking 核讀範圍。"
+    },
+    "version_note": "作者 TRACKING.md 說因 PyTorch 升級，公開結果與原論文有約 1% 變動；不能將當前程式當原表格的逐位重現。所核讀的 external/MMTracking 檔案是正式入口依賴，其他內嵌模型／資料集未據此宣稱全數讀完。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            82
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 82,
+        "sha256": "d0792e7aee6e88835c5c85172f9a835aa82283d25b175706adf9b4db3017982b",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/README.md",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/README.md#L1-L82",
+        "why": "論文身份、活動及 benchmark 角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "assets/TRACKING.md",
+        "ranges": [
+          [
+            1,
+            33
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 33,
+        "sha256": "47515302659e96a18bc33fdf054db1f9fce502090404dd677ff3896a71478427",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/assets/TRACKING.md",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/assets/TRACKING.md#L1-L33",
+        "why": "原作 tracking 和 GT/detector 條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "assets/COCO_VIDEO.md",
+        "ranges": [
+          [
+            1,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 61,
+        "sha256": "7c0fa8e67081c3f81b82f6aee9d01c7028979a8a29dbdd72d67c08be0052cce7",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/assets/COCO_VIDEO.md",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/assets/COCO_VIDEO.md#L1-L61",
+        "why": "COCO video 加工與深度來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "egohumans/tools/create_benchmark/coco_video_format.py",
+        "ranges": [
+          [
+            35,
+            41
+          ],
+          [
+            43,
+            77
+          ],
+          [
+            84,
+            90
+          ],
+          [
+            109,
+            141
+          ],
+          [
+            145,
+            152
+          ],
+          [
+            155,
+            178
+          ],
+          [
+            188,
+            225
+          ],
+          [
+            228,
+            241
+          ],
+          [
+            263,
+            335
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 377,
+        "sha256": "52679704cabeed805ebbc48981f816b9bdabd14c125e8ea0a3c79b8a4e4a1a07",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/egohumans/tools/create_benchmark/coco_video_format.py",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/egohumans/tools/create_benchmark/coco_video_format.py#L35-L41",
+        "why": "原始人物／影格到評測 ID 的轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "scripts/benchmarks/tracking/0_test_tracking.sh",
+        "ranges": [
+          [
+            1,
+            130
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 223,
+        "sha256": "8eb2f90fbf0600a13cb3f1725218d47c9ab22b7357a94a59c2be768cf4d73277",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/scripts/benchmarks/tracking/0_test_tracking.sh",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/scripts/benchmarks/tracking/0_test_tracking.sh#L1-L130",
+        "why": "實際 MMTracking 入口與子集設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "egohumans/external/mmtracking/mmtrack/datasets/coco_video_dataset.py",
+        "ranges": [
+          [
+            5,
+            13
+          ],
+          [
+            240,
+            254
+          ],
+          [
+            363,
+            453
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 498,
+        "sha256": "12a48a16fa8ec071f391a5397c1d12a8a74ca83a7e56582a1425bd79c8817269",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/egohumans/external/mmtracking/mmtrack/datasets/coco_video_dataset.py",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/egohumans/external/mmtracking/mmtrack/datasets/coco_video_dataset.py#L5-L13",
+        "why": "分影片與 evaluator 呼叫",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rawalkhirodkar/egohumans",
+        "requested_repo": "rawalkhirodkar/egohumans",
+        "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+        "ref": null,
+        "path": "egohumans/external/mmtracking/mmtrack/core/evaluation/eval_mot.py",
+        "ranges": [
+          [
+            2,
+            20
+          ],
+          [
+            28,
+            82
+          ],
+          [
+            87,
+            93
+          ],
+          [
+            100,
+            139
+          ],
+          [
+            147,
+            161
+          ],
+          [
+            179,
+            185
+          ],
+          [
+            188,
+            194
+          ],
+          [
+            218,
+            227
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 231,
+        "sha256": "46e78682532884a72fc4a41afa2399a712210f2b3ea8ba051e86846ffc8f9a00",
+        "url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/egohumans/external/mmtracking/mmtrack/core/evaluation/eval_mot.py",
+        "reading_url": "https://github.com/rawalkhirodkar/egohumans/blob/d7875dd4b3e3cc4e306af386d5c4febf1290a3e9/egohumans/external/mmtracking/mmtrack/core/evaluation/eval_mot.py#L2-L20",
+        "why": "IoU matching、ignore 與 MOT 聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7b07588c4882a7ae1f6e60ee4af49a3ee10bb66275cd8bd146249923e07be164"
+  },
+  "repository_binding_review_sha256": "7b07588c4882a7ae1f6e60ee4af49a3ee10bb66275cd8bd146249923e07be164",
+  "repository_bindings": [
+    {
+      "requested_repo": "rawalkhirodkar/egohumans",
+      "resolved_repo": "rawalkhirodkar/egohumans",
+      "aliases_in_this_review": [
+        "rawalkhirodkar/egohumans"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d7875dd4b3e3cc4e306af386d5c4febf1290a3e9",
+          "reviewed_files": [
+            "README.md",
+            "assets/COCO_VIDEO.md",
+            "assets/TRACKING.md",
+            "egohumans/external/mmtracking/mmtrack/core/evaluation/eval_mot.py",
+            "egohumans/external/mmtracking/mmtrack/datasets/coco_video_dataset.py",
+            "egohumans/tools/create_benchmark/coco_video_format.py",
+            "scripts/benchmarks/tracking/0_test_tracking.sh"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/rawalkhirodkar/egohumans",
+          "link_label": "Code",
+          "project_url": "https://rawalkhirodkar.github.io/egohumans",
+          "page_sha256": "5472457145961a6a3f5805fdc75e26b68c3f8087e2f3990f8fe1ec0a37fed805"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P020",
+          "review_file": "content/github_review/reviews/P020.json",
+          "review_sha256": "7b07588c4882a7ae1f6e60ee4af49a3ee10bb66275cd8bd146249923e07be164",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "休閒與運動",
+    "社交與溝通",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P020",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoHumans，arXiv 2305.16487v2。",
+    "scope_read": "資料統計、test切分、tracking評測與主端點定義。",
+    "pages_read": [
+      1,
+      2,
+      6
+    ],
+    "domains": [
+      "休閒與運動",
+      "社交與溝通",
+      "穿戴互動與動作介面"
+    ],
+    "role": "人體與互動感知評測",
+    "environment": "6個地點＝3室內＋3室外；7個活動sequence，20人，多人同時戴Aria。",
+    "tasks": "籃球、擊劍、羽球、網球、排球、追逐、搭城堡；主要3D多人追蹤，並提供2D/3D姿態與mesh。",
+    "cases": "125K ego RGB、250K灰階、446K外部圖像；正式ego train77,260／test47,740 images。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 6,
+        "unit": "錄製地點",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "活動sequences／類型",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 47740,
+        "unit": "test ego影像",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "CLEAR追蹤指標（MOTA、FP、FN、IDs）、IDF1、HOTA；因主要使用off-the-shelf detector，以IDF1作主要tracking指標。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "train/test地點不重疊；同步多人的多視角不能視為獨立活動。",
+    "lineage": "新蒐集多視角；COCO用於模型訓練對照，不算本benchmark題數。",
+    "evidence": [
+      {
+        "pages": [
+          6
+        ],
+        "locator": "§5.1 Data Statistics與Metrics",
+        "supports": "環境、影格split與主要metric"
+      }
+    ],
+    "unresolved": [
+      "各附加pose／mesh端點是否有獨立正式leaderboard與有效ID需另查。"
+    ],
+    "reuse": "拓展戶外多人互動感知；不能直接宣稱涵蓋同量可執行robot工作任務。",
+    "reviewed_pdf_sha256": "7d7f42b85231561ddb1a646fefbdec9fe97bc1e02455d7603006aa7ceac3de30",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoHumans",
+    "year": 2023,
+    "title": "EgoHumans: An Egocentric 3D Multi-Human Benchmark",
+    "source_url": "https://arxiv.org/abs/2305.16487",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "leisure",
+      "social",
+      "wearable"
+    ],
+    "review_tags": [
+      "運動與身體技能",
+      "社交與溝通"
+    ],
+    "domain_names": [
+      "休閒與運動",
+      "社交與溝通",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P020",
+      "domain_ids": [
+        "leisure",
+        "social",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P020",
+          "domain_ids": [
+            "leisure",
+            "social"
+          ],
+          "pages": [
+            1,
+            2,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "籃球、擊劍、羽球、網球、排球、追逐、搭城堡；主要3D多人追蹤，並提供2D/3D姿態與mesh。",
+            "6個地點＝3室內＋3室外；7個活動sequence，20人，多人同時戴Aria。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7d7f42b85231561ddb1a646fefbdec9fe97bc1e02455d7603006aa7ceac3de30"
+        },
+        {
+          "paper_id": "P020",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "動態人群的3D追蹤、姿態與mesh表示。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "7d7f42b85231561ddb1a646fefbdec9fe97bc1e02455d7603006aa7ceac3de30"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7d7f42b85231561ddb1a646fefbdec9fe97bc1e02455d7603006aa7ceac3de30",
+      "previous_domain_ids": [
+        "leisure",
+        "social"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P020",
+      "name": "EgoHumans",
+      "expected_title": "EgoHumans: An Egocentric 3D Multi-Human Benchmark",
+      "source_url": "https://arxiv.org/abs/2305.16487",
+      "pdf_url": "https://arxiv.org/pdf/2305.16487",
+      "retrieved_at": "2026-10-02T21:33:10.155465+00:00",
+      "pdf_sha256": "7d7f42b85231561ddb1a646fefbdec9fe97bc1e02455d7603006aa7ceac3de30",
+      "text_sha256": "365ab7bf28f930d72ad2783cc5ea18de74be45d0348ba6b5b8cd1b8700006783",
+      "pdf_bytes": 3279068,
+      "pages": 13,
+      "text_characters": 91313,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2305.16487v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2305.16487v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 6,
+        "unit": "錄製地點",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P020:1",
+        "paper_id": "P020",
+        "benchmark": "EgoHumans",
+        "native_term": "錄製地點",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2305.16487v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2305.16487v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "活動sequences／類型",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P020:2",
+        "paper_id": "P020",
+        "benchmark": "EgoHumans",
+        "native_term": "活動sequences／類型",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2305.16487v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2305.16487v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 47740,
+        "unit": "test ego影像",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P020:3",
+        "paper_id": "P020",
+        "benchmark": "EgoHumans",
+        "native_term": "test ego影像",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2305.16487v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2305.16487v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "rawalkhirodkar/egohumans"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,306 @@
+{
+  "paper_id": "P042",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RoboSpatial 必須分生成工具NVlabs/RoboSpatial與benchmark評測RoboSpatial-Eval；兩個repo互相連結，身份已確認。已核讀範例loader、生成入口與新版Context評分。",
+  "reading_order": [
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "README.md",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "ranges": [
+        [
+          1,
+          81
+        ],
+        [
+          110,
+          164
+        ],
+        [
+          180,
+          208
+        ]
+      ],
+      "why": "生成與評測角色、待辦支援及來源身份"
+    },
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "data/README.md",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "ranges": [
+        [
+          1,
+          46
+        ]
+      ],
+      "why": "掃描／EmbodiedScan父來源"
+    },
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "robospatial/data_loader/example_loader.py",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "ranges": [
+        [
+          20,
+          28
+        ],
+        [
+          55,
+          75
+        ],
+        [
+          102,
+          109
+        ],
+        [
+          111,
+          118
+        ],
+        [
+          122,
+          134
+        ],
+        [
+          139,
+          163
+        ],
+        [
+          170,
+          178
+        ],
+        [
+          182,
+          238
+        ],
+        [
+          240,
+          247
+        ],
+        [
+          249,
+          259
+        ],
+        [
+          261,
+          280
+        ],
+        [
+          294,
+          303
+        ]
+      ],
+      "why": "中介欄位、區域性物件ID與可見物件限制"
+    },
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "robospatial/annotation_generator.py",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "ranges": [
+        [
+          11,
+          24
+        ],
+        [
+          34,
+          41
+        ],
+        [
+          44,
+          70
+        ],
+        [
+          120,
+          131
+        ],
+        [
+          139,
+          171
+        ],
+        [
+          176,
+          185
+        ],
+        [
+          229,
+          248
+        ],
+        [
+          250,
+          258
+        ],
+        [
+          277,
+          284
+        ],
+        [
+          297,
+          306
+        ]
+      ],
+      "why": "生成型別、派發與引數"
+    },
+    {
+      "repo": "chanhee-luke/RoboSpatial-Eval",
+      "path": "README.md",
+      "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+      "ranges": [
+        [
+          1,
+          100
+        ],
+        [
+          141,
+          196
+        ]
+      ],
+      "why": "Home三類、聚合、point budget及版本修正"
+    },
+    {
+      "repo": "chanhee-luke/RoboSpatial-Eval",
+      "path": "evaluation.py",
+      "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+      "ranges": [
+        [
+          12,
+          54
+        ],
+        [
+          60,
+          121
+        ],
+        [
+          123,
+          137
+        ],
+        [
+          140,
+          146
+        ],
+        [
+          156,
+          174
+        ],
+        [
+          190,
+          216
+        ],
+        [
+          222,
+          263
+        ],
+        [
+          265,
+          271
+        ],
+        [
+          281,
+          287
+        ],
+        [
+          294,
+          300
+        ],
+        [
+          302,
+          308
+        ],
+        [
+          316,
+          344
+        ],
+        [
+          349,
+          374
+        ],
+        [
+          382,
+          398
+        ],
+        [
+          410,
+          416
+        ],
+        [
+          419,
+          434
+        ],
+        [
+          436,
+          442
+        ],
+        [
+          446,
+          474
+        ],
+        [
+          478,
+          494
+        ]
+      ],
+      "why": "真實mask/yes-no判分與兩種分母"
+    }
+  ],
+  "environment": "生成工具沿用EmbodiedScan整理的ScanNet/3RScan/Matterport3D/ARKitScenes等掃描；dataset/scene_name/image_name分層。RoboSpatial-Home是另外發布的評測集合，不能與生成資料總量直接相加。",
+  "tasks": "grounding、context（空間指點）、configuration（關係）、compatibility（能否容納）；Home評測用後三類。BOP/GraspNet統一loader在固定README仍為待辦，不能報已支援全部資產。",
+  "data": "ExampleLoader要求dataset/scene_name/image_name/objects/camera_annotations，含intrinsic/extrinsic、Name與bbox_3d[0]的9DOF；重複類別生成區域性chair_0等名稱。generator按unique/all-visible pair模式、grid/threshold/buffer/sample數產生unary/pairwise與grounding JSON。Home例欄位img/category/question/answer，Context另需mask。",
+  "evaluation": "新版Context解析最多前2點（可設1），正規化xy乘width-1/height-1、round後clamp，任一點落非零mask畫素算對；不再用GT點的距離。binary答案用yes/no開頭判斷。即時評分分母為原json_data數；pregenerated按(question,img)匹配，unmatched跳過分母，需額外報matching coverage。README總分按三類平均，VQA avg只平均configuration/compatibility。",
+  "standardization": {
+    "profile": "spatial_image_qa_and_pointing",
+    "reuse": "掃描來源/scene ID、相機/9DOF box中介格式、生成引數，以及二值/point-in-mask評測。",
+    "transform": "保留生成資料與Home benchmark的source/subset區別；case以原question+img並附穩定hash，mask/座標縮放/影像尺寸版本化。區域性物件索引映回來源instance，不當跨圖全球ID；evaluator記num_points_to_match、clamp、mask版本、matched/total與分項聚合。",
+    "missing": "未下載Home影像／mask與全掃描或執行生成。需核驗Home對train來源的重用關係、各loader座標約定及full-scene occupancy；範例loader只含當前圖可見／標註物件，不能假定所有未見空間都為空。生成幾何關係不等於具體機器人能抓取或放置成功。"
+  },
+  "version_note": "固定Eval README要求5/13以前fork更新Context邏輯，屬2026 challenge版本。應和CVPR2025原論文結果分版本比較；預測點數由1改2也會改變成功機會。已讀生成派發，未宣稱完整spatial_analysis幾何演算法逐行審完。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "README.md",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "sha256": "0187b6ba8888968b5676e1cef1dbe55681a994339096ba037e89e92339ea197a",
+      "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/README.md",
+      "local_file": "audit/.cache/github_review/repos/NVlabs__RoboSpatial/files/README.md"
+    },
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "data/README.md",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "sha256": "c75478dc263006a88e27272e6666ee5d85f1c2492daf2a2a508136710f8a84d9",
+      "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/data/README.md",
+      "local_file": "audit/.cache/github_review/repos/NVlabs__RoboSpatial/files/data/README.md"
+    },
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "robospatial/data_loader/example_loader.py",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "sha256": "837bcae1b00db337ac4dcaf1eacafada7b1a096c7411356ad0145c64e568cfbd",
+      "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/robospatial/data_loader/example_loader.py",
+      "local_file": "audit/.cache/github_review/repos/NVlabs__RoboSpatial/files/robospatial/data_loader/example_loader.py"
+    },
+    {
+      "repo": "NVlabs/RoboSpatial",
+      "path": "robospatial/annotation_generator.py",
+      "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+      "sha256": "92198237fa6b6ece321b1bd2e5dfd440819b74a36bf7cbf486444e5977a6cec3",
+      "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/robospatial/annotation_generator.py",
+      "local_file": "audit/.cache/github_review/repos/NVlabs__RoboSpatial/files/robospatial/annotation_generator.py"
+    },
+    {
+      "repo": "chanhee-luke/RoboSpatial-Eval",
+      "path": "README.md",
+      "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+      "sha256": "d6913a279e662fe8c0d565e64e91b461f03f586a1fd34a0915de84dff83987ad",
+      "url": "https://github.com/chanhee-luke/RoboSpatial-Eval/blob/c0095be6ca2d012086b3c141eccac4c879865cd4/README.md",
+      "local_file": "audit/.cache/github_review/repos/chanhee-luke__RoboSpatial-Eval/files/README.md"
+    },
+    {
+      "repo": "chanhee-luke/RoboSpatial-Eval",
+      "path": "evaluation.py",
+      "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+      "sha256": "cbfda621874bd99f5d4bd00fe662e8dddda0b1a87e7367695fcc197f345c4a83",
+      "url": "https://github.com/chanhee-luke/RoboSpatial-Eval/blob/c0095be6ca2d012086b3c141eccac4c879865cd4/evaluation.py",
+      "local_file": "audit/.cache/github_review/repos/chanhee-luke__RoboSpatial-Eval/files/evaluation.py"
+    }
+  ]
+}

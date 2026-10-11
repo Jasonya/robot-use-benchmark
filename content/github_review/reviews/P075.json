@@ -1,0 +1,621 @@
+{
+  "paper_id": "P075",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "VIMA-Bench提供任務、資料與成功判定，VIMA倉庫提供模型與互動範例。已核讀多模態prompt、四級partition、T+1/T資料對齊，以及visual_manipulation與without_touching的具體checker；primitive步數不能當低階控制步數。",
+  "identity_note": "對應arXiv:2210.03094v2（2023-05-28／ICML 2023），收錄年份2022是首版年。兩個官方倉庫都連同一arXiv；VIMABench固定97e0af11e126fd477c9d81eeabfb6c739021c680，VIMA固定8449837aa453f8ec9ba229cb956e3bbef5c796ea。",
+  "discovery_evidence": [
+    {
+      "kind": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P075/pages.json",
+      "pages": [
+        1
+      ],
+      "pdf_sha256": "cf849f80368749b0310b43117519ce0abff3e8ae49744e78c4a29b9d17f0695f"
+    },
+    {
+      "kind": "author_project_repository_links",
+      "local_file": "content/github_review/repository_bindings.json",
+      "paper_id": "P075",
+      "roles": {
+        "vimalabs/VIMABench": "benchmark_and_data",
+        "vimalabs/VIMA": "policy_and_example"
+      }
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          46,
+          158
+        ]
+      ],
+      "why": "17模板、4級泛化、650K訓練軌跡及原生媒體／action。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/__init__.py",
+      "ranges": [
+        [
+          11,
+          94
+        ]
+      ],
+      "why": "task class註冊、YAML插值解析及過濾輔助key。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/partition_files/train.yaml",
+      "ranges": [
+        [
+          1,
+          200
+        ]
+      ],
+      "why": "13個訓練模板與物件／材質集合。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/partition_files/placement_generalization.yaml",
+      "ranges": [
+        [
+          103,
+          125
+        ]
+      ],
+      "why": "L1沿用訓練物件和材質；整檔bytes與train相同。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/partition_files/combinatorial_generalization.yaml",
+      "ranges": [
+        [
+          1,
+          204
+        ]
+      ],
+      "why": "L2交換材質集合的角色，保留13模板設定。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/partition_files/novel_object_generalization.yaml",
+      "ranges": [
+        [
+          1,
+          69
+        ]
+      ],
+      "why": "L3的12個模板及新形狀／容器。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/partition_files/novel_task_generalization.yaml",
+      "ranges": [
+        [
+          1,
+          11
+        ]
+      ],
+      "why": "L4四個未見模板，空值不等於零案例。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/task_suite/instruction_following/simple_manipulation.py",
+      "ranges": [
+        [
+          22,
+          76
+        ],
+        [
+          205,
+          233
+        ],
+        [
+          302,
+          353
+        ],
+        [
+          484,
+          536
+        ]
+      ],
+      "why": "圖像placeholder、goal tuple與10公分平面匹配；rotation被忽略。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/task_suite/base.py",
+      "ranges": [
+        [
+          72,
+          96
+        ],
+        [
+          313,
+          430
+        ],
+        [
+          448,
+          498
+        ]
+      ],
+      "why": "goal移除、distractor失敗條件、prompt資產與xy/yaw匹配實作。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/task_suite/constraint_satisfaction/without_touching.py",
+      "ranges": [
+        [
+          25,
+          66
+        ],
+        [
+          352,
+          369
+        ]
+      ],
+      "why": "語言約束與需追蹤的禁止區域／物件點集。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/task_suite/constraint_satisfaction/base.py",
+      "ranges": [
+        [
+          130,
+          143
+        ],
+        [
+          155,
+          369
+        ]
+      ],
+      "why": "每50個simulation steps檢查點集入區，鎖定違規及精確物件數。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/env/base.py",
+      "ranges": [
+        [
+          28,
+          57
+        ],
+        [
+          159,
+          199
+        ],
+        [
+          320,
+          389
+        ],
+        [
+          391,
+          455
+        ],
+        [
+          581,
+          591
+        ],
+        [
+          660,
+          682
+        ]
+      ],
+      "why": "兩pose API、meta_info、zero reward、success/failure與constraint呼叫鏈。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "vima_bench/tasks/components/action_primitives.py",
+      "ranges": [
+        [
+          177,
+          241
+        ]
+      ],
+      "why": "PickPlace如何將2D位置補z並透過接觸下降／吸盤執行。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "scripts/data_generation/run.py",
+      "ranges": [
+        [
+          39,
+          145
+        ]
+      ],
+      "why": "成功篩選、T+1觀測/T動作與三個pickle＋JPEG的保存。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "path": "scripts/data_loading.py",
+      "ranges": [
+        [
+          10,
+          48
+        ]
+      ],
+      "why": "真正的分檔reader、CHW RGB與prompt_assets復原。",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680"
+    },
+    {
+      "repo": "vimalabs/VIMA",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "why": "確認另一倉庫的角色是模型與示範。",
+      "commit": "8449837aa453f8ec9ba229cb956e3bbef5c796ea"
+    },
+    {
+      "repo": "vimalabs/VIMA",
+      "path": "scripts/example.py",
+      "ranges": [
+        [
+          79,
+          106
+        ],
+        [
+          200,
+          240
+        ],
+        [
+          476,
+          496
+        ]
+      ],
+      "why": "模型action反正規化、固定seed範例、reset重試與oracle_max_steps+2限制。",
+      "commit": "8449837aa453f8ec9ba229cb956e3bbef5c796ea"
+    }
+  ],
+  "environment": "PyBullet／UR5桌面，前方與俯視RGB＋segmentation；基礎physics為240 Hz。位置bounds為x=[0.25,0.75]、y=[−0.5,0.5]公尺。吸盤pick-place或spatula push是完整primitive，一次env.step內含多個移動、接觸與settle步。",
+  "tasks": "全庫17個模板；train/L1/L2各13、L3為12、L4為4個模板，不能直接算17×4套獨立任務。L4是sweep_without_touching、novel_adj_and_noun、follow_motion、same_texture。visual_manipulation的goal含objects/matches/target poses/metric/params/max_progress；影像placeholder與語言由generate_prompt共同生成，不能把prompt_assets丟掉後稱為同一任務。",
+  "data": "發布說明為650K成功訓練軌跡，非測試case總量且本輪未重新清點資產。每trajectory含rgb_front/<t>.jpg、rgb_top/<t>.jpg、obs.pkl（segm/ee）、action.pkl、trajectory.pkl（prompt/prompt_assets/steps/success/failure及seed、物件映射、action_bounds等meta）。writer明確保存T個actions與T+1個observations；loader將JPEG HWC轉CHW。action為pose0/pose1各2D位置＋xyzw四元數，模型範例另執行位置反正規化與quaternion範圍轉換。",
+  "evaluation": "env.step→task.update_goals→具體check_success→info.success/failure；reward固定0，done也可能來自失敗或primitive timeout。visual_manipulation設定pos_eps=0.1公尺，is_match只比xy距離，忽略z與旋轉；完成的goal逐一移除，誤把distractor當目標／物件亦失敗。without_touching每50個physics steps檢查物件點集與禁止區域重疊，一次違規即鎖定failure，最後還需完成精確目標數；不是逐接觸事件的檢查。",
+  "standardization": {
+    "profile": "multimodal_prompt_cases_with_robot_primitives",
+    "reuse": "模板class、版本化partition/YAML參照、prompt_assets、obs/action時序、seed與具體幾何／過程checker。",
+    "transform": "case ID需含template、partition、seed、物件/材質及prompt媒體；保留T+1/T對齊、2D雙pose primitive、oracle-only goals、違規記憶與50-frame檢查頻率。任務模板、軌跡量及rollout數分欄。",
+    "missing": "正式eval seed/case manifest及跨task聚合設定、其餘checker逐一覆核、全部示範／prompt媒體閉合，以及policy checkpoint與視覺資訊條件驗證。"
+  },
+  "version_note": "train與L1 YAML整檔相同（SHA256 bf577e269939b6b9850f1d4fe1deb4e532b1badae6711cb4c74b9f438c611322）；泛化須靠不同初始化，不能把相同YAML當已固定test cases。VIMA example.py一直重設seed42，reset失敗才加seed；顯示範例設hide_arm_rgb=False，README benchmark預設True。其TimeLimit是oracle_max_steps+2，並非完成全級評測的統計腳本。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/vimalabs__VIMABench/files/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/vimalabs__VIMABench/manifest.json",
+      "sha256": "6e9884edfcb4aaa709a613e9f14bc6db65bb409ff2bded18564988d3fd228029",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/README.md",
+      "read_ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          46,
+          158
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/__init__.py",
+      "local_file": "audit/.cache/github_review/repos/vimalabs__VIMABench/files/vima_bench/tasks/__init__.py",
+      "source_manifest": "audit/.cache/github_review/repos/vimalabs__VIMABench/manifest.json",
+      "sha256": "0ca479d93928c7aec36d3f15a51865cb6ff413f000f55273c47d981a6ba62e38",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/__init__.py",
+      "read_ranges": [
+        [
+          11,
+          94
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/partition_files/train.yaml",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/train.yaml",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/train.yaml.receipt.json",
+      "sha256": "bf577e269939b6b9850f1d4fe1deb4e532b1badae6711cb4c74b9f438c611322",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/partition_files/train.yaml",
+      "read_ranges": [
+        [
+          1,
+          200
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/partition_files/placement_generalization.yaml",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/placement_generalization.yaml",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/placement_generalization.yaml.receipt.json",
+      "sha256": "bf577e269939b6b9850f1d4fe1deb4e532b1badae6711cb4c74b9f438c611322",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/partition_files/placement_generalization.yaml",
+      "read_ranges": [
+        [
+          103,
+          125
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/partition_files/combinatorial_generalization.yaml",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/combinatorial_generalization.yaml",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/combinatorial_generalization.yaml.receipt.json",
+      "sha256": "d4a7e8982764e69b9b56b50f19e4070aac589a8ac3e8e21e74d53e3b37a98ecd",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/partition_files/combinatorial_generalization.yaml",
+      "read_ranges": [
+        [
+          1,
+          204
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/partition_files/novel_object_generalization.yaml",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/novel_object_generalization.yaml",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/novel_object_generalization.yaml.receipt.json",
+      "sha256": "18d61e6dde6184cb7978fd7dc6b2c7026b2f2997b639c8e67373fbc212ebb11c",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/partition_files/novel_object_generalization.yaml",
+      "read_ranges": [
+        [
+          1,
+          69
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/partition_files/novel_task_generalization.yaml",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/novel_task_generalization.yaml",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/partition_files/novel_task_generalization.yaml.receipt.json",
+      "sha256": "22510882c3f24cb8d998fd89293f353a85964ce772996cfab885104b8a150d69",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/partition_files/novel_task_generalization.yaml",
+      "read_ranges": [
+        [
+          1,
+          11
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/task_suite/instruction_following/simple_manipulation.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/instruction_following/simple_manipulation.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/instruction_following/simple_manipulation.py.receipt.json",
+      "sha256": "bede3935ed72a4d5a051f5a0c42df356039f07a1b860565fd2f7acf353386ece",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/instruction_following/simple_manipulation.py",
+      "read_ranges": [
+        [
+          22,
+          76
+        ],
+        [
+          205,
+          233
+        ],
+        [
+          302,
+          353
+        ],
+        [
+          484,
+          536
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/task_suite/base.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/base.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/base.py.receipt.json",
+      "sha256": "c63062b9352efd87d4a7747d528c65f3b2e819277817183c68dee9769be34eca",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/base.py",
+      "read_ranges": [
+        [
+          72,
+          96
+        ],
+        [
+          313,
+          430
+        ],
+        [
+          448,
+          498
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/task_suite/constraint_satisfaction/without_touching.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/constraint_satisfaction/without_touching.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/constraint_satisfaction/without_touching.py.receipt.json",
+      "sha256": "dee7ef88002ca96fe887254874669573750327bd6a32f8317fe4c83fafa9b1bc",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/constraint_satisfaction/without_touching.py",
+      "read_ranges": [
+        [
+          25,
+          66
+        ],
+        [
+          352,
+          369
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/task_suite/constraint_satisfaction/base.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/constraint_satisfaction/base.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/task_suite/constraint_satisfaction/base.py.receipt.json",
+      "sha256": "774cec5a1a0f37e3bab25226d7ec6738f8dcb23f02d39869e1c46fd2578b79ef",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/task_suite/constraint_satisfaction/base.py",
+      "read_ranges": [
+        [
+          130,
+          143
+        ],
+        [
+          155,
+          369
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/env/base.py",
+      "local_file": "audit/.cache/github_review/repos/vimalabs__VIMABench/files/vima_bench/env/base.py",
+      "source_manifest": "audit/.cache/github_review/repos/vimalabs__VIMABench/manifest.json",
+      "sha256": "ed1d8a00dd78811b451eff2030c069d683bd8bd1e987ac85e5fdea37aa56ef1b",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/env/base.py",
+      "read_ranges": [
+        [
+          28,
+          57
+        ],
+        [
+          159,
+          199
+        ],
+        [
+          320,
+          389
+        ],
+        [
+          391,
+          455
+        ],
+        [
+          581,
+          591
+        ],
+        [
+          660,
+          682
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "vima_bench/tasks/components/action_primitives.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/components/action_primitives.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/vima_bench/tasks/components/action_primitives.py.receipt.json",
+      "sha256": "fdf09714c97d29e259932782beca6d7d655c8e9d8dea0442c75dd836f92381d7",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/vima_bench/tasks/components/action_primitives.py",
+      "read_ranges": [
+        [
+          177,
+          241
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "scripts/data_generation/run.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/scripts/data_generation/run.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/scripts/data_generation/run.py.receipt.json",
+      "sha256": "75ffd5b613dd3903c13e7d26ed72d6e9bc16002645483c1d30182ec88bb21d68",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/scripts/data_generation/run.py",
+      "read_ranges": [
+        [
+          39,
+          145
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMABench",
+      "commit": "97e0af11e126fd477c9d81eeabfb6c739021c680",
+      "path": "scripts/data_loading.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/scripts/data_loading.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/vimalabs__VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/files/scripts/data_loading.py.receipt.json",
+      "sha256": "6cc1e12ddf3ffe2bf2d6e088119791b08c2ccb1dbdf6403c755626157106eb6a",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMABench/97e0af11e126fd477c9d81eeabfb6c739021c680/scripts/data_loading.py",
+      "read_ranges": [
+        [
+          10,
+          48
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMA",
+      "commit": "8449837aa453f8ec9ba229cb956e3bbef5c796ea",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/vimalabs__VIMA/files/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/vimalabs__VIMA/manifest.json",
+      "sha256": "ebe970010fd240e1976fc7435e43326380f35f6c44671dbc97683ed17a5b5fd9",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMA/8449837aa453f8ec9ba229cb956e3bbef5c796ea/README.md",
+      "read_ranges": [
+        [
+          1,
+          24
+        ]
+      ]
+    },
+    {
+      "repo": "vimalabs/VIMA",
+      "commit": "8449837aa453f8ec9ba229cb956e3bbef5c796ea",
+      "path": "scripts/example.py",
+      "local_file": "audit/.cache/github_review/repos/vimalabs__VIMA/files/scripts/example.py",
+      "source_manifest": "audit/.cache/github_review/repos/vimalabs__VIMA/manifest.json",
+      "sha256": "295df0f4b6c837cce40cff33d96e52f5a412fb94cba64504c0fced53c19289e5",
+      "url": "https://raw.githubusercontent.com/vimalabs/VIMA/8449837aa453f8ec9ba229cb956e3bbef5c796ea/scripts/example.py",
+      "read_ranges": [
+        [
+          79,
+          106
+        ],
+        [
+          200,
+          240
+        ],
+        [
+          476,
+          496
+        ]
+      ]
+    }
+  ]
+}

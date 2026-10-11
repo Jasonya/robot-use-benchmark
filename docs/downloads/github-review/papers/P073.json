@@ -1,0 +1,729 @@
+{
+  "paper_id": "P073",
+  "name": "RoboTwin",
+  "title": "RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins (early version)",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2409.02920",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P073",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "P073 應綁官方early_version分支。已核讀早期DP3的PKL→Zarr→reader→rollout→錘擊checker與公開seed檔；真實17項資料任務、論文6項實驗、後續分支任務表必須分開。",
+    "identity_note": "對應arXiv:2409.02920v3（2025-04-16），題名帶early version、九位作者。早期與現行README都直接引用該arXiv；CVPR 2025的RoboTwin為2504.13059，不能替代P073。",
+    "discovery_evidence": [
+      {
+        "kind": "pinned_primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P073/pages.json",
+        "pages": [
+          1,
+          6,
+          7,
+          8
+        ],
+        "pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f"
+      },
+      {
+        "kind": "official_branch_resolution",
+        "local_file": "audit/.cache/github_review_worker/P069-P076/robotwin-early-ref.json",
+        "source_manifest": "audit/.cache/github_review_worker/P069-P076/robotwin-early-ref.receipt.json",
+        "ref": "early_version",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2"
+      },
+      {
+        "kind": "pinned_git_tree",
+        "local_file": "audit/.cache/github_review_worker/P069-P076/robotwin-early-tree.json",
+        "source_manifest": "audit/.cache/github_review_worker/P069-P076/robotwin-early-tree.receipt.json",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "tree_truncated": false
+      }
+    ],
+    "additional_repo_proposals": [
+      {
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "ref": "early_version",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "role": "paper_specific_legacy_branch",
+        "basis": "現行README第30行列出分支，分支README直接引用2409.02920；P073建議使用此版本，main留給P074。"
+      }
+    ],
+    "environment": "早期SAPIEN雙臂桌面，physics timestep預設1/250秒。錘擊配置有頭部、前方與兩腕相機，320×240、1024個世界座標xyzRGB點；conbine=False只取頭部點雲。論文真實Cobot Magic資料另為30 Hz、三個640×480 RGB-D視角及主／從臂記錄，不能與模擬schema混用。",
+    "tasks": "論文評測6項；真實資料設計17項各30條軌跡，標籤可重疊。分支README列15個名稱，但完整tree只有14個具體env檔，block_sweep未在該commit提供。已讀block_hammer_beat的play_once為pass，不能稱expert產生器已公開。checker要求工具target_pose轉到世界後，xy與方塊各差<0.02公尺且0.78<z<0.81；沒有接觸、衝量或敲擊次數檢查。",
+    "data": "PKL保存observation/<camera>的rgb/depth、intrinsic_cv/extrinsic_cv/cam2world_gl，以及pointcloud/joint_action/endpose。depth乘1000存float64，單位毫米；點雲xyz為世界公尺、RGB限0–1。joint_action是左右各6關節get_drive_target加gripper，共14維，並非實測qpos；endpose為左右xyz/RPY/gripper。轉檔將joint_action同時寫成Zarr data/state與data/action，endpose寫tcp_action，meta/episode_ends為累積排他端點。DP3 reader讀state/action/point_cloud，以episode mask和padding建立時間窗。",
+    "evaluation": "eval_policy_dp3→test_policy→setup_demo→apply_dp3→check_success。指定checkpoint測100個seed；checkpoint=-1掃描300…3000十個checkpoint，各取前20 seeds再選Top5。錘擊seed檔100筆，範圍100000–100102，略過100025/100029/100040。step_lim=400按預測chunk長度累計，TOPP再展為250 Hz動作；get_obs本身也會scene.step，因此400不能當400個physics frames。每episode成功只累加一次suc。",
+    "standardization": {
+      "profile": "versioned_bimanual_simulation_tasks_and_command_episodes",
+      "reuse": "early_version任務class、checker、eval seeds、相機／點雲設定、PKL/Zarr轉換及DP3評測。",
+      "transform": "source分early/1.0/2.0，task保留論文子集關係；case存seed、checkpoint選擇方式及chunk預算。state標為command target，另記depth的mm→m轉換、world/OpenGL/OpenCV、RPY與episode邊界。",
+      "missing": "block_sweep程式、其他論文任務逐一checker覆核、17項真實資料manifest、可執行expert產生器、資產target_pose與相容SAPIEN/DP3依賴鎖定。"
+    },
+    "version_note": "本體固定early_version f14a315ac4c9c72bfea05b523874f787080dfcf2，非main ea8b21121ebb3cd201ff5b3fe361944ac94eda3f。早期README明記2024-10-01改get_obs及實驗結果，真實資料仍標Coming Soon。TopK摘要寫出各項suc/(topk×test_num)，沒有求和成單一平均，不能直接把文字輸出當總平均。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            8,
+            31
+          ],
+          [
+            281,
+            288
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 298,
+        "sha256": "08bd114a0de29a5b797a80cd993b6689211df86531612e4121fc057a9a8f3114",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/README.md",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/ea8b21121ebb3cd201ff5b3fe361944ac94eda3f/README.md#L8-L31",
+        "why": "區分early、CVPR 1.0與2.0，找到官方legacy分支。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "README.md",
+        "ranges": [
+          [
+            5,
+            8
+          ],
+          [
+            21,
+            49
+          ],
+          [
+            83,
+            123
+          ],
+          [
+            137,
+            167
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 172,
+        "sha256": "2f5a723f83dcb55c03fa3ca057507256553ed15ed984a5711e64cc7c052d27de",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/README.md",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/README.md#L5-L8",
+        "why": "50示範發布、模態、較新任務表及尚未發布的真實資料。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "task_config/block_hammer_beat.yml",
+        "ranges": [
+          [
+            1,
+            25
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 25,
+        "sha256": "81c550ee92c1d4a45273be12c38b44d1880d317c305eed22a02f9ff294e11390",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/task_config/block_hammer_beat.yml",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/task_config/block_hammer_beat.yml#L1-L25",
+        "why": "相機、1024點、雙臂及PKL資料選項。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "envs/block_hammer_beat.py",
+        "ranges": [
+          [
+            6,
+            64
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 64,
+        "sha256": "8165e0cb057da439dd3b31cec99b11d87e570e9d86beff8afe040d33bb49dd43",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/envs/block_hammer_beat.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/envs/block_hammer_beat.py#L6-L64",
+        "why": "初態、400步上限、play_once佔位及工具參考點成功條件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "envs/base_task.py",
+        "ranges": [
+          [
+            48,
+            84
+          ],
+          [
+            97,
+            122
+          ],
+          [
+            694,
+            738
+          ],
+          [
+            746,
+            773
+          ],
+          [
+            889,
+            908
+          ],
+          [
+            1035,
+            1069
+          ],
+          [
+            1099,
+            1109
+          ],
+          [
+            1111,
+            1220
+          ],
+          [
+            1222,
+            1311
+          ],
+          [
+            1320,
+            1387
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1705,
+        "sha256": "59d198d17a3715e91f8ad40716ed609070ec9fd98bb7d187f8e70b10425bfadd",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/envs/base_task.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/envs/base_task.py#L48-L84",
+        "why": "深度/座標、drive targets、PKL欄位、DP3 chunk控制與checker。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "script/pkl2zarr_dp3.py",
+        "ranges": [
+          [
+            17,
+            58
+          ],
+          [
+            66,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 98,
+        "sha256": "ec4985f0834f800abd95802dbd057a7b575fe1bcad1e520c17d2916478d3d779",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/script/pkl2zarr_dp3.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/script/pkl2zarr_dp3.py#L17-L58",
+        "why": "state/action都來自joint_action；episode_ends累積邊界。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "policy/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/dataset/robot_dataset.py",
+        "ranges": [
+          [
+            13,
+            58
+          ],
+          [
+            73,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 94,
+        "sha256": "0efeb0d2bfd0f126483eb94b22fab57e2f7cff9e907b00457b22c64130863c74",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/policy/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/dataset/robot_dataset.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/policy/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/dataset/robot_dataset.py#L13-L58",
+        "why": "Zarr reader、episode mask與時間窗sample。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "policy/3D-Diffusion-Policy/3D-Diffusion-Policy/dp3_policy.py",
+        "ranges": [
+          [
+            31,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 48,
+        "sha256": "e918ed9a772f6adc8923598f0697dfd861cbb23bf1ae9cb53139b425afb1cc77",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/policy/3D-Diffusion-Policy/3D-Diffusion-Policy/dp3_policy.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/policy/3D-Diffusion-Policy/3D-Diffusion-Policy/dp3_policy.py#L31-L45",
+        "why": "policy/runner與apply_dp3的接點。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "script/eval_policy_dp3.py",
+        "ranges": [
+          [
+            42,
+            99
+          ],
+          [
+            105,
+            134
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 137,
+        "sha256": "91b81f9e5e8d0ba534fc5de412681e2da2c53ea79a4ac250a82e39ef0bf56f48",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/script/eval_policy_dp3.py",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/script/eval_policy_dp3.py#L42-L99",
+        "why": "checkpoint選擇、20/100 trials、seed與成功率分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboTwin-Platform/RoboTwin",
+        "requested_repo": "RoboTwin-Platform/RoboTwin",
+        "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+        "ref": "early_version",
+        "path": "task_config/eval_seeds/block_hammer_beat.txt",
+        "ranges": [
+          [
+            1,
+            1
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1,
+        "sha256": "1896d29339a442c117edf06f27d4e6cffcbf9c247a2bc1507a245a9f3cd3f2d7",
+        "url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/task_config/eval_seeds/block_hammer_beat.txt",
+        "reading_url": "https://github.com/RoboTwin-Platform/RoboTwin/blob/f14a315ac4c9c72bfea05b523874f787080dfcf2/task_config/eval_seeds/block_hammer_beat.txt#L1-L1",
+        "why": "100個不連續eval seeds，不能用連續range代替。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4b33d46cc433630993e8ca4cc3f31fa1cfb7b67cfe33dfb26c846bd6b2fa7fe2"
+  },
+  "repository_binding_review_sha256": "4b33d46cc433630993e8ca4cc3f31fa1cfb7b67cfe33dfb26c846bd6b2fa7fe2",
+  "repository_bindings": [
+    {
+      "requested_repo": "RoboTwin-Platform/RoboTwin",
+      "resolved_repo": "RoboTwin-Platform/RoboTwin",
+      "aliases_in_this_review": [
+        "robotwin-platform/robotwin"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ea8b21121ebb3cd201ff5b3fe361944ac94eda3f",
+          "reviewed_files": [
+            "README.md"
+          ]
+        },
+        {
+          "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+          "reviewed_files": [
+            "README.md",
+            "envs/base_task.py",
+            "envs/block_hammer_beat.py",
+            "policy/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/dataset/robot_dataset.py",
+            "policy/3D-Diffusion-Policy/3D-Diffusion-Policy/dp3_policy.py",
+            "script/eval_policy_dp3.py",
+            "script/pkl2zarr_dp3.py",
+            "task_config/block_hammer_beat.yml",
+            "task_config/eval_seeds/block_hammer_beat.txt"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboTwin-Platform/RoboTwin",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "6dde57155eafa3e4ebf6ad1f93a7cf7d5d41a755"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboTwin-Platform/RoboTwin",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "6dde57155eafa3e4ebf6ad1f93a7cf7d5d41a755"
+        },
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P073",
+          "review_sha256": "4b33d46cc433630993e8ca4cc3f31fa1cfb7b67cfe33dfb26c846bd6b2fa7fe2",
+          "proposal": {
+            "repo": "RoboTwin-Platform/RoboTwin",
+            "ref": "early_version",
+            "commit": "f14a315ac4c9c72bfea05b523874f787080dfcf2",
+            "role": "paper_specific_legacy_branch",
+            "basis": "現行README第30行列出分支，分支README直接引用2409.02920；P073建議使用此版本，main留給P074。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P073",
+          "review_file": "content/github_review/reviews/P073.json",
+          "review_sha256": "4b33d46cc433630993e8ca4cc3f31fa1cfb7b67cfe33dfb26c846bd6b2fa7fe2",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P073",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboTwin early version，arXiv 2409.02920v3；不要與其他RoboTwin版本混寫。",
+    "scope_read": "digital twin資料流程、17真實資料任務与6個DP3 benchmark子集。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      7,
+      8,
+      9
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "協助、交接與陪伴"
+    ],
+    "role": "模擬與真實操作benchmark",
+    "environment": "COBOT Magic工作站與其合成digital twins；未報多房屋總數。",
+    "tasks": "資料設計17任務（9tool、5人際、6雙臂，標籤可重疊）；本文DP3跑6任務。",
+    "cases": "真實資料每task30trajs（17×30＝510）；6任務實驗比較10/20/50 expert demos。test rollouts精確數本段未報。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 17,
+        "unit": "資料收集任務",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "DP3評测任務",
+        "pages": [
+          7,
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 510,
+        "unit": "真實demo trajectories",
+        "qualifier": "17×30推算",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "各task completion success rate；示範數是訓練條件，不是評測題数。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "real收集範圍與synthetic expert評測6task分開；9+5+6不能加為20個不重疊task。",
+    "lineage": "AIGC由圖到3D，MLLM寫expert code；RoboTwin2為後續擴充。",
+    "related_paper_ids": [
+      "P074"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          7,
+          8
+        ],
+        "locator": "圖4、表1、Dataset task design",
+        "supports": "17 vs6、demo量"
+      }
+    ],
+    "unresolved": [
+      "原文引用A.3而此PDF附錄資訊有限，完整17task manifest與test rollout數仍待code核。"
+    ],
+    "reuse": "雙臂、工具、人機互動與digital twin產題可借；版本應明確分層。",
+    "reviewed_pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboTwin",
+    "year": 2024,
+    "title": "RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins (early version)",
+    "source_url": "https://arxiv.org/abs/2409.02920",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft",
+      "assistance"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用",
+      "人機協作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P073",
+      "summary": "從杯子擺放、蘋果收納、掃除、鎚擊與人際互動資料歸納，保留每種用途所對應的任務範圍。",
+      "evidence": [
+        {
+          "paper_id": "P073",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            8
+          ],
+          "locator": "Table 1、資料設計與實驗段落",
+          "observed_tasks": [
+            "Empty Cup Place",
+            "Apple Cabinet Storage",
+            "Block Sweep"
+          ],
+          "reasoning": "對應餐具準備、食品收納和表面整理。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f"
+        },
+        {
+          "paper_id": "P073",
+          "domain_ids": [
+            "craft"
+          ],
+          "pages": [
+            5,
+            8
+          ],
+          "locator": "工具生成流程、Table 1",
+          "observed_tasks": [
+            "Block Hammer Beat",
+            "依鎚子功能部位生成姿態"
+          ],
+          "reasoning": "有具體工具作業目標，可歸納為工藝／修繕基礎作業。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f"
+        },
+        {
+          "paper_id": "P073",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            8
+          ],
+          "locator": "資料設計段落",
+          "observed_tasks": [
+            "17項資料任務中作者明列5項人際互動"
+          ],
+          "reasoning": "協作用途由作者的資料範圍支持；不把全部6項DP3實驗都說成人機交接。",
+          "basis": "stated_application",
+          "source_pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f"
+        }
+      ],
+      "domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "assistance"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P073",
+      "name": "RoboTwin",
+      "expected_title": "RoboTwin: Dual-Arm Robot Benchmark with Generative Digital Twins (early version)",
+      "source_url": "https://arxiv.org/abs/2409.02920",
+      "pdf_url": "https://arxiv.org/pdf/2409.02920",
+      "retrieved_at": "2026-10-02T21:33:44.734164+00:00",
+      "pdf_sha256": "2c289e8ac5352f42de2908b166176fe6d01f045fbb4fb7214134a63e7c432c4f",
+      "text_sha256": "c3a9d56fa640e390768f7267a4df39c31091fbfa926a06bc3ae250b1204058d8",
+      "pdf_bytes": 9471541,
+      "pages": 11,
+      "text_characters": 32840,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2409.02920v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2409.02920v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 17,
+        "unit": "資料收集任務",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P073:1",
+        "paper_id": "P073",
+        "benchmark": "RoboTwin",
+        "native_term": "資料收集任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2409.02920v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2409.02920v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "DP3評测任務",
+        "pages": [
+          7,
+          8
+        ],
+        "record_id": "review10:P073:2",
+        "paper_id": "P073",
+        "benchmark": "RoboTwin",
+        "native_term": "DP3評测任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2409.02920v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2409.02920v3",
+            "locator": "PDF pp. 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 510,
+        "unit": "真實demo trajectories",
+        "qualifier": "17×30推算",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P073:3",
+        "paper_id": "P073",
+        "benchmark": "RoboTwin",
+        "native_term": "真實demo trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2409.02920v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2409.02920v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "RoboTwin-Platform/RoboTwin"
+  ],
+  "external_repositories": []
+}

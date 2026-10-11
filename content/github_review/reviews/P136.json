@@ -1,0 +1,92 @@
+{
+  "paper_id": "P136",
+  "summary": "π0的openpi接口保留機體與模型兩種表示；模型預設輸出50步、32維，ALOHA adapter再轉成14維控制。",
+  "reading_order": [
+    {
+      "repo": "Physical-Intelligence/openpi",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          59,
+          84
+        ]
+      ],
+      "why": "原π0與FAST/π0.5、base與task checkpoints分開",
+      "commit": "215abfb217dbac7d5f1273282331b9b1866c0479"
+    },
+    {
+      "repo": "Physical-Intelligence/openpi",
+      "path": "src/openpi/models/pi0_config.py",
+      "ranges": [
+        [
+          18,
+          55
+        ]
+      ],
+      "why": "action維度/長度及π0/π0.5旗標",
+      "commit": "215abfb217dbac7d5f1273282331b9b1866c0479"
+    },
+    {
+      "repo": "Physical-Intelligence/openpi",
+      "path": "src/openpi/policies/aloha_policy.py",
+      "ranges": [
+        [
+          25,
+          102
+        ],
+        [
+          181,
+          202
+        ]
+      ],
+      "why": "相機缺失mask、關節/夾爪轉換與14D輸出",
+      "commit": "215abfb217dbac7d5f1273282331b9b1866c0479"
+    },
+    {
+      "repo": "Physical-Intelligence/openpi",
+      "path": "src/openpi/transforms.py",
+      "ranges": [
+        [
+          204,
+          242
+        ],
+        [
+          328,
+          337
+        ]
+      ],
+      "why": "依state與mask做delta/absolute及padding",
+      "commit": "215abfb217dbac7d5f1273282331b9b1866c0479"
+    },
+    {
+      "repo": "Physical-Intelligence/openpi",
+      "path": "src/openpi/policies/policy.py",
+      "ranges": [
+        [
+          67,
+          106
+        ]
+      ],
+      "why": "input→model→output轉換與infer_ms範圍",
+      "commit": "215abfb217dbac7d5f1273282331b9b1866c0479"
+    }
+  ],
+  "environment": "原π0研究機體與openpi公開ALOHA/DROID示例應分開；checkpoint場景標籤與原私有訓練資料不是公開環境manifest。",
+  "tasks": "通用VLA與任務微調，含towel等示例；訓練10k+小時和各checkpoint不當新獨立benchmark task/case量。",
+  "data": "模型預設action_horizon50/action_dim32；ALOHA外部state/action14D，input轉換關節sign/gripper angular，缺wrist圖片填零且image_maskFalse；output只回前14維。DeltaActions/AbsoluteActions依mask和當前state轉換。",
+  "evaluation": "policy.infer返回action和infer_ms；timer只包模型sample_actions，不含input/output轉換或網路。此policy接口不是task成功checker；各示例要承接原環境或實機rubric，不能以推論成功當任務完成。",
+  "standardization": {
+    "profile": "flow_matching_vla_policy_adapter",
+    "reuse": "機體adapter、相機mask、state/action表示、checkpoint/config與normalization鏈。",
+    "transform": "method與task/case分開；保留原生維度、padding、關節/夾爪映射、delta mask、history/horizon和全流程預算，模型輸出容器不拿來計環境或任務量。",
+    "missing": "原π0訓練資料/正式測試清單、各機體scorer、完整素材/校準/模型與control spec對照、原生基線執行。"
+  },
+  "version_note": "固定215abfb現行openpi同時含π0/FAST/π0.5；此筆以π0接口為主，不能把後續π0.5功能與成績歸到最初π0版本。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

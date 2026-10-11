@@ -1,0 +1,399 @@
+{
+  "paper_id": "P111",
+  "name": "RoboReward",
+  "title": "RoboReward: General-Purpose Vision-Language Reward Models for Robotics",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2601.00675",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "website_only",
+  "review": {
+    "paper_id": "P111",
+    "status": "website_only",
+    "summary": "已找到並核讀HELM中的RoboReward官方入口，以及其連出的資料卡；目前確認的是排行榜網站與資料格式，未確認專用訓練／評測後端實作。",
+    "environment": "OXE和RoboArena的真實機器人rollout影片；源自多機體／場景，獎勵配對不能當新增物理軌跡或環境。",
+    "tasks": "看task instruction＋rollout video預測1–5結束進度；反事實指令和時間截短產生不同評分題，但保留同一父影片關係。",
+    "data": "官方資料卡列video/task/reward/gpt5_mini_check；train45,072、val6,232、test2,831，合54,135配對（作者資料卡數字，未全量下載）。自動檢查輸出是標籤審核證據，不能作模型輸入；test另由人驗證。",
+    "evaluation": "原文主指標為progress MAE並按來源群組聚合。HELM前端只渲染MiniLeaderboard與連結，不能當本地scorer；資料卡指出五級rubric，但本次未取得完整原生評分後端／輸出解析和group aggregation程式。",
+    "standardization": {
+      "profile": "robot_video_reward_labels",
+      "reuse": "官方資料卡schema、五級分數、train/val/test口徑、OXE/RoboArena來源鏈。",
+      "transform": "case以video＋instruction＋截短窗口識別；同一父episode的反事實／截短放在同split lineage群。reward/reference和審核訊號隔離；evaluator維持MAE與群組分母。",
+      "missing": "全量影片／原始episode ID對映、官方scorer實作、模型輸出解析、生成／人工審核紀錄和語義去重。"
+    },
+    "version_note": "HELM main的固定commit可查到對應2601.00675前端；未將整個HELM通用後端宣稱為RoboReward專用評測程式。資料卡引用v0.0.1排行榜，latest與固定版本要分開。",
+    "additional_repo_proposals": [
+      {
+        "repo": "stanford-crfm/helm",
+        "role": "leaderboard_website",
+        "basis": "paper project URL is HELM; pinned RoboRewardLanding links exact arXiv and official dataset"
+      }
+    ],
+    "discovery_evidence": [
+      {
+        "url": "https://huggingface.co/datasets/teetone/RoboReward/raw/main/README.md",
+        "sha256": "39cac60ab217b992d61ef7f5e7275515a6d05055b8a91171213e7ab5e354b5f1",
+        "ranges": [
+          [
+            1,
+            65
+          ]
+        ],
+        "supports": "officially linked dataset card read in full; not data download or evaluator execution"
+      }
+    ],
+    "reviewed_on": "2026-10-10",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "stanford-crfm/helm",
+        "requested_repo": "stanford-crfm/helm",
+        "commit": "63754d05db6f874e41a395880fb573890a13e791",
+        "ref": null,
+        "path": "helm-frontend/src/components/Landing/RoboRewardLanding.tsx",
+        "ranges": [
+          [
+            1,
+            101
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 101,
+        "sha256": "88d409edb77bc488dc4f1b7e41b0608f2e7d7462a199b6bf41bcc413ebfcf26c",
+        "url": "https://github.com/stanford-crfm/helm/blob/63754d05db6f874e41a395880fb573890a13e791/helm-frontend/src/components/Landing/RoboRewardLanding.tsx",
+        "reading_url": "https://github.com/stanford-crfm/helm/blob/63754d05db6f874e41a395880fb573890a13e791/helm-frontend/src/components/Landing/RoboRewardLanding.tsx#L1-L101",
+        "why": "精確arXiv、HF資料/模型與排行榜連結；此檔是前端展示",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ba9b01d54f61473c3992a00c3178742cf79e2aaed192bc43d64f0a8fe2ce1657"
+  },
+  "repository_binding_review_sha256": "ba9b01d54f61473c3992a00c3178742cf79e2aaed192bc43d64f0a8fe2ce1657",
+  "repository_bindings": [
+    {
+      "requested_repo": "stanford-crfm/helm",
+      "resolved_repo": "stanford-crfm/helm",
+      "aliases_in_this_review": [
+        "stanford-crfm/helm"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "project_or_leaderboard_website",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "website_only",
+      "versions": [
+        {
+          "commit": "63754d05db6f874e41a395880fb573890a13e791",
+          "reviewed_files": [
+            "helm-frontend/src/components/Landing/RoboRewardLanding.tsx"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P111",
+          "review_sha256": "ba9b01d54f61473c3992a00c3178742cf79e2aaed192bc43d64f0a8fe2ce1657",
+          "proposal": {
+            "repo": "stanford-crfm/helm",
+            "role": "leaderboard_website",
+            "basis": "paper project URL is HELM; pinned RoboRewardLanding links exact arXiv and official dataset"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P111",
+          "review_file": "content/github_review/reviews/P111.json",
+          "review_sha256": "ba9b01d54f61473c3992a00c3178742cf79e2aaed192bc43d64f0a8fe2ce1657",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P111",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboReward，arXiv 2601.00675v2。",
+    "scope_read": "OXE/RoboArena來源、counterfactual/clipping生成、5級rubric、完整split與人工驗證附錄。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      22,
+      27
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "獎勵與完成度評測",
+    "environment": "多OXE來源與RoboArena實拍；14embodiments是機體種類，非14生活環境。",
+    "tasks": "給task description＋rollout video預測1–5progress；反事實重寫指令和截短影片擴增負例，不自動新增實體失敗任務。",
+    "cases": "45,072train／6,232val／2,831人類驗證test；合54,135 episode-reward pairs。RoboArena test子集1,000。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 2831,
+        "unit": "人工驗證RoboRewardBench test pairs",
+        "pages": [
+          3,
+          27
+        ]
+      },
+      {
+        "field": "data",
+        "value": 45072,
+        "unit": "train episode-reward pairs",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 6232,
+        "unit": "validation pairs",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 54135,
+        "unit": "全部split pairs",
+        "pages": [
+          22
+        ]
+      }
+    ],
+    "evaluation": [
+      "主metric progress label MAE，總體採group-wise平均；不同子資料來源分列，另以RL下游驗證。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "按original task description分組互斥；同一影片的counterfactual/clips需跟父episode分組，字串互斥不證明語義互斥。",
+    "lineage": "OXE成功demo及RoboArena自然成功／失敗；生成標籤是弱監督，test另人工逐例確認。",
+    "related_paper_ids": [
+      "P108"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          7,
+          8,
+          22,
+          27
+        ],
+        "locator": "§4.2–4.3、Data Sources、附錄A.3",
+        "supports": "兩種擴增、54,135／2,831及人類審核"
+      },
+      {
+        "pages": [
+          6,
+          9
+        ],
+        "locator": "MAE與benchmark results",
+        "supports": "分組MAE"
+      }
+    ],
+    "unresolved": [
+      "跨OXE子集的母episode重複與semantic task去重仍需ID核。"
+    ],
+    "reuse": "是有效擴充任務／評分規則的重要來源；應區分重標問題與新物理軌跡。",
+    "reviewed_pdf_sha256": "601200a96f8e30137cd3166d6d330ff9ff2ceb0de6a4c43949d808e6e9c0d29a",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboReward",
+    "year": 2026,
+    "title": "RoboReward: General-Purpose Vision-Language Reward Models for Robotics",
+    "source_url": "https://arxiv.org/abs/2601.00675",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活",
+      "工具使用"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P111",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P111",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            6,
+            7,
+            8,
+            9,
+            22,
+            27
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "給task description＋rollout video預測1–5progress；反事實重寫指令和截短影片擴增負例，不自動新增實體失敗任務。",
+            "多OXE來源與RoboArena實拍；14embodiments是機體種類，非14生活環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "601200a96f8e30137cd3166d6d330ff9ff2ceb0de6a4c43949d808e6e9c0d29a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "601200a96f8e30137cd3166d6d330ff9ff2ceb0de6a4c43949d808e6e9c0d29a",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P111",
+      "name": "RoboReward",
+      "expected_title": "RoboReward: General-Purpose Vision-Language Reward Models for Robotics",
+      "source_url": "https://arxiv.org/abs/2601.00675",
+      "pdf_url": "https://arxiv.org/pdf/2601.00675",
+      "retrieved_at": "2026-10-02T21:34:20.306018+00:00",
+      "pdf_sha256": "601200a96f8e30137cd3166d6d330ff9ff2ceb0de6a4c43949d808e6e9c0d29a",
+      "text_sha256": "34d7c1e5fb6dc7c7c979c4204279e9b4d5f8e6b94879c9ed74e1481c95996ca8",
+      "pdf_bytes": 14285054,
+      "pages": 33,
+      "text_characters": 133990,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2601.00675v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2601.00675v2"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 2831,
+        "unit": "人工驗證RoboRewardBench test pairs",
+        "pages": [
+          3,
+          27
+        ],
+        "record_id": "review10:P111:1",
+        "paper_id": "P111",
+        "benchmark": "RoboReward",
+        "native_term": "人工驗證RoboRewardBench test pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2601.00675v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2601.00675v2",
+            "locator": "PDF pp. 3, 27",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 45072,
+        "unit": "train episode-reward pairs",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P111:2",
+        "paper_id": "P111",
+        "benchmark": "RoboReward",
+        "native_term": "train episode-reward pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2601.00675v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2601.00675v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 6232,
+        "unit": "validation pairs",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P111:3",
+        "paper_id": "P111",
+        "benchmark": "RoboReward",
+        "native_term": "validation pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2601.00675v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2601.00675v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 54135,
+        "unit": "全部split pairs",
+        "pages": [
+          22
+        ],
+        "record_id": "review10:P111:4",
+        "paper_id": "P111",
+        "benchmark": "RoboReward",
+        "native_term": "全部split pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2601.00675v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2601.00675v2",
+            "locator": "PDF pp. 22",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "stanford-crfm/helm"
+  ],
+  "external_repositories": []
+}

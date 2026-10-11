@@ -1,0 +1,96 @@
+{
+  "paper_id": "P117",
+  "summary": "UMI是示範蒐集與跨機體部署介面。需要分開原始影片/SLAM、重播buffer、訓練pose表達和實際控制；README的SLAM可用比例不是任務成功率。",
+  "reading_order": [
+    {
+      "repo": "real-stanford/universal_manipulation_interface",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          24
+        ],
+        [
+          47,
+          87
+        ]
+      ],
+      "why": "原始論文、SLAM與資料轉換鏈",
+      "commit": "d095ba9590df789df5189eea5ee7e431689038a6"
+    },
+    {
+      "repo": "real-stanford/universal_manipulation_interface",
+      "path": "scripts_slam_pipeline/07_generate_replay_buffer.py",
+      "ranges": [
+        [
+          75,
+          145
+        ]
+      ],
+      "why": "dataset_plan、每gripper姿態與多相機frame對齊",
+      "commit": "d095ba9590df789df5189eea5ee7e431689038a6"
+    },
+    {
+      "repo": "real-stanford/universal_manipulation_interface",
+      "path": "diffusion_policy/dataset/umi_dataset.py",
+      "ranges": [
+        [
+          30,
+          44
+        ],
+        [
+          91,
+          125
+        ],
+        [
+          334,
+          372
+        ]
+      ],
+      "why": "各觀測/動作的horizon/latency/downsample與座標表示",
+      "commit": "d095ba9590df789df5189eea5ee7e431689038a6"
+    },
+    {
+      "repo": "real-stanford/universal_manipulation_interface",
+      "path": "umi/common/pose_util.py",
+      "ranges": [
+        [
+          17,
+          44
+        ],
+        [
+          86,
+          115
+        ]
+      ],
+      "why": "rotvec、旋轉6D以及pose10d函式實際輸出",
+      "commit": "d095ba9590df789df5189eea5ee7e431689038a6"
+    },
+    {
+      "repo": "real-stanford/universal_manipulation_interface",
+      "path": "eval_real.py",
+      "ranges": [
+        [
+          64,
+          106
+        ]
+      ],
+      "why": "部署端桌面和雙臂碰撞修正屬於控制介入",
+      "commit": "d095ba9590df789df5189eea5ee7e431689038a6"
+    }
+  ],
+  "environment": "野外手持gripper/相機蒐集與實機部署兩種場景；有左右gripper及非gripper相機，frame serial/場景和episode需保留關係。",
+  "tasks": "UMI可蒐集多種操作示範並訓練Diffusion Policy；示範source與下游robot task不同層，SLAM成功不能替代物理任務成功判斷。",
+  "data": "dataset_plan.pkl含grippers/tcp_pose/gripper_width/demo_start/end_pose及cameras/video_path/video_start_end。轉成Zarr robotN_eef_pos/rot_axis_angle/width。訓練把原每手7D轉成pos3+rot6+gripper1；mat_to_pose10d本身是9D，不能從函式名猜10D。",
+  "evaluation": "已讀部署端有桌面高度與雙臂球碰撞姿態修正，屬控制輔助；未核得通用跨任務自動成功checker。資料讀取保留每key的horizon/latency_steps/down_sample；當前action轉換實際用obs_pose_repr，即使另有action_pose_repr設定也需驗證。",
+  "standardization": {
+    "profile": "portable_gripper_demonstration_and_robot_transfer",
+    "reuse": "影片→SLAM→dataset_plan→Zarr的來源鏈、gripper/相機身份與時間/座標轉換。",
+    "transform": "human-held demonstration與robot trial分開；case固定座標anchor、原7D/訓練10D/部署格式、延遲補償及控制修正；處理品質和task success另列。",
+    "missing": "原影片/SLAM資產與校準、全部示範有效性、下游task rubric、時間/pose轉換與跨機體執行驗證。"
+  },
+  "version_note": "固定d095ba9；code另重用Diffusion Policy與ORB_SLAM3，不把內含的其他task示例當新UMI獨立資料。只核讀核心轉換與控制修正，未執行硬體。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

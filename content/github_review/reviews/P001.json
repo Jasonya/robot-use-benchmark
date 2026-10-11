@@ -1,0 +1,70 @@
+{
+  "paper_id": "P001",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "找到作者的 VLOGToolkit；它提供原作資料讀取和四種感知評測，並按 uploader 群聚 bootstrap，不能把影片當成互相獨立的樣本。",
+  "reading_order": [
+    {
+      "repo": "dfouhey/VLOGToolkit",
+      "path": "Readme.md",
+      "commit": "69cef04828cde3d688d588c3b0bc57fc43065dc8",
+      "ranges": [
+        [
+          1,
+          40
+        ]
+      ],
+      "why": "作者資料入口、資料路徑與評測用途。"
+    },
+    {
+      "repo": "dfouhey/VLOGToolkit",
+      "path": "eval.py",
+      "commit": "69cef04828cde3d688d588c3b0bc57fc43065dc8",
+      "ranges": [
+        [
+          1,
+          406
+        ]
+      ],
+      "why": "資料索引、有效標籤、分類/AP與uploader群聚評分。"
+    }
+  ],
+  "environment": "影片的場景／距離類別是觀測標籤，不是可互動環境。",
+  "tasks": "手—物接觸、手部狀態、場景類別與proxemic分類；本倉庫沒有機器人動作任務或完整未來手軌跡評測入口。",
+  "data": "manifest.txt、splitId.txt、uploaderId.txt、hand_object.npy、hand_state.txt，clip/frame路徑連回video ID；外部data_v1.1.tgz與影片尚未閉合取得。",
+  "evaluation": "evaluateNBinary先排除標籤0再算逐類AP/mAP；其他分支算accuracy/top-k。bootstrap的抽樣單位為uploader。hand_state分支直接比較類別預測與標籤，不能只照過時的posterior註解傳矩陣。",
+  "standardization": {
+    "profile": "video_perception_labels",
+    "reuse": "原生video/frame/uploader ID、split、未知標籤mask與評分程式。",
+    "transform": "把影片／影格保留為context與case；原生分類分項登記，uploader用於分組切分與不確定性。",
+    "missing": "外部素材、Python2／舊依賴移植、預測輸出型別核對與正式case驗證。"
+  },
+  "version_note": "固定toolkit commit；README連到Berkeley作者資料頁。這補足既有VLOG GitHub空缺，未將資料集宣稱量視為已下載量。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "dfouhey/VLOGToolkit",
+      "path": "Readme.md",
+      "commit": "69cef04828cde3d688d588c3b0bc57fc43065dc8",
+      "sha256": "ee5ad852b26e2ca241825890d580bf60bcdd1397269bc0ff4bed9712400ac74f",
+      "url": "https://github.com/dfouhey/VLOGToolkit/blob/69cef04828cde3d688d588c3b0bc57fc43065dc8/Readme.md",
+      "local_file": "audit/.cache/github_review_worker/early/files/dfouhey__VLOGToolkit/Readme.md"
+    },
+    {
+      "repo": "dfouhey/VLOGToolkit",
+      "path": "eval.py",
+      "commit": "69cef04828cde3d688d588c3b0bc57fc43065dc8",
+      "sha256": "07aebcd4e7be03975784ec5fa885fe0f99921a361eec79184dc0f25e9e417556",
+      "url": "https://github.com/dfouhey/VLOGToolkit/blob/69cef04828cde3d688d588c3b0bc57fc43065dc8/eval.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/dfouhey__VLOGToolkit/eval.py"
+    }
+  ],
+  "identity_note": "README指向dfouhey的VLOG資料頁，eval.py署名David Fouhey；與原論文作者和資料集相符。",
+  "additional_repo_proposals": [
+    {
+      "repo": "dfouhey/VLOGToolkit",
+      "commit": "69cef04828cde3d688d588c3b0bc57fc43065dc8",
+      "role": "author_dataset_toolkit"
+    }
+  ]
+}

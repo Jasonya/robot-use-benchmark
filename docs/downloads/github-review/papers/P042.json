@@ -1,0 +1,698 @@
+{
+  "paper_id": "P042",
+  "name": "RoboSpatial",
+  "title": "RoboSpatial: Teaching Spatial Understanding to 2D and 3D Vision-Language Models for Robotics",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2411.16537",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P042",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboSpatial 必須分生成工具NVlabs/RoboSpatial與benchmark評測RoboSpatial-Eval；兩個repo互相連結，身份已確認。已核讀範例loader、生成入口與新版Context評分。",
+    "environment": "生成工具沿用EmbodiedScan整理的ScanNet/3RScan/Matterport3D/ARKitScenes等掃描；dataset/scene_name/image_name分層。RoboSpatial-Home是另外發布的評測集合，不能與生成資料總量直接相加。",
+    "tasks": "grounding、context（空間指點）、configuration（關係）、compatibility（能否容納）；Home評測用後三類。BOP/GraspNet統一loader在固定README仍為待辦，不能報已支援全部資產。",
+    "data": "ExampleLoader要求dataset/scene_name/image_name/objects/camera_annotations，含intrinsic/extrinsic、Name與bbox_3d[0]的9DOF；重複類別生成區域性chair_0等名稱。generator按unique/all-visible pair模式、grid/threshold/buffer/sample數產生unary/pairwise與grounding JSON。Home例欄位img/category/question/answer，Context另需mask。",
+    "evaluation": "新版Context解析最多前2點（可設1），正規化xy乘width-1/height-1、round後clamp，任一點落非零mask畫素算對；不再用GT點的距離。binary答案用yes/no開頭判斷。即時評分分母為原json_data數；pregenerated按(question,img)匹配，unmatched跳過分母，需額外報matching coverage。README總分按三類平均，VQA avg只平均configuration/compatibility。",
+    "standardization": {
+      "profile": "spatial_image_qa_and_pointing",
+      "reuse": "掃描來源/scene ID、相機/9DOF box中介格式、生成引數，以及二值/point-in-mask評測。",
+      "transform": "保留生成資料與Home benchmark的source/subset區別；case以原question+img並附穩定hash，mask/座標縮放/影像尺寸版本化。區域性物件索引映回來源instance，不當跨圖全球ID；evaluator記num_points_to_match、clamp、mask版本、matched/total與分項聚合。",
+      "missing": "未下載Home影像／mask與全掃描或執行生成。需核驗Home對train來源的重用關係、各loader座標約定及full-scene occupancy；範例loader只含當前圖可見／標註物件，不能假定所有未見空間都為空。生成幾何關係不等於具體機器人能抓取或放置成功。"
+    },
+    "version_note": "固定Eval README要求5/13以前fork更新Context邏輯，屬2026 challenge版本。應和CVPR2025原論文結果分版本比較；預測點數由1改2也會改變成功機會。已讀生成派發，未宣稱完整spatial_analysis幾何演算法逐行審完。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "NVlabs/RoboSpatial",
+        "requested_repo": "NVlabs/RoboSpatial",
+        "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            81
+          ],
+          [
+            110,
+            164
+          ],
+          [
+            180,
+            208
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 208,
+        "sha256": "0187b6ba8888968b5676e1cef1dbe55681a994339096ba037e89e92339ea197a",
+        "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/README.md",
+        "reading_url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/README.md#L1-L81",
+        "why": "生成與評測角色、待辦支援及來源身份",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "NVlabs/RoboSpatial",
+        "requested_repo": "NVlabs/RoboSpatial",
+        "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+        "ref": null,
+        "path": "data/README.md",
+        "ranges": [
+          [
+            1,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 46,
+        "sha256": "c75478dc263006a88e27272e6666ee5d85f1c2492daf2a2a508136710f8a84d9",
+        "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/data/README.md",
+        "reading_url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/data/README.md#L1-L46",
+        "why": "掃描／EmbodiedScan父來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "NVlabs/RoboSpatial",
+        "requested_repo": "NVlabs/RoboSpatial",
+        "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+        "ref": null,
+        "path": "robospatial/data_loader/example_loader.py",
+        "ranges": [
+          [
+            20,
+            28
+          ],
+          [
+            55,
+            75
+          ],
+          [
+            102,
+            109
+          ],
+          [
+            111,
+            118
+          ],
+          [
+            122,
+            134
+          ],
+          [
+            139,
+            163
+          ],
+          [
+            170,
+            178
+          ],
+          [
+            182,
+            238
+          ],
+          [
+            240,
+            247
+          ],
+          [
+            249,
+            259
+          ],
+          [
+            261,
+            280
+          ],
+          [
+            294,
+            303
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 303,
+        "sha256": "837bcae1b00db337ac4dcaf1eacafada7b1a096c7411356ad0145c64e568cfbd",
+        "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/robospatial/data_loader/example_loader.py",
+        "reading_url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/robospatial/data_loader/example_loader.py#L20-L28",
+        "why": "中介欄位、區域性物件ID與可見物件限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "NVlabs/RoboSpatial",
+        "requested_repo": "NVlabs/RoboSpatial",
+        "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+        "ref": null,
+        "path": "robospatial/annotation_generator.py",
+        "ranges": [
+          [
+            11,
+            24
+          ],
+          [
+            34,
+            41
+          ],
+          [
+            44,
+            70
+          ],
+          [
+            120,
+            131
+          ],
+          [
+            139,
+            171
+          ],
+          [
+            176,
+            185
+          ],
+          [
+            229,
+            248
+          ],
+          [
+            250,
+            258
+          ],
+          [
+            277,
+            284
+          ],
+          [
+            297,
+            306
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 306,
+        "sha256": "92198237fa6b6ece321b1bd2e5dfd440819b74a36bf7cbf486444e5977a6cec3",
+        "url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/robospatial/annotation_generator.py",
+        "reading_url": "https://github.com/NVlabs/RoboSpatial/blob/7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19/robospatial/annotation_generator.py#L11-L24",
+        "why": "生成型別、派發與引數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chanhee-luke/RoboSpatial-Eval",
+        "requested_repo": "chanhee-luke/RoboSpatial-Eval",
+        "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            100
+          ],
+          [
+            141,
+            196
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 221,
+        "sha256": "d6913a279e662fe8c0d565e64e91b461f03f586a1fd34a0915de84dff83987ad",
+        "url": "https://github.com/chanhee-luke/RoboSpatial-Eval/blob/c0095be6ca2d012086b3c141eccac4c879865cd4/README.md",
+        "reading_url": "https://github.com/chanhee-luke/RoboSpatial-Eval/blob/c0095be6ca2d012086b3c141eccac4c879865cd4/README.md#L1-L100",
+        "why": "Home三類、聚合、point budget及版本修正",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "chanhee-luke/RoboSpatial-Eval",
+        "requested_repo": "chanhee-luke/RoboSpatial-Eval",
+        "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+        "ref": null,
+        "path": "evaluation.py",
+        "ranges": [
+          [
+            12,
+            54
+          ],
+          [
+            60,
+            121
+          ],
+          [
+            123,
+            137
+          ],
+          [
+            140,
+            146
+          ],
+          [
+            156,
+            174
+          ],
+          [
+            190,
+            216
+          ],
+          [
+            222,
+            263
+          ],
+          [
+            265,
+            271
+          ],
+          [
+            281,
+            287
+          ],
+          [
+            294,
+            300
+          ],
+          [
+            302,
+            308
+          ],
+          [
+            316,
+            344
+          ],
+          [
+            349,
+            374
+          ],
+          [
+            382,
+            398
+          ],
+          [
+            410,
+            416
+          ],
+          [
+            419,
+            434
+          ],
+          [
+            436,
+            442
+          ],
+          [
+            446,
+            474
+          ],
+          [
+            478,
+            494
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 494,
+        "sha256": "cbfda621874bd99f5d4bd00fe662e8dddda0b1a87e7367695fcc197f345c4a83",
+        "url": "https://github.com/chanhee-luke/RoboSpatial-Eval/blob/c0095be6ca2d012086b3c141eccac4c879865cd4/evaluation.py",
+        "reading_url": "https://github.com/chanhee-luke/RoboSpatial-Eval/blob/c0095be6ca2d012086b3c141eccac4c879865cd4/evaluation.py#L12-L54",
+        "why": "真實mask/yes-no判分與兩種分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a73201b72dc7c2d007babdd96206cb4cac47b9ea1a3ff88c99f327992779cb16"
+  },
+  "repository_binding_review_sha256": "a73201b72dc7c2d007babdd96206cb4cac47b9ea1a3ff88c99f327992779cb16",
+  "repository_bindings": [
+    {
+      "requested_repo": "chanhee-luke/RoboSpatial-Eval",
+      "resolved_repo": "chanhee-luke/RoboSpatial-Eval",
+      "aliases_in_this_review": [
+        "chanhee-luke/robospatial-eval"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c0095be6ca2d012086b3c141eccac4c879865cd4",
+          "reviewed_files": [
+            "README.md",
+            "evaluation.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "RoboSpatial",
+          "search_receipt_sha256": "a8964915059e86d97cc6dd150d88d066c49266b30991f907a78e400fae7db9f6",
+          "url": "https://github.com/chanhee-luke/RoboSpatial-Eval",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P042",
+          "review_file": "content/github_review/reviews/P042.json",
+          "review_sha256": "a73201b72dc7c2d007babdd96206cb4cac47b9ea1a3ff88c99f327992779cb16",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "NVlabs/RoboSpatial",
+      "resolved_repo": "NVlabs/RoboSpatial",
+      "aliases_in_this_review": [
+        "nvlabs/robospatial"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "7a1b901cd86ad980ff6d14c0c1fc9d556ccabb19",
+          "reviewed_files": [
+            "README.md",
+            "data/README.md",
+            "robospatial/annotation_generator.py",
+            "robospatial/data_loader/example_loader.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://chanh.ee/RoboSpatial/",
+          "page_sha256": "e3cdd2b2c4b23a9ce073175fec20d1afa8e64e0b079d807f527406f08930214a",
+          "url": "https://github.com/NVlabs/RoboSpatial",
+          "link_label": "Code"
+        },
+        {
+          "kind": "repository_search_candidate",
+          "query": "RoboSpatial",
+          "search_receipt_sha256": "a8964915059e86d97cc6dd150d88d066c49266b30991f907a78e400fae7db9f6",
+          "url": "https://github.com/NVlabs/RoboSpatial",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P042",
+          "review_file": "content/github_review/reviews/P042.json",
+          "review_sha256": "a73201b72dc7c2d007babdd96206cb4cac47b9ea1a3ff88c99f327992779cb16",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P042",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboSpatial，arXiv 2411.16537v5（2026-02-18）。",
+    "scope_read": "關係與frame定義、生成規則、表2、Val/Home評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "role": "空間理解與affordance",
+    "environment": "訓練4,916 indoor scans＋190 tabletop scenes；validation40 scans＋77 scenes；來源重用而非新掃描5K個robot場景。",
+    "tasks": "context／compatibility／configuration三類空間關係，ego／world／object三種reference frame。",
+    "cases": "約3M是生成訓練QA/relations；正式Val 6,000題，每關係2,000；新錄Home另350人工題。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4916,
+        "unit": "train indoor scans",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 190,
+        "unit": "train tabletop scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6000,
+        "unit": "RoboSpatial-Val QA",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 350,
+        "unit": "RoboSpatial-Home QA",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "yes/no accuracy；座標預測以3D點是否落在reference convex hull判正確。",
+      "compatibility以bbox放置無重疊且各軸10cm餘量的幾何規則構造，不等於真實可操作性。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "Val scans完全未在training中；另有indoor↔tabletop泛化与OOD Home。",
+    "lineage": "ScanNet、Matterport3D、3RScan經EmbodiedScan取幾何；桌面用HOPE、GraspNet-1B；BLINK／SpatialBench是外部eval。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§3、表2、§4.1.2–4.1.4",
+        "supports": "生成假設、環境split、6K／350與metric"
+      }
+    ],
+    "unresolved": [
+      "源scan之跨庫重建重複量及bbox規則邊界誤差需原生ID／幾何審核。"
+    ],
+    "reuse": "是規則自動擴題與多reference-frame評測的直接先例；可擴大題量，但需保留train與eval區別。",
+    "reviewed_pdf_sha256": "58a5b655a8d69265586b817547ebe08770c6d88ea05ea17d50c2fb56ead76c22",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboSpatial",
+    "year": 2024,
+    "title": "RoboSpatial: Teaching Spatial Understanding to 2D and 3D Vision-Language Models for Robotics",
+    "source_url": "https://arxiv.org/abs/2411.16537",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "office"
+    ],
+    "review_tags": [
+      "居家生活",
+      "辦公活動",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P042",
+      "domain_ids": [
+        "home",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P042",
+          "domain_ids": [
+            "home",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "context／compatibility／configuration三類空間關係，ego／world／object三種reference frame。",
+            "訓練4,916 indoor scans＋190 tabletop scenes；validation40 scans＋77 scenes；來源重用而非新掃描5K個robot場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "58a5b655a8d69265586b817547ebe08770c6d88ea05ea17d50c2fb56ead76c22"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "58a5b655a8d69265586b817547ebe08770c6d88ea05ea17d50c2fb56ead76c22",
+      "previous_domain_ids": [
+        "home",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P042",
+      "name": "RoboSpatial",
+      "expected_title": "RoboSpatial: Teaching Spatial Understanding to 2D and 3D Vision-Language Models for Robotics",
+      "source_url": "https://arxiv.org/abs/2411.16537",
+      "pdf_url": "https://arxiv.org/pdf/2411.16537",
+      "retrieved_at": "2026-10-02T21:33:30.781140+00:00",
+      "pdf_sha256": "58a5b655a8d69265586b817547ebe08770c6d88ea05ea17d50c2fb56ead76c22",
+      "text_sha256": "c1879c99def3ef9e846f833684ea2447f28e8e757685d10e0b40d5f7ed85a01c",
+      "pdf_bytes": 13274472,
+      "pages": 19,
+      "text_characters": 139264,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2411.16537v5",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2411.16537v5"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 4916,
+        "unit": "train indoor scans",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P042:1",
+        "paper_id": "P042",
+        "benchmark": "RoboSpatial",
+        "native_term": "train indoor scans",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.16537v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.16537v5",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 190,
+        "unit": "train tabletop scenes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P042:2",
+        "paper_id": "P042",
+        "benchmark": "RoboSpatial",
+        "native_term": "train tabletop scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.16537v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.16537v5",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6000,
+        "unit": "RoboSpatial-Val QA",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P042:3",
+        "paper_id": "P042",
+        "benchmark": "RoboSpatial",
+        "native_term": "RoboSpatial-Val QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.16537v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.16537v5",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 350,
+        "unit": "RoboSpatial-Home QA",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P042:4",
+        "paper_id": "P042",
+        "benchmark": "RoboSpatial",
+        "native_term": "RoboSpatial-Home QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.16537v5",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.16537v5",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "NVlabs/RoboSpatial",
+    "chanhee-luke/RoboSpatial-Eval"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,530 @@
+{
+  "paper_id": "P039",
+  "name": "RoboVQA",
+  "title": "RoboVQA: Multimodal Long-Horizon Reasoning for Robotics",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2311.00899",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P039",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboVQA 公開 GitHub 是資料讀取與示範評分 notebook，並非完整實機控制評測平臺。已讀所有 notebook source cells，包含 SequenceExample schema、任務tag解析和 mock eval。",
+    "environment": "已核原論文第1頁：資料來自3棟辦公大樓，含機器人、人、人持抓取工具的多 embodiment。公開 notebook 本身只讀 images/texts，未提供可直接重設的場景或 robot dynamics。",
+    "tasks": "長程／中程指令與高階 VQA，例如成功、affordance、離散進度及文字推理。<task:...> 是問題／標註型別，同一影片可帶多個 QA；29,520 unique instructions 與829,502 video-text pairs 是原論文報告的不同單位，不是本次取得或可執行題數。",
+    "data": "Google Storage train/val TFRecord 裡是 tf.train.SequenceExample，feature_lists 的 images 為 JPEG bytes，texts[0] 為包含多個 task/pred/speaker tags 的UTF-8字串。Tasks 分成 tag→文字，再用 A: 分離輸入／答案；隨機抽 task 與 split 需儲存實際選到的內容。",
+    "evaluation": "run_eval 只取 validation 第一筆 SequenceExample，對其中 QA 呼叫 mock_call_model 並示範 sentence_bleu，無全量平均或實機 intervention 統計。程式呼叫為 sentence_bleu(answer,pred_answer)，需按鎖定 SacreBLEU 核對候選／參考順序及型別，不能直接把示範印出的數字當正式 benchmark 成績。",
+    "standardization": {
+      "profile": "robot_human_video_tagged_qa",
+      "reuse": "原生多tag語料、TFRecord images/texts schema 與 task/source-target parser。",
+      "transform": "source 記 embodiment／episode／building 若來源metadata可取得；case 用record ID+task tag+該tag內QA序號，frame sequence 只儲存一次。raw text/tag 與去tag的prompt/answer同存；VQA字串評分與實機 intervention evaluator 分別建檔。",
+      "missing": "尚未下載 TFRecords、執行 notebook 或機器人試驗。需要全量 ID/split/embodiment metadata、正式 BLEU 協定與 intervention 原始軌跡；get_splits 的 binary/discrete 路由引用未定義常數，使用時需修正並測試，A:範例不受該路由影響。"
+    },
+    "version_note": "公開 notebook 的 mock 範例與論文的真實機器人／人工介入實驗不同。程式授權與其餘資料授權在 README 分開列示，後續來源表應各自儲存。",
+    "runtime_executed": false,
+    "discovery_evidence": [
+      {
+        "kind": "pinned_paper_page",
+        "local_file": "audit/.cache/fulltext_review/P039/pages.json",
+        "page": 1,
+        "basis": "實際閱讀摘要的場地、embodiment及兩種計數單位；非本次程式／資料執行結果"
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "google-deepmind/robovqa",
+        "requested_repo": "google-deepmind/robovqa",
+        "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 45,
+        "sha256": "c0f04b532782582cc962b47bb89360400f89dd365630f5e39dde3a9d93154957",
+        "url": "https://github.com/google-deepmind/robovqa/blob/93f183129a224a6ca48b1eb26025422c418ff7f2/README.md",
+        "reading_url": "https://github.com/google-deepmind/robovqa/blob/93f183129a224a6ca48b1eb26025422c418ff7f2/README.md#L1-L45",
+        "why": "官方 example-code 身份與精確論文",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-deepmind/robovqa",
+        "requested_repo": "google-deepmind/robovqa",
+        "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+        "ref": null,
+        "path": "data_loading_and_eval.ipynb",
+        "ranges": [
+          [
+            8,
+            22
+          ],
+          [
+            29,
+            46
+          ],
+          [
+            53,
+            55
+          ],
+          [
+            65,
+            88
+          ],
+          [
+            98,
+            375
+          ],
+          [
+            384,
+            389
+          ],
+          [
+            399,
+            403
+          ],
+          [
+            412,
+            428
+          ],
+          [
+            435,
+            437
+          ],
+          [
+            447,
+            452
+          ],
+          [
+            461,
+            492
+          ],
+          [
+            501,
+            503
+          ],
+          [
+            512,
+            514
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 540,
+        "sha256": "8d5bb81cf5ca01d8b8fcc5b2455f317cd2c7b51d9e57e4ae2ccd0d44ecdafefa",
+        "url": "https://github.com/google-deepmind/robovqa/blob/93f183129a224a6ca48b1eb26025422c418ff7f2/data_loading_and_eval.ipynb",
+        "reading_url": "https://github.com/google-deepmind/robovqa/blob/93f183129a224a6ca48b1eb26025422c418ff7f2/data_loading_and_eval.ipynb#L8-L22",
+        "why": "所有 source cells；未執行、不把 notebook outputs 當驗證",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f5d8bff53ff15bd4b95250ff69c5cf2067876c8522cf8aa0c4c4fd3e43a5a1d2"
+  },
+  "repository_binding_review_sha256": "f5d8bff53ff15bd4b95250ff69c5cf2067876c8522cf8aa0c4c4fd3e43a5a1d2",
+  "repository_bindings": [
+    {
+      "requested_repo": "google-deepmind/robovqa",
+      "resolved_repo": "google-deepmind/robovqa",
+      "aliases_in_this_review": [
+        "google-deepmind/robovqa"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "93f183129a224a6ca48b1eb26025422c418ff7f2",
+          "reviewed_files": [
+            "README.md",
+            "data_loading_and_eval.ipynb"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/google-deepmind/robovqa/tree/main",
+          "link_label": "Code",
+          "project_url": "https://robovqa.github.io",
+          "page_sha256": "006277ba07f336037e8544303fe188641342e9eb8b2722a900c335dcaded3e4a"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P039",
+          "review_file": "content/github_review/reviews/P039.json",
+          "review_sha256": "f5d8bff53ff15bd4b95250ff69c5cf2067876c8522cf8aa0c4c4fd3e43a5a1d2",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P039",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboVQA，arXiv 2311.00899v1。",
+    "scope_read": "資料蒐集、10種QA擴充、VQA人工判分與三種planning介入評測。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      10
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育"
+    ],
+    "role": "具身問答與探索",
+    "environment": "3棟辦公樓，robot／人手／人持夾具3種embodiment。",
+    "tasks": "2,722 unique長指令、26,798 unique中程指令；字串去重不是共同語義任務去重。10種QA包含規劃、完成檢測、affordance、過去描述／未來預測。",
+    "cases": "5,246長程episodes、92,948中程episodes、238小時；VQA val/test各約1,000筆，來自各50 episodes。另100個離線planning episodes／854步、10個live teleop任務及1個自主5步任務。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 3,
+        "unit": "辦公樓",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2722,
+        "unit": "unique長程指令字串",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26798,
+        "unit": "unique中程指令字串",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 5246,
+        "unit": "長程episodes",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "離線planning episodes",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 854,
+        "unit": "離線planning steps",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "VQA先查已人工判定的答案快取，未見答案交人工判correct/incorrect。",
+      "planning分cognitive／physical intervention rate；人類救援使所有任務完成，不能把完成率當自主成功率。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "人工或模型評審",
+      "數值誤差與相似度"
+    ],
+    "split": "episodes互斥但scenes可重疊；robot-only與human+robot測試分開。",
+    "lineage": "自身多機體蒐集；SayCan固定60任務是外部baseline範圍，不是RoboVQA任務總量。",
+    "evidence": [
+      {
+        "pages": [
+          2
+        ],
+        "locator": "§II Data、圖1",
+        "supports": "場域、指令／episodes／QA區別"
+      },
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§IV、圖5",
+        "supports": "人工判分、100/10/1評測量與介入"
+      }
+    ],
+    "unresolved": [
+      "完整release QA精確行數與文字語義去重量尚未重算。"
+    ],
+    "reuse": "是大廣度robot／human資料與高低階分離評測的直接比較對象；數萬指令已大於先前任意5,000配額。",
+    "reviewed_pdf_sha256": "0d6f31eb8631105b7abfd15b617c7477404b7e7694955c0a3108fcff05d658bf",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboVQA",
+    "year": 2023,
+    "title": "RoboVQA: Multimodal Long-Horizon Reasoning for Robotics",
+    "source_url": "https://arxiv.org/abs/2311.00899",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "office"
+    ],
+    "review_tags": [
+      "辦公活動",
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P039",
+      "domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P039",
+          "domain_ids": [
+            "home",
+            "food",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            10
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "2,722 unique長指令、26,798 unique中程指令；字串去重不是共同語義任務去重。10種QA包含規劃、完成檢測、affordance、過去描述／未來預測。",
+            "3棟辦公樓，robot／人手／人持夾具3種embodiment。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "0d6f31eb8631105b7abfd15b617c7477404b7e7694955c0a3108fcff05d658bf"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "0d6f31eb8631105b7abfd15b617c7477404b7e7694955c0a3108fcff05d658bf",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "judge",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P039",
+      "name": "RoboVQA",
+      "expected_title": "RoboVQA: Multimodal Long-Horizon Reasoning for Robotics",
+      "source_url": "https://arxiv.org/abs/2311.00899",
+      "pdf_url": "https://arxiv.org/pdf/2311.00899",
+      "retrieved_at": "2026-10-02T21:33:27.591523+00:00",
+      "pdf_sha256": "0d6f31eb8631105b7abfd15b617c7477404b7e7694955c0a3108fcff05d658bf",
+      "text_sha256": "f0ac3e334c1b8c995d0f8dbefe86dadfda8f2c64f1c002622916e98609f73233",
+      "pdf_bytes": 3220455,
+      "pages": 13,
+      "text_characters": 116335,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2311.00899v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2311.00899v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 3,
+        "unit": "辦公樓",
+        "pages": [
+          1,
+          2
+        ],
+        "record_id": "review10:P039:1",
+        "paper_id": "P039",
+        "benchmark": "RoboVQA",
+        "native_term": "辦公樓",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.00899v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.00899v1",
+            "locator": "PDF pp. 1, 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2722,
+        "unit": "unique長程指令字串",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P039:2",
+        "paper_id": "P039",
+        "benchmark": "RoboVQA",
+        "native_term": "unique長程指令字串",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.00899v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.00899v1",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26798,
+        "unit": "unique中程指令字串",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P039:3",
+        "paper_id": "P039",
+        "benchmark": "RoboVQA",
+        "native_term": "unique中程指令字串",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.00899v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.00899v1",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 5246,
+        "unit": "長程episodes",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P039:4",
+        "paper_id": "P039",
+        "benchmark": "RoboVQA",
+        "native_term": "長程episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.00899v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.00899v1",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "離線planning episodes",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P039:5",
+        "paper_id": "P039",
+        "benchmark": "RoboVQA",
+        "native_term": "離線planning episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.00899v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.00899v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 854,
+        "unit": "離線planning steps",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P039:6",
+        "paper_id": "P039",
+        "benchmark": "RoboVQA",
+        "native_term": "離線planning steps",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.00899v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.00899v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "google-deepmind/robovqa"
+  ],
+  "external_repositories": []
+}

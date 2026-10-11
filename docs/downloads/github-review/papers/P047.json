@@ -1,0 +1,237 @@
+{
+  "paper_id": "P047",
+  "name": "AVT",
+  "title": "Anticipative Video Transformer",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2106.02036",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P047",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "AVT是重用EK55/EK100、EGTEA及50Salads的預測方法；README還固定了外部RULSTM commit，必須把模型repo與父資料／評測來源分開。",
+    "environment": "影片或預取特徵的觀測脈絡，無互動場景定義。",
+    "tasks": "依tau_a提前量及tau_o觀測長度做動作預測，另有未來特徵學習；辨識與預測模式不能混用。",
+    "data": "base_video_dataset保存orig_start/orig_end，轉換出過去窗口和future_i窗口並另記discarded樣本；不同資料根目錄與特徵頻率保留。",
+    "evaluation": "BasicLossAccuracy對各target類型計cross-entropy、top1/top5；common.utils.accuracy會展平時間維。正式EPIC評測另依README固定的RULSTM接口。",
+    "standardization": {
+      "profile": "action_anticipation",
+      "reuse": "時間窗轉換、target字典、標籤空間及原生metric。",
+      "transform": "case分開context、未來reference、tau_a/tau_o和資料版本；future欄位作訓練目標或評分證據，不能自動全部給推論端。",
+      "missing": "素材閉合、外部RULSTM指定版本、discarded分母與共同split核對。"
+    },
+    "version_note": "原作外部RULSTM固定57842b27d6264318be2cb0beb9e2f8c2819ad9bc；不能默認使用其他commit的評測。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/AVT",
+        "requested_repo": "facebookresearch/AVT",
+        "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            13,
+            55
+          ],
+          [
+            71,
+            142
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 225,
+        "sha256": "ba6a3dadccb633120377ec4fc1421e8d6f752b41b8ffe5a926686e907efd4523",
+        "url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/README.md",
+        "reading_url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/README.md#L13-L55",
+        "why": "確認精確論文、父資料和指定外部commit。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/AVT",
+        "requested_repo": "facebookresearch/AVT",
+        "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+        "ref": null,
+        "path": "docs/DATASETS.md",
+        "ranges": [
+          [
+            1,
+            20
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 20,
+        "sha256": "f909a9ad7059ef0c5abad39096e715ed7bf9a76e0059be5c96e2737daf4556d5",
+        "url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/docs/DATASETS.md",
+        "reading_url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/docs/DATASETS.md#L1-L20",
+        "why": "核對其他資料集標註來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/AVT",
+        "requested_repo": "facebookresearch/AVT",
+        "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+        "ref": null,
+        "path": "datasets/base_video_dataset.py",
+        "ranges": [
+          [
+            23,
+            32
+          ],
+          [
+            38,
+            71
+          ],
+          [
+            73,
+            79
+          ],
+          [
+            82,
+            100
+          ],
+          [
+            106,
+            112
+          ],
+          [
+            116,
+            138
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 891,
+        "sha256": "ef01e5ed3c2d4962f0e0a128d901cd35b3910ef78a77fb11cacee8f4ef983ef1",
+        "url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/datasets/base_video_dataset.py",
+        "reading_url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/datasets/base_video_dataset.py#L23-L32",
+        "why": "讀時間窗口、future與discard規則。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/AVT",
+        "requested_repo": "facebookresearch/AVT",
+        "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+        "ref": null,
+        "path": "func/train_eval_ops.py",
+        "ranges": [
+          [
+            10,
+            37
+          ],
+          [
+            51,
+            102
+          ],
+          [
+            113,
+            121
+          ],
+          [
+            129,
+            159
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 231,
+        "sha256": "fb8ce65aca0afb191058a55388667b1b569cd5ce98fc68b1e20992a138f85de2",
+        "url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/func/train_eval_ops.py",
+        "reading_url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/func/train_eval_ops.py#L10-L37",
+        "why": "讀target/logits與分類指標。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/AVT",
+        "requested_repo": "facebookresearch/AVT",
+        "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+        "ref": null,
+        "path": "common/utils.py",
+        "ranges": [
+          [
+            17,
+            44
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 208,
+        "sha256": "11afbce7f50fa34018acfab1826e4c13c2f1493a9ba3da9e3df4128321a98561",
+        "url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/common/utils.py",
+        "reading_url": "https://github.com/facebookresearch/AVT/blob/b082c99a6b3104780237022274db74f5c3124cc5/common/utils.py#L17-L44",
+        "why": "核對accuracy分母和多維輸出處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "75817fe5e0c1ca9cc4ef83d26b83668463b1fba9122448bdd9fdf502d54b6a94"
+  },
+  "repository_binding_review_sha256": "75817fe5e0c1ca9cc4ef83d26b83668463b1fba9122448bdd9fdf502d54b6a94",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/AVT",
+      "resolved_repo": "facebookresearch/AVT",
+      "aliases_in_this_review": [
+        "facebookresearch/avt"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b082c99a6b3104780237022274db74f5c3124cc5",
+          "reviewed_files": [
+            "README.md",
+            "common/utils.py",
+            "datasets/base_video_dataset.py",
+            "docs/DATASETS.md",
+            "func/train_eval_ops.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/AVT",
+          "link_label": "code/models",
+          "project_url": "http://facebookresearch.github.io/AVT",
+          "page_sha256": "889b728f893e0d6590a3a12ad897859cff9674a8b37b1f18efc3b315fc8716ae"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P047",
+          "review_file": "content/github_review/reviews/P047.json",
+          "review_sha256": "75817fe5e0c1ca9cc4ef83d26b83668463b1fba9122448bdd9fdf502d54b6a94",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "facebookresearch/AVT"
+  ],
+  "external_repositories": []
+}

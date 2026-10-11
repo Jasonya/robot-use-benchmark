@@ -1,0 +1,518 @@
+{
+  "paper_id": "P228",
+  "name": "SFHand / EgoHaFL",
+  "title": "SFHand: Learning Embodied Manipulation by Streaming Egocentric 3D Hand Forecasting",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2511.18127",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "wearable",
+    "home",
+    "food",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P228",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "SFHand／EgoHaFL 有可讀取的手部串流預測資料與 evaluator；目前 README 仍把 Franka Kitchen 評測與 3D 標註產生程式列為 Coming soon。已沿 loader→stream→模型輸入→matching→metric 查核，將人體預測與機器人實作分開。",
+    "environment": "Ego4D v1 真實活動短片／自動 MANO 標註；EgoHaFL 為衍生 annotations，不是 247K 個模擬環境。Franka Kitchen 下游環境須追到父 benchmark，公開源碼尚未完整涵蓋。",
+    "tasks": "串流、語言引導的 hand type／2D box／3D pose／3D trajectory 四類輸出，共用同一 clip。每步餵入截至當下的新影像，hand state 由前次預測接續；不是一次只看首幀的全盲長期預測。",
+    "data": "論文報告約 247K 個 3 秒 clips（242K train／5K test）、每 clip 16 個 annotated frames，約 3.95M 標註幀；不是 3.95M 獨立問題。eval config clip_length=8、max_hand=10、camera depth 0<z<2.5。loader 保留前 10 個有效 hand，LMDB uid／video_id／start/end／caption 與 native split 一起保存。",
+    "evaluation": "Hungarian matching 後，以 IoU>−1／0.5 及手別正確篩選，再計 camera translation ADE／最後一步 FDE、wrist-aligned MPJPE／PA-MPJPE，輸出 cm。precision=matched 中達 IoU 且手別正確／matched 中達 IoU；recall 分母也是 matched pairs 數，未匹配額外預測不在該分母。誤差是條件於匹配及分類正確的子集合，不能當完整 detection precision/recall 或所有手的平均誤差。err_data 未看到跨 rank gather，正式分散式評測需核對匯總。",
+    "standardization": {
+      "profile": "streaming_language_conditioned_3d_hand_forecasting",
+      "reuse": "重用 EgoHaFL CSV／LMDB uid、原始 clip 時間窗、有效手數與原生匹配 evaluator。；保留 4 類預測輸出及 IoU 門檻，同列呈現 coverage／條件誤差。",
+      "transform": "標準 case 寫明 rolling RGB observation、autoregressive hand input、文字來源、clip horizon／frame stride、深度過濾與 hand cap。；保留原始 metrics；若要完整 detection precision／recall，另建版本並將所有未匹配預測／GT 納入分母。；跨 Ego4D 衍生資料以 video／時間交集去重，不將標註幀數乘成新增題數。",
+      "missing": "本次未下載 Ego4D 影片／MANO 權重，未執行模型或確認論文分數。；embodied evaluation 與 annotation pipeline 尚未公開於本次 revision；matching error 空集合與多 rank 匯總需要 adapter 驗證。"
+    },
+    "version_note": "閱讀版本為 pinned GitHub commit；DATA／MODEL 外部儲存庫另需固定 revision。論文尺度與程式 clip 子取樣各自登記，不把新觀測幀或四種輸出當新任務。",
+    "runtime_executed": false,
+    "discovery_evidence": [
+      {
+        "kind": "paper",
+        "url": "https://arxiv.org/abs/2511.18127",
+        "checked_sections": [
+          "第 4 節與第 5.2 節，頁 5：247K clips、242K／5K split、16 annotation frames。"
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 151,
+        "sha256": "afba05b08522c2b8d0dc2ae0f206854e21c1581983d4e35093b1476ff85aba9d",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/README.md",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/README.md#L1-L92",
+        "why": "確認原生資料來自 Ego4D v1，發布範圍與未發布元件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "configs/config/clip_base_eval.yml",
+        "ranges": [
+          [
+            1,
+            42
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 42,
+        "sha256": "8c0543d77cce2f618111fb7e6d74b1056e05fc39a1153850db649addce7a3b14",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/configs/config/clip_base_eval.yml",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/configs/config/clip_base_eval.yml#L1-L42",
+        "why": "固定 test CSV、clip 長度、max_hand 與深度有效範圍。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "dataset/egodataset.py",
+        "ranges": [
+          [
+            20,
+            194
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 198,
+        "sha256": "e46c43e81d71f161a1595c399ba8aa24fe0f279bd619a6462e7b31e80180c3a7",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/dataset/egodataset.py",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/dataset/egodataset.py#L20-L194",
+        "why": "讀取 clip／caption／LMDB、16-frame 子取樣、深度篩選與最多 10 手的截斷。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "engine_pretrain.py",
+        "ranges": [
+          [
+            90,
+            288
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 352,
+        "sha256": "869d0011904faa78f032683b12bc5e0c906b895dbd78f3d12fca186bfad3a72f",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/engine_pretrain.py",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/engine_pretrain.py#L90-L288",
+        "why": "追蹤每步新增影像、autoregressive hand state、matching-only 分母與誤差。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "model/matcher.py",
+        "ranges": [
+          [
+            21,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 92,
+        "sha256": "f83ea7b0c36785faaca9473ed0c881578f0802dcd4094b6015e5636dbb7d0c8e",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/model/matcher.py",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/model/matcher.py#L21-L92",
+        "why": "確認 Hungarian 一對一匹配只保留 min(predictions,targets) 對。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "model/clip.py",
+        "ranges": [
+          [
+            274,
+            317
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 317,
+        "sha256": "4a7da7467ad39c36be647801cb841b72ca50c83a8b27922a261f6ef18b8b9224",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/model/clip.py",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/model/clip.py#L274-L317",
+        "why": "核對名為 future 的參數在這個 forward 中沒有被使用，避免憑變數名誤判。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ut-vision/SFHand",
+        "requested_repo": "ut-vision/SFHand",
+        "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+        "ref": null,
+        "path": "main.py",
+        "ranges": [
+          [
+            135,
+            164
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 187,
+        "sha256": "7492a461b857ce52a52c84a8c9f2418bcf19cb9ea9c51083f694728a060539b0",
+        "url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/main.py",
+        "reading_url": "https://github.com/ut-vision/SFHand/blob/86e3e34e57a9ebe8f0068e552ea3216628da6d83/main.py#L135-L164",
+        "why": "查核 distributed 包裝、eval 儲存的原生統計。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "092d493b3a3890768546bfb839bb21fadae2ab5962f536326c83c889352fe495"
+  },
+  "repository_binding_review_sha256": "092d493b3a3890768546bfb839bb21fadae2ab5962f536326c83c889352fe495",
+  "repository_bindings": [
+    {
+      "requested_repo": "ut-vision/SFHand",
+      "resolved_repo": "ut-vision/SFHand",
+      "aliases_in_this_review": [
+        "ut-vision/sfhand"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "86e3e34e57a9ebe8f0068e552ea3216628da6d83",
+          "reviewed_files": [
+            "README.md",
+            "configs/config/clip_base_eval.yml",
+            "dataset/egodataset.py",
+            "engine_pretrain.py",
+            "main.py",
+            "model/clip.py",
+            "model/matcher.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/ut-vision/SFHand",
+          "pdf_page": 1,
+          "pdf_sha256": "523777e21488e904c826eaab83130b80cffb36f33c1de90506f75949869bee9d",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P228",
+          "review_file": "content/github_review/reviews/P228.json",
+          "review_sha256": "092d493b3a3890768546bfb839bb21fadae2ab5962f536326c83c889352fe495",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "穿戴互動與動作介面",
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P228",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SFHand: Learning Embodied Manipulation by Streaming Egocentric 3D Hand Forecasting；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "Ego4D→EgoHOD/EgoVid衍生影片；worldcoordinates由估計camera/hand取得。",
+    "tasks": "streaming3Dhandstateforecast（type/box/pose/globaltrajectory）；Kitchen/Adroit只做下游representationtransfer。",
+    "cases": "247K三秒clips＝242Ktrain/5Ktest，3.95Mhandannotations；不是3.95M独立taskcases。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 247000,
+        "unit": "3-second clips（約數）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 5000,
+        "unit": "test clips（約數）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3950000,
+        "unit": "hand annotations（約數）",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "ADE/FDE、wristalignedJPE/PA-JPE、2Dboxrecall/FPS；SFHand*使用GTstate oracle另列。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "答案或標籤比對"
+    ],
+    "split": "test時間autoregression吃前一步預測；普通SFHand不可和oracle58.8FPS/accuracy混成同設定。",
+    "lineage": "Ego4D/EgoHOD/EgoVid共同影片，再用HaMeR生成pose。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "paper『4M Ego4D videos』實為衍生片段層級，不能當4M原始長影片；scene/video-disjoint split需核。"
+    ],
+    "reuse": "補streaming預測規則及teacher-forcing/oracle邊界，sourceclip/traininglabel分開。",
+    "reviewed_pdf_sha256": "523777e21488e904c826eaab83130b80cffb36f33c1de90506f75949869bee9d",
+    "reviewed_on": "2026-10-02",
+    "name": "SFHand / EgoHaFL",
+    "year": 2025,
+    "title": "SFHand: Learning Embodied Manipulation by Streaming Egocentric 3D Hand Forecasting",
+    "source_url": "https://arxiv.org/abs/2511.18127",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "home",
+      "food",
+      "general",
+      "wearable"
+    ],
+    "review_tags": [
+      "跨域人類活動",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P228",
+      "summary": "即時語言引導手部預測歸入動作介面；其Kitchen與Adroit下游評測另外歸納家居／餐飲與通用作業。",
+      "evidence": [
+        {
+          "paper_id": "P228",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            5
+          ],
+          "locator": "Abstract／Introduction",
+          "observed_tasks": [
+            "real-time AR／assistive robotics的hand-state forecasting"
+          ],
+          "reasoning": "原文明列即時交互用途。",
+          "basis": "stated_application",
+          "source_pdf_sha256": "523777e21488e904c826eaab83130b80cffb36f33c1de90506f75949869bee9d"
+        },
+        {
+          "paper_id": "P228",
+          "domain_ids": [
+            "home",
+            "food",
+            "general"
+          ],
+          "pages": [
+            5
+          ],
+          "locator": "Fig.3與§5.1",
+          "observed_tasks": [
+            "開燈、開門／微波爐、轉爐具旋鈕",
+            "重定向筆與搬球"
+          ],
+          "reasoning": "只依實際列出的下游task歸納，沒有把全部Ego4D用途自動搬入。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "523777e21488e904c826eaab83130b80cffb36f33c1de90506f75949869bee9d"
+        }
+      ],
+      "domain_ids": [
+        "wearable",
+        "home",
+        "food",
+        "general"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "523777e21488e904c826eaab83130b80cffb36f33c1de90506f75949869bee9d",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance",
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P228",
+      "name": "SFHand / EgoHaFL",
+      "expected_title": "SFHand: Learning Embodied Manipulation by Streaming Egocentric 3D Hand Forecasting",
+      "source_url": "https://arxiv.org/abs/2511.18127",
+      "pdf_url": "https://arxiv.org/pdf/2511.18127",
+      "retrieved_at": "2026-10-02T22:14:27.008270+00:00",
+      "pdf_sha256": "523777e21488e904c826eaab83130b80cffb36f33c1de90506f75949869bee9d",
+      "text_sha256": "ae9f816433d9e662f65f5c57cceb6e78f731e711a23a60a68409b6c5e2784353",
+      "pdf_bytes": 4893105,
+      "pages": 12,
+      "text_characters": 80460,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2511.18127v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2511.18127v2"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 247000,
+        "unit": "3-second clips（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P228:1",
+        "paper_id": "P228",
+        "benchmark": "SFHand / EgoHaFL",
+        "native_term": "3-second clips（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.18127v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.18127v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 5000,
+        "unit": "test clips（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P228:2",
+        "paper_id": "P228",
+        "benchmark": "SFHand / EgoHaFL",
+        "native_term": "test clips（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.18127v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.18127v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3950000,
+        "unit": "hand annotations（約數）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P228:3",
+        "paper_id": "P228",
+        "benchmark": "SFHand / EgoHaFL",
+        "native_term": "hand annotations（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.18127v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.18127v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "ut-vision/SFHand"
+  ],
+  "external_repositories": []
+}

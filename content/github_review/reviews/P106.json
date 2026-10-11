@@ -1,0 +1,76 @@
+{
+  "paper_id": "P106",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "現行Meta-World README直接引用2505.11289，與MetaWorld+相符。重點是固定觀測、動作、成功終止和meta適應預算，而不是把新實驗版本計成另一份獨立任務庫。",
+  "reading_order": [
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          55
+        ]
+      ],
+      "why": "確認論文身份、MT/ML用途與現行API。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/sawyer_xyz_env.py",
+      "ranges": [
+        [
+          320,
+          336
+        ],
+        [
+          475,
+          527
+        ]
+      ],
+      "why": "核對動作縮放、觀測stack與遮蔽goal。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/envs/sawyer_drawer_open_v3.py",
+      "ranges": [
+        [
+          66,
+          88
+        ],
+        [
+          115,
+          188
+        ]
+      ],
+      "why": "對照獨立success訊號與reward版本。"
+    },
+    {
+      "repo": "Farama-Foundation/Metaworld",
+      "path": "metaworld/evaluation.py",
+      "ranges": [
+        [
+          48,
+          103
+        ],
+        [
+          106,
+          169
+        ]
+      ],
+      "why": "看正式計分、task平均和meta適應/測試分離。"
+    }
+  ],
+  "environment": "與Meta-World來源共用Sawyer/MuJoCo任務體系；保留版本重用關係。",
+  "tasks": "50個任務可組成MT1/10/50與ML1/10/45。train任務、test任務與goal variations需要各自保留單位。",
+  "data": "實際程式使用39維基礎觀測與4維控制；多任務觀測可附task ID，目標是否可見取決於約定。",
+  "evaluation": "成功率依完成的episode和info.success統計；meta適應資料與最終評測episode分開，預算是可比較性的必要條件。",
+  "standardization": {
+    "profile": "interactive_task_definitions",
+    "reuse": "原生evaluation.py、task清單、versioned reset和success判定。",
+    "transform": "與P063記為同一程式來源的版本關係；task identity、goal instance及trial分開，保留動作縮放與可見資訊。",
+    "missing": "共同跨來源語義去重、素材閉合與新benchmark協定下的baseline。"
+  },
+  "version_note": "部分舊state-space說明與現行程式不一致；不得以9D舊描述生成本版schema。",
+  "runtime_executed": false
+}

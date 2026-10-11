@@ -1,0 +1,492 @@
+{
+  "paper_id": "P058",
+  "name": "EgoPAT3Dv2",
+  "title": "EgoPAT3Dv2: Predicting 3D Action Target from 2D Egocentric Vision for Human-Robot Interaction",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2403.05046",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "assistance",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P058",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoPAT3Dv2 的作者 repo 同時保留原版與擴充版讀取器；可追到逐幀 3D 目標誤差與進度分箱，但 HDF5 版本、手部特徵錯寫及評分彙整差異須先處理。",
+    "identity_note": "README 的完整標題、十一位作者與論文 arXiv:2403.05046v1 一致；論文指定的 ai4ce 專案頁直接連本 repo 與 Hugging Face 資料。這是 ICRA 2024 EgoPAT3Dv2 的實作及 EgoPAT3D 擴充資料入口，原版 D1 與擴充版 D2 有重用關係，不能加總當作兩份互斥資料集。",
+    "environment": "頭盔安裝 Azure Kinect 的人類物件操作影片。論文 §VI 的 UR10e 避讓／朝預測點移動是另行展示；已讀 repo 提供預測資料與模型測試，沒有該展示的機器人任務成功評分器。",
+    "tasks": "在線以 X1:t 預測同一段操作最終 3D 手部目標；目標必須轉到當前影格相機座標，並非未來全身動作或機器人控制。T1/T2 指原版／擴充訓練來源，D1/D2 指測試資料版本，seen/unseen 指場景是否在訓練出現。論文報告可用 clips 由 4129 增為 9579；本輪未下載資產核算此數。",
+    "data": "原版 HDF5 用 /{annotrain|annovalidate|annotest}/{scene}/{video} 與 /sequences/{scene}/{video}/{color,transformation/odometry}；擴充版將 /color/{scene}/{video}/{frame} 與 annotation、/transformation/{scene}/{video}/{frame} 分置兩檔。annotation 每列前三值為三個邊界，3:6／6:9 為兩段目標 xyz；原版要求 z>0.1，擴充版 z>0。長度=end-start、RGB 讀 start+1…end，累乘 odometry 後以逆矩陣轉換目標，單位公尺。RGB resize 224×224；training 直接排除長度>25 的 clips，測試以最長段補零並回傳真實長度。handLM 為 21×2、hand 為 landmark 5 的 x/y；兩 RGB 讀取器的 handLM 奇數欄實際也寫 lm.x，不能當成正確的 x/y 特徵。",
+    "evaluation": "test_DDP.py 依模型／epoch、scene、video 輸出 start-end.txt（逗號分隔 xyz）與 start-end_gt.txt。eval.py 算每幀 ||pred-gt||2，以 i/(L-1) 落入十個寬 0.1、兩端皆包含的區間；先在 clip 內平均，再平均同 recording 的 clips，最後等權平均 recordings，×100 得 cm；Overall 使用 linspace(2,1,10) 加權。邊界影格可能進入相鄰兩箱，短 clips 可出現空箱。論文 §IV-B 寫按影格等分十階段、餘數給較早階段，並報三個 seed 平均；目前入口不自動做三 seed 彙整。eval.py 的 --mode 是 store_true，僅用於輸出命名，真正 split 由 test_DDP 的設定決定。",
+    "standardization": {
+      "profile": "egocentric_3d_target_forecasting",
+      "reuse": "scene/video/clip 邊界、逐幀目標與 odometry 引用、D1/D2 及 seen/unseen 分派、歐氏誤差實作。",
+      "transform": "case 保存 dataset_version+split+scene+video+start/end，附實際影格索引、公尺相機座標、有效長度與手部缺失遮罩；evaluator 明列進度分箱、recording 平均、Overall 時間權重與 seed。原版／擴充版以來源重用關係相連。",
+      "missing": "需取得並固定 Hugging Face HDF5 版本／場景清單，核對修正版標註與影格取樣時間；修正或隔離 handLM 的 x/x 特徵、補足 checkpoint/model_epoch 參數與私人路徑，再驗證評分分箱及後處理。"
+    },
+    "version_note": "固定 a24b3a5a2453931de69a17dfc7116057dc849136（2024-03-19）。configs/README.md 在 manifest 中是空檔；README 測試命令未帶程式所需 model_epoch/checkpoint。test_DDP 後處理固定 4K 內參，v>=2160 分支錯改 u，且 x1/y1 使用前輪 z；重現前須確認保留原行為或另列修正版。論文 §IV-A 說擴充分配 9+2 新場景，§V-B 又說新增12場景，不能以文字自行決定總場景數。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P058-discovery.json",
+        "json_pointers": [
+          "/title",
+          "/pdf_sha256",
+          "/candidates/0"
+        ],
+        "sha256": "16ee1cc9a8dc82e93d2568c13942c8f3ce1edd70b1fbf607b3817d7130a7f281"
+      }
+    ],
+    "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+    "runtime_executed": false,
+    "source_manifest_sha256": "bfb48fd77a222ee3681a2a420310fa2d5fdcf4d44c5a2c2b0023d70378dadb5d",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 45,
+        "sha256": "e610ac0ebeea5b67a04d78ad0ef0fdf8c0cf4cfd430a586abb01526e18b590c1",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/README.md",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/README.md#L1-L45",
+        "why": "確認作者／論文、外置 HDF5 資料及 test_DDP→eval.py 流程。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "configs/cfg_defaults.py",
+        "ranges": [
+          [
+            15,
+            35
+          ],
+          [
+            42,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 83,
+        "sha256": "73a5d076d64c9bab3c36bafb8de0b5796a147b01edd58ccd924a58234a2d208b",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cfg_defaults.py",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cfg_defaults.py#L15-L35",
+        "why": "確認原版／擴充版、seen/unseen、單筆測試 batch 及預設路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+        "ranges": [
+          [
+            1,
+            21
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 23,
+        "sha256": "6fb48ec574672ee4a3f6792c1f0ad7698e699f2b1fe18598b7a4992ba0a7a039",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cn_t_post_hand_newloss_1_d1_seen.yaml#L1-L21",
+        "why": "實際 D1 seen RGB 設定與作者 HPC 路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "data_utils/Dataset_RGBD.py",
+        "ranges": [
+          [
+            10,
+            114
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 136,
+        "sha256": "07ab18433ec25685eae79527e16e5b918f1727edb1a7d1c75f5f1b7199d8136c",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/data_utils/Dataset_RGBD.py",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/data_utils/Dataset_RGBD.py#L10-L114",
+        "why": "原版 annotation、color/odometry、有效深度門檻及逐幀轉換。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "data_utils/Dataset_RGBD_enhanced.py",
+        "ranges": [
+          [
+            13,
+            120
+          ],
+          [
+            136,
+            140
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 164,
+        "sha256": "bb88f822a9535e87eaf03aab0ca31fa344646546fb9e744d8ddc667594407e63",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/data_utils/Dataset_RGBD_enhanced.py",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/data_utils/Dataset_RGBD_enhanced.py#L13-L120",
+        "why": "擴充版兩個 HDF5 的群組、clip 篩選、影格偏移與手部輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "data_utils/testDataset.py",
+        "ranges": [
+          [
+            9,
+            34
+          ],
+          [
+            42,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 101,
+        "sha256": "81521554e5a8b199783bb0a6ac697ea2a122ecc1adef2814177d2e75aaa34f1c",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/data_utils/testDataset.py",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/data_utils/testDataset.py#L9-L34",
+        "why": "區分舊 pointcloud/IMU 基線所需欄位，避免誤列為 RGB 方法必要輸入。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "test_DDP.py",
+        "ranges": [
+          [
+            19,
+            38
+          ],
+          [
+            58,
+            87
+          ],
+          [
+            160,
+            237
+          ],
+          [
+            256,
+            261
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 261,
+        "sha256": "326e8e33ef268f103ca35ef24823f7f5a331caad97a885205c7d4cf84ea82067",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/test_DDP.py",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/test_DDP.py#L19-L38",
+        "why": "追 seen/unseen 讀取器分派、真值／預測輸出及固定內參後處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ai4ce/EgoPAT3Dv2",
+        "requested_repo": "ai4ce/EgoPAT3Dv2",
+        "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+        "ref": null,
+        "path": "eval.py",
+        "ranges": [
+          [
+            45,
+            61
+          ],
+          [
+            92,
+            104
+          ],
+          [
+            248,
+            282
+          ],
+          [
+            284,
+            345
+          ],
+          [
+            397,
+            409
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 419,
+        "sha256": "8f519307f8ec27716ffcb40ad057b0a0d1ab9ccd04391ecb386c36cabc114b08",
+        "url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/eval.py",
+        "reading_url": "https://github.com/ai4ce/EgoPAT3Dv2/blob/a24b3a5a2453931de69a17dfc7116057dc849136/eval.py#L45-L61",
+        "why": "核對歐氏誤差、公分單位、含雙端點的十箱及 recording 層級平均。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ae8939bed649012c283e265484c8d1b881053f0cf08f527613baa160f3ae943d"
+  },
+  "repository_binding_review_sha256": "ae8939bed649012c283e265484c8d1b881053f0cf08f527613baa160f3ae943d",
+  "repository_bindings": [
+    {
+      "requested_repo": "ai4ce/EgoPAT3Dv2",
+      "resolved_repo": "ai4ce/EgoPAT3Dv2",
+      "aliases_in_this_review": [
+        "ai4ce/egopat3dv2"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+          "reviewed_files": [
+            "README.md",
+            "configs/cfg_defaults.py",
+            "configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+            "data_utils/Dataset_RGBD.py",
+            "data_utils/Dataset_RGBD_enhanced.py",
+            "data_utils/testDataset.py",
+            "eval.py",
+            "test_DDP.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ai4ce/EgoPAT3Dv2/tree/main",
+          "link_label": "Code",
+          "project_url": "https://ai4ce.github.io/EgoPAT3Dv2/",
+          "page_sha256": "96e0500a77d939e07dd498c8506dde3f9b94a6971f83eeff4a7834cc8422e1d4"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P058",
+          "review_file": "content/github_review/reviews/P058.json",
+          "review_sha256": "ae8939bed649012c283e265484c8d1b881053f0cf08f527613baa160f3ae943d",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "協助、交接與陪伴",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P058",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPAT3Dv2，arXiv 2403.05046v1。",
+    "scope_read": "原版／新增資料、seen/unseen切分、10段進度評分及HRI定位。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "協助、交接與陪伴",
+      "穿戴互動與動作介面"
+    ],
+    "role": "動作與軌跡預測",
+    "environment": "原版5 seen＋6 unseen scenes；新增9 seen＋2 unseen，合計22場景（由原文分量推算）。",
+    "tasks": "從RGB预测人手3D action target；cobot接近／避讓是應用展示，非22個操作goal。",
+    "cases": "本輪已讀原作未取得精確clip總量；各test clip按進度10等份評測，不能乘10當獨立軌跡。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 22,
+        "unit": "原版＋新增scenes",
+        "qualifier": "5+6+9+2推算",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "厘米級target prediction error，early／late分列；3個訓練seed取平均。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "保留T1/T2訓練與D1/D2測試來源、seen/unseen；train clips最多25frames，test不限制。",
+    "lineage": "EgoPAT3D擴充並修正部分GT；原baseline也因此改進，需固定版本後比較。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§IV-A、表I–II",
+        "supports": "22场景推算、切分、進度與seed單位"
+      }
+    ],
+    "unresolved": [
+      "新增與原版各split精確clip ID總量仍須發布資料核對。"
+    ],
+    "reuse": "可加入人類手部目標提前量／距離誤差軸，不能拿10個觀測比例冒充10種任務。",
+    "reviewed_pdf_sha256": "7496f4c315189a824e5c490ba688d26788d161a66d4cbc6f93caf2d64665979c",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoPAT3Dv2",
+    "year": 2024,
+    "title": "EgoPAT3Dv2: Predicting 3D Action Target from 2D Egocentric Vision for Human-Robot Interaction",
+    "source_url": "https://arxiv.org/abs/2403.05046",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "assistance",
+      "wearable"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "人機協作"
+    ],
+    "domain_names": [
+      "協助、交接與陪伴",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P058",
+      "summary": "預測人手將接觸的位置，讓共享工作區的機器人提前配合；同時是頭戴裝置的動作意圖介面。",
+      "evidence": [
+        {
+          "paper_id": "P058",
+          "domain_ids": [
+            "assistance",
+            "wearable"
+          ],
+          "pages": [
+            1
+          ],
+          "locator": "摘要、Fig.1、Introduction",
+          "observed_tasks": [
+            "人戴頭盔操作物件；UR10E接近預測的3D目標",
+            "從第一人稱影片預測手部動作意圖"
+          ],
+          "reasoning": "從合作目標與穿戴輸入歸納為交互協助及動作介面，無須把場景硬命名成工廠或廚房。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "7496f4c315189a824e5c490ba688d26788d161a66d4cbc6f93caf2d64665979c"
+        }
+      ],
+      "domain_ids": [
+        "assistance",
+        "wearable"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7496f4c315189a824e5c490ba688d26788d161a66d4cbc6f93caf2d64665979c",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P058",
+      "name": "EgoPAT3Dv2",
+      "expected_title": "EgoPAT3Dv2: Predicting 3D Action Target from 2D Egocentric Vision for Human-Robot Interaction",
+      "source_url": "https://arxiv.org/abs/2403.05046",
+      "pdf_url": "https://arxiv.org/pdf/2403.05046",
+      "retrieved_at": "2026-10-02T21:33:30.967885+00:00",
+      "pdf_sha256": "7496f4c315189a824e5c490ba688d26788d161a66d4cbc6f93caf2d64665979c",
+      "text_sha256": "408e6c44d3d507eb6a4bf9edc2ee4d6269462128279657c9a26451f206550476",
+      "pdf_bytes": 2745510,
+      "pages": 8,
+      "text_characters": 59309,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2403.05046v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2403.05046v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 22,
+        "unit": "原版＋新增scenes",
+        "qualifier": "5+6+9+2推算",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P058:1",
+        "paper_id": "P058",
+        "benchmark": "EgoPAT3Dv2",
+        "native_term": "原版＋新增scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.05046v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.05046v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "ai4ce/EgoPAT3Dv2"
+  ],
+  "external_repositories": []
+}

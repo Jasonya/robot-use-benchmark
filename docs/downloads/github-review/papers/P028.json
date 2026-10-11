@@ -1,0 +1,395 @@
+{
+  "paper_id": "P028",
+  "name": "EgoSchema",
+  "title": "EgoSchema: A Diagnostic Benchmark for Very Long-form Video Language Understanding",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2308.09126",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft",
+    "garden"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P028",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoSchema 官方倉庫含資料取得、原 Ego4D 對映和遠端提交 wrapper；完整 GT 未公開。已核讀提交程式與兩筆來源對映樣本，未把遠端介面當作本機 evaluator。",
+    "environment": "從 Ego4D 截出的第一人稱影片；q_uid 對應一個影片片段，uid_to_ego4d.json 另連 video_uid、starting_sec、ending_sec。多片段可能來自同一原影片／場景。",
+    "tasks": "零樣本長影片五選一 QA。README 的完整 5,031 題與公開答案 500 題是不同口徑，500 題為子集，不能加總；這是原作者檔案數字，非本次已整合題數。",
+    "data": "影片名對 q_uid；提交 JSON 是 question_uid→0–4 整數。已讀兩筆 parent mapping，其中一例把 q_uid 對到原影片 240–420 秒；只核對欄位與例子，不宣稱全量對映已人工審查。",
+    "evaluation": "validate.py 直接 POST JSON 到作者服務，返回 full/subset MCQ accuracy；程式本身沒有本機 scoring 邏輯或完整 hidden labels。未送出任何提交，也未驗證服務現時可用性。500 題離線結果不能當完整 benchmark 成績。",
+    "standardization": {
+      "profile": "long_video_mcqa",
+      "reuse": "原生 q_uid、五選一輸出範圍、公開 subset 口徑及 Ego4D 來源時間對映。",
+      "transform": "case 留 q_uid 與 parent video/time window；split/label_access 明確區分 public-500、完整公開問題與 hidden answers。evaluator 分 local_subset／remote_full，記錄影片取樣預算、輸出解析和提交回執。",
+      "missing": "本次未取得全量影片與 questions.json（超過本工作者小型文字取得上限），未執行模型或服務。需全量 schema／ID 唯一性與 public subset 對齊檢查後，才計已取得／已整合 cases。"
+    },
+    "version_note": "README 同時有 Kaggle 入口與舊 coming-soon 文句；這次只確認釘選檔案與 wrapper，不用舊介紹推定平臺狀態。Wasabi 簽署網址會過期，下載網址不是穩定資料 ID。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "egoschema/EgoSchema",
+        "requested_repo": "egoschema/EgoSchema",
+        "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 115,
+        "sha256": "59d65ed00873fdb1c5b883defb11ea3a0b4829491e483a6995b966ca81af597e",
+        "url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/README.md",
+        "reading_url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/README.md#L1-L115",
+        "why": "零樣本用途、native 題數、public/hidden 與提交格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "egoschema/EgoSchema",
+        "requested_repo": "egoschema/EgoSchema",
+        "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+        "ref": null,
+        "path": "uid_to_ego4d.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/001934bb-81bd-4cd8-a574-0472ef3f6678",
+          "/001d2d1b-d2f9-4c39-810e-6e2087ff9d5a"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/001934bb-81bd-4cd8-a574-0472ef3f6678",
+            "selected_value_sha256": "ae325ef7537999da9cd0cc4bc264820484eea607becb0c36cb967f21f040b2d4"
+          },
+          {
+            "pointer": "/001d2d1b-d2f9-4c39-810e-6e2087ff9d5a",
+            "selected_value_sha256": "6afa6cefe5a53ef3c2f5b8f984f77b0e023a9e34e6ea2add7ab55a351d51655f"
+          }
+        ],
+        "read_scope": "Only selected JSON entries read; no full-file or full-line review claimed",
+        "line_count": 1,
+        "sha256": "b6aa6b7b5e77863fa1ec725df8646ccb7915bdfe5f053991ba55d610b23e78a6",
+        "url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/uid_to_ego4d.json",
+        "reading_url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/uid_to_ego4d.json",
+        "why": "只讀兩筆 JSON pointer，確認原 Ego4D 與秒制來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "egoschema/EgoSchema",
+        "requested_repo": "egoschema/EgoSchema",
+        "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+        "ref": null,
+        "path": "validate.py",
+        "ranges": [
+          [
+            1,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 43,
+        "sha256": "0033bf3d241ed8f20df03a0118ad2f7b12f68bfffb10ed80d2a74934a869cb3a",
+        "url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/validate.py",
+        "reading_url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/validate.py#L1-L43",
+        "why": "遠端傳送程式，不是本地評分器",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f8f19322851c0a7d5b2f232724f2684a7ac40e9ce866875cf0de6fa6ef29d27b"
+  },
+  "repository_binding_review_sha256": "f8f19322851c0a7d5b2f232724f2684a7ac40e9ce866875cf0de6fa6ef29d27b",
+  "repository_bindings": [
+    {
+      "requested_repo": "egoschema/EgoSchema",
+      "resolved_repo": "egoschema/EgoSchema",
+      "aliases_in_this_review": [
+        "egoschema/egoschema"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+          "reviewed_files": [
+            "README.md",
+            "uid_to_ego4d.json",
+            "validate.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/egoschema/EgoSchema",
+          "pdf_page": 15,
+          "pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/egoschema/EgoSchema",
+          "pdf_page": 19,
+          "pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/egoschema/egoschema",
+          "link_label": "Github",
+          "project_url": "http://egoschema.github.io",
+          "page_sha256": "7ce526b6508b21254bf9d9a9e94915a328b9781731aa590c48c6d65e409f0198"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/egoschema/EgoSchema.git",
+          "link_label": "following link",
+          "project_url": "http://egoschema.github.io",
+          "page_sha256": "7ce526b6508b21254bf9d9a9e94915a328b9781731aa590c48c6d65e409f0198"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/egoschema/EgoSchema.git",
+          "link_label": "here",
+          "project_url": "http://egoschema.github.io",
+          "page_sha256": "7ce526b6508b21254bf9d9a9e94915a328b9781731aa590c48c6d65e409f0198"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/egoschema/EgoSchema/tree/main/benchmarking",
+          "link_label": "here",
+          "project_url": "http://egoschema.github.io",
+          "page_sha256": "7ce526b6508b21254bf9d9a9e94915a328b9781731aa590c48c6d65e409f0198"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P028",
+          "review_file": "content/github_review/reviews/P028.json",
+          "review_sha256": "f8f19322851c0a7d5b2f232724f2684a7ac40e9ce866875cf0de6fa6ef29d27b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "農業與園藝"
+  ],
+  "source_review": {
+    "paper_id": "P028",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoSchema，arXiv 2308.09126v1。",
+    "scope_read": "資料生成與人工過濾、temporal certificate定義、評测與datasheet精確量。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      9,
+      14
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "農業與園藝"
+    ],
+    "role": "影片問答與推理",
+    "environment": "Ego4D影片子集，未另外提供去重後環境數。",
+    "tasks": "長影片五選一QA；temporal certificate量必要證據時長，不能把3分鐘輸入長度直接當難度。",
+    "cases": "5,063題，每題一段3分鐘影片；約250小時為衍生片段量。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 5063,
+        "unit": "五選一QA",
+        "pages": [
+          14
+        ]
+      }
+    ],
+    "evaluation": [
+      "選項accuracy；人類時間／影格受限條件另列。",
+      "QA人工過濾要求至少30秒certificate，與完整3分鐘影片長度區分。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "本文定位zero-shot診斷評測；公開標籤子集與完整隱藏評測需依發布版本另外核對。",
+    "lineage": "Ego4D非重疊3分鐘片段產題，與其他Ego4D衍生QA仍可能共用上游影片。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§3.1–3.2",
+        "supports": "來源、過濾、certificate"
+      },
+      {
+        "pages": [
+          14
+        ],
+        "locator": "Datasheet Composition",
+        "supports": "精確5,063題"
+      }
+    ],
+    "unresolved": [
+      "本庫未逐ID對齊所有Ego4D衍生benchmark。"
+    ],
+    "reuse": "可借certificate、人類驗證和blind基線衡量時間推理難度；不評機器人實際完成。",
+    "reviewed_pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoSchema",
+    "year": 2023,
+    "title": "EgoSchema: A Diagnostic Benchmark for Very Long-form Video Language Understanding",
+    "source_url": "https://arxiv.org/abs/2308.09126",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft",
+      "garden"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "工藝與修繕",
+      "園藝與戶外"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "農業與園藝"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P028",
+      "domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "garden"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P028",
+          "domain_ids": [
+            "home",
+            "food",
+            "craft",
+            "garden"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            9,
+            14
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "長影片五選一QA；temporal certificate量必要證據時長，不能把3分鐘輸入長度直接當難度。",
+            "Ego4D影片子集，未另外提供去重後環境數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "garden"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P028",
+      "name": "EgoSchema",
+      "expected_title": "EgoSchema: A Diagnostic Benchmark for Very Long-form Video Language Understanding",
+      "source_url": "https://arxiv.org/abs/2308.09126",
+      "pdf_url": "https://arxiv.org/pdf/2308.09126",
+      "retrieved_at": "2026-10-02T21:33:20.780159+00:00",
+      "pdf_sha256": "4ae865287c1d40b806c5f51e4b5101fe90f7d246a201668f14bbb9cab00b442f",
+      "text_sha256": "343fbc251c782c5b9f7d7294763597976d82c8e27856a478049a01c6f88b4888",
+      "pdf_bytes": 3144656,
+      "pages": 32,
+      "text_characters": 191493,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2308.09126v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2308.09126v1"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 5063,
+        "unit": "五選一QA",
+        "pages": [
+          14
+        ],
+        "record_id": "review10:P028:1",
+        "paper_id": "P028",
+        "benchmark": "EgoSchema",
+        "native_term": "五選一QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.09126v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.09126v1",
+            "locator": "PDF pp. 14",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "egoschema/EgoSchema"
+  ],
+  "external_repositories": []
+}

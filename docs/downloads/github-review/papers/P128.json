@@ -1,0 +1,402 @@
+{
+  "paper_id": "P128",
+  "name": "RoboNet",
+  "title": "RoboNet: Large-Scale Multi-Robot Learning",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1910.11215",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P128",
+    "summary": "RoboNet原生loader會檢查資料hash，統一T個影像/狀態與T−1個action；不同機體維度可補零、截短或推估autograsp，必須保留轉換來源。",
+    "environment": "多機器人HDF5 interaction sequences，metadata帶robot/ncam/維度/長度/檔案hash。任務環境或物件配置不能由機體名與record數推定。",
+    "tasks": "動作條件影片預測、逆動態／視覺控制及標註點預測；frame、subsequence、同episode多camera皆不是新增語義任務。",
+    "data": "env/state、policy/actions、camera影像及可選bbox_annotations；loader以min(state_T,img_T,action_T+1)決定可用T，action取T−1。Mismatch模式可PAD_ZERO/CLEAVE，autograsp根據後一state及邊界推估新增控制維。",
+    "evaluation": "標註variant預設拆non-annotated train/val/test並另列annotated robots；指定train_ex_per_source時另走分支，須固定split規則。metrics提供分佈像素距離和normalize到1的PSNR/MSE等，值受resize/camera/horizon影響，不是物理task完成率。",
+    "standardization": {
+      "profile": "multi_robot_action_conditioned_video_prediction",
+      "reuse": "內容hash、原robot/相機/維度、T/T−1對齊、標註模式與視覺metrics。",
+      "transform": "case記parent HDF5、選取camera/起始frame/context/horizon、原維度和補零/截斷/autograsp推估；像素誤差附影像解析度，原標註缺失與零placeholder分開。",
+      "missing": "資料資產與完整metadata、場景/語義目標映射、原train/test與annotated子集隔離、視覺控制真實成功協定及跨來源去重。"
+    },
+    "version_note": "固定d83eee2的2019來源實作；RoboNet另被OXE重發為RLDS，需保留同一父episode關係。未執行TF模型或原資料loader。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "SudeepDasari/RoboNet",
+        "requested_repo": "SudeepDasari/RoboNet",
+        "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            20
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 20,
+        "sha256": "4bf9ac1ba5e11d898d854aa0137dc6eb90eb3a7529b228677cdbc1cdbffdaa33",
+        "url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/README.md",
+        "reading_url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/README.md#L1-L20",
+        "why": "原作、資料與inverse/video prediction方法角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SudeepDasari/RoboNet",
+        "requested_repo": "SudeepDasari/RoboNet",
+        "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7",
+        "ref": null,
+        "path": "robonet/datasets/util/hdf5_loader.py",
+        "ranges": [
+          [
+            78,
+            174
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 220,
+        "sha256": "54b07a9a5aa26d2188017996c11a746c9669ec958b881dc25301eb19b73e4953",
+        "url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/robonet/datasets/util/hdf5_loader.py",
+        "reading_url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/robonet/datasets/util/hdf5_loader.py#L78-L174",
+        "why": "state/action維度、autograsp推估、標註縮放與T對齊",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SudeepDasari/RoboNet",
+        "requested_repo": "SudeepDasari/RoboNet",
+        "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7",
+        "ref": null,
+        "path": "robonet/datasets/variants/annotation_benchmark_dataset.py",
+        "ranges": [
+          [
+            1,
+            54
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 82,
+        "sha256": "70538d108f8d62f8ba81925d72624f10838efae0deb4c524ec3dec4cab1e3660",
+        "url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/robonet/datasets/variants/annotation_benchmark_dataset.py",
+        "reading_url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/robonet/datasets/variants/annotation_benchmark_dataset.py#L1-L54",
+        "why": "有/無標註與robot-specific評測模式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SudeepDasari/RoboNet",
+        "requested_repo": "SudeepDasari/RoboNet",
+        "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7",
+        "ref": null,
+        "path": "robonet/video_prediction/metrics.py",
+        "ranges": [
+          [
+            13,
+            88
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 511,
+        "sha256": "aaaad1a87c419a2a78517bacbea7fb78355af03c2fbbc096c3cf1784bd2433bf",
+        "url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/robonet/video_prediction/metrics.py",
+        "reading_url": "https://github.com/SudeepDasari/RoboNet/blob/d83eee20f39653c3f8e7c349df7350e8a9e9f7a7/robonet/video_prediction/metrics.py#L13-L88",
+        "why": "像素距離與MSE/PSNR的實際計量公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "45922b368ad5e5d968ee405883447bae57bf3736b6ac9868a22ef7f0dfeb3118"
+  },
+  "repository_binding_review_sha256": "45922b368ad5e5d968ee405883447bae57bf3736b6ac9868a22ef7f0dfeb3118",
+  "repository_bindings": [
+    {
+      "requested_repo": "SudeepDasari/RoboNet",
+      "resolved_repo": "SudeepDasari/RoboNet",
+      "aliases_in_this_review": [
+        "sudeepdasari/robonet"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7",
+          "reviewed_files": [
+            "README.md",
+            "robonet/datasets/util/hdf5_loader.py",
+            "robonet/datasets/variants/annotation_benchmark_dataset.py",
+            "robonet/video_prediction/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SudeepDasari/RoboNet",
+          "link_label": "Code",
+          "project_url": "http://www.robonet.wiki/",
+          "page_sha256": "a98f6ee1a793de15227cdebc61deffbef0668e1ac60a0174973e05e6a1b15e04"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SudeepDasari/RoboNet/wiki/Getting-Started",
+          "link_label": "Dataset",
+          "project_url": "http://www.robonet.wiki/",
+          "page_sha256": "a98f6ee1a793de15227cdebc61deffbef0668e1ac60a0174973e05e6a1b15e04"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P128",
+          "review_file": "content/github_review/reviews/P128.json",
+          "review_sha256": "45922b368ad5e5d968ee405883447bae57bf3736b6ac9868a22ef7f0dfeb3118",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P128",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboNet: Large-Scale Multi-Robot Learning；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "跨資料集整合與評測方法",
+    "domains": [
+      "通用物件與機動作業"
+    ],
+    "environment": "4lab environments、113camera configurations、7arenatypes等不同環境層級。",
+    "tasks": "主要objectrelocation，可用推或抓放；manyrobots不增加相同數量goal families。",
+    "cases": "15Mframes、約162Ktrajectories；7platforms，Table1caption稱6arms有文字差異。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "lab environments",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 113,
+        "unit": "camera configurations",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 15000000,
+        "unit": "video frames（約數）",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "endgoal distance與operator判斷是否覆蓋goal；作者明言不同experiments不可直接比難度。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "人類或模型判讀"
+    ],
+    "split": "held-out robot或view再fine-tune300–400targettrajectories；不叫完全zero-shotrobottransfer。",
+    "lineage": "多institution資料與existingrobotcorpora整合；同物理trajectory可能多view。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "release-version軌跡精確數及scene去重待manifest；不從15Mframes推testcases。"
+    ],
+    "reuse": "重要早期整合前作；以哪種目標、哪種資訊與哪個分母比較，比合併大小更關鍵。",
+    "reviewed_pdf_sha256": "01a03705dfb76192445b8c09fa3e85d67a1d9165b2c00df3672cfd10cc66052a",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboNet",
+    "year": 2019,
+    "title": "RoboNet: Large-Scale Multi-Robot Learning",
+    "source_url": "https://arxiv.org/abs/1910.11215",
+    "primary_type": "G",
+    "category_name": "機器人資料與通用策略",
+    "domain_ids": [
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P128",
+      "summary": "核心目標是把未知物件推或抓放到指定位置，歸入跨場域物件搬移作業。",
+      "evidence": [
+        {
+          "paper_id": "P128",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            3,
+            5
+          ],
+          "locator": "§3 Problem statement、§5.1",
+          "observed_tasks": [
+            "object relocation：pushing 或 grasping-and-placing",
+            "跨機器人、物件、場景與視角復用"
+          ],
+          "reasoning": "場景未綁特定行業不妨礙歸納明確作業用途。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "01a03705dfb76192445b8c09fa3e85d67a1d9165b2c00df3672cfd10cc66052a"
+        }
+      ],
+      "domain_ids": [
+        "general"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "01a03705dfb76192445b8c09fa3e85d67a1d9165b2c00df3672cfd10cc66052a",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P128",
+      "name": "RoboNet",
+      "expected_title": "RoboNet: Large-Scale Multi-Robot Learning",
+      "source_url": "https://arxiv.org/abs/1910.11215",
+      "pdf_url": "https://arxiv.org/pdf/1910.11215",
+      "retrieved_at": "2026-10-02T22:13:47.889122+00:00",
+      "pdf_sha256": "01a03705dfb76192445b8c09fa3e85d67a1d9165b2c00df3672cfd10cc66052a",
+      "text_sha256": "67e1d292b8ea28e2ba088d92324c93b1ce520277a4b7df82bb39be05b3f6dbd3",
+      "pdf_bytes": 4846317,
+      "pages": 15,
+      "text_characters": 66223,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1910.11215v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1910.11215v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "lab environments",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P128:1",
+        "paper_id": "P128",
+        "benchmark": "RoboNet",
+        "native_term": "lab environments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1910.11215v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1910.11215v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 113,
+        "unit": "camera configurations",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P128:2",
+        "paper_id": "P128",
+        "benchmark": "RoboNet",
+        "native_term": "camera configurations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1910.11215v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1910.11215v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 15000000,
+        "unit": "video frames（約數）",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P128:3",
+        "paper_id": "P128",
+        "benchmark": "RoboNet",
+        "native_term": "video frames（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1910.11215v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1910.11215v2",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "SudeepDasari/RoboNet"
+  ],
+  "external_repositories": []
+}

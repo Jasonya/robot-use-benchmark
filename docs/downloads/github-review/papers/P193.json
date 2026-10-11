@@ -1,0 +1,358 @@
+{
+  "paper_id": "P193",
+  "name": "GRIP",
+  "title": "GRIP: A General Robotic Incremental Potential Contact Simulation Dataset for Unified Deformable-Rigid Coupled Grasping",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2503.05020",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P193",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "GRIP有柔性/剛性抓取HDF5結構和Finray視覺化程式；整體10萬姿態與8子集是不同於目前公開Finray範圍的聲明。完整生成/評分pipeline尚未發布。",
+    "environment": "IPC柔性–剛性耦合抓取，手型與material分子集；overview記1200objects/100000poses。finray_soft_837與finray_rigid_710可能共用object ID，不直接相加當獨立物件或環境。",
+    "tasks": "抓取及stress-field等下游學習來源；每個pose/手型/材質形成具體抓取設定。雙手/單手子集與物件變體不直接增加語義task。",
+    "data": "HDF5分object_config(密度、Young模數、Poisson比、摩擦)和trajectories(關節/SE3/mesh/contact)。Finray文件稱每H5有20個成功trajectory、每條100frame，前40抓取、後60作重力驗證；是已篩成功的資料，不可從此推未篩候選的成功率。未下載大archive。",
+    "evaluation": "本庫沒有完整生成/失敗判定程式，不能重現10萬候選的過濾率。visualizer有soft分支rajectories/object_points拼字，object_type在README稱類別但程式用rigid判material；contacts文件語義與viewer向量相加用法仍需核定。record_fps24只決定輸出影片，不是simulation timebase。",
+    "standardization": {
+      "profile": "deformable_rigid_grasp_trajectories",
+      "reuse": "object/material參數、pose/time結構、mesh及contact紀錄，作柔性物task/資產來源。",
+      "transform": "用objectUID+hand/material+poseID形成instance，frame作其軌跡；記successful-only選擇條件、未篩樣本來源和力/位置/時間單位；修正或版本化reader而不更改原始bytes。",
+      "missing": "完整/已公開子集manifest、生成/驗收器、失敗資料、HDF5型別/單位實測、viewer路徑和object_type對應。"
+    },
+    "version_note": "固定56a4520；README計畫僅勾Finray，其他子集/生成pipeline未勾，雖寫完整dataset連結仍需依實際發布manifest核對。未把100frames或renderer輸出當獨立case。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "BeLl0o/GRIP_Dataset",
+        "requested_repo": "BeLl0o/GRIP_Dataset",
+        "commit": "56a45201677d4637467f96ab14937c0caa8c9314",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            35
+          ],
+          [
+            61,
+            100
+          ],
+          [
+            107,
+            188
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 200,
+        "sha256": "eda41ad77680e37a0cb5630f68d052df4d730b808f423e1bbf97a5feefd73b27",
+        "url": "https://github.com/BeLl0o/GRIP_Dataset/blob/56a45201677d4637467f96ab14937c0caa8c9314/README.md",
+        "reading_url": "https://github.com/BeLl0o/GRIP_Dataset/blob/56a45201677d4637467f96ab14937c0caa8c9314/README.md#L1-L35",
+        "why": "原作、公開計畫、object/hand/material階層與成功過濾軌跡",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "BeLl0o/GRIP_Dataset",
+        "requested_repo": "BeLl0o/GRIP_Dataset",
+        "commit": "56a45201677d4637467f96ab14937c0caa8c9314",
+        "ref": null,
+        "path": "scripts/finray_h5_visualizer.py",
+        "ranges": [
+          [
+            143,
+            227
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 273,
+        "sha256": "928ead5c86759e360eeff5fe6b0eb90b053a5df85907a1a6a71c599ae166e50d",
+        "url": "https://github.com/BeLl0o/GRIP_Dataset/blob/56a45201677d4637467f96ab14937c0caa8c9314/scripts/finray_h5_visualizer.py",
+        "reading_url": "https://github.com/BeLl0o/GRIP_Dataset/blob/56a45201677d4637467f96ab14937c0caa8c9314/scripts/finray_h5_visualizer.py#L143-L227",
+        "why": "真實HDF5路徑、pose/time索引、剛/柔分支與渲染clock",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "1d340a5e7197c61eaddee57c8700528b67fc1390ed809a62938ccc53080523ef"
+  },
+  "repository_binding_review_sha256": "1d340a5e7197c61eaddee57c8700528b67fc1390ed809a62938ccc53080523ef",
+  "repository_bindings": [
+    {
+      "requested_repo": "BeLl0o/GRIP_Dataset",
+      "resolved_repo": "BeLl0o/GRIP_Dataset",
+      "aliases_in_this_review": [
+        "bell0o/grip_dataset"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "56a45201677d4637467f96ab14937c0caa8c9314",
+          "reviewed_files": [
+            "README.md",
+            "scripts/finray_h5_visualizer.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/BeLl0o/GRIP_Dataset",
+          "link_label": "Code",
+          "project_url": "https://bell0o.github.io/GRIP/",
+          "page_sha256": "3716ec7f0390a18c5e62e01ea5020f50451929db3abb8a1c6e78769c26bb6642"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P193",
+          "review_file": "content/github_review/reviews/P193.json",
+          "review_sha256": "1d340a5e7197c61eaddee57c8700528b67fc1390ed809a62938ccc53080523ef",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P193",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "GRIP: A General Robotic Incremental Potential Contact Simulation Dataset for Unified Deformable-Rigid Coupled Grasping；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "柔性物與抓取benchmark",
+    "domains": [
+      "通用物件與機動作業"
+    ],
+    "environment": "IPC平行physics；UMIsoftgripper/LEAHand；800singleobjects，800bimanual含400重用，union1200。",
+    "tasks": "grasp synthesis/validation與stressprediction；single/bimanual不同graspconditions。",
+    "cases": "100,000grasp poses（概要）；stresssubset8bowls+8mugs，每類6train/2test；非100K不同tasks。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 1200,
+        "unit": "unique selected objects，800+800−400",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100000,
+        "unit": "grasp poses（概要數）",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4,
+        "unit": "stressprediction held-out objects",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "sixdirectiongravity穩定抓持、penetration/absolutecontactdistance、stressrelativeMAE/KL；simulationfidelityrealcheck只4objects。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "DexGraspNet/PartNetassets重用；stress按object切，graspwholepool分割另需release核。",
+    "lineage": "固定物件union和多gripper/material/randomizedpose；全量物件與real2sim4個子集分開。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "50N停止closure和gravity0.1秒/方向是本protocol，不能當通用安全標準。"
+    ],
+    "reuse": "可補接觸穩定性與材料保護規則；candidatepose生成和有效評測case分開。",
+    "reviewed_pdf_sha256": "04cf205cc12587bbc6680049d1eaa00b17736f5efde4581b6e2043a79bd684a5",
+    "reviewed_on": "2026-10-02",
+    "name": "GRIP",
+    "year": 2025,
+    "title": "GRIP: A General Robotic Incremental Potential Contact Simulation Dataset for Unified Deformable-Rigid Coupled Grasping",
+    "source_url": "https://arxiv.org/abs/2503.05020",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "易損物品處理"
+    ],
+    "domain_names": [
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P193",
+      "summary": "產生穩定抓握並預測物件受力，歸入通用抓取與易損物處理作業。",
+      "evidence": [
+        {
+          "paper_id": "P193",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            4,
+            5,
+            6
+          ],
+          "locator": "Grasp Validation、Dataset Quality、Stress Force Prediction",
+          "observed_tasks": [
+            "單／雙手穩定抓取",
+            "穿透與接觸距離檢查",
+            "杯碗等可變形物的應力預測"
+          ],
+          "reasoning": "不憑『研究在實驗室做』改稱濕實驗室用途；依抓取與保護物件的目標歸納。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "04cf205cc12587bbc6680049d1eaa00b17736f5efde4581b6e2043a79bd684a5"
+        }
+      ],
+      "domain_ids": [
+        "general"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "04cf205cc12587bbc6680049d1eaa00b17736f5efde4581b6e2043a79bd684a5",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P193",
+      "name": "GRIP",
+      "expected_title": "GRIP: A General Robotic Incremental Potential Contact Simulation Dataset for Unified Deformable-Rigid Coupled Grasping",
+      "source_url": "https://arxiv.org/abs/2503.05020",
+      "pdf_url": "https://arxiv.org/pdf/2503.05020",
+      "retrieved_at": "2026-10-02T22:14:13.071729+00:00",
+      "pdf_sha256": "04cf205cc12587bbc6680049d1eaa00b17736f5efde4581b6e2043a79bd684a5",
+      "text_sha256": "a9b679369dd9eb83de6ee78689bdfa8404ad89acad15e1eeb30e48f2ceef4bdb",
+      "pdf_bytes": 5673660,
+      "pages": 8,
+      "text_characters": 59918,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2503.05020v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2503.05020v2"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 1200,
+        "unit": "unique selected objects，800+800−400",
+        "pages": [
+          1,
+          4
+        ],
+        "record_id": "review10:P193:1",
+        "paper_id": "P193",
+        "benchmark": "GRIP",
+        "native_term": "unique selected objects，800+800−400",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.05020v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.05020v2",
+            "locator": "PDF pp. 1, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100000,
+        "unit": "grasp poses（概要數）",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P193:2",
+        "paper_id": "P193",
+        "benchmark": "GRIP",
+        "native_term": "grasp poses（概要數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.05020v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.05020v2",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4,
+        "unit": "stressprediction held-out objects",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P193:3",
+        "paper_id": "P193",
+        "benchmark": "GRIP",
+        "native_term": "stressprediction held-out objects",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2503.05020v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2503.05020v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "BeLl0o/GRIP_Dataset"
+  ],
+  "external_repositories": []
+}

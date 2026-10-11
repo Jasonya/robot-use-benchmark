@@ -1,0 +1,478 @@
+{
+  "paper_id": "P196",
+  "name": "Deform360",
+  "title": "Deform360: A Massive Multi-view Visuotactile Dataset for Deformable World Models",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2607.05390",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P196",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Deform360有明確多視角/觸覺對齊與annotation contract，可直接作資料層參考；README明示world-model訓練、baseline和checkpoint未公開。",
+    "environment": "BRICS capture dome真實柔性物互動；原作198物件/13類、1980互動，41同步RGB相機及4組16×32觸覺sensor。13物件類別不是13生活domain，41views不是41episodes。",
+    "tasks": "柔性物世界模型/多視觸覺研究資料；dataset utility提供對齊和annotations，不等同機器人物理任務registry或已釋出的world-model benchmark runner。",
+    "data": "原作215.7h、約23.3Mframes須保留其跨視角統計口徑。episode/<camera>/undistorted.mp4與K/c2w、aligned timestamps、provenance hash；預設檢查相機frame/timeline一致。H5鍵data：mask bool/uint8二值、depth uint16毫米且0無效、velocity m/s；不可像RGB除255。",
+    "evaluation": "這些檢查驗證資料形狀/時間/校準一致性，不是world-model或robot成功分數。觸覺nearest配對保留match/accepted/duplicate資訊，未接受格補0須連valid mask使用；用於預測task時另外限制query以前的可見資料。",
+    "standardization": {
+      "profile": "multiview_visuotactile_deformable_data",
+      "reuse": "明確影像/姿態/深度/速度/觸覺契約、common timeline與output hash校驗，可復用到標準化來源層。",
+      "transform": "source/episode是主lineage，camera/frame/sensor作子記錄；保存微秒時間、c2w方向、單位、invalid值與alignment政策，case另綁定真正預測目標和scorer。",
+      "missing": "完整資料/annotations取得、interaction/物件split、world-model評測協定/程式與checkpoint、從感知資料建立物理可執行task的驗證。"
+    },
+    "version_note": "固定d8522a4；所讀公開庫定位access/preprocessing/annotation/alignment，未把能生成annotation推論為已發布world-model baseline。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "lhy0807/deform360",
+        "requested_repo": "lhy0807/deform360",
+        "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 615,
+        "sha256": "52f2ebed1800eb8c1e6dde05fefaca15ebba4456f0756b1ca05cfc4380fc8f7a",
+        "url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/README.md",
+        "reading_url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/README.md#L1-L85",
+        "why": "198objects/1980interactions/41camera與release scope",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lhy0807/deform360",
+        "requested_repo": "lhy0807/deform360",
+        "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+        "ref": null,
+        "path": "deform360/dataset.py",
+        "ranges": [
+          [
+            130,
+            269
+          ],
+          [
+            421,
+            478
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 494,
+        "sha256": "37fc36eff758afba694de380924c4bde84ffcb265956365cd766ee46face5b7a",
+        "url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/deform360/dataset.py",
+        "reading_url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/deform360/dataset.py#L130-L269",
+        "why": "相機K/c2w校驗、frame數/輸出provenance與timestamp_us",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lhy0807/deform360",
+        "requested_repo": "lhy0807/deform360",
+        "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+        "ref": null,
+        "path": "deform360/tactile.py",
+        "ranges": [
+          [
+            304,
+            353
+          ],
+          [
+            408,
+            449
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 945,
+        "sha256": "eaceb4263609174cadff7f0b162f2e63a0fed6a4d5be046ffa491c36a905b688",
+        "url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/deform360/tactile.py",
+        "reading_url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/deform360/tactile.py#L304-L353",
+        "why": "nearest時間對齊、accepted mask與共同camera timeline",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "lhy0807/deform360",
+        "requested_repo": "lhy0807/deform360",
+        "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+        "ref": null,
+        "path": "deform360/annotations.py",
+        "ranges": [
+          [
+            1,
+            83
+          ],
+          [
+            175,
+            206
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 458,
+        "sha256": "a8962c77dfac4fe0d12325af2b5086612e9ff7f4aa9ead2b3fc3856a92de7046",
+        "url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/deform360/annotations.py",
+        "reading_url": "https://github.com/lhy0807/deform360/blob/d8522a4403b766aeb387510c04e89032a56fdf35/deform360/annotations.py#L1-L83",
+        "why": "HDF5 data陣列、mask/depth/velocity單位與encode/decode",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "cf8e8f8af5f317a6e07c8db1ead5524cc945ca5ef6584a8b21e0a512c5e7521c"
+  },
+  "repository_binding_review_sha256": "cf8e8f8af5f317a6e07c8db1ead5524cc945ca5ef6584a8b21e0a512c5e7521c",
+  "repository_bindings": [
+    {
+      "requested_repo": "lhy0807/deform360",
+      "resolved_repo": "lhy0807/deform360",
+      "aliases_in_this_review": [
+        "lhy0807/deform360"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+          "reviewed_files": [
+            "README.md",
+            "deform360/annotations.py",
+            "deform360/dataset.py",
+            "deform360/tactile.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/lhy0807/deform360",
+          "link_label": "{ } Code & pipeline",
+          "project_url": "https://deform360.lhy.xyz",
+          "page_sha256": "ab35a7b59bf26e97162fa13f8fc7bf395b7b3bfbdc7c8e9eba606cc9290e835d"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/lhy0807/deform360",
+          "link_label": "Code",
+          "project_url": "https://deform360.lhy.xyz",
+          "page_sha256": "ab35a7b59bf26e97162fa13f8fc7bf395b7b3bfbdc7c8e9eba606cc9290e835d"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/lhy0807/deform360'",
+          "link_label": "URL in page source",
+          "project_url": "https://deform360.lhy.xyz",
+          "page_sha256": "ab35a7b59bf26e97162fa13f8fc7bf395b7b3bfbdc7c8e9eba606cc9290e835d"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P196",
+          "review_file": "content/github_review/reviews/P196.json",
+          "review_sha256": "cf8e8f8af5f317a6e07c8db1ead5524cc945ca5ef6584a8b21e0a512c5e7521c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P196",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Deform360，arXiv 2607.05390v1。",
+    "scope_read": "198objects、capture/重建、1980episodes、多層generalization及2D/3D metrics。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      27
+    ],
+    "domains": [
+      "衣物與洗護"
+    ],
+    "role": "柔性物資料與世界模型benchmark",
+    "environment": "一套41camera環繞capture rig；41視角不是41環境。人類持UMI tactile grippers操作。",
+    "tasks": "3D重建/重模擬、future prediction、episode及object generalization；198objects不是198語義task。",
+    "cases": "198物件＝28線材+98片材+72體積柔性物；每物件5single+5bimanual，共1,980episodes。清理後74,850videos、23.3M多視角frames。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 198,
+        "unit": "deformable objects",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1980,
+        "unit": "physical interaction episodes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 74850,
+        "unit": "同步/品質filter後view videos",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 215.7,
+        "unit": "累加多視角video hours",
+        "qualifier": "單視角行為20,483秒約5.69h，非215.7h獨立行為",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "3D Chamfer/track MSE；2D PSNR/SSIM/LPIPS；接觸accuracy/F1使用36個同步過濾視角。"
+    ],
+    "evaluation_types": [
+      "数值誤差與相似度",
+      "答案或標籤比對"
+    ],
+    "split": "分episode內future frames、同物件未見episodes、未見objects三種；不同方法適用不同設定，不能共用一個排行分母。",
+    "lineage": "3DGS＋tracking＋normal-pressure tactile重建；收集刻意避免slip，未提供完整shear/slip涵蓋。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          9,
+          10,
+          11,
+          12,
+          13,
+          27
+        ],
+        "locator": "Dataset Statistics、World Models、Tables 3–5、Tactile Appendix",
+        "supports": "198/1980/74850、view hours與generalization"
+      }
+    ],
+    "unresolved": [
+      "各generalization split的精確train/test ID數需release protocol；未宣稱所有198物件已完成real-robot closed-loop task驗證。"
+    ],
+    "reuse": "補材料與動力學覆蓋，亦示範為何要將episode、view影片、frame和hours各自計數。",
+    "reviewed_pdf_sha256": "3f23966cb31f3614a8b27aba9ae558ef4684e812dd86ef6cd072d1788c6faf95",
+    "reviewed_on": "2026-10-02",
+    "name": "Deform360",
+    "year": 2026,
+    "title": "Deform360: A Massive Multi-view Visuotactile Dataset for Deformable World Models",
+    "source_url": "https://arxiv.org/abs/2607.05390",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織",
+      "液體與柔性材料",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P196",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P196",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            27
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3D重建/重模擬、future prediction、episode及object generalization；198objects不是198語義task。",
+            "一套41camera環繞capture rig；41視角不是41環境。人類持UMI tactile grippers操作。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "3f23966cb31f3614a8b27aba9ae558ef4684e812dd86ef6cd072d1788c6faf95"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "3f23966cb31f3614a8b27aba9ae558ef4684e812dd86ef6cd072d1788c6faf95",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance",
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P196",
+      "name": "Deform360",
+      "expected_title": "Deform360: A Massive Multi-view Visuotactile Dataset for Deformable World Models",
+      "source_url": "https://arxiv.org/abs/2607.05390",
+      "pdf_url": "https://arxiv.org/pdf/2607.05390",
+      "retrieved_at": "2026-10-02T21:34:59.633155+00:00",
+      "pdf_sha256": "3f23966cb31f3614a8b27aba9ae558ef4684e812dd86ef6cd072d1788c6faf95",
+      "text_sha256": "0c3a21e403848080e534c4f92fca30a67477a5a0ca56da9fe5e44e143fc22ef0",
+      "pdf_bytes": 34160032,
+      "pages": 41,
+      "text_characters": 94793,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2607.05390v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2607.05390v1"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 198,
+        "unit": "deformable objects",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P196:1",
+        "paper_id": "P196",
+        "benchmark": "Deform360",
+        "native_term": "deformable objects",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.05390v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.05390v1",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1980,
+        "unit": "physical interaction episodes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P196:2",
+        "paper_id": "P196",
+        "benchmark": "Deform360",
+        "native_term": "physical interaction episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.05390v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.05390v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 74850,
+        "unit": "同步/品質filter後view videos",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P196:3",
+        "paper_id": "P196",
+        "benchmark": "Deform360",
+        "native_term": "同步/品質filter後view videos",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.05390v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.05390v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 215.7,
+        "unit": "累加多視角video hours",
+        "qualifier": "單視角行為20,483秒約5.69h，非215.7h獨立行為",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P196:4",
+        "paper_id": "P196",
+        "benchmark": "Deform360",
+        "native_term": "累加多視角video hours",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.05390v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.05390v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "lhy0807/deform360"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,772 @@
+{
+  "paper_id": "P222",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已核讀Uni-Hand human-video demo與作者指向的MMTwin/EgoPAT3D reader及具體ADE/FDE。主庫現行流程只以首影格條件預測右手腕與接觸轉換；不能將論文全部2D/3D、多關節、head-motion及robot結果視為同一套已公開評測。",
+  "identity_note": "arXiv:2511.12878v4（2026-05-11），Junyi Ma等，精確題名Uni-Hand: Universal Hand Motion Forecasting in Egocentric Views。PDF連作者專案頁，頁面Code指IRMVLab/UniHand、Data指IRMVLab/MMTwin；MMTwin README反向指Uni-Hand為extended version，本身論文為2504.07375。專案頁footer的nerfies是網頁模板，論文USST erratum是baseline依存，均非本篇模型庫。",
+  "environment": "主庫為RealSense L515人類示範的pick-and-place／open-door場景，首RGBD影格產生固定相機座標點雲；MMTwin用EgoPAT3D-DT移動頭戴視角，以odometry將軌跡表成首camera參照。CABH的cup/apple/box與HAT robot-transfer屬論文/前身不同子集，不可和主庫toy split混成獨立robot environment registry。",
+  "tasks": "Uni-Hand論文涵蓋手部2D/3D中心與指定關節、head motion及contact/separation；本次主庫實際epoch loop取joint0，註明TODO multi-finger，preprocess只讀right_keypoints；motion_feat為全零，視覺使用第一張feature，觀測mask只保留第0個手腕點。輸出是未來腕點與兩個接觸/分離峰，非完整21關節姿態，也不是可直接執行的末端action。",
+  "data": "主庫以date folder讀traj3d_in_cam_dict_refine.pkl、date.npy視覺特徵、rgb數字檔名與date_folders.csv。所謂traj3d原始值實為21×(u像素,v像素,depth-mm)；reader對depth除1000、u/w與v/h、z/max_depth後各減0.5，保留有效frame IDs，截/零補至40。CSV兩個原始frame ID映到有效序列的0-based index；沒有FPS/秒換算。config為1280×720、max_depth=1、50³ voxel、0.02公尺格、origin[-0.5,-0.5,0]。split檔有100 train與5 test唯一ID且無交集；它們是清單筆數，未下載素材核驗有效case。val/test/test_novel全部走同一test_split.txt。MMTwin則有明列scene/record train/val/test；novel scenes13/14/15，pkl讀traj2d/traj3d/num_preserve，最多40點，3D以odometry連乘轉首camera，再以(u/w,v/h,z/3)-0.5編碼，非train的未來motion/odometry先以最後觀測值替代。",
+  "evaluation": "主庫實際scorer在epoch_feat.py：單次diffusion sample，gap=1、3點moving-average平滑；加回0.5並以內參反投影XYZ，z使用預設max_depth=1，單位公尺。future slice=[1,nframes)，ADE先對該case所有有效未來點的Euclidean error取平均，FDE只取最後有效點，最後對case平均，非全資料逐frame加權。CE將future contact曲線Gaussian平滑、取最高兩個局部峰並排序，兩個峰的絕對index誤差平均後再跨case平均；缺峰用-1補而未剔除。存在明確索引疑點：pred峰是future slice相對index，GT是完整valid序列index，scorer未加start_=1或減GT offset，CE不是可直接當秒的MAE。MMTwin actual loop用固定ratio（預設0.6），floor(nframes×ratio)作觀測長度，單次sample；相同逐case ADE/FDE，test_space=3d為公尺，其他值走投影、clip/floor像素再除影像尺寸的2D距離，並非best-of-K。論文robot SR為每task 10次trial的報告；已讀repo沒有該robot成功checker。",
+  "standardization": {
+    "profile": "offline_rgbd_hand_waypoint_and_contact_forecasting",
+    "reuse": "重用兩庫各自split與reader、有效frame index、內參/voxel設定、逐case ADE/FDE與contact峰值定義；保留MMTwin為前身與母資料轉接來源。",
+    "transform": "case以repo版本+dataset+scene/date/clip+觀測長度識別；把u/v/depth-mm、正規化latent及XYZ-m分開保存，記錄camera參照與有效frame至原frame映射。evaluator分開ADE、FDE、CE、paper-reported robot SR，保存每case未來點數、sample數、smoothing/gap與ratio。grasp_offset屬另行校準的camera-frame幾何轉換。",
+    "missing": "RGBD、refined trajectories、特徵、點雲與weights未取得，roster不等於可執行case數；需修正/核驗CE offset、缺峰策略、改max_depth時的反正規化一致性。需補獨立validation/novel split、論文其餘資料集/多target/robot協定，以及相機到robot基座外參、運動控制與成功判定。MMTwin不能充當Uni-Hand所有新版結果的實作證據。"
+  },
+  "version_note": "主庫commit 7f3edd5955fcb786b78b343510d7b2297694393b；MMTwin commit bd0faf148ae574accd5a4c1e7cd173f6416a52e6。README稱toy有100段影片，而本版split roster是100 train+5 test，保留此粒度/版本差異。主庫unseen_envs已標deprecated且兩個test loader讀同檔；MMTwin的test_novel才是實際不同scene split。論文表1的USST修正引用不能視為本輪已核讀或新版metric等價證明。",
+  "discovery_evidence": [
+    {
+      "kind": "cached_primary_paper",
+      "url": "https://arxiv.org/pdf/2511.12878",
+      "pdf_sha256": "f71d9925369c1a5feb6fe1ecf4b409c2c11ae40edf1f0c8c7d568d12a00417ca",
+      "local_file": "audit/.cache/fulltext_review/P222/pages.json",
+      "sha256": "d78bb5c7113cbb98bdb446ed35eef82e9282cb2ad1d24cf71a5ba0f0b3374d65",
+      "json_pointers": [
+        "/0/text",
+        "/8/text",
+        "/10/text",
+        "/12/text"
+      ],
+      "finding": "精確v4身份、公開/自收資料範圍、3D公尺/2D normalized評測、robot每task10次trial。"
+    },
+    {
+      "kind": "cached_primary_project_links",
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "finding": "已核對Code/Data link標籤，排除nerfies模板。",
+      "json_pointers": [
+        "/221"
+      ]
+    },
+    {
+      "kind": "cached_primary_project",
+      "local_file": "audit/.cache/github_review/projects/631dac026a80bdae5f7267d7a79f9073212a91ddda8b84ded1547b1787a8d7a3.txt",
+      "sha256": "31151bc73329e2d5df8bea1e0a39eb35b4d6ba65f8bee452e49fa21fa92ab8e6",
+      "finding": "專案題名、作者與兩篇論文引用，區分模板footer。",
+      "ranges": [
+        [
+          11,
+          84
+        ]
+      ],
+      "url": "https://irmvlab.github.io/unihand.github.io/"
+    }
+  ],
+  "reading_order": [
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/README.md",
+      "sha256": "3fca2bc17e519b1e99231b290d767b8d9ec8dc92dd028fd3aaddf595e17029f0",
+      "ranges": [
+        [
+          1,
+          27
+        ],
+        [
+          116,
+          140
+        ],
+        [
+          193,
+          199
+        ],
+        [
+          236,
+          261
+        ],
+        [
+          279,
+          326
+        ]
+      ],
+      "why": "確認Uni-Hand主庫的human-video demo範圍、MMTwin前身關係與heuristic grasp。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/README.md",
+      "git_blob_sha": "f78a70e578427ffa688490338eaed8f6bd50d438"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__MMTwin/files/README.md",
+      "sha256": "d2cf99b6b42f8d2275676aa87fce8ce935d02ae5027293f4b36d68ddde98adc0",
+      "ranges": [
+        [
+          5,
+          35
+        ],
+        [
+          161,
+          184
+        ],
+        [
+          194,
+          216
+        ]
+      ],
+      "why": "確認MMTwin/EgoPAT3D/CABH資料角色，CABH專用模型程式仍標示待發布。",
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/README.md",
+      "git_blob_sha": "eaf8dff65418915a3f4c02997a2b1c4fe16f24ca"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/configs/traineval.yaml",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/configs/traineval.yaml",
+      "sha256": "660507e958ce879d04d4a569c439ad7881207e8d481915d4c2b2d2e1cae28b9f",
+      "ranges": [
+        [
+          1,
+          63
+        ]
+      ],
+      "why": "固定相機內參、depth尺度、40影格、split、gap與平滑預算。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/configs/traineval.yaml",
+      "git_blob_sha": "30b71e123160e5e3dab83a030765105001132440"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/train_split.txt",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/data_utils/train_split.txt",
+      "sha256": "6ce920465df9b88e59306757eee3f115edf8ad7427cb625732df95dba10759a8",
+      "ranges": [
+        [
+          1,
+          100
+        ]
+      ],
+      "why": "實讀100個唯一train roster ID，與test比較無交集。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/train_split.txt",
+      "git_blob_sha": "29b4a97d931d70623d9a88fa33c8f5ad0d99c311"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/test_split.txt",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/data_utils/test_split.txt",
+      "sha256": "e23f867f934aedc2df1ee1a9101730490546a282c1dd2b3dedaff8ab252e17f6",
+      "ranges": [
+        [
+          1,
+          5
+        ]
+      ],
+      "why": "實讀5個唯一test roster ID；這不是5個task。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/test_split.txt",
+      "git_blob_sha": "77f3ef2f02e076f2b712cd970c0d3d7f5449ca57"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/date_folders.csv",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/unihand/data_utils/date_folders.csv",
+      "sha256": "0f339bda6bedce0cd292ba1f7321388411c3f3ed3fbd639b16a9e2c3a7dfdd0f",
+      "ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "why": "確認CSV實際只有date與兩個整數frame標記，非秒制contact timestamp。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/date_folders.csv",
+      "git_blob_sha": "b09173f85cab0d3637723ec2e904b2e943af54ad"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "preprocess_human_video/generate_hand_trajs.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/preprocess_human_video/generate_hand_trajs.py",
+      "sha256": "70bd5c76d8908e8d2f124fc9e7e4616aa96e0e4959b750f1396fa559a00988e7",
+      "ranges": [
+        [
+          37,
+          59
+        ],
+        [
+          76,
+          96
+        ],
+        [
+          124,
+          154
+        ],
+        [
+          157,
+          179
+        ]
+      ],
+      "why": "確認right-hand 21點是u/v/depth-mm，只有000000影格寫入點雲。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/preprocess_human_video/generate_hand_trajs.py",
+      "git_blob_sha": "3f98180828e1162eebd238280ac459f1ab7138e9"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/HumanDataLoader.py",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/data_utils/HumanDataLoader.py",
+      "sha256": "9eea2af55d026125aa4045c65785a512b864821ce9ec941c374b6d298f2fa5c5",
+      "ranges": [
+        [
+          31,
+          168
+        ],
+        [
+          194,
+          213
+        ],
+        [
+          245,
+          315
+        ],
+        [
+          330,
+          374
+        ]
+      ],
+      "why": "追到有效frame對齊、pixel/depth正規化、padding、voxel與contact index，三個非train split共用清單。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/HumanDataLoader.py",
+      "git_blob_sha": "481f850b73de082aa3fc4c64754ddfafbd4fa2c4"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/traineval.py",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/traineval.py",
+      "sha256": "1a564b307d33fff47f17f1aa9bb9ec5ffd7938720e43b4779be169e371a6b988",
+      "ranges": [
+        [
+          23,
+          31
+        ],
+        [
+          85,
+          107
+        ],
+        [
+          119,
+          149
+        ]
+      ],
+      "why": "確認demo入口選用TrainEvalLoop與test/test_novel loader。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/traineval.py",
+      "git_blob_sha": "9ae7b9cba0cd8e7c79ebeb7cb04316599442ba71"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/netscripts/epoch_feat.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/unihand/netscripts/epoch_feat.py",
+      "sha256": "bb36614620e0a21fec7bc319c3a04063f0a55f55623d23784d3ea90a4283e061",
+      "ranges": [
+        [
+          34,
+          114
+        ],
+        [
+          201,
+          221
+        ],
+        [
+          300,
+          322
+        ],
+        [
+          573,
+          746
+        ],
+        [
+          778,
+          786
+        ]
+      ],
+      "why": "核對實際單腕/首frame/單次sample評測、ADE/FDE公尺分母、CE兩峰與索引偏移。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/netscripts/epoch_feat.py",
+      "git_blob_sha": "923d3913351b7ef8bcf4ccc734119b777085a88c"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/viz_predicted_trajs.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/unihand/viz_predicted_trajs.py",
+      "sha256": "892ab52d64699eb07cd39c3a63cda2110b45964021aca4d67a8553fd366362e3",
+      "ranges": [
+        [
+          21,
+          25
+        ],
+        [
+          85,
+          119
+        ]
+      ],
+      "why": "確認相機座標中的固定grasp_offset，沒有機器人controller/success checker。",
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/viz_predicted_trajs.py",
+      "git_blob_sha": "3985234376ccf18dbeae85b4a77431693141002f"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "options/expopts.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__MMTwin/options/expopts.py",
+      "sha256": "42e5e8853057fd2b876125d304a55808d557f297f62c9d9a95563661f7a3518b",
+      "ranges": [
+        [
+          1,
+          37
+        ],
+        [
+          40,
+          74
+        ]
+      ],
+      "why": "固定EgoPAT3D的seen/unseen、ratio0.6、40frame與diffusion預算。",
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/options/expopts.py",
+      "git_blob_sha": "2b054d72494f2b0c36e95fe5ca78f8e3c3a94c9c"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "data_utils/EgoPAT3DLoader.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__MMTwin/data_utils/EgoPAT3DLoader.py",
+      "sha256": "fe89d3397a52687f43485a1683fbca2b2431d2df97ef5cc240dc4e1f04e0760e",
+      "ranges": [
+        [
+          38,
+          133
+        ],
+        [
+          147,
+          173
+        ],
+        [
+          220,
+          343
+        ],
+        [
+          437,
+          456
+        ]
+      ],
+      "why": "核對scene/record split、traj2d/traj3d/num_preserve、首camera投影及非train未來motion遮蔽。",
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/data_utils/EgoPAT3DLoader.py",
+      "git_blob_sha": "50600b2ed008003c4013d700d5d6913754e39838"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "traineval.py",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__MMTwin/files/traineval.py",
+      "sha256": "37c81e4ed19cac9ae737d92c810961ef14e099f1ce06a9e9dc1bd99c9e5085c5",
+      "ranges": [
+        [
+          23,
+          46
+        ],
+        [
+          126,
+          136
+        ],
+        [
+          149,
+          185
+        ]
+      ],
+      "why": "追到test_novel選擇、seed與實際metric loop參數。",
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/traineval.py",
+      "git_blob_sha": "4bb93b52fc3d29b91157f4c706c208c186954adf"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "netscripts/epoch_feat.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__MMTwin/netscripts/epoch_feat.py",
+      "sha256": "045dc2316c54c692fba96e717caeba456e19f1d436b8dcedf0048f6757a963b6",
+      "ranges": [
+        [
+          27,
+          84
+        ],
+        [
+          451,
+          587
+        ],
+        [
+          613,
+          620
+        ]
+      ],
+      "why": "確認真正執行的ratio mask、單次sample與逐case ADE/FDE，2D為影像尺寸正規化。",
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/netscripts/epoch_feat.py",
+      "git_blob_sha": "d4be0e6874f7fe9fb16eb08eb4e1f9ad46a7f7dc"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/README.md",
+      "sha256": "3fca2bc17e519b1e99231b290d767b8d9ec8dc92dd028fd3aaddf595e17029f0",
+      "ranges": [
+        [
+          1,
+          27
+        ],
+        [
+          116,
+          140
+        ],
+        [
+          193,
+          199
+        ],
+        [
+          236,
+          261
+        ],
+        [
+          279,
+          326
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/README.md",
+      "git_blob_sha": "f78a70e578427ffa688490338eaed8f6bd50d438"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__MMTwin/files/README.md",
+      "sha256": "d2cf99b6b42f8d2275676aa87fce8ce935d02ae5027293f4b36d68ddde98adc0",
+      "ranges": [
+        [
+          5,
+          35
+        ],
+        [
+          161,
+          184
+        ],
+        [
+          194,
+          216
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/README.md",
+      "git_blob_sha": "eaf8dff65418915a3f4c02997a2b1c4fe16f24ca"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/configs/traineval.yaml",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/configs/traineval.yaml",
+      "sha256": "660507e958ce879d04d4a569c439ad7881207e8d481915d4c2b2d2e1cae28b9f",
+      "ranges": [
+        [
+          1,
+          63
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/configs/traineval.yaml",
+      "git_blob_sha": "30b71e123160e5e3dab83a030765105001132440"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/train_split.txt",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/data_utils/train_split.txt",
+      "sha256": "6ce920465df9b88e59306757eee3f115edf8ad7427cb625732df95dba10759a8",
+      "ranges": [
+        [
+          1,
+          100
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/train_split.txt",
+      "git_blob_sha": "29b4a97d931d70623d9a88fa33c8f5ad0d99c311"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/test_split.txt",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/data_utils/test_split.txt",
+      "sha256": "e23f867f934aedc2df1ee1a9101730490546a282c1dd2b3dedaff8ab252e17f6",
+      "ranges": [
+        [
+          1,
+          5
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/test_split.txt",
+      "git_blob_sha": "77f3ef2f02e076f2b712cd970c0d3d7f5449ca57"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/date_folders.csv",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/unihand/data_utils/date_folders.csv",
+      "sha256": "0f339bda6bedce0cd292ba1f7321388411c3f3ed3fbd639b16a9e2c3a7dfdd0f",
+      "ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/date_folders.csv",
+      "git_blob_sha": "b09173f85cab0d3637723ec2e904b2e943af54ad"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "preprocess_human_video/generate_hand_trajs.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/preprocess_human_video/generate_hand_trajs.py",
+      "sha256": "70bd5c76d8908e8d2f124fc9e7e4616aa96e0e4959b750f1396fa559a00988e7",
+      "ranges": [
+        [
+          37,
+          59
+        ],
+        [
+          76,
+          96
+        ],
+        [
+          124,
+          154
+        ],
+        [
+          157,
+          179
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/preprocess_human_video/generate_hand_trajs.py",
+      "git_blob_sha": "3f98180828e1162eebd238280ac459f1ab7138e9"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/data_utils/HumanDataLoader.py",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/data_utils/HumanDataLoader.py",
+      "sha256": "9eea2af55d026125aa4045c65785a512b864821ce9ec941c374b6d298f2fa5c5",
+      "ranges": [
+        [
+          31,
+          168
+        ],
+        [
+          194,
+          213
+        ],
+        [
+          245,
+          315
+        ],
+        [
+          330,
+          374
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/data_utils/HumanDataLoader.py",
+      "git_blob_sha": "481f850b73de082aa3fc4c64754ddfafbd4fa2c4"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/traineval.py",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__UniHand/files/unihand/traineval.py",
+      "sha256": "1a564b307d33fff47f17f1aa9bb9ec5ffd7938720e43b4779be169e371a6b988",
+      "ranges": [
+        [
+          23,
+          31
+        ],
+        [
+          85,
+          107
+        ],
+        [
+          119,
+          149
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/traineval.py",
+      "git_blob_sha": "9ae7b9cba0cd8e7c79ebeb7cb04316599442ba71"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/netscripts/epoch_feat.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/unihand/netscripts/epoch_feat.py",
+      "sha256": "bb36614620e0a21fec7bc319c3a04063f0a55f55623d23784d3ea90a4283e061",
+      "ranges": [
+        [
+          34,
+          114
+        ],
+        [
+          201,
+          221
+        ],
+        [
+          300,
+          322
+        ],
+        [
+          573,
+          746
+        ],
+        [
+          778,
+          786
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/netscripts/epoch_feat.py",
+      "git_blob_sha": "923d3913351b7ef8bcf4ccc734119b777085a88c"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/UniHand",
+      "commit": "7f3edd5955fcb786b78b343510d7b2297694393b",
+      "path": "unihand/viz_predicted_trajs.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__UniHand/unihand/viz_predicted_trajs.py",
+      "sha256": "892ab52d64699eb07cd39c3a63cda2110b45964021aca4d67a8553fd366362e3",
+      "ranges": [
+        [
+          21,
+          25
+        ],
+        [
+          85,
+          119
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/UniHand/blob/7f3edd5955fcb786b78b343510d7b2297694393b/unihand/viz_predicted_trajs.py",
+      "git_blob_sha": "3985234376ccf18dbeae85b4a77431693141002f"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "options/expopts.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__MMTwin/options/expopts.py",
+      "sha256": "42e5e8853057fd2b876125d304a55808d557f297f62c9d9a95563661f7a3518b",
+      "ranges": [
+        [
+          1,
+          37
+        ],
+        [
+          40,
+          74
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/options/expopts.py",
+      "git_blob_sha": "2b054d72494f2b0c36e95fe5ca78f8e3c3a94c9c"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "data_utils/EgoPAT3DLoader.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__MMTwin/data_utils/EgoPAT3DLoader.py",
+      "sha256": "fe89d3397a52687f43485a1683fbca2b2431d2df97ef5cc240dc4e1f04e0760e",
+      "ranges": [
+        [
+          38,
+          133
+        ],
+        [
+          147,
+          173
+        ],
+        [
+          220,
+          343
+        ],
+        [
+          437,
+          456
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/data_utils/EgoPAT3DLoader.py",
+      "git_blob_sha": "50600b2ed008003c4013d700d5d6913754e39838"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "traineval.py",
+      "local_file": "audit/.cache/github_review/repos/IRMVLab__MMTwin/files/traineval.py",
+      "sha256": "37c81e4ed19cac9ae737d92c810961ef14e099f1ce06a9e9dc1bd99c9e5085c5",
+      "ranges": [
+        [
+          23,
+          46
+        ],
+        [
+          126,
+          136
+        ],
+        [
+          149,
+          185
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/traineval.py",
+      "git_blob_sha": "4bb93b52fc3d29b91157f4c706c208c186954adf"
+    },
+    {
+      "provider": "github",
+      "repo": "IRMVLab/MMTwin",
+      "commit": "bd0faf148ae574accd5a4c1e7cd173f6416a52e6",
+      "path": "netscripts/epoch_feat.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/IRMVLab__MMTwin/netscripts/epoch_feat.py",
+      "sha256": "045dc2316c54c692fba96e717caeba456e19f1d436b8dcedf0048f6757a963b6",
+      "ranges": [
+        [
+          27,
+          84
+        ],
+        [
+          451,
+          587
+        ],
+        [
+          613,
+          620
+        ]
+      ],
+      "url": "https://github.com/IRMVLab/MMTwin/blob/bd0faf148ae574accd5a4c1e7cd173f6416a52e6/netscripts/epoch_feat.py",
+      "git_blob_sha": "d4be0e6874f7fe9fb16eb08eb4e1f9ad46a7f7dc"
+    }
+  ],
+  "runtime_executed": false
+}

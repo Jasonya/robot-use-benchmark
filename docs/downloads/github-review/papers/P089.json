@@ -1,0 +1,628 @@
+{
+  "paper_id": "P089",
+  "name": "SpeedFolding",
+  "title": "SpeedFolding: Learning Efficient Bimanual Folding of Garments",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2208.10552",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P089",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已核讀 SpeedFolding 的真機流程、SQLite/PNG 格式、BiMaMa 資料 reader、摺線指令與具體 coverage reward。evaluation.py 只記錄事件／時間，folded 事件也不是獨立成功判定；論文摺衣成功須保留三位人類評閱者多數決。公開版本另有 reader／writer 介面不一致。",
+    "identity_note": "README直接連結 arXiv:2208.10552 與 pantor 官方專案頁，明示 IROS 2022／ABB YuMi＋PhoXi 的硬體相依參考實作。",
+    "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+    "paper_evidence": {
+      "local_file": "audit/.cache/fulltext_review/P089/pages.json",
+      "sha256": "8777449ad4493310deccdcb20c5c0d1887288034064d8353d2a478690fc966e6",
+      "pdf_sha256": "2421f14228d394a1a2f683d8156f4ff953dee3dd1deefef64ce0037854b86be1",
+      "pages_read": [
+        6,
+        7
+      ],
+      "scope": "第6頁資料／15 trials／三人多數決段；第7頁表I caption的duration與cycle/FPH分母。"
+    },
+    "environment": "實體ABB YuMi雙臂平行夾爪、海綿工作面、PhoXi頂視灰階／深度，以及額外webcam coverage。軟體包含OMPL與PhoXi C++ wrappers，README明示不易直接執行。pixel_to_transform從校正point cloud取xyz、以theta設定gripper姿態；影像位姿不能直接當已校正機器人動作。",
+    "tasks": "流程是先平整衣物，再依使用者摺線／2-second heuristic／fling-to-fold完成摺衣。shirt.json有兩種順序、每種三條摺線，屬同一目標的候選程序，不是6個任務。loader的fling、fling-to-fold、pick-and-hold、drag、done為訓練primitive類別。論文每組實驗15 trials，4300訓練action records含1500複製重標；不能把records、物理操作、完整摺衣trial及任務名稱混算。",
+    "data": "SQLite actions(id,episode_id,action_id,data JSON)與images(episode_id,action_id,scene,camera,hash)；PNG路徑為collection/episode_id/{action_id}-{scene}-{camera}.png，scene含before/after，camera可為color/depth/ortho-color/ortho-depth。JSON保存type、poses[{x,y,theta}]、reward、needs_annotation、is_human_annotated、is_self_supervised。Saver把0.85–1.25m深度反向線性映射0–255並裁切，0深度先改1.25m，不能把PNG值當公尺。BiFoldingDataset讀灰階與量化深度兩通道，按1032×772來源尺寸crop後resize到256×192、theta為弧度及20個離散方向。預設以episode_id的SHA256低16bit閾值做約80/20 train/test，非衣物物件切分；run.py每個action新建Episode，因此該ID未必代表整個物理trial。",
+    "evaluation": "reward.segment以灰階閾值90、形態學與最大輪廓產生mask；calculate_reward為tanh(64×A_before×(A_after−A_before))，A為mask像素佔比。另一個coverage＋confidence reward函式存在，但run.py呼叫前者。Experiment.take_coverage用校正webcam、閾值130並回傳輪廓面積/影像面積。done是模型分類的Sufficiently Smoothed停止決策；執行摺線後直接記folded事件，不代表成品合格。Evaluation記相對啟動秒數及profile duration，未實作三人投票或完整FPH。論文成功要求10動作內且三位評閱者多數通過，排除motion-planning早退；表I duration只平均成功trial，cycle time/FPH包含成功與失敗。程式CLI horizon預設3，README實驗設10；run.py horizon限制平整迴圈，後續摺線及move另外執行，須明訂共同action budget。",
+    "standardization": {
+      "profile": "physical_bimanual_folding_actions_and_human_judged_trials",
+      "reuse": "摺線JSON＋template、影像／action DB索引、primitive執行脈絡、coverage reward及事件計時。",
+      "transform": "source綁commit；environment綁YuMi工作站與相機校正；task綁衣物與摺線程序；case新增完整trial_id、garment_id與初態，連到多個action record；evaluator分smoothing confidence、grasp failure、coverage、成品人評與duration/cycle/FPH，明列排除及分母。重標記錄保留來源action關係，量化depth需用尺度／缺測mask解碼。",
+      "missing": "人評票決與完整trial成品影像／耗時表；去除重標後的資料lineage及物理trial切分；公開reader/writer相容性修正；硬體／template／weights資產與校正接線。"
+    },
+    "integration_issues": [
+      "不要把evaluation.py或folded事件標成自動成品success evaluator；補人評記錄與15-trial分母、早退政策及FPH聚合。",
+      "BiFoldingDataset傳Database(...,base_path=...)，但所綁learning/database.py建構子只收collection；run.py兩處save_action少傳collection，與Saver簽名不合，需修正後另記adapter版本。",
+      "run.py在action迴圈內new Episode，80/20雜湊分割不能自動保證完整trial不跨split；4300含1500重標也需另存去重關係。",
+      "README的--fold未給值，parser實際要求shirt/towel等指令名；完整流程horizon與後續摺線操作數要分開。"
+    ],
+    "version_note": "固定2023-12-11 commit，晚於2022論文；README已明示硬體相依參考程式。未連線數據庫、相機或YuMi，未下載15.2GB資料集或執行模型。",
+    "reviewed_on": "2026-10-11",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            29,
+            87
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 87,
+        "sha256": "5e8be74f8aa6d2784ffc022b8e4c6f313c729b8ac04bc511b26d63e2f90e1940",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/README.md",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/README.md#L29-L87",
+        "why": "確認論文身分、硬體限制、來源結構與測試命令。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "learning/database.py",
+        "ranges": [
+          [
+            13,
+            109
+          ],
+          [
+            121,
+            126
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 130,
+        "sha256": "8690389c11c210139da66f5db682d5dc817dfbad5abd0b48c2f6c60527f68302",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/database.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/database.py#L13-L109",
+        "why": "SQLite schema、JSON action、影像引用及episode_id雜湊分割。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "manipulation/saver.py",
+        "ranges": [
+          [
+            11,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "1d71548e726100e7c62ae3f034a7e06813e80e4ec7e78a8c322347615c3dc595",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/saver.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/saver.py#L11-L78",
+        "why": "實際writer簽名、每次新ID與depth壓至PNG的尺度。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "learning/bimama/dataset.py",
+        "ranges": [
+          [
+            20,
+            103
+          ],
+          [
+            109,
+            175
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 198,
+        "sha256": "9764bb0ae63688352383fe38bcfca9c17950e5bae91205293fe7489a81ff97d2",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/bimama/dataset.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/bimama/dataset.py#L20-L103",
+        "why": "觀測灰階＋深度、五個primitive classes、heatmaps、標註權重及split。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "data/instructions/shirt.json",
+        "ranges": [
+          [
+            1,
+            27
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 27,
+        "sha256": "05e479d8c925e42cc1b05730f909675ee3d44583f3a228d5b58a2308f4596306",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/data/instructions/shirt.json",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/data/instructions/shirt.json#L1-L27",
+        "why": "兩個摺線順序候選、三條摺線與兩個grasp-points。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "manipulation/heuristics/matching.py",
+        "ranges": [
+          [
+            13,
+            28
+          ],
+          [
+            54,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 164,
+        "sha256": "1adb401a24903692c504d99221b869e1a70df54632615dcfedd84fbcdfe936b3",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/heuristics/matching.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/heuristics/matching.py#L13-L28",
+        "why": "讀取template與instructions，pixel equality配準後選候選。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "manipulation/heuristics/folding.py",
+        "ranges": [
+          [
+            9,
+            98
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 132,
+        "sha256": "4fd5efb91d90c048edd896147eb087aa55fe9795778490525bfb48909e297638",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/heuristics/folding.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/heuristics/folding.py#L9-L98",
+        "why": "摺線像素化、輪廓抓點及鏡像放置。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "manipulation/experiment.py",
+        "ranges": [
+          [
+            77,
+            92
+          ],
+          [
+            210,
+            244
+          ],
+          [
+            1033,
+            1087
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1456,
+        "sha256": "1cc8a78ce9dd9593954a354db6954409cfacc1bc495d724c781303665c02386c",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/experiment.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/experiment.py#L77-L92",
+        "why": "像素→3D pose、webcam coverage及摺線執行，沒有成品裁判。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "learning/inference.py",
+        "ranges": [
+          [
+            181,
+            229
+          ],
+          [
+            272,
+            286
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 286,
+        "sha256": "656783e789a5a9e8a17acd0d714b9073c827548c3be33b129579db9509f1a6ad",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/inference.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/inference.py#L181-L229",
+        "why": "done由模型primitive分類選出，非摺衣成功checker。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "learning/reward.py",
+        "ranges": [
+          [
+            5,
+            64
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 64,
+        "sha256": "fe28993e0602831cbc0c17f09a0ef0cf3ebea47af4c2189986ae17defd4cbb0d",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/reward.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/learning/reward.py#L5-L64",
+        "why": "灰階分割、area fraction及實際tanh reward；辨別備用confidence reward。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "manipulation/evaluation.py",
+        "ranges": [
+          [
+            1,
+            47
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 47,
+        "sha256": "2dbaaf37cd6544dd03a481febcaefe5584c2b065a37acb5571d5b2e72b23551a",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/evaluation.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/evaluation.py#L1-L47",
+        "why": "具體event elapsed time／profile duration，而非成功率計算器。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pantor/speedfolding",
+        "requested_repo": "pantor/speedfolding",
+        "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+        "ref": null,
+        "path": "manipulation/run.py",
+        "ranges": [
+          [
+            17,
+            29
+          ],
+          [
+            69,
+            129
+          ],
+          [
+            143,
+            209
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 209,
+        "sha256": "775b8dcb40616777ee46408546d222750c68a731c2d4deeebac63603fe7a7aa5",
+        "url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/run.py",
+        "reading_url": "https://github.com/pantor/speedfolding/blob/db06519a2fd1e39b9ed2a2fa1610d08759ea1732/manipulation/run.py#L17-L29",
+        "why": "horizon、folded事件、每action新Episode、失敗排除及實際writer呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "566fa2770cfb02b9aee5902262ac5c5bd3673a4f029750edc8e1a8220350dd68"
+  },
+  "repository_binding_review_sha256": "566fa2770cfb02b9aee5902262ac5c5bd3673a4f029750edc8e1a8220350dd68",
+  "repository_bindings": [
+    {
+      "requested_repo": "pantor/speedfolding",
+      "resolved_repo": "pantor/speedfolding",
+      "aliases_in_this_review": [
+        "pantor/speedfolding"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "db06519a2fd1e39b9ed2a2fa1610d08759ea1732",
+          "reviewed_files": [
+            "README.md",
+            "data/instructions/shirt.json",
+            "learning/bimama/dataset.py",
+            "learning/database.py",
+            "learning/inference.py",
+            "learning/reward.py",
+            "manipulation/evaluation.py",
+            "manipulation/experiment.py",
+            "manipulation/heuristics/folding.py",
+            "manipulation/heuristics/matching.py",
+            "manipulation/run.py",
+            "manipulation/saver.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/pantor/speedfolding",
+          "link_label": "Code",
+          "project_url": "https://pantor.github.io/speedfolding",
+          "page_sha256": "c05026e60e2c4d23a12bbb7acd1fd0b4046ff18a21dd580f2436b4aa902768ad"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/pantor/speedfolding",
+          "link_label": "repository",
+          "project_url": "https://pantor.github.io/speedfolding",
+          "page_sha256": "c05026e60e2c4d23a12bbb7acd1fd0b4046ff18a21dd580f2436b4aa902768ad"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P089",
+          "review_file": "content/github_review/reviews/P089.json",
+          "review_sha256": "566fa2770cfb02b9aee5902262ac5c5bd3673a4f029750edc8e1a8220350dd68",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P089",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SpeedFolding: Learning Efficient Bimanual Folding of Garments；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      5,
+      6,
+      7
+    ],
+    "role": "柔性物操作benchmark",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "ABB YuMi工作站；known shirt、unseen shirt、towel。",
+    "tasks": "smoothing→folding，instruction/2-second/Fling-to-fold三策略並非三個生活domain。",
+    "cases": "4,300action records包含1,500複製重標；每experiment15trials。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 4300,
+        "unit": "training action records，含重標",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "trials per experiment",
+        "pages": [
+          6,
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "fold由3reviewers多數決；horizon10；time成功回合平均，FPH/cycle包括失敗。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人類或模型判讀",
+      "數值誤差與相似度"
+    ],
+    "split": "train單shirt；towel泛化前加20smoothimages再訓練，不是完全zero-shot。",
+    "lineage": "前作FlingBot比較有不同hardware；1500重標非獨立physical actions。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          5,
+          6,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "排除motion-planning early failures會影響整體systemsuccess解讀；須在共同protocol保留此差異。"
+    ],
+    "reuse": "補摺衣全流程與吞吐量，不能只報93%而略過任務、排除規則和15次分母。",
+    "reviewed_pdf_sha256": "2421f14228d394a1a2f683d8156f4ff953dee3dd1deefef64ce0037854b86be1",
+    "reviewed_on": "2026-10-02",
+    "name": "SpeedFolding",
+    "year": 2022,
+    "title": "SpeedFolding: Learning Efficient Bimanual Folding of Garments",
+    "source_url": "https://arxiv.org/abs/2208.10552",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織",
+      "洗衣服務"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P089",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P089",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "smoothing→folding，instruction/2-second/Fling-to-fold三策略並非三個生活domain。",
+            "ABB YuMi工作站；known shirt、unseen shirt、towel。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "2421f14228d394a1a2f683d8156f4ff953dee3dd1deefef64ce0037854b86be1"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2421f14228d394a1a2f683d8156f4ff953dee3dd1deefef64ce0037854b86be1",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "judge",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P089",
+      "name": "SpeedFolding",
+      "expected_title": "SpeedFolding: Learning Efficient Bimanual Folding of Garments",
+      "source_url": "https://arxiv.org/abs/2208.10552",
+      "pdf_url": "https://arxiv.org/pdf/2208.10552",
+      "retrieved_at": "2026-10-02T22:13:37.928166+00:00",
+      "pdf_sha256": "2421f14228d394a1a2f683d8156f4ff953dee3dd1deefef64ce0037854b86be1",
+      "text_sha256": "16580f55b4c2ad39497dacd216beae2a19cb3dd121fa078451970c04fb25c23e",
+      "pdf_bytes": 4632866,
+      "pages": 8,
+      "text_characters": 58019,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2208.10552v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2208.10552v2"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 4300,
+        "unit": "training action records，含重標",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P089:1",
+        "paper_id": "P089",
+        "benchmark": "SpeedFolding",
+        "native_term": "training action records，含重標",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2208.10552v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2208.10552v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "trials per experiment",
+        "pages": [
+          6,
+          7
+        ],
+        "record_id": "review10:P089:2",
+        "paper_id": "P089",
+        "benchmark": "SpeedFolding",
+        "native_term": "trials per experiment",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2208.10552v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2208.10552v2",
+            "locator": "PDF pp. 6, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "pantor/speedfolding"
+  ],
+  "external_repositories": []
+}

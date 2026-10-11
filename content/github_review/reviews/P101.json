@@ -1,0 +1,112 @@
+{
+  "paper_id": "P101",
+  "summary": "EAI統一四種決策模組，但BEHAVIOR與VirtualHome各有具體評分程式。目標理解的JSON錯誤處理不同，不能只因同名F1就合併成一個分數。",
+  "reading_order": [
+    {
+      "repo": "embodied-agent-eval/embodied-agent-eval",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          69
+        ],
+        [
+          92,
+          105
+        ]
+      ],
+      "why": "精確論文、4模組、父環境與程式改名",
+      "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6"
+    },
+    {
+      "repo": "embodied-agent-eval/embodied-agent-eval",
+      "path": "docs/source/modules/goal_interpretation.md",
+      "ranges": [
+        [
+          1,
+          70
+        ]
+      ],
+      "why": "初態與語言到形式目標的評測約定",
+      "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6"
+    },
+    {
+      "repo": "embodied-agent-eval/embodied-agent-eval",
+      "path": "src/behavior_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+      "ranges": [
+        [
+          133,
+          162
+        ],
+        [
+          362,
+          449
+        ],
+        [
+          451,
+          490
+        ],
+        [
+          529,
+          579
+        ]
+      ],
+      "why": "條件精確比對、備選goal、解析錯誤與global計數",
+      "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6"
+    },
+    {
+      "repo": "embodied-agent-eval/embodied-agent-eval",
+      "path": "src/virtualhome_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+      "ranges": [
+        [
+          15,
+          59
+        ],
+        [
+          95,
+          147
+        ],
+        [
+          153,
+          217
+        ],
+        [
+          275,
+          310
+        ]
+      ],
+      "why": "VirtualHome schema、不同錯誤處理與node/edge/action分數",
+      "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6"
+    },
+    {
+      "repo": "embodied-agent-eval/embodied-agent-eval",
+      "path": "src/behavior_eval/transition_model/eval_env.py",
+      "ranges": [
+        [
+          133,
+          142
+        ],
+        [
+          155,
+          157
+        ]
+      ],
+      "why": "符號／抽象action效果接口不等於逐步物理操作",
+      "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6"
+    }
+  ],
+  "environment": "重用BEHAVIOR/iGibson與VirtualHome環境／狀態圖。形式goal、PDDL problem或語言題不自動新增物理場景。",
+  "tasks": "goal interpretation、subgoal decomposition、action sequencing、transition modeling四種資訊／決策評測；同一底層家務任務可接受不同資訊及要求，應建立不同case protocol。",
+  "data": "BEHAVIOR以demo identifier連goal conditions、objects、instruction與LLM輸出；VirtualHome以scene_id、script/file_id連狀態／動作目標。保留node goals/edge goals/action goals與原形式語法，不能直接flatten丟掉順序／備選完成方式。",
+  "evaluation": "已核讀goal interpretation：BEHAVIOR精確比對conditions，對備選目標取命中最多option，累計TP/FP/FN；解析失敗代空預測。VirtualHome JSON解析失敗直接continue並記format error，幻覺物件另記錄；跨環境F1分母與失敗規則需分開。transition env.step呼叫抽象control，不能宣稱真實機器人成功。",
+  "standardization": {
+    "profile": "symbolic_embodied_decision_modules",
+    "reuse": "原goal/schema、scene/demo/script身份、模組介面、細粒度錯誤與evaluator。",
+    "transform": "同一父task連多protocol case；state/可見物件名/語言與reference答案分開；保留環境特定parser、備選goal及micro計數，不扁平為通用accuracy。",
+    "missing": "其餘3模組各具體checker逐一接線、原始資產、判分分母完整性、形式規劃器與物理執行的比較界線。"
+  },
+  "version_note": "原embodied-agent-eval repo現轉址embodied-agent-interface/embodied-agent-interface，屬同一倉庫身份。這次深入核對goal interpretation，其他模組僅確認介面與來源角色，未宣稱全codebase或所有模組已跑通。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

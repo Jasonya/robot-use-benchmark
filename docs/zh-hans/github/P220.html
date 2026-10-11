@@ -1,0 +1,102 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VISTA（Ego4D STA）｜GitHub怎么读与整理 · Robot-use Benchmark</title>
+  <meta name="description" content="已核读精确VISTA repo的STA reader、split设置、submission串行化与具体Top-5 mAP程序。公开train设置使用train+大部分val，仅24个holdout且每次只跑1个batch的proxy；最终ensemble预设version 2.0，库内scorer却只接受1.0，集成时须显式处理。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P220.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P220.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P220.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="VISTA（Ego4D STA）｜GitHub怎么读与整理 · Robot-use Benchmark"><meta property="og:description" content="已核读精确VISTA repo的STA reader、split设置、submission串行化与具体Top-5 mAP程序。公开train设置使用train+大部分val，仅24个holdout且每次只跑1个batch的proxy；最终ensemble预设version 2.0，库内scorer却只接受1.0，集成时须显式处理。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P220.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"github/P220.html","title":"VISTA（Ego4D STA）｜GitHub怎么读与整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hans.js?v=081237f01e25","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原作定义／设置","staticOnly":"本卡记录来源索引；任务环境规格的对齐和运行验证分别记录。","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"索引出处与对应细节","empty":"没有符合的索引条目","showing":"显示","records":"笔索引条目","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原作任务ID","native_task_class":"原作任务类别","native_task_registration":"原作任务注册","native_task_module":"原作任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务schema","generator_configuration":"生成器设置","integration_registration_group":"框架注册组","evaluation_protocol":"评测协定","video_task_schema":"视频／任务题型","human_sim_task_mapping":"人类／模拟任务对应","native_task_template":"任务模板","instructional_activity_definition":"人类活动定义","native_task_definition":"原作任务定义","information_task_schema":"信息题型定义"},"buckets":{"native_task_candidates":"原作robot任务条目（待对齐）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类活动／流程定义（视频来源）","information_task_definitions":"信息任务／问答题型定义"},"recordMeaning":"索引型态","meaningByBucket":{"native_task_candidates":"原作者列出的robot任务条目；在本库等待共同规格与来源对齐。","human_activity_definitions":"人类活动类别与流程来源，可对应多部视频；任务环境另建对应。","integration_or_protocol":"框架注册、协定或生成设置，可指向多个任务／样本；一条索引不等于一个环境。","video_pairing":"视频题型或人类／模拟任务对应；观测数据与物理环境规格分开。","documented_examples":"示范程序入口；可作定义与实作线索，尚不直接代表独立环境。","information_task_definitions":"原作的信息任务或问题类型；题目实数另外按question_id或case_id计数。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../coverage.html">覆盖与比较</a><a href="../native-tasks.html">任务清单</a><a href="../survey-union.html">来源名录</a><a href="../design.html">整体设计</a><a href="../collection-pipeline.html">数据流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核读</a><a href="../library.html">文献</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/github/P220.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="P220.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>P220 · VISTA（Ego4D STA）</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P220 · VISTA（Ego4D STA）</h1><p class="lede">VISTA: Technical Report for the Ego4D Short-Term Object Interaction Anticipation at EgoVis 2026</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇总表</a><span class="github-status core">内核内容已核读</span>
+      <span>方法／综述参考</span><a href="https://arxiv.org/abs/2605.20901" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+
+    </div>
+    <p class="github-scope">核读快照 2026-10-11。已读范围限所列片段；本轮未运行上游程序。</p>
+    <p class="github-summary">已核读精确VISTA repo的STA reader、split设置、submission串行化与具体Top-5 mAP程序。公开train设置使用train+大部分val，仅24个holdout且每次只跑1个batch的proxy；最终ensemble预设version 2.0，库内scorer却只接受1.0，集成时须显式处理。</p>
+    <aside class="github-version"><b>版本与身份</b><p>读取commit 62e39d137426e12f30fe4efd12122f8c188b4b33。初始prediction writer回传version 1.0；dynamic_metric_head_ensemble与包装shell预设最终version 2.0，而本地validate_results_json拒绝非1.0。ensemble/proxy使用无+1的连续IoU，scorer使用+1像素IoU；ensemble的IoU匹配可含0.5，scorer严格&gt;0.5；论文写TTC&lt;0.25，程序为≤。README的scaffold称呼不代表只有README，亦不代表已完整重现官方submission。</p><p>arXiv:2605.20901v1，Qiaohui Chu等人的 VISTA: Technical Report for the Ego4D Short-Term Object Interaction Anticipation at EgoVis 2026，PDF第1页直接指向CorrineQiu/VISTA；README与8张2FPS视频、Faster R-CNN still branch、四prediction heads相符。不是其他同名VISTA项目，也不是FROST-STA。</p></aside>
+    <dl class="github-five-fields"><div><dt>领域</dt><dd>方法／综述参考，未另作来源用途归纳。</dd></div><div><dt>环境</dt><dd>Ego4D v2人类第一人称视频之STA query；数据被预先拆成train／val／test_unannotated sample directories，每例含短片历史影格与最后高解析影格。没有robot rollout或simulation场景。</dd></div><div><dt>任务</dt><dd>预测每个query下一交互的active-object box、noun、verb、TTC及score；一例可有多个GT对象。类别不是固定新任务清单：build_label_maps_from_roots扫train+val中有效noun/verb ID，排序重编成连续index，输出时再还原；须保留mapping与母数据taxonomy版本。</dd></div><div><dt>题数与数据</dt><dd>reader扫排序后的label.json，读uid、split、video_uid、frame、observation.history_frames[*].file与last_history_frame_highres_file；GT优先future_prediction_target.objects，fallback raw_annotation.objects，读box_xyxy/box/bbox、noun_category_id/noun_id、verb_category_id/verb_id、time_to_contact/ttc。train/val排除空标注与所有框无效的样本；test仍需label.json但不要求GT。history_frames保留既有顺序，超过8取最后8，不足8以前端第一张补齐，并不在reader内由fps重建时间戳。论文/设置为8张2FPS、视频384×384；still short-side train640–800、eval800，max1333。框随图像缩放，dump依orig_size还原xyxy像素，TTC秒不缩放；可改读split/uid.pt的1664维JEPA cache。train_include_val=true时以有效样本排序后前24个作holdout，其余val并train，并非take-disjoint的新split。</dd></div><div><dt>评估方式</dt><dd>run_official_metric_only.py是真正本地scorer：以uid对齐，CLI要求所有GT uid都有results（可空list）；无GT对象的query不入评分。IoU面积使用(x2-x1+1)(y2-y1+1)，框须IoU&gt;0.5，TTC条件为绝对误差≤0.25秒。每query按score贪婪一对一匹配各metric的GT；Top-5不是截前5，而是每个metric忽略排序前4×该query GT数的FP。Noun／Noun+Verb／Noun+TTC／Overall皆按noun类别分组：recall分母是全评测集中该noun的GT对象数，AP以precision envelope对recall积分乘100，再只对出现GT的noun做macro平均。compute_proxy_hits则只查score前5，只要任一GT匹配就给该query一个hit，分母为batch中有GT的query；eval.py以batch size加权再跨rank平均，与mAP不同。预设train max_val_batches=1、run_official=false、best_metric_source=proxy；test设置只产生每head最多100个hypotheses，四headensemble再保留100。论文5.40为test server结果，本轮未重跑或证明本地Lite实作与server完全等价。</dd></div></dl>
+
+    <h2 id="reading">依这个顺序读</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/README.md#L1-L22" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>核对精确EgoVis 2026 STA方法、数据依存与公开评测入口。</p><small>L1–22 · L69–77 · L95–103 · L158–188 · L197–223</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 2c9d6f5782785d9b7d675a179f712a88f86c55c5de903e6915623e418c9433eb</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/configs/vista_train.yaml#L19-L40" target="_blank" rel="noopener noreferrer"><code>configs/vista_train.yaml</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>固定train+val、24个holdout、8-frame输入、proxy验证与四prediction-head设置。</p><small>L19–40 · L58–110</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 f16a3eafb16eb8f81cf64d513b44103d37efa411e3aea1db95c2c8631ea6f1e3</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/configs/vista_test.yaml#L19-L40" target="_blank" rel="noopener noreferrer"><code>configs/vista_test.yaml</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>test_unannotated、完整推论dump及top100输出预算。</p><small>L19–40 · L58–106</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 3ebe01038ee193fe2cf706351f8d6a3f05551c954facb37f74ef5f6d025191aa</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/dataloader.py#L15-L114" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/dataloader.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>实读label-map来源、validation前24个holdout、其余并入train及DataLoader分母。</p><small>L15–114 · L139–182</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 871d07522b5a39f022ab96c0627ae1cc879590c414be4ae1f04c388d6e8b1c05</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/ego4d_sta.py#L84-L148" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/ego4d_sta.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>追到label.json字段、历史影格pad、类别重编码、过滤与box/image座标。</p><small>L84–148 · L171–203 · L258–335 · L436–496 · L512–625 · L664–776</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 c20a4a37f8b35a9062e08c5e2d6f66012534aa3184d179e8562219f6a5d03355</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/losses.py#L10-L20" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/losses.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>区分top5样本hit proxy与AP；核对原始像素框逆缩放及submission串行化。</p><small>L10–20 · L68–150</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 3ac838df396304520219af9816edfadf62947f293562d372a48501ce33c3c976</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/eval.py#L637-L640" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/eval.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>追到batch proxy汇总、head选择、scorer调用与test禁用本地GT评分。</p><small>L637–640 · L704–718 · L772–843 · L854–875 · L1321–1346</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 9fe708bd10d0e2dae9a60d0012eae8eda3b9b6de8098293060bfd36f38e7a67d</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/utils.py#L230-L258" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/utils.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>确定run_official_evaluator只是subprocess包装，需另读具体计分程序。</p><small>L230–258</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 bc5506ed64d96aadf42005527faaa76824333275668db2998e16d3cedfde1196</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/run_official_metric_only.py#L11-L15" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/run_official_metric_only.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>核对+1像素IoU、TTC边界、greedy匹配、4×GT之FP额度、noun-class AP分母与version检查。</p><small>L11–15 · L71–144 · L190–345 · L376–428</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 de2a4318542440f8892b373e14f2174f0253168296b5d01a3dd6d0c2a44a4118</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/dynamic_metric_head_ensemble.py#L23-L150" target="_blank" rel="noopener noreferrer"><code>evals/vista_sta/dynamic_metric_head_ensemble.py</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>核对noun/verb/IoU/TTC合并、head权重与输出version 2.0，不将ensemble当metric。</p><small>L23–150 · L153–362</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 b6bbae98922d6b23e6f8e86a22d51c759357bd06bbda868395f4e1dfd2e8ed70</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/scripts/ensemble_vista.sh#L1-L22" target="_blank" rel="noopener noreferrer"><code>scripts/ensemble_vista.sh</code> ↗</a><span>GitHub · CorrineQiu/VISTA · 62e39d1374</span></div>
+      <p>最终四head包装命令未覆写ensemble的version 2.0预设。</p><small>L1–22</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 dc93858d019266bf22e2da320048f049ee05a63464ad72fe2d590bc2862a4aff</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎么接入我们的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>重用STASampleDirItem及label.json reader、noun/verb双向map、UID submission schema、具体STAMeanAveragePrecisionLite与head ensemble参数，保留其来源commit。</p></section><section><h3>需要转换</h3><p>case键为Ego4D版本+split+uid，video_uid/frame另存；框保留原图像像素xyxy、orig_size与resize比例，时间以TTC秒与实际history-frame串行描述。evaluator分开记proxy query-hit与noun-macro Top-5 mAP，保存FP-budget=4×GT、IoU+1、比较边界与head/top100预算。</p></section><section><h3>仍需补齐</h3><p>原始视频至sample label.json的可验证制作流程、实际manifest/hash与frame时间戳仍需补齐；未取得数据、features、weights，无法报有效case总数。需固定24个holdout身份并按完整benchmark split评分；须对齐ensemble version 2.0与scorer要求1.0、以边界例核验本地scorer/server差异，不能只改字符串便宣称等价。</p></section></div>
+    <details class="github-discovery"><summary>查看来源确认纪录</summary><pre><code>[
+  {
+    &quot;kind&quot;: &quot;cached_primary_paper&quot;,
+    &quot;url&quot;: &quot;https://arxiv.org/pdf/2605.20901&quot;,
+    &quot;pdf_sha256&quot;: &quot;371945fef3f43f17cf251f3ce0b6ba835a5b828cdb2e39d0158cd721c5825faf&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P220/pages.json&quot;,
+    &quot;sha256&quot;: &quot;991a1808c56d9bb9b0c2fb02ef811df337feb3615917c66394b7215d2da1ce48&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/0/text&quot;,
+      &quot;/1/text&quot;,
+      &quot;/2/text&quot;,
+      &quot;/3/text&quot;
+    ],
+    &quot;finding&quot;: &quot;精確paper→repo連結、8張2FPS、train+most-val、16epoch、四prediction heads及論文指標定義。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同结构与格式说明 →</a><a href="../../downloads/github-review/papers/P220.json" download>本篇JSON与证据 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇阅读"><a href="P219.html">← 上一篇 · FROST-STA</a><a href="P221.html">下一篇 → · STAformer++</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理与逐篇报告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hans.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆盖总览与前作比较</a><a href="../design.html">目前主设计</a><a href="../research.html">文献与分类</a><a href="../counting.html">计数细节与旧代号</a><a href="../../downloads/source-review/source-review-zh-hans.pdf">用途归纳PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">历史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初筛、183份关键章节审阅、672笔原生数量摘录；183/183份来源完成21类用途归纳；4类判分分项保留。GitHub核读增补：250/250篇有处理结果，范围与程序运行分开。旧配额已撤回，全库任务与环境去重仍待完成。 <a href="../github-review.html">逐篇GitHub与标准化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

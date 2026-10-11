@@ -1,0 +1,446 @@
+{
+  "paper_id": "P127",
+  "name": "BridgeData V2",
+  "title": "BridgeData V2: A Dataset for Robot Learning at Scale",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2308.12952",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P127",
+    "summary": "BridgeData V2提供raw/自訂TFRecord/RLDS多種表示。預設訓練action會被改寫成到達狀態差分，gripper還會使用後續狀態重新標記，不能只改檔案副檔名。",
+    "environment": "WidowX在多種桌面/廚房環境的蒐集與部署；raw示範和scripted資料、經轉換的TFRecord/RLDS共用來源episode。",
+    "tasks": "goal-image或language條件的操作；各算法/目標重標與視角不是新的物理任務。CALVIN/SuSIE子目錄為其他實驗來源，需另標parent。",
+    "data": "自訂TFRecord每example一trajectory，含observations與next_observations的image/state、actions、terminals/truncates和可選language。relabel_actions用next_proprio[:6]-current_proprio[:6]，gripper閾值>.95/<.05再回填中間值；chunk補首obs/末action，goal與language另採樣。",
+    "evaluation": "部署從checkpoint還原action_mean/std；採樣後可加noise、sticky-gripper狀態機與屏蔽部分姿態自由度，再送WidowX。這些是控制協定。所讀eval程式提供rollout，沒有通用任務成功predicate；原作實機成功標記需另建protocol。",
+    "standardization": {
+      "profile": "robot_demonstration_with_action_and_goal_relabeling",
+      "reuse": "父episode、多格式對映、原生7D action/重標規則、goal和語言條件。",
+      "transform": "保存raw_action與training_action的轉換/normalization版本；補值mask、來源時間、goal採樣一起記入case；評測固定action execution horizon及gripper/DOF後處理。",
+      "missing": "raw→NumPy→TFRecord/RLDS全量ID映射、相機/場景metadata、測試split與成功rubric、與OXE子資料去重、原生部署驗證。"
+    },
+    "version_note": "固定bc60a35，README清楚區分raw demos與scripted zip及多種表示。此repo是訓練/部署方法實作，不能把其所有分支範例當Bridge新增benchmark。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "rail-berkeley/bridge_data_v2",
+        "requested_repo": "rail-berkeley/bridge_data_v2",
+        "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            27
+          ],
+          [
+            41,
+            74
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "495f26dbfea53876db3f470e7b8a04901962e9e86b170d65aa7408536945ff7b",
+        "url": "https://github.com/rail-berkeley/bridge_data_v2/blob/bc60a35b701a12021c8c95e9d8601274d3acd928/README.md",
+        "reading_url": "https://github.com/rail-berkeley/bridge_data_v2/blob/bc60a35b701a12021c8c95e9d8601274d3acd928/README.md#L1-L27",
+        "why": "原作、表示與方法角色、真實controller來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rail-berkeley/bridge_data_v2",
+        "requested_repo": "rail-berkeley/bridge_data_v2",
+        "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928",
+        "ref": null,
+        "path": "jaxrl_m/data/bridge_dataset.py",
+        "ranges": [
+          [
+            41,
+            81
+          ],
+          [
+            257,
+            312
+          ],
+          [
+            349,
+            397
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 420,
+        "sha256": "289012216f59a1cbfeedb3507fbfc80badad8d8edd53193287ff4f2dcf446d4f",
+        "url": "https://github.com/rail-berkeley/bridge_data_v2/blob/bc60a35b701a12021c8c95e9d8601274d3acd928/jaxrl_m/data/bridge_dataset.py",
+        "reading_url": "https://github.com/rail-berkeley/bridge_data_v2/blob/bc60a35b701a12021c8c95e9d8601274d3acd928/jaxrl_m/data/bridge_dataset.py#L41-L81",
+        "why": "TFRecord schema、action重標、chunk padding與goal relabeling",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rail-berkeley/bridge_data_v2",
+        "requested_repo": "rail-berkeley/bridge_data_v2",
+        "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928",
+        "ref": null,
+        "path": "experiments/eval.py",
+        "ranges": [
+          [
+            82,
+            150
+          ],
+          [
+            325,
+            369
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 391,
+        "sha256": "dec0ab4e0f1855d6f1a00578d1994d1ab69e55564082d3f3f2139b31f481280e",
+        "url": "https://github.com/rail-berkeley/bridge_data_v2/blob/bc60a35b701a12021c8c95e9d8601274d3acd928/experiments/eval.py",
+        "reading_url": "https://github.com/rail-berkeley/bridge_data_v2/blob/bc60a35b701a12021c8c95e9d8601274d3acd928/experiments/eval.py#L82-L150",
+        "why": "checkpoint action反正規化、sticky gripper與DOF限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "631d980a72b3ce7241bb3ad9334f4b357e8b64ab7cee2c0cd46b6d188f85e78d"
+  },
+  "repository_binding_review_sha256": "631d980a72b3ce7241bb3ad9334f4b357e8b64ab7cee2c0cd46b6d188f85e78d",
+  "repository_bindings": [
+    {
+      "requested_repo": "rail-berkeley/bridge_data_v2",
+      "resolved_repo": "rail-berkeley/bridge_data_v2",
+      "aliases_in_this_review": [
+        "rail-berkeley/bridge_data_v2"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "bc60a35b701a12021c8c95e9d8601274d3acd928",
+          "reviewed_files": [
+            "README.md",
+            "experiments/eval.py",
+            "jaxrl_m/data/bridge_dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/rail-berkeley/bridge_data_v2",
+          "link_label": "Code",
+          "project_url": "https://rail-berkeley.github.io/bridgedata/",
+          "page_sha256": "9be7a758ab24782955a6fa4145bbed80527671939e4f40dff70e22ee9b69c580"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/rail-berkeley/bridge_data_v2",
+          "link_label": "This repository",
+          "project_url": "https://rail-berkeley.github.io/bridgedata/",
+          "page_sha256": "9be7a758ab24782955a6fa4145bbed80527671939e4f40dff70e22ee9b69c580"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P127",
+          "review_file": "content/github_review/reviews/P127.json",
+          "review_sha256": "631d980a72b3ce7241bb3ad9334f4b357e8b64ab7cee2c0cd46b6d188f85e78d",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P127",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "BridgeData V2: A Dataset for Robot Learning at Scale；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "真實操作benchmark",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "衣物與洗護"
+    ],
+    "environment": "24environments，含7toy kitchens及tabletops/sinks/laundrysetups，4環境類別。",
+    "tasks": "13skills；同skill換object可成不同原作task，未報全庫正規化task總數。",
+    "cases": "60,096trajectories＝50,365expert+9,731scripted；主task每method10trials。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "source environments",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 13,
+        "unit": "skills",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 60096,
+        "unit": "expert+scripted trajectories",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "real trials per method/task",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "tasksuccess；goalimage與languageconditions分別比較。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "seen/unseenobject/environment/otherinstitution；RT1input解析度與history較大須註記。",
+    "lineage": "BridgeData原版擴充，後被OXE/OpenVLA/Octo重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "13skill不是13全部task；不同原作method觀測預算未完全一致。"
+    ],
+    "reuse": "補家電、表面、衣物與顆粒工具操作；保留human/scripteddemo品質類型。",
+    "reviewed_pdf_sha256": "aa5fdac48bf9122b22f88150d45575cb0685f2a2f761ca6fc570be743022819b",
+    "reviewed_on": "2026-10-02",
+    "name": "BridgeData V2",
+    "year": 2023,
+    "title": "BridgeData V2: A Dataset for Robot Learning at Scale",
+    "source_url": "https://arxiv.org/abs/2308.12952",
+    "primary_type": "G",
+    "category_name": "機器人資料與通用策略",
+    "domain_ids": [
+      "home",
+      "food",
+      "garment"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "衣物與紡織",
+      "表面清潔"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P127",
+      "domain_ids": [
+        "home",
+        "food",
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P127",
+          "domain_ids": [
+            "home",
+            "food",
+            "garment"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "13skills；同skill換object可成不同原作task，未報全庫正規化task總數。",
+            "24environments，含7toy kitchens及tabletops/sinks/laundrysetups，4環境類別。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "aa5fdac48bf9122b22f88150d45575cb0685f2a2f761ca6fc570be743022819b"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "aa5fdac48bf9122b22f88150d45575cb0685f2a2f761ca6fc570be743022819b",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P127",
+      "name": "BridgeData V2",
+      "expected_title": "BridgeData V2: A Dataset for Robot Learning at Scale",
+      "source_url": "https://arxiv.org/abs/2308.12952",
+      "pdf_url": "https://arxiv.org/pdf/2308.12952",
+      "retrieved_at": "2026-10-02T22:13:46.109624+00:00",
+      "pdf_sha256": "aa5fdac48bf9122b22f88150d45575cb0685f2a2f761ca6fc570be743022819b",
+      "text_sha256": "70726b98466737a402596f0d7fab2a53e603406ef3dc256d9152146fa8108888",
+      "pdf_bytes": 3258884,
+      "pages": 15,
+      "text_characters": 62557,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2308.12952v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2308.12952v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "source environments",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P127:1",
+        "paper_id": "P127",
+        "benchmark": "BridgeData V2",
+        "native_term": "source environments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.12952v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.12952v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 13,
+        "unit": "skills",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P127:2",
+        "paper_id": "P127",
+        "benchmark": "BridgeData V2",
+        "native_term": "skills",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.12952v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.12952v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 60096,
+        "unit": "expert+scripted trajectories",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P127:3",
+        "paper_id": "P127",
+        "benchmark": "BridgeData V2",
+        "native_term": "expert+scripted trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.12952v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.12952v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "real trials per method/task",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P127:4",
+        "paper_id": "P127",
+        "benchmark": "BridgeData V2",
+        "native_term": "real trials per method/task",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2308.12952v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2308.12952v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "rail-berkeley/bridge_data_v2"
+  ],
+  "external_repositories": []
+}

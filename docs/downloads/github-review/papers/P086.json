@@ -1,0 +1,919 @@
+{
+  "paper_id": "P086",
+  "name": "DeformableRavens",
+  "title": "Learning to Rearrange Deformable Cables, Fabrics, and Bags with Goal-Conditioned Transporter Networks",
+  "year": 2020,
+  "paper_url": "https://arxiv.org/abs/2012.03385",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment",
+    "logistics"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P086",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已核讀模擬主倉庫與實體 cable 實驗補充倉庫。12 個新增柔性物任務共用 Task.reward 分支，但 cloth coverage、袋口凸包、袋子搬運與真機 mask IoU 是不同指標；bag-items 的 task.done 只要求正分，不能直接當論文完整成功。",
+    "identity_note": "模擬 README 明示 ICRA 2021 完整題名及作者、繼承 google-research/ravens，並直接連結 gctn_physical；後者 README 反向指向模擬倉庫。論文 arXiv:2012.03385v4 含後加真機章節，不能把 2023 真機程式視為 2020 初稿內容。",
+    "commits": {
+      "DanielTakeshi/deformable-ravens": "73982748bdfe756e04553e28698948facccecb41",
+      "DanielTakeshi/gctn_physical": "ac002ece139b66c5f45b4e18091a3ef7d352cd45"
+    },
+    "paper_evidence": {
+      "local_file": "audit/.cache/fulltext_review/P086/pages.json",
+      "sha256": "1cf9314aafe6e5a0e919bb87f455ced022475c15c4bc0f2ac60b4b7efdaba975",
+      "pdf_sha256": "7227984ec317cff8190a29c2f53794d0e399fbbb7ed78c8ee21c7b27f78d65f8",
+      "pages_read": [
+        5,
+        7
+      ],
+      "scope": "第5頁任務／snapshot 彙總段；第7頁真機協定與結果。"
+    },
+    "environment": "模擬為 PyBullet UR5 桌面與三臺 RGB-D camera，z 軸向上；柔性 cloth/bag 需 deformable world，environment 註解要求至少 480 Hz，CLI 預設卻是 240，必須保留實驗命令設定。真機另為 Franka Panda＋手部 Azure Kinect、foam 工作面及校正轉換。",
+    "tasks": "新增 5 cable、3 cloth、4 bag，共 12；全 registry 另含原 Ravens 任務與 insertion-goal。cloth-flat 等程式名稱對應論文 fabric-*；bag-items-easy/hard 對應 bag-items-1/2。cable-ring-notarget 只是無可見標線，load.py 未將它列為 goal-image conditioned 任務。bag-items 以打開、插入、搬運三 stage 及各 stage primitive 參數組成。",
+    "data": "Dataset 將 color/depth/action/info 存成各目錄相同的 {episode:06d}-{length}.pkl；RGB uint8 為 T×3×480×640×3，depth float32 為 T×3×480×640。最後一筆另存 last_color/last_depth/last_info，不在 action 長度內；goal 預設取同回合最後狀態，也可抽未來時間。action 有 camera_config、primitive、params.pose0/pose1；info 保存 object_id→(position,rotation,dimensions) 及 extras。真機 trial_info 的 img_dict/eval_metrics 應比 act_dict/gctn_dict 多一筆，舊 trial 有缺尾；depth 原始毫米、mask 160×320，需保留 crop 與相機外參。人類示範取像不是 robot rollout。",
+    "evaluation": "模擬 reward 回傳當步 delta，extras.total_rewards 保留當前值。cable-target 檢查每珠到任一目標 XY 距離 <3.5×radius、全數合格才 done；ring 面積除 πr² 達0.75，bag-alone-open 達0.70。cloth-flat 以目標交集/目標面積達0.85，另記 IoU；cloth-cover 要 cube 在 segmentation 不可見且距四角中心≤0.25。bag-items 在 stage3 以物體入 zone 比例與袋口珠入 zone 比例各佔0.5，done 只要求 total_rewards>0；訓練 main.py 另過濾不完整示範，測試 load.py 僅排除 t=0 或 exit_gracefully，不能沿用示範過濾作 test success。bag-color-goal 以目標物可見像素位於目標袋口凸包的比例≥0.95，先要求可見袋口珠比例>0.33；不是完整3D containment。load.py 每2000 iteration 評測一次，共10 snapshots，各20個有效回合，seed 從10000開始，保留重抽計數與 final_info；論文第5頁對3訓練runs的60個指標先平均再取10 snapshots最大值，bag-color-goal僅1 run。真機 evaluate_masks 算交集/聯集，另有交集/min(mask面積)；論文成功為10動作內 IoU>0.25，程式只存連續值、README 使用手動退出，尚無完整自動成功彙總。",
+    "standardization": {
+      "profile": "deformable_pick_place_tasks_and_goal_conditioned_rollouts",
+      "reuse": "新增 task subclasses、metric 分支、RGB-D／goal 配對、seed 與 snapshot 的結果 pickle，以及真機 mask evaluator。",
+      "transform": "source 分兩個 commit；environment 分 UR5 模擬與 Panda 真機；task 保存 paper_name↔code_name 與 Ravens 繼承；case 綁 seed／goal episode／初態；evaluator 分 delta、raw score、task.done、termination_reason 及 paper-success。t=0 為取像而非操作，所以 max_steps=21/11/3 等不能直接作動作數；有效 cable 通常20、cloth-flat10、cloth-cover2次，bag依子類8或9次。",
+      "missing": "資料／goal 資產清單與每次重抽 seed；論文 bag-items 完整成功的結果彙總對接；10-snapshot 選擇與獨立測試分割；真機10-goal清單、手動停止紀錄、完整校正和缺尾 trial 處理。"
+    },
+    "integration_issues": [
+      "主 registry 的 inherited tasks 必須與 P076 Ravens 建立 reuse 關係，不能全部算本篇新任務。",
+      "將 bag-items 的 positive done 與完整搬運成功分開；袋口2D凸包只作原生近似指標。",
+      "保存 test 排除／重抽與 best-of-10 snapshot 選擇，20 episodes 不可乘成獨立唯一 case 數。",
+      "實體倉庫需保留相依 GCTN 修改、毫米／公尺及 crop 轉換，並補自動成功聚合；不能宣稱開箱可執行。"
+    ],
+    "version_note": "兩倉庫均固定 2023-06-11 commit；模擬 README 的 metric 概述仍只寫 pose/zone，實際新增分支更多。原生狀態／示範及 PyBullet、Franka 控制均未執行。",
+    "reviewed_on": "2026-10-11",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            18
+          ],
+          [
+            51,
+            138
+          ],
+          [
+            147,
+            163
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 163,
+        "sha256": "cf1b403bc2d0416ed09ada5e904dbd53ee917a2e96aae28293ce4ef9a46626b1",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/README.md",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/README.md#L1-L18",
+        "why": "核對論文、Ravens 衍生關係、資料與真機補充來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "Tasks.md",
+        "ranges": [
+          [
+            1,
+            12
+          ],
+          [
+            72,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 154,
+        "sha256": "af8850cc55eae252bc830f7d1b3665ec5ae5886028a686bfd98ef0e6542bdc47",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/Tasks.md",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/Tasks.md#L1-L12",
+        "why": "確認該文件主要記錄前代 Transporter 任務，不把舊 cable 算成新套件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/tasks/__init__.py",
+        "ranges": [
+          [
+            1,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 55,
+        "sha256": "0217b98798b05537a067cfac7ffadc86a93f68aad6d2a15ac457b4d7e44fe098",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/__init__.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/__init__.py#L1-L55",
+        "why": "分開 12 新增柔性物名稱與繼承 registry。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/dataset.py",
+        "ranges": [
+          [
+            68,
+            226
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 621,
+        "sha256": "b7ed49e5b66529de8b8fd930ccc3280dd7a229ba7756b81948b4078c3ecebd12",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/dataset.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/dataset.py#L68-L226",
+        "why": "核對 episode/time 索引、三視角 RGB-D、動作及 last_* goal。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/environment.py",
+        "ranges": [
+          [
+            20,
+            76
+          ],
+          [
+            135,
+            180
+          ],
+          [
+            247,
+            325
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 710,
+        "sha256": "ce83b960f95b1c8a42c0a3e00c82c23c6855fff2e09fb80ce3d9db961df2b927",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/environment.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/environment.py#L20-L76",
+        "why": "讀實際 UR5 場景、空觀測初始化、終止失敗與 task.done 的分離。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/tasks/defs_cables.py",
+        "ranges": [
+          [
+            396,
+            408
+          ],
+          [
+            449,
+            481
+          ],
+          [
+            555,
+            576
+          ],
+          [
+            600,
+            632
+          ],
+          [
+            637,
+            677
+          ],
+          [
+            721,
+            731
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 731,
+        "sha256": "3d2126cca33631fc666883685655030e5541a6393a2fb3ea59286d5b1e860ceb",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/defs_cables.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/defs_cables.py#L396-L408",
+        "why": "確認 cable 目標／ring 子類、珠粒參數、goal 和 0.75 門檻。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/tasks/defs_cloth.py",
+        "ranges": [
+          [
+            190,
+            235
+          ],
+          [
+            313,
+            316
+          ],
+          [
+            354,
+            391
+          ],
+          [
+            433,
+            483
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 536,
+        "sha256": "88ff33d3d62fad5646848828f792bd0a8a515159875cd0ad3fe669ccf26283c5",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/defs_cloth.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/defs_cloth.py#L190-L235",
+        "why": "讀 pixel IoU／goal coverage、遮擋 checker 與具體 cloth 任務。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/tasks/defs_bags.py",
+        "ranges": [
+          [
+            44,
+            84
+          ],
+          [
+            251,
+            258
+          ],
+          [
+            402,
+            428
+          ],
+          [
+            476,
+            520
+          ],
+          [
+            660,
+            705
+          ],
+          [
+            899,
+            949
+          ],
+          [
+            1098,
+            1192
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1256,
+        "sha256": "7108e74fe1527d82ed7858308cadf26617408897f756b122aef5099724cc7747",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/defs_bags.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/defs_bags.py#L44-L84",
+        "why": "讀袋子 task、stage、0.70 面積門檻及可見袋口凸包內物體比例。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "ravens/tasks/task.py",
+        "ranges": [
+          [
+            726,
+            750
+          ],
+          [
+            845,
+            1106
+          ],
+          [
+            1108,
+            1164
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1335,
+        "sha256": "8da60329743c33cc0c48109cd50dbc730e5cc74ed4b01a4c852a85791157230b",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/task.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/ravens/tasks/task.py#L726-L750",
+        "why": "追到底層 reward 與所有新增 metric 的 done 條件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "main.py",
+        "ranges": [
+          [
+            47,
+            81
+          ],
+          [
+            163,
+            194
+          ],
+          [
+            234,
+            274
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 363,
+        "sha256": "e6655a7cbdecc9ea2a31fd4687254a692f6c162737423a87f10ca7f8a4ace513",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/main.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/main.py#L47-L81",
+        "why": "區分成功 demo 過濾、1000 生成預算與多次訓練。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/deformable-ravens",
+        "requested_repo": "DanielTakeshi/deformable-ravens",
+        "commit": "73982748bdfe756e04553e28698948facccecb41",
+        "ref": null,
+        "path": "load.py",
+        "ranges": [
+          [
+            17,
+            79
+          ],
+          [
+            157,
+            212
+          ],
+          [
+            224,
+            244
+          ],
+          [
+            249,
+            265
+          ],
+          [
+            282,
+            290
+          ],
+          [
+            339,
+            376
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 376,
+        "sha256": "d2358e651247471642ba946a47eda41666c9fb1f259edf4bf3699a706113caf5",
+        "url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/load.py",
+        "reading_url": "https://github.com/DanielTakeshi/deformable-ravens/blob/73982748bdfe756e04553e28698948facccecb41/load.py#L17-L79",
+        "why": "核對具體測試 goal、L2/SSIM、10 snapshots、20 accepted episodes 與 seed 起點。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/gctn_physical",
+        "requested_repo": "DanielTakeshi/gctn_physical",
+        "commit": "ac002ece139b66c5f45b4e18091a3ef7d352cd45",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 90,
+        "sha256": "04909a465ec206f61485d3dcded87f2bf08913aff1fa14b59dbd142a3dd1f7a6",
+        "url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/README.md",
+        "reading_url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/README.md#L1-L75",
+        "why": "確認真機參考實作的機器相依與手動退出慣例。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/gctn_physical",
+        "requested_repo": "DanielTakeshi/gctn_physical",
+        "commit": "ac002ece139b66c5f45b4e18091a3ef7d352cd45",
+        "ref": null,
+        "path": "get_demo_data.py",
+        "ranges": [
+          [
+            66,
+            103
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 131,
+        "sha256": "87eb919bbc8e100d3f82c8efb679cb4213d6b279ac3f013a6a825d8449e283df",
+        "url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/get_demo_data.py",
+        "reading_url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/get_demo_data.py#L66-L103",
+        "why": "核對人類擺放後取像資料；不將取像當機器人 action。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/gctn_physical",
+        "requested_repo": "DanielTakeshi/gctn_physical",
+        "commit": "ac002ece139b66c5f45b4e18091a3ef7d352cd45",
+        "ref": null,
+        "path": "main.py",
+        "ranges": [
+          [
+            104,
+            192
+          ],
+          [
+            376,
+            399
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 466,
+        "sha256": "c677648e84d55269ad4baf7911791f24d12df6f6e93a1eeb81a5829e27207f04",
+        "url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/main.py",
+        "reading_url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/main.py#L104-L192",
+        "why": "核對真機 trial_info、毫米 depth、逐步 metric 與預設 10 動作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/gctn_physical",
+        "requested_repo": "DanielTakeshi/gctn_physical",
+        "commit": "ac002ece139b66c5f45b4e18091a3ef7d352cd45",
+        "ref": null,
+        "path": "daniel_utils.py",
+        "ranges": [
+          [
+            562,
+            601
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 605,
+        "sha256": "6c6b4c023b0c635674a08ed25727380d15dfb5bd37bcd05a49407aff8c8ca3e7",
+        "url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/daniel_utils.py",
+        "reading_url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/daniel_utils.py#L562-L601",
+        "why": "具體 160×320 binary mask IoU 與另兩個 pixel 指標。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "DanielTakeshi/gctn_physical",
+        "requested_repo": "DanielTakeshi/gctn_physical",
+        "commit": "ac002ece139b66c5f45b4e18091a3ef7d352cd45",
+        "ref": null,
+        "path": "inspect_results.py",
+        "ranges": [
+          [
+            43,
+            66
+          ],
+          [
+            100,
+            123
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 173,
+        "sha256": "5cd75e5d9b841725a5e258d3be46e66385383f9c22d4db4182c935c2feebb2cb",
+        "url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/inspect_results.py",
+        "reading_url": "https://github.com/DanielTakeshi/gctn_physical/blob/ac002ece139b66c5f45b4e18091a3ef7d352cd45/inspect_results.py#L43-L66",
+        "why": "驗證歷史 rollout 缺值及重新計算 IoU 的 reader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "703b4de9ec5feafa93878ff45399a63e017d7a14c5d1157f54ba126dc409f454"
+  },
+  "repository_binding_review_sha256": "703b4de9ec5feafa93878ff45399a63e017d7a14c5d1157f54ba126dc409f454",
+  "repository_bindings": [
+    {
+      "requested_repo": "DanielTakeshi/deformable-ravens",
+      "resolved_repo": "DanielTakeshi/deformable-ravens",
+      "aliases_in_this_review": [
+        "danieltakeshi/deformable-ravens"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "73982748bdfe756e04553e28698948facccecb41",
+          "reviewed_files": [
+            "README.md",
+            "Tasks.md",
+            "load.py",
+            "main.py",
+            "ravens/dataset.py",
+            "ravens/environment.py",
+            "ravens/tasks/__init__.py",
+            "ravens/tasks/defs_bags.py",
+            "ravens/tasks/defs_cables.py",
+            "ravens/tasks/defs_cloth.py",
+            "ravens/tasks/task.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/DanielTakeshi/deformable-ravens",
+          "link_label": "Code (GitHub)",
+          "project_url": "https://berkeleyautomation.github.io/bags/",
+          "page_sha256": "23343d4182b284bd3bacce97b42aa8d6831da0dbf8bd67da656a4afda5ee4939"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/DanielTakeshi/deformable-ravens",
+          "link_label": "https://github.com/DanielTakeshi/deformable-ravens",
+          "project_url": "https://berkeleyautomation.github.io/bags/",
+          "page_sha256": "23343d4182b284bd3bacce97b42aa8d6831da0dbf8bd67da656a4afda5ee4939"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "DanielTakeshi/deformable-ravens",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "73982748bdfe756e04553e28698948facccecb41"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "DanielTakeshi/deformable-ravens",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "73982748bdfe756e04553e28698948facccecb41"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P086",
+          "review_file": "content/github_review/reviews/P086.json",
+          "review_sha256": "703b4de9ec5feafa93878ff45399a63e017d7a14c5d1157f54ba126dc409f454",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "DanielTakeshi/gctn_physical",
+      "resolved_repo": "DanielTakeshi/gctn_physical",
+      "aliases_in_this_review": [
+        "danieltakeshi/gctn_physical"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ac002ece139b66c5f45b4e18091a3ef7d352cd45",
+          "reviewed_files": [
+            "README.md",
+            "daniel_utils.py",
+            "get_demo_data.py",
+            "inspect_results.py",
+            "main.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/DanielTakeshi/gctn_physical",
+          "link_label": "released here",
+          "project_url": "https://berkeleyautomation.github.io/bags/",
+          "page_sha256": "23343d4182b284bd3bacce97b42aa8d6831da0dbf8bd67da656a4afda5ee4939"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P086",
+          "review_file": "content/github_review/reviews/P086.json",
+          "review_sha256": "703b4de9ec5feafa93878ff45399a63e017d7a14c5d1157f54ba126dc409f454",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護",
+    "包裝、倉儲與物流"
+  ],
+  "source_review": {
+    "paper_id": "P086",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DeformableRavens，arXiv 2012.03385v4。",
+    "scope_read": "12任務全表、deformable primitive、資料與checkpoint選擇、真機cable實驗。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      13,
+      14
+    ],
+    "domains": [
+      "衣物與洗護",
+      "包裝、倉儲與物流"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "共用UR5桌面，PyBullet繩索／布料／袋子；理想nearest-vertex抓持。",
+    "tasks": "12＝5 cable、3 fabric、4 bag；有goal image和無goal圖兩種設定，bag含打開→裝物→搬運。",
+    "cases": "每task1,000成功demo；每checkpoint20eval episodes、通常3訓練runs，bag-color僅1run。表格選10checkpoints最大值。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "deformable tasks",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 12000,
+        "unit": "scripted成功demo",
+        "qualifier": "12×1,000",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "每checkpoint每run eval episodes",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "cable位置／凸包面積、cloth coverage、bag containment/transport依task分開。",
+      "真機cable另10episodes、最多10actions、mask IoU>0.25判成功。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "held-out random seeds；依eval最大checkpoint報分有選擇效應，不能當獨立test後只評一次。",
+    "lineage": "Ravens延伸；成功demo經過濾，script成功率與policy測試不是同一分母。",
+    "related_paper_ids": [
+      "P076"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "表I–II、§V–VIII",
+        "supports": "12任務、eval选择、真機IoU"
+      }
+    ],
+    "unresolved": [
+      "各task指標中連續coverage與binary success混合，跨任務總分需保留原生定義。"
+    ],
+    "reuse": "拓展袋子、繩索與布料多階段規則；要額外防止袋外掛物等達標漏洞。",
+    "reviewed_pdf_sha256": "7227984ec317cff8190a29c2f53794d0e399fbbb7ed78c8ee21c7b27f78d65f8",
+    "reviewed_on": "2026-10-02",
+    "name": "DeformableRavens",
+    "year": 2020,
+    "title": "Learning to Rearrange Deformable Cables, Fabrics, and Bags with Goal-Conditioned Transporter Networks",
+    "source_url": "https://arxiv.org/abs/2012.03385",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment",
+      "logistics"
+    ],
+    "review_tags": [
+      "衣物與柔性物操作",
+      "包裝與倉儲"
+    ],
+    "domain_names": [
+      "衣物與洗護",
+      "包裝、倉儲與物流"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P086",
+      "domain_ids": [
+        "garment",
+        "logistics"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P086",
+          "domain_ids": [
+            "garment",
+            "logistics"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            13,
+            14
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "12＝5 cable、3 fabric、4 bag；有goal image和無goal圖兩種設定，bag含打開→裝物→搬運。",
+            "共用UR5桌面，PyBullet繩索／布料／袋子；理想nearest-vertex抓持。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7227984ec317cff8190a29c2f53794d0e399fbbb7ed78c8ee21c7b27f78d65f8"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7227984ec317cff8190a29c2f53794d0e399fbbb7ed78c8ee21c7b27f78d65f8",
+      "previous_domain_ids": [
+        "garment",
+        "logistics"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P086",
+      "name": "DeformableRavens",
+      "expected_title": "Learning to Rearrange Deformable Cables, Fabrics, and Bags with Goal-Conditioned Transporter Networks",
+      "source_url": "https://arxiv.org/abs/2012.03385",
+      "pdf_url": "https://arxiv.org/pdf/2012.03385",
+      "retrieved_at": "2026-10-02T21:33:56.126692+00:00",
+      "pdf_sha256": "7227984ec317cff8190a29c2f53794d0e399fbbb7ed78c8ee21c7b27f78d65f8",
+      "text_sha256": "76e2408ec87623f1cb7669b0acf212ca01598775349ef1b638668ffde23daec1",
+      "pdf_bytes": 7115999,
+      "pages": 17,
+      "text_characters": 95357,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2012.03385v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2012.03385v4"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "deformable tasks",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P086:1",
+        "paper_id": "P086",
+        "benchmark": "DeformableRavens",
+        "native_term": "deformable tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2012.03385v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2012.03385v4",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 12000,
+        "unit": "scripted成功demo",
+        "qualifier": "12×1,000",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P086:2",
+        "paper_id": "P086",
+        "benchmark": "DeformableRavens",
+        "native_term": "scripted成功demo",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2012.03385v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2012.03385v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "每checkpoint每run eval episodes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P086:3",
+        "paper_id": "P086",
+        "benchmark": "DeformableRavens",
+        "native_term": "每checkpoint每run eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2012.03385v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2012.03385v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "DanielTakeshi/deformable-ravens",
+    "DanielTakeshi/gctn_physical"
+  ],
+  "external_repositories": []
+}

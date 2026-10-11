@@ -1,0 +1,828 @@
+{
+  "paper_id": "P011",
+  "name": "EPIC-KITCHENS VISOR",
+  "title": "EPIC-KITCHENS VISOR Benchmark: VIdeo Segmentations and Object Relations",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2209.13064",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P011",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "VISOR 是 EPIC-KITCHENS 影片上的分割與物件關係標註。五個倉庫分別承擔 VOS、HOS、來源追溯、視覺化與抽幀工作，不能算成五批獨立環境。",
+    "environment": "EPIC-100 的廚房影片子集；video、subsequence、image 各是不同層級。VISOR 重新抽幀，需 frame_mapping.json 才能對回 EPIC。",
+    "tasks": "VOS 在給定首影格物件遮罩後追蹤分割；HOS 判斷手側、接觸與手物件組合；WDTCF 用查詢物件遮罩追溯來源物件與證據影格。這些為視覺理解，不是機器人完成操作。",
+    "data": "每影片 JSON 的 video_annotations 含 image.name/video/subsequence 及 mask id/name/class_id/segments/exhaustive/in_contact_object/on_which_hand。dense type=0 為插值、type=1 為端點 GT，不可同當人工標註。VOS 轉成 DAVIS 的 JPEGImages、Annotations、ImageSets 與物件色碼對映。",
+    "evaluation": "VOS 實作排除首影格但保留末影格，以逐物件 J（IoU）與 F（邊界 F-measure）評分；空 union 的 J=1。HOS 將手側／接觸轉類別、遮罩轉 RLE，交給 COCO evaluator。WDTCF 必須 query 類別、證據影格字串吻合，source 類別才可計分，另算 query/source mask IoU；錯類別或錯影格會歸零，非單純來源分類正確率。",
+    "standardization": {
+      "profile": "video_segmentation_relations",
+      "reuse": "原生分割多邊形、接觸 ID、首影格輸入限制、VOS evaluator、WDTCF JSON 與四項輸出。",
+      "transform": "保留 parent=EPIC-100、frame mapping、subsequence 和 mask ID；人工／插值標註分開；以 VOS／HOS／WDTCF 建立獨立 case/evaluator profile，且記錄 480p／1080p 座標與縮放。",
+      "missing": "尚未取得影格與 mask；HOS 的外部 COCO 實作和線上 C6 提交流程未完整追核；資料轉換需驗證色碼與 frame mapping，不能從視覺化結果推定可評測。"
+    },
+    "version_note": "VISOR-FrameExtraction 要求先修正插值並列出 P02_01、P03_14；新版名詞表追加左右手／手套，仍保留舊 hand/glove 類別。VOS 不是未修改的 DAVIS 評分：末影格被納入。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-FrameExtraction",
+        "requested_repo": "epic-kitchens/VISOR-FrameExtraction",
+        "commit": "095cb98a7d8c03cada86fe5ed57dc79c617fa7cd",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            23
+          ],
+          [
+            86,
+            151
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 151,
+        "sha256": "9c092992bb5fced9af394284c89826dbc4358441dd5548182dea0a813b72ee9e",
+        "url": "https://github.com/epic-kitchens/VISOR-FrameExtraction/blob/095cb98a7d8c03cada86fe5ed57dc79c617fa7cd/README.md",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-FrameExtraction/blob/095cb98a7d8c03cada86fe5ed57dc79c617fa7cd/README.md#L1-L23",
+        "why": "稀疏／插值欄位、抽幀修正與 EPIC 重用",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-VOS",
+        "requested_repo": "epic-kitchens/VISOR-VOS",
+        "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            54
+          ],
+          [
+            85,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 155,
+        "sha256": "86c2e94f75999362497adb9b6f6c8e19f8a6dab2921c3cd04898108950528c54",
+        "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/README.md",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/README.md#L1-L54",
+        "why": "首影格條件與轉換流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-VOS",
+        "requested_repo": "epic-kitchens/VISOR-VOS",
+        "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+        "ref": null,
+        "path": "dataset/visor.py",
+        "ranges": [
+          [
+            22,
+            134
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 182,
+        "sha256": "ca2027216194cb2a8e118437ce5ba602c1f36216d18deea98cfda7408c7e7eec",
+        "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/dataset/visor.py",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/dataset/visor.py#L22-L134",
+        "why": "逐片段讀圖、mask 色碼與取樣",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-VOS",
+        "requested_repo": "epic-kitchens/VISOR-VOS",
+        "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+        "ref": null,
+        "path": "evaldavis2017/davis2017/evaluation.py",
+        "ranges": [
+          [
+            1,
+            111
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 111,
+        "sha256": "41734896094474cc50e4d5046f3f4687081d2cabc9e64a1c53929cd9966e055c",
+        "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/evaldavis2017/davis2017/evaluation.py",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/evaldavis2017/davis2017/evaluation.py#L1-L111",
+        "why": "評測影格範圍及逐物件統計",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-VOS",
+        "requested_repo": "epic-kitchens/VISOR-VOS",
+        "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+        "ref": null,
+        "path": "evaldavis2017/davis2017/metrics.py",
+        "ranges": [
+          [
+            14,
+            52
+          ],
+          [
+            101,
+            152
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 197,
+        "sha256": "7d9ec157ca2f7797d1eccac6646d9b48e085ef2b9895e8b44ebe014ebbf324ae",
+        "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/evaldavis2017/davis2017/metrics.py",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/evaldavis2017/davis2017/metrics.py#L14-L52",
+        "why": "IoU 與邊界 F 實際公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-HOS",
+        "requested_repo": "epic-kitchens/VISOR-HOS",
+        "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            59
+          ],
+          [
+            99,
+            151
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 153,
+        "sha256": "48ffb9e649bc49dacb90d362bef7a49d5cf767e04c9668ace9bc725989bd8de8",
+        "url": "https://github.com/epic-kitchens/VISOR-HOS/blob/8566507382add7dd037a83e7233950e0ad1ea78e/README.md",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-HOS/blob/8566507382add7dd037a83e7233950e0ad1ea78e/README.md#L1-L59",
+        "why": "HOS／active 子任務",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-HOS",
+        "requested_repo": "epic-kitchens/VISOR-HOS",
+        "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+        "ref": null,
+        "path": "hos/evaluation/epick_evaluation.py",
+        "ranges": [
+          [
+            28,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 145,
+        "sha256": "b01477e5a6d551bba5f7b90dbf8e239f9f0ce759d86a933e1fbab81a97a9d22d",
+        "url": "https://github.com/epic-kitchens/VISOR-HOS/blob/8566507382add7dd037a83e7233950e0ad1ea78e/hos/evaluation/epick_evaluation.py",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-HOS/blob/8566507382add7dd037a83e7233950e0ad1ea78e/hos/evaluation/epick_evaluation.py#L28-L145",
+        "why": "COCO 輸出轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-WDTCF",
+        "requested_repo": "epic-kitchens/VISOR-WDTCF",
+        "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            82
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 82,
+        "sha256": "21d9d7d9902ce51b8f9be65fede3548214fce640ccefc4b6a7fd7520760d7be4",
+        "url": "https://github.com/epic-kitchens/VISOR-WDTCF/blob/02829f09072cc4726ffd4aed4150c70108fc0b02/README.md",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-WDTCF/blob/02829f09072cc4726ffd4aed4150c70108fc0b02/README.md#L1-L82",
+        "why": "來源追溯輸入與標籤",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-WDTCF",
+        "requested_repo": "epic-kitchens/VISOR-WDTCF",
+        "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+        "ref": null,
+        "path": "evaluation.py",
+        "ranges": [
+          [
+            25,
+            184
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 184,
+        "sha256": "70517231dd15aa1f8e8aa00305742167c3a44198067e78c0eb9cdddcfbe35483",
+        "url": "https://github.com/epic-kitchens/VISOR-WDTCF/blob/02829f09072cc4726ffd4aed4150c70108fc0b02/evaluation.py",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-WDTCF/blob/02829f09072cc4726ffd4aed4150c70108fc0b02/evaluation.py#L25-L184",
+        "why": "嚴格證據影格條件與失敗歸零",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/VISOR-VIS",
+        "requested_repo": "epic-kitchens/VISOR-VIS",
+        "commit": "c4865d0c53a3546e1b70420e4c2d0a652291c758",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            31
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 127,
+        "sha256": "cd330d2d8e0297d232d77d2791232202c30055c32220671348ff0a0e312a2e2d",
+        "url": "https://github.com/epic-kitchens/VISOR-VIS/blob/c4865d0c53a3546e1b70420e4c2d0a652291c758/README.md",
+        "reading_url": "https://github.com/epic-kitchens/VISOR-VIS/blob/c4865d0c53a3546e1b70420e4c2d0a652291c758/README.md#L1-L31",
+        "why": "視覺化工具角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1"
+  },
+  "repository_binding_review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1",
+  "repository_bindings": [
+    {
+      "requested_repo": "epic-kitchens/VISOR-FrameExtraction",
+      "resolved_repo": "epic-kitchens/VISOR-FrameExtraction",
+      "aliases_in_this_review": [
+        "epic-kitchens/visor-frameextraction"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "095cb98a7d8c03cada86fe5ed57dc79c617fa7cd",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/VISOR/site",
+          "page_sha256": "8dda13b8e10d5a42a0ae6044b99faeabf3d7e1b443053883321729aaa056aba1",
+          "url": "https://github.com/epic-kitchens/VISOR-FrameExtraction",
+          "link_label": "VISOR-FrameExtraction"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P011",
+          "review_file": "content/github_review/reviews/P011.json",
+          "review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/VISOR-HOS",
+      "resolved_repo": "epic-kitchens/VISOR-HOS",
+      "aliases_in_this_review": [
+        "epic-kitchens/visor-hos"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+          "reviewed_files": [
+            "README.md",
+            "hos/evaluation/epick_evaluation.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/epic-kitchens/VISOR-HOS",
+          "pdf_page": 9,
+          "pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P011",
+          "review_file": "content/github_review/reviews/P011.json",
+          "review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/VISOR-VIS",
+      "resolved_repo": "epic-kitchens/VISOR-VIS",
+      "aliases_in_this_review": [
+        "epic-kitchens/visor-vis"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c4865d0c53a3546e1b70420e4c2d0a652291c758",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/VISOR/site",
+          "page_sha256": "8dda13b8e10d5a42a0ae6044b99faeabf3d7e1b443053883321729aaa056aba1",
+          "url": "https://github.com/epic-kitchens/VISOR-VIS",
+          "link_label": "VISOR-VIS"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P011",
+          "review_file": "content/github_review/reviews/P011.json",
+          "review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/VISOR-VOS",
+      "resolved_repo": "epic-kitchens/VISOR-VOS",
+      "aliases_in_this_review": [
+        "epic-kitchens/visor-vos"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+          "reviewed_files": [
+            "README.md",
+            "dataset/visor.py",
+            "evaldavis2017/davis2017/evaluation.py",
+            "evaldavis2017/davis2017/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/epic-kitchens/VISOR-VOS",
+          "pdf_page": 7,
+          "pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P011",
+          "review_file": "content/github_review/reviews/P011.json",
+          "review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/VISOR-WDTCF",
+      "resolved_repo": "epic-kitchens/VISOR-WDTCF",
+      "aliases_in_this_review": [
+        "epic-kitchens/visor-wdtcf"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+          "reviewed_files": [
+            "README.md",
+            "evaluation.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/epic-kitchens/VISOR-WDTCF",
+          "pdf_page": 9,
+          "pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P011",
+          "review_file": "content/github_review/reviews/P011.json",
+          "review_sha256": "a59a258f8e6c32c754c40306a5efecbcd5764877d5db7f919a2ad8b86b1214c1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P011",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EPIC-KITCHENS VISOR，arXiv 2209.13064v1。",
+    "scope_read": "資料／split表與3個benchmark定義、主要metric；附錄標註品質段落。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      25
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "42個EPIC廚房；為上游環境子集，不是新增42個互動場景。",
+    "tasks": "3個challenge：VOS、手物關係分割、Where Did This Come From。最後一項有15種來源容器，非15個生活domain。",
+    "cases": "179 untrimmed影片、50,729人工標註影格、271,584人工mask；9.9M為篩過的插值mask。WDTCF另有222測試query，取自92影片。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 42,
+        "unit": "錄製廚房",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "challenge",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 179,
+        "unit": "影片",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 50729,
+        "unit": "人工標註影格",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 271584,
+        "unit": "人工mask",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 222,
+        "unit": "WDTCF test queries",
+        "pages": [
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "VOS用Jaccard J及boundary F；只追第一影格已指定物件。",
+      "HOS用COCO mask AP，手側別、接觸與active object分開。",
+      "WDTCF用來源分類accuracy、證據影格及mask IoU；錯誤證據影格使IoU為0。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "train／val／test影片115／43／21，影格32,857／7,747／10,125；保留未見廚房子集。WDTCF為222題test-only taster。",
+    "lineage": "直接標註EPIC-KITCHENS-100影片；自動插值從14.5M過濾為9.9M，不能當9.9M獨立人工標籤。",
+    "related_paper_ids": [
+      "P009",
+      "P010"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          6
+        ],
+        "locator": "表2與interpolation",
+        "supports": "原生split、人工／自動mask"
+      },
+      {
+        "pages": [
+          7,
+          8,
+          9
+        ],
+        "locator": "§5.1–5.3",
+        "supports": "三端點、222題及判分"
+      }
+    ],
+    "unresolved": [
+      "各VOS subsequence發布ID與影片父ID的完整映射尚未匯入。"
+    ],
+    "reuse": "補充物件變形、接觸及來源追溯題；同一影片不能重算為新增環境。",
+    "reviewed_pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9",
+    "reviewed_on": "2026-10-02",
+    "name": "EPIC-KITCHENS VISOR",
+    "year": 2022,
+    "title": "EPIC-KITCHENS VISOR Benchmark: VIdeo Segmentations and Object Relations",
+    "source_url": "https://arxiv.org/abs/2209.13064",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P011",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P011",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9,
+            10,
+            25
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3個challenge：VOS、手物關係分割、Where Did This Come From。最後一項有15種來源容器，非15個生活domain。",
+            "42個EPIC廚房；為上游環境子集，不是新增42個互動場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P011",
+      "name": "EPIC-KITCHENS VISOR",
+      "expected_title": "EPIC-KITCHENS VISOR Benchmark: VIdeo Segmentations and Object Relations",
+      "source_url": "https://arxiv.org/abs/2209.13064",
+      "pdf_url": "https://arxiv.org/pdf/2209.13064",
+      "retrieved_at": "2026-10-02T21:33:35.176049+00:00",
+      "pdf_sha256": "912638891fd5608d681de38f6e902f5caa0b4a1925c4b22ffb564b92d69701c9",
+      "text_sha256": "c20203ee59805287247fd11c06f43599acb359dd62d8ae82e5a84915cb45b7fe",
+      "pdf_bytes": 77958113,
+      "pages": 52,
+      "text_characters": 180689,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2209.13064v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2209.13064v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 42,
+        "unit": "錄製廚房",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P011:1",
+        "paper_id": "P011",
+        "benchmark": "EPIC-KITCHENS VISOR",
+        "native_term": "錄製廚房",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2209.13064v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2209.13064v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "challenge",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P011:2",
+        "paper_id": "P011",
+        "benchmark": "EPIC-KITCHENS VISOR",
+        "native_term": "challenge",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2209.13064v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2209.13064v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 179,
+        "unit": "影片",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P011:3",
+        "paper_id": "P011",
+        "benchmark": "EPIC-KITCHENS VISOR",
+        "native_term": "影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2209.13064v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2209.13064v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 50729,
+        "unit": "人工標註影格",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P011:4",
+        "paper_id": "P011",
+        "benchmark": "EPIC-KITCHENS VISOR",
+        "native_term": "人工標註影格",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2209.13064v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2209.13064v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 271584,
+        "unit": "人工mask",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P011:5",
+        "paper_id": "P011",
+        "benchmark": "EPIC-KITCHENS VISOR",
+        "native_term": "人工mask",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2209.13064v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2209.13064v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 222,
+        "unit": "WDTCF test queries",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P011:6",
+        "paper_id": "P011",
+        "benchmark": "EPIC-KITCHENS VISOR",
+        "native_term": "WDTCF test queries",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2209.13064v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2209.13064v1",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "epic-kitchens/VISOR-FrameExtraction",
+    "epic-kitchens/VISOR-VOS",
+    "epic-kitchens/VISOR-HOS",
+    "epic-kitchens/VISOR-WDTCF",
+    "epic-kitchens/VISOR-VIS"
+  ],
+  "external_repositories": []
+}

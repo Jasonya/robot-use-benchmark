@@ -1,0 +1,82 @@
+{
+  "paper_id": "P028",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoSchema 官方倉庫含資料取得、原 Ego4D 對映和遠端提交 wrapper；完整 GT 未公開。已核讀提交程式與兩筆來源對映樣本，未把遠端介面當作本機 evaluator。",
+  "reading_order": [
+    {
+      "repo": "egoschema/EgoSchema",
+      "path": "README.md",
+      "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+      "ranges": [
+        [
+          1,
+          115
+        ]
+      ],
+      "why": "零樣本用途、native 題數、public/hidden 與提交格式"
+    },
+    {
+      "repo": "egoschema/EgoSchema",
+      "path": "uid_to_ego4d.json",
+      "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+      "ranges": [],
+      "why": "只讀兩筆 JSON pointer，確認原 Ego4D 與秒制來源",
+      "json_pointers": [
+        "/001934bb-81bd-4cd8-a574-0472ef3f6678",
+        "/001d2d1b-d2f9-4c39-810e-6e2087ff9d5a"
+      ],
+      "scope": "Only selected JSON entries read; no full-file or full-line review claimed"
+    },
+    {
+      "repo": "egoschema/EgoSchema",
+      "path": "validate.py",
+      "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+      "ranges": [
+        [
+          1,
+          43
+        ]
+      ],
+      "why": "遠端傳送程式，不是本地評分器"
+    }
+  ],
+  "environment": "從 Ego4D 截出的第一人稱影片；q_uid 對應一個影片片段，uid_to_ego4d.json 另連 video_uid、starting_sec、ending_sec。多片段可能來自同一原影片／場景。",
+  "tasks": "零樣本長影片五選一 QA。README 的完整 5,031 題與公開答案 500 題是不同口徑，500 題為子集，不能加總；這是原作者檔案數字，非本次已整合題數。",
+  "data": "影片名對 q_uid；提交 JSON 是 question_uid→0–4 整數。已讀兩筆 parent mapping，其中一例把 q_uid 對到原影片 240–420 秒；只核對欄位與例子，不宣稱全量對映已人工審查。",
+  "evaluation": "validate.py 直接 POST JSON 到作者服務，返回 full/subset MCQ accuracy；程式本身沒有本機 scoring 邏輯或完整 hidden labels。未送出任何提交，也未驗證服務現時可用性。500 題離線結果不能當完整 benchmark 成績。",
+  "standardization": {
+    "profile": "long_video_mcqa",
+    "reuse": "原生 q_uid、五選一輸出範圍、公開 subset 口徑及 Ego4D 來源時間對映。",
+    "transform": "case 留 q_uid 與 parent video/time window；split/label_access 明確區分 public-500、完整公開問題與 hidden answers。evaluator 分 local_subset／remote_full，記錄影片取樣預算、輸出解析和提交回執。",
+    "missing": "本次未取得全量影片與 questions.json（超過本工作者小型文字取得上限），未執行模型或服務。需全量 schema／ID 唯一性與 public subset 對齊檢查後，才計已取得／已整合 cases。"
+  },
+  "version_note": "README 同時有 Kaggle 入口與舊 coming-soon 文句；這次只確認釘選檔案與 wrapper，不用舊介紹推定平臺狀態。Wasabi 簽署網址會過期，下載網址不是穩定資料 ID。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "egoschema/EgoSchema",
+      "path": "README.md",
+      "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+      "sha256": "59d65ed00873fdb1c5b883defb11ea3a0b4829491e483a6995b966ca81af597e",
+      "url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/README.md",
+      "local_file": "audit/.cache/github_review/repos/egoschema__EgoSchema/files/README.md"
+    },
+    {
+      "repo": "egoschema/EgoSchema",
+      "path": "uid_to_ego4d.json",
+      "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+      "sha256": "b6aa6b7b5e77863fa1ec725df8646ccb7915bdfe5f053991ba55d610b23e78a6",
+      "url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/uid_to_ego4d.json",
+      "local_file": "audit/.cache/github_review_worker/early/files/egoschema__EgoSchema/uid_to_ego4d.json"
+    },
+    {
+      "repo": "egoschema/EgoSchema",
+      "path": "validate.py",
+      "commit": "505c787376b5e066d0ae406d0e0d41245cebba15",
+      "sha256": "0033bf3d241ed8f20df03a0118ad2f7b12f68bfffb10ed80d2a74934a869cb3a",
+      "url": "https://github.com/egoschema/EgoSchema/blob/505c787376b5e066d0ae406d0e0d41245cebba15/validate.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/egoschema__EgoSchema/validate.py"
+    }
+  ]
+}

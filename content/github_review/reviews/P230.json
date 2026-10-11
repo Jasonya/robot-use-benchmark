@@ -1,0 +1,129 @@
+{
+  "paper_id": "P230",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoH4 評測由頭部／影像與可見 2D 手位置推估及預測 3D 手部，特別區分視野內外。已核對資料模組、20+10 幀切分與 metric 實作；這是 EgoExo4D 上的新評測任務，不是新採集的一批影片。",
+  "reading_order": [
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          46
+        ]
+      ],
+      "why": "確認官方論文、執行入口與 checkpoint 來源。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "config/data_module/egoexo.yaml",
+      "ranges": [
+        [
+          1,
+          47
+        ]
+      ],
+      "why": "核對原生 split、30-frame window、interval=3 與正規化界限。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "config/trainer/egoh4.yaml",
+      "ranges": [
+        [
+          1,
+          39
+        ]
+      ],
+      "why": "查核模型維度及 30 timestep 設定；註解與實際維度不可混讀。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "datamodule/lit_egoexo4d_data_module.py",
+      "ranges": [
+        [
+          14,
+          44
+        ]
+      ],
+      "why": "確認測試實際用 EgoExo4D val、body／hand loader concatenation。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "datamodule/dataset/egoexo4d_hand_body_pose_dataset.py",
+      "ranges": [
+        [
+          15,
+          127
+        ],
+        [
+          296,
+          383
+        ]
+      ],
+      "why": "追蹤 take、連續窗口、out-of-view 分組、17+42 關節、mask 與只載前 20 幀影像。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "models/lit_EgoH4Trainer.py",
+      "ranges": [
+        [
+          273,
+          436
+        ]
+      ],
+      "why": "檢查 57 關節、觀測／未來分開、per-timestep 誤差及零誤差過濾。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "models/transformer_cond_diffusion_model.py",
+      "ranges": [
+        [
+          314,
+          345
+        ]
+      ],
+      "why": "確認 sample 只用 x_start.shape 建噪聲，不把 GT 座標直接當預測。"
+    },
+    {
+      "repo": "masashi-hatano/EgoH4",
+      "commit": "baa8ae87ce50dbff4471e2cce180bb187ce0e900",
+      "path": "models/transformer_module.py",
+      "ranges": [
+        [
+          236,
+          283
+        ]
+      ],
+      "why": "確認 future token 只讀 noisy pose channels、沒有讀 future condition。"
+    }
+  ],
+  "environment": "EgoExo4D 的 Aria 頭部相機、相機姿態及人體／手部標註。機器人控制與物理成功不在本來源評測範圍內；場景應沿用父 take。",
+  "tasks": "3D 手軌跡及手姿態 forecasting，並可分離觀測段 reconstruction；native 30 幀中前 20 幀觀測、後 10 幀未來，按可見／視野外比例分組。全身 57 joints 是移除重複 wrist 後的輸出維度，不是 57 個任務。",
+  "data": "論文報告約 156K train／34K test sequences；公開 config 的 test.split=val，並 concatenate manual body dataset 與 manual hand+auto body dataset。窗口 size=30、slice=1、frame interval=3，需保存 take_uid／start_frame 和標註類型，避免把交疊片段或不同標註視為獨立原片。",
+  "evaluation": "原生 evaluator 分 body／wrist／hand／full，計 obs/fut ADE、末幀 FDE、10 個未來 timestep 和 in-/out-of-view 子群；不以單一 success 評分。calc_jpe 先乘 visibility，再以 jpe!=0 篩選，會連真正零誤差也排除。該固定版本以絕對座標 L2 計手部誤差，沒有在所讀 test_step 執行 wrist-relative 對齊；比較論文相對 MPJPE 欄時必須核對。",
+  "standardization": {
+    "profile": "egocentric_visible_and_out_of_view_3d_hand_forecasting",
+    "reuse": "重用 parent take／sequence indexing、可見性標註、原生 20+10 與分組 evaluator。；以各分項原生誤差作基準；0…1 視野外比例是 case 屬性，不直接標成難度分數。",
+    "transform": "canonical case 固定 observation boundary、camera／pose 座標、joint order、3D／2D masks 及 annotation provenance。；保留 native evaluator；修正零誤差 mask 或新增 wrist-relative metric 時另建協定與相同 fixture 對照。；test dataset 所稱 test 對應父資料 val，標準格式同時保留兩個 split 名稱。",
+    "missing": "本次只查核列出的公開來源段落，未取得完整資料或執行 diffusion。；body／hand concatenation 之重疊 take 與實際數量需要用下載後的 annotation manifest 核對。"
+  },
+  "version_note": "固定目前官方 commit；trainer 註解有 17-joint 遺留文字，但實際使用 57 joints。future condition 於 decoder 被排除，不能因 sample 接收 GT-shaped tensor 就直接判定資料洩漏。",
+  "runtime_executed": false,
+  "discovery_evidence": [
+    {
+      "kind": "paper",
+      "url": "https://arxiv.org/abs/2504.08654",
+      "checked_sections": [
+        "摘要與表 1，156K／34K sequences；第 7 頁相對 MPJPE 註記。"
+      ]
+    }
+  ]
+}

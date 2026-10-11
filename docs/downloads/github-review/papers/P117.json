@@ -1,0 +1,217 @@
+{
+  "paper_id": "P117",
+  "name": "UMI",
+  "title": "Universal Manipulation Interface: In-The-Wild Robot Teaching Without In-The-Wild Robots",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2402.10329",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P117",
+    "summary": "UMI是示範蒐集與跨機體部署介面。需要分開原始影片/SLAM、重播buffer、訓練pose表達和實際控制；README的SLAM可用比例不是任務成功率。",
+    "environment": "野外手持gripper/相機蒐集與實機部署兩種場景；有左右gripper及非gripper相機，frame serial/場景和episode需保留關係。",
+    "tasks": "UMI可蒐集多種操作示範並訓練Diffusion Policy；示範source與下游robot task不同層，SLAM成功不能替代物理任務成功判斷。",
+    "data": "dataset_plan.pkl含grippers/tcp_pose/gripper_width/demo_start/end_pose及cameras/video_path/video_start_end。轉成Zarr robotN_eef_pos/rot_axis_angle/width。訓練把原每手7D轉成pos3+rot6+gripper1；mat_to_pose10d本身是9D，不能從函式名猜10D。",
+    "evaluation": "已讀部署端有桌面高度與雙臂球碰撞姿態修正，屬控制輔助；未核得通用跨任務自動成功checker。資料讀取保留每key的horizon/latency_steps/down_sample；當前action轉換實際用obs_pose_repr，即使另有action_pose_repr設定也需驗證。",
+    "standardization": {
+      "profile": "portable_gripper_demonstration_and_robot_transfer",
+      "reuse": "影片→SLAM→dataset_plan→Zarr的來源鏈、gripper/相機身份與時間/座標轉換。",
+      "transform": "human-held demonstration與robot trial分開；case固定座標anchor、原7D/訓練10D/部署格式、延遲補償及控制修正；處理品質和task success另列。",
+      "missing": "原影片/SLAM資產與校準、全部示範有效性、下游task rubric、時間/pose轉換與跨機體執行驗證。"
+    },
+    "version_note": "固定d095ba9；code另重用Diffusion Policy與ORB_SLAM3，不把內含的其他task示例當新UMI獨立資料。只核讀核心轉換與控制修正，未執行硬體。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "real-stanford/universal_manipulation_interface",
+        "requested_repo": "real-stanford/universal_manipulation_interface",
+        "commit": "d095ba9590df789df5189eea5ee7e431689038a6",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            24
+          ],
+          [
+            47,
+            87
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 170,
+        "sha256": "3cab084378ba7781c2766e410e53812db65aee22fba4d2144a285230d1c737f2",
+        "url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/README.md",
+        "reading_url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/README.md#L1-L24",
+        "why": "原始論文、SLAM與資料轉換鏈",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/universal_manipulation_interface",
+        "requested_repo": "real-stanford/universal_manipulation_interface",
+        "commit": "d095ba9590df789df5189eea5ee7e431689038a6",
+        "ref": null,
+        "path": "scripts_slam_pipeline/07_generate_replay_buffer.py",
+        "ranges": [
+          [
+            75,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 274,
+        "sha256": "218e45e667e54450e595c5a513d01d5f119a6a2eced0393a25e4c328d0750346",
+        "url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/scripts_slam_pipeline/07_generate_replay_buffer.py",
+        "reading_url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/scripts_slam_pipeline/07_generate_replay_buffer.py#L75-L145",
+        "why": "dataset_plan、每gripper姿態與多相機frame對齊",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/universal_manipulation_interface",
+        "requested_repo": "real-stanford/universal_manipulation_interface",
+        "commit": "d095ba9590df789df5189eea5ee7e431689038a6",
+        "ref": null,
+        "path": "diffusion_policy/dataset/umi_dataset.py",
+        "ranges": [
+          [
+            30,
+            44
+          ],
+          [
+            91,
+            125
+          ],
+          [
+            334,
+            372
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 372,
+        "sha256": "448bb1e99e550a86b295c8345480bb362e9163333fb8bd0f137ed5dc3e86a09c",
+        "url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/diffusion_policy/dataset/umi_dataset.py",
+        "reading_url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/diffusion_policy/dataset/umi_dataset.py#L30-L44",
+        "why": "各觀測/動作的horizon/latency/downsample與座標表示",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/universal_manipulation_interface",
+        "requested_repo": "real-stanford/universal_manipulation_interface",
+        "commit": "d095ba9590df789df5189eea5ee7e431689038a6",
+        "ref": null,
+        "path": "umi/common/pose_util.py",
+        "ranges": [
+          [
+            17,
+            44
+          ],
+          [
+            86,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 115,
+        "sha256": "7970440a072a1db49136c5f116e808fedf1e03a11557ab4d8f718c267e4d8d4a",
+        "url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/umi/common/pose_util.py",
+        "reading_url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/umi/common/pose_util.py#L17-L44",
+        "why": "rotvec、旋轉6D以及pose10d函式實際輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/universal_manipulation_interface",
+        "requested_repo": "real-stanford/universal_manipulation_interface",
+        "commit": "d095ba9590df789df5189eea5ee7e431689038a6",
+        "ref": null,
+        "path": "eval_real.py",
+        "ranges": [
+          [
+            64,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 581,
+        "sha256": "3e3c1bd865fe38b96b87b78c02b575200d5fcf350beeb034789b7ef6c25c4adc",
+        "url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/eval_real.py",
+        "reading_url": "https://github.com/real-stanford/universal_manipulation_interface/blob/d095ba9590df789df5189eea5ee7e431689038a6/eval_real.py#L64-L106",
+        "why": "部署端桌面和雙臂碰撞修正屬於控制介入",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "c092a5ab3494e16993f388cc89329a4914bd14992011b9db9bd4d1ccec0aeea0"
+  },
+  "repository_binding_review_sha256": "c092a5ab3494e16993f388cc89329a4914bd14992011b9db9bd4d1ccec0aeea0",
+  "repository_bindings": [
+    {
+      "requested_repo": "real-stanford/universal_manipulation_interface",
+      "resolved_repo": "real-stanford/universal_manipulation_interface",
+      "aliases_in_this_review": [
+        "real-stanford/universal_manipulation_interface"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d095ba9590df789df5189eea5ee7e431689038a6",
+          "reviewed_files": [
+            "README.md",
+            "diffusion_policy/dataset/umi_dataset.py",
+            "eval_real.py",
+            "scripts_slam_pipeline/07_generate_replay_buffer.py",
+            "umi/common/pose_util.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/real-stanford/universal_manipulation_interface",
+          "link_label": "Codebase",
+          "project_url": "https://umi-gripper.github.io",
+          "page_sha256": "108010d8e70d6ef11ec59b05b118f91f1a86996be19938151cffb18d61de5315"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P117",
+          "review_file": "content/github_review/reviews/P117.json",
+          "review_sha256": "c092a5ab3494e16993f388cc89329a4914bd14992011b9db9bd4d1ccec0aeea0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "real-stanford/universal_manipulation_interface"
+  ],
+  "external_repositories": []
+}

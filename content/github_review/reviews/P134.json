@@ -1,0 +1,60 @@
+{
+  "paper_id": "P134",
+  "summary": "OpenVLA是VLA方法，重用OXE/Bridge/LIBERO資料與任務。模型action解碼依dataset專屬q01/q99，LIBERO部署再改gripper範圍與方向。",
+  "reading_order": [
+    {
+      "repo": "openvla/openvla",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          37
+        ],
+        [
+          65,
+          83
+        ]
+      ],
+      "why": "原作、後續OFT/FAST、資料重用及模型接口",
+      "commit": "c8f03f48af692657d3060c19588038c7220e9af9"
+    },
+    {
+      "repo": "openvla/openvla",
+      "path": "prismatic/models/vlas/openvla.py",
+      "ranges": [
+        [
+          90,
+          131
+        ]
+      ],
+      "why": "依unnorm_key取stats、mask與action維度",
+      "commit": "c8f03f48af692657d3060c19588038c7220e9af9"
+    },
+    {
+      "repo": "openvla/openvla",
+      "path": "experiments/robot/libero/run_libero_eval.py",
+      "ranges": [
+        [
+          150,
+          235
+        ]
+      ],
+      "why": "原生init-state、各suite步數、合法輸入與gripper變換",
+      "commit": "c8f03f48af692657d3060c19588038c7220e9af9"
+    }
+  ],
+  "environment": "BridgeData V2真實WidowX和LIBERO模擬設定；新增模型／微調不新建獨立benchmark環境。",
+  "tasks": "語言條件操作策略與既有task-suite評測。原作訓練資料量和LIBERO任務數應追到父來源，不累加成新的任務聯集。",
+  "data": "predict_action以dataset專屬unnorm_key解碼action tokens，依mask使用q01/q99還原。維度由stats的q01長度決定；雖範例7D，不能忽略dataset/controller。LIBERO observation字典含state，但程式註明OpenVLA不使用proprio作輸入。",
+  "evaluation": "LIBERO使用固定initial_states[episode_idx]，suite預算220/280/300/520/400步，另有暖機；gripper[0,1]→[-1,+1]且OpenVLA再反號。成功取原env.done，原goals沿LIBERO。需記下成功/例外和整體分母。",
+  "standardization": {
+    "profile": "vla_policy_on_existing_benchmarks",
+    "reuse": "模型與原dataset/suite對應、action解碼統計、各task評測腳本。",
+    "transform": "method與source task/case分離；case固定預算/初態/影像前處理，policy adapter保存unnorm_key/mask/gripper方向。原native分數與我們新增規則各有版本。",
+    "missing": "完整checkpoint/資料/資產、各來源訓練重疊與holdout、normalize與實機controller對照、原生執行再現。"
+  },
+  "version_note": "固定c8f03f4；README後加OFT/FAST並非vanilla OpenVLA同版本。此庫是Prismatic fork且由原作者頁認領，fork屬性不代表非官方。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

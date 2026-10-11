@@ -1,0 +1,494 @@
+{
+  "paper_id": "P098",
+  "name": "Habitat 2.0",
+  "title": "Habitat 2.0: Training Home Assistants to Rearrange their Habitat",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2106.14405",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P098",
+    "summary": "Habitat-Lab負責episode／任務／評分，Habitat-Sim負責感測與物理。二者共同支援多代論文；目前HEAD不能直接代表2021的Habitat2.0原設定。",
+    "environment": "Habitat2.0研究使用家居可互動重排環境；現行Sim另外支援多種掃描場景、CAD、機器人URDF與RGB-D。引擎支援的資料集列表不等於已取得或可對比的環境全集。",
+    "tasks": "物件重排及導航／抓放等子任務；具體task config和measure才決定條件。Lab的benchmark速度腳本與模型任務成功率不可混為同一評估。",
+    "data": "RearrangeEpisode包含ao_states、rigid_objs(handle,transform)、targets、markers、target/goal_receptacles與name_to_receptacle。現行from_json把episode_id重設為列序號，標準庫須保留原source檔案與record index避免ID碰撞。",
+    "evaluation": "具體RearrangePickSuccess檢查持有正確物件、未違反hold constraint，且末端到rest位置距離低於配置閾值；-1可關閉rest檢查。成功定義依配置改變，不能只存measure名稱；reward、渲染FPS及task success分開。",
+    "standardization": {
+      "profile": "simulator_platform_and_rearrangement_episode",
+      "reuse": "episode schema、資產UID／版本、任務配置與原生measure。",
+      "transform": "source拆論文/程式/資產角色，environment存scene及物件初態；case ID以來源版本＋原檔＋原索引生成；evaluator釘選實作與閾值。",
+      "missing": "2021論文匹配的Lab/Sim/資產版本及完整任務配置、LFS實體資產、原生重播與共同協定接線。"
+    },
+    "version_note": "現有README同時引用Habitat1/2/3。這次核讀指定現有commit中的具體介面，歷史2.0重現版本仍需另定；未將新增3.0能力歸給2021論文。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            14,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 227,
+        "sha256": "49ffbba6a3e459e382aebcc1724a9682ebb3c4eec85df7f6e2aa92ee0eefa8a7",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/README.md",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/README.md#L14-L78",
+        "why": "原論文身份與Lab/Sim角色依賴",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-sim",
+        "requested_repo": "facebookresearch/habitat-sim",
+        "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            14,
+            27
+          ],
+          [
+            47,
+            70
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 269,
+        "sha256": "2422fd0b1c58dc9939fc3e74d6b39415e202df651dd93b87204d3871bfc803b8",
+        "url": "https://github.com/facebookresearch/habitat-sim/blob/57ee4941dc4765240f0f91f70b2c97a919bf9038/README.md",
+        "reading_url": "https://github.com/facebookresearch/habitat-sim/blob/57ee4941dc4765240f0f91f70b2c97a919bf9038/README.md#L14-L27",
+        "why": "引擎、資產與機體支援；非新增獨立任務庫",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+        "ref": null,
+        "path": "habitat-lab/habitat/datasets/rearrange/rearrange_dataset.py",
+        "ranges": [
+          [
+            23,
+            76
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 195,
+        "sha256": "ce110bf1db4ef22c5dfd6f1f302bdf6b465873e2ae2baafd57ea9629f79480b5",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/datasets/rearrange/rearrange_dataset.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/datasets/rearrange/rearrange_dataset.py#L23-L76",
+        "why": "具體rearrangement episode欄位與讀取時ID重設",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+        "ref": null,
+        "path": "habitat-lab/habitat/tasks/rearrange/sub_tasks/pick_sensors.py",
+        "ranges": [
+          [
+            205,
+            249
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 249,
+        "sha256": "9df705b950c71005d84fbb5cafce446c5bd8aeae4921066047b333e984805e65",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/tasks/rearrange/sub_tasks/pick_sensors.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/tasks/rearrange/sub_tasks/pick_sensors.py#L205-L249",
+        "why": "具體pick成功條件及配置閾值",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-sim",
+        "requested_repo": "facebookresearch/habitat-sim",
+        "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038",
+        "ref": null,
+        "path": "src_python/habitat_sim/utils/datasets_download.py",
+        "ranges": [
+          [
+            527,
+            539
+          ],
+          [
+            727,
+            767
+          ],
+          [
+            785,
+            825
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 968,
+        "sha256": "54bef3d4fbc3a38898cb02ac62897fc47d4b677af15bd80e5aab0c33cabb4cf1",
+        "url": "https://github.com/facebookresearch/habitat-sim/blob/57ee4941dc4765240f0f91f70b2c97a919bf9038/src_python/habitat_sim/utils/datasets_download.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-sim/blob/57ee4941dc4765240f0f91f70b2c97a919bf9038/src_python/habitat_sim/utils/datasets_download.py#L527-L539",
+        "why": "資料UID、版本、LFS與實體資產取得狀態",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "22999fe7845331f65df24c785c6a1f155302ecbc60cd3cec7c28f68b7e71571d"
+  },
+  "repository_binding_review_sha256": "22999fe7845331f65df24c785c6a1f155302ecbc60cd3cec7c28f68b7e71571d",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/habitat-lab",
+      "resolved_repo": "facebookresearch/habitat-lab",
+      "aliases_in_this_review": [
+        "facebookresearch/habitat-lab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+          "reviewed_files": [
+            "README.md",
+            "habitat-lab/habitat/datasets/rearrange/rearrange_dataset.py",
+            "habitat-lab/habitat/tasks/rearrange/sub_tasks/pick_sensors.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/facebookresearch/habitat-lab/",
+          "pdf_page": 3,
+          "pdf_sha256": "92f9c30479fe4203f656c218fa228c7e5fd71f23a9821b3afa47e06dbe5ab317",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P098",
+          "review_file": "content/github_review/reviews/P098.json",
+          "review_sha256": "22999fe7845331f65df24c785c6a1f155302ecbc60cd3cec7c28f68b7e71571d",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "facebookresearch/habitat-sim",
+      "resolved_repo": "facebookresearch/habitat-sim",
+      "aliases_in_this_review": [
+        "facebookresearch/habitat-sim"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038",
+          "reviewed_files": [
+            "README.md",
+            "src_python/habitat_sim/utils/datasets_download.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P098",
+          "review_file": "content/github_review/reviews/P098.json",
+          "review_sha256": "22999fe7845331f65df24c785c6a1f155302ecbc60cd3cec7c28f68b7e71571d",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P098",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Habitat2.0/HAB，arXiv 2106.14405v2。",
+    "scope_read": "ReplicaCAD構造、Pick基本任務、3種HAB任務與評估假設。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      29
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "室內長流程操作",
+    "environment": "ReplicaCAD111 layouts建立於單一apartment backdrop；正文105新layout variations與原始配置分量需分清，非111獨立住宅。",
+    "tasks": "HAB3families：TidyHouse、PrepareGroceries、SetTable；另Pick基礎實驗。任務goal為object起終3D位置，不是自然語言理解。",
+    "cases": "程序clutter/goal episodes；Pick有500 unseen-layout eval樣本；技能附錄另100eval episodes，不能混作HAB全庫題數。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 111,
+        "unit": "ReplicaCAD layouts",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "HAB long-range families",
+        "pages": [
+          10,
+          11
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "Pick unseen-layout eval episodes",
+        "pages": [
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "goal成功與分階段成功；操作次數用作難度proxy；模擬速度SPS另列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "未見layout/object配置；抽象抓持與kinematic base控制，並非完整wheel/contact dynamics。",
+    "lineage": "Replica FRL apartment→ReplicaCAD、YCB clutter；Habitat3/後續rearrangement套件會重用。",
+    "related_paper_ids": [
+      "P142"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          4,
+          5
+        ],
+        "locator": "ReplicaCAD章",
+        "supports": "111與單apartment來源"
+      },
+      {
+        "pages": [
+          10,
+          11
+        ],
+        "locator": "§6.1",
+        "supports": "HAB3families與GeometricGoal"
+      }
+    ],
+    "unresolved": [
+      "HAB每family全套eval episode IDs與111layout正式manifest仍待匯入。"
+    ],
+    "reuse": "可借home-scale長流程與open/close前後置條件；環境分量與感測先驗需精確報。",
+    "reviewed_pdf_sha256": "92f9c30479fe4203f656c218fa228c7e5fd71f23a9821b3afa47e06dbe5ab317",
+    "reviewed_on": "2026-10-02",
+    "name": "Habitat 2.0",
+    "year": 2021,
+    "title": "Habitat 2.0: Training Home Assistants to Rearrange their Habitat",
+    "source_url": "https://arxiv.org/abs/2106.14405",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "室內導航"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P098",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P098",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            9,
+            10,
+            11,
+            29
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "HAB3families：TidyHouse、PrepareGroceries、SetTable；另Pick基礎實驗。任務goal為object起終3D位置，不是自然語言理解。",
+            "ReplicaCAD111 layouts建立於單一apartment backdrop；正文105新layout variations與原始配置分量需分清，非111獨立住宅。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "92f9c30479fe4203f656c218fa228c7e5fd71f23a9821b3afa47e06dbe5ab317"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "92f9c30479fe4203f656c218fa228c7e5fd71f23a9821b3afa47e06dbe5ab317",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P098",
+      "name": "Habitat 2.0",
+      "expected_title": "Habitat 2.0: Training Home Assistants to Rearrange their Habitat",
+      "source_url": "https://arxiv.org/abs/2106.14405",
+      "pdf_url": "https://arxiv.org/pdf/2106.14405",
+      "retrieved_at": "2026-10-02T21:34:12.646115+00:00",
+      "pdf_sha256": "92f9c30479fe4203f656c218fa228c7e5fd71f23a9821b3afa47e06dbe5ab317",
+      "text_sha256": "07422bf4e6914bab98305d47e875a3f51b06cc5e2135324da8e882ecda2c2279",
+      "pdf_bytes": 45408472,
+      "pages": 32,
+      "text_characters": 232879,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2106.14405v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2106.14405v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 111,
+        "unit": "ReplicaCAD layouts",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P098:1",
+        "paper_id": "P098",
+        "benchmark": "Habitat 2.0",
+        "native_term": "ReplicaCAD layouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2106.14405v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2106.14405v2",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "HAB long-range families",
+        "pages": [
+          10,
+          11
+        ],
+        "record_id": "review10:P098:2",
+        "paper_id": "P098",
+        "benchmark": "Habitat 2.0",
+        "native_term": "HAB long-range families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2106.14405v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2106.14405v2",
+            "locator": "PDF pp. 10, 11",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 500,
+        "unit": "Pick unseen-layout eval episodes",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P098:3",
+        "paper_id": "P098",
+        "benchmark": "Habitat 2.0",
+        "native_term": "Pick unseen-layout eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2106.14405v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2106.14405v2",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/habitat-lab",
+    "facebookresearch/habitat-sim"
+  ],
+  "external_repositories": []
+}

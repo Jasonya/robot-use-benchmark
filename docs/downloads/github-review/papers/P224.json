@@ -1,0 +1,855 @@
+{
+  "paper_id": "P224",
+  "name": "EMPIRE",
+  "title": "EMPIRE: Explicit Manipulation Planning as a Learnable Intermediate Representation for Egocentric Hand-Motion Forecasting",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2608.22449",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P224",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已追完EMPIRE的index/episode reader、30→12FPS取樣、混合MANO動作表示及best-of-8 joint scorer。公開庫有核心程式，但EMPIRE-651K資料與前處理明示尚未發布；650,910訓練視窗與111活動標籤為論文數字，未由實際dataset逐筆驗證。",
+    "identity_note": "arXiv:2608.22449v1，Wen Wang、Ruibing Hou、Hong Chang、Shiguang Shan、Xilin Chen，EMPIRE: Explicit Manipulation Planning as a Learnable Intermediate Representation for Egocentric Hand-Motion Forecasting。PDF第1頁直接連wangwen-banban/EMPIRE，README題名/arXiv一致。VITRA為程式與資料格式基礎，EgoDex為母資料，Being-H0為比較baseline，三者不能另算本篇新資料。",
+    "environment": "EgoDex/Apple Vision Pro的人類桌面操作第一人稱影片，RGB、相機內外參、雙手追蹤骨架轉MANO、task caption與per-hand plan。reader在query frame的camera座標表示整段未來姿態；公開FrameDataset只支援human，不提供robot互動環境。",
+    "tasks": "從current RGB、初始雙手狀態與caption生成操作plan，再預測雙手未來motion；plan描述不是可執行robot技能。論文650,910個5秒train windows、6,836個test windows、111個活動標籤需分開計數。Part1 ablation另以訓練任務重疊定義26 seen tasks/1,247 windows與85 unseen tasks/5,589 windows；並非全五partition訓練的預設unseen切分。task summary從episode名稱或obj_class/video_name解析label，再對指定training annotation snapshot比對，沒有封閉111-task registry。",
+    "data": "preferred layout為dataset/episode_frame_index.npz（index_frame_pair[N,2]=episode_index/frame_index、index_to_episode_id[E]）、episodic_annotations/id.npy及statistics.json；legacy .npy字典/processed_episodes_vitra_format也可讀。episode含video_name、video_decode_frame、intrinsics、extrinsics及left/right的beta、kept_frames、global_orient_worldspace、transl_worldspace、hand_pose、joints_worldspace、text/anno_type；caption→instruction、plan→cot只是alias。標準設定source_fps=30、target_fps=12，step=2.5，以np.rint取整，並可依此過濾index rows；future=59建立含current的60個window位置，再取next-state而產生60個未來action。OOB雖clip索引，但被mask剔除，60個slots不保證60個有效影格。text範圍採[start,end)，plan匹配卻允許end且取最近範圍。每hand51維為逐步腕平移m、腕旋轉xyz Euler-radians及下一步絕對15×3手指Euler；use_rel=false仍保留腕部relative分量。兩手102維action補到288；原state122維含betas，padding移除betas後補到296。predicted plan ABI為schema_version=1.0、plans[episode_id:frame_index]，主StageII配置明確讀該sidecar。",
+    "evaluation": "run_full_eval預設REPEAT_TIMES=8、ONLINE_PLAN=1、save_repeated_samples；model config為flow matching 4步。eval_mse先依mask選正規化動作MSE最小者，分母為有效action scalar數，這不是論文MPJPE。compute_egodex_metrics優先讀sampled_actions[N,K,T,D]，逐候選反正規化並recon_traj：累加腕平移、左乘腕旋轉、手指使用絕對角，再以MANO重建21關節；beta固定0、左手套軸修正，剔除初始state，只評未來。mask為hand/frame有效性，非獨立joint可見性。每window MPJPE=全部有效hand-frame之21-joint Euclidean均值；等價分母21×有效hand-frame數。選該MPJPE最小的同一候選來算wrist joint0與finger-relative（扣wrist後只取其餘20關節），不可各指標另挑best。FDE為每個有GT手最後有效frame的joint均值，再對手平均。最終對非NaN windows的metric等權nanmean，再m×1000轉mm；num_samples仍包含無有效手而為NaN的records，須另報有效分母。若NPZ沒有sampled_actions，scorer把pred_actions當K=1，無法恢復best-of-8。shard merge按sample_positions排序並檢查連續性；task summary再分組，並不將總分改成task-macro平均。",
+    "standardization": {
+      "profile": "offline_bimanual_parametric_motion_with_plan_conditioning",
+      "reuse": "重用versioned schema/resolver、canonical sample ID、plan sidecar、FPS/mask邏輯、MANO adapter、step重建、best-of-K MPJPE與task provenance摘要；保留EgoDex/VITRA lineage。",
+      "transform": "分開source/domain/environment/task/window/evaluator；case鍵為dataset revision+episode_id+frame_index，保存source/video/target FPS及np.rint後實際indices。將51維混合action、102有效維、288/296 padding及mean/std明確分層；保留anchor-camera與xyz-radians、公尺/mm轉換。evaluator保存K、4步設定、全部sampled_actions、選中best_k、21/20 joint定義、每window有效hand-frame及NaN分母。",
+      "missing": "未發布的index/episodes、骨架→MANO擬合與caption/plan前處理、資料/統計/sidecar/weights/MANO資產尚未閉合；不能驗證650,910/6,836筆或真正split無洩漏。需核對eval dataset statistics.json與scorer STATISTICS_PATH均使用對應training normalization，避免反正規化版本不同。須鎖定ONLINE_PLAN、各shard皆保留sampled_actions、真正K與完整case coverage；資料格式稱HF-compatible不代表已確認HF dataset repo/revision。"
+    },
+    "version_note": "固定commit bea74bb146baa750b02f291754cafd5ed6cd0bfe。標準StageII配置與predicted_plan ablation使用預測plan；ground_truth_plan另列。直接執行eval_mse的預設K=5、COT_GENERATE_THEN_CONDITION=0，可能使用GT plan suffix；正式shell才設定K=8與online生成，因此兩入口不可混同。online分支重讀raw image/coarse instruction而不用GT suffix，但資料載入仍依賴reference-plan存在；不能宣稱是完全無標註部署封裝。所有內容僅靜態核讀，未執行資料前處理、模型、MANO或評測。",
+    "discovery_evidence": [
+      {
+        "kind": "cached_primary_paper",
+        "url": "https://arxiv.org/pdf/2608.22449",
+        "pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03",
+        "local_file": "audit/.cache/fulltext_review/P224/pages.json",
+        "sha256": "f9bf7343b538d684bd24510223a7e08ef0bd2f3d41ebfd005637fcf249996f53",
+        "json_pointers": [
+          "/0/text",
+          "/3/text",
+          "/4/text",
+          "/5/text",
+          "/10/text"
+        ],
+        "finding": "確認repo身份、EMPIRE-651K原始粒度、split/60-step/K=8/4-step及joint指標；論文數字未當成已下載核驗樣本。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            22
+          ],
+          [
+            35,
+            50
+          ],
+          [
+            84,
+            117
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 117,
+        "sha256": "81516f1f216ae4f0e117a70d89dad1b523aa48f8ec574b9f4f90d73b3605fcb4",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/README.md",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/README.md#L1-L22",
+        "why": "確認精確論文、dataset coming soon、VITRA依存與正式eval鏈。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "docs/DATA_SCHEMA.md",
+        "ranges": [
+          [
+            1,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 85,
+        "sha256": "c9a1dd24e1e06f9f074908887786e984ec6462a27994b0832d7ef016d9417300",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/docs/DATA_SCHEMA.md",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/docs/DATA_SCHEMA.md#L1-L85",
+        "why": "核對index/episode/plan ABI，明確區分runtime格式與未發布dataset/preprocessing。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/datasets/schema.py",
+        "ranges": [
+          [
+            25,
+            158
+          ],
+          [
+            164,
+            195
+          ],
+          [
+            198,
+            264
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 264,
+        "sha256": "c100a4c8f97863b604e4da4063a68b048635d7abb4fb791c3274f4875ef26321",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/schema.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/schema.py#L25-L158",
+        "why": "讀preferred/legacy resolver、index形狀、caption/plan別名、canonical sample ID與sidecar驗證。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/configs/train_stage2_actor.json",
+        "ranges": [
+          [
+            1,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "ac27854ed0147ba3bebb74dbcf00febf7c8b9b4c4536bee9a2ea04ef2bec1cb9",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/train_stage2_actor.json",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/train_stage2_actor.json#L1-L110",
+        "why": "固定predicted-plan條件、60步、30→12FPS、8次sample及4-step flow matching設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/configs/ablations/ground_truth_plan.json",
+        "ranges": [
+          [
+            1,
+            108
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 108,
+        "sha256": "04d41e5c87aa30c19b3143167fcdf08011efb903f0704ad5b5265770a954c2cd",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/ground_truth_plan.json",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/ground_truth_plan.json#L1-L108",
+        "why": "核對GT-plan ablation與預設sidecar條件的差別。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/configs/ablations/predicted_plan.json",
+        "ranges": [
+          [
+            1,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "b3f484b8a3bd60fb00005719065db45d13d1707eb6018af070a21310cd620058",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/predicted_plan.json",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/configs/ablations/predicted_plan.json#L1-L110",
+        "why": "核對明確的predicted plan來源與sidecar路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/datasets/data_mixture.py",
+        "ranges": [
+          [
+            1,
+            7
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 7,
+        "sha256": "84be47f05914fa201d821a0f639014ff140b1a7b57102fa5547fabb86a297d60",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/data_mixture.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/data_mixture.py#L1-L7",
+        "why": "empire_train只是一個具名dataset mixture，沒有111個task registry。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/datasets/dataset.py",
+        "ranges": [
+          [
+            30,
+            219
+          ],
+          [
+            219,
+            259
+          ],
+          [
+            268,
+            340
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 628,
+        "sha256": "5b7871619c71b8ccec42e1c05b9804b4209c268e1375d3e2e4fab08366fcd1f1",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/dataset.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/dataset.py#L30-L219",
+        "why": "追到EpisodicDatasetCore/EvalDataset、plan選擇、suffix資料及model tensor欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/datasets/human_dataset.py",
+        "ranges": [
+          [
+            48,
+            123
+          ],
+          [
+            169,
+            283
+          ],
+          [
+            345,
+            439
+          ],
+          [
+            536,
+            597
+          ],
+          [
+            639,
+            661
+          ],
+          [
+            731,
+            787
+          ],
+          [
+            791,
+            842
+          ],
+          [
+            873,
+            947
+          ],
+          [
+            1040,
+            1202
+          ],
+          [
+            1283,
+            1406
+          ],
+          [
+            1430,
+            1558
+          ],
+          [
+            1596,
+            1686
+          ],
+          [
+            1681,
+            1750
+          ],
+          [
+            1850,
+            1899
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1899,
+        "sha256": "51ad5b2da580cf3a641c63695e50c1ad1685a5a68ead36aa0c4cb658996216a4",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/human_dataset.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/datasets/human_dataset.py#L48-L123",
+        "why": "核讀FPS推斷/取樣、anchor-camera轉換、有效mask、相對腕/絕對finger混合表示、padding及evaluation同約定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/utils/data_utils.py",
+        "ranges": [
+          [
+            268,
+            408
+          ],
+          [
+            462,
+            539
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 620,
+        "sha256": "63f2b65253b7c5dfe52eca7d980f680685549e08e0cd63f3118cb046d61a1b1a",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/utils/data_utils.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/utils/data_utils.py#L268-L408",
+        "why": "追到mean/std正規化及實際step-wise wrist/pose重建，不能把latent MSE當MPJPE。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "scripts/run_full_eval.sh",
+        "ranges": [
+          [
+            1,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 106,
+        "sha256": "79e20432a8c2c14ccda3c40e7f08f013963f344ee01cfb31f2f67c22ab772f24",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/run_full_eval.sh",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/run_full_eval.sh#L1-L106",
+        "why": "正式入口預設K=8、online plan、保留全部sample、merge→joint metric→task summary。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "scripts/eval_mse.py",
+        "ranges": [
+          [
+            21,
+            116
+          ],
+          [
+            152,
+            190
+          ],
+          [
+            192,
+            274
+          ],
+          [
+            275,
+            391
+          ],
+          [
+            379,
+            444
+          ],
+          [
+            450,
+            583
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 596,
+        "sha256": "66524a3f9fb841c67319e2e3750932620d2bc04c1c9307959ec0fe83333b5d90",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/eval_mse.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/eval_mse.py#L21-L116",
+        "why": "核對K預算、GT-plan/online分支、MSE預選與sampled_actions/UID/FPS輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "scripts/merge_eval_shards.py",
+        "ranges": [
+          [
+            1,
+            56
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 56,
+        "sha256": "b67de594d0a855ff146a3bca87385dde07d38eed096d37ba47189cd453da9fb0",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/merge_eval_shards.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/merge_eval_shards.py#L1-L56",
+        "why": "確認按sample_positions排序及連續性檢查；欄位只取各shard交集。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "scripts/egodex_eval_utils.py",
+        "ranges": [
+          [
+            19,
+            74
+          ],
+          [
+            157,
+            190
+          ],
+          [
+            192,
+            289
+          ],
+          [
+            291,
+            307
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 335,
+        "sha256": "f9aa07d3d76a078fc36e811b949a6ccde9f7d85c598c1c12d0195b5ff9925a32",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/egodex_eval_utils.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/egodex_eval_utils.py#L19-L74",
+        "why": "重建左右手21關節、beta=0、左手chirality、初始frame剔除及mask。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "empire/models/mano.py",
+        "ranges": [
+          [
+            1,
+            57
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 57,
+        "sha256": "eaf3e256daf9ad1ec579ed31f103f698fff4370cb0e7f49a1206f78fb6ef216f",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/models/mano.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/empire/models/mano.py#L1-L57",
+        "why": "確認SMPL-X MANO補五個指尖並轉OpenPose 21-joint順序。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "scripts/compute_egodex_metrics.py",
+        "ranges": [
+          [
+            1,
+            406
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 406,
+        "sha256": "4f3aa41581425dcc527c947f55282c3183d609bcb9172313663246fb1ff24b27",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/compute_egodex_metrics.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/compute_egodex_metrics.py#L1-L406",
+        "why": "完整核讀具體joint scorer：per-hand有效frame、best MPJPE、wrist/finger-relative/FDE、NaN與window平均。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wangwen-banban/EMPIRE",
+        "requested_repo": "wangwen-banban/EMPIRE",
+        "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+        "ref": null,
+        "path": "scripts/summarize_egodex_all_tasks.py",
+        "ranges": [
+          [
+            1,
+            98
+          ],
+          [
+            157,
+            238
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 270,
+        "sha256": "1f884ad61fba268cf50ddf1f8630780c5beb67059620f66fd92cc88796ac91ef",
+        "url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/summarize_egodex_all_tasks.py",
+        "reading_url": "https://github.com/wangwen-banban/EMPIRE/blob/bea74bb146baa750b02f291754cafd5ed6cd0bfe/scripts/summarize_egodex_all_tasks.py#L1-L98",
+        "why": "核對task解析、training snapshot定義seen/unseen及episode/raw-file/window各自計數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "df50a7d426be3246d7de2018e603a5c2aaa8e37031ed7f177ea0b3fd6fcca53a"
+  },
+  "repository_binding_review_sha256": "df50a7d426be3246d7de2018e603a5c2aaa8e37031ed7f177ea0b3fd6fcca53a",
+  "repository_bindings": [
+    {
+      "requested_repo": "wangwen-banban/EMPIRE",
+      "resolved_repo": "wangwen-banban/EMPIRE",
+      "aliases_in_this_review": [
+        "wangwen-banban/empire"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "bea74bb146baa750b02f291754cafd5ed6cd0bfe",
+          "reviewed_files": [
+            "README.md",
+            "docs/DATA_SCHEMA.md",
+            "empire/configs/ablations/ground_truth_plan.json",
+            "empire/configs/ablations/predicted_plan.json",
+            "empire/configs/train_stage2_actor.json",
+            "empire/datasets/data_mixture.py",
+            "empire/datasets/dataset.py",
+            "empire/datasets/human_dataset.py",
+            "empire/datasets/schema.py",
+            "empire/models/mano.py",
+            "empire/utils/data_utils.py",
+            "scripts/compute_egodex_metrics.py",
+            "scripts/egodex_eval_utils.py",
+            "scripts/eval_mse.py",
+            "scripts/merge_eval_shards.py",
+            "scripts/run_full_eval.sh",
+            "scripts/summarize_egodex_all_tasks.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/wangwen-banban/EMPIRE",
+          "pdf_page": 1,
+          "pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03",
+          "basis": "pdf_extracted_text"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P224",
+          "review_file": "content/github_review/reviews/P224.json",
+          "review_sha256": "df50a7d426be3246d7de2018e603a5c2aaa8e37031ed7f177ea0b3fd6fcca53a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P224",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EMPIRE: Explicit Manipulation Planning as a Learnable Intermediate Representation for Egocentric Hand-Motion Forecasting；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EgoDex原recordings，沒有新增111獨立物理場景。",
+    "tasks": "111tasklabels下bimanual5秒motionforecast＋explicitplans；原作194只保留subset。",
+    "cases": "650,910trainwindows、6,836testwindows；non-overlapping5swindows，parentepisodes先分。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 111,
+        "unit": "retained source task labels",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 650910,
+        "unit": "training windows",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6836,
+        "unit": "held-out test windows",
+        "pages": [
+          4,
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "best-of8按MPJPE選trajectory再算wrist/fingerrelative；不是單次控制policy。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "原EgoDexofficialsplit；85unseentasks僅Part1ablations，fulltrain111tasks都seen。",
+    "lineage": "EgoDex→EMPIRE650K，Qwencaption/plan＋MANOfitting；100caseaudit84%usable，未全部人工審核。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "difficulty按baselineMPJPE分43/49/19，僅模型相對难度；不得當通用easy/medium/hard真值。"
+    ],
+    "reuse": "可借規劃介面與預測粒度，同時保留生成標籤品質及best-ofK預算。",
+    "reviewed_pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03",
+    "reviewed_on": "2026-10-02",
+    "name": "EMPIRE",
+    "year": 2026,
+    "title": "EMPIRE: Explicit Manipulation Planning as a Learnable Intermediate Representation for Egocentric Hand-Motion Forecasting",
+    "source_url": "https://arxiv.org/abs/2608.22449",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "wearable"
+    ],
+    "review_tags": [
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P224",
+      "summary": "預測雙手未來動作並產生操作計畫，歸入穿戴互動與動作介面。",
+      "evidence": [
+        {
+          "paper_id": "P224",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            4
+          ],
+          "locator": "Introduction、EMPIRE-651K資料",
+          "observed_tasks": [
+            "雙手五秒動作預測",
+            "每隻手的操作計畫",
+            "原文明列VR／AR、robot learning、human-robot collaboration"
+          ],
+          "reasoning": "依動作輸出和交互應用歸納；不因使用EgoDex就假設111項保留任務涵蓋父庫所有用途。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03"
+        }
+      ],
+      "domain_ids": [
+        "wearable"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P224",
+      "name": "EMPIRE",
+      "expected_title": "EMPIRE: Explicit Manipulation Planning as a Learnable Intermediate Representation for Egocentric Hand-Motion Forecasting",
+      "source_url": "https://arxiv.org/abs/2608.22449",
+      "pdf_url": "https://arxiv.org/pdf/2608.22449",
+      "retrieved_at": "2026-10-02T22:14:21.930517+00:00",
+      "pdf_sha256": "e49c2bea71f4e0913128fd930c8536111ea26aa22782f634ac9ce7497f14aa03",
+      "text_sha256": "d7834d929c3fce557c1d920caaeed5044410ef654193d06055f29cc1f0532b66",
+      "pdf_bytes": 14370550,
+      "pages": 14,
+      "text_characters": 91146,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2608.22449v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2608.22449v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 111,
+        "unit": "retained source task labels",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P224:1",
+        "paper_id": "P224",
+        "benchmark": "EMPIRE",
+        "native_term": "retained source task labels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.22449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.22449v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 650910,
+        "unit": "training windows",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P224:2",
+        "paper_id": "P224",
+        "benchmark": "EMPIRE",
+        "native_term": "training windows",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.22449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.22449v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6836,
+        "unit": "held-out test windows",
+        "pages": [
+          4,
+          6
+        ],
+        "record_id": "review10:P224:3",
+        "paper_id": "P224",
+        "benchmark": "EMPIRE",
+        "native_term": "held-out test windows",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2608.22449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2608.22449v1",
+            "locator": "PDF pp. 4, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "wangwen-banban/EMPIRE"
+  ],
+  "external_repositories": []
+}

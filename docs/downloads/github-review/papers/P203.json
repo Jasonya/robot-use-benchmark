@@ -1,0 +1,448 @@
+{
+  "paper_id": "P203",
+  "name": "EGOSTREAM",
+  "title": "EGOSTREAM: A Diagnostic Benchmark for Streaming Episodic Memory in Egocentric Vision",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.31557",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "website_only",
+  "review": {
+    "paper_id": "P203",
+    "reviewed_on": "2026-10-11",
+    "status": "website_only",
+    "summary": "已確認 saroo25/Egostream 是論文官方網站的靜態原始碼。首頁明示 data 尚未公開且 GitHub coming soon；唯一 Python 檔 server.py 只是 HTTP 靜態伺服器，沒有資料 reader、memory manager 或評測 scorer。",
+    "identity_note": "arXiv:2605.31557v2 首頁連到 saroo25.github.io/Egostream；網站題名、Rosario Forte／Giuseppe Lando／Antonino Furnari 與 Catania 單位一致，並反連同一 arXiv。網站 cache 與 pinned index.html SHA256 相同，可確認此 repo 的網站角色。論文 p.3 所稱匿名 GitHub release，未在 pinned PDF 連結或公開網站找到可解析的 release 位址。",
+    "environment": "重用 Ego4D Episodic Memory VQA、EgoLife、EgoTempo、Multi-Hop EgoQA 與 HD-EPIC 的人類第一人稱影片；沒有新增可執行機器人環境。父來源、影片、參與者與重寫 QA 關係必須保留。",
+    "tasks": "7 個 primary memory dimensions：detail、spatial、temporal、event、social、causal、prospective；每題另可有 secondary tags。7 個 recall regimes 是同題的時間條件：0 秒、0–5 秒、5–30 秒、30–180 秒、180–1,800 秒、1,800–28,800 秒、超過 28,800 秒，不應計成額外語義 task。",
+    "data": "論文流程 2,634 candidates → 2,335 人工核對 → 2,250 final base questions，再依 AVW 展成 8,528 question–recall evaluations。每題概念上關聯來源影片、四選一題／正解、evidence moment、primary／secondary labels、AVW 與 recall timestamp；目前沒有公開 annotation 檔可驗證這些概念的實際 JSON keys、時間原點、split 或 loader。Appendix A.6 以秒為 delay 單位，Instant=0，其餘依 regime 截取高斯分佈取樣，只接受落在該題 AVW 的時間，ultra-long 用 TTL；不是每題固定乘 7。",
+    "evaluation": "論文 §3.4 定義四選一 accuracy = 正確推論數／適用 question–recall 推論數，完整實驗分母 8,528；語義類別與 recall regime 用各自子集分母，不能用 2,250 代替。串流只准使用 recall time 前畫面，建記憶時不可先知 query，亦不可無限保存原影格再重讀；需記 memory budget 與平均每 frame 處理時間。Appendix A.7 描述 ingestion／QA 分離並要求回覆選項 index；實際 parser、skip／error 計數、記憶限制與 timing scorer 未公開，論文協定不可記成程式已核。",
+    "standardization": {
+      "profile": "streaming_episodic_mcq_with_answer_validity_window",
+      "reuse": "可保留官方網站／paper 的題型、AVW 定義、因果觀測限制、原生統計及子題擴充關係；網站程式僅作 discovery 證據。",
+      "transform": "source 記 v2、website repo commit 與五父來源；task 記 primary dimension、secondary tags；case 分成 base QA 與帶 recall timestamp／AVW／regime 的條件化評測紀錄，保留群聚 parent ID。evaluator 分開記整體／類別／regime accuracy、實際有效推論分母、memory／frame budget 及時間成本。",
+      "missing": "公開 annotations／split／source manifest、AVW 與 recall 抽樣清單／seed、資料 reader、串流 memory manager、答案解析與 concrete scorer。尚無可核實的 executable release；不能把網站部署程式當評測。"
+    },
+    "version_note": "pinned paper 是 2605.31557v2（2026-06-01）；website repo main 固定 8cb0dab06659a56a7de75b88770f31eecec17944。完整非截斷 tree 已核，public release 狀態與論文「匿名倉庫已分享」敘述不一致。這是 website-only／release 未找到，不是 GitHub 404 或 rate-limit deferred。",
+    "additional_repo_proposals": [
+      {
+        "repo": "saroo25/Egostream",
+        "role": "official_project_website_only",
+        "proposal": "可補登為官方網站來源，不應綁成評測實作。",
+        "commit": "8cb0dab06659a56a7de75b88770f31eecec17944"
+      }
+    ],
+    "discovery_evidence": [
+      {
+        "source": "audit/.cache/github_review/P203-discovery.json",
+        "json_pointers": [
+          "/candidates",
+          "/code_contexts"
+        ],
+        "finding": "PDF 唯一 project URL 連到本網站；匿名 release 宣告未附可用 GitHub URL。"
+      },
+      {
+        "source": "audit/.cache/github_review/search/P203-refined.json",
+        "json_pointers": [
+          "/query",
+          "/results/0"
+        ],
+        "finding": "EGOSTREAM benchmark 精確搜尋回傳的 saroo25/Egostream 自述 static landing page。"
+      },
+      {
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/saroo25__Egostream/tree.json",
+        "json_pointers": [
+          "/sha",
+          "/truncated",
+          "/tree"
+        ],
+        "finding": "依共享節流 network.fetch 補讀 pinned tree，再核 index/server/script 的實際內容；未擴查無關同名結果。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "saroo25/Egostream",
+        "requested_repo": "saroo25/Egostream",
+        "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            3
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 3,
+        "sha256": "44f1b4019d54388dac5118bb79895f7b2127fcf5ebc747d16fadc2c61569e868",
+        "url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/README.md",
+        "reading_url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/README.md#L1-L3",
+        "why": "確認倉庫自述為靜態 landing page。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "saroo25/Egostream",
+        "requested_repo": "saroo25/Egostream",
+        "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+        "ref": null,
+        "path": "index.html",
+        "ranges": [
+          [
+            34,
+            111
+          ],
+          [
+            113,
+            211
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 241,
+        "sha256": "d5444e2637ad7ad38a01b101845cf3caf461b1c37d159215dde9897157e5f354",
+        "url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/index.html",
+        "reading_url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/index.html#L34-L111",
+        "why": "核對作者、paper link、未公開公告、AVW 與串流協定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "saroo25/Egostream",
+        "requested_repo": "saroo25/Egostream",
+        "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+        "ref": null,
+        "path": "server.py",
+        "ranges": [
+          [
+            1,
+            62
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 62,
+        "sha256": "d053b0e41b71587680c60fbcd0794c355b153fc250c33053ba40d74b433deab7",
+        "url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/server.py",
+        "reading_url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/server.py#L1-L62",
+        "why": "核對 Python 入口只提供靜態網站，不能冒稱 benchmark runner。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "saroo25/Egostream",
+        "requested_repo": "saroo25/Egostream",
+        "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+        "ref": null,
+        "path": "script.js",
+        "ranges": [
+          [
+            1,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 38,
+        "sha256": "9d27d8b88c73ab6f60f4eff26602cdb0761cdfbd25c5fecd98cd64469b759205",
+        "url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/script.js",
+        "reading_url": "https://github.com/saroo25/Egostream/blob/8cb0dab06659a56a7de75b88770f31eecec17944/script.js#L1-L38",
+        "why": "核對 JavaScript 只有選單、捲動與顯示動畫，沒有隱藏資料／scorer 呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f93fa2180310006417bbecd9edbff3a97f7302141e6af0fe5eb61037a7c6591a"
+  },
+  "repository_binding_review_sha256": "f93fa2180310006417bbecd9edbff3a97f7302141e6af0fe5eb61037a7c6591a",
+  "repository_bindings": [
+    {
+      "requested_repo": "saroo25/Egostream",
+      "resolved_repo": "saroo25/Egostream",
+      "aliases_in_this_review": [
+        "saroo25/egostream"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "project_or_leaderboard_website",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "website_only",
+      "versions": [
+        {
+          "commit": "8cb0dab06659a56a7de75b88770f31eecec17944",
+          "reviewed_files": [
+            "README.md",
+            "index.html",
+            "script.js",
+            "server.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P203",
+          "review_sha256": "f93fa2180310006417bbecd9edbff3a97f7302141e6af0fe5eb61037a7c6591a",
+          "proposal": {
+            "repo": "saroo25/Egostream",
+            "role": "official_project_website_only",
+            "proposal": "可補登為官方網站來源，不應綁成評測實作。",
+            "commit": "8cb0dab06659a56a7de75b88770f31eecec17944"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P203",
+          "review_file": "content/github_review/reviews/P203.json",
+          "review_sha256": "f93fa2180310006417bbecd9edbff3a97f7302141e6af0fe5eb61037a7c6591a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P203",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EGOSTREAM，arXiv 2605.31557v2。",
+    "scope_read": "五父來源、人工filter、AVW與7recall regimes、8528擴充和stream protocol。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "串流記憶benchmark",
+    "environment": "Ego4D VQA、EgoLife、EgoTempo、Multi-Hop EgoQA、HD-EPIC五來源；無新增可執行場景。",
+    "tasks": "7記憶題型：detail/spatial/temporal/event/social/causal/prospective；7recall時間區間另是條件。",
+    "cases": "2,634candidate→2,335human-verified→2,250final QA；依Answer Validity Window擴成8,528question-recall evaluations。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "primary memory dimensions",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2250,
+        "unit": "base validated questions",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 8528,
+        "unit": "question × applicable recall evaluations",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "4-way accuracy，依語義/recall報；每frame processing time及受限memory，固定backbone比較不同memory managers。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "query到時才揭露；memory construction須query-agnostic，不能無界保存原frames再重讀；不是所有題都可乘7。",
+    "lineage": "五來源QA與evidence重用/改寫；baseQA與多recall conditions有父子關係。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "locator": "§3.1–3.4",
+        "supports": "2250→8528、AVW、query-agnostic constraints"
+      }
+    ],
+    "unresolved": [
+      "無global scene union；同一QA的多recall測例需群聚统计，不能算8528獨立語義問題。"
+    ],
+    "reuse": "示範正當擴題：保留base question，新增不同合法歷史條件，並明示擴充規則和依賴。",
+    "reviewed_pdf_sha256": "2b7fad2f7b3b003fe66a26ce10fe8f4c0b2950ae9a0a072a3f9215790a59ef17",
+    "reviewed_on": "2026-10-02",
+    "name": "EGOSTREAM",
+    "year": 2026,
+    "title": "EGOSTREAM: A Diagnostic Benchmark for Streaming Episodic Memory in Egocentric Vision",
+    "source_url": "https://arxiv.org/abs/2605.31557",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "工具使用",
+      "跨域人類活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P203",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P203",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "7記憶題型：detail/spatial/temporal/event/social/causal/prospective；7recall時間區間另是條件。",
+            "Ego4D VQA、EgoLife、EgoTempo、Multi-Hop EgoQA、HD-EPIC五來源；無新增可執行場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "2b7fad2f7b3b003fe66a26ce10fe8f4c0b2950ae9a0a072a3f9215790a59ef17"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2b7fad2f7b3b003fe66a26ce10fe8f4c0b2950ae9a0a072a3f9215790a59ef17",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P203",
+      "name": "EGOSTREAM",
+      "expected_title": "EGOSTREAM: A Diagnostic Benchmark for Streaming Episodic Memory in Egocentric Vision",
+      "source_url": "https://arxiv.org/abs/2605.31557",
+      "pdf_url": "https://arxiv.org/pdf/2605.31557",
+      "retrieved_at": "2026-10-02T21:35:05.285611+00:00",
+      "pdf_sha256": "2b7fad2f7b3b003fe66a26ce10fe8f4c0b2950ae9a0a072a3f9215790a59ef17",
+      "text_sha256": "b6d08a655d3b8a4f07ab60f0dc8702a480dfb2f3fd03216ece05475888c8fa7b",
+      "pdf_bytes": 13697275,
+      "pages": 43,
+      "text_characters": 156634,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2605.31557v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2605.31557v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "primary memory dimensions",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P203:1",
+        "paper_id": "P203",
+        "benchmark": "EGOSTREAM",
+        "native_term": "primary memory dimensions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.31557v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.31557v2",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2250,
+        "unit": "base validated questions",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P203:2",
+        "paper_id": "P203",
+        "benchmark": "EGOSTREAM",
+        "native_term": "base validated questions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.31557v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.31557v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 8528,
+        "unit": "question × applicable recall evaluations",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P203:3",
+        "paper_id": "P203",
+        "benchmark": "EGOSTREAM",
+        "native_term": "question × applicable recall evaluations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.31557v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.31557v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "saroo25/Egostream"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,433 @@
+{
+  "paper_id": "P094",
+  "name": "R2R / VLN",
+  "title": "Vision-and-Language Navigation: Interpreting visually-grounded navigation instructions in real environments",
+  "year": 2017,
+  "paper_url": "https://arxiv.org/abs/1711.07280",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P094",
+    "summary": "R2R的基本身份是scan→path_id→instruction_id；同一路徑的3份語言說明是不同題目，共用環境與路徑。評分逐條檢查軌跡連通性與終點距離。",
+    "environment": "Matterport3D真實室內RGB-D全景與離散導航圖。README的90個原始環境是父資產規模，不能當R2R每個split的已取得環境數。",
+    "tasks": "自然語言引導導航；scan是環境、path_id是一條來源路徑、instr_id=path_id_說明序號是一道語言條件題。每路徑3句的假設寫在原evaluator，擴充語言數時不能原樣沿用。",
+    "data": "原生item含scan/path/heading/instructions；R2RBatch拆instructions成多筆，reset由首viewpoint和heading開始。觀測字典有feature、navigableLocations和teacher最短路徑；teacher屬監督訊號，不能默認作測試輸入。",
+    "evaluation": "輸出instr_id與(viewpoint,heading,elevation)序列。程式要求完整ID集合、正確起點與合法圖邊；navigation error／oracle error用圖上最短距離。成功為誤差<3m，SPL=成功×最短路長/max(實走長,最短路長)，按指令題平均。",
+    "standardization": {
+      "profile": "discrete_graph_language_navigation",
+      "reuse": "scan／viewpoint／path／instruction身份、導航圖、語言和原生evaluator。",
+      "transform": "environment鍵連Matterport父資產；task存導航目標語義；case保留instr_id與語言、split、起點／朝向、感測／步數預算；teacher隔離為reference。",
+      "missing": "Matterport資產存取、圖與影像版本閉合、split防洩漏、動作／停止規則和模擬器API匹配。"
+    },
+    "version_note": "主README說2019API由單筆改為batched並有v0.1舊版。釘選現有commit的R2R實作，未宣稱重現2018所有設定；RxR共享父環境需去重。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "peteanderson80/Matterport3DSimulator",
+        "requested_repo": "peteanderson80/Matterport3DSimulator",
+        "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            50
+          ],
+          [
+            77,
+            84
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 327,
+        "sha256": "2a5fa4e92d1c0e26827ffbb0f87bcdf527de12005d0fde6e802e775550517360",
+        "url": "https://github.com/peteanderson80/Matterport3DSimulator/blob/589d091b111333f9e9f9d6cfd021b2eb68435925/README.md",
+        "reading_url": "https://github.com/peteanderson80/Matterport3DSimulator/blob/589d091b111333f9e9f9d6cfd021b2eb68435925/README.md#L1-L50",
+        "why": "原始論文身份、Matterport資產及版本變更",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peteanderson80/Matterport3DSimulator",
+        "requested_repo": "peteanderson80/Matterport3DSimulator",
+        "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925",
+        "ref": null,
+        "path": "tasks/R2R/env.py",
+        "ranges": [
+          [
+            104,
+            152
+          ],
+          [
+            157,
+            211
+          ],
+          [
+            215,
+            222
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 227,
+        "sha256": "e8caa75ec10a76b76a353ccf04fa3b7556b46bcbb4f7310cf7a1c47b8121e2fe",
+        "url": "https://github.com/peteanderson80/Matterport3DSimulator/blob/589d091b111333f9e9f9d6cfd021b2eb68435925/tasks/R2R/env.py",
+        "reading_url": "https://github.com/peteanderson80/Matterport3DSimulator/blob/589d091b111333f9e9f9d6cfd021b2eb68435925/tasks/R2R/env.py#L104-L152",
+        "why": "路徑／多說明拆題、初態、teacher與合法觀測",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peteanderson80/Matterport3DSimulator",
+        "requested_repo": "peteanderson80/Matterport3DSimulator",
+        "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925",
+        "ref": null,
+        "path": "tasks/R2R/eval.py",
+        "ranges": [
+          [
+            1,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 149,
+        "sha256": "78e2867da1c79ba7d2657091ff385cff622bbf85f07a72a4635a62b2f38e321c",
+        "url": "https://github.com/peteanderson80/Matterport3DSimulator/blob/589d091b111333f9e9f9d6cfd021b2eb68435925/tasks/R2R/eval.py",
+        "reading_url": "https://github.com/peteanderson80/Matterport3DSimulator/blob/589d091b111333f9e9f9d6cfd021b2eb68435925/tasks/R2R/eval.py#L1-L106",
+        "why": "預期題目ID、3公尺嚴格閾值、軌跡有效性和SPL",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f086fd9b541c87abc5dd22cc4eecf76562431caa410d342ee0b3961591a518d7"
+  },
+  "repository_binding_review_sha256": "f086fd9b541c87abc5dd22cc4eecf76562431caa410d342ee0b3961591a518d7",
+  "repository_bindings": [
+    {
+      "requested_repo": "peteanderson80/Matterport3DSimulator",
+      "resolved_repo": "peteanderson80/Matterport3DSimulator",
+      "aliases_in_this_review": [
+        "peteanderson80/matterport3dsimulator"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925",
+          "reviewed_files": [
+            "README.md",
+            "tasks/R2R/env.py",
+            "tasks/R2R/eval.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/peteanderson80/Matterport3DSimulator",
+          "link_label": "GitHub",
+          "project_url": "https://bringmeaspoon.org",
+          "page_sha256": "dda1ddbf6ee427a238461b5af4c784ee670241afa64a55cd1add0c1a4138ae92"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P094",
+          "review_file": "content/github_review/reviews/P094.json",
+          "review_sha256": "f086fd9b541c87abc5dd22cc4eecf76562431caa410d342ee0b3961591a518d7",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P094",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "R2R/VLN，arXiv 1711.07280v3。",
+    "scope_read": "navigation graph、路徑／指令蒐集、scene split與stop成功定義。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "role": "導航benchmark",
+    "environment": "90個Matterport3D建築scene；panorama graph離散移動，非真輪式動力學。",
+    "tasks": "1個指令導航task family；7,189 route goals、21,567語言指令（通常每path3條）。",
+    "cases": "train14,025／val-seen1,020／val-unseen2,349／test4,173 instructions。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "building scenes",
+        "pages": [
+          2,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7189,
+        "unit": "navigation paths",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 21567,
+        "unit": "instruction instances（全部split）",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4173,
+        "unit": "test instructions",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "navigation error；主success要求stop後距goal<3m；oracle stop另列。原文不要求全程遵循原path。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "61train scenes／11val-unseen／18test；不能把全部21,567叫test。",
+    "lineage": "Matterport3D上游；RxR、RoboVerse、VLN-CE等重用同scene，場景數不可加總。",
+    "related_paper_ids": [
+      "P095",
+      "P082"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§4.2–4.4、Dataset Splits",
+        "supports": "90／7189／21567／4173及成功條件"
+      }
+    ],
+    "unresolved": [
+      "下游continuous變體的可導航幾何／case過濾需要另版本。"
+    ],
+    "reuse": "可引入route-following與語言多樣性；路徑數和導航task family是不同粒度。",
+    "reviewed_pdf_sha256": "b7589865ee573d4753ee9e25bdc494cbbb199e6ec17d0a349091aed0fd86c420",
+    "reviewed_on": "2026-10-02",
+    "name": "R2R / VLN",
+    "year": 2017,
+    "title": "Vision-and-Language Navigation: Interpreting visually-grounded navigation instructions in real environments",
+    "source_url": "https://arxiv.org/abs/1711.07280",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "office"
+    ],
+    "review_tags": [
+      "室內導航",
+      "居家生活",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P094",
+      "domain_ids": [
+        "home",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P094",
+          "domain_ids": [
+            "home",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "1個指令導航task family；7,189 route goals、21,567語言指令（通常每path3條）。",
+            "90個Matterport3D建築scene；panorama graph離散移動，非真輪式動力學。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b7589865ee573d4753ee9e25bdc494cbbb199e6ec17d0a349091aed0fd86c420"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b7589865ee573d4753ee9e25bdc494cbbb199e6ec17d0a349091aed0fd86c420",
+      "previous_domain_ids": [
+        "home",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P094",
+      "name": "R2R / VLN",
+      "expected_title": "Vision-and-Language Navigation: Interpreting visually-grounded navigation instructions in real environments",
+      "source_url": "https://arxiv.org/abs/1711.07280",
+      "pdf_url": "https://arxiv.org/pdf/1711.07280",
+      "retrieved_at": "2026-10-02T21:34:01.819160+00:00",
+      "pdf_sha256": "b7589865ee573d4753ee9e25bdc494cbbb199e6ec17d0a349091aed0fd86c420",
+      "text_sha256": "451a59fcfa4ef22c3e81f151d192a8436d6bc8b0f5a84eed58ddf33699f68231",
+      "pdf_bytes": 9720283,
+      "pages": 13,
+      "text_characters": 69562,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1711.07280v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1711.07280v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "building scenes",
+        "pages": [
+          2,
+          6
+        ],
+        "record_id": "review10:P094:1",
+        "paper_id": "P094",
+        "benchmark": "R2R / VLN",
+        "native_term": "building scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1711.07280v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1711.07280v3",
+            "locator": "PDF pp. 2, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7189,
+        "unit": "navigation paths",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P094:2",
+        "paper_id": "P094",
+        "benchmark": "R2R / VLN",
+        "native_term": "navigation paths",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1711.07280v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1711.07280v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 21567,
+        "unit": "instruction instances（全部split）",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P094:3",
+        "paper_id": "P094",
+        "benchmark": "R2R / VLN",
+        "native_term": "instruction instances（全部split）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1711.07280v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1711.07280v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4173,
+        "unit": "test instructions",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P094:4",
+        "paper_id": "P094",
+        "benchmark": "R2R / VLN",
+        "native_term": "test instructions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1711.07280v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1711.07280v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "peteanderson80/Matterport3DSimulator"
+  ],
+  "external_repositories": []
+}

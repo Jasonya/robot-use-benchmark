@@ -1,0 +1,164 @@
+{
+  "paper_id": "P188",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "DRAPER的來源分散在SoftGym擴充、Agent-Arena和real-robot介面；兩個倉庫已有改名。需固定三者版本、資料模式與task config，不能把同一布料環境的fork視為獨立benchmark。",
+  "reading_order": [
+    {
+      "repo": "halid1020/softgym-deepcloth",
+      "commit": "8a2196648c4ef6c4463ca862324bae442bcba22d",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          7
+        ],
+        [
+          32,
+          46
+        ]
+      ],
+      "why": "DRAPER/其他論文共用擴充與初態資料"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          41,
+          45
+        ]
+      ],
+      "why": "Agent-Arena與共用SoftGym關係"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "agent_arena/api.py",
+      "ranges": [
+        [
+          80,
+          127
+        ]
+      ],
+      "why": "eval configs與checkpoint、已存在結果跳過"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "agent_arena/arena/softgym/builder.py",
+      "ranges": [
+        [
+          7,
+          62
+        ]
+      ],
+      "why": "domain/task/action/picker設定解析"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "agent_arena/arena/softgym/builders/fabric_domain_builder.py",
+      "ranges": [
+        [
+          99,
+          112
+        ],
+        [
+          298,
+          318
+        ]
+      ],
+      "why": "flattening接線與1000variation中30eval/3val"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "agent_arena/arena/softgym/tasks/rect_fabric/towel_flattening.py",
+      "ranges": [
+        [
+          18,
+          55
+        ],
+        [
+          93,
+          162
+        ]
+      ],
+      "why": "可見性/coverage成功與多種progress metrics"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "agent_arena/utilities/perform_single.py",
+      "ranges": [
+        [
+          7,
+          126
+        ]
+      ],
+      "why": "終止、成功、動作耗時與逐步評估"
+    },
+    {
+      "repo": "halid1020/agent-arena-v0",
+      "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+      "path": "agent_arena/utilities/trajectory_dataset.py",
+      "ranges": [
+        [
+          224,
+          269
+        ],
+        [
+          325,
+          374
+        ]
+      ],
+      "why": "T+1觀測/terminal action補0與不同window模式"
+    },
+    {
+      "repo": "halid1020/robot_control_cloth",
+      "commit": "405d4c2ae433619d3c2931c1b3304260f4069cd0",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          7
+        ]
+      ],
+      "why": "DRAPER的ROS硬體接口角色"
+    },
+    {
+      "repo": "halid1020/robot_control_cloth",
+      "commit": "405d4c2ae433619d3c2931c1b3304260f4069cd0",
+      "path": "interface/agent_arena_interface.py",
+      "ranges": [
+        [
+          96,
+          125
+        ],
+        [
+          140,
+          186
+        ]
+      ],
+      "why": "normalized pixel action及real-depth轉換"
+    }
+  ],
+  "environment": "共用SoftGym布料整形與realadapt towel場景；realadapt config宣告1000variation，但eval tier只取30、val取3。Franka/UR3e是另一硬體接口層，未執行。",
+  "tasks": "主要布料攤平/整形及跨sim-real適應；domain字串如rainbow-rectangular-fabrics是布料分佈設定，不是生活用途domain。多論文共享initial_states需建立reuse關係。",
+  "data": "TrajectoryDataset以observation/action/goal/trajectory_lengths存資料，T+1觀測對T個action並附terminal補0；whole/cross-trajectory模式與goal索引需驗證。實機接口RGB由BGR轉換，v1/v2 depth作單frame min-max並將背景置1，已非metric depth；action為4個[-1,1]pick-place座標另帶orientation。",
+  "evaluation": "Towel flattening成功需要keypoints全可見且normalized coverage≥0.99，canonical模式另加IoU。記錄coverage/improvement/形狀距離與首次成功步；perform_single可因environment done、agent terminate/success、arena success或max_steps終止，因此done不等於完成。當前towel.step呼叫reward參數數目與定義不同，正式adapter需修正/驗證。",
+  "standardization": {
+    "profile": "cloth_shaping_sim_to_real_control",
+    "reuse": "明確arena配置、eval/val初態索引、source改名關係、T+1 trajectory和real-depth/action轉換。",
+    "transform": "source分方法/框架/模擬/硬體repo角色；case固定init-state hash、觀測尺度、像素順序、policy checkpoint與停止條件；保留整形metric各自分母。",
+    "missing": "原DRAPER paper-era configuration/checkpoint對照、repo版本相容、reward/trajectory mode接口驗證、初態資產與全部pipeline重現。"
+  },
+  "version_note": "softgym-deepcloth解析到halid1020/softgym(8a21966)，agent-arena-v0解析到actoris_harena(4d9c9c9)，硬體庫405d4c2；目前generic框架不等於原論文固定實驗release。",
+  "runtime_executed": false
+}

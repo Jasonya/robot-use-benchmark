@@ -1,0 +1,468 @@
+{
+  "paper_id": "P031",
+  "name": "EgoPlan-Bench2",
+  "title": "EgoPlan-Bench2: A Benchmark for Multimodal Large Language Model Planning in Real-World Scenarios",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2412.04447",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft",
+    "retail",
+    "lab",
+    "care",
+    "transport",
+    "garden",
+    "leisure"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P031",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoPlan-Bench2 比第一版加入明確 domain/scenario 欄位並擴充人類生活用途；已核讀完整 eval.py，確認其測量仍是影片下一步四選一。",
+    "environment": "Ego4D v1_288p 影片，原文案 4 major domains／24 scenarios 是生活用途分類，不是 24 個物理 layout。sample_id 的 UUID 字首連到父影片，另有 task_start_frame。",
+    "tasks": "依整段進度及當前觀測推下一動作。四候選與 task_goal 構成題目；CoT／GroundingDINO 是可選方法處理，不能當多一批評測任務。",
+    "data": "sample_id、domain、scenario、task_goal、choice_a–d、golden_choice_idx、answer、task_start_frame、current_observation_frame、task_progress_metadata。eval 從 start 到 current 逐 frame 截影片（含末 frame），或用 linspace 抽預設8張給 image model。",
+    "evaluation": "extract_characters_regex 取回覆第一個大寫 A–D，空字串算錯，再與 golden_choice_idx 比較累積 accuracy；儲存 raw model_response 與 extracted_answer。parser 的部分 prefix 字串因少逗號被相接，且非嚴格字邊界匹配，需儲存此原始版本。",
+    "standardization": {
+      "profile": "video_next_action_mcqa",
+      "reuse": "來源 domain/scenario、完整觀測區間、四候選與推論／解析／分數紀錄。",
+      "transform": "沿用父 Ego4D ancestry，新增 source-local domain/scenario 對映；case 留 sample_id/觀測範圍。image-8frame、video、CoT 分成 evaluator configuration，不把方法條件算成新任務；選項及字串一致性可在 intake 檢查。",
+      "missing": "未取得完整 HF 題庫／影片或執行。需將所有來源 domain/scenario 逐項對映本計畫用途，不能只抄 4/24。輸出採 append 且每次 count 重設，重跑需 session ID 與去重；已存在的視覺快取需繫結 source/sampling hash。"
+    },
+    "version_note": "與 P030 的 EPIC/Ego4D 雙父庫不同，本版檔案只指 Ego4D；題目集合、父影片與候選需核對後才能算淨新增量。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "qiulu66/EgoPlan-Bench2",
+        "requested_repo": "qiulu66/EgoPlan-Bench2",
+        "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            161
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 202,
+        "sha256": "9007c79d83078a8e5b4419a19d8e6af661cecd73409a8076f9757d5359716644",
+        "url": "https://github.com/qiulu66/EgoPlan-Bench2/blob/5c75ffff73688fc454473cc7a19ad6d09415c5e3/README.md",
+        "reading_url": "https://github.com/qiulu66/EgoPlan-Bench2/blob/5c75ffff73688fc454473cc7a19ad6d09415c5e3/README.md#L1-L161",
+        "why": "原生用途分類、欄位及 CoT 方法範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "qiulu66/EgoPlan-Bench2",
+        "requested_repo": "qiulu66/EgoPlan-Bench2",
+        "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+        "ref": null,
+        "path": "eval.py",
+        "ranges": [
+          [
+            1,
+            172
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 172,
+        "sha256": "c9f069436c672e2240da097289128983252c86fa296e9ec050dfa092be1190b4",
+        "url": "https://github.com/qiulu66/EgoPlan-Bench2/blob/5c75ffff73688fc454473cc7a19ad6d09415c5e3/eval.py",
+        "reading_url": "https://github.com/qiulu66/EgoPlan-Bench2/blob/5c75ffff73688fc454473cc7a19ad6d09415c5e3/eval.py#L1-L172",
+        "why": "截片、取樣、字母解析與 accuracy",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "9d4fd3e4c25d6033e6d7976b213a7b6d850a903cc208a89bce59dc53af9f9012"
+  },
+  "repository_binding_review_sha256": "9d4fd3e4c25d6033e6d7976b213a7b6d850a903cc208a89bce59dc53af9f9012",
+  "repository_bindings": [
+    {
+      "requested_repo": "qiulu66/EgoPlan-Bench2",
+      "resolved_repo": "qiulu66/EgoPlan-Bench2",
+      "aliases_in_this_review": [
+        "qiulu66/egoplan-bench2"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5c75ffff73688fc454473cc7a19ad6d09415c5e3",
+          "reviewed_files": [
+            "README.md",
+            "eval.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/qiulu66/EgoPlan-Bench2/",
+          "link_label": "Code",
+          "project_url": "https://qiulu66.github.io/egoplanbench2/",
+          "page_sha256": "3c02cdc684d68b822b6ac11bede6901b329a152691f786499961abf442ea0d99"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P031",
+          "review_file": "content/github_review/reviews/P031.json",
+          "review_sha256": "9d4fd3e4c25d6033e6d7976b213a7b6d850a903cc208a89bce59dc53af9f9012",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "零售與購物",
+    "實驗室操作",
+    "個人照護",
+    "交通移動與車輛維修",
+    "農業與園藝",
+    "休閒與運動"
+  ],
+  "source_review": {
+    "paper_id": "P031",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPlan-Bench2，arXiv 2412.04447v2。",
+    "scope_read": "4 domains／24 scenarios清單、goal過濾、觀測選取、MC評分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "零售與購物",
+      "實驗室操作",
+      "個人照護",
+      "交通移動與車輛維修",
+      "農業與園藝",
+      "休閒與運動"
+    ],
+    "role": "影片問答與推理",
+    "environment": "24個語義scenario類別，非24個物理scene；來源1,113個Ego4D影片。",
+    "tasks": "4原生domains（Work／Daily life／Hobbies／Recreation）；保留4–20步的goal；284 goal verbs不是284個正式任務。",
+    "cases": "1,321道四選一QA；比第一版題少但原作場域更廣，兩種尺度要分開。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "原生life domains",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "語義scenario類別",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1113,
+        "unit": "來源影片",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1321,
+        "unit": "四選一QA",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "直接匹配A/B/C/D計accuracy；原作不引入第三方LLM judge。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "評測用QA；原作觀測篩選以排除單張即可答與已洩漏動作的影格。",
+    "lineage": "Ego4D更新版衍生；與第一版方法相承，但不是在同一題集上直接擴成更大數量。",
+    "related_paper_ids": [
+      "P013",
+      "P030"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          1,
+          5
+        ],
+        "locator": "概述與§III.A",
+        "supports": "1,321／1,113／4／24"
+      },
+      {
+        "pages": [
+          6,
+          7
+        ],
+        "locator": "Construction與Evaluation",
+        "supports": "4–20步與判分"
+      }
+    ],
+    "unresolved": [
+      "task-goal語義去重與跨EgoPlan版本同源query重疊未逐ID核。"
+    ],
+    "reuse": "其24 scenario清單是廣度候選的重要依據；不能拿少量QA即宣稱域內所有任務已覆蓋。",
+    "reviewed_pdf_sha256": "86d13b4d204df0eee1eec14c5a5dde9f3cdc465b7e5b96009d4d8b7f4c48f353",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoPlan-Bench2",
+    "year": 2024,
+    "title": "EgoPlan-Bench2: A Benchmark for Multimodal Large Language Model Planning in Real-World Scenarios",
+    "source_url": "https://arxiv.org/abs/2412.04447",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft",
+      "retail",
+      "lab",
+      "care",
+      "transport",
+      "garden",
+      "leisure"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "零售與購物",
+      "工藝與修繕",
+      "實驗室操作",
+      "園藝與戶外",
+      "交通與移動",
+      "休閒活動",
+      "照護與個人活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "零售與購物",
+      "實驗室操作",
+      "個人照護",
+      "交通移動與車輛維修",
+      "農業與園藝",
+      "休閒與運動"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P031",
+      "domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "retail",
+        "lab",
+        "care",
+        "transport",
+        "garden",
+        "leisure"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P031",
+          "domain_ids": [
+            "home",
+            "food",
+            "craft",
+            "retail",
+            "lab",
+            "care",
+            "transport",
+            "garden",
+            "leisure"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4原生domains（Work／Daily life／Hobbies／Recreation）；保留4–20步的goal；284 goal verbs不是284個正式任務。",
+            "24個語義scenario類別，非24個物理scene；來源1,113個Ego4D影片。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "86d13b4d204df0eee1eec14c5a5dde9f3cdc465b7e5b96009d4d8b7f4c48f353"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "86d13b4d204df0eee1eec14c5a5dde9f3cdc465b7e5b96009d4d8b7f4c48f353",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "retail",
+        "lab",
+        "care",
+        "transport",
+        "garden",
+        "leisure"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P031",
+      "name": "EgoPlan-Bench2",
+      "expected_title": "EgoPlan-Bench2: A Benchmark for Multimodal Large Language Model Planning in Real-World Scenarios",
+      "source_url": "https://arxiv.org/abs/2412.04447",
+      "pdf_url": "https://arxiv.org/pdf/2412.04447",
+      "retrieved_at": "2026-10-02T21:33:23.998542+00:00",
+      "pdf_sha256": "86d13b4d204df0eee1eec14c5a5dde9f3cdc465b7e5b96009d4d8b7f4c48f353",
+      "text_sha256": "cdb4b241def5847978088d58d6ac05c8adcca7e367405c4521ff0f15101ab11a",
+      "pdf_bytes": 14614718,
+      "pages": 18,
+      "text_characters": 128113,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2412.04447v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2412.04447v2"
+    },
+    "counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "原生life domains",
+        "pages": [
+          1,
+          5
+        ],
+        "record_id": "review10:P031:1",
+        "paper_id": "P031",
+        "benchmark": "EgoPlan-Bench2",
+        "native_term": "原生life domains",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.04447v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.04447v2",
+            "locator": "PDF pp. 1, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 24,
+        "unit": "語義scenario類別",
+        "pages": [
+          1,
+          5
+        ],
+        "record_id": "review10:P031:2",
+        "paper_id": "P031",
+        "benchmark": "EgoPlan-Bench2",
+        "native_term": "語義scenario類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.04447v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.04447v2",
+            "locator": "PDF pp. 1, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1113,
+        "unit": "來源影片",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P031:3",
+        "paper_id": "P031",
+        "benchmark": "EgoPlan-Bench2",
+        "native_term": "來源影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.04447v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.04447v2",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1321,
+        "unit": "四選一QA",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P031:4",
+        "paper_id": "P031",
+        "benchmark": "EgoPlan-Bench2",
+        "native_term": "四選一QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2412.04447v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2412.04447v2",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "qiulu66/EgoPlan-Bench2"
+  ],
+  "external_repositories": []
+}

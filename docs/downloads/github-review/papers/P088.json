@@ -1,0 +1,765 @@
+{
+  "paper_id": "P088",
+  "name": "FlingBot",
+  "title": "FlingBot: The Unreasonable Effectiveness of Dynamic Manipulation for Cloth Unfolding",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2105.03655",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P088",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已核讀 FlingBot 的模擬／真機 task 與 replay HDF5、coverage checker、evaluation 入口及彙總。原生 task 是衣物形狀／材質／初態的一筆配置，目標仍是展布；模擬與真機 coverage 的原始單位不同。另確認非重複 loader 的末筆等待問題及彙總過濾會影響分母。",
+    "identity_note": "論文 arXiv:2105.03655 與 README 作者 Huy Ha／Shuran Song 對應。binding 的 columbia-robovision/flingbot 在快取 GitHub metadata 解析為 real-stanford/flingbot；保留 requested_repo 與 resolved_repo，不能當兩個獨立來源。論文亦使用 columbia-ai-robotics 舊網址。 舊入口columbia-robovision/flingbot的已保存GitHub metadata回應指向real-stanford/flingbot，按倉庫別名保留，不另外算成未讀的第二個倉庫。",
+    "requested_repo": "columbia-robovision/flingbot",
+    "resolved_repo": "real-stanford/flingbot",
+    "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+    "paper_evidence": {
+      "local_file": "audit/.cache/fulltext_review/P088/pages.json",
+      "sha256": "8d356390bb7db5c8ffd5de519e67f3b1432c850364ef23e4cb5f7dcb2bfd0651",
+      "pdf_sha256": "ad6e502825c044a1ce13911164ae7817e00628ba7ac3e46358cc277c9d25dc8e",
+      "pages_read": [
+        7
+      ],
+      "scope": "資料規模段：2000模擬訓練配置、600測試配置、150真機調適回合與每類10測試。"
+    },
+    "environment": "模擬為修改 SoftGym/PyFlex 的 CUDA 粒子布料環境，抽象雙picker配合UR5可達性邊界；使用Blender或OpenGL，論文設定為Blender。真機為兩支UR5、RG2／WSG50、頂視Azure Kinect及前視RealSense；setup.py 只留一件衣物參考與設備位置參數，未提供完整論文實體資產清單。",
+    "tasks": "展布／最大覆蓋面積是一個目標族；Normal Rect、Large Rect、Shirt 是形狀／尺寸泛化設定。fling、stretchdrag、drag、place 是 action primitives，不是四個新的生活任務。TaskLoader 的 task_name 是 HDF5 配置ID；生成group key是對當時記錄數字取SHA1，不是狀態內容雜湊。論文600模擬測試配置＝三類各200，真機三類各10次；2000訓練配置及150真機調適回合另列，未下載HDF5驗證實際記錄數。",
+    "data": "task HDF5 以group保存 particle_pos、particle_vel、shape_pos、phase、cloth_size、cloth_stiff、mesh_verts／faces／stretch/bend/shear edges；flatten_area、initial_coverage、cloth_mass、task_difficulty為attribute。方布尺寸為粒子數，預設半徑0.00625m；mesh尺寸用[-1,-1]、flatten_area取trimesh面積/2。replay每個 {episode:09d}_step{step:02d}（尾步加_last）為一筆action；含observations、actions單像素mask、rewards、is_terminal、next_observations及rotation/scale/action_primitive/task_name/preaction_coverage/postaction_coverage/max_coverage。RGB/255＋depth為4×H×W、策略預設僅用RGB與64×64輸入；action需連同影像旋轉縮放與可達性轉換解碼。",
+    "evaluation": "模擬coverage是100×100 xz佔格的面積（原生m²）；step reward為A_after−A_before，學習label預設再除flatten_area。方布reference來自展平網格，mesh取表面面積/2。真機coverage是HSV背景分割後最大連通區像素佔全影像比例，再除同相機的flatten_area參考；不能把此原始值當m²。10 primitive actions內可提前終止：模擬最大粒子位移<0.05，真機前後mask IoU>0.9，均代表停滯而非成功。collect_stats報normalized final/best/delta coverage，未裁至[0,1]；跳過failed_grasp/cloth_stuck/timed_out、缺max_coverage及postcoverage/reference<0.05的記錄。其episode_length直接讀零起始尾步索引，真正動作數需+1。run_sim預設統計最近128個step groups；visualize.summarize用1e7上限讀全buffer，不可把在線平均當全測試分數。",
+    "standardization": {
+      "profile": "cloth_unfolding_hdf5_configurations_and_primitive_rollouts",
+      "reuse": "Task狀態重設、HDF5 reader/writer、action transformation欄位、raw與normalized coverage及failure flags。",
+      "transform": "source保存舊repo別名及resolved commit；environment分模擬／真機與renderer；task保存展布目標及primitive；case用dataset雜湊＋task_name＋形狀設定；rollout另存episode/step/action_count；evaluator明列面積或像素比例、reference方法及過濾後分母。",
+      "missing": "三測試HDF5／訓練HDF5的雜湊與mesh split；nonrepeat loader末筆問題修正或保留原版行為；未排除失敗的系統評測分母；真機衣物完整表、校正與背景設定；native step index轉操作次數驗證。"
+    },
+    "integration_issues": [
+      "binding應保留columbia-robovision、論文columbia-ai-robotics與resolved real-stanford的版本關係，避免重複repo。",
+      "TaskLoader.get_next_task先將索引加一，在最後一筆return Task之前進入while sleep；eval設repeat=False會使最後配置無法交付，需修正後另標adapter版本。",
+      "把coverage原始單位、失敗過濾、128-step視窗與零起始episode_length全部保留，不能輸出共同success rate。",
+      "README訓練命令用--tasks_path，但parser定義--tasks；真機README說cloths在realWorldEnv.py，實際表在setup.py，入口文件需協調者整合。"
+    ],
+    "version_note": "固定2021-10-13 commit，原論文PDF快取為後續2021-10-18版；保留版本差異。environment/Memory.py是symlink文字，實作讀到learning/Memory.py。未執行任何模擬、GPU模型、機器人控制或下載衣物HDF5。",
+    "reviewed_on": "2026-10-11",
+    "runtime_executed": false,
+    "repository_aliases": [
+      {
+        "repo": "columbia-robovision/flingbot",
+        "canonical_repo": "real-stanford/flingbot",
+        "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/columbia-robovision/flingbot",
+            "retrieved_at": "2026-10-10T07:44:51.901847+00:00",
+            "status": 200,
+            "resolved_url": "https://api.github.com/repositories/354453664",
+            "content_type": "application/json; charset=utf-8",
+            "bytes": 6697,
+            "sha256": "9c2460541dba71398b78de346e71bf78461fd28edb09be582525974e42d60ae2"
+          }
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            46
+          ],
+          [
+            79,
+            87
+          ],
+          [
+            123,
+            215
+          ],
+          [
+            217,
+            280
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 280,
+        "sha256": "9c50087c440823a8eb6ba43aea812fdf02cd5ef71bc702a7d180e036d402e82d",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/README.md",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/README.md#L1-L46",
+        "why": "確認論文、SoftGym/PyFlex 衍生、三種測試衣物設定與真機設備。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "environment/tasks.py",
+        "ranges": [
+          [
+            105,
+            219
+          ],
+          [
+            261,
+            421
+          ],
+          [
+            436,
+            479
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 501,
+        "sha256": "8572dc892b6d3601122fa21f5c525b988d2f4bcdb1a2dbc2f64fcf631e6d3d3e",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/tasks.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/tasks.py#L105-L219",
+        "why": "核對任務生成、mesh／粒子狀態、HDF5 格式及 nonrepeat loader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "environment/simEnv.py",
+        "ranges": [
+          [
+            33,
+            117
+          ],
+          [
+            431,
+            516
+          ],
+          [
+            663,
+            689
+          ],
+          [
+            782,
+            807
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 816,
+        "sha256": "a876cc6f52f27e9db001478831fd0e816eca0ea97fd20511d8454ac664e004c8",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/simEnv.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/simEnv.py#L33-L117",
+        "why": "action primitive、逐步記錄、coverage delta 與終止機制。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "environment/flex_utils.py",
+        "ranges": [
+          [
+            358,
+            415
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 441,
+        "sha256": "8cf1aebdbc1b0371013746e14442082ccad280fde77e352245157bc58c98df94",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/flex_utils.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/flex_utils.py#L358-L415",
+        "why": "實際 xz 網格面積與方布 flatten reference。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "environment/Memory.py",
+        "ranges": [
+          [
+            1,
+            1
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1,
+        "sha256": "a603684d85c519995713a12a5a7fe44b92062afdb7dabdcaee3212104dba0dd5",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/Memory.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/Memory.py#L1-L1",
+        "why": "確認該檔是指向 learning/Memory.py 的連結內容。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "learning/Memory.py",
+        "ranges": [
+          [
+            9,
+            23
+          ],
+          [
+            55,
+            80
+          ],
+          [
+            106,
+            165
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 165,
+        "sha256": "c520df1399429afeb5f39fb2a2c13b379a6201e731578b743cdc271d0ea8aae9",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/learning/Memory.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/learning/Memory.py#L9-L23",
+        "why": "episode-step HDF5 的 attribute/dataset、最後步與巢狀資料。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "learning/utils.py",
+        "ranges": [
+          [
+            12,
+            44
+          ],
+          [
+            76,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 100,
+        "sha256": "e193a711ee429d9b1d408ddbb98778b281f01bd511bd16e07cdb809498144054",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/learning/utils.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/learning/utils.py#L12-L44",
+        "why": "讀取 replay 的 observation/action mask 及 normalized coverage label。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "environment/utils.py",
+        "ranges": [
+          [
+            579,
+            602
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 602,
+        "sha256": "e5c76667ba69d8c2bda2a1342d98e36c6ccede8d0b9af50197890d14adbebd04",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/utils.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/environment/utils.py#L579-L602",
+        "why": "RGB/255 與原生 depth 組成 CHW，以及真機 segmentation 後處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "run_sim.py",
+        "ranges": [
+          [
+            37,
+            109
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 109,
+        "sha256": "444c1738c1b8338d47ea9e92485cb3cd76c6245da3dd45cbac31559b1929fda7",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/run_sim.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/run_sim.py#L37-L109",
+        "why": "確認 eval／訓練入口與定期 collect_stats。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "utils.py",
+        "ranges": [
+          [
+            17,
+            88
+          ],
+          [
+            100,
+            157
+          ],
+          [
+            186,
+            336
+          ],
+          [
+            337,
+            376
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 418,
+        "sha256": "c574d4340eb7a8d70df2da548374d8f87d9ccd592ea4fb91a845028160bc21e2",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/utils.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/utils.py#L17-L88",
+        "why": "eval 停止更新、loader 接線、raw/final/delta 統計、排除規則與零起始步索引。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "visualize.py",
+        "ranges": [
+          [
+            1,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 299,
+        "sha256": "afbea7442091354e01892c4735223bbff1a78437a4f01f51a592f3e67cd4cdd7",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/visualize.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/visualize.py#L1-L43",
+        "why": "離線 summary 使用全buffer上限，與訓練128步視窗分開。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "real_world/setup.py",
+        "ranges": [
+          [
+            7,
+            52
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 52,
+        "sha256": "9077f5aa4860f1c5c45ea3c459b6921cea98b1e66540808a48e5589927145c6a",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/real_world/setup.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/real_world/setup.py#L7-L52",
+        "why": "真機衣物 reference、workspace crop 與空白設備配置。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "real_world/realWorldEnv.py",
+        "ranges": [
+          [
+            1,
+            63
+          ],
+          [
+            96,
+            163
+          ],
+          [
+            367,
+            394
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 564,
+        "sha256": "2507f81c8e8a552f4ea0b6797d0ac23439763dde65f47325bb956198d1235fb5",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/real_world/realWorldEnv.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/real_world/realWorldEnv.py#L1-L63",
+        "why": "真機同名 task 與原生 IoU 停滯、失敗旗標、感測縮放。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/flingbot",
+        "requested_repo": "real-stanford/flingbot",
+        "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+        "ref": null,
+        "path": "real_world/utils.py",
+        "ranges": [
+          [
+            22,
+            69
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 94,
+        "sha256": "05fc84400e58c4831dc469d839d37cb75a078760927f63ab985567f215dac710",
+        "url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/real_world/utils.py",
+        "reading_url": "https://github.com/real-stanford/flingbot/blob/c5f35c785c6bc5d49282fb10117aa66ca04bf144/real_world/utils.py#L22-L69",
+        "why": "真機 mask coverage 是影像像素比例，並核對像素至機器人座標轉換。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4e56d607d15c125e00f2d6b1fcc65628813d1981f696441ca2eff06ef1c44770"
+  },
+  "repository_binding_review_sha256": "4e56d607d15c125e00f2d6b1fcc65628813d1981f696441ca2eff06ef1c44770",
+  "repository_bindings": [
+    {
+      "requested_repo": "real-stanford/flingbot",
+      "resolved_repo": "real-stanford/flingbot",
+      "aliases_in_this_review": [
+        "columbia-robovision/flingbot",
+        "real-stanford/flingbot"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c5f35c785c6bc5d49282fb10117aa66ca04bf144",
+          "reviewed_files": [
+            "README.md",
+            "environment/Memory.py",
+            "environment/flex_utils.py",
+            "environment/simEnv.py",
+            "environment/tasks.py",
+            "environment/utils.py",
+            "learning/Memory.py",
+            "learning/utils.py",
+            "real_world/realWorldEnv.py",
+            "real_world/setup.py",
+            "real_world/utils.py",
+            "run_sim.py",
+            "utils.py",
+            "visualize.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/columbia-robovision/flingbot",
+          "link_label": "Github",
+          "project_url": "https://flingbot.cs.columbia.edu",
+          "page_sha256": "e5f0e39139b09a92c430af4598595edcff5730bbb2bb80e49a308fc6ce78473a"
+        },
+        {
+          "kind": "authored_repository_alias",
+          "paper_id": "P088",
+          "review_sha256": "4e56d607d15c125e00f2d6b1fcc65628813d1981f696441ca2eff06ef1c44770",
+          "alias": {
+            "repo": "columbia-robovision/flingbot",
+            "canonical_repo": "real-stanford/flingbot",
+            "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+            "evidence": [
+              {
+                "requested_url": "https://api.github.com/repos/columbia-robovision/flingbot",
+                "retrieved_at": "2026-10-10T07:44:51.901847+00:00",
+                "status": 200,
+                "resolved_url": "https://api.github.com/repositories/354453664",
+                "content_type": "application/json; charset=utf-8",
+                "bytes": 6697,
+                "sha256": "9c2460541dba71398b78de346e71bf78461fd28edb09be582525974e42d60ae2"
+              }
+            ]
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P088",
+          "review_file": "content/github_review/reviews/P088.json",
+          "review_sha256": "4e56d607d15c125e00f2d6b1fcc65628813d1981f696441ca2eff06ef1c44770",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P088",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "FlingBot: The Unreasonable Effectiveness of Dynamic Manipulation for Cloth Unfolding；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      6,
+      7
+    ],
+    "role": "柔性物操作benchmark",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "simulation cloths與dualUR5真實工作站；NormalRect/LargeRect/Shirt三object regimes。",
+    "tasks": "主要1個unfolding目標；三clothtypes是材料/形狀泛化設定。",
+    "cases": "2,000trainingcloth settings，600sim test cases各類200；real各類10cases，150realadapt episodes不算test。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "cloth-unfolding goal family",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 600,
+        "unit": "simulation test initializations",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "real test cases，3types×10",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "normalized final/delta coverage及actions，允許coverage>1的正規化情形不裁成success。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "CLOTH3D test shirts；mesh/material/init分離，10step budget或預測抓地板終止。",
+    "lineage": "CLOTH3D與既有clothphysics，dataset task實為具體cloth+material+initialization。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          6,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "coverage並不保證可直接摺衣；real細節與sim material參數只能作相應範圍推論。"
+    ],
+    "reuse": "示範同一目標可以有大量物理cases，而未增加語義task數。",
+    "reviewed_pdf_sha256": "ad6e502825c044a1ce13911164ae7817e00628ba7ac3e46358cc277c9d25dc8e",
+    "reviewed_on": "2026-10-02",
+    "name": "FlingBot",
+    "year": 2021,
+    "title": "FlingBot: The Unreasonable Effectiveness of Dynamic Manipulation for Cloth Unfolding",
+    "source_url": "https://arxiv.org/abs/2105.03655",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P088",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P088",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "主要1個unfolding目標；三clothtypes是材料/形狀泛化設定。",
+            "simulation cloths與dualUR5真實工作站；NormalRect/LargeRect/Shirt三object regimes。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "ad6e502825c044a1ce13911164ae7817e00628ba7ac3e46358cc277c9d25dc8e"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "ad6e502825c044a1ce13911164ae7817e00628ba7ac3e46358cc277c9d25dc8e",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P088",
+      "name": "FlingBot",
+      "expected_title": "FlingBot: The Unreasonable Effectiveness of Dynamic Manipulation for Cloth Unfolding",
+      "source_url": "https://arxiv.org/abs/2105.03655",
+      "pdf_url": "https://arxiv.org/pdf/2105.03655",
+      "retrieved_at": "2026-10-02T22:13:36.433646+00:00",
+      "pdf_sha256": "ad6e502825c044a1ce13911164ae7817e00628ba7ac3e46358cc277c9d25dc8e",
+      "text_sha256": "ba274f3aa137a536630eb6e94e4c434dfdde9224948d10aa7c2dbbdf917e1297",
+      "pdf_bytes": 2555001,
+      "pages": 15,
+      "text_characters": 69457,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2105.03655v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2105.03655v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "cloth-unfolding goal family",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P088:1",
+        "paper_id": "P088",
+        "benchmark": "FlingBot",
+        "native_term": "cloth-unfolding goal family",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2105.03655v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2105.03655v3",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 600,
+        "unit": "simulation test initializations",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P088:2",
+        "paper_id": "P088",
+        "benchmark": "FlingBot",
+        "native_term": "simulation test initializations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2105.03655v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2105.03655v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "real test cases，3types×10",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P088:3",
+        "paper_id": "P088",
+        "benchmark": "FlingBot",
+        "native_term": "real test cases，3types×10",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2105.03655v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2105.03655v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "real-stanford/flingbot"
+  ],
+  "external_repositories": []
+}

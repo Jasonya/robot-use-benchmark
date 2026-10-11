@@ -1,0 +1,738 @@
+{
+  "paper_id": "P178",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+  "identity_note": "收錄論文為 arXiv:2609.28952v1，PDF 第1頁直接連至 RUCKBReasoning/RoboRecover；README 的雙平臺、action-prefix recovery 與論文一致。README 第78行仍使用 CuteClaire/RoboRecover 複製網址，保留為別名待確認，不另算來源。",
+  "summary": "公開程式是 LIBERO／RoboTwin 的恢復起點、固定 split 與回放後推論 overlay。已核讀 JSON reader、回放／新推論預算、LIBERO 成功傳遞與 RoboTwin 入櫃任務的具體 checker；完整2,000個 scenario JSON 的託管仍待發布，兩個 example 並非完整資料集。",
+  "reading_order": [
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          55,
+          71
+        ],
+        [
+          105,
+          153
+        ]
+      ],
+      "why": "核對雙平臺身分、資料未完整託管與 scenario 等權評分協定。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "dependencies.lock.json",
+      "ranges": [
+        [
+          1,
+          52
+        ]
+      ],
+      "why": "保留 upstream commit 與 historical_revision_verified=false，不能宣稱重現了論文原始環境。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "tools/prepare_data.py",
+      "ranges": [
+        [
+          10,
+          37
+        ]
+      ],
+      "why": "split membership、SHA256、action shape 與數值檢查。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "examples/libero.json",
+      "ranges": [],
+      "why": "LIBERO task/reset、stage/type 與第一個 action 的實際欄位。",
+      "json_pointers": [
+        "/task_suite_name",
+        "/task_id",
+        "/episode_idx",
+        "/seed",
+        "/initial_state",
+        "/s_stage",
+        "/d_stage",
+        "/annotated_step",
+        "/actions/0"
+      ]
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "examples/robotwin.json",
+      "ranges": [],
+      "why": "RoboTwin config、instruction、關節／末端初態與 annotation frame 約定。",
+      "json_pointers": [
+        "/task_name",
+        "/task_config",
+        "/instruction",
+        "/initial_state",
+        "/annotation_meta",
+        "/actions/0"
+      ]
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/script/robotwin_trace_utils.py",
+      "ranges": [
+        [
+          21,
+          29
+        ],
+        [
+          84,
+          101
+        ],
+        [
+          123,
+          175
+        ]
+      ],
+      "why": "JSON 必要欄位、annotated_step 截取與動態 task class 解析。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/script/eval_ood_replay_then_infer.py",
+      "ranges": [
+        [
+          348,
+          442
+        ],
+        [
+          480,
+          556
+        ],
+        [
+          596,
+          643
+        ]
+      ],
+      "why": "回放與推論分段、異常狀態、具體 summary 的 trial 分母。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/envs/_base_task.py",
+      "ranges": [
+        [
+          1707,
+          1715
+        ]
+      ],
+      "why": "每次物理 step 的 check_success 如何設置 eval_success。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/envs/put_object_cabinet.py",
+      "ranges": [
+        [
+          67,
+          81
+        ],
+        [
+          119,
+          130
+        ]
+      ],
+      "why": "入櫃 task 的高度／平面距離／張開夾爪聯合條件。"
+    },
+    {
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/openpi/examples/libero/eval_filtered_repro.py",
+      "ranges": [
+        [
+          104,
+          110
+        ],
+        [
+          245,
+          302
+        ],
+        [
+          428,
+          470
+        ],
+        [
+          703,
+          741
+        ],
+        [
+          770,
+          802
+        ],
+        [
+          918,
+          937
+        ],
+        [
+          1244,
+          1271
+        ]
+      ],
+      "why": "LIBERO reset、7D prefix、done 解讀、suite 預算與狀態統計。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+      "path": "libero/libero/envs/env_wrapper.py",
+      "ranges": [
+        [
+          43,
+          88
+        ],
+        [
+          103,
+          104
+        ]
+      ],
+      "why": "在 dependencies.lock 指定版本追 TASK_MAPPING 到 task。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+      "path": "libero/libero/envs/bddl_base_domain.py",
+      "ranges": [
+        [
+          801,
+          809
+        ]
+      ],
+      "why": "step 的 done 直接覆寫為具體 task 的 _check_success。"
+    },
+    {
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+      "path": "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "ranges": [
+        [
+          135,
+          154
+        ]
+      ],
+      "why": "goal_state 的逐項 predicate 合取；不是 base class 的佔位 False。"
+    }
+  ],
+  "environment": "LIBERO 的 MuJoCo 桌面任務與 RoboTwin 2.0 的 SAPIEN 雙臂場景各自重用原 benchmark。LIBERO 依 suite/task_id 找 BDDL、episode_idx 找原生 init state；RoboTwin 依 task_name/task_config/seed、embodiment 與 camera YAML 初始化。scenario 是同一任務執行偏離後的起點，不另計為新的 environment 或 task。",
+  "tasks": "論文定義 Recovery Stage=Approach/Contact/Move/Place，Deviation Type=Wrong Target/Wrong Pose/Stage Rollback/Scene Change；實際兩個 test CSV 都有9種 stage–type 組合，不是4×4皆存在。靜態解析各200個不重複 test sample_id，LIBERO 含38個 task_name、RoboTwin 含34個；論文另述 train 涵蓋40／42個任務。2,000是恢復 scenarios，兩平臺各800 train／200 test，不是2,000項技能。",
+  "data": "split CSV 欄位為 sample_id/path/sha256/original_sha256/actions/replay_prefix_steps/task_name/s_stage/d_stage；兩個 example 的實際 SHA256 各匹配該平臺 test 第一列。LIBERO JSON 包含 task_suite_name/task_id/episode_idx/seed、initial_state.xyz/quat/rpy/gripper、actions；RoboTwin 包含 task_name/task_config/instruction、initial_state.joint_vector/left_endpose/right_endpose/left_gripper/right_gripper 及 annotation_meta.frame_index/video_fps。驗證器接受 LIBERO 7D、RoboTwin 14或16D action，qpos／ee 應另存 action_type；不可把 gripper 或正規化 action 一律當公尺。reader 只在長於 annotated_step+1 時截取，不補短 prefix。LIBERO 模型輸入是兩視角 RGB、末端位置／axis-angle／gripper state；annotation video_fps=10 的 example 不代表所有控制頻率。",
+  "evaluation": "先以原 reset 重建，再回放 prefix、清空推論歷史並給新的 S 步預算；正式設定 post-replay wait=0，prefix 不扣推論額度。LIBERO suite 預設預算 spatial/object/goal/10/90 分別220/280/300/520/400；RoboTwin 以原 task.step_lim 和可選 max_infer_steps 取較小值。LIBERO native done 來自 goal predicates；RoboTwin Base_Task 將具體 check_success 鎖存至 eval_success，所讀入櫃 checker 要求 |dx|、|dy|各<0.05，物件比初高0.007至0.12且對應夾爪張開（原生模擬長度單位）。論文 Overall RSR 是每 scenario 成功數／排定 trials 後等權平均；Macro-9 再對9個 stage–type group 等權平均。程式 build_summary 按 task/error_type 直接累加 trial 並使用 eval_success_at_end，可能包含 replay_already_done；不能原封當成論文 RSR。LIBERO _to_summary 主要輸出 status_counts，effective_failure 只加 timeout_failure/env_crash，亦不等於完整失敗分母。",
+  "standardization": {
+    "profile": "replayed_intermediate_state_recovery",
+    "reuse": "固定 split／逐檔雜湊、JSON schema、upstream task/reset 關係、stage–type 標籤、replay/infer 分段與具體成功 checker。",
+    "transform": "source 保留兩層 commit；environment 指向原生模擬器／資產；task 仍用平臺與 native task key；case 用平臺+split+sample_id，保存 reset 引用、prefix、原指令及偏離來源；evaluator 另記 step budget、repeat、scheduled/invalid/status。domain 只按任務內容映射。從 results.jsonl 重算 scenario 等權 RSR、Macro-9，將回放已完成與 state mismatch 保留為獨立有效性狀態。",
+    "missing": "完整 scenario archive／資料授權及 simulator assets；各 adapter 完整環境驗證；原論文歷史 upstream revision 證實；正式排定 trial 名冊及 replay_already_done 的統一處置；各 task checker 全覆蓋。本輪只核讀代表性核心路徑，未跑模型或模擬。"
+  },
+  "version_note": "固定 RoboRecover 089b942；LIBERO 延伸核讀恰為 lock 指定8f1084e。lock 所有 historical_revision_verified 均為 false；README 指 LIBERO MuJoCo3.3.2／robosuite1.4.x、RoboTwin SAPIEN3.0.0b1，不可用 upstream 最新版代換。RoboTwin FastWAM／LingBot-VA recovery adapters 仍 pending；論文六政策結果不等於倉庫六個可用 adapter。",
+  "integration_issues": [
+    "RoboRecover README 複製網址仍用 CuteClaire，主綁定以 PDF 的 RUCKBReasoning 為準，別名需協調者確認。",
+    "需要 scenario 層級 RSR 聚合；不能採用 trial 加權 task_summary 或 1-effective_failure_rate。",
+    "完整託管、歷史依賴驗證及兩個 pending adapter 必須保持未閉合狀態。"
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/github_review/P178-discovery.json",
+      "sha256": "e15cc1a99ccaba140f738065b5dc75faa1364c4b97c514756eae2c0fc30b387a",
+      "json_pointers": [
+        "/candidates/0",
+        "/candidates/1",
+        "/paper_url",
+        "/pdf_sha256",
+        "/title"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/README.md",
+      "sha256": "fd32a09715a4d985a4c660043057dab29dc9d638b264ab4f327873fab60b4824",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "README.md",
+      "git_blob_sha": "83ba8fc2ecfd8a80afddff7c382f196a389dd6c2",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/README.md",
+      "read_ranges": [
+        [
+          1,
+          153
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/tree.json",
+      "sha256": "325608dc4ec5926e3524bd606fb903ddc5548458e891ba2f5cf66db428396ec8",
+      "kind": "pinned_repository_tree",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "url": "https://api.github.com/repos/RUCKBReasoning/RoboRecover/git/trees/089b9420e8b7c303e2338a8212a8b6c27c26a79b?recursive=1",
+      "json_pointers": [
+        "/tree/0",
+        "/tree/1",
+        "/tree/10",
+        "/tree/100",
+        "/tree/101",
+        "/tree/102",
+        "/tree/103",
+        "/tree/104",
+        "/tree/105",
+        "/tree/106",
+        "/tree/107",
+        "/tree/108",
+        "/tree/109",
+        "/tree/11",
+        "/tree/110",
+        "/tree/111",
+        "/tree/112",
+        "/tree/113",
+        "/tree/114",
+        "/tree/115",
+        "/tree/116",
+        "/tree/117",
+        "/tree/118",
+        "/tree/119",
+        "/tree/12",
+        "/tree/120",
+        "/tree/121",
+        "/tree/13",
+        "/tree/14",
+        "/tree/15",
+        "/tree/16",
+        "/tree/17",
+        "/tree/18",
+        "/tree/19",
+        "/tree/2",
+        "/tree/20",
+        "/tree/21",
+        "/tree/22",
+        "/tree/23",
+        "/tree/24",
+        "/tree/25",
+        "/tree/26",
+        "/tree/27",
+        "/tree/28",
+        "/tree/29",
+        "/tree/3",
+        "/tree/30",
+        "/tree/31",
+        "/tree/32",
+        "/tree/33",
+        "/tree/34",
+        "/tree/35",
+        "/tree/36",
+        "/tree/37",
+        "/tree/38",
+        "/tree/39",
+        "/tree/4",
+        "/tree/40",
+        "/tree/41",
+        "/tree/42",
+        "/tree/43",
+        "/tree/44",
+        "/tree/45",
+        "/tree/46",
+        "/tree/47",
+        "/tree/48",
+        "/tree/49",
+        "/tree/5",
+        "/tree/50",
+        "/tree/51",
+        "/tree/52",
+        "/tree/53",
+        "/tree/54",
+        "/tree/55",
+        "/tree/56",
+        "/tree/57",
+        "/tree/58",
+        "/tree/59",
+        "/tree/6",
+        "/tree/60",
+        "/tree/61",
+        "/tree/62",
+        "/tree/63",
+        "/tree/64",
+        "/tree/65",
+        "/tree/66",
+        "/tree/67",
+        "/tree/68",
+        "/tree/69",
+        "/tree/7",
+        "/tree/70",
+        "/tree/71",
+        "/tree/72",
+        "/tree/73",
+        "/tree/74",
+        "/tree/75",
+        "/tree/76",
+        "/tree/77",
+        "/tree/78",
+        "/tree/79",
+        "/tree/8",
+        "/tree/80",
+        "/tree/81",
+        "/tree/82",
+        "/tree/83",
+        "/tree/84",
+        "/tree/85",
+        "/tree/86",
+        "/tree/87",
+        "/tree/88",
+        "/tree/89",
+        "/tree/9",
+        "/tree/90",
+        "/tree/91",
+        "/tree/92",
+        "/tree/93",
+        "/tree/94",
+        "/tree/95",
+        "/tree/96",
+        "/tree/97",
+        "/tree/98",
+        "/tree/99",
+        "/truncated"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P178/pages.json",
+      "sha256": "d28b3a578666f1a923de871c9ad843c2a2bffc5e0107e62849aa850e9923e2bc",
+      "kind": "pinned_pdf_text",
+      "pdf_pages": [
+        3,
+        4,
+        5
+      ],
+      "json_pointers": [
+        "/2/text",
+        "/3/text",
+        "/4/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P178/paper.pdf",
+      "pdf_sha256": "63986a4660ca344bb479e10ce0aa378f0c5b8a2ce86623d7725c5474f9a51faf"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/RUCKBReasoning__RoboRecover/dependencies.lock.json",
+      "sha256": "21d8af7068724b3f222c89a275b17ff1736af2c1ee5fe18ce1ce1794355e3209",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "dependencies.lock.json",
+      "git_blob_sha": "18983ba00228880a0255191e0ed7b137cd7e3d18",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/dependencies.lock.json",
+      "read_ranges": [
+        [
+          1,
+          52
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/RUCKBReasoning__RoboRecover/tools/prepare_data.py",
+      "sha256": "211a19c7a31853b43cef83fe1e659733fa5b2ea64103cd642c3e60ebcb46192d",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "tools/prepare_data.py",
+      "git_blob_sha": "c9ebeb94976885e73df62b4f787f651ff7460f8e",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/tools/prepare_data.py",
+      "read_ranges": [
+        [
+          1,
+          47
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/overlays/RoboTwin/script/eval_ood_replay_then_infer.py",
+      "sha256": "e335523db8ad4a2e06def1180f0e734334dbbd3b873df69d46873e17face700d",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/script/eval_ood_replay_then_infer.py",
+      "git_blob_sha": "704ce09eb346b4931a812cd0a8980297bc5c2425",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/overlays/RoboTwin/script/eval_ood_replay_then_infer.py",
+      "read_ranges": [
+        [
+          86,
+          106
+        ],
+        [
+          348,
+          442
+        ],
+        [
+          480,
+          556
+        ],
+        [
+          596,
+          658
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/overlays/RoboTwin/envs/put_object_cabinet.py",
+      "sha256": "8c95d626f58b36714c684b86519420e52d9089201b88dec6d53f57a7a59a0f16",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/envs/put_object_cabinet.py",
+      "git_blob_sha": "40b0c1fbd72205add509aa9e09bce310481b4a1e",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/overlays/RoboTwin/envs/put_object_cabinet.py",
+      "read_ranges": [
+        [
+          12,
+          83
+        ],
+        [
+          119,
+          130
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/RUCKBReasoning__RoboRecover/overlays/RoboTwin/script/robotwin_trace_utils.py",
+      "sha256": "d2179cc10ab8961c13351a83d74514f36b587db809ab23b1d36f32e42fe90602",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/script/robotwin_trace_utils.py",
+      "git_blob_sha": "de0d135eb11fdf16d846964b3c608a1e6cfa73d7",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/overlays/RoboTwin/script/robotwin_trace_utils.py",
+      "read_ranges": [
+        [
+          1,
+          177
+        ],
+        [
+          255,
+          318
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/overlays/openpi/examples/libero/eval_filtered_repro.py",
+      "sha256": "3e1cd54025389f4fb2b3e60c9bceb7e3ecafaddfc0e8ac4092f1e0313d14c9b1",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/openpi/examples/libero/eval_filtered_repro.py",
+      "git_blob_sha": "51e2e3c5bd05461280b7130ce8e1c21b21d90370",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/overlays/openpi/examples/libero/eval_filtered_repro.py",
+      "read_ranges": [
+        [
+          40,
+          112
+        ],
+        [
+          245,
+          302
+        ],
+        [
+          428,
+          470
+        ],
+        [
+          498,
+          582
+        ],
+        [
+          662,
+          710
+        ],
+        [
+          711,
+          741
+        ],
+        [
+          767,
+          805
+        ],
+        [
+          836,
+          944
+        ],
+        [
+          1239,
+          1273
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/examples/libero.json",
+      "sha256": "7d250c4f41a3f71d6e828860295252bdb80113180e8f838378c069b72522ba13",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "examples/libero.json",
+      "git_blob_sha": "3c746234a1e8f6d084661244b6b695a2844aa578",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/examples/libero.json",
+      "json_pointers": [
+        "/actions/0",
+        "/annotated_step",
+        "/d_stage",
+        "/data_type",
+        "/episode_idx",
+        "/error_category",
+        "/initial_state",
+        "/model_name",
+        "/s_stage",
+        "/seed",
+        "/target_error_category",
+        "/task_description",
+        "/task_id",
+        "/task_suite_name"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/splits/libero_test.csv",
+      "sha256": "c59581521fbd7197fa4d4996d4ce7cdb535313b02a2a27dfa51a916593b3a4e3",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "splits/libero_test.csv",
+      "git_blob_sha": "925af3d5ab5e810cd65b86f6d4f35bbc3891d67f",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/splits/libero_test.csv",
+      "read_ranges": [
+        [
+          1,
+          4
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/examples/robotwin.json",
+      "sha256": "4f133b61b1105051be078bf13f2bd08759e8b89a5b253be57d6a889fc764ba1e",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "examples/robotwin.json",
+      "git_blob_sha": "95cf2de5f501388533cd91ac2f16cec2696610e5",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/examples/robotwin.json",
+      "json_pointers": [
+        "/actions/0",
+        "/annotated_step",
+        "/annotation_meta",
+        "/d_stage",
+        "/data_type",
+        "/episode_idx",
+        "/error_type",
+        "/initial_state",
+        "/instruction",
+        "/instruction_type",
+        "/model_name",
+        "/policy_name",
+        "/s_stage",
+        "/seed",
+        "/success",
+        "/task_config",
+        "/task_description",
+        "/task_name",
+        "/task_suite_name",
+        "/total_steps"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/splits/robotwin_test.csv",
+      "sha256": "51afdf09abfaf6e154f97b8d209dccef73a8a802c1a11c45c1c9c2726399407b",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "splits/robotwin_test.csv",
+      "git_blob_sha": "c9b40e12d6f8d2dab723815dfc2e966ea7e62cd5",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/splits/robotwin_test.csv",
+      "read_ranges": [
+        [
+          1,
+          4
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/RUCKBReasoning__RoboRecover/files/overlays/RoboTwin/envs/_base_task.py",
+      "sha256": "a5186d9328f98f8d714d1de5af4e761eeba9b86269bed3d05a1b68d90a93d5a8",
+      "kind": "pinned_repository_file",
+      "repo": "RUCKBReasoning/RoboRecover",
+      "commit": "089b9420e8b7c303e2338a8212a8b6c27c26a79b",
+      "path": "overlays/RoboTwin/envs/_base_task.py",
+      "git_blob_sha": "19c8b9e3d0eb4218f5e656821ebbb09292047ea0",
+      "url": "https://raw.githubusercontent.com/RUCKBReasoning/RoboRecover/089b9420e8b7c303e2338a8212a8b6c27c26a79b/overlays/RoboTwin/envs/_base_task.py",
+      "read_ranges": [
+        [
+          1698,
+          1724
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/Lifelong-Robot-Learning__LIBERO/files/libero/libero/envs/env_wrapper.py",
+      "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0",
+      "kind": "pinned_repository_file",
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+      "path": "libero/libero/envs/env_wrapper.py",
+      "git_blob_sha": "b5a732b0d7e5d67ba5428fdf0edef150e80f6296",
+      "url": "https://raw.githubusercontent.com/Lifelong-Robot-Learning/LIBERO/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/env_wrapper.py",
+      "read_ranges": [
+        [
+          25,
+          108
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/Lifelong-Robot-Learning__LIBERO/files/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "sha256": "0defb17c0bbab8f6bd34c021ac15598ea101fe1e48690cb440d4ef92762880fe",
+      "kind": "pinned_repository_file",
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+      "path": "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "git_blob_sha": "43cd4a8540bac703547c58e99c10c65b622f85b1",
+      "url": "https://raw.githubusercontent.com/Lifelong-Robot-Learning/LIBERO/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "read_ranges": [
+        [
+          135,
+          154
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/Lifelong-Robot-Learning__LIBERO/files/libero/libero/envs/bddl_base_domain.py",
+      "sha256": "055836670ac5fcac7e033fc86404718fd53854996e5776b1ff68b646f7bbcc9d",
+      "kind": "pinned_repository_file",
+      "repo": "Lifelong-Robot-Learning/LIBERO",
+      "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+      "path": "libero/libero/envs/bddl_base_domain.py",
+      "git_blob_sha": "0aa0f0c212a3ee0413980ff8d48c5100724115c5",
+      "url": "https://raw.githubusercontent.com/Lifelong-Robot-Learning/LIBERO/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/bddl_base_domain.py",
+      "read_ranges": [
+        [
+          801,
+          819
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/P178-static-counts.json",
+      "sha256": "bd073d91d0af79438c450cc1b4c76e55ac93eed2bf2af1ac1dede1d80a56b372",
+      "kind": "local_static_inspection",
+      "runtime_executed": false,
+      "json_pointers": [
+        ""
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

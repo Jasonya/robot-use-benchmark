@@ -1,0 +1,690 @@
+{
+  "paper_id": "P041",
+  "name": "EgoCross",
+  "title": "EgoCross: Benchmarking Multimodal Large Language Models for Cross-Domain Egocentric Video Question Answering",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2508.10729",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "craft",
+    "medical",
+    "leisure",
+    "animal"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P041",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoCross 的原作者工具庫另指官方 EgoCrossCodes；已補釘選兩者，核對開／閉集評分和官方testbed。兩份核心eval檔案的SHA256相同，README／資料發布內容則不同。",
+    "environment": "官方957題testbed JSON實際含CholecTrack20、ENIGMA、EgoPet、EgoSurgery、ExtrameSportFPV五個原生dataset標記。這是父資料來源，不是5個實體環境；primary_category/question_type另為能力分類。",
+    "tasks": "閉集四選一與開集文字問答，保留多種活動／視角來源。官方檔案區分source-limited/open-source challenge條件；不從benchmark名稱推定統一robot action space。",
+    "data": "實際解析questions-only檔有957列、957唯一id，0列含correct_option_letter，0列含question_id；欄位包括dataset、primary_category、question_type、question_text、options、original_video_fps、video_path列表。官方README說另可取得957題answers檔，新增correct_option_letter/answer_text/detailed_answer及global question_id，未在本次取得。",
+    "evaluation": "閉集從JSON prediction解析並小寫後完全比correct_option_letter，模型例外記success=False。開集先以參考字串／數字子字串包含規則直接給5，否則文字裁判給0–5，score>=4才算success再平均；不是單純平均0–5分。來源通常.5fps，部分手術影格條件為1fps，original_video_fps和實際觀測取樣不同。",
+    "standardization": {
+      "profile": "cross_source_ego_video_qa",
+      "reuse": "957題唯讀metadata、來源標記、原題與四選項、原作者／官方core evaluators和答案發布說明。",
+      "transform": "source保留原作者repo與challenge repo roles；case以官方id加source version，answers檔以id一對一join，global question_id未取得則不杜撰。video_path序列儲存原fps/取樣率和父影片對映；closed exact-match、open substring shortcut／judge／>=4規則各自版本化。",
+      "missing": "尚未取得影格與需另取得的answers檔，也未執行／提交。questions-only不具eval指令碼必需的answer和question_id欄位，不能直接以README早期命令宣稱能評分。開集substring捷徑需保留原作口徑並另分析誤判；裁判/API程式仍有外部依賴。"
+    },
+    "version_note": "官方固定README說2026-05挑戰結束後釋出answers，故不再把它寫成永久隱藏GT；本次僅取得questions-only metadata。官方指令碼與原作者檔案相同不表示兩個repository或957題可重複計數。",
+    "runtime_executed": false,
+    "additional_repo_proposals": [
+      {
+        "repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "role": "作者README明確連結的官方評測與testbed metadata",
+        "evidence": "MyUniverse0726/EgoCross README第8行；新repo README一致"
+      }
+    ],
+    "metadata_audit": {
+      "rows": 957,
+      "unique_ids": 957,
+      "rows_with_correct_option_letter": 0,
+      "rows_with_question_id": 0,
+      "scope": "metadata structure/count only, not item-level semantic review or image acquisition"
+    },
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "MyUniverse0726/EgoCross",
+        "requested_repo": "MyUniverse0726/EgoCross",
+        "commit": "f81f41d29df74aa7188a6cadf3fb41b161fc841d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            79
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 79,
+        "sha256": "a79bd76fbe861a1b84a484e9ae2649b7b821fcd744c1cd1eb91f9f09a9fc7cff",
+        "url": "https://github.com/MyUniverse0726/EgoCross/blob/f81f41d29df74aa7188a6cadf3fb41b161fc841d/README.md",
+        "reading_url": "https://github.com/MyUniverse0726/EgoCross/blob/f81f41d29df74aa7188a6cadf3fb41b161fc841d/README.md#L1-L79",
+        "why": "原作者工具與官方challenge repo互連",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MyUniverse0726/EgoCross",
+        "requested_repo": "MyUniverse0726/EgoCross",
+        "commit": "f81f41d29df74aa7188a6cadf3fb41b161fc841d",
+        "ref": null,
+        "path": "eval_os_closedset.py",
+        "ranges": [
+          [
+            60,
+            66
+          ],
+          [
+            111,
+            117
+          ],
+          [
+            191,
+            197
+          ],
+          [
+            350,
+            501
+          ],
+          [
+            503,
+            524
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 553,
+        "sha256": "c480632129682e2018978607abb51a98cbdd9b4ac13971fba00e24aa93ae9d10",
+        "url": "https://github.com/MyUniverse0726/EgoCross/blob/f81f41d29df74aa7188a6cadf3fb41b161fc841d/eval_os_closedset.py",
+        "reading_url": "https://github.com/MyUniverse0726/EgoCross/blob/f81f41d29df74aa7188a6cadf3fb41b161fc841d/eval_os_closedset.py#L60-L66",
+        "why": "讀取、取樣、JSON解析、失敗記錄",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MyUniverse0726/EgoCross",
+        "requested_repo": "MyUniverse0726/EgoCross",
+        "commit": "f81f41d29df74aa7188a6cadf3fb41b161fc841d",
+        "ref": null,
+        "path": "eval_gpt_openset.py",
+        "ranges": [
+          [
+            12,
+            18
+          ],
+          [
+            22,
+            58
+          ],
+          [
+            68,
+            78
+          ],
+          [
+            80,
+            117
+          ],
+          [
+            127,
+            137
+          ],
+          [
+            139,
+            145
+          ],
+          [
+            166,
+            172
+          ],
+          [
+            186,
+            202
+          ],
+          [
+            215,
+            221
+          ],
+          [
+            228,
+            237
+          ],
+          [
+            243,
+            249
+          ],
+          [
+            253,
+            260
+          ],
+          [
+            268,
+            280
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 292,
+        "sha256": "256f13c45538cdceb7d5b50e153a7aa0f864b39d37aae703eeaba2d3b3a427cb",
+        "url": "https://github.com/MyUniverse0726/EgoCross/blob/f81f41d29df74aa7188a6cadf3fb41b161fc841d/eval_gpt_openset.py",
+        "reading_url": "https://github.com/MyUniverse0726/EgoCross/blob/f81f41d29df74aa7188a6cadf3fb41b161fc841d/eval_gpt_openset.py#L12-L18",
+        "why": "開集shortcut與0–5裁判",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "requested_repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "commit": "6737720c12374cad81b037dd7107684eb5e5a9d5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 92,
+        "sha256": "d533739332bd97a510022f0649524824629d2252f0de0ed543df2aa93a1e2a21",
+        "url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/README.md",
+        "reading_url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/README.md#L1-L92",
+        "why": "957題questions/answers版本及取得方式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "requested_repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "commit": "6737720c12374cad81b037dd7107684eb5e5a9d5",
+        "ref": null,
+        "path": "datasets/egocross_testbed_imgs.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/0"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/0",
+            "selected_value_sha256": "1d6e7e5781ac582fccf3b4ca9ca76190c81f0e8285f9b4b0b413e152be38ab95"
+          }
+        ],
+        "read_scope": "Only selected JSON entries read; no full-file or full-line review claimed",
+        "line_count": 26062,
+        "sha256": "4909e9db13890dd82b1493d50423c2917dc9b3f79b0dd5dcb75e040a88fb2218",
+        "url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/datasets/egocross_testbed_imgs.json",
+        "reading_url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/datasets/egocross_testbed_imgs.json",
+        "why": "JSON /0逐項閱讀；另對全檔做row/ID/欄位數量統計",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "requested_repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "commit": "6737720c12374cad81b037dd7107684eb5e5a9d5",
+        "ref": null,
+        "path": "eval_os_closedset.py",
+        "ranges": [
+          [
+            322,
+            377
+          ],
+          [
+            403,
+            424
+          ],
+          [
+            482,
+            508
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 553,
+        "sha256": "c480632129682e2018978607abb51a98cbdd9b4ac13971fba00e24aa93ae9d10",
+        "url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/eval_os_closedset.py",
+        "reading_url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/eval_os_closedset.py#L322-L377",
+        "why": "確認官方閉集核心與必要欄位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "requested_repo": "EgoCross-Benchmark/EgoCrossCodes",
+        "commit": "6737720c12374cad81b037dd7107684eb5e5a9d5",
+        "ref": null,
+        "path": "eval_gpt_openset.py",
+        "ranges": [
+          [
+            25,
+            35
+          ],
+          [
+            83,
+            139
+          ],
+          [
+            230,
+            246
+          ],
+          [
+            270,
+            280
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 292,
+        "sha256": "256f13c45538cdceb7d5b50e153a7aa0f864b39d37aae703eeaba2d3b3a427cb",
+        "url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/eval_gpt_openset.py",
+        "reading_url": "https://github.com/EgoCross-Benchmark/EgoCrossCodes/blob/6737720c12374cad81b037dd7107684eb5e5a9d5/eval_gpt_openset.py#L25-L35",
+        "why": "確認官方開集核心與>=4成功閾值",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "985d6187a5b9a4ea4759f20d697e472511eded4a57d0d2519d44f9d61caf8f5e"
+  },
+  "repository_binding_review_sha256": "985d6187a5b9a4ea4759f20d697e472511eded4a57d0d2519d44f9d61caf8f5e",
+  "repository_bindings": [
+    {
+      "requested_repo": "EgoCross-Benchmark/EgoCrossCodes",
+      "resolved_repo": "EgoCross-Benchmark/EgoCrossCodes",
+      "aliases_in_this_review": [
+        "egocross-benchmark/egocrosscodes"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "6737720c12374cad81b037dd7107684eb5e5a9d5",
+          "reviewed_files": [
+            "README.md",
+            "datasets/egocross_testbed_imgs.json",
+            "eval_gpt_openset.py",
+            "eval_os_closedset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P041",
+          "review_sha256": "985d6187a5b9a4ea4759f20d697e472511eded4a57d0d2519d44f9d61caf8f5e",
+          "proposal": {
+            "repo": "EgoCross-Benchmark/EgoCrossCodes",
+            "role": "作者README明確連結的官方評測與testbed metadata",
+            "evidence": "MyUniverse0726/EgoCross README第8行；新repo README一致"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P041",
+          "review_file": "content/github_review/reviews/P041.json",
+          "review_sha256": "985d6187a5b9a4ea4759f20d697e472511eded4a57d0d2519d44f9d61caf8f5e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "MyUniverse0726/EgoCross",
+      "resolved_repo": "MyUniverse0726/EgoCross",
+      "aliases_in_this_review": [
+        "myuniverse0726/egocross"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "f81f41d29df74aa7188a6cadf3fb41b161fc841d",
+          "reviewed_files": [
+            "README.md",
+            "eval_gpt_openset.py",
+            "eval_os_closedset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/MyUniverse0726/EgoCross",
+          "pdf_page": 1,
+          "pdf_sha256": "f4c3606509844a990b9b1c2fc3df05bdab0cff9a08af8fa5446cc9080f49e743",
+          "basis": "pdf_extracted_text"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/MyUniverse0726/EgoCross",
+          "link_label": "Source Code & Documentation",
+          "project_url": "https://egocross-benchmark.github.io/",
+          "page_sha256": "e91d0f1ffe626b412380cfba509832613edfb39b2d74204f47ba8833a6eaa309"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P041",
+          "review_file": "content/github_review/reviews/P041.json",
+          "review_sha256": "985d6187a5b9a4ea4759f20d697e472511eded4a57d0d2519d44f9d61caf8f5e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "工藝與修繕",
+    "醫療與手術支援",
+    "休閒與運動",
+    "寵物照護與動物活動"
+  ],
+  "source_review": {
+    "paper_id": "P041",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoCross，arXiv 2508.10729v2。",
+    "scope_read": "domain選擇、五個上游資料、QA數、Close/Open評分與finetuning split。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      7,
+      10
+    ],
+    "domains": [
+      "工藝與修繕",
+      "醫療與手術支援",
+      "休閒與運動",
+      "寵物照護與動物活動"
+    ],
+    "role": "影片問答與推理",
+    "environment": "4個domain來自5資料集，不是4個環境；含內視鏡工具視角，不全是人類頭戴相機。",
+    "tasks": "identification／localization／prediction／counting四類，15細分題型。",
+    "cases": "957 QA、798 clips；OpenQA與CloseQA為同一問題兩種格式，不是1,914個獨立題。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "原作domains",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "細分QA類型",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 957,
+        "unit": "QA",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 798,
+        "unit": "clips",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "CloseQA：4選1 accuracy；OpenQA：Qwen-Max檢查语義正確與reference。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "人工或模型評審"
+    ],
+    "split": "主zero-shot全題；SFT／RL pilot將原QA再70:30分train/test，其分數不能與全題zero-shot當相同測集。",
+    "lineage": "EgoSurgery、CholecTrack20、ENIGMA-51、ExtremeSportFPV、EgoPet的衍生QA。",
+    "related_paper_ids": [
+      "P025"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§3.1–3.3",
+        "supports": "domains、上游、957／798"
+      },
+      {
+        "pages": [
+          7,
+          10
+        ],
+        "locator": "pilot與OpenQA protocol",
+        "supports": "split與judge"
+      }
+    ],
+    "unresolved": [
+      "上述五個上游是否全部在現有書目中獨立登記需補查。"
+    ],
+    "reuse": "直接提示家務之外的缺域；跨domain來源聯集已有前例，要把多樣性貢獻做得可量化。",
+    "reviewed_pdf_sha256": "f4c3606509844a990b9b1c2fc3df05bdab0cff9a08af8fa5446cc9080f49e743",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoCross",
+    "year": 2025,
+    "title": "EgoCross: Benchmarking Multimodal Large Language Models for Cross-Domain Egocentric Video Question Answering",
+    "source_url": "https://arxiv.org/abs/2508.10729",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "craft",
+      "medical",
+      "leisure",
+      "animal"
+    ],
+    "review_tags": [
+      "醫療與手術",
+      "工業維修",
+      "運動與身體技能",
+      "動物行為"
+    ],
+    "domain_names": [
+      "工藝與修繕",
+      "醫療與手術支援",
+      "休閒與運動",
+      "寵物照護與動物活動"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P041",
+      "domain_ids": [
+        "craft",
+        "medical",
+        "leisure",
+        "animal"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P041",
+          "domain_ids": [
+            "craft",
+            "medical",
+            "leisure",
+            "animal"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            7,
+            10
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "identification／localization／prediction／counting四類，15細分題型。",
+            "4個domain來自5資料集，不是4個環境；含內視鏡工具視角，不全是人類頭戴相機。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "f4c3606509844a990b9b1c2fc3df05bdab0cff9a08af8fa5446cc9080f49e743"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "f4c3606509844a990b9b1c2fc3df05bdab0cff9a08af8fa5446cc9080f49e743",
+      "previous_domain_ids": [
+        "craft",
+        "medical",
+        "leisure",
+        "animal"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P041",
+      "name": "EgoCross",
+      "expected_title": "EgoCross: Benchmarking Multimodal Large Language Models for Cross-Domain Egocentric Video Question Answering",
+      "source_url": "https://arxiv.org/abs/2508.10729",
+      "pdf_url": "https://arxiv.org/pdf/2508.10729",
+      "retrieved_at": "2026-10-02T21:33:29.394263+00:00",
+      "pdf_sha256": "f4c3606509844a990b9b1c2fc3df05bdab0cff9a08af8fa5446cc9080f49e743",
+      "text_sha256": "8ea62c3747d4d7a3faed3a031549a7ca743c714c08d3744d55559fc24b12f694",
+      "pdf_bytes": 3378009,
+      "pages": 19,
+      "text_characters": 122544,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2508.10729v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2508.10729v2"
+    },
+    "counts": [
+      {
+        "field": "domain",
+        "value": 4,
+        "unit": "原作domains",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P041:1",
+        "paper_id": "P041",
+        "benchmark": "EgoCross",
+        "native_term": "原作domains",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.10729v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.10729v2",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "細分QA類型",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P041:2",
+        "paper_id": "P041",
+        "benchmark": "EgoCross",
+        "native_term": "細分QA類型",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.10729v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.10729v2",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 957,
+        "unit": "QA",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P041:3",
+        "paper_id": "P041",
+        "benchmark": "EgoCross",
+        "native_term": "QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.10729v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.10729v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 798,
+        "unit": "clips",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P041:4",
+        "paper_id": "P041",
+        "benchmark": "EgoCross",
+        "native_term": "clips",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2508.10729v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2508.10729v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "MyUniverse0726/EgoCross",
+    "EgoCross-Benchmark/EgoCrossCodes"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,31 @@
+{
+  "paper_id": "P213",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "Vision to Harvest評估從果園影像生成多臂採收計畫；原文的harvested ratio與collision ratio是計畫幾何指標，不能當作實際採摘完成與碰撞感測結果。未確認官方GitHub。",
+  "reading_order": [],
+  "environment": "兩份真實orchard RGB-D來源：Fuji apple與citrus；citrus父資料432張影像，論文再取heldout場景，未提供本次可取得的benchmark場景ID manifest。",
+  "tasks": "從初始canopy觀測分配水果及生成各Cartesian arm的順序/waypoints。作者明說online perception/replanning留待future work，因此屬觀測後計畫評測，不是完整閉環採果。",
+  "data": "oracle採GroundingDINO/SAM2→depth投3D→DBSCAN→MIP分配/規劃；VLM用原始影像及workspace/robot constraints，輸出每臂JSON順序/waypoints，未提供定時軌跡。沒有公開reader/標註子集入口可核驗。",
+  "evaluation": "五類原生指標為detection ratio、距離門檻內waypoint的harvested ratio、含x軸arm-order violation的scene比例、總路徑距離、tokens/scene。Verifier不修復計畫；碰撞定義是順序可行性proxy，沒有實際觸碰或水果detach驗收。",
+  "standardization": {
+    "profile": "multiarm_orchard_visual_planning",
+    "reuse": "農業用途、原圖→多臂計畫的任務定義、原生空間可行性與效率指標。",
+    "transform": "case綁crop/scene/image-depth標定、arm配置/工作空間、固定prompt與距離門檻；將計畫品質和可執行物理採收分層，保留oracle與VLM合法輸入差異。",
+    "missing": "官方code、heldout scene/GT清單、JSON parser/一對一水果匹配/ verifier與完整控制、動態feedback及真正採果驗收。"
+  },
+  "version_note": "已讀2609.13606v1 p3/5與現有repository discovery；未確認source code或將相關harvesting/MIP工具當作本篇完整實作。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2609.13606",
+    "pdf_sha256": "b3ee03d5d25e728c85d714de947fb09d06f56e94067923961d75c365281c22eb",
+    "paper_pages_read": [
+      3,
+      5
+    ],
+    "search_receipts": [
+      "audit/.cache/github_review/search/P213-refined.json",
+      "audit/.cache/github_review/search/P213.json"
+    ]
+  }
+}

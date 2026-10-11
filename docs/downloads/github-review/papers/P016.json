@@ -1,0 +1,545 @@
+{
+  "paper_id": "P016",
+  "name": "IKEA ASM",
+  "title": "The IKEA ASM Dataset: Understanding People Assembling Furniture through Actions, Objects and Pose",
+  "year": 2020,
+  "paper_url": "https://arxiv.org/abs/2007.00394",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P016",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "IKEA ASM 的 GitHub 包含影片／姿態／零件處理工具與多項視覺 baseline。本次核讀動作資料庫、片段轉 frame 和具體評分，另確認 tracking 入口依賴 MOT evaluator。",
+    "environment": "人類組裝 IKEA 傢俱的多視角 RGB/depth 影片；scan_path 與 dev1/dev2/dev3 相機分開，預設 train_cross_env/test_cross_env 是來源切分條件。",
+    "tasks": "原子動作辨識與時間定位、人體姿態、零件分割／追蹤。frame/clip/pose-based 是模型輸入方式，不是三批新任務。背景 NA 不算傢俱組裝任務。",
+    "data": "SQLite videos/annotations 表以 video_id 關聯；indexing_files 的動作與動作物件關係共同排序，索引 0 插入 NA。ActivityNet 外形 JSON 的 database/annotation 或 results 內 segment 在此 loader 直接切 current_labels[start:end]，實際為 frame index，不能因格式名稱就當秒。",
+    "evaluation": "動作 evaluator 對每影片先算 frame top-1/top-3 和 balanced accuracy 再平均，並呼叫 ANET detection/classification AP。tIoU 閾值為 .1,.2,.3,.4,.5,.55 至 .95；eval_utils 以真正交集／聯集及 interpolated P/R 積分。tracking 入口採 dev3 的 MOT 格式並呼叫 motmetrics，細部 matching 尚未完整核讀。",
+    "standardization": {
+      "profile": "multiview_assembly_perception",
+      "reuse": "SQLite／split 索引、動作字典、frame segment 轉換及原生動作評分流程。",
+      "transform": "scan→camera→frame 建來源關聯，任務字典保留排序與 NA。case 記原始 frame 邊界與相機、輸出 logits 和片段分數；每影片平均與全 frame pooled 的統計分開，pose/tracking 另建 evaluator。",
+      "missing": "尚未取得 SQLite、影片、校準與標註或執行。姿態、分割與完整 MOT matching 需後續獨立 adapter。README 的 evaluate 路徑與 tree 中 evaluation 不同；入口解析 testset_filename 但建立 Dataset 時未顯式傳入，需確認實際 split 生效方式。"
+    },
+    "version_note": "倉庫解析名稱為 IkeaASM/IKEA_ASM_Dataset；README 保留早期 dev wording，但已存在實際處理／評分程式，不能標為只有計畫。物理組裝成功不由影格辨識 accuracy 證明。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "IkeaASM/IKEA_ASM_Dataset",
+        "requested_repo": "IkeaASM/ikea_asm_dataset",
+        "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "f25497d46f4119f1d6e5a2a85ee3be62929eab6c610500f86b1bf4301b4dcdc6",
+        "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/README.md",
+        "reading_url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/README.md#L1-L78",
+        "why": "精確論文身份、多模態資產與子任務",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IkeaASM/IKEA_ASM_Dataset",
+        "requested_repo": "IkeaASM/ikea_asm_dataset",
+        "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+        "ref": null,
+        "path": "action/README.md",
+        "ranges": [
+          [
+            1,
+            64
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 64,
+        "sha256": "4cad8127448f0913a23ca9c071c55635e4b71296614b29792828f4c1293674b9",
+        "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/README.md",
+        "reading_url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/README.md#L1-L64",
+        "why": "baseline 輸入與原生 split",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IkeaASM/IKEA_ASM_Dataset",
+        "requested_repo": "IkeaASM/ikea_asm_dataset",
+        "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+        "ref": null,
+        "path": "action/IKEAActionDataset.py",
+        "ranges": [
+          [
+            22,
+            100
+          ],
+          [
+            160,
+            226
+          ],
+          [
+            310,
+            346
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 690,
+        "sha256": "8178c0f321230af92f716986b2eb4f5367b28cff9e4cf73bb962b3793ed92ea1",
+        "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/IKEAActionDataset.py",
+        "reading_url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/IKEAActionDataset.py#L22-L100",
+        "why": "SQLite、字典排序、frame labels 與相機",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IkeaASM/IKEA_ASM_Dataset",
+        "requested_repo": "IkeaASM/ikea_asm_dataset",
+        "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+        "ref": null,
+        "path": "action/evaluation/evaluate.py",
+        "ranges": [
+          [
+            1,
+            112
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 112,
+        "sha256": "0f0419c4c8a143355691989b88a75598074d64ce8261774c93c297746b71bc87",
+        "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/evaluation/evaluate.py",
+        "reading_url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/evaluation/evaluate.py#L1-L112",
+        "why": "實際指標與聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IkeaASM/IKEA_ASM_Dataset",
+        "requested_repo": "IkeaASM/ikea_asm_dataset",
+        "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+        "ref": null,
+        "path": "action/evaluation/eval_utils.py",
+        "ranges": [
+          [
+            1,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 92,
+        "sha256": "ec04d8f2fb74f5da5e5557668add377e002a39231ab4db3761424f9574c7e6e2",
+        "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/evaluation/eval_utils.py",
+        "reading_url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/action/evaluation/eval_utils.py#L1-L92",
+        "why": "top-k、tIoU 與 AP 核心公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IkeaASM/IKEA_ASM_Dataset",
+        "requested_repo": "IkeaASM/ikea_asm_dataset",
+        "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+        "ref": null,
+        "path": "part-tracking/eval.py",
+        "ranges": [
+          [
+            1,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 28,
+        "sha256": "ef4ef2978e92139a3841c5879f7d67214609861b616d93f6515fb68d04c35342",
+        "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/part-tracking/eval.py",
+        "reading_url": "https://github.com/IkeaASM/IKEA_ASM_Dataset/blob/6fc2d9ea67557ca748b43257e99e3beb6d3cf069/part-tracking/eval.py#L1-L28",
+        "why": "MOT 子任務入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "45068a4b15dec8d4e58749cca49329e5fa0ead771322370c698784313382206b"
+  },
+  "repository_binding_review_sha256": "45068a4b15dec8d4e58749cca49329e5fa0ead771322370c698784313382206b",
+  "repository_bindings": [
+    {
+      "requested_repo": "IkeaASM/ikea_asm_dataset",
+      "resolved_repo": "IkeaASM/IKEA_ASM_Dataset",
+      "aliases_in_this_review": [
+        "ikeaasm/ikea_asm_dataset"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "6fc2d9ea67557ca748b43257e99e3beb6d3cf069",
+          "reviewed_files": [
+            "README.md",
+            "action/IKEAActionDataset.py",
+            "action/README.md",
+            "action/evaluation/eval_utils.py",
+            "action/evaluation/evaluate.py",
+            "part-tracking/eval.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/IkeaASM/ikea_asm_dataset",
+          "link_label": "code",
+          "project_url": "https://ikeaasm.github.io/",
+          "page_sha256": "163249523e87ff33e90b6eae76ecf7418468fc4faf2c0df7ec77ef9421ef5e20"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/IkeaASM/IKEA_ASM_Dataset",
+          "link_label": "code",
+          "project_url": "https://ikeaasm.github.io/",
+          "page_sha256": "163249523e87ff33e90b6eae76ecf7418468fc4faf2c0df7ec77ef9421ef5e20"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P016",
+          "review_file": "content/github_review/reviews/P016.json",
+          "review_sha256": "45068a4b15dec8d4e58749cca49329e5fa0ead771322370c698784313382206b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P016",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "IKEA ASM，arXiv 2007.00394v2。",
+    "scope_read": "資料與split、動作／分割／追蹤／姿態評分段落。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "裝配與生產作業"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "5個真實環境，桌上／地上共10相機配置；3台同步RGB相機。",
+    "tasks": "4種家具（side table、coffee table、TV bench、drawer）與原子装配動作；不是1,113個任務。",
+    "cases": "371次assembly，1,113 RGB視角影片及371 depth影片；本文16,764動作標註；254 train／117 test assembly scans。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 5,
+        "unit": "錄製環境",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "家具種類",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 371,
+        "unit": "assembly scans",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1113,
+        "unit": "RGB視角影片",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 117,
+        "unit": "test assembly scans",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "動作frame accuracy、macro-recall、mAP。",
+      "零件分割與MOT分開；追蹤MOTA、IDF1、IDs等。",
+      "3D姿態用MPJPE／PA-MPJPE、PCK@150mm。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "按環境保留family room與office測試；作者明示此主split不保證subject同時互斥，另提供其他切分腳本。",
+    "lineage": "自行錄製；空間標註僅1%影格人工，餘下有pseudo-GT；不可把全部影格稱人工標註。",
+    "evidence": [
+      {
+        "pages": [
+          4
+        ],
+        "locator": "Dataset statistics、Data split",
+        "supports": "5環境／371次裝配／254+117"
+      },
+      {
+        "pages": [
+          5,
+          6,
+          8
+        ],
+        "locator": "§4.1–4.5",
+        "supports": "多端点评分"
+      }
+    ],
+    "unresolved": [
+      "原子動作label完整清單与不同年份發布版本尚未逐ID對齊。"
+    ],
+    "reuse": "家具裝配與部件追蹤來源；環境泛化與受試者泛化要分開報。",
+    "reviewed_pdf_sha256": "5869f1542aa7372df85b6b4006127599aba58b0364d546d963dff8a3876080af",
+    "reviewed_on": "2026-10-02",
+    "name": "IKEA ASM",
+    "year": 2020,
+    "title": "The IKEA ASM Dataset: Understanding People Assembling Furniture through Actions, Objects and Pose",
+    "source_url": "https://arxiv.org/abs/2007.00394",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "industry"
+    ],
+    "review_tags": [
+      "組裝與拆解",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P016",
+      "domain_ids": [
+        "home",
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P016",
+          "domain_ids": [
+            "home",
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4種家具（side table、coffee table、TV bench、drawer）與原子装配動作；不是1,113個任務。",
+            "5個真實環境，桌上／地上共10相機配置；3台同步RGB相機。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "5869f1542aa7372df85b6b4006127599aba58b0364d546d963dff8a3876080af"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "5869f1542aa7372df85b6b4006127599aba58b0364d546d963dff8a3876080af",
+      "previous_domain_ids": [
+        "home",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P016",
+      "name": "IKEA ASM",
+      "expected_title": "The IKEA ASM Dataset: Understanding People Assembling Furniture through Actions, Objects and Pose",
+      "source_url": "https://arxiv.org/abs/2007.00394",
+      "pdf_url": "https://arxiv.org/pdf/2007.00394",
+      "retrieved_at": "2026-10-02T21:33:07.636591+00:00",
+      "pdf_sha256": "5869f1542aa7372df85b6b4006127599aba58b0364d546d963dff8a3876080af",
+      "text_sha256": "c5148c187bfd6d67816d0212538206410772e3c560a00b352e18033cdcdc9d40",
+      "pdf_bytes": 7916354,
+      "pages": 17,
+      "text_characters": 90616,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2007.00394v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2007.00394v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 5,
+        "unit": "錄製環境",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P016:1",
+        "paper_id": "P016",
+        "benchmark": "IKEA ASM",
+        "native_term": "錄製環境",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2007.00394v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2007.00394v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "家具種類",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P016:2",
+        "paper_id": "P016",
+        "benchmark": "IKEA ASM",
+        "native_term": "家具種類",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2007.00394v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2007.00394v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 371,
+        "unit": "assembly scans",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P016:3",
+        "paper_id": "P016",
+        "benchmark": "IKEA ASM",
+        "native_term": "assembly scans",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2007.00394v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2007.00394v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1113,
+        "unit": "RGB視角影片",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P016:4",
+        "paper_id": "P016",
+        "benchmark": "IKEA ASM",
+        "native_term": "RGB視角影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2007.00394v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2007.00394v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 117,
+        "unit": "test assembly scans",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P016:5",
+        "paper_id": "P016",
+        "benchmark": "IKEA ASM",
+        "native_term": "test assembly scans",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2007.00394v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2007.00394v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "IkeaASM/IKEA_ASM_Dataset"
+  ],
+  "external_repositories": []
+}

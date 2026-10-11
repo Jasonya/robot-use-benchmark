@@ -1,0 +1,245 @@
+{
+  "paper_id": "P029",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoThink 是單影像第一人稱思考問答。已核讀資料樣本、推論輸出、實際裁判 prompt 選擇與分數聚合；程式沿用 FastChat 格式，但原生分數不是其通用 1–10 分。",
+  "reading_order": [
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "README.md",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [
+        [
+          1,
+          117
+        ],
+        [
+          152,
+          197
+        ]
+      ],
+      "why": "精確論文身份、能力與流程"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "data/Activity/annotations.json",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [],
+      "why": "JSON /0 樣本欄位與 Ego4D parent",
+      "json_pointers": [
+        "/0"
+      ],
+      "scope": "Only selected JSON entries read; no full-file or full-line review claimed"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "eval.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [
+        [
+          1,
+          145
+        ]
+      ],
+      "why": "單影像讀取、預算與重編 ID"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "judge_prompts.jsonl",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [
+        [
+          1,
+          9
+        ]
+      ],
+      "why": "原生 reference-only 0/.5/1 prompt"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "gen_judgment.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [
+        [
+          19,
+          24
+        ],
+        [
+          29,
+          33
+        ],
+        [
+          71,
+          75
+        ],
+        [
+          112,
+          116
+        ],
+        [
+          142,
+          146
+        ],
+        [
+          168,
+          175
+        ],
+        [
+          178,
+          182
+        ],
+        [
+          184,
+          199
+        ],
+        [
+          201,
+          205
+        ],
+        [
+          212,
+          225
+        ],
+        [
+          234,
+          242
+        ],
+        [
+          276,
+          296
+        ],
+        [
+          310,
+          329
+        ],
+        [
+          341,
+          349
+        ],
+        [
+          352,
+          356
+        ]
+      ],
+      "why": "實際選用 single-math-v2"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "common.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [
+        [
+          129,
+          137
+        ],
+        [
+          152,
+          160
+        ],
+        [
+          173,
+          196
+        ],
+        [
+          343,
+          354
+        ]
+      ],
+      "why": "rating 解析／失敗／重試"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "show_result.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "ranges": [
+        [
+          3,
+          11
+        ],
+        [
+          32,
+          133
+        ],
+        [
+          142,
+          157
+        ],
+        [
+          169,
+          181
+        ]
+      ],
+      "why": "排除 -1、分組平均與未啟用去重"
+    }
+  ],
+  "environment": "來自人類第一人稱影像；樣本 source_dataset=ego4d，image_path 為本地圖片。能力目錄不等於生活場域或新實體環境；原影片時間／地點需另外補來源對映。",
+  "tasks": "六類能力目錄 Activity、Forecast、Localization、Object、Planning、Reasoning，下含 12 份 annotations.json。導航／協助題是文字規劃問答，未要求機器人執行。",
+  "data": "樣本含 source_dataset、image_path、question、answer；eval.py 用 image_path[0] 的檔名定位影像，依目錄順序重新給 question_id，輸出 question/model_answer/reference_answer JSONL。assistance/navigation token 預算300，其他30，需保留差異。",
+  "evaluation": "gen_judgment.py 實際採 judges[math] 的 single-math-v2 prompt：只看問題、參考與模型文字、不看圖片，給 0/.5/1；common.py 解析 [[rating]]，最多嘗試3次，失敗=-1。show_result.py 排除 -1 後平均，去重被註解；應額外報有效率和重複題，不能將保留樣本平均當全題 accuracy。",
+  "standardization": {
+    "profile": "image_qa_reference_judge",
+    "reuse": "十二能力題集結構、單影像 QA schema、原參考答案與具體 0/.5/1 裁判流程。",
+    "transform": "case 用 source+能力目錄+原始 row/hash 建穩定 ID，儲存生成 question_id 對映；記錄圖片、token budget、reference、judge model/version/prompt、原 judgment、解析重試與缺失。各能力分項，與 physical navigation evaluator 分開。",
+    "missing": "未執行模型／付費裁判。僅讀 Activity 第一筆資料樣本，未逐題查圖片與標籤；需確認各子集來源 video/time、去重與盲測切分。API 模型版本與裁判可靠性需另外驗證。"
+  },
+  "version_note": "README 列 VidEgoThink 為另一篇後續工作；不能因同 repo 宣傳連結就把其影片題目計入 EgoThink。現行預設裁判為 gpt-4o，原論文使用的模型／prompt 必須另依對應版本釘選。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "README.md",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "73682fb124df788f56990b1c42c5d17edec3220c645a9803b42150eb548018fd",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/README.md",
+      "local_file": "audit/.cache/github_review/repos/AdaCheng__EgoThink/files/README.md"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "data/Activity/annotations.json",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "91dea9b694644e70df90478597f680e80637f183031c1b10327f30cb1c62b81d",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/data/Activity/annotations.json",
+      "local_file": "audit/.cache/github_review_worker/early/files/AdaCheng__EgoThink/data/Activity/annotations.json"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "eval.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "dfef7972deca51e3bacd38ff6f74b804a11f2488277072a8c8160c135354fde4",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/eval.py",
+      "local_file": "audit/.cache/github_review/repos/AdaCheng__EgoThink/files/eval.py"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "judge_prompts.jsonl",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "10880d0de01f057fdfd1ecda1f2c2cb41fee29bc8192aeb9e932a4f7906f03cd",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/judge_prompts.jsonl",
+      "local_file": "audit/.cache/github_review_worker/early/files/AdaCheng__EgoThink/judge_prompts.jsonl"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "gen_judgment.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "860ddd030cceb90336a4e8806c96859728951fa0ce402a1289414897b424eb9a",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/gen_judgment.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/AdaCheng__EgoThink/gen_judgment.py"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "common.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "cb52b685cf693c67ffe40145f3d0157d9a0c95749be8808af493ab77f990958e",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/common.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/AdaCheng__EgoThink/common.py"
+    },
+    {
+      "repo": "AdaCheng/EgoThink",
+      "path": "show_result.py",
+      "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+      "sha256": "2b4dd98f628e64821f040140e18d87cb4d1e0c514646f317bf10fa2ebc726352",
+      "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/show_result.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/AdaCheng__EgoThink/show_result.py"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "paper_id": "P186",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "BiFold同庫含ICRA原作和加入時間上下文的workshop版本；可復用語言/雙手pick-place標註與SoftGym評估，但像素預測分數和物理摺疊結果要分開。",
+  "reading_order": [
+    {
+      "repo": "Barbany/bifold",
+      "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          25
+        ],
+        [
+          56,
+          63
+        ],
+        [
+          99,
+          167
+        ]
+      ],
+      "why": "兩篇版本、SoftGym/CLOTH3D、VR folding和真實影像來源"
+    },
+    {
+      "repo": "Barbany/bifold",
+      "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+      "path": "bifold/data/bimanual_dataset.py",
+      "ranges": [
+        [
+          19,
+          52
+        ],
+        [
+          117,
+          206
+        ]
+      ],
+      "why": "Zarr+CSV、camera矩陣、左右手vertex→pixel及start/end frame"
+    },
+    {
+      "repo": "Barbany/bifold",
+      "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+      "path": "bifold/env/softgym_evaluator.py",
+      "ranges": [
+        [
+          27,
+          49
+        ],
+        [
+          78,
+          87
+        ],
+        [
+          103,
+          128
+        ],
+        [
+          423,
+          469
+        ],
+        [
+          527,
+          624
+        ]
+      ],
+      "why": "具體雙手物理評測、oracle目標與粒子/IoU門檻"
+    },
+    {
+      "repo": "Barbany/bifold",
+      "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+      "path": "bifold/metrics/utils.py",
+      "ranges": [
+        [
+          1,
+          7
+        ]
+      ],
+      "why": "模擬mask IoU是0–100"
+    },
+    {
+      "repo": "Barbany/bifold",
+      "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+      "path": "bifold/metrics/__init__.py",
+      "ranges": [
+        [
+          76,
+          125
+        ]
+      ],
+      "why": "影像IoU與名稱KeypointMSE的實際公式"
+    }
+  ],
+  "environment": "客製SoftGym/PyFlex，載入CLOTH3D衣物；VR folding為父雙手資料，真實影像另一路徑。重貼texture/render與順序版衍生資料不當成獨立物理場景。",
+  "tasks": "單手/雙手語言摺疊，包含逐步與rollout評測；左右pick/place是動作欄位，不是4種獨立任務。原作與temporal extension各自保留合法history設定。",
+  "data": "vr_folding_dataset.zarr配actions/<partition>.csv，含left/right_grip_from/to、end_idx與text；3D vertex經相機矩陣投到pixel、depth依depth_scale還原。frame_start/frame_end是case對齊基礎，未來end位置只作GT label，不能自動暴露給policy。",
+  "evaluation": "同初態先跑oracle、再跑model；成功為平均對應particle距離<2×particle_radius，另報mask IoU及50/80/90門檻，task分組後macro平均。KeypointMSE實作是最近點L2距離且另除valid數量，不能直接當一般MSE；真實影像預測分數亦不是實體摺疊成功。",
+  "standardization": {
+    "profile": "language_guided_bimanual_cloth_folding",
+    "reuse": "Zarr/CSV/相機投影、原生partition、oracle相同初態比較與各metric公式。",
+    "transform": "case固定cloth asset/config/state、文字、history與相機；分開標註預測/物理粒子誤差/視覺IoU；VR與CLOTH3D lineage保留，衍生render與順序資料去重。",
+    "missing": "資產/原生split取得、temporal版本切分、GT多解/粒子對應有效性、KeypointMSE分母確認、真實成品與simulation重現。"
+  },
+  "version_note": "固定0b763d1，README同時連2501.16458和2505.07600；只有列出片段經核讀，未把workshop額外設定併為原作新task。",
+  "runtime_executed": false
+}

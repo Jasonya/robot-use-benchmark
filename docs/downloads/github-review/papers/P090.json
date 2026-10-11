@@ -1,0 +1,755 @@
+{
+  "paper_id": "P090",
+  "name": "Cloth Funnels",
+  "title": "Cloth Funnels: Canonicalized-Alignment for Multi-Purpose Garment Manipulation",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2210.09347",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P090",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已核讀 Cloth Funnels 模擬的 task HDF5、mesh split、replay reader/writer、剛體／變形距離及實際 eval_buffer。生成腳本規劃每類400個eval配置，但公開eval鏈只選hard子集；彙總固定取每回合最大IoU步，並非函式參數宣稱的第n步或最終步。",
+    "identity_note": "README 題名、七位作者與 arXiv:2210.09347 對應本篇；binding舊網址 columbia-ai-robotics/cloth-funnels 解析為 real-stanford/cloth-funnels。保留原始別名、canonical repo與同一commit，避免重複來源。 舊入口columbia-ai-robotics/cloth-funnels的已保存GitHub metadata回應指向real-stanford/cloth-funnels，按倉庫別名保留，不另外算成未讀的第二個倉庫。",
+    "requested_repo": "columbia-ai-robotics/cloth-funnels",
+    "resolved_repo": "real-stanford/cloth-funnels",
+    "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+    "environment": "修改版FleX/PyFlex粒子衣物與抽象雙picker，可達性與table參數另存；本輪核讀README主張的模擬評測鏈。原生xyz中y為高度，canonicalized-alignment要求指定平面姿態與衣物形狀；高coverage不能代替對齊。真機檔案雖在tree，本輪未聲稱真機／熨燙評測已完整核讀。",
+    "tasks": "主要目標為canonicalized-alignment，place/fling為預設primitive；longsleeve/pants/dress/jumpsuit/skirt為五衣物類別。生成腳本每類目標配額2000 train＝1500 hard＋500 easy、400 eval＝200 hard＋200 easy；第二次命令的num_tasks是累積配額，不再相加。實際eval loader只取hard，因此README的200與整份400有子集差異；未下載HDF5確認實際完成配額。fold_finish為下游shirt heuristic，不另當完成驗證的benchmark。",
+    "data": "類別JSON以train/test清單選mesh，生成器按args.eval抽對應衣物ID；不能用同檔未被調用的is_eval前綴helper替代。task HDF5包含particle_pos（擾動後起始狀態）、init_particle_pos（canonical目標）、particle_vel、shape_pos、phase、mesh_verts/faces/edges/nocs、cloth_instance、pkl_path、init_rgb/task_rgb、cloth_height/width與keypoint groups。flatten_area為mesh表面面積/2，get_config.cloth_area卻是cloth_height×cloth_width；距離正規化用後者。replay為episode_stepXX[_last]，有觀測、單像素action mask、旋轉／scale／primitive、pre/postaction_verts／masks、各metric與deformable_weight。writer丟掉task_name及cloth_instance，但保留task_pkl_path與init_verts；sum(init_verts)僅是既有查詢慣例，不是可靠唯一ID。",
+    "evaluation": "SimEnv.deformable_reward→learning.utils.deformable_distance：goal/current先將y設0，保留相同mesh頂點對應；以SVD及5次距離子集配準取得變形殘差，逆向配準取得剛體偏移，允許x鏡像取較小距離。原生l2_distance是變形項、icp_distance是剛體項、pointwise_distance是未配準點距；各除sqrt(cloth_height×cloth_width)，weighted_distance預設0.65×變形＋0.35×剛體。mask為RGB通道和>0；IoU=交集/聯集，coverage=當前mask像素/目標mask像素。init mask失敗時退用當前mask，應保留異常。SimEnv儲存rewards=0，學習reader才從pre−post metric重建reward並用0.072等尺度標準化，不能直接平均rewards欄。eval_buffer先hard-only，再每個episode固定選postaction_iou最大步，無視evaluate(mode,n)，10輪迴圈實際重複相同選擇，報mean與std/sqrt(N)。fold_finish在最後一步以三段shirt heuristic替代policy primitive，沒有獨立摺衣成品checker；應分開canonicalization與downstream成功。",
+    "standardization": {
+      "profile": "canonical_alignment_mesh_tasks_with_factorized_geometric_metrics",
+      "reuse": "mesh split與task目標／初態、固定對應頂點、分解距離／mask metric、HDF5狀態與primitive資料。",
+      "transform": "source綁canonical repo及commit；environment保留FleX/renderer/座標系；task保存對齊目標、衣物類及fold_finish協定；case用task來源雜湊＋原group ID＋mesh ID＋擾動；evaluator把legacy名稱映到deformable/rigid/pointwise並保存正規化面積、鏡像規則與step-selection。保留hard子集分母及policy-step與heuristic動作數，禁止自動轉成共同success。",
+      "missing": "實際task HDF5清單與case/replay穩定對照；非重複loader末筆等待修正；最大IoU／nth／last選步協定；失敗reset未落檔的分母；下游fold／真機與熨燙成功規則及資產校正。"
+    },
+    "integration_issues": [
+      "eval_buffer.py固定max_iou且hard-only，須明確顯示best-step協定；不能用mode=nth或10次重複輸出宣稱第10步結果。",
+      "TaskLoader在交付末筆Task之前進入while sleep，與FlingBot相同；失敗action／空畫面直接reset也可能不留下完整episode，應補失敗紀錄。",
+      "保留cloth_area長寬乘積與flatten_area面積/2的不同用途，以及legacy l2/icp/pointwise欄位，避免對調metric。",
+      "writer省略task_name/cloth_instance、sum(init_verts)可碰撞；建立可追溯case ID，不用vertex sum作唯一鍵。",
+      "README eval_buffer命令寫--path與run目錄，實際parser要求--input_path及HDF5檔；fold_finish一個step含三段動作，需獨立計budget。"
+    ],
+    "version_note": "固定2025-08-23 commit，晚於2022 arXiv；README標ICRA2023但BibTeX仍填2022，保留原論文與公開程式版本。只核讀所列模擬來源段落，未執行GPU、下載task/weights或宣稱真機全流程可用。",
+    "reviewed_on": "2026-10-11",
+    "runtime_executed": false,
+    "repository_aliases": [
+      {
+        "repo": "columbia-ai-robotics/cloth-funnels",
+        "canonical_repo": "real-stanford/cloth-funnels",
+        "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/columbia-ai-robotics/cloth-funnels",
+            "retrieved_at": "2026-10-10T07:44:49.470054+00:00",
+            "status": 200,
+            "resolved_url": "https://api.github.com/repositories/627975222",
+            "content_type": "application/json; charset=utf-8",
+            "bytes": 6862,
+            "sha256": "77e0ea9e03c29152828ce09056cc136d03bf8bb689b7aca73da85174742337a2"
+          }
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            46
+          ],
+          [
+            81,
+            85
+          ],
+          [
+            125,
+            155
+          ],
+          [
+            162,
+            249
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 250,
+        "sha256": "5a7c2b4d3142729d71661ac600a2c4a6d0909add95f8085f8fb9576a08e16d59",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/README.md",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/README.md#L1-L46",
+        "why": "確認論文、200個crumpled eval敘述、五衣物類及FlingBot/SoftGym來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/conf/config.yaml",
+        "ranges": [
+          [
+            1,
+            20
+          ],
+          [
+            29,
+            49
+          ],
+          [
+            57,
+            114
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 130,
+        "sha256": "9b4ba60d81d58c930ceb822302eacfb243869eb8c4ef3060162dca58f2f2f474",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/conf/config.yaml",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/conf/config.yaml#L1-L20",
+        "why": "核對訓練8步／eval覆寫10步、primitive、觀測與0.65權重。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/cloth_data/cloth3d_pickle/longsleeve.json",
+        "ranges": [
+          [
+            1,
+            1
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1,
+        "sha256": "901f9bf6a7fb7fd78e08a6cc115b80031fab0459033928744d613c3936092900",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/cloth_data/cloth3d_pickle/longsleeve.json",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/cloth_data/cloth3d_pickle/longsleeve.json#L1-L1",
+        "why": "實際train/test mesh ID列表，非由檔名前綴猜split。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/tasks/generate_tasks_script.py",
+        "ranges": [
+          [
+            1,
+            41
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 41,
+        "sha256": "a9732252d8b8e3e5d1d31a8a34145b9d83c7e8d2a82f884739f9720225c08949",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/tasks/generate_tasks_script.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/tasks/generate_tasks_script.py#L1-L41",
+        "why": "2000訓練與400測試生成配額、hard/easy的不同擾動。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/tasks/generate_tasks.py",
+        "ranges": [
+          [
+            54,
+            173
+          ],
+          [
+            255,
+            293
+          ],
+          [
+            330,
+            367
+          ],
+          [
+            374,
+            424
+          ],
+          [
+            457,
+            505
+          ],
+          [
+            532,
+            596
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 775,
+        "sha256": "abaff83b659291d50a8b5c7f63756c9859c38309768675610e277c2fedf32c85",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/tasks/generate_tasks.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/tasks/generate_tasks.py#L54-L173",
+        "why": "確認canonical goal／擾動初態、HDF5欄位、cloth_area與hard-only loader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/environment/Memory.py",
+        "ranges": [
+          [
+            1,
+            1
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1,
+        "sha256": "a603684d85c519995713a12a5a7fe44b92062afdb7dabdcaee3212104dba0dd5",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/environment/Memory.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/environment/Memory.py#L1-L1",
+        "why": "讀到symlink目標，避免把連結文字當writer。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/learning/Memory.py",
+        "ranges": [
+          [
+            109,
+            178
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 178,
+        "sha256": "1017b1f166ecfb88b83ed0afd4d4b919caa27ca99b77020892593eae36b01a05",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/learning/Memory.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/learning/Memory.py#L109-L178",
+        "why": "episode-step序列化及被刻意省略的task_name/cloth_instance欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/learning/utils.py",
+        "ranges": [
+          [
+            32,
+            199
+          ],
+          [
+            270,
+            343
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 521,
+        "sha256": "dea0e8b18cd4df6976f1bb1e7af20d6accba2b36dabe871a2634466a88d09074",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/learning/utils.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/learning/utils.py#L32-L199",
+        "why": "追到SVD配準與正規化距離、reward重建及HDF5 reader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/environment/simEnv.py",
+        "ranges": [
+          [
+            6,
+            41
+          ],
+          [
+            696,
+            779
+          ],
+          [
+            782,
+            832
+          ],
+          [
+            855,
+            873
+          ],
+          [
+            876,
+            922
+          ],
+          [
+            945,
+            1024
+          ],
+          [
+            1330,
+            1404
+          ],
+          [
+            1430,
+            1450
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1592,
+        "sha256": "2794f100ae518faca31b844e6d455d56e4a22f9dcfd4fc91cd009bc1f8fd77c5",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/environment/simEnv.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/environment/simEnv.py#L6-L41",
+        "why": "實際呼叫metric、mask計分、zero reward欄位、失敗reset、fold_finish與canonical reference。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/environment/flex_utils.py",
+        "ranges": [
+          [
+            269,
+            300
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 553,
+        "sha256": "a59a19235164ed61857676e18873c72bdf8bc13ae12aaf15bda561006067a527",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/environment/flex_utils.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/environment/flex_utils.py#L269-L300",
+        "why": "實際匯入版本的粒子覆蓋面積函式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/utils/env_utils.py",
+        "ranges": [
+          [
+            890,
+            936
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 936,
+        "sha256": "e4ae975b6c7e200744ffb1655be6b86a844ba755268353b25f072027f12d30fc",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/utils/env_utils.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/utils/env_utils.py#L890-L936",
+        "why": "六點幾何導出三段下游摺衣動作，不是成功裁判。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/utils/utils.py",
+        "ranges": [
+          [
+            100,
+            148
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 565,
+        "sha256": "fac6aa8f81d40b29102af5a8a5f00670c46f8eac444be7217da75b515bb0eadc",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/utils/utils.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/utils/utils.py#L100-L148",
+        "why": "eval_tasks／TaskLoader與SimEnv接線，另讀到sum(init_verts)重建查詢。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/run_sim.py",
+        "ranges": [
+          [
+            106,
+            120
+          ],
+          [
+            134,
+            170
+          ],
+          [
+            184,
+            193
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 263,
+        "sha256": "66623d4ba963c24b9ca4cbd8e5890911cd49709c3bba878bf0ba13d5d59a0266",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/run_sim.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/run_sim.py#L106-L120",
+        "why": "eval不更新模型、max_steps為buffer大小限制而非唯一case數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/cloth-funnels",
+        "requested_repo": "real-stanford/cloth-funnels",
+        "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+        "ref": null,
+        "path": "cloth_funnels/scripts/eval_buffer.py",
+        "ranges": [
+          [
+            8,
+            38
+          ],
+          [
+            41,
+            160
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 160,
+        "sha256": "5c2dbc9dab0edf3dce441424818e8efa50e06aa5fc447a83b8d6b377cf86f30f",
+        "url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/scripts/eval_buffer.py",
+        "reading_url": "https://github.com/real-stanford/cloth-funnels/blob/3b355304a62ca96d30d07b4c1a3c68408d2d5135/cloth_funnels/scripts/eval_buffer.py#L8-L38",
+        "why": "完整閱讀hard過濾、legacy metric名稱與固定max_iou步選擇。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4d4e1007783c2ec015ba55efe3d38e78bd9215c7e6f3f82d84a26cdf720640ad"
+  },
+  "repository_binding_review_sha256": "4d4e1007783c2ec015ba55efe3d38e78bd9215c7e6f3f82d84a26cdf720640ad",
+  "repository_bindings": [
+    {
+      "requested_repo": "real-stanford/cloth-funnels",
+      "resolved_repo": "real-stanford/cloth-funnels",
+      "aliases_in_this_review": [
+        "columbia-ai-robotics/cloth-funnels",
+        "real-stanford/cloth-funnels"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "3b355304a62ca96d30d07b4c1a3c68408d2d5135",
+          "reviewed_files": [
+            "README.md",
+            "cloth_funnels/cloth_data/cloth3d_pickle/longsleeve.json",
+            "cloth_funnels/conf/config.yaml",
+            "cloth_funnels/environment/Memory.py",
+            "cloth_funnels/environment/flex_utils.py",
+            "cloth_funnels/environment/simEnv.py",
+            "cloth_funnels/learning/Memory.py",
+            "cloth_funnels/learning/utils.py",
+            "cloth_funnels/run_sim.py",
+            "cloth_funnels/scripts/eval_buffer.py",
+            "cloth_funnels/tasks/generate_tasks.py",
+            "cloth_funnels/tasks/generate_tasks_script.py",
+            "cloth_funnels/utils/env_utils.py",
+            "cloth_funnels/utils/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/columbia-ai-robotics/cloth-funnels",
+          "link_label": "here",
+          "project_url": "https://clothfunnels.cs.columbia.edu",
+          "page_sha256": "edc46578267676ef8796ec9e82ac0a53d69a253f15e52ef753f52ef9e68ae200"
+        },
+        {
+          "kind": "authored_repository_alias",
+          "paper_id": "P090",
+          "review_sha256": "4d4e1007783c2ec015ba55efe3d38e78bd9215c7e6f3f82d84a26cdf720640ad",
+          "alias": {
+            "repo": "columbia-ai-robotics/cloth-funnels",
+            "canonical_repo": "real-stanford/cloth-funnels",
+            "reason": "原作舊網址重新導向已核讀的同一GitHub倉庫；名稱不增加獨立來源數，實際程式版本仍由reading_order固定。",
+            "evidence": [
+              {
+                "requested_url": "https://api.github.com/repos/columbia-ai-robotics/cloth-funnels",
+                "retrieved_at": "2026-10-10T07:44:49.470054+00:00",
+                "status": 200,
+                "resolved_url": "https://api.github.com/repositories/627975222",
+                "content_type": "application/json; charset=utf-8",
+                "bytes": 6862,
+                "sha256": "77e0ea9e03c29152828ce09056cc136d03bf8bb689b7aca73da85174742337a2"
+              }
+            ]
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P090",
+          "review_file": "content/github_review/reviews/P090.json",
+          "review_sha256": "4d4e1007783c2ec015ba55efe3d38e78bd9215c7e6f3f82d84a26cdf720640ad",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P090",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Cloth Funnels: Canonicalized-Alignment for Multi-Purpose Garment Manipulation；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "role": "柔性物操作benchmark",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "CLOTH3D simulation與真實衣物工作站，5garment categories。",
+    "tasks": "canonicalized alignment，另支援folding/ironing；highcoverage不保證對齊。",
+    "cases": "每garment category2,000train/400test settings；hard/easy train75/25、test50/50。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 5,
+        "unit": "garment categories",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 400,
+        "unit": "unseen-mesh test settings per category",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "IoU/coverage及分離rigid-alignment和deformable errors；fold success為qualitatively選的error門檻。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "環境狀態與過程檢查"
+    ],
+    "split": "mesh-disjoint，easy/hard是不同初態生成；eachgarmentcategory獨立policy。",
+    "lineage": "CLOTH3D／FlingBot資料生成構想；downstreamfoldheuristic非新end-to-end模型。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "real全部trajectory分母未在已讀段報出；不可套用sim400為realcase數。"
+    ],
+    "reuse": "把攤平、對齊和指定摺法拆成可驗收目標，適合作為擴充規則依據。",
+    "reviewed_pdf_sha256": "06417ac85cf98e06ede6fd96b746e6e1ce3ad99ca09fcd9f61789122d0ecfcdb",
+    "reviewed_on": "2026-10-02",
+    "name": "Cloth Funnels",
+    "year": 2022,
+    "title": "Cloth Funnels: Canonicalized-Alignment for Multi-Purpose Garment Manipulation",
+    "source_url": "https://arxiv.org/abs/2210.09347",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織",
+      "洗衣服務"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P090",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P090",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "canonicalized alignment，另支援folding/ironing；highcoverage不保證對齊。",
+            "CLOTH3D simulation與真實衣物工作站，5garment categories。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "06417ac85cf98e06ede6fd96b746e6e1ce3ad99ca09fcd9f61789122d0ecfcdb"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "06417ac85cf98e06ede6fd96b746e6e1ce3ad99ca09fcd9f61789122d0ecfcdb",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P090",
+      "name": "Cloth Funnels",
+      "expected_title": "Cloth Funnels: Canonicalized-Alignment for Multi-Purpose Garment Manipulation",
+      "source_url": "https://arxiv.org/abs/2210.09347",
+      "pdf_url": "https://arxiv.org/pdf/2210.09347",
+      "retrieved_at": "2026-10-02T22:13:41.990942+00:00",
+      "pdf_sha256": "06417ac85cf98e06ede6fd96b746e6e1ce3ad99ca09fcd9f61789122d0ecfcdb",
+      "text_sha256": "ab951e526fb9f0f82c13e65fe2145dbde3788dbaee75ede2d2de2552d0cbccfa",
+      "pdf_bytes": 5939866,
+      "pages": 8,
+      "text_characters": 51266,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2210.09347v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2210.09347v1"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 5,
+        "unit": "garment categories",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P090:1",
+        "paper_id": "P090",
+        "benchmark": "Cloth Funnels",
+        "native_term": "garment categories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2210.09347v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2210.09347v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 400,
+        "unit": "unseen-mesh test settings per category",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P090:2",
+        "paper_id": "P090",
+        "benchmark": "Cloth Funnels",
+        "native_term": "unseen-mesh test settings per category",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2210.09347v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2210.09347v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "real-stanford/cloth-funnels"
+  ],
+  "external_repositories": []
+}

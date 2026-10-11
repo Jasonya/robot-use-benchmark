@@ -1,0 +1,149 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gated Temporal Diffusion｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="已核 GTDA 的 Breakfast/50Salads 與 Assembly101 loader、DDIM inference 及 Mean/Max MoC／Frame Diversity。三個指標有不同分母：candidate-pooled class accuracy、逐 case/β oracle 選樣後 class accuracy，以及候選兩兩 frame disagreement；不可折成共同 success 或把 Top-1 當部署模型選出的最佳預測。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P237.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P237.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P237.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="Gated Temporal Diffusion｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="已核 GTDA 的 Breakfast/50Salads 與 Assembly101 loader、DDIM inference 及 Mean/Max MoC／Frame Diversity。三個指標有不同分母：candidate-pooled class accuracy、逐 case/β oracle 選樣後 class accuracy，以及候選兩兩 frame disagreement；不可折成共同 success 或把 Top-1 當部署模型選出的最佳預測。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P237.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P237.html","title":"Gated Temporal Diffusion｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P237.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P237.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P237 · Gated Temporal Diffusion</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P237 · Gated Temporal Diffusion</h1><p class="lede">Gated Temporal Diffusion for Stochastic Long-Term Dense Anticipation</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>方法／綜述參考</span><a href="https://arxiv.org/abs/2407.11954" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+
+    </div>
+    <p class="github-scope">核讀快照 2026-10-11。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">已核 GTDA 的 Breakfast/50Salads 與 Assembly101 loader、DDIM inference 及 Mean/Max MoC／Frame Diversity。三個指標有不同分母：candidate-pooled class accuracy、逐 case/β oracle 選樣後 class accuracy，以及候選兩兩 frame disagreement；不可折成共同 success 或把 Top-1 當部署模型選出的最佳預測。</p>
+    <aside class="github-version"><b>版本與身份</b><p>固定 010bad63c802e1666f64943dd098f3ac7be13118（2025-05-29），晚於ECCV 2024。readme所稱 precomputed_&lt;dataset&gt; 命名與實際 predict_precomp_bf_prob.sh 不同。論文對Breakfast/Assembly用50 DDIM steps，50Salads用10；不能把兩個已讀指令碼的50套全資料集。paper p.14 明指ANTICIPATR協定不同，不應與P240數值直接合併。僅讀核心區段及小型split/label來源，未跑模型或載入pickle／大資產。</p><p>arXiv:2407.11954v1（2024-07-16），Olga Zatsarynna、Emad Bahrami、Yazan Abu Farha、Gianpiero Francesca、Juergen Gall；PDF p.1 直接給 olga-zats/GTDA，README 引同一 ECCV 2024 論文。GTD 是 stochastic diffusion、GTAN 是其 deterministic backbone；同 repo 兩個模式不增加獨立來源數。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>方法／綜述參考，未另作來源用途歸納。</dd></div><div><dt>環境</dt><dd>離線烹飪（Breakfast、50 Salads）及玩具車組裝／拆解（Assembly101）。Assembly CSV 含固定 RGB 相機與頭戴 HMC view，程式按存在的 numpy feature 過濾，沒有隻選 Ego view 的條件；視角欄位必須留在 case，不能把所有來源標第一人稱。</dd></div><div><dt>任務</dt><dd>以 α=0.2/0.3 的觀測預測 β=0.1/0.2/0.3/0.5 的逐格動作標籤。Breakfast mapping=48類含 SIL；50Salads mapping=19類（17動作+action_start/action_end）；Assembly 使用 coarse action_cls/action_id，附帶 actions.csv 有202類，不是全部細粒度 action 組合。每訓練 video/view 衍生 α=.2/.3/.5 的3個 observation case，另有40%機率改為 .15+.25U；這些不是3支新增影片。</dd></div><div><dt>題數與資料</dt><dd>Breakfast/50s 為 D×T 的 .npy、逐行 label .txt、mapping.txt、split bundle。sample 回傳 features、classes、classes_all、classes_one_hot、mask_past、mask_future、vid_len、file_name；feature 只取 [:int(αT)] 並 [::sample_rate]，collate 在未來／padding補零，label padding=C+1。--part_obs 將 prediction span設為全影片的 .5，所需長度仍源自完整 GT T。Assembly CSV 為 video_id,view,action_type,video_start_frame,video_end_frame；coarse_labels/{action_type}_{video_id}.txt 每行 tab 分隔 start,end,label（尾空欄依實作），依 end-start 展開，程式註明 @30fps；TSM_features/{video_id}/{view}/features.npy 用 [start:end] 裁切。feature缺檔、空segment或無長度會跳過，lmdb分支未實作。固定 split4 bundle 1136 train／576 test unique video keys，無交集；這是名單數。Assembly train/val CSV 4684/1424列、204/61個 video_id，各16種view；尚非有效執行case數。儲存預測 pickle 以 action_type_video_id_view 或 Breakfast file_name 為key，值為K組復原逐格預測，gt_ 字首是全長GT。</dd></div><div><dt>評估方式</dt><dd>線上 validate 強制 batch_size=1，stochastic 用 EMA 產生 K=25 候選；Breakfast示例 sample_rate=3，Assembly=6，預測每個取樣位置重複該倍數回原格。對 [int(αT):int((α+β)T)] 計 n_T/n_F。Mean MoC 先把所有影片、全部K候選的每GT類別正誤格數相加，再對有GT的類別平均 T/(T+F)，輸出0..1；不是每影片MoC的平均。Max/Top-1 MoC 對每影片及每β依GT挑該範圍MoC最高的一個候選，累積其類別計數後再宏平均，同影片不同β可選不同候選。precomputed Frame Diversity 對每case取 K(K-1)/2 配對的 [1-相同frame數/該future窗長] 平均，再等權平均case。完整K=25對應300配對；test_num_samples 預設1會除零，不能沿用其預設。eval_file 另算 normalized segment Levenshtein error，但目前 MoC caller 丟棄該回傳，不能當正式主指標。程式把 x_0 GT傳到 predict，但底層只用 zeros_like取得形狀，生成值起於高斯噪聲；仍依賴GT長度，與GT action值洩漏需分辨。</dd></div></dl>
+
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/README.md#L1-L25" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>正式題名、作者與 Breakfast/Assembly features／annotation 外部依賴。</p><small>L1–25 · L34–94</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 881b66f8dff8aef566bfbf26bda7c7a5d408f90cbc9a93a4e58a5b1541685adc</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/main.py#L148-L224" target="_blank" rel="noopener noreferrer"><code>src/main.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>資料分支、真實 action dict、α 與 evaluation 入口。</p><small>L148–224</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 6c65b4cb8936a1699d311aa95c2a894950e8b567b2b2817f58eb48a499d3254b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/batch_gen.py#L34-L136" target="_blank" rel="noopener noreferrer"><code>src/batch_gen.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>bundle、3 個訓練 observation case、部分未來長度、零補 features 與 masks。</p><small>L34–136 · L159–216</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 7f14d82d8faf567e5e9600d386a9badd0baf89b7015857b42ebaa7c2316f5cb2</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/batch_gen_assembly.py#L18-L20" target="_blank" rel="noopener noreferrer"><code>src/batch_gen_assembly.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>view/action_type identity、coarse segment/end-exclusive 展開與缺 feature 排除。</p><small>L18–20 · L78–179 · L182–255 · L278–332</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 30dedde3e1372edac250e7ac95185d0859a84e222df6dca6c474513711f6e892</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/trainers.py#L22-L55" target="_blank" rel="noopener noreferrer"><code>src/trainers.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>EMA sampling、原 frame 回復、Mean/Max MoC、輸出 pickle 與無效 stochastic Acc。</p><small>L22–55 · L283–341 · L345–456 · L459–569</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 3c61b9b9fb7dda80252f892755c13bf4059d7a424836d35f2f44628034c6a9f1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/bit_diffusion.py#L305-L352" target="_blank" rel="noopener noreferrer"><code>src/bit_diffusion.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>確認 x_0 僅供形狀；self-condition 是先前預測，輸入 features 按觀測 mask。</p><small>L305–352 · L380–471</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 59ef285a47179eba40a53f2ecda3aeaf77b5e749848b4e3228709bdb94ef4969</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/evaluation.py#L12-L87" target="_blank" rel="noopener noreferrer"><code>src/evaluation.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>實際 class TP/FN 計數、frame mismatch、segment edit 距離。</p><small>L12–87</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 82269649ba165793b4074e497468dc1b9248e991cd0a10a8ce56c106f8e18891</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/diff_evaluate.py#L14-L150" target="_blank" rel="noopener noreferrer"><code>src/diff_evaluate.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>預存候選選擇、best-per-case-and-horizon、成對 Frame Diversity 與聚合分母。</p><small>L14–150</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 8953ac52ffa243005ef761e40b1db5ad2e359436bef8c44ceb531b25034986c0</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/main_diff_evaluate.py#L16-L29" target="_blank" rel="noopener noreferrer"><code>src/main_diff_evaluate.py</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>precomputed 評測缺 mapping 的入口與 Assembly 空 dict 問題。</p><small>L16–29 · L43–83</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 5845452e3e76181bac6c6acbec692d6218a16f3178c35d47e332c9e078348fea</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_bf_prob.sh#L1-L33" target="_blank" rel="noopener noreferrer"><code>scripts/prob/predict_bf_prob.sh</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>Breakfast split4、K=25、sample_rate=3、50/1000步與 epoch85。</p><small>L1–33</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 495c3138e0f4dde8a1a09fba354ff2181f653a271cd079f381ed4c32f489d70a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_assembly_prob.sh#L1-L30" target="_blank" rel="noopener noreferrer"><code>scripts/prob/predict_assembly_prob.sh</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>Assembly val、K=25、sample_rate=6與部分觀測。</p><small>L1–30</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 17638ef1d24aa1033f699b4195a51345d55deb3c076fb0d488a6687a881e26ac</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/determ/predict_bf_determ.sh#L2-L29" target="_blank" rel="noopener noreferrer"><code>scripts/determ/predict_bf_determ.sh</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>GTAN 無 diffusion，且示例用不同 split1。</p><small>L2–29</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 59030a2305bf9b05687fe042bdb527d42cd88537cb8e6706ef23ffeec5c90e0d</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_precomp_bf_prob.sh#L1-L19" target="_blank" rel="noopener noreferrer"><code>scripts/prob/predict_precomp_bf_prob.sh</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>K=25 的 precomputed 示例未傳 --mapping_file。</p><small>L1–19</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 0138fb3e5e4c31a56cce626c3073d78e2a55b0c15c8d42593c0aeaeafd9a809c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/50salads/mapping.txt#L1-L19" target="_blank" rel="noopener noreferrer"><code>datasets/50salads/mapping.txt</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>17 動作外另含 action_start/action_end，原生19類。</p><small>L1–19</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 d9896add0c02ba39649eb1745a8082c294d37b758961d4c4f425526630c549f7</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/mapping.txt#L1-L48" target="_blank" rel="noopener noreferrer"><code>datasets/breakfast/mapping.txt</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>48類含 SIL，保留原始ID。</p><small>L1–48</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 7352004e679ab525bd8e0f0b82c29e64f394f4f5cee4d860dbefd594453c6f6e</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/actions.csv#L1-L16" target="_blank" rel="noopener noreferrer"><code>datasets/assembly101/actions.csv</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>coarse action_id/verb_id/noun_id/action_cls 欄位與邊界 ID；不等於 fine labels。</p><small>L1–16 · L195–203</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 65cb686c26016ee500947b0a4d48f7d403d77c47fb02d76e4fb678393ee18795</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/train.csv#L1-L12" target="_blank" rel="noopener noreferrer"><code>datasets/assembly101/train.csv</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>原生訓練 CSV 的 video、view、action_type、起訖影格樣例。</p><small>L1–12</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 597fe9a03b795f60b799ce36e90801c5ced83255a2bcbb78e08122ebedc4f84f</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/val.csv#L1-L12" target="_blank" rel="noopener noreferrer"><code>datasets/assembly101/val.csv</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>原生 validation CSV 與多視角身份。</p><small>L1–12</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 6f602de17e9013c04721dae94bd0e59f1687ee9cceb4e766c876aa1d34afc033</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/splits/train.split4.bundle#L1-L8" target="_blank" rel="noopener noreferrer"><code>datasets/breakfast/splits/train.split4.bundle</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>固定 split4 訓練名單樣例；另以全列 key scan 檢驗計數。</p><small>L1–8</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 b3d2994cb981e466272d7fc562f8af5bce8ed886551c76953fb075e22aae6de9</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/splits/test.split4.bundle#L1-L8" target="_blank" rel="noopener noreferrer"><code>datasets/breakfast/splits/test.split4.bundle</code> ↗</a><span>GitHub · olga-zats/GTDA · 010bad63c8</span></div>
+      <p>固定 split4 評測名單樣例；另以全列 key scan 檢驗計數。</p><small>L1–8</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 bf9bc8ed43860632ef5b86df64ccee51b8e9db35eff9d379067494c76427d4e6</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>原生 mapping、split與view身份、coarse-to-frame規則、TP/FN累積、候選pickle結構及Frame Diversity程式。</p></section><section><h3>需要轉換</h3><p>source 記paper/repo/data-feature revision，domain/environment依烹飪或組裝與view分類；task區分deterministic GTAN／stochastic GTD；case=(dataset revision,fold或train/val,video,action_type,view,α,β)，candidate_index屬case內試樣。保留annotation frame reference、sample_rate、GT-length protocol、K、EMA/checkpoint、diffusion T/D；evaluator標明Mean MoC／oracle Top-1 MoC／pairwise diversity各自分母與0..1尺度，不能直接對齊P236的百分比或P240的mAP。</p></section><section><h3>仍需補齊</h3><p>固定TSM/I3D及Assembly coarse annotation版本、實際feature存在清單，驗證start/end與view長度裁切。線上stochastic分支沒有累加frame error/num_frames卻仍輸出Acc，會得到0/0，應列為無效欄位。precomputed讀取硬編碼 /home/user/diff_results/final，與writer的 ./diff_results 不同；predict_precomp_bf_prob.sh未傳mapping_file；Assembly的main_diff_evaluate把actions_dict設空，eval_file會以零長類別陣列索引，須修復後才能重評。固定test_num_samples&gt;=2並檢查候選數／長度、有效GT窗；原程式min(pred_len,GT_len)可能縮短評測分母。尚未閉合50Salads的示例指令碼／checkpoints與完整跨fold聚合。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;provider&quot;: &quot;primary_paper&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P237/pages.json&quot;,
+    &quot;sha256&quot;: &quot;43da9448312f48c6d6173c3eb64909bfdcbd8d9c7a0829984b7ab40f9380a791&quot;,
+    &quot;url&quot;: &quot;https://arxiv.org/pdf/2407.11954&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/0/text&quot;,
+      &quot;/8/text&quot;,
+      &quot;/9/text&quot;,
+      &quot;/13/text&quot;,
+      &quot;/19/text&quot;,
+      &quot;/28/text&quot;
+    ],
+    &quot;version&quot;: &quot;arXiv:2407.11954v1; ECCV 2024&quot;,
+    &quot;pdf_local_file&quot;: &quot;audit/.cache/fulltext_review/P237/paper.pdf&quot;,
+    &quot;pdf_sha256&quot;: &quot;f6c21ba878b3a9f3a21fb3198b583f08ba445805d677655b101b549d90b450f5&quot;,
+    &quot;pages&quot;: [
+      1,
+      9,
+      10,
+      14,
+      20,
+      29
+    ]
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P237.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P236.html">← 上一篇 · ActFusion</a><a href="P238.html">下一篇 → · Object-centric LTA</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

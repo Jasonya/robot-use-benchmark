@@ -1,0 +1,473 @@
+{
+  "paper_id": "P192",
+  "name": "Phys-Liquid",
+  "title": "Phys-Liquid: A Physics-Informed Dataset for Estimating 3D Geometry and Volume of Transparent Deformable Liquids",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2511.11077",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "lab"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P192",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Phys-Liquid提供液體幾何/尺度估計reader及F-score/voxel IoU程式，但README的總量仍是N佔位、完整下載入口TBD；不能把樣本庫視為完整benchmark已取得。",
+    "environment": "模擬實驗室透明液體/容器，顏色、照明、場景與旋轉設定；六張生成/重建視角屬同一樣本的觀測，不增加六個環境。",
+    "tasks": "透明液體segmentation、多視角mask、3D reconstruction及metric scale/volume估計；屬於感知/量測任務，不直接驗證robot倒水或吸液完成。",
+    "data": "sample/frame目錄有multiview_images.png、volumes.json、real_volume.json；拼圖切成6×256²。pseudo volume乘1e-6、width乘1e-2；label_mode可為體積比、三軸比、算術/幾何平均，需記模式與單位。缺檔/GT會跳過，README沒有可用總量數字。",
+    "evaluation": "F-score先各自質心對齊，隨機採10000surface points，以距離門檻(預設0.02)算precision/recall；不測絕對位置誤差。frame缺pred/GT/載入錯誤被略過，再sample內均值→sample間均值。voxel IoU以各網格grid_index相交，shared origin/voxel尺度需驗證；這些都不是task成功率。",
+    "standardization": {
+      "profile": "transparent_liquid_geometry_and_volume",
+      "reuse": "具體label生成、前處理與原生幾何metrics，可作universal benchmark的量測能力來源。",
+      "transform": "case_id連到物理sample/frame與view；保存原始/重建mesh、座標/單位/scale mode，GT只給scorer；報attempted/valid/skipped與metric seed，避免有效子集分母混淆。",
+      "missing": "完整公開資料/精確數量、正式split manifest、物理單位、voxel共同grid、sample間相依性與task級液體操作驗收。"
+    },
+    "version_note": "固定2d4e3c8，AAAI26 source/sample repo；split_data.py只是指定結果資料夾複製工具，沒有據此宣稱已取得完整train/test。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "dualtransparency/Phys-Liquid-AAAI",
+        "requested_repo": "dualtransparency/Phys-Liquid-AAAI",
+        "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            36
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 36,
+        "sha256": "4c8aac7cadd3d51be3346705a98d0682489dac1269ffe45a6401678a6aa0ebee",
+        "url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/README.md",
+        "reading_url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/README.md#L1-L36",
+        "why": "原作、四階段重建與sample/full release狀態",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "dualtransparency/Phys-Liquid-AAAI",
+        "requested_repo": "dualtransparency/Phys-Liquid-AAAI",
+        "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+        "ref": null,
+        "path": "volume_estimate/dataset.py",
+        "ranges": [
+          [
+            9,
+            108
+          ],
+          [
+            113,
+            140
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 177,
+        "sha256": "c33008330084993bba58a9d480a28cd812d894dc4742659425f90e37c4fb3ae9",
+        "url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/volume_estimate/dataset.py",
+        "reading_url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/volume_estimate/dataset.py#L9-L108",
+        "why": "sample/frame結構、6視角拼圖、體積/尺度ratio標籤",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "dualtransparency/Phys-Liquid-AAAI",
+        "requested_repo": "dualtransparency/Phys-Liquid-AAAI",
+        "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+        "ref": null,
+        "path": "metrics/F-Score.py",
+        "ranges": [
+          [
+            10,
+            94
+          ],
+          [
+            112,
+            189
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 213,
+        "sha256": "7a7043b44c0762b1947f1626366bd796ea4d558ceceb4ac11f493987ccb7aa7e",
+        "url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/metrics/F-Score.py",
+        "reading_url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/metrics/F-Score.py#L10-L94",
+        "why": "質心對齊、點採樣、距離門檻與跳過/聚合分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "dualtransparency/Phys-Liquid-AAAI",
+        "requested_repo": "dualtransparency/Phys-Liquid-AAAI",
+        "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+        "ref": null,
+        "path": "metrics/volume_iou.py",
+        "ranges": [
+          [
+            20,
+            50
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 151,
+        "sha256": "6acdae3ed510ea4d65a33a3a391ca536ddc4c48b561a2108adf87b6199057bed",
+        "url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/metrics/volume_iou.py",
+        "reading_url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/metrics/volume_iou.py#L20-L50",
+        "why": "mesh體素化與grid-index IoU",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "dualtransparency/Phys-Liquid-AAAI",
+        "requested_repo": "dualtransparency/Phys-Liquid-AAAI",
+        "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+        "ref": null,
+        "path": "split_data.py",
+        "ranges": [
+          [
+            1,
+            60
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 60,
+        "sha256": "a2f963ee1c5faf95a96b8456fda65e508b9d3917fabbfd4616f6a87419b42240",
+        "url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/split_data.py",
+        "reading_url": "https://github.com/dualtransparency/Phys-Liquid-AAAI/blob/2d4e3c877023b0bc35a7d579de70855f0de3e73b/split_data.py#L1-L60",
+        "why": "手列13個結果目錄複製，非完整split生成協定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "292b2b37e3860c1e1e6a6029e19fb1ebaf34f5613af3b51bb6bfb69557958d8e"
+  },
+  "repository_binding_review_sha256": "292b2b37e3860c1e1e6a6029e19fb1ebaf34f5613af3b51bb6bfb69557958d8e",
+  "repository_bindings": [
+    {
+      "requested_repo": "dualtransparency/Phys-Liquid-AAAI",
+      "resolved_repo": "dualtransparency/Phys-Liquid-AAAI",
+      "aliases_in_this_review": [
+        "dualtransparency/phys-liquid-aaai"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "2d4e3c877023b0bc35a7d579de70855f0de3e73b",
+          "reviewed_files": [
+            "README.md",
+            "metrics/F-Score.py",
+            "metrics/volume_iou.py",
+            "split_data.py",
+            "volume_estimate/dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/dualtransparency/Phys-Liquid-AAAI",
+          "link_label": "Code",
+          "project_url": "https://dualtransparency.github.io/Phys-Liquid/",
+          "page_sha256": "ff108c30869499a8ea5affad8b77333c75b213b9d4e660c7c3eff763da4ee488"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P192",
+          "review_file": "content/github_review/reviews/P192.json",
+          "review_sha256": "292b2b37e3860c1e1e6a6029e19fb1ebaf34f5613af3b51bb6bfb69557958d8e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "實驗室操作"
+  ],
+  "source_review": {
+    "paper_id": "P192",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Phys-Liquid，arXiv 2511.11077v1。",
+    "scope_read": "渲染組成、100sequences、90/10切分、reconstruction與real驗證。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      11
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "液體感知benchmark",
+    "environment": "Blender/Mantaflow的5lab scenes、20containers、8lights、5colors、6orthographic views。",
+    "tasks": "單/多視角液體形狀與體積重建，未直接評robot pouring控制。",
+    "cases": "100simulation sequences×81timesteps＝8,100液體meshes；97,200images含RGB和mask兩種，不能全叫獨立RGB題。90/10sequence split。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 5,
+        "unit": "lab scenes",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100,
+        "unit": "simulation configuration sequences",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "held-out sequences",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 97200,
+        "unit": "RGB與mask image files合計",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "2D IoU、3D CD/Volume IoU/F-score、dimension RMSE、scale MAPE；部分baseline只比50張random test images。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "以整條temporal sequence切90/10，避免相鄰frames跨split；real 10containers驗證不等於10固定interaction tasks。",
+    "lineage": "simulation-generated感知資料；不同視角與mask共享同一物理狀態。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          11
+        ],
+        "locator": "Dataset Construction、Table 1、Experiments",
+        "supports": "5/100/97200、90/10及50image子集"
+      }
+    ],
+    "unresolved": [
+      "p4文字Three scenes與Lab1–Lab5衝突，以Table1和資料組成5為據；完整real case IDs未報。"
+    ],
+    "reuse": "可作液體觀測模組與量測參考；仍需另建可執行倒液任務及物理終態判分。",
+    "reviewed_pdf_sha256": "827b09bcc3b8968cc32b21f332b5b31286c3784578fc04a00435cb0dd6b6700b",
+    "reviewed_on": "2026-10-02",
+    "name": "Phys-Liquid",
+    "year": 2025,
+    "title": "Phys-Liquid: A Physics-Informed Dataset for Estimating 3D Geometry and Volume of Transparent Deformable Liquids",
+    "source_url": "https://arxiv.org/abs/2511.11077",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "lab"
+    ],
+    "review_tags": [
+      "實驗室操作",
+      "液體處理"
+    ],
+    "domain_names": [
+      "實驗室操作"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P192",
+      "domain_ids": [
+        "lab"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P192",
+          "domain_ids": [
+            "lab"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            11
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "單/多視角液體形狀與體積重建，未直接評robot pouring控制。",
+            "Blender/Mantaflow的5lab scenes、20containers、8lights、5colors、6orthographic views。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "827b09bcc3b8968cc32b21f332b5b31286c3784578fc04a00435cb0dd6b6700b"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "827b09bcc3b8968cc32b21f332b5b31286c3784578fc04a00435cb0dd6b6700b",
+      "previous_domain_ids": [
+        "lab"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P192",
+      "name": "Phys-Liquid",
+      "expected_title": "Phys-Liquid: A Physics-Informed Dataset for Estimating 3D Geometry and Volume of Transparent Deformable Liquids",
+      "source_url": "https://arxiv.org/abs/2511.11077",
+      "pdf_url": "https://arxiv.org/pdf/2511.11077",
+      "retrieved_at": "2026-10-02T21:35:03.531651+00:00",
+      "pdf_sha256": "827b09bcc3b8968cc32b21f332b5b31286c3784578fc04a00435cb0dd6b6700b",
+      "text_sha256": "38c204a87757f74dfd146f10c3990031ef236ac108e9e2f13c9c61103e8d56b4",
+      "pdf_bytes": 17417546,
+      "pages": 14,
+      "text_characters": 97697,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2511.11077v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2511.11077v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 5,
+        "unit": "lab scenes",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P192:1",
+        "paper_id": "P192",
+        "benchmark": "Phys-Liquid",
+        "native_term": "lab scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.11077v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.11077v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 100,
+        "unit": "simulation configuration sequences",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P192:2",
+        "paper_id": "P192",
+        "benchmark": "Phys-Liquid",
+        "native_term": "simulation configuration sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.11077v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.11077v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "held-out sequences",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P192:3",
+        "paper_id": "P192",
+        "benchmark": "Phys-Liquid",
+        "native_term": "held-out sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.11077v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.11077v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 97200,
+        "unit": "RGB與mask image files合計",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P192:4",
+        "paper_id": "P192",
+        "benchmark": "Phys-Liquid",
+        "native_term": "RGB與mask image files合計",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.11077v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.11077v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "dualtransparency/Phys-Liquid-AAAI"
+  ],
+  "external_repositories": []
+}

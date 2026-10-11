@@ -1,0 +1,88 @@
+{
+  "paper_id": "P049",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "AntGPT用LLM產生未來動作序列；Ego4D v1/v2、EPIC55及EGTEA仍是父資料，文字解析及序列修補是評測契約的重要部分。",
+  "reading_order": [
+    {
+      "repo": "brown-palm/AntGPT",
+      "path": "README.md",
+      "ranges": [
+        [
+          15,
+          114
+        ]
+      ],
+      "why": "確認原作和多個父資料版本。",
+      "commit": "2dbc211ae85d4fd8115b50a416ca91e8687bb6e6"
+    },
+    {
+      "repo": "brown-palm/AntGPT",
+      "path": "GPT_models/ICL_COT/eval_icl.py",
+      "ranges": [
+        [
+          3,
+          15
+        ],
+        [
+          17,
+          25
+        ],
+        [
+          36,
+          112
+        ],
+        [
+          142,
+          150
+        ],
+        [
+          162,
+          170
+        ],
+        [
+          193,
+          201
+        ],
+        [
+          203,
+          229
+        ]
+      ],
+      "why": "讀序列修補、詞彙fallback、K候選評分與輸出。",
+      "commit": "2dbc211ae85d4fd8115b50a416ca91e8687bb6e6"
+    }
+  ],
+  "environment": "影片、caption／動作上下文和既有資料切分，非互動模擬環境。",
+  "tasks": "長期verb/noun/action序列預測；候選序列及不同語言模型不增加獨立任務。",
+  "data": "taxonomy/dicts.json、上下文與未來動作文字、LLM回應及相似度檢索池；腳本將序列截斷或補齊為20動作，並做詞彙映射。",
+  "evaluation": "eval_icl.py逐樣本取K候選最小正規化editdistance.eval。短/空答案有補齊策略，未知詞有模糊匹配和預設類別；action ED在此腳本使用verb/noun索引相加，需與官方定義核對。",
+  "standardization": {
+    "profile": "action_sequence_anticipation",
+    "reuse": "父資料血緣、候選輸出、vocab映射與原作解析／評分程式。",
+    "transform": "case保存上下文模式、候選K、20個動作的horizon、prompt/檢索池版本及修補規則；不得把20動作當20秒或20道新題。",
+    "missing": "原始素材及split閉合、解析失敗處理、action度量對照官方evaluator及本庫協定。"
+  },
+  "version_note": "此核讀針對指定GPT ICL腳本；不能把其他GPT/Llama/Transformer腳本的配置及成績當同一協定。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "brown-palm/AntGPT",
+      "path": "README.md",
+      "commit": "2dbc211ae85d4fd8115b50a416ca91e8687bb6e6",
+      "sha256": "46dbed837f20c2f2179d33b99184b244a068c651200bee42dd1205756db25f8a",
+      "url": "https://raw.githubusercontent.com/brown-palm/AntGPT/2dbc211ae85d4fd8115b50a416ca91e8687bb6e6/README.md",
+      "permalink": "https://github.com/brown-palm/AntGPT/blob/2dbc211ae85d4fd8115b50a416ca91e8687bb6e6/README.md",
+      "local_path": "audit/.cache/github_review/repos/brown-palm__AntGPT/files/README.md"
+    },
+    {
+      "repo": "brown-palm/AntGPT",
+      "path": "GPT_models/ICL_COT/eval_icl.py",
+      "commit": "2dbc211ae85d4fd8115b50a416ca91e8687bb6e6",
+      "sha256": "64c377083e0135f8321305c6be5cbe344b73a72bfb2abb9cc3a9c365e8d8fef6",
+      "url": "https://raw.githubusercontent.com/brown-palm/AntGPT/2dbc211ae85d4fd8115b50a416ca91e8687bb6e6/GPT_models/ICL_COT/eval_icl.py",
+      "permalink": "https://github.com/brown-palm/AntGPT/blob/2dbc211ae85d4fd8115b50a416ca91e8687bb6e6/GPT_models/ICL_COT/eval_icl.py",
+      "local_path": "audit/.cache/github_review/repos/brown-palm__AntGPT/files/GPT_models/ICL_COT/eval_icl.py"
+    }
+  ]
+}

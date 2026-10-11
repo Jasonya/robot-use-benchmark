@@ -1,0 +1,68 @@
+{
+  "paper_id": "P054",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoVid的公開repo主要是Ego4D衍生影片標註與清洗工具；相機運動控制標註不能直接視為可執行機器人控制。",
+  "reading_order": [
+    {
+      "repo": "JeffWang987/EgoVid",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          120
+        ]
+      ],
+      "why": "確認來源素材、CSV、pose欄位與精確論文。",
+      "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c"
+    },
+    {
+      "repo": "JeffWang987/EgoVid",
+      "path": "processor/egovid-metadata/Optical-flow/optical-flow-score.py",
+      "ranges": [
+        [
+          1,
+          30
+        ],
+        [
+          45,
+          138
+        ]
+      ],
+      "why": "核對frame步長、尺寸正規化及分箱實作。",
+      "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c"
+    }
+  ],
+  "environment": "Ego4D v1/v2來源影片及clip窗口；來源影片須另行取得。",
+  "tasks": "文字／相機運動條件的第一人稱影片資料；本次固定tree見標註、pose及品質計算工具，未取得完整EgoDreamer生成／評測實作。",
+  "data": "CSV的video_id=來源影片_起始影格_終止影格，含fps、frame_num、noun/verb、llava_cap、name和各項品質分數；pose資產含3×3 intrinsics及逐影格4×4相機外參。README提醒raw IMU已知問題。",
+  "evaluation": "光流清洗程式每8影格取樣，將flow按平均影像尺寸縮放到512基準，再存均值／分箱比例；這是素材品質證據，不是操作成功率。flow_0_4程式實為>0且≤5，與欄名／README有差異。",
+  "standardization": {
+    "profile": "egocentric_video_generation_annotations",
+    "reuse": "父影片ID、精確clip範圍、文字／pose標註和清洗provenance。",
+    "transform": "source記Ego4D重用關係；case保留frame/fps、caption來源、pose座標與quality filter版本。5M名稱不能直接算成本庫已取得評測題數。",
+    "missing": "完整CSV與影片／pose資產閉合、實際clip去重、生成模型與正式evaluator，以及清洗欄名／實作差異校核。"
+  },
+  "version_note": "本筆覆蓋公開資料處理路徑；不宣稱EgoDreamer模型或所有外部清洗依賴已核讀。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "JeffWang987/EgoVid",
+      "path": "README.md",
+      "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c",
+      "sha256": "a966e32cd9fd9f54ecbfc699612e1ee8d3b7959bc506352898edfd4c58e3b042",
+      "url": "https://raw.githubusercontent.com/JeffWang987/EgoVid/45c59d0df9c248bd88c08d96f4d9c038707f037c/README.md",
+      "permalink": "https://github.com/JeffWang987/EgoVid/blob/45c59d0df9c248bd88c08d96f4d9c038707f037c/README.md",
+      "local_path": "audit/.cache/github_review/repos/JeffWang987__EgoVid/files/README.md"
+    },
+    {
+      "repo": "JeffWang987/EgoVid",
+      "path": "processor/egovid-metadata/Optical-flow/optical-flow-score.py",
+      "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c",
+      "sha256": "d6cb996ba24fc5c4b5d332d5818b852cd0d8e3dbff47012f4eb4f92f7e3fe230",
+      "url": "https://raw.githubusercontent.com/JeffWang987/EgoVid/45c59d0df9c248bd88c08d96f4d9c038707f037c/processor/egovid-metadata/Optical-flow/optical-flow-score.py",
+      "permalink": "https://github.com/JeffWang987/EgoVid/blob/45c59d0df9c248bd88c08d96f4d9c038707f037c/processor/egovid-metadata/Optical-flow/optical-flow-score.py",
+      "local_path": "audit/.cache/github_review/repos/JeffWang987__EgoVid/files/processor/egovid-metadata/Optical-flow/optical-flow-score.py"
+    }
+  ]
+}

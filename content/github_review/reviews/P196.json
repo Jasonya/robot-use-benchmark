@@ -1,0 +1,80 @@
+{
+  "paper_id": "P196",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Deform360有明確多視角/觸覺對齊與annotation contract，可直接作資料層參考；README明示world-model訓練、baseline和checkpoint未公開。",
+  "reading_order": [
+    {
+      "repo": "lhy0807/deform360",
+      "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "198objects/1980interactions/41camera與release scope"
+    },
+    {
+      "repo": "lhy0807/deform360",
+      "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+      "path": "deform360/dataset.py",
+      "ranges": [
+        [
+          130,
+          269
+        ],
+        [
+          421,
+          478
+        ]
+      ],
+      "why": "相機K/c2w校驗、frame數/輸出provenance與timestamp_us"
+    },
+    {
+      "repo": "lhy0807/deform360",
+      "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+      "path": "deform360/tactile.py",
+      "ranges": [
+        [
+          304,
+          353
+        ],
+        [
+          408,
+          449
+        ]
+      ],
+      "why": "nearest時間對齊、accepted mask與共同camera timeline"
+    },
+    {
+      "repo": "lhy0807/deform360",
+      "commit": "d8522a4403b766aeb387510c04e89032a56fdf35",
+      "path": "deform360/annotations.py",
+      "ranges": [
+        [
+          1,
+          83
+        ],
+        [
+          175,
+          206
+        ]
+      ],
+      "why": "HDF5 data陣列、mask/depth/velocity單位與encode/decode"
+    }
+  ],
+  "environment": "BRICS capture dome真實柔性物互動；原作198物件/13類、1980互動，41同步RGB相機及4組16×32觸覺sensor。13物件類別不是13生活domain，41views不是41episodes。",
+  "tasks": "柔性物世界模型/多視觸覺研究資料；dataset utility提供對齊和annotations，不等同機器人物理任務registry或已釋出的world-model benchmark runner。",
+  "data": "原作215.7h、約23.3Mframes須保留其跨視角統計口徑。episode/<camera>/undistorted.mp4與K/c2w、aligned timestamps、provenance hash；預設檢查相機frame/timeline一致。H5鍵data：mask bool/uint8二值、depth uint16毫米且0無效、velocity m/s；不可像RGB除255。",
+  "evaluation": "這些檢查驗證資料形狀/時間/校準一致性，不是world-model或robot成功分數。觸覺nearest配對保留match/accepted/duplicate資訊，未接受格補0須連valid mask使用；用於預測task時另外限制query以前的可見資料。",
+  "standardization": {
+    "profile": "multiview_visuotactile_deformable_data",
+    "reuse": "明確影像/姿態/深度/速度/觸覺契約、common timeline與output hash校驗，可復用到標準化來源層。",
+    "transform": "source/episode是主lineage，camera/frame/sensor作子記錄；保存微秒時間、c2w方向、單位、invalid值與alignment政策，case另綁定真正預測目標和scorer。",
+    "missing": "完整資料/annotations取得、interaction/物件split、world-model評測協定/程式與checkpoint、從感知資料建立物理可執行task的驗證。"
+  },
+  "version_note": "固定d8522a4；所讀公開庫定位access/preprocessing/annotation/alignment，未把能生成annotation推論為已發布world-model baseline。",
+  "runtime_executed": false
+}

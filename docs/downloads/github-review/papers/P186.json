@@ -1,0 +1,437 @@
+{
+  "paper_id": "P186",
+  "name": "BiFold",
+  "title": "BiFold: Bimanual Cloth Folding with Language Guidance",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2501.16458",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P186",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "BiFold同庫含ICRA原作和加入時間上下文的workshop版本；可復用語言/雙手pick-place標註與SoftGym評估，但像素預測分數和物理摺疊結果要分開。",
+    "environment": "客製SoftGym/PyFlex，載入CLOTH3D衣物；VR folding為父雙手資料，真實影像另一路徑。重貼texture/render與順序版衍生資料不當成獨立物理場景。",
+    "tasks": "單手/雙手語言摺疊，包含逐步與rollout評測；左右pick/place是動作欄位，不是4種獨立任務。原作與temporal extension各自保留合法history設定。",
+    "data": "vr_folding_dataset.zarr配actions/<partition>.csv，含left/right_grip_from/to、end_idx與text；3D vertex經相機矩陣投到pixel、depth依depth_scale還原。frame_start/frame_end是case對齊基礎，未來end位置只作GT label，不能自動暴露給policy。",
+    "evaluation": "同初態先跑oracle、再跑model；成功為平均對應particle距離<2×particle_radius，另報mask IoU及50/80/90門檻，task分組後macro平均。KeypointMSE實作是最近點L2距離且另除valid數量，不能直接當一般MSE；真實影像預測分數亦不是實體摺疊成功。",
+    "standardization": {
+      "profile": "language_guided_bimanual_cloth_folding",
+      "reuse": "Zarr/CSV/相機投影、原生partition、oracle相同初態比較與各metric公式。",
+      "transform": "case固定cloth asset/config/state、文字、history與相機；分開標註預測/物理粒子誤差/視覺IoU；VR與CLOTH3D lineage保留，衍生render與順序資料去重。",
+      "missing": "資產/原生split取得、temporal版本切分、GT多解/粒子對應有效性、KeypointMSE分母確認、真實成品與simulation重現。"
+    },
+    "version_note": "固定0b763d1，README同時連2501.16458和2505.07600；只有列出片段經核讀，未把workshop額外設定併為原作新task。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Barbany/bifold",
+        "requested_repo": "Barbany/bifold",
+        "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            25
+          ],
+          [
+            56,
+            63
+          ],
+          [
+            99,
+            167
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 237,
+        "sha256": "87ee4b00f353e6f7b10eb9e1a9f973524b499bc9cc5a8bc0ff3f8f4ae3f5edc9",
+        "url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/README.md",
+        "reading_url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/README.md#L1-L25",
+        "why": "兩篇版本、SoftGym/CLOTH3D、VR folding和真實影像來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Barbany/bifold",
+        "requested_repo": "Barbany/bifold",
+        "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+        "ref": null,
+        "path": "bifold/data/bimanual_dataset.py",
+        "ranges": [
+          [
+            19,
+            52
+          ],
+          [
+            117,
+            206
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 206,
+        "sha256": "3bfa8c7cafd1bfd9c8e75e7d3771e91ed0a839edd07df25ecfb4a178f4c4abf3",
+        "url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/data/bimanual_dataset.py",
+        "reading_url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/data/bimanual_dataset.py#L19-L52",
+        "why": "Zarr+CSV、camera矩陣、左右手vertex→pixel及start/end frame",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Barbany/bifold",
+        "requested_repo": "Barbany/bifold",
+        "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+        "ref": null,
+        "path": "bifold/env/softgym_evaluator.py",
+        "ranges": [
+          [
+            27,
+            49
+          ],
+          [
+            78,
+            87
+          ],
+          [
+            103,
+            128
+          ],
+          [
+            423,
+            469
+          ],
+          [
+            527,
+            624
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 892,
+        "sha256": "14b8c19f6b1391b8db2a16b9d84e6ebba87432a6fd235bb0c05d2e87ed934263",
+        "url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/env/softgym_evaluator.py",
+        "reading_url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/env/softgym_evaluator.py#L27-L49",
+        "why": "具體雙手物理評測、oracle目標與粒子/IoU門檻",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Barbany/bifold",
+        "requested_repo": "Barbany/bifold",
+        "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+        "ref": null,
+        "path": "bifold/metrics/utils.py",
+        "ranges": [
+          [
+            1,
+            7
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 7,
+        "sha256": "12bdfaaca88ca6e5a10b920779a67c8e518a99827a1ce98bba05e32494bc6792",
+        "url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/metrics/utils.py",
+        "reading_url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/metrics/utils.py#L1-L7",
+        "why": "模擬mask IoU是0–100",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Barbany/bifold",
+        "requested_repo": "Barbany/bifold",
+        "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+        "ref": null,
+        "path": "bifold/metrics/__init__.py",
+        "ranges": [
+          [
+            76,
+            125
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 213,
+        "sha256": "2ccd44c11cc5c5b120a16c12e5883c9f3fbff6d7a3acb2d87b0f18510293f7e3",
+        "url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/metrics/__init__.py",
+        "reading_url": "https://github.com/Barbany/bifold/blob/0b763d16ef494ba01428f224c657845d3a2e3872/bifold/metrics/__init__.py#L76-L125",
+        "why": "影像IoU與名稱KeypointMSE的實際公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "eb8fb8b6b1d1c124ada60f7815c043b1b55966387bcc8ce8ce71390dfd128445"
+  },
+  "repository_binding_review_sha256": "eb8fb8b6b1d1c124ada60f7815c043b1b55966387bcc8ce8ce71390dfd128445",
+  "repository_bindings": [
+    {
+      "requested_repo": "Barbany/bifold",
+      "resolved_repo": "Barbany/bifold",
+      "aliases_in_this_review": [
+        "barbany/bifold"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0b763d16ef494ba01428f224c657845d3a2e3872",
+          "reviewed_files": [
+            "README.md",
+            "bifold/data/bimanual_dataset.py",
+            "bifold/env/softgym_evaluator.py",
+            "bifold/metrics/__init__.py",
+            "bifold/metrics/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Barbany/bifold",
+          "link_label": "Code",
+          "project_url": "https://barbany.github.io/bifold",
+          "page_sha256": "1932938f2edd8aaa8aec85e7002b31a8c7c434eaa3c015bb3c872658ddc4761a"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/barbany/bifold",
+          "link_label": "Code",
+          "project_url": "https://barbany.github.io/bifold",
+          "page_sha256": "1932938f2edd8aaa8aec85e7002b31a8c7c434eaa3c015bb3c872658ddc4761a"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Barbany/bifold",
+          "link_label": "Code",
+          "project_url": "https://barbany.github.io/bifold/",
+          "page_sha256": "1932938f2edd8aaa8aec85e7002b31a8c7c434eaa3c015bb3c872658ddc4761a"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/barbany/bifold",
+          "link_label": "Code",
+          "project_url": "https://barbany.github.io/bifold/",
+          "page_sha256": "1932938f2edd8aaa8aec85e7002b31a8c7c434eaa3c015bb3c872658ddc4761a"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P186",
+          "review_file": "content/github_review/reviews/P186.json",
+          "review_sha256": "eb8fb8b6b1d1c124ada60f7815c043b1b55966387bcc8ce8ce71390dfd128445",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P186",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "BiFold: Bimanual Cloth Folding with Language Guidance；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      3,
+      4
+    ],
+    "role": "柔性物操作benchmark",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "VR-Folding/CLOTH3D重渲染，SoftGym；真實RGB-D衣物觀測。",
+    "tasks": "language-guided single/bimanual folding；新方向/位置規則与instructionparaphrase分開。",
+    "cases": "近4KVRdemos分成約7Kactions、>1Kunique prompts；90/10sample split。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 7000,
+        "unit": "parsed bimanual folding actions（約數）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "unique prompts（>1K）",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "singlearm以meanvertexerror<0.0125m判success；bimanual另用image metrics，不默認相同判分。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "環境狀態與過程檢查"
+    ],
+    "split": "先flattenedcloth；H=3history支援指令歧義，未證明所有sample分割已按parenttrajectory群聚。",
+    "lineage": "VR-Folding既有demos＋CLOTH3Dtextures、新增語言與actionparsing；不是全部新physical demonstrations。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          3,
+          4
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "部分只有真實影像推action展示，完整realautonomous成績分母需原始實驗核。"
+    ],
+    "reuse": "補指定摺法、手別與歷史依賴；語言改寫不自動算新task。",
+    "reviewed_pdf_sha256": "f80ff8748e8d36c77c1f3decfdff8b86e43da9909071a194e963c876c3ce56f3",
+    "reviewed_on": "2026-10-02",
+    "name": "BiFold",
+    "year": 2025,
+    "title": "BiFold: Bimanual Cloth Folding with Language Guidance",
+    "source_url": "https://arxiv.org/abs/2501.16458",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P186",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P186",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            3,
+            4
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "language-guided single/bimanual folding；新方向/位置規則与instructionparaphrase分開。",
+            "VR-Folding/CLOTH3D重渲染，SoftGym；真實RGB-D衣物觀測。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "f80ff8748e8d36c77c1f3decfdff8b86e43da9909071a194e963c876c3ce56f3"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "f80ff8748e8d36c77c1f3decfdff8b86e43da9909071a194e963c876c3ce56f3",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P186",
+      "name": "BiFold",
+      "expected_title": "BiFold: Bimanual Cloth Folding with Language Guidance",
+      "source_url": "https://arxiv.org/abs/2501.16458",
+      "pdf_url": "https://arxiv.org/pdf/2501.16458",
+      "retrieved_at": "2026-10-02T22:14:23.689074+00:00",
+      "pdf_sha256": "f80ff8748e8d36c77c1f3decfdff8b86e43da9909071a194e963c876c3ce56f3",
+      "text_sha256": "cd0a8d6a0dfde62229da47651e55b70a82cfe659ebfe04d7004c4b42f2dc7ccb",
+      "pdf_bytes": 24325979,
+      "pages": 30,
+      "text_characters": 115324,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2501.16458v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2501.16458v2"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 7000,
+        "unit": "parsed bimanual folding actions（約數）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P186:1",
+        "paper_id": "P186",
+        "benchmark": "BiFold",
+        "native_term": "parsed bimanual folding actions（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2501.16458v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2501.16458v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "unique prompts（>1K）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P186:2",
+        "paper_id": "P186",
+        "benchmark": "BiFold",
+        "native_term": "unique prompts（>1K）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2501.16458v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2501.16458v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Barbany/bifold"
+  ],
+  "external_repositories": []
+}

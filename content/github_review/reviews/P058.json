@@ -1,0 +1,285 @@
+{
+  "paper_id": "P058",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoPAT3Dv2 的作者 repo 同時保留原版與擴充版讀取器；可追到逐幀 3D 目標誤差與進度分箱，但 HDF5 版本、手部特徵錯寫及評分彙整差異須先處理。",
+  "identity_note": "README 的完整標題、十一位作者與論文 arXiv:2403.05046v1 一致；論文指定的 ai4ce 專案頁直接連本 repo 與 Hugging Face 資料。這是 ICRA 2024 EgoPAT3Dv2 的實作及 EgoPAT3D 擴充資料入口，原版 D1 與擴充版 D2 有重用關係，不能加總當作兩份互斥資料集。",
+  "reading_order": [
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          45
+        ]
+      ],
+      "why": "確認作者／論文、外置 HDF5 資料及 test_DDP→eval.py 流程。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "configs/cfg_defaults.py",
+      "ranges": [
+        [
+          15,
+          35
+        ],
+        [
+          42,
+          75
+        ]
+      ],
+      "why": "確認原版／擴充版、seen/unseen、單筆測試 batch 及預設路徑。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+      "ranges": [
+        [
+          1,
+          21
+        ]
+      ],
+      "why": "實際 D1 seen RGB 設定與作者 HPC 路徑。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "data_utils/Dataset_RGBD.py",
+      "ranges": [
+        [
+          10,
+          114
+        ]
+      ],
+      "why": "原版 annotation、color/odometry、有效深度門檻及逐幀轉換。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "data_utils/Dataset_RGBD_enhanced.py",
+      "ranges": [
+        [
+          13,
+          120
+        ],
+        [
+          136,
+          140
+        ]
+      ],
+      "why": "擴充版兩個 HDF5 的群組、clip 篩選、影格偏移與手部輸出。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "data_utils/testDataset.py",
+      "ranges": [
+        [
+          9,
+          34
+        ],
+        [
+          42,
+          100
+        ]
+      ],
+      "why": "區分舊 pointcloud/IMU 基線所需欄位，避免誤列為 RGB 方法必要輸入。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "test_DDP.py",
+      "ranges": [
+        [
+          19,
+          38
+        ],
+        [
+          58,
+          87
+        ],
+        [
+          160,
+          237
+        ],
+        [
+          256,
+          261
+        ]
+      ],
+      "why": "追 seen/unseen 讀取器分派、真值／預測輸出及固定內參後處理。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "eval.py",
+      "ranges": [
+        [
+          45,
+          61
+        ],
+        [
+          92,
+          104
+        ],
+        [
+          248,
+          282
+        ],
+        [
+          284,
+          345
+        ],
+        [
+          397,
+          409
+        ]
+      ],
+      "why": "核對歐氏誤差、公分單位、含雙端點的十箱及 recording 層級平均。"
+    }
+  ],
+  "environment": "頭盔安裝 Azure Kinect 的人類物件操作影片。論文 §VI 的 UR10e 避讓／朝預測點移動是另行展示；已讀 repo 提供預測資料與模型測試，沒有該展示的機器人任務成功評分器。",
+  "tasks": "在線以 X1:t 預測同一段操作最終 3D 手部目標；目標必須轉到當前影格相機座標，並非未來全身動作或機器人控制。T1/T2 指原版／擴充訓練來源，D1/D2 指測試資料版本，seen/unseen 指場景是否在訓練出現。論文報告可用 clips 由 4129 增為 9579；本輪未下載資產核算此數。",
+  "data": "原版 HDF5 用 /{annotrain|annovalidate|annotest}/{scene}/{video} 與 /sequences/{scene}/{video}/{color,transformation/odometry}；擴充版將 /color/{scene}/{video}/{frame} 與 annotation、/transformation/{scene}/{video}/{frame} 分置兩檔。annotation 每列前三值為三個邊界，3:6／6:9 為兩段目標 xyz；原版要求 z>0.1，擴充版 z>0。長度=end-start、RGB 讀 start+1…end，累乘 odometry 後以逆矩陣轉換目標，單位公尺。RGB resize 224×224；training 直接排除長度>25 的 clips，測試以最長段補零並回傳真實長度。handLM 為 21×2、hand 為 landmark 5 的 x/y；兩 RGB 讀取器的 handLM 奇數欄實際也寫 lm.x，不能當成正確的 x/y 特徵。",
+  "evaluation": "test_DDP.py 依模型／epoch、scene、video 輸出 start-end.txt（逗號分隔 xyz）與 start-end_gt.txt。eval.py 算每幀 ||pred-gt||2，以 i/(L-1) 落入十個寬 0.1、兩端皆包含的區間；先在 clip 內平均，再平均同 recording 的 clips，最後等權平均 recordings，×100 得 cm；Overall 使用 linspace(2,1,10) 加權。邊界影格可能進入相鄰兩箱，短 clips 可出現空箱。論文 §IV-B 寫按影格等分十階段、餘數給較早階段，並報三個 seed 平均；目前入口不自動做三 seed 彙整。eval.py 的 --mode 是 store_true，僅用於輸出命名，真正 split 由 test_DDP 的設定決定。",
+  "standardization": {
+    "profile": "egocentric_3d_target_forecasting",
+    "reuse": "scene/video/clip 邊界、逐幀目標與 odometry 引用、D1/D2 及 seen/unseen 分派、歐氏誤差實作。",
+    "transform": "case 保存 dataset_version+split+scene+video+start/end，附實際影格索引、公尺相機座標、有效長度與手部缺失遮罩；evaluator 明列進度分箱、recording 平均、Overall 時間權重與 seed。原版／擴充版以來源重用關係相連。",
+    "missing": "需取得並固定 Hugging Face HDF5 版本／場景清單，核對修正版標註與影格取樣時間；修正或隔離 handLM 的 x/x 特徵、補足 checkpoint/model_epoch 參數與私人路徑，再驗證評分分箱及後處理。"
+  },
+  "version_note": "固定 a24b3a5a2453931de69a17dfc7116057dc849136（2024-03-19）。configs/README.md 在 manifest 中是空檔；README 測試命令未帶程式所需 model_epoch/checkpoint。test_DDP 後處理固定 4K 內參，v>=2160 分支錯改 u，且 x1/y1 使用前輪 z；重現前須確認保留原行為或另列修正版。論文 §IV-A 說擴充分配 9+2 新場景，§V-B 又說新增12場景，不能以文字自行決定總場景數。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P058-discovery.json",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0"
+      ],
+      "sha256": "16ee1cc9a8dc82e93d2568c13942c8f3ce1edd70b1fbf607b3817d7130a7f281"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P058/pages.json",
+      "sha256": "063987afba0bc3b7466ad8e037dd718d2739382333bed460c73c82d2094a4eb9",
+      "json_pointers": [
+        "/2/text",
+        "/3/text",
+        "/5/text"
+      ],
+      "why": "PDF 頁3、4、6：在線任務／座標、split／評測、規模及機器人展示。"
+    },
+    {
+      "local_file": "audit/.cache/github_review/http/0cdd18561a083fee2c55d7ed21e91f297ba8a789f3e6c2d58a9c0ff2620ebf2c.body",
+      "sha256": "96e0500a77d939e07dd498c8506dde3f9b94a6971f83eeff4a7834cc8422e1d4",
+      "url": "https://ai4ce.github.io/EgoPAT3Dv2/",
+      "ranges": [
+        [
+          187,
+          213
+        ],
+        [
+          432,
+          444
+        ]
+      ],
+      "why": "論文作者頁的 Code/Data 連結與正式引用。"
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "configs/cfg_defaults.py",
+      "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+      "url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cfg_defaults.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cfg_defaults.py",
+        "retrieved_at": "2026-10-10T23:32:49.976072+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cfg_defaults.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2527,
+        "sha256": "73a5d076d64c9bab3c36bafb8de0b5796a147b01edd58ccd924a58234a2d208b"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/ai4ce__EgoPAT3Dv2/configs/cfg_defaults.py",
+      "sha256": "73a5d076d64c9bab3c36bafb8de0b5796a147b01edd58ccd924a58234a2d208b",
+      "git_blob_sha": "8545ca44a80708055edc6239f7b6f1061bc242ce",
+      "lines": 83,
+      "ranges": [
+        [
+          15,
+          35
+        ],
+        [
+          42,
+          75
+        ]
+      ]
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+      "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+      "url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+        "retrieved_at": "2026-10-10T23:32:50.973877+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 440,
+        "sha256": "6fb48ec574672ee4a3f6792c1f0ad7698e699f2b1fe18598b7a4992ba0a7a039"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/ai4ce__EgoPAT3Dv2/configs/cn_t_post_hand_newloss_1_d1_seen.yaml",
+      "sha256": "6fb48ec574672ee4a3f6792c1f0ad7698e699f2b1fe18598b7a4992ba0a7a039",
+      "git_blob_sha": "f8bce438b46d10d6316c4df9596beba15a159b39",
+      "lines": 23,
+      "ranges": [
+        [
+          1,
+          21
+        ]
+      ]
+    },
+    {
+      "repo": "ai4ce/EgoPAT3Dv2",
+      "path": "test_DDP.py",
+      "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+      "url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/test_DDP.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/test_DDP.py",
+        "retrieved_at": "2026-10-10T23:32:48.973033+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/ai4ce/EgoPAT3Dv2/a24b3a5a2453931de69a17dfc7116057dc849136/test_DDP.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 11250,
+        "sha256": "326e8e33ef268f103ca35ef24823f7f5a331caad97a885205c7d4cf84ea82067"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/ai4ce__EgoPAT3Dv2/test_DDP.py",
+      "sha256": "326e8e33ef268f103ca35ef24823f7f5a331caad97a885205c7d4cf84ea82067",
+      "git_blob_sha": "368d57a14bda81f6aa05a13fb70a36af4fcbe4b5",
+      "lines": 261,
+      "ranges": [
+        [
+          19,
+          38
+        ],
+        [
+          58,
+          87
+        ],
+        [
+          160,
+          237
+        ],
+        [
+          256,
+          261
+        ]
+      ]
+    }
+  ],
+  "commit": "a24b3a5a2453931de69a17dfc7116057dc849136",
+  "source_manifest": "audit/.cache/github_review/repos/ai4ce__EgoPAT3Dv2/manifest.json",
+  "runtime_executed": false,
+  "source_manifest_sha256": "bfb48fd77a222ee3681a2a420310fa2d5fdcf4d44c5a2c2b0023d70378dadb5d"
+}

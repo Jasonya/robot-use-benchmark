@@ -1,0 +1,285 @@
+{
+  "paper_id": "P043",
+  "name": "Embodied VideoAgent",
+  "title": "Embodied VideoAgent: Persistent Memory from Egocentric Videos and Embodied Sensors Enables Dynamic Scene Understanding",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2501.00358",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P043",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Embodied VideoAgent 是可呼叫導航／操作工具的持續記憶agent，保留related_reference角色。本次確認程式實際用Habitat/HSSD場景與兩agent流程，不能推定為ALFRED或TEACh移植。",
+    "environment": "Habitat-sim0.3.0 withbullet，generate_episodes 指向home-robot-remake/HSSD場景；scene_config與layout_i、agent_position、island_index分層。預設for迴圈生成同場景10個layout只是範例設定，不是已發布benchmark規模。",
+    "tasks": "另一LLM生成使用者要求，agent用CHAT/GOTO/OPEN/CLOSE/PICK/PLACE/SEARCH及appearance/environment檢索處理。object memory接受timestamp/RGB/depth/depth_mask/camera pose/FOV，物件記憶與工具技能不是固定題庫。",
+    "data": "episode JSON含scene、agent_position、island_index、objects；需另有pickable/unpickable/receptacle資產檔。記憶相機座標定義為右x、下y、入畫面z。生成器用物件／容器box提議位置與contact_test後穩定step；重新隨機layout必須儲存具體初態。",
+    "evaluation": "two_agent_pipeline 限max_iterations=100，輸出tool_cnt與action_cnt，核讀入口未提供獨立goal-success evaluator。PICK檢查距離<=2及可見性後將物件移到y-10000並設STATIC；PLACE直接設translation/DYNAMIC後step，OPEN/CLOSE直接改joint velocities。這是抽象工具執行條件，不是末端效應器接觸控制benchmark。",
+    "standardization": {
+      "profile": "method_memory_agent_simulation",
+      "reuse": "RGB-D/pose記憶介面、工具回饋、scene/layout初態與部分物理狀態處理。",
+      "transform": "method連父Habitat/HSSD/資產版本；environment分scene與layout，case需先固定user task生成結果、初始episode及合法sensor/tool約定。工具呼叫、sim actions、dialogue與終態證據分別記錄，另加獨立goal判定後才可列可評測。",
+      "missing": "未下載場景／模型、執行agent或對外服務。尚缺固定任務清單、task生成seed、獨立success checker與完整初態重播驗證；executor回覆success字串不能單獨當benchmark通過。真實機器人動作轉移需新的控制與驗證。"
+    },
+    "version_note": "此repo明確標ICCV2025 Embodied VideoAgent；README中VideoAgent為2024前作，不能將兩者資料/評測混計。生成10 layouts不等於10種新任務，更不代表全套測例已建立。",
+    "runtime_executed": false,
+    "source_role": "related_reference",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Embodied-VideoAgent/embodied-videoagent",
+        "requested_repo": "Embodied-VideoAgent/embodied-videoagent",
+        "commit": "342c06f727b9e403dc7e4074514e38dcaa34f9d1",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 90,
+        "sha256": "4df78580d449d8522d36c099a7502d5c380817dc712b0995172257d2c8807317",
+        "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/README.md",
+        "reading_url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/README.md#L1-L90",
+        "why": "精確論文、Habitat環境與sensor座標",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Embodied-VideoAgent/embodied-videoagent",
+        "requested_repo": "Embodied-VideoAgent/embodied-videoagent",
+        "commit": "342c06f727b9e403dc7e4074514e38dcaa34f9d1",
+        "ref": null,
+        "path": "generate_episodes.py",
+        "ranges": [
+          [
+            1,
+            101
+          ],
+          [
+            136,
+            178
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 178,
+        "sha256": "da8d5075ae76744c1909e15fdb433c51cd6ea82e3b2ddd8ec1283147d8b34061",
+        "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/generate_episodes.py",
+        "reading_url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/generate_episodes.py#L1-L101",
+        "why": "HSSD父場景、隨機layout與初態輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Embodied-VideoAgent/embodied-videoagent",
+        "requested_repo": "Embodied-VideoAgent/embodied-videoagent",
+        "commit": "342c06f727b9e403dc7e4074514e38dcaa34f9d1",
+        "ref": null,
+        "path": "env/actions.py",
+        "ranges": [
+          [
+            1,
+            22
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 22,
+        "sha256": "944241612f73fa623db11b939c907b6eaaf67bc7987fda7195ef1383a2e378c3",
+        "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/env/actions.py",
+        "reading_url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/env/actions.py#L1-L22",
+        "why": "額外no-op/backward actions",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Embodied-VideoAgent/embodied-videoagent",
+        "requested_repo": "Embodied-VideoAgent/embodied-videoagent",
+        "commit": "342c06f727b9e403dc7e4074514e38dcaa34f9d1",
+        "ref": null,
+        "path": "env/executor.py",
+        "ranges": [
+          [
+            4,
+            10
+          ],
+          [
+            12,
+            19
+          ],
+          [
+            42,
+            53
+          ],
+          [
+            58,
+            70
+          ],
+          [
+            101,
+            107
+          ],
+          [
+            146,
+            176
+          ],
+          [
+            193,
+            207
+          ],
+          [
+            225,
+            254
+          ],
+          [
+            263,
+            279
+          ],
+          [
+            286,
+            293
+          ],
+          [
+            295,
+            307
+          ],
+          [
+            314,
+            321
+          ],
+          [
+            323,
+            373
+          ],
+          [
+            383,
+            400
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 400,
+        "sha256": "ea63a650f820e6bb48951d20a61ee21e124c9ec2e47656901f9a746365e7f4ed",
+        "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/env/executor.py",
+        "reading_url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/env/executor.py#L4-L10",
+        "why": "工具語義、距離/可見性條件及狀態修改",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Embodied-VideoAgent/embodied-videoagent",
+        "requested_repo": "Embodied-VideoAgent/embodied-videoagent",
+        "commit": "342c06f727b9e403dc7e4074514e38dcaa34f9d1",
+        "ref": null,
+        "path": "two_agent_pipeline.py",
+        "ranges": [
+          [
+            64,
+            70
+          ],
+          [
+            153,
+            159
+          ],
+          [
+            171,
+            177
+          ],
+          [
+            190,
+            204
+          ],
+          [
+            231,
+            244
+          ],
+          [
+            246,
+            270
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 270,
+        "sha256": "acde6a06278ba5495b21bc153a9d1553412e112df7b7e8510dbc9a667407e13b",
+        "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/two_agent_pipeline.py",
+        "reading_url": "https://github.com/Embodied-VideoAgent/embodied-videoagent/blob/342c06f727b9e403dc7e4074514e38dcaa34f9d1/two_agent_pipeline.py#L64-L70",
+        "why": "LLM任務生成、工具集、預算與輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "49c29b35e30ddfd64154e287dbbec80e6bb1723fadc22d9a2a3da12d5bd18e6b"
+  },
+  "repository_binding_review_sha256": "49c29b35e30ddfd64154e287dbbec80e6bb1723fadc22d9a2a3da12d5bd18e6b",
+  "repository_bindings": [
+    {
+      "requested_repo": "Embodied-VideoAgent/embodied-videoagent",
+      "resolved_repo": "Embodied-VideoAgent/embodied-videoagent",
+      "aliases_in_this_review": [
+        "embodied-videoagent/embodied-videoagent"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "342c06f727b9e403dc7e4074514e38dcaa34f9d1",
+          "reviewed_files": [
+            "README.md",
+            "env/actions.py",
+            "env/executor.py",
+            "generate_episodes.py",
+            "two_agent_pipeline.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent",
+          "link_label": "Code",
+          "project_url": "https://embodied-videoagent.github.io/",
+          "page_sha256": "84e5e1088c093770429dd64e5f29c4bd5088b8bf0a490bcc4b6d3fa5edf25192"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Embodied-VideoAgent/embodied-videoagent",
+          "link_label": "Code",
+          "project_url": "https://embodied-videoagent.github.io",
+          "page_sha256": "84e5e1088c093770429dd64e5f29c4bd5088b8bf0a490bcc4b6d3fa5edf25192"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P043",
+          "review_file": "content/github_review/reviews/P043.json",
+          "review_sha256": "49c29b35e30ddfd64154e287dbbec80e6bb1723fadc22d9a2a3da12d5bd18e6b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "Embodied-VideoAgent/embodied-videoagent"
+  ],
+  "external_repositories": []
+}

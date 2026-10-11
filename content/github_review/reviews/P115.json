@@ -1,0 +1,76 @@
+{
+  "paper_id": "P115",
+  "summary": "RoboMME-Interference在既有RoboMME任務上新增跨session幹擾規則；已取得並結構核對25,200列發布結果，這些是多方法rollouts，不是25,200種任務。",
+  "reading_order": [
+    {
+      "repo": "SoumilRathi/robomme-interference",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          24
+        ],
+        [
+          58,
+          90
+        ]
+      ],
+      "why": "父benchmark、9家族/5條件/方法網格及重現範圍",
+      "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d"
+    },
+    {
+      "repo": "SoumilRathi/robomme-interference",
+      "path": "results/canonical_rollouts.csv",
+      "ranges": [
+        [
+          1,
+          3
+        ]
+      ],
+      "why": "只讀表頭與前2列；全量25,200列做結構計數",
+      "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d"
+    },
+    {
+      "repo": "SoumilRathi/robomme-interference",
+      "path": "scripts/analyze_cross_session_results.py",
+      "ranges": [
+        [
+          98,
+          128
+        ],
+        [
+          147,
+          192
+        ]
+      ],
+      "why": "success字串處理、groupby分母與Wilson區間",
+      "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d"
+    },
+    {
+      "repo": "SoumilRathi/robomme-interference",
+      "path": "retrieval/robomme_visual_gate.py",
+      "ranges": [
+        [
+          1,
+          96
+        ]
+      ],
+      "why": "檢索分段、threshold校準與purity/coverage gate",
+      "commit": "3536f63bbd483654cdd50ef86a656572a03fb72d"
+    }
+  ],
+  "environment": "重用RoboMME場景與任務；lesson session、k個幹擾session、query是歷史條件，不是增加k個新的場景種類。",
+  "tasks": "9native任務家族，no-history/k0/k1/k3/k7；同一query跨memory系統重跑屬trial比較。原作者easy/medium/hard另為來源標籤。",
+  "data": "CSV已結構計數25,200rows，含variant/family/split/episode/seed/difficulty/condition/success/status、buffer構成與latency欄位；前2例latency等欄位為空。取得結果CSV不等於取得每次影像／狀態或獨立驗證執行。",
+  "evaluation": "analysis以字串true轉success_bool，按variant/condition及family分組計分母與Wilson CI。視覺gate利用lesson_span/filler真實邊界校準閾值，再以query相似度選segment；校準集合須和最終test分開，purity/coverage是檢索品質，不是物理成功。",
+  "standardization": {
+    "profile": "cross_session_memory_interference",
+    "reuse": "query/lesson/distractor protocol、發布結果表與原生聚合、檢索選框證據。",
+    "transform": "case固定query父episode、歷史session有序列表、memory budget與k；trial才連variant/result。原task來源仍是RoboMME，不重算為獨立新任務庫。",
+    "missing": "底層RoboMME環境/政策版本與可執行資產、歷史影像/embedding、校準split證據、相同query配對不確定性及完整執行回執。"
+  },
+  "version_note": "此repo主要提供cross-session分析與檢索擴充，README重現指令能重算發布CSV圖表，不代表重新跑25,200個機器人試驗。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

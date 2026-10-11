@@ -1,0 +1,760 @@
+{
+  "paper_id": "P180",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+  "identity_note": "收錄 arXiv:2605.12386v3（2026-09-28），第6頁列此 GitHub；README 題名一致但仍匿名。程式固定2026-09-26 commit，早於該 PDF 修訂，尤其評分與ID映射不可假定完全同步。",
+  "summary": "已追到 privileged HDF5/JSON reader、simulator contact grounding、LTLf DFA、可恢復的 repeated-violation 狀態機與實際聚合器。公開 code 有20個 enforced specifications／8類，但所讀 analysis/monitor_metrics/RQ1 的分母與論文v3 per-trigger pooled metrics 不一致；id.csv 也有9個當前公式無法匹配。",
+  "reading_order": [
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "README.md",
+      "ranges": [
+        [
+          13,
+          69
+        ],
+        [
+          83,
+          92
+        ],
+        [
+          309,
+          353
+        ]
+      ],
+      "why": "確認 safety layer 角色、gitignored working forks 與固定／變動場景流程。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": ".gitmodules",
+      "ranges": [
+        [
+          1,
+          41
+        ]
+      ],
+      "why": "模擬器／模型是獨立 gitlink，不能把 parent tree 當完整上游程式。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/ApplicableProperty.csv",
+      "ranges": [
+        [
+          1,
+          15
+        ]
+      ],
+      "why": "以50個task欄位對應property applicability，不將所有安全類別套到每task。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+      "ranges": [
+        [
+          107,
+          219
+        ],
+        [
+          267,
+          305
+        ]
+      ],
+      "why": "HDF5 states/actions/BDDL reader、逐frame還原與末端frame補回。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/sim/libero/env_ext.py",
+      "ranges": [
+        [
+          50,
+          131
+        ]
+      ],
+      "why": "實際輸出 task/scene/robot/predicates 與 wxyz quaternion。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/sim/robocasa/predicates.py",
+      "ranges": [
+        [
+          436,
+          456
+        ],
+        [
+          4140,
+          4273
+        ]
+      ],
+      "why": "allowed contact class 排除後，連續 forbidden contact 超過20 frames 才觸發 sustained。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/specs.py",
+      "ranges": [
+        [
+          443,
+          460
+        ],
+        [
+          527,
+          531
+        ]
+      ],
+      "why": "具體 collision invariant 與 grasp weak-until，和文章template分層保存。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/predicates.py",
+      "ranges": [
+        [
+          119,
+          163
+        ]
+      ],
+      "why": "predicate wrapper 只查已grounded值，必須往 sim implementation 追。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/monitor.py",
+      "ranges": [
+        [
+          72,
+          93
+        ],
+        [
+          225,
+          276
+        ]
+      ],
+      "why": "每property使用單一空binding，逐frame餵入已grounded atom。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/LTLfDFA.py",
+      "ranges": [
+        [
+          161,
+          246
+        ],
+        [
+          267,
+          287
+        ]
+      ],
+      "why": "實際 MONA/DFA 建立、唯一轉移與終止／trap 判定。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/repeated_violation_monitor.py",
+      "ranges": [
+        [
+          105,
+          245
+        ],
+        [
+          248,
+          319
+        ],
+        [
+          1408,
+          1437
+        ]
+      ],
+      "why": "違反後凍結main、啟動recovery、恢復時reset，以及collision具體recovery公式。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/run_monitor_on_privileged.py",
+      "ranges": [
+        [
+          103,
+          133
+        ],
+        [
+          1238,
+          1324
+        ],
+        [
+          1328,
+          1409
+        ],
+        [
+          1524,
+          1569
+        ],
+        [
+          1640,
+          1681
+        ]
+      ],
+      "why": "reader→predicate修補→monitor→輸出；截斷timeout會被列為satisfied的實際語義。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/monitor_metrics.py",
+      "ranges": [
+        [
+          77,
+          125
+        ],
+        [
+          137,
+          230
+        ]
+      ],
+      "why": "instance分母的violation_rate與frame exposure，不是per-trigger。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/metrics.py",
+      "ranges": [
+        [
+          72,
+          85
+        ],
+        [
+          266,
+          397
+        ]
+      ],
+      "why": "onset候選計數、零分母空值、task/safety/safe-success的分離。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/id.csv",
+      "ranges": [
+        [
+          1,
+          20
+        ]
+      ],
+      "why": "舊公式／類別映射與當前spec不一致。"
+    },
+    {
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/RQ1.py",
+      "ranges": [
+        [
+          743,
+          766
+        ],
+        [
+          1846,
+          1864
+        ]
+      ],
+      "why": "圖表以ratio列取平均，未依論文先pool trigger與violation數。"
+    }
+  ],
+  "environment": "沿用 RoboCasa365 廚房與 LIBERO 桌面模擬，主體是可取得 privileged simulator state 的安全監測層。論文50個RoboCasa tasks、4×10個LIBERO tasks是重用範圍，不另當90個新環境。固定scene實驗依seed鎖定layout／初態，應與一般scene variation分開。gitlink 的 LIBERO=8f1084e、LIBERO_openpi=f78abd6、RoboCasa=4f8a298。",
+  "tasks": "8類：碰撞／接觸、抓握穩定、釋放穩定、交叉汙染、action onset、mechanism、containment、enclosure/access。論文表2的10個template與表4／程式20個enforced spec不同單位；靜態AST逐一抽出20個name/ltl，抓握拆同步與掉落合法性，action onset有8種skill。task applicability 必須取原生場景／物件及ApplicableProperty表；LIBERO無某些語義觸發不能當免費安全分數。monitor目前每property每episode使用binding={}，未枚舉全物件組合。",
+  "data": "LIBERO reader 讀 data/demo_*/states、可選actions及init_state attr、data.attrs.bddl_file_name；直接set_state_from_flattened後forward，另設timestep=t+1防止監測狀態每frame重置。若actions數等於states數，嘗試最後action補一個terminal frame，故監測長度可能T+1；其replay_summary仍硬編split='train'，即使fallback可讀eval rollout。輸出 privileged_static_info、privileged_dynamic_info[{step,data}]、replay_summary；dynamic含task.timestep/success、robot.end_effector_pose、scene物件／fixture pose與predicates。env_ext quaternion由body_xquat輸出wxyz。monitor輸出property_name/ltl/binding、num_frames、violations/satisfied、original/repeated、repaired_traces、accepting_by_property/recovery_accepting_by_property；raw per-frame repeated trace預設移除。frame index、原生step、call_stride與秒數須分開，不從monitor行數推定物理時間。",
+  "evaluation": "具體collision grounding先排除合法robot/object/fixture/receiver/source-support/tool接觸，剩餘geom pair累加forbidden_contact_age，>20 frames才令forbidden_contact_sustained=True，enforced公式為G(!forbidden_contact_sustained)。SETTLE_TIMEOUT_FRAMES=100、SKILL_ONSET_FRAMES=10是本commit幀閾值。DFA逐frame轉移；repeated monitor進reject後凍結main並推進recovery DFA，recovery接受才結束unsafe episode及重新啟動，保留次數與duration。論文v3定義聚合後Vφ/Nφ及Uφ/Nφ，aggregate先pool counts，task success獨立。實際monitor_metrics卻算violated_instances/evaluated_instances及exposure_frames/monitored_frames；analysis.metrics的violations_per_skill_onset以evidence裡所有skill_*_onset_candidate_count的最大快照作分母，RQ1再平均各列ratio，不是每property trigger總數。因此這些現成CSV／圖不能直接標成v3正式per-trigger結果。timeout未觸發而影片已結束時run_monitor把該property歸satisfied，必須保存截斷／未觀測完成的限制。",
+  "standardization": {
+    "profile": "privileged_state_temporal_safety_monitoring",
+    "reuse": "原生property_name、enforced LTLf、recovery LTLf、predicate grounding／幀閾值、靜態scene角色、逐frame trace與unsafe episode區間。",
+    "transform": "source保留PDF版／parent commit／simulator gitlink；environment與task指向原生RoboCasa/LIBERO；case=原生task+policy+seed+scene/split+episode；evaluator拆task success、whole-rollout satisfaction、repeated counts、unsafe frames、per-property trigger counts。保留template→enforced-spec→category映射與NA applicability。零分母記NA，禁止把空類別回傳0當成已證安全；從trace另建有版本的trigger registry後才算v3 pooled metrics。",
+    "missing": "v3 per-trigger Nφ 的完整程式／可核對輸出；當前20個公式與id.csv／ApplicableProperty的版本對齊；被gitignore的working policy/simulator fork與公開extension的接線；末端補frame及硬編train provenance驗證；全部grounding與機制的獨立有效性檢查。本輪未跑MONA、模型或模擬。"
+  },
+  "version_note": "AST／CSV靜態比對發現9／20個當前公式不能由id.csv文字join到ID；例如collision已改sustained、grasp拆成兩spec、release改用object_dropped。id.csv也將釋放公式列為GraspStability、舊抓握公式列為ReleaseStability，與ApplicableProperty不同。不要用舊P1…ID自行覆寫native property_name。README明示working forks被gitignore，但monitor/sim公開extension確實存在，不能把整個來源誤標為無程式。",
+  "integration_issues": [
+    "必須分開論文v3 per-trigger、現行instance/frame指標與平均onset ratio三種口徑。",
+    "修復9個公式join落空與grasp/release類別互換前，不可匯入現成分析CSV作正式結果。",
+    "保留gitlink與gitignored fork限制、T+1末端frame、硬編train及timeout截斷語義。"
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/github_review/P180-discovery.json",
+      "sha256": "917ebb73042fff59a9704ada0b153dd34461a2fd1de6ab39a9aec8c8ca0155d6",
+      "json_pointers": [
+        "/candidates/0",
+        "/candidates/1",
+        "/paper_url",
+        "/pdf_sha256",
+        "/title"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/chengyuehuang511__SafeManip/files/README.md",
+      "sha256": "6cfc1a803f4735709e2f6061c0cfaa6b7f208b205e02b92229721805403e1661",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "README.md",
+      "git_blob_sha": "74bcb644a9213344bc8603288b2e9a541e0d4bf0",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/README.md",
+      "read_ranges": [
+        [
+          1,
+          200
+        ],
+        [
+          294,
+          410
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/chengyuehuang511__SafeManip/tree.json",
+      "sha256": "ee7fe8059b9f83e0f684bb3c07fa94f86acf3be9fb03b63ea228b9a9ce842003",
+      "kind": "pinned_repository_tree",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "url": "https://api.github.com/repos/chengyuehuang511/SafeManip/git/trees/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b?recursive=1",
+      "json_pointers": [
+        "/tree/1",
+        "/tree/10",
+        "/tree/103",
+        "/tree/104",
+        "/tree/106",
+        "/tree/107",
+        "/tree/108",
+        "/tree/109",
+        "/tree/11",
+        "/tree/110",
+        "/tree/114",
+        "/tree/118",
+        "/tree/12",
+        "/tree/120",
+        "/tree/13",
+        "/tree/14",
+        "/tree/15",
+        "/tree/158",
+        "/tree/17",
+        "/tree/18",
+        "/tree/19",
+        "/tree/206",
+        "/tree/207",
+        "/tree/208",
+        "/tree/209",
+        "/tree/21",
+        "/tree/22",
+        "/tree/23",
+        "/tree/24",
+        "/tree/25",
+        "/tree/26",
+        "/tree/27",
+        "/tree/28",
+        "/tree/29",
+        "/tree/30",
+        "/tree/31",
+        "/tree/32",
+        "/tree/33",
+        "/tree/36",
+        "/tree/38",
+        "/tree/39",
+        "/tree/40",
+        "/tree/41",
+        "/tree/42",
+        "/tree/43",
+        "/tree/46",
+        "/tree/47",
+        "/tree/48",
+        "/tree/5",
+        "/tree/50",
+        "/tree/51",
+        "/tree/52",
+        "/tree/53",
+        "/tree/54",
+        "/tree/55",
+        "/tree/56",
+        "/tree/57",
+        "/tree/58",
+        "/tree/64",
+        "/tree/67",
+        "/tree/68",
+        "/tree/69",
+        "/tree/7",
+        "/tree/70",
+        "/tree/71",
+        "/tree/72",
+        "/tree/73",
+        "/tree/74",
+        "/tree/75",
+        "/tree/76",
+        "/tree/77",
+        "/tree/78",
+        "/tree/79",
+        "/tree/8",
+        "/tree/80",
+        "/tree/81",
+        "/tree/82",
+        "/tree/83",
+        "/tree/84",
+        "/tree/85",
+        "/tree/86",
+        "/tree/87",
+        "/tree/88",
+        "/tree/89",
+        "/tree/9",
+        "/tree/90",
+        "/tree/91",
+        "/tree/92",
+        "/tree/93",
+        "/tree/94",
+        "/tree/95",
+        "/tree/96",
+        "/truncated"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/chengyuehuang511__SafeManip/files/SafeManip/monitor/specs.py",
+      "sha256": "90e01dfba4b8b181bb5409877247f54ea67e51fe268b3eec11f5c1ee7989553f",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/specs.py",
+      "git_blob_sha": "1da4e901554d1d8a39e4985300567f371109b0ff",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/specs.py",
+      "read_ranges": [
+        [
+          1,
+          145
+        ],
+        [
+          300,
+          369
+        ],
+        [
+          443,
+          473
+        ],
+        [
+          520,
+          563
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/chengyuehuang511__SafeManip/files/SafeManip/analysis/metrics.py",
+      "sha256": "6bd1e87912973a557f2857127023c5a589acdb28da4d93ad531ff15e69f51984",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/metrics.py",
+      "git_blob_sha": "a7dc0b07d5b96e1fb7aebc2b09f833633dcdcf69",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/metrics.py",
+      "read_ranges": [
+        [
+          1,
+          121
+        ],
+        [
+          234,
+          399
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/chengyuehuang511__SafeManip/files/SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+      "sha256": "274ffbecdc97a8a570deed28a5c33e851a21d5b73536f41257652277ba6ada52",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+      "git_blob_sha": "469d01bd048cb5aa76fa14c58a8a90bb6c7ad566",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/extract_privileged_from_dataset_libero.py",
+      "read_ranges": [
+        [
+          107,
+          222
+        ],
+        [
+          267,
+          333
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/monitor_metrics.py",
+      "sha256": "e43c11a2beb940620dfcf1a1d5d325f4a0970438d2f4bc196db015d7122c289f",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/monitor_metrics.py",
+      "git_blob_sha": "4f2fb049141fc4a86e49ee561b55c29d15b05896",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/monitor_metrics.py",
+      "read_ranges": [
+        [
+          1,
+          232
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/analysis/id.csv",
+      "sha256": "2c764951c8261d26b50ba1cce7c843243cd0ae66a531016fcacfc3306429bf9d",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/id.csv",
+      "git_blob_sha": "b8402ac5b0b42a4aec0fb8e7d94dc8b5dea95f9c",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/id.csv",
+      "read_ranges": [
+        [
+          1,
+          20
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/analysis/ApplicableProperty.csv",
+      "sha256": "1966fa1e7f56fa63ba7decc631e3f9ae793b1b70adaf44964caae289c9902cde",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/ApplicableProperty.csv",
+      "git_blob_sha": "5a206b945c9f55a69c0818da270717c302fd1abc",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/ApplicableProperty.csv",
+      "read_ranges": [
+        [
+          1,
+          15
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/.gitmodules",
+      "sha256": "467773c69287c0b7fb95e761d451a7bac9cd9bf8ef05883e0930bba305616a03",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": ".gitmodules",
+      "git_blob_sha": "49e34413aa1feb09e5d303e46894e2da79fa9959",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/.gitmodules",
+      "read_ranges": [
+        [
+          1,
+          41
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/run_monitor_on_privileged.py",
+      "sha256": "3d6b6e29896a5b81e0ab394c369eda39f43b002dcf1802af069668bb3f7530f2",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/run_monitor_on_privileged.py",
+      "git_blob_sha": "5697708fe6d66615e1d119bb02d4dc2477ac58dc",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/run_monitor_on_privileged.py",
+      "read_ranges": [
+        [
+          95,
+          135
+        ],
+        [
+          1238,
+          1328
+        ],
+        [
+          1328,
+          1409
+        ],
+        [
+          1410,
+          1518
+        ],
+        [
+          1524,
+          1570
+        ],
+        [
+          1575,
+          1638
+        ],
+        [
+          1640,
+          1682
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/repeated_violation_monitor.py",
+      "sha256": "cf777c1e5cb3f531e3c82ab0c42e8a8aa0a8650652772ae666f17d606e49743f",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/repeated_violation_monitor.py",
+      "git_blob_sha": "b0303830caf3ba1596d41566a6c39368ed58488e",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/repeated_violation_monitor.py",
+      "read_ranges": [
+        [
+          71,
+          247
+        ],
+        [
+          248,
+          319
+        ],
+        [
+          1408,
+          1440
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/LTLfDFA.py",
+      "sha256": "4996132080b489b80d925f01a2e2feea28ae07fa5336c0d467226622e5eb91e5",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/LTLfDFA.py",
+      "git_blob_sha": "af3b321e3f57a992ab9173c901f5ef4e5a5db8e1",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/LTLfDFA.py",
+      "read_ranges": [
+        [
+          158,
+          246
+        ],
+        [
+          267,
+          288
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/sim/robocasa/predicates.py",
+      "sha256": "6b34b271d94c41cebfad0b0375880af47c58e8fe22e2e3c7351dd79015b1775a",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/sim/robocasa/predicates.py",
+      "git_blob_sha": "f863f9dae600181d39d24b41d46562bf1b20de75",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/sim/robocasa/predicates.py",
+      "read_ranges": [
+        [
+          330,
+          346
+        ],
+        [
+          372,
+          386
+        ],
+        [
+          436,
+          457
+        ],
+        [
+          4140,
+          4298
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/chengyuehuang511__SafeManip/files/SafeManip/monitor/predicates.py",
+      "sha256": "fda268e2309507f79f54dea80ecc4d4d4cd2585f0c37b11b257a2cab51effd40",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/predicates.py",
+      "git_blob_sha": "d21ed88d1d4987b217ac2c1d446a63e0e80154d9",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/predicates.py",
+      "read_ranges": [
+        [
+          119,
+          164
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/sim/libero/env_ext.py",
+      "sha256": "88c09bd67cbb6d22d52ac5eb4e99a0df5134f2d3f5b07c5420e8b183bb60dacb",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/sim/libero/env_ext.py",
+      "git_blob_sha": "daada33943705c3cdc6914cf3f10394efb3892b9",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/sim/libero/env_ext.py",
+      "read_ranges": [
+        [
+          1,
+          131
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/analysis/RQ1.py",
+      "sha256": "2d06de923c4962ece9a15a099500b3f53c3ed88510b95dc88a982e48d08c2d4b",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/analysis/RQ1.py",
+      "git_blob_sha": "f91a9d25edc5c31d52d6ad95ed9cb465f192b261",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/analysis/RQ1.py",
+      "read_ranges": [
+        [
+          727,
+          773
+        ],
+        [
+          1821,
+          1878
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/chengyuehuang511__SafeManip/SafeManip/monitor/monitor.py",
+      "sha256": "a6c9536c303e31f0fa98888cea1a703afc4ba4262bd1abe83fd1ac76f4226c75",
+      "kind": "pinned_repository_file",
+      "repo": "chengyuehuang511/SafeManip",
+      "commit": "cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b",
+      "path": "SafeManip/monitor/monitor.py",
+      "git_blob_sha": "43628bd708f6f39e49a754ce1cea2c45b9aa05c8",
+      "url": "https://raw.githubusercontent.com/chengyuehuang511/SafeManip/cb9ca772c5a2e7fce9a0d44f966aabd3e2f5eb3b/SafeManip/monitor/monitor.py",
+      "read_ranges": [
+        [
+          60,
+          94
+        ],
+        [
+          225,
+          277
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P180/pages.json",
+      "sha256": "0731b4226b13a8bcaa20aec3ab77fe44c4be3ef44d22a199d6f507fbed0d6223",
+      "kind": "pinned_pdf_text",
+      "pdf_pages": [
+        5,
+        6,
+        26
+      ],
+      "json_pointers": [
+        "/25/text",
+        "/4/text",
+        "/5/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P180/paper.pdf",
+      "pdf_sha256": "561f1135594da0aca29135e76d5abec42f8cac6a946d0f92c6380b1c213488fc"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/P180-spec-inventory.json",
+      "sha256": "a8c3864dd297dcfb9f98795404c4fa15036fda2c9a38aa077fab3c6249dea0c8",
+      "kind": "local_static_inspection",
+      "json_pointers": [
+        ""
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

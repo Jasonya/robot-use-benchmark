@@ -1,0 +1,482 @@
+{
+  "paper_id": "P030",
+  "name": "EgoPlan-Bench",
+  "title": "EgoPlan-Bench: Benchmarking Multimodal Large Language Models for Human-Level Planning",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2312.06722",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P030",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoPlan-Bench 使用 EPIC-100／Ego4D 的人類影片做下一步四選一；已核讀 sample schema、Video-LLaMA 介面與實際比較方式。EgoPlan-IT 是另外的訓練資料。",
+    "environment": "來源為既有 EPIC-100 與 Ego4D。video_source/video_id 連原影片，目標與進度是題目上下文，不能把同影片不同目標當新實體環境。",
+    "tasks": "給 task_goal、進度片段與當前觀測，選最合理下一步。原檔案列 Val 3,355、Test 1,584（隱藏 GT）、IT 50K；額外 164K 通用 instruction 不屬測試題數。",
+    "data": "sample_id、video_source、video_id、task_goal、choice_a–d、golden_choice_idx、answer、current_observation_frame、task_progress_metadata 的 narration/start/stop_frame。Ego4D 介面只取最近4個 action、每個8 frames，再加當前影格；不足片段以 padding+clip_mask 補齊。",
+    "evaluation": "介面對四個候選計模型 loss，取 argmin 回傳候選文字；eval_multiple_choice.py 將該文字與 sample.answer 完全比較，再算 accuracy。對外 submission 則是 sample_id+label A–D，兩種表示需顯式對映。",
+    "standardization": {
+      "profile": "video_next_action_mcqa",
+      "reuse": "目標／進度／當前影格與候選 schema、兩個父庫對映、四選一 loss scoring。",
+      "transform": "source 分 Bench-Val／Bench-Test／IT，case ID 留原 sample_id、video_source、video_id 與 frame 範圍；記合法 action 邊界資訊、最近4片段與取樣預算。輸出同時保留候選索引／原字串與 choice2loss，未見 label 不補 GT。",
+      "missing": "未下載影片／IT、執行模型或提交。入口引用未定義 subset_name（列印與 predict_choice 呼叫），需修正為來源分支後驗證；短 action 可能讓 (end-start)//8=0，需記錄例外策略。不能把問答正確率當物理規劃成功。"
+    },
+    "version_note": "原 README 包含不同模型的輸入設定，必須記錄 history segmentation 是否給定。IT 的自動答案與人工核驗 Bench split 不能合併宣稱同等標註品質。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "ChenYi99/EgoPlan",
+        "requested_repo": "ChenYi99/EgoPlan",
+        "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            176
+          ],
+          [
+            205,
+            263
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 282,
+        "sha256": "8da2ab45618f311490380f63ed341145143284785d30f9450d0c9070dfee63e7",
+        "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/README.md",
+        "reading_url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/README.md#L1-L176",
+        "why": "原生訓練／評測量、欄位與父資料",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ChenYi99/EgoPlan",
+        "requested_repo": "ChenYi99/EgoPlan",
+        "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+        "ref": null,
+        "path": "src/__init__.py",
+        "ranges": [
+          [
+            1,
+            11
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 11,
+        "sha256": "402e6dfa9554137d152bb871fe550114c1d3e2bf2b33df663e29c38fd2d118a0",
+        "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/src/__init__.py",
+        "reading_url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/src/__init__.py#L1-L11",
+        "why": "模型介面入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ChenYi99/EgoPlan",
+        "requested_repo": "ChenYi99/EgoPlan",
+        "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+        "ref": null,
+        "path": "src/egoplan_video_llama_interface.py",
+        "ranges": [
+          [
+            32,
+            64
+          ],
+          [
+            70,
+            78
+          ],
+          [
+            81,
+            92
+          ],
+          [
+            95,
+            109
+          ],
+          [
+            138,
+            160
+          ],
+          [
+            169,
+            175
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 175,
+        "sha256": "b98f7e45e3df1303455daf2d6a16b5a970bc43faf93229f65561bd319aa13cb4",
+        "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/src/egoplan_video_llama_interface.py",
+        "reading_url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/src/egoplan_video_llama_interface.py#L32-L64",
+        "why": "合法影片讀取與四選項 loss",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ChenYi99/EgoPlan",
+        "requested_repo": "ChenYi99/EgoPlan",
+        "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+        "ref": null,
+        "path": "eval_multiple_choice.py",
+        "ranges": [
+          [
+            1,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "31dbf21d6a5e36f23a1a53aa6dbcac2e31ac861cf8c533ce255411ba48358332",
+        "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/eval_multiple_choice.py",
+        "reading_url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/eval_multiple_choice.py#L1-L78",
+        "why": "實際文字比較及入口變數問題",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ad09741dbee48df6b8beab9ce1f4399288be148c866abf99ec9746690ab576aa"
+  },
+  "repository_binding_review_sha256": "ad09741dbee48df6b8beab9ce1f4399288be148c866abf99ec9746690ab576aa",
+  "repository_bindings": [
+    {
+      "requested_repo": "ChenYi99/EgoPlan",
+      "resolved_repo": "ChenYi99/EgoPlan",
+      "aliases_in_this_review": [
+        "chenyi99/egoplan"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+          "reviewed_files": [
+            "README.md",
+            "eval_multiple_choice.py",
+            "src/__init__.py",
+            "src/egoplan_video_llama_interface.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/ChenYi99/EgoPlan",
+          "pdf_page": 1,
+          "pdf_sha256": "c15ca6dd2823dc0af2a6f55ce15cae49463268b814075cc9260e0d79ba751373",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/ChenYi99/EgoPlan",
+          "link_label": "Code",
+          "project_url": "https://chenyi99.github.io/ego_plan/",
+          "page_sha256": "bba409a007b15c306c7c59cce25b38eb0906c99fd5f5e877d08aa74d238bcc94"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P030",
+          "review_file": "content/github_review/reviews/P030.json",
+          "review_sha256": "ad09741dbee48df6b8beab9ce1f4399288be148c866abf99ec9746690ab576aa",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P030",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoPlan-Bench，arXiv 2312.06722v3。",
+    "scope_read": "資料來源、goal到QA、統計、選項評分、instruction-tuning資料區別。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      14
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "影片問答與推理",
+    "environment": "原作報419 scenes（影片觀測場景），非419個已建模robot layouts。",
+    "tasks": "下一步planning QA；表2合計3,269 task goals與3,185候選action plans，兩者不等同題數。",
+    "cases": "4,939評測QA＝3,355 val＋1,584 test；50K EgoPlan-IT是另外訓練集，非50K測試題。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 419,
+        "unit": "原作觀測scenes",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3269,
+        "unit": "表2 task goals",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4939,
+        "unit": "評測QA（val+test）",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1584,
+        "unit": "test QA",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "MC accuracy；部分開放模型以候選答案條件likelihood排序，需保留不同推論介面。",
+      "觀測只可到下一動作開始前；歷史狀態不能洩漏GT下一步。"
+    ],
+    "evaluation_types": [
+      "標準答案比對"
+    ],
+    "split": "EgoPlan-Val／EgoPlan-Test；EgoPlan-IT僅用EPIC來源，以Ego4D子集查跨資料泛化。",
+    "lineage": "EPIC-KITCHENS與Ego4D的衍生QA；不可與上游影片或EgoPlan2直接加成獨立新活動。",
+    "related_paper_ids": [
+      "P010",
+      "P013",
+      "P031"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§3.4、表2、§5.1",
+        "supports": "精確QA、goal、train/eval區別"
+      }
+    ],
+    "unresolved": [
+      "正文3,296 goals與表2的3,269相差27；採表2數字且保留差異。",
+      "419 scenes的跨影片物理等價關係未核。"
+    ],
+    "reuse": "提供goal／歷史／當前觀測→下一步的可用題型；不同goal文字仍須做語義等價審核。",
+    "reviewed_pdf_sha256": "c15ca6dd2823dc0af2a6f55ce15cae49463268b814075cc9260e0d79ba751373",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoPlan-Bench",
+    "year": 2023,
+    "title": "EgoPlan-Bench: Benchmarking Multimodal Large Language Models for Human-Level Planning",
+    "source_url": "https://arxiv.org/abs/2312.06722",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P030",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P030",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            14
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "下一步planning QA；表2合計3,269 task goals與3,185候選action plans，兩者不等同題數。",
+            "原作報419 scenes（影片觀測場景），非419個已建模robot layouts。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "c15ca6dd2823dc0af2a6f55ce15cae49463268b814075cc9260e0d79ba751373"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c15ca6dd2823dc0af2a6f55ce15cae49463268b814075cc9260e0d79ba751373",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P030",
+      "name": "EgoPlan-Bench",
+      "expected_title": "EgoPlan-Bench: Benchmarking Multimodal Large Language Models for Human-Level Planning",
+      "source_url": "https://arxiv.org/abs/2312.06722",
+      "pdf_url": "https://arxiv.org/pdf/2312.06722",
+      "retrieved_at": "2026-10-02T21:33:21.520907+00:00",
+      "pdf_sha256": "c15ca6dd2823dc0af2a6f55ce15cae49463268b814075cc9260e0d79ba751373",
+      "text_sha256": "a1de8998499bd16fadf0e568231a9d46a9792c740ace6eeadfbf1246cb09171b",
+      "pdf_bytes": 1896403,
+      "pages": 16,
+      "text_characters": 111653,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2312.06722v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2312.06722v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 419,
+        "unit": "原作觀測scenes",
+        "pages": [
+          5,
+          7
+        ],
+        "record_id": "review10:P030:1",
+        "paper_id": "P030",
+        "benchmark": "EgoPlan-Bench",
+        "native_term": "原作觀測scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2312.06722v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2312.06722v3",
+            "locator": "PDF pp. 5, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3269,
+        "unit": "表2 task goals",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P030:2",
+        "paper_id": "P030",
+        "benchmark": "EgoPlan-Bench",
+        "native_term": "表2 task goals",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2312.06722v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2312.06722v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4939,
+        "unit": "評測QA（val+test）",
+        "pages": [
+          5,
+          7
+        ],
+        "record_id": "review10:P030:3",
+        "paper_id": "P030",
+        "benchmark": "EgoPlan-Bench",
+        "native_term": "評測QA（val+test）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2312.06722v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2312.06722v3",
+            "locator": "PDF pp. 5, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1584,
+        "unit": "test QA",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P030:4",
+        "paper_id": "P030",
+        "benchmark": "EgoPlan-Bench",
+        "native_term": "test QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2312.06722v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2312.06722v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "ChenYi99/EgoPlan"
+  ],
+  "external_repositories": []
+}

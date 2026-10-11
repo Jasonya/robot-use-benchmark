@@ -1,0 +1,140 @@
+{
+  "paper_id": "P171",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Bench2Dex有可追溯的YAML任務、視觸覺HDF5 reader與具體success engine。26任務、12機體、8模態和1300示範各有不同單位；雙手/多模態不直接倍增任務。",
+  "reading_order": [
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          88
+        ]
+      ],
+      "why": "原作ID、規模宣告與Isaac版本"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "scenes/task.md",
+      "ranges": [
+        [
+          1,
+          39
+        ]
+      ],
+      "why": "26個release task ID與YAML入口"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "collector/task_manifest.py",
+      "ranges": [
+        [
+          12,
+          105
+        ]
+      ],
+      "why": "scene優先序、metadata parser與缺值fallback"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "scenes/76_soup_serving.yaml",
+      "ranges": [
+        [
+          1,
+          137
+        ]
+      ],
+      "why": "實例資產/初態/custom checker/stage DAG/dwell與safety設定"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "success/engine.py",
+      "ranges": [
+        [
+          1,
+          86
+        ]
+      ],
+      "why": "all/any/sequence/hold_duration/custom語義"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "success/custom/task_76_soup_serving.py",
+      "ranges": [
+        [
+          1,
+          44
+        ],
+        [
+          54,
+          152
+        ]
+      ],
+      "why": "兩次舀取狀態機與實際末態條件"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "policy/ACT-Tactile/act_tactile_dataset.py",
+      "ranges": [
+        [
+          20,
+          36
+        ],
+        [
+          47,
+          169
+        ]
+      ],
+      "why": "tactile site順序、同步sampling、command/qpos fallback與padding"
+    },
+    {
+      "repo": "Bench2Dex/Bench2Dex",
+      "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+      "path": "benchmark/metrics.py",
+      "ranges": [
+        [
+          1,
+          70
+        ],
+        [
+          413,
+          491
+        ],
+        [
+          498,
+          515
+        ],
+        [
+          549,
+          575
+        ],
+        [
+          817,
+          874
+        ]
+      ],
+      "why": "success protocol、空結果/有效結果分母與OOD比例"
+    }
+  ],
+  "environment": "IsaacSim5.1/IsaacLab2.3.2；26個task YAML包含桌面、資產路徑、物理屬性、佈局與generalization flags，跨12種robot embodiment。相同場景的雙手與多感測不算獨立環境。",
+  "tasks": "原生26task從放置/分類、清潔、工具使用、拼圖到盛湯/琴鍵等；YAML stages可有depends_on。task_manifest先選scenes_final再scenes；其中task.md只有3欄但parser要求6欄，可能退回Unknown，需我們的匯入器自行正確對映原表。",
+  "data": "HDF5 robot/qpos、action/commanded、cameras/*/rgb、robot/tactile/tacmap/*與site_names。同一start_ts取所有模態；缺commanded會改用qpos作action，必須記來源。tactile為uint8影像且順序跨episode嚴格一致；activeDOF/padding/NaN mask保存，尾chunk mask長度仍需測試。1300demo為原作宣告，未取得payload。",
+  "evaluation": "core-v1.8：reach_and_stop以terminal條件持續dwell(預設0.5秒)為成功，fixed_horizon改看budget末態；instant/at_end/stable分開。Soup Serving以湯杓進鍋→到碗上方兩次，再歸杓/擺碗/碗直立判分，沒有直接量測流體體積。安全成功另排drop/high-speed；joint limits預設diagnostic。空結果回0在本庫應標N/A；robust ratio需baseline和perturbed兩組才定義。",
+  "standardization": {
+    "profile": "visuotactile_bimanual_manipulation",
+    "reuse": "26task目錄、YAML stage/terminal規格、視觸覺schema、成功/安全/魯棒聚合公式。",
+    "transform": "task映射原ID及領域用途，保留scene版本；case固定control/physics/query時計與embodiment/activeDOF；evaluator原樣報stable/instant/safety，新增實際舀取量規則另版本化。",
+    "missing": "完整assets/HDF5取得、12機體適配、所有task checker/時鐘實測、manifest欄位修復、NaN/padding與空結果處理、感測單位/校準。"
+  },
+  "version_note": "固定fd90dcc；success語義依metric_schema_version與evaluation_protocol而變，不能拿不同版本同名success_rate直接合併。只核讀所列實際片段，未跑Isaac或policy。",
+  "runtime_executed": false
+}

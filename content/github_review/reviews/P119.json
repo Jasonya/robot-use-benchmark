@@ -1,0 +1,60 @@
+{
+  "paper_id": "P119",
+  "summary": "EgoDex官方庫提供HDF5/MP4 loader及best-of-K軌跡誤差。829小時包含split凍結後追加資料；每frame樣本量不能當不同任務或episode數。",
+  "reading_order": [
+    {
+      "repo": "apple/ml-egodex",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          37,
+          87
+        ]
+      ],
+      "why": "原作、split/extra與SE3/語言/置信度schema",
+      "commit": "718d9ebd8ec17187f72a74a08c66deea80178cb6"
+    },
+    {
+      "repo": "apple/ml-egodex",
+      "path": "simple_dataset.py",
+      "ranges": [
+        [
+          15,
+          75
+        ]
+      ],
+      "why": "frame到episode定位、座標與reversible指令／置信度取值",
+      "commit": "718d9ebd8ec17187f72a74a08c66deea80178cb6"
+    },
+    {
+      "repo": "apple/ml-egodex",
+      "path": "compute_metrics.py",
+      "ranges": [
+        [
+          11,
+          50
+        ]
+      ],
+      "why": "48D動作中只評位置、padding排除、各K獨立最小化",
+      "commit": "718d9ebd8ec17187f72a74a08c66deea80178cb6"
+    }
+  ],
+  "environment": "Vision Pro/ARKit第一人稱桌面人類操作；每episode的ARKit origin由裝置初始化，不保證跨episode一致，不能把相同world坐標當同一場所。",
+  "tasks": "作者報194種人類操作task，829小時資料；test/robot部署是不同用途。loader __len__回總frame數，不是194任務的題數。",
+  "data": "同索引MP4/HDF5，30Hz對齊；camera intrinsic3×3、各joint transforms N×4×4、可選confidence；reversible語言用llm_description/description2及which_llm_description。loader比較字串\"1\"，需驗證實際attr型別。",
+  "evaluation": "evaluate_distance採B×T×48 GT與K×B×T×48 prediction，排除任何padding的chunk，選出12個位置點而略過6D旋轉；平均距離與終點距離各自best-of-K，可能選不同候選。這是人類軌跡預測誤差，非機器人完成率。",
+  "standardization": {
+    "profile": "egocentric_pose_and_action_chunk_prediction",
+    "reuse": "episode/media配對、ARKit座標、joint confidence、語言方向及best-of-K metrics。",
+    "transform": "case固定episode/frame/history/horizon/K及query joints；raw SE3和prediction action表達分開，split凍結後extra另版，confidence缺失和padding明確標記。",
+    "missing": "大型媒體取得、194task完整manifest、語言方向標籤確認、joint/action映射與全test一致聚合；robot retargeting需另協定。"
+  },
+  "version_note": "apple/ml-egodex已轉址apple-aiml-research/ml-egodex，屬同一源。README分約725h train/7h test/97h extra；不可將追加部分混進原凍結test。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

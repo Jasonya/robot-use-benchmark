@@ -1,0 +1,470 @@
+{
+  "paper_id": "P060",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "review_scope": "已讀 Coherent4D 資料建置核心與論文指標；固定 tree 未公開 HIGFlow 模型或 forecasting evaluator。",
+  "summary": "此來源不只是專案頁：有 Coherent4D 的事件分段、共同座標及 SMPL 附加程式。正式預測指標只能讀到論文定義，尚無公開評分器可直接沿用。",
+  "identity_note": "README 的完整標題、六位作者及 arXiv:2609.08636 與本地 v1 論文一致，論文作者頁直接連 CorrineQiu/from-where-to-how。Coherent4D 是在 Ego-Exo4D 上建置的配對位置／姿態資料；HIGFlow 是方法名稱。FIction、Detic、Llama 與 WHAM 是來源／依賴，不能替代本論文版本。",
+  "reading_order": [
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "why": "辨認論文、Coherent4D/HIGFlow 角色、資料規模及 Ego-Exo4D 重用。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "data/README.md",
+      "ranges": [
+        [
+          1,
+          13
+        ]
+      ],
+      "why": "確認事件步數、有效 target 與跨 domain 物件標籤去重單位。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "data/dataset_statistics.csv",
+      "ranges": [
+        [
+          1,
+          5
+        ]
+      ],
+      "why": "核對各 domain、split、takes、samples、targets 與 object labels。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "data/dataset_task_sunburst_stats.csv",
+      "ranges": [
+        [
+          1,
+          22
+        ]
+      ],
+      "why": "讀21個原生程序任務及其 domain／樣本統計。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/README.md",
+      "ranges": [
+        [
+          1,
+          39
+        ]
+      ],
+      "why": "釐清五階段建置、外置資產與 pose 附加順序。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/02_shared_coordinate_construction/README.md",
+      "ranges": [
+        [
+          1,
+          40
+        ]
+      ],
+      "why": "確認 F0 空間參照、5公尺縮放、pose 公尺欄位與 chunk 繼承關係。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/05_forecast_sample_generation/README.md",
+      "ranges": [
+        [
+          1,
+          48
+        ]
+      ],
+      "why": "核對事件 horizon、30秒觀測、history 壓縮及 split 前提。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/05_forecast_sample_generation/build_chunks.py",
+      "ranges": [
+        [
+          31,
+          36
+        ],
+        [
+          106,
+          137
+        ],
+        [
+          151,
+          225
+        ],
+        [
+          227,
+          261
+        ],
+        [
+          267,
+          463
+        ],
+        [
+          517,
+          533
+        ],
+        [
+          571,
+          629
+        ]
+      ],
+      "why": "讀實際 pickle schema、非重疊事件分段、時間原點、history、padding mask 與輸出 metadata。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/04_smpl_state_attachment/README.md",
+      "ranges": [
+        [
+          1,
+          29
+        ],
+        [
+          59,
+          110
+        ]
+      ],
+      "why": "確認外部 WHAM/SMPL、19關節、配對遮罩、時間容差與姿態單位。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/04_smpl_state_attachment/attach_smpl.py",
+      "ranges": [
+        [
+          101,
+          116
+        ],
+        [
+          158,
+          174
+        ],
+        [
+          210,
+          226
+        ],
+        [
+          521,
+          535
+        ],
+        [
+          883,
+          977
+        ],
+        [
+          1054,
+          1079
+        ],
+        [
+          1194,
+          1249
+        ],
+        [
+          1264,
+          1302
+        ],
+        [
+          1309,
+          1377
+        ]
+      ],
+      "why": "核對最近影格實作、F0 復用、旋轉6D排列、米制姿態欄位與逐 token 成功遮罩。"
+    }
+  ],
+  "environment": "Ego-Exo4D 的 Aria 第一視角程序影片；Cooking、Health、Bike Repair 三個 domain。第三視角用於離線標註／SMPL 重建，不是預測輸入。787 unique takes 是來源錄製單位，不能當成787個獨立機器人環境。",
+  "tasks": "共同預測有序3D互動位置與同時間的全身 SMPL 狀態。原生21個程序任務由 CSV 按 domain 指定；Cooking/Health/Bike Repair 分別預測10/5/4個事件，並非秒數。公開統計為233828 samples（train193598、val20484、test19746）、1594186個非padding未來 targets、跨domain去重535個物件標籤；這些均為來源統計，未以完整資產重算。",
+  "data": "build_chunks 讀 pickle 根層 dataset，按 interactions.time 排序並以 chunk_size 不重疊切分，產生 id={take_name}_{datum_idx}_{chunk_idx}。每筆含 observation_start/end_time_s、history_interactions、target_interactions、target_mask、source_meta 及可選 env_objects；事件有 time_s、time_rel_s、location_norm、object。首個未來事件是時間零，history 嚴格在前30秒（起點截於0）；尾段以 None 加 mask=0。F0 取自 source_meta.source_observation_end_time_s，不隨 chunk 時間原點重新設定；位置用 clip(R0.T@(p-t0)/5,-1,1)。SMPL 附加 history/target_pose_mask、*_pose_frame、*_pose_time_delta_s、*_root_orient6d_f0、*_root_trans_f0_m、*_body_pose_local6d（23×6）、*_joints_f0_m（19×3）。pose位置保留公尺，6D旋轉為3×3矩陣前兩欄按列展平；不能套用不同6D排列。",
+  "evaluation": "固定 tree 沒有 HIGFlow 預測／benchmark 評分器。已讀論文 §III-C：位置先反縮放至度量空間，ADE 先平均每樣本有效事件再跨樣本平均，ADE90 是每樣本 ADE 的90百分位，FDE 取最後有效事件；姿態用19關節 MPJPE、每姿態相似變換對齊的 PA-MPJPE、Root Trans. 及23個非root關節 Body Geo.，位置報mm、旋轉報度。Single 用第一候選；Best-5 以各樣本有效步的關節誤差選一條候選，再用同一候選算所有pose指標。資料建置的最近影格檢查採 floor(time_s×fps)，預設fps30、誤差上限0.49秒；它只是標註有效性檢查，不能充作預測評分。配對有效性須用 target_mask & target_pose_mask。",
+  "standardization": {
+    "profile": "paired_3d_interaction_and_smpl_forecasting",
+    "reuse": "原生 domain/task_name 統計、take/datum/chunk 身分、事件時間、F0 metadata、位置／pose 分離遮罩與實際建置函式。",
+    "transform": "source 記 Ego-Exo4D 派生與外部重建版本；task 保留 CSV domain/task_name，case 用 take+datum+chunk，保存30秒觀測引用、事件horizon、絕對／相對秒與空間參照。位置正規化／裁切、公尺pose及毫米／角度評分分開記；不可由裁切座標還原超界真值。",
+    "missing": "需取得原始takes、確定的take-level split清單、建置後位置／pose caches、SMPL/19關節regressor與模型依賴；補公開預測/evaluator及30張觀測影格抽取對照。再驗證mask、資料規模、共同座標與論文報表一致性。"
+  },
+  "version_note": "固定67386704bf335af977232594d0f86428d0623c8e（2026-09-14）。非截斷tree有網站、統計與process程式，沒有釋出完整訓練／評分實作。SMPL指南指定外部 FIction-WHAM b520bc8f1d755be658c4d2bafdffe5081d09cfe2；本輪只讀該依賴宣告，未讀取／執行外部模型。chunk腳本不建立split，須承接來源take分割，不能把每個chunk隨機切分。",
+  "integration_issues": [
+    "現有 literature_snapshot 將 P060 記為 contribution_types=M、new_benchmark_contribution=no；README 與論文 §III 明列 Coherent4D 資料集及連續評測定義，請協調者覆核 D/B 分類。",
+    "來源已有資料建置程式，不能標成網站／README-only；同時不能以此宣稱 HIGFlow evaluator 已公開或已驗證。"
+  ],
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P060-discovery.json",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0"
+      ],
+      "sha256": "bcd982d35d44d847636730cf0e7561f95db43eee07305ea13782ba0baf01b217"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P060/pages.json",
+      "sha256": "d5ccd795ebb3cdbb549345cf0c71fbf625f875e0d1835180829d15d0e8ebbcc4",
+      "json_pointers": [
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text"
+      ],
+      "why": "PDF 頁4–7：資料建置、統計、split、共同座標與正式位置／姿態指標。"
+    },
+    {
+      "local_file": "audit/.cache/github_review/http/4322e6ade9dfb1a2a09685e0246bd3a6438748fde5cca1e5cc1fab69bb6e53a2.body",
+      "sha256": "f51894b8895243586a4695efc1e37bdd4b247f5741b4f99109d97d6c992c6e53",
+      "url": "https://corrineqiu.github.io/from-where-to-how/",
+      "ranges": [
+        [
+          5,
+          14
+        ],
+        [
+          95,
+          112
+        ],
+        [
+          634,
+          642
+        ]
+      ],
+      "why": "確認論文、作者與指定 repo。"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__from-where-to-how/tree.json",
+      "sha256": "453f395ee52910ea3da7df5b2d64c43c371868567bc36df6dac984a4b741bb38",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "json_pointers": [
+        "/truncated",
+        "/tree"
+      ],
+      "why": "完整 tree 證實公開範圍為網站、統計與資料process，無模型／forecasting evaluator。"
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/README.md",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/README.md",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/README.md",
+        "retrieved_at": "2026-10-10T23:35:35.126514+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/README.md",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 4056,
+        "sha256": "b9573867b9ca26e7518238521d4a652704e737d11859167be47f0a48202c0469"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/CorrineQiu__from-where-to-how/process/README.md",
+      "sha256": "b9573867b9ca26e7518238521d4a652704e737d11859167be47f0a48202c0469",
+      "git_blob_sha": "998d20e19e87e5c9dbe39e1b53412e47c186e97e",
+      "lines": 39,
+      "ranges": [
+        [
+          1,
+          39
+        ]
+      ]
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/02_shared_coordinate_construction/README.md",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/02_shared_coordinate_construction/README.md",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/02_shared_coordinate_construction/README.md",
+        "retrieved_at": "2026-10-10T23:35:36.132191+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/02_shared_coordinate_construction/README.md",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2989,
+        "sha256": "7235495a6a7d2ab117ed2b2e6f18aae62c54bfd72f04b5f02cbeaa5d83635e67"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/CorrineQiu__from-where-to-how/process/02_shared_coordinate_construction/README.md",
+      "sha256": "7235495a6a7d2ab117ed2b2e6f18aae62c54bfd72f04b5f02cbeaa5d83635e67",
+      "git_blob_sha": "1ff7bd6fb4f3be1f77af2a556f9837dd53c7d44b",
+      "lines": 40,
+      "ranges": [
+        [
+          1,
+          40
+        ]
+      ]
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/05_forecast_sample_generation/README.md",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/README.md",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/README.md",
+        "retrieved_at": "2026-10-10T23:35:37.138333+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/README.md",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2268,
+        "sha256": "26dd30225f8add84baec4400d4ef7df89192be72bb6c24b3fc8493946f7442a6"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/CorrineQiu__from-where-to-how/process/05_forecast_sample_generation/README.md",
+      "sha256": "26dd30225f8add84baec4400d4ef7df89192be72bb6c24b3fc8493946f7442a6",
+      "git_blob_sha": "8467dedc1c97503b11f59f4f17990dc4e2cd6555",
+      "lines": 48,
+      "ranges": [
+        [
+          1,
+          48
+        ]
+      ]
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/05_forecast_sample_generation/build_chunks.py",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/build_chunks.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/build_chunks.py",
+        "retrieved_at": "2026-10-10T23:35:38.137452+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/build_chunks.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 24663,
+        "sha256": "11bbff4c7dbde04385429f7c27f476fdaf939626de0745299fc2888b31a7be8a"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/CorrineQiu__from-where-to-how/process/05_forecast_sample_generation/build_chunks.py",
+      "sha256": "11bbff4c7dbde04385429f7c27f476fdaf939626de0745299fc2888b31a7be8a",
+      "git_blob_sha": "8866234ccef6bc002de39fa39edd0385f03b1466",
+      "lines": 652,
+      "ranges": [
+        [
+          31,
+          36
+        ],
+        [
+          106,
+          137
+        ],
+        [
+          151,
+          225
+        ],
+        [
+          227,
+          261
+        ],
+        [
+          267,
+          463
+        ],
+        [
+          517,
+          533
+        ],
+        [
+          571,
+          629
+        ]
+      ]
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/04_smpl_state_attachment/README.md",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/README.md",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/README.md",
+        "retrieved_at": "2026-10-10T23:36:04.678867+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/README.md",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 9643,
+        "sha256": "c26029b03c41420fe613b9b1c32565f4726c209520245fa4aaa0458c253ccdb5"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/CorrineQiu__from-where-to-how/process/04_smpl_state_attachment/README.md",
+      "sha256": "c26029b03c41420fe613b9b1c32565f4726c209520245fa4aaa0458c253ccdb5",
+      "git_blob_sha": "7f5c58fe901931b0b687dc2904ba1ff4fead7351",
+      "lines": 110,
+      "ranges": [
+        [
+          1,
+          29
+        ],
+        [
+          59,
+          110
+        ]
+      ]
+    },
+    {
+      "repo": "CorrineQiu/from-where-to-how",
+      "path": "process/04_smpl_state_attachment/attach_smpl.py",
+      "commit": "67386704bf335af977232594d0f86428d0623c8e",
+      "url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/attach_smpl.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/attach_smpl.py",
+        "retrieved_at": "2026-10-10T23:36:05.691655+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/CorrineQiu/from-where-to-how/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/attach_smpl.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 65868,
+        "sha256": "0cf4fffcb925d23091866c46f07e91fddde78c30b5b9f2ded1bc82c1bb5968ac"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/CorrineQiu__from-where-to-how/process/04_smpl_state_attachment/attach_smpl.py",
+      "sha256": "0cf4fffcb925d23091866c46f07e91fddde78c30b5b9f2ded1bc82c1bb5968ac",
+      "git_blob_sha": "79792f805c5552fc888e520695fb9ae567fec8e9",
+      "lines": 1567,
+      "ranges": [
+        [
+          101,
+          116
+        ],
+        [
+          158,
+          174
+        ],
+        [
+          210,
+          226
+        ],
+        [
+          521,
+          535
+        ],
+        [
+          883,
+          977
+        ],
+        [
+          1054,
+          1079
+        ],
+        [
+          1194,
+          1249
+        ],
+        [
+          1264,
+          1302
+        ],
+        [
+          1309,
+          1377
+        ]
+      ]
+    }
+  ],
+  "commit": "67386704bf335af977232594d0f86428d0623c8e",
+  "source_manifest": "audit/.cache/github_review/repos/CorrineQiu__from-where-to-how/manifest.json",
+  "runtime_executed": false,
+  "source_manifest_sha256": "33843b8b2616798a7e04ee3207c27ef08e7571e48d37c0f28f0f90ea4814bb77",
+  "classification_note": "既有Coverage已將本作納入資料／評測主來源；本次維持此判定。原文定義Coherent4D資料、固定split、聯合預測目標和具體指標，應同時承認資料、評測與方法貢獻。早期書目M／no標記屬初篩快照，不能用來否定此後原文審閱結果。公開倉庫未釋出預測scorer是另一項可得性缺口。"
+}

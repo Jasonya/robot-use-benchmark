@@ -1,0 +1,783 @@
+{
+  "paper_id": "P078",
+  "name": "PerAct",
+  "title": "Perceiver-Actor: A Multi-Task Transformer for Robotic Manipulation",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2209.05451",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P078",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "PerAct 是使用 RLBench 的方法參考，不另建18任務／249 variations的新任務庫。已讀replay與keypoint定義，並沿作者peract分支的reader、open_drawer condition、YARR rollout及accumulator閉合一條具體評測路徑；test可為每個task載入不同的val最佳checkpoint。",
+    "identity_note": "論文為Shridhar、Manuelli、Fox的Perceiver-Actor: A Multi-Task Transformer for Robotic Manipulation，arXiv:2209.05451v2（2022-11-11）。README題名、作者、arXiv與peract.github.io相符；84–109明指MohitShridhar/RLBench及MohitShridhar/YARR的peract分支，不是P062的stepjam/RLBench現行快照。兩fork是執行／計分依賴。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P078-discovery.json",
+        "selected_json_pointers": [
+          "/title",
+          "/paper_url",
+          "/pdf_sha256",
+          "/code_contexts/1",
+          "/code_contexts/2"
+        ],
+        "paper_version": "2209.05451v2",
+        "pdf_sha256": "daab02c1ba8c47505f9eb54e8e61fd327e799bb20b392efd7f4d06b0357d0f17",
+        "finding": "精確作者／版次、18個RLBench task／249 variations及專案頁。",
+        "sha256": "72fa035d636d685e26d09dd3d742f67a9ba25e1c823c87fe9137f9e158848551",
+        "text_excerpts": [
+          {
+            "json_pointer": "/opening_text",
+            "character_range": [
+              845,
+              883
+            ],
+            "text": "arXiv:2209.05451v2 [cs.RO] 11 Nov 2022",
+            "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+          }
+        ]
+      },
+      {
+        "local_file": "audit/.cache/github_review_worker/P077-P084/dependency_refs.json",
+        "selected_json_pointers": [
+          "/0",
+          "/1"
+        ],
+        "finding": "以共享paced network helper讀取README指定分支並固定commit；不是2022論文原始dependency lock。"
+      }
+    ],
+    "additional_repo_proposals": [
+      {
+        "repo": "MohitShridhar/RLBench",
+        "role": "author_rlbench_fork_dependency",
+        "ref": "peract",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "evidence": "peract/peract README.md 84–97"
+      },
+      {
+        "repo": "MohitShridhar/YARR",
+        "role": "author_yarr_evaluator_dependency",
+        "ref": "peract",
+        "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+        "evidence": "peract/peract README.md 99–109"
+      }
+    ],
+    "environment": "作者fork的RLBench/CoppeliaSim 4.1／PyRep桌面操作，EndEffectorPoseViaPlanning後接Discrete gripper。policy取front/left_shoulder/right_shoulder/wrist四個128×128 RGB與世界點雲；配置不直接輸出depth/mask，loader仍讀depth產生點雲。場景界限[-0.3,-0.5,0.6,0.7,0.5,1.6]為公尺，100³ voxel在此配置每格1cm。Franka真實實驗的teleop ZIP及Drive資料是外部附件，未取得／未驗證。",
+    "tasks": "18個task是README 232–249手選RLBench subset；249是論文v2的variations，不是task或trial數。已讀open_drawer的bottom/middle/top三variation，成功條件為指定joint相對初態位移>0.15m。task、variation_number、語句、demo初態各自存放；其餘17個checker未逐一選讀。",
+    "data": "路徑為{split_root}/{task}/all_variations/episodes/episodeN，包含low_dim_obs.pkl、variation_number.pkl、variation_descriptions.pkl與camera/%d.png。24-bit depth除DEPTH_SCALE後以near+depth*(far-near)還原公尺，結合intrinsics/extrinsics產生點雲。reader即使僅啟用四視角，仍檢查全部五相機RGB/depth影格數與low_dim_obs一致。fill_replay按自然序讀demo、取第一句description；keypoint為gripper_open改變、末幀或joint_velocities在0.1容差內停止，stopped_buffer=4。action為xyz公尺+xyzw+gripper共8D；保留拼法trans_action_indicies／rot_grip_action_indicies，rotation是xyz Euler+180後5度bin。replay另含ignore_collisions、rgb/point_cloud/矩陣、task、lang_goal、1024D sentence embedding、77×512 token embedding及demo。low_dim_state是gripper_open、兩指位置及[-1,1]決策進度。末keypoint的100 reward為合成訓練標籤；增廣replay條目數不能當demo/case數。",
+    "evaluation": "eval→IndependentEnvRunner→_run_eval_independent→RolloutGenerator→CustomMultiTaskRLBenchEnv→RLBench TaskEnvironment.step→Task.success→open_drawer JointCondition。demo index=eval_from_eps_number+ep，variation與初態自檔案恢復。範例checker成功時RLBench回1並terminal，PerAct乘100；reward<1歸零，IK／path／invalid-action錯誤直接失敗終止；預設25決策後timeout。SimpleAccumulator對episode累積reward取mean，稀疏0/100協定的eval_envs/return/{task}數值等於百分比成功率，但保留return名稱及scale，不泛推到有reward shaping的task。預設每task25 episodes；method seed另記。best模式每task依val CSV獨立選現存checkpoint、平手取最後，因此test不保證同一權重。YARR依weight是否dict決定test_data.csv檔名，仍需另核對demo_path實際split。",
+    "standardization": {
+      "profile": "rlbench_keypoint_behavior_cloning_reference",
+      "reuse": "作者fork reader／demo reset、18-task subset、variation/description、keypoint生成、planner與具體condition、YARR return aggregation。",
+      "transform": "source記P078方法與P062 RLBench重用關係並保存三個commit；case以split+task+episode+variation+Demo初態hash識別。raw sensor、policy observation、連續pose與voxel/Euler標籤分層；保留原始frame到keypoint的映射、augmentation起點與碰撞旗標。evaluator另存task→checkpoint、decision/trial budget、return scale、error/timeout。",
+      "missing": "README只鎖peract分支，補pin不能證明是論文實驗版本。尚需五相機影像／TTM／Demo資產閉合、其餘17 checker核對與實機附件版本。不能套用P062現行RLBench reader。YARR pop只在>1個完成episode時輸出，單case試讀不保證有CSV指標。"
+    },
+    "version_note": "主倉庫02fb87681c5a47be9dbf20141bedb836ee2d3ef9（2024-05-09），README明說論文DataParallel改為公開版DDP。補讀依賴固定RLBench ad991951bc53e4f3b73b803a75cf4b7d55295cf7與YARR 8d0f2e228b97efa207eeccedfc6dac9334342ba3。P077 PyBullet、P062較新RLBench與本版資料／checker各有版本邊界；本輪只審所列區段。",
+    "runtime_executed": false,
+    "reviewed_on": "2026-10-11",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            13
+          ],
+          [
+            42,
+            55
+          ],
+          [
+            84,
+            109
+          ],
+          [
+            214,
+            263
+          ],
+          [
+            309,
+            347
+          ],
+          [
+            413,
+            423
+          ],
+          [
+            448,
+            462
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 591,
+        "sha256": "a5d5179e5eed9ddd5185724c02a102fcb3a31fad4249a94d170d130fd1d6ec1d",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/README.md",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/README.md#L1-L13",
+        "why": "身份、作者fork、18 task清單、val/test流程與實機附件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "conf/config.yaml",
+        "ranges": [
+          [
+            6,
+            24
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 51,
+        "sha256": "eba5f36a92797d1c64fd7e09bc3057a0d0208d33893bb2c9f669c2f75501cd6c",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/conf/config.yaml",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/conf/config.yaml#L6-L24",
+        "why": "100 demos/task、四相機、場景界限與task-uniform replay。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "conf/method/PERACT_BC.yaml",
+        "ranges": [
+          [
+            5,
+            9
+          ],
+          [
+            37,
+            42
+          ],
+          [
+            48,
+            63
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 63,
+        "sha256": "9ba726123743377854b30982a32eb3a2fec774b92798f9daf704456a98c36351",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/conf/method/PERACT_BC.yaml",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/conf/method/PERACT_BC.yaml#L5-L9",
+        "why": "100³ voxel、5度rotation bin與每10原始步重取起點。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/RLBench",
+        "requested_repo": "MohitShridhar/RLBench",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "ref": null,
+        "path": "rlbench/backend/const.py",
+        "ranges": [
+          [
+            1,
+            29
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 30,
+        "sha256": "e2ddb02ab09a2ad372adb4ed1e08f136caa75b7f2bd743b533e3d471979c68d7",
+        "url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/backend/const.py",
+        "reading_url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/backend/const.py#L1-L29",
+        "why": "實際目錄／pickle／PNG命名與24-bit depth scale。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/RLBench",
+        "requested_repo": "MohitShridhar/RLBench",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "ref": null,
+        "path": "rlbench/utils.py",
+        "ranges": [
+          [
+            41,
+            147
+          ],
+          [
+            209,
+            236
+          ],
+          [
+            254,
+            308
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 345,
+        "sha256": "65f2e45de557e7df4b8f23b0bc8b44263eaed6de04a53b28626c1ccc7ad8b273",
+        "url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/utils.py",
+        "reading_url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/utils.py#L41-L147",
+        "why": "自然序episode、variation/description、五相機完整性檢查與depth還原。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "helpers/demo_loading_utils.py",
+        "ranges": [
+          [
+            8,
+            42
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 71,
+        "sha256": "dd30c91ca1f9c4a5abc16aa2dc0e6dfdeefe5346b5aacfb0ea600a341cd1d319",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/helpers/demo_loading_utils.py",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/helpers/demo_loading_utils.py#L8-L42",
+        "why": "夾爪切換、最後幀與低關節速度停止點。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "agents/peract_bc/launch_utils.py",
+        "ranges": [
+          [
+            32,
+            209
+          ],
+          [
+            212,
+            274
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 419,
+        "sha256": "9a6283dcda65046b82cffe598c461d36830139831cb82a6bf335cbde049617ed",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/agents/peract_bc/launch_utils.py",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/agents/peract_bc/launch_utils.py#L32-L209",
+        "why": "replay schema、pose標籤、合成訓練reward與示範增廣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "helpers/utils.py",
+        "ranges": [
+          [
+            43,
+            59
+          ],
+          [
+            72,
+            82
+          ],
+          [
+            322,
+            418
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 427,
+        "sha256": "efab9ff8c2757726cd99bd6645446336eb19f4a019563778fea2125d0372114c",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/helpers/utils.py",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/helpers/utils.py#L43-L59",
+        "why": "四元數／Euler bin、policy observation及相機矩陣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "helpers/custom_rlbench_env.py",
+        "ranges": [
+          [
+            20,
+            91
+          ],
+          [
+            134,
+            198
+          ],
+          [
+            314,
+            391
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 391,
+        "sha256": "c109e10bebf0afd9e482579c242e23cc12895efb3c4cf100388735bdf06374db",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/helpers/custom_rlbench_env.py",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/helpers/custom_rlbench_env.py#L20-L91",
+        "why": "demo reset、100倍reward及IK/path/action錯誤終止。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/RLBench",
+        "requested_repo": "MohitShridhar/RLBench",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "ref": null,
+        "path": "rlbench/tasks/open_drawer.py",
+        "ranges": [
+          [
+            9,
+            33
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 33,
+        "sha256": "ccc50b9d806fbe7a3367ff55e3ead42a25914a2843b1f384dbe0d2508a3797a2",
+        "url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/tasks/open_drawer.py",
+        "reading_url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/tasks/open_drawer.py#L9-L33",
+        "why": "三種drawer variation、語句與JointCondition(0.15)。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/RLBench",
+        "requested_repo": "MohitShridhar/RLBench",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "ref": null,
+        "path": "rlbench/backend/conditions.py",
+        "ranges": [
+          [
+            30,
+            40
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 194,
+        "sha256": "73669d9811783cb2f86b91ae5ab48c6dabce5f46a16078ae506ca4f890ad17d2",
+        "url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/backend/conditions.py",
+        "reading_url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/backend/conditions.py#L30-L40",
+        "why": "prismatic joint相對初態的絕對位移嚴格大於0.15m。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/RLBench",
+        "requested_repo": "MohitShridhar/RLBench",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "ref": null,
+        "path": "rlbench/backend/task.py",
+        "ranges": [
+          [
+            118,
+            120
+          ],
+          [
+            180,
+            187
+          ],
+          [
+            287,
+            311
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 416,
+        "sha256": "b6b44420b1d8cb489c1c35dc7c8c7ee3252000e896ae66f6e8d7edb1a21be2c0",
+        "url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/backend/task.py",
+        "reading_url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/backend/task.py#L118-L120",
+        "why": "reward預設None、fail優先／success AND與TTM引用。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/RLBench",
+        "requested_repo": "MohitShridhar/RLBench",
+        "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+        "ref": null,
+        "path": "rlbench/task_environment.py",
+        "ranges": [
+          [
+            94,
+            126
+          ],
+          [
+            159,
+            161
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 161,
+        "sha256": "561679e53a2e591f85b3d226533eff4d99eb99d0f2d3b35d2420bbaaacb60024",
+        "url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/task_environment.py",
+        "reading_url": "https://github.com/MohitShridhar/RLBench/blob/ad991951bc53e4f3b73b803a75cf4b7d55295cf7/rlbench/task_environment.py#L94-L126",
+        "why": "action後由success給0/1 reward、從Demo恢復初態。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "eval.py",
+        "ranges": [
+          [
+            14,
+            31
+          ],
+          [
+            83,
+            105
+          ],
+          [
+            124,
+            152
+          ],
+          [
+            220,
+            272
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 284,
+        "sha256": "57ea779b966855c3337ae151616e582ce9d8ec6279934e2fa7ebc054a6e894f9",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/eval.py",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/eval.py#L14-L31",
+        "why": "planner與每task獨立選最佳val checkpoint。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "peract/peract",
+        "requested_repo": "peract/peract",
+        "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+        "ref": null,
+        "path": "conf/eval.yaml",
+        "ranges": [
+          [
+            1,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 35,
+        "sha256": "95e6d367f2f2730632c762521cad6ee6b9c2bb323d8a9d8057edcc8604f54343",
+        "url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/conf/eval.yaml",
+        "reading_url": "https://github.com/peract/peract/blob/02fb87681c5a47be9dbf20141bedb836ee2d3ef9/conf/eval.yaml#L1-L28",
+        "why": "每task25 episodes與每episode25決策是不同預算。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/YARR",
+        "requested_repo": "MohitShridhar/YARR",
+        "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+        "ref": null,
+        "path": "yarr/runners/independent_env_runner.py",
+        "ranges": [
+          [
+            74,
+            126
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "fade550652557d59aa048608d53838fb3059aa8f68164c6882c5f23f4c67cb68",
+        "url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/runners/independent_env_runner.py",
+        "reading_url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/runners/independent_env_runner.py#L74-L126",
+        "why": "建立自訂env後進入真正的runner。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/YARR",
+        "requested_repo": "MohitShridhar/YARR",
+        "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+        "ref": null,
+        "path": "yarr/runners/_independent_env_runner.py",
+        "ranges": [
+          [
+            112,
+            139
+          ],
+          [
+            154,
+            200
+          ],
+          [
+            230,
+            283
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 297,
+        "sha256": "2c61101bf489c68f4d96cba79a3c59e539bb010b9aebb190494f65bf64dd05c7",
+        "url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/runners/_independent_env_runner.py",
+        "reading_url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/runners/_independent_env_runner.py#L112-L139",
+        "why": "逐task換權重、demo index範圍、accumulator寫CSV。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/YARR",
+        "requested_repo": "MohitShridhar/YARR",
+        "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+        "ref": null,
+        "path": "yarr/utils/rollout_generator.py",
+        "ranges": [
+          [
+            17,
+            89
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 89,
+        "sha256": "5becb6a3ec1013a083f24eb3bb4de097cb3f9606fc157da051ddf075a7d96ec6",
+        "url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/utils/rollout_generator.py",
+        "reading_url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/utils/rollout_generator.py#L17-L89",
+        "why": "demo reset、deterministic action、timeout與終止。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MohitShridhar/YARR",
+        "requested_repo": "MohitShridhar/YARR",
+        "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+        "ref": null,
+        "path": "yarr/utils/stat_accumulator.py",
+        "ranges": [
+          [
+            24,
+            56
+          ],
+          [
+            81,
+            119
+          ],
+          [
+            129,
+            151
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 192,
+        "sha256": "8d50b441e8413d7123845b8abdb13a6a9c44b69f3f5c35e939dce60299c6571a",
+        "url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/utils/stat_accumulator.py",
+        "reading_url": "https://github.com/MohitShridhar/YARR/blob/8d0f2e228b97efa207eeccedfc6dac9334342ba3/yarr/utils/stat_accumulator.py#L24-L56",
+        "why": "episode return平均；pop至少需兩個完成episode。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5"
+  },
+  "repository_binding_review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5",
+  "repository_bindings": [
+    {
+      "requested_repo": "MohitShridhar/RLBench",
+      "resolved_repo": "MohitShridhar/RLBench",
+      "aliases_in_this_review": [
+        "mohitshridhar/rlbench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+          "reviewed_files": [
+            "rlbench/backend/conditions.py",
+            "rlbench/backend/const.py",
+            "rlbench/backend/task.py",
+            "rlbench/task_environment.py",
+            "rlbench/tasks/open_drawer.py",
+            "rlbench/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P078",
+          "review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5",
+          "proposal": {
+            "repo": "MohitShridhar/RLBench",
+            "role": "author_rlbench_fork_dependency",
+            "ref": "peract",
+            "commit": "ad991951bc53e4f3b73b803a75cf4b7d55295cf7",
+            "evidence": "peract/peract README.md 84–97"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P078",
+          "review_file": "content/github_review/reviews/P078.json",
+          "review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "MohitShridhar/YARR",
+      "resolved_repo": "MohitShridhar/YARR",
+      "aliases_in_this_review": [
+        "mohitshridhar/yarr"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+          "reviewed_files": [
+            "yarr/runners/_independent_env_runner.py",
+            "yarr/runners/independent_env_runner.py",
+            "yarr/utils/rollout_generator.py",
+            "yarr/utils/stat_accumulator.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P078",
+          "review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5",
+          "proposal": {
+            "repo": "MohitShridhar/YARR",
+            "role": "author_yarr_evaluator_dependency",
+            "ref": "peract",
+            "commit": "8d0f2e228b97efa207eeccedfc6dac9334342ba3",
+            "evidence": "peract/peract README.md 99–109"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P078",
+          "review_file": "content/github_review/reviews/P078.json",
+          "review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "peract/peract",
+      "resolved_repo": "peract/peract",
+      "aliases_in_this_review": [
+        "peract/peract"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "02fb87681c5a47be9dbf20141bedb836ee2d3ef9",
+          "reviewed_files": [
+            "README.md",
+            "agents/peract_bc/launch_utils.py",
+            "conf/config.yaml",
+            "conf/eval.yaml",
+            "conf/method/PERACT_BC.yaml",
+            "eval.py",
+            "helpers/custom_rlbench_env.py",
+            "helpers/demo_loading_utils.py",
+            "helpers/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "peract",
+          "search_receipt_sha256": "e76208a4efa907e2faf5575e08be1541fdf1c67313389e5c53caf8a601131ab0",
+          "url": "https://github.com/peract/peract",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P078",
+          "review_file": "content/github_review/reviews/P078.json",
+          "review_sha256": "fd4b31488acedd266e1052ca51451e67552849353170f630f8468e3cfdde31b5",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "peract/peract",
+    "MohitShridhar/RLBench",
+    "MohitShridhar/YARR"
+  ],
+  "external_repositories": []
+}

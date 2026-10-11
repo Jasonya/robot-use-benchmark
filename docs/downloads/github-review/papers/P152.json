@@ -1,0 +1,593 @@
+{
+  "paper_id": "P152",
+  "name": "RoboWM-Bench",
+  "title": "RoboWM-Bench: A Benchmark for Evaluating World Models in Robotic Manipulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2604.19092",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "garment",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P152",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboWM-Bench把生成影片經IDM/手部軌跡抽取後放入Isaac Lab評估，能連到真實task checker；其成功定義仍須逐題保留，不能只比較影片品質。",
+    "environment": "IsaacSim5.1與庫內IsaacLab_5_1、LeHome式操作場景；robot track列7個Gym名稱，其中pull_and_push共享名稱。human track列12個原生task目錄；不能加上隨附IsaacLab全部任務當RoboWM規模。",
+    "tasks": "robot影片經IDM解碼為Franka動作；human影片經Phantom抽手軌跡再執行。pick/擺盤/丟垃圾/抽屜/按鈕/推拉及human track柔性、倒水等，各有獨立判分。",
+    "data": "World-model輸入為初始RGB和prompt；robot軌跡檔名.json實為每行一個action，pose.jsonl依episode檔名索引。parquet轉檔按episode尾3位排序後重編0..N，須保存映射避免pose錯配。Franka為7arm+2gripper joint targets，夾爪有額外閾值與關節裁切。",
+    "evaluation": "回放先30step穩定，再取軌跡中曾成功；例外回False列入attempts。pick用abs(z−ori_z)>0.05，未限制向上；擺盤成功只看XY各≤0.15；倒水預設至少1%粒子落在XY±0.02、Z±0.5的對稱盒內。step_interval計數跨呼叫，部分成功條件不檢查穩定、容器內部或釋放；需保留原版並另定嚴格擴充。",
+    "standardization": {
+      "profile": "generated_video_to_simulated_action",
+      "reuse": "兩條video-to-action管線、原始初圖/prompt、具體success與stage score。",
+      "transform": "case固定原影片ID、解碼器/軌跡/pose映射及sim資產；將影片生成、動作解碼、物理回放結果分別保存；新增規則用新evaluator版本，不覆寫原作score。",
+      "missing": "完整初態/資產取得、原生case清單、各task checker全覆蓋、時間/間隔計數核驗、IDM/Phantom抽取誤差與GPU執行基線。"
+    },
+    "version_note": "固定0a8b0ea；README的Code badge實際連HF權重，核讀本GitHub內實作。未安裝Isaac或執行任何世界模型。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            125
+          ],
+          [
+            149,
+            218
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 242,
+        "sha256": "8c80f3bca18879ed5f86a871d32a22133f202b07646c0f9c260d88487509946a",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/README.md",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/README.md#L1-L125",
+        "why": "世界模型→動作→模擬流程、環境版本和兩種track",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "tools/parquet_actions_to_json.py",
+        "ranges": [
+          [
+            24,
+            43
+          ],
+          [
+            70,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 105,
+        "sha256": "22f051d5ff367fb7c63a35cc23a74f061811cb0312598446ba8985f96f260997",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/tools/parquet_actions_to_json.py",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/tools/parquet_actions_to_json.py#L24-L43",
+        "why": "parquet action逐行輸出及重新編號/pose配對",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "scripts/robot/eval_franka.py",
+        "ranges": [
+          [
+            123,
+            138
+          ],
+          [
+            207,
+            241
+          ],
+          [
+            285,
+            355
+          ],
+          [
+            419,
+            439
+          ],
+          [
+            481,
+            505
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 519,
+        "sha256": "98dc9cdfe30be341baa1dbd60e914de4c997dc279b8bcfa04ab599dc10b71831",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/scripts/robot/eval_franka.py",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/scripts/robot/eval_franka.py#L123-L138",
+        "why": "動作裁切、30step穩定、any-time success與分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "source/lehome/lehome/tasks/franka_task/Task00_Pick/pick.py",
+        "ranges": [
+          [
+            125,
+            156
+          ],
+          [
+            291,
+            300
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 305,
+        "sha256": "cd40f8d1abd7f15838eeb7e9b12653d06537e24cf4e5cd18509367bfe98a5ea0",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/tasks/franka_task/Task00_Pick/pick.py",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/tasks/franka_task/Task00_Pick/pick.py#L125-L156",
+        "why": "joint target與pick checker實際呼叫",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "source/lehome/lehome/tasks/franka_task/Task01_Put_on_plate/tableware.py",
+        "ranges": [
+          [
+            328,
+            372
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 372,
+        "sha256": "2e5cb1746dba48b5a8c98e9dabbdcb63bf2734432f53b6e7277e2b518910124a",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/tasks/franka_task/Task01_Put_on_plate/tableware.py",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/tasks/franka_task/Task01_Put_on_plate/tableware.py#L328-L372",
+        "why": "分階段contact/lift/place",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "source/lehome/lehome/utils/success_checker.py",
+        "ranges": [
+          [
+            1,
+            26
+          ],
+          [
+            63,
+            90
+          ],
+          [
+            115,
+            141
+          ],
+          [
+            197,
+            208
+          ],
+          [
+            430,
+            467
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 508,
+        "sha256": "9666ee1be894eb53b99583bc9afd93bc8ce7a983f1e323ad633f714267461e8e",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/utils/success_checker.py",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/utils/success_checker.py#L1-L26",
+        "why": "間隔檢查、絕對高度差、XY對齊和水粒子近似",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fffstrong/RoboWM-Bench",
+        "requested_repo": "fffstrong/RoboWM-Bench",
+        "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+        "ref": null,
+        "path": "source/lehome/lehome/tasks/human_task/Task07_Franka_Tableware_Pour_Water/tableware.py",
+        "ranges": [
+          [
+            364,
+            373
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 373,
+        "sha256": "0e589aa81901a6759eb57c12294ea859c3a10a48db9cb467ac3b3e01fa81aed4",
+        "url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/tasks/human_task/Task07_Franka_Tableware_Pour_Water/tableware.py",
+        "reading_url": "https://github.com/fffstrong/RoboWM-Bench/blob/0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1/source/lehome/lehome/tasks/human_task/Task07_Franka_Tableware_Pour_Water/tableware.py#L364-L373",
+        "why": "human track倒水實際呼叫預設checker",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "80ff3474702ca23c7752d336dd3d4d2bf5963e03b4166dc50752e3fef6b9fdfe"
+  },
+  "repository_binding_review_sha256": "80ff3474702ca23c7752d336dd3d4d2bf5963e03b4166dc50752e3fef6b9fdfe",
+  "repository_bindings": [
+    {
+      "requested_repo": "fffstrong/RoboWM-Bench",
+      "resolved_repo": "fffstrong/RoboWM-Bench",
+      "aliases_in_this_review": [
+        "fffstrong/robowm-bench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+          "reviewed_files": [
+            "README.md",
+            "scripts/robot/eval_franka.py",
+            "source/lehome/lehome/tasks/franka_task/Task00_Pick/pick.py",
+            "source/lehome/lehome/tasks/franka_task/Task01_Put_on_plate/tableware.py",
+            "source/lehome/lehome/tasks/human_task/Task07_Franka_Tableware_Pour_Water/tableware.py",
+            "source/lehome/lehome/utils/success_checker.py",
+            "tools/parquet_actions_to_json.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/fffstrong/RoboWM-Bench",
+          "link_label": "Code",
+          "project_url": "https://robowm-bench.github.io/RoboWM-Bench/",
+          "page_sha256": "28169d87f3d3b37e9cda816ce748f34ae275aeaa11f378991849d6d1f41565b8"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P152",
+          "review_file": "content/github_review/reviews/P152.json",
+          "review_sha256": "80ff3474702ca23c7752d336dd3d4d2bf5963e03b4166dc50752e3fef6b9fdfe",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "衣物與洗護",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P152",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboWM-Bench，arXiv 2604.19092v2。",
+    "scope_read": "video→action兩路、task suite、主表與sim附錄、10初態與execution成功。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      14,
+      15
+    ],
+    "domains": [
+      "餐飲與烹飪",
+      "衣物與洗護",
+      "通用物件與機動作業"
+    ],
+    "role": "世界模型與影片生成評測",
+    "environment": "LeHome/IsaacSim原生與real-to-sim桌面；固定camera、隨機物件初態。",
+    "tasks": "主表8human-hand及8robot-task條件，附錄另6simulation-native條件；含同名重用，不直接加成22語義task。",
+    "cases": "每task10個共同initial configurations；Cosmos-finetune每task50trajectories是額外訓練。bimanual附錄又為另條件。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主表human-hand task條件",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主表robot task條件",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "附錄sim-native task條件",
+        "pages": [
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "每task共享initial configurations",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "generated video經HaMeR retargeting或IDM轉action，再進simulation；key nodes全通過且達goal才Task SR，另Step SR。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "固定初態／種子跨model；human與robot影片使用不同action extraction pipeline，pipeline誤差須分開分析。",
+    "lineage": "LeHome底座與real reconstruction，PAI-Bench作同影片視覺分數對照。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          14
+        ],
+        "locator": "§3.2–4.1、表1/3、Limitations",
+        "supports": "兩路action、8/8/6、10初態與joint判準"
+      }
+    ],
+    "unresolved": [
+      "全部task條件與語義去重清單需release manifest；retargeting/IDM失誤會影響world model分數。"
+    ],
+    "reuse": "提供生成影片到物理可執行性的橋梁，但需把影片模型和action extractor責任拆解。",
+    "reviewed_pdf_sha256": "4450ceffa72850511da6c91b3ce6f73bc070d372104dc8f60ce6fbf8f84ed566",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboWM-Bench",
+    "year": 2026,
+    "title": "RoboWM-Bench: A Benchmark for Evaluating World Models in Robotic Manipulation",
+    "source_url": "https://arxiv.org/abs/2604.19092",
+    "primary_type": "W",
+    "category_name": "世界模型與預測表示",
+    "domain_ids": [
+      "food",
+      "garment",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "餐飲與料理",
+      "衣物與柔性物操作"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "衣物與洗護",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P152",
+      "domain_ids": [
+        "food",
+        "garment",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P152",
+          "domain_ids": [
+            "food",
+            "garment"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            14,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "主表8human-hand及8robot-task條件，附錄另6simulation-native條件；含同名重用，不直接加成22語義task。",
+            "LeHome/IsaacSim原生與real-to-sim桌面；固定camera、隨機物件初態。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "4450ceffa72850511da6c91b3ce6f73bc070d372104dc8f60ce6fbf8f84ed566"
+        },
+        {
+          "paper_id": "P152",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            14,
+            15
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "人手與機器人操作條件下的通用動作效果預測。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "4450ceffa72850511da6c91b3ce6f73bc070d372104dc8f60ce6fbf8f84ed566"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "4450ceffa72850511da6c91b3ce6f73bc070d372104dc8f60ce6fbf8f84ed566",
+      "previous_domain_ids": [
+        "food",
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P152",
+      "name": "RoboWM-Bench",
+      "expected_title": "RoboWM-Bench: A Benchmark for Evaluating World Models in Robotic Manipulation",
+      "source_url": "https://arxiv.org/abs/2604.19092",
+      "pdf_url": "https://arxiv.org/pdf/2604.19092",
+      "retrieved_at": "2026-10-02T21:34:35.134716+00:00",
+      "pdf_sha256": "4450ceffa72850511da6c91b3ce6f73bc070d372104dc8f60ce6fbf8f84ed566",
+      "text_sha256": "6aa86cdc3e184d9af92f506f659729108d1e2393aad00eaf1b385a29d2c0d4ed",
+      "pdf_bytes": 18408004,
+      "pages": 24,
+      "text_characters": 92105,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2604.19092v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2604.19092v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主表human-hand task條件",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P152:1",
+        "paper_id": "P152",
+        "benchmark": "RoboWM-Bench",
+        "native_term": "主表human-hand task條件",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.19092v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.19092v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主表robot task條件",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P152:2",
+        "paper_id": "P152",
+        "benchmark": "RoboWM-Bench",
+        "native_term": "主表robot task條件",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.19092v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.19092v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "附錄sim-native task條件",
+        "pages": [
+          14
+        ],
+        "record_id": "review10:P152:3",
+        "paper_id": "P152",
+        "benchmark": "RoboWM-Bench",
+        "native_term": "附錄sim-native task條件",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.19092v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.19092v2",
+            "locator": "PDF pp. 14",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "每task共享initial configurations",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P152:4",
+        "paper_id": "P152",
+        "benchmark": "RoboWM-Bench",
+        "native_term": "每task共享initial configurations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.19092v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.19092v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "fffstrong/RoboWM-Bench"
+  ],
+  "external_repositories": []
+}

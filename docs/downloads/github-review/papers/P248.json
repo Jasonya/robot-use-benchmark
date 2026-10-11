@@ -1,0 +1,309 @@
+{
+  "paper_id": "P248",
+  "name": "HOIMotion",
+  "title": "HOIMotion: Forecasting Human Motion During Human-Object Interactions Using Egocentric 3D Object Bounding Boxes",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2407.02633",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P248",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "HOIMotion 以過去人體姿態和頭部視角的 3D 物件框預測人體動作，重用 ADT／MoGaze。已核兩套 loader、跨參與者設定與 MPJPE；物件框頂點、圖節點和人物關節都不應計為任務數。",
+    "environment": "Aria Digital Twin 與 MoGaze 的人類物件互動場景；ADT 原生 work／decoration／meal 三活動類，MoGaze pick／place 兩類，不能把五個標籤當五個新獨立物理環境。",
+    "tasks": "單一人體 3D motion forecasting 任務，按用途與 holdout participant 分組。21 joints，10 個過去 frame→30 個未來 frame（評分假設 30 Hz）；兩個 dynamic／兩個 static objects，各 bbox 八個頂點作模型輸入。",
+    "data": "原生 .npy 檔依 sequence 提供 pose xyz、head、dynamicbbx、staticbbx；loader 各自排序後用相同 list index 配對。每個連續 40-frame 窗口可重疊，train_sample_rate=2 只抽窗口，不把影片 FPS 降半。MoGaze 測試 p1／p2／p4／p5／p6／p7 六個 holdouts，每人可有多個 session。",
+    "evaluation": "MPJPE=未來各關節 xyz 歐氏距離的平均，先 batch 平均×batch_size 累加再除總 sample；輸出 mm、每未來 timestamp／joint 另列。zero-velocity baseline 重複末個觀測 pose。velocity loss 僅訓練用，沒有加到報告 MPJPE。ADT training 將 test 目錄作 validation 選 best checkpoint；MoGaze 也以 holdout participant 作 validation，完整模型選擇條件應保留。",
+    "standardization": {
+      "profile": "human_object_conditioned_body_motion_forecasting",
+      "reuse": "可重用兩父資料的 actor/session、動作標籤、21-joint pose、3D bbox 與原生 MPJPE；用戶研究 N=20 是獨立感知評價，不併入樣本題數。",
+      "transform": "標準 case 以 parent sequence／window 起點識別，明定 30 Hz、21 joints／米、過去 bbox 可見性與 split role；檔案配對改用 sequence key 並驗證一致。新增真正 untouched test split 時另列為擴充協定。",
+      "missing": "本次未下載 ADT／MoGaze 原始素材、未執行訓練。各用途的精確窗口數需由完整檔案 manifest 重算；原始資料及工具授權／版本各自保留。"
+    },
+    "version_note": "官方來源固定 commit；ADT preprocessing 明載資料版本 1.1.0。default script 的 train→eval 不是唯讀測試命令，沒有在本機執行。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            53
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 53,
+        "sha256": "b5f7617013f6cb8a272d616e19a2bbbe7cf418b0b2055c8cbd754eb7170cd922",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/README.md",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/README.md#L1-L53",
+        "why": "確認兩個父資料集、訓練後測試的 shell 工作方式與人類研究範圍。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "adt_processing/README.md",
+        "ranges": [
+          [
+            1,
+            13
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 33,
+        "sha256": "3a0306c6cdd8c26aa53de5a1396de06a337f11cad886080fcc412286b0ce0457",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/adt_processing/README.md",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/adt_processing/README.md#L1-L13",
+        "why": "固定 ADT／Project Aria Tools 均為 1.1.0 的資料前處理依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "utils/adt_dataset.py",
+        "ranges": [
+          [
+            6,
+            119
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 130,
+        "sha256": "b60467d737193d6572997bb6765e725933f664bd1427884a8a0eb779674a1f4c",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/utils/adt_dataset.py",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/utils/adt_dataset.py#L6-L119",
+        "why": "核對 work／decoration／meal、train/test 目錄、對應陣列及重疊切窗。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "utils/mogaze_dataset.py",
+        "ranges": [
+          [
+            6,
+            113
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 127,
+        "sha256": "ef31a80dda1995d3c2c1f629df4730fb20b71dc8005b869d9358624a8c020139",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/utils/mogaze_dataset.py",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/utils/mogaze_dataset.py#L6-L113",
+        "why": "核對 pick／place、participant split、native 檔名與切窗。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "utils/opt.py",
+        "ranges": [
+          [
+            15,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 67,
+        "sha256": "8c4a757634be27baa7c1bc9c37d5670f0e6b613b09c8bb3532e2bae2a7441f35",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/utils/opt.py",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/utils/opt.py#L15-L55",
+        "why": "固定 21 joints、10 history／30 future、object counts 與取樣率。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "train_adt.sh",
+        "ranges": [
+          [
+            1,
+            9
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 9,
+        "sha256": "0d15b1ec0a80da31656163cda15b177923e0859a0c93e37ca4b4e20d3697599e",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/train_adt.sh",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/train_adt.sh#L1-L9",
+        "why": "區分 all 與三個 action 子集；腳本先訓練再評分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "train_mogaze_p1.sh",
+        "ranges": [
+          [
+            1,
+            7
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 7,
+        "sha256": "fa13a72c4d8e19d617b95620b34728b53bf3a5bce80ab3399baaa610916d0ab0",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/train_mogaze_p1.sh",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/train_mogaze_p1.sh#L1-L7",
+        "why": "確認 p1 holdout 與 pick/place 分組不是額外獨立資料。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "main_adt_pose_forecasting.py",
+        "ranges": [
+          [
+            17,
+            97
+          ],
+          [
+            257,
+            373
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 381,
+        "sha256": "266adf45bc894d4ae312b27638c86acb59754cf93042606db2e827d1816d3a7e",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/main_adt_pose_forecasting.py",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/main_adt_pose_forecasting.py#L17-L97",
+        "why": "確認 test folder 用於 validation 選 checkpoint、只用過去物件資訊、MPJPE 分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CraneHzm/HOIMotion",
+        "requested_repo": "CraneHzm/HOIMotion",
+        "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+        "ref": null,
+        "path": "main_mogaze_pose_forecasting.py",
+        "ranges": [
+          [
+            16,
+            81
+          ],
+          [
+            295,
+            411
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 419,
+        "sha256": "241bd88ae5fe71075ae2bb9a0cf1c276e8b36d41824ae23ebbb81e84e03cedee",
+        "url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/main_mogaze_pose_forecasting.py",
+        "reading_url": "https://github.com/CraneHzm/HOIMotion/blob/d2f4322c70127a1dda08f3e6e40f56be651b9471/main_mogaze_pose_forecasting.py#L16-L81",
+        "why": "查核六個 participant holdout 的組成與相同 MPJPE 匯總。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "8f4758c1cdacd1c6986e32c3aea65f70f27b9193cfa758ff990d37653fad5c86"
+  },
+  "repository_binding_review_sha256": "8f4758c1cdacd1c6986e32c3aea65f70f27b9193cfa758ff990d37653fad5c86",
+  "repository_bindings": [
+    {
+      "requested_repo": "CraneHzm/HOIMotion",
+      "resolved_repo": "CraneHzm/HOIMotion",
+      "aliases_in_this_review": [
+        "cranehzm/hoimotion"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "d2f4322c70127a1dda08f3e6e40f56be651b9471",
+          "reviewed_files": [
+            "README.md",
+            "adt_processing/README.md",
+            "main_adt_pose_forecasting.py",
+            "main_mogaze_pose_forecasting.py",
+            "train_adt.sh",
+            "train_mogaze_p1.sh",
+            "utils/adt_dataset.py",
+            "utils/mogaze_dataset.py",
+            "utils/opt.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "HOIMotion",
+          "search_receipt_sha256": "53e7df13254dfc4711541489ffee85256d31671283c0bf8e2375dde825a55c7e",
+          "url": "https://github.com/CraneHzm/HOIMotion",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P248",
+          "review_file": "content/github_review/reviews/P248.json",
+          "review_sha256": "8f4758c1cdacd1c6986e32c3aea65f70f27b9193cfa758ff990d37653fad5c86",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "CraneHzm/HOIMotion"
+  ],
+  "external_repositories": []
+}

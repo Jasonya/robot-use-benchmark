@@ -1,0 +1,547 @@
+{
+  "paper_id": "P101",
+  "name": "Embodied Agent Interface",
+  "title": "Embodied Agent Interface: Benchmarking LLMs for Embodied Decision Making",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2410.07166",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "office"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P101",
+    "summary": "EAI統一四種決策模組，但BEHAVIOR與VirtualHome各有具體評分程式。目標理解的JSON錯誤處理不同，不能只因同名F1就合併成一個分數。",
+    "environment": "重用BEHAVIOR/iGibson與VirtualHome環境／狀態圖。形式goal、PDDL problem或語言題不自動新增物理場景。",
+    "tasks": "goal interpretation、subgoal decomposition、action sequencing、transition modeling四種資訊／決策評測；同一底層家務任務可接受不同資訊及要求，應建立不同case protocol。",
+    "data": "BEHAVIOR以demo identifier連goal conditions、objects、instruction與LLM輸出；VirtualHome以scene_id、script/file_id連狀態／動作目標。保留node goals/edge goals/action goals與原形式語法，不能直接flatten丟掉順序／備選完成方式。",
+    "evaluation": "已核讀goal interpretation：BEHAVIOR精確比對conditions，對備選目標取命中最多option，累計TP/FP/FN；解析失敗代空預測。VirtualHome JSON解析失敗直接continue並記format error，幻覺物件另記錄；跨環境F1分母與失敗規則需分開。transition env.step呼叫抽象control，不能宣稱真實機器人成功。",
+    "standardization": {
+      "profile": "symbolic_embodied_decision_modules",
+      "reuse": "原goal/schema、scene/demo/script身份、模組介面、細粒度錯誤與evaluator。",
+      "transform": "同一父task連多protocol case；state/可見物件名/語言與reference答案分開；保留環境特定parser、備選goal及micro計數，不扁平為通用accuracy。",
+      "missing": "其餘3模組各具體checker逐一接線、原始資產、判分分母完整性、形式規劃器與物理執行的比較界線。"
+    },
+    "version_note": "原embodied-agent-eval repo現轉址embodied-agent-interface/embodied-agent-interface，屬同一倉庫身份。這次深入核對goal interpretation，其他模組僅確認介面與來源角色，未宣稱全codebase或所有模組已跑通。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "embodied-agent-interface/embodied-agent-interface",
+        "requested_repo": "embodied-agent-eval/embodied-agent-eval",
+        "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            69
+          ],
+          [
+            92,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 243,
+        "sha256": "8b4d58dc20ace87a10106b827ab857c91b2289e3db46b15c61f5682c22e377bc",
+        "url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/README.md",
+        "reading_url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/README.md#L1-L69",
+        "why": "精確論文、4模組、父環境與程式改名",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "embodied-agent-interface/embodied-agent-interface",
+        "requested_repo": "embodied-agent-eval/embodied-agent-eval",
+        "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6",
+        "ref": null,
+        "path": "docs/source/modules/goal_interpretation.md",
+        "ranges": [
+          [
+            1,
+            70
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 70,
+        "sha256": "db7810a116e5c893f280fc2795639a2f5cd68a5b431a62d4a71d74023b307bea",
+        "url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/docs/source/modules/goal_interpretation.md",
+        "reading_url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/docs/source/modules/goal_interpretation.md#L1-L70",
+        "why": "初態與語言到形式目標的評測約定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "embodied-agent-interface/embodied-agent-interface",
+        "requested_repo": "embodied-agent-eval/embodied-agent-eval",
+        "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6",
+        "ref": null,
+        "path": "src/behavior_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+        "ranges": [
+          [
+            133,
+            162
+          ],
+          [
+            362,
+            449
+          ],
+          [
+            451,
+            490
+          ],
+          [
+            529,
+            579
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 596,
+        "sha256": "9d8816c4bf9f9067620b524fc90b5b618f89bf3e8318eb1084fcd2e3c1eca14c",
+        "url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/src/behavior_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+        "reading_url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/src/behavior_eval/evaluation/goal_interpretation/scripts/evaluate_results.py#L133-L162",
+        "why": "條件精確比對、備選goal、解析錯誤與global計數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "embodied-agent-interface/embodied-agent-interface",
+        "requested_repo": "embodied-agent-eval/embodied-agent-eval",
+        "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6",
+        "ref": null,
+        "path": "src/virtualhome_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+        "ranges": [
+          [
+            15,
+            59
+          ],
+          [
+            95,
+            147
+          ],
+          [
+            153,
+            217
+          ],
+          [
+            275,
+            310
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 350,
+        "sha256": "7f71f8ce6af1395e5379c6865f314a116082abca60250fc720ce9665da727b91",
+        "url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/src/virtualhome_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+        "reading_url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/src/virtualhome_eval/evaluation/goal_interpretation/scripts/evaluate_results.py#L15-L59",
+        "why": "VirtualHome schema、不同錯誤處理與node/edge/action分數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "embodied-agent-interface/embodied-agent-interface",
+        "requested_repo": "embodied-agent-eval/embodied-agent-eval",
+        "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6",
+        "ref": null,
+        "path": "src/behavior_eval/transition_model/eval_env.py",
+        "ranges": [
+          [
+            133,
+            142
+          ],
+          [
+            155,
+            157
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 168,
+        "sha256": "cc27581e1bf4a99429a1b3e65d8f8313716b0aba495c93c97358e7c8433b12da",
+        "url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/src/behavior_eval/transition_model/eval_env.py",
+        "reading_url": "https://github.com/embodied-agent-interface/embodied-agent-interface/blob/531c62f8df2cb392bdf1907923c76da41cad4fe6/src/behavior_eval/transition_model/eval_env.py#L133-L142",
+        "why": "符號／抽象action效果接口不等於逐步物理操作",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4b2bf03310437a3de4eea21caacb378bec7efad7c120932d57ac8173486a014c"
+  },
+  "repository_binding_review_sha256": "4b2bf03310437a3de4eea21caacb378bec7efad7c120932d57ac8173486a014c",
+  "repository_bindings": [
+    {
+      "requested_repo": "embodied-agent-eval/embodied-agent-eval",
+      "resolved_repo": "embodied-agent-interface/embodied-agent-interface",
+      "aliases_in_this_review": [
+        "embodied-agent-eval/embodied-agent-eval",
+        "embodied-agent-interface/embodied-agent-interface"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "531c62f8df2cb392bdf1907923c76da41cad4fe6",
+          "reviewed_files": [
+            "README.md",
+            "docs/source/modules/goal_interpretation.md",
+            "src/behavior_eval/evaluation/goal_interpretation/scripts/evaluate_results.py",
+            "src/behavior_eval/transition_model/eval_env.py",
+            "src/virtualhome_eval/evaluation/goal_interpretation/scripts/evaluate_results.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/embodied-agent-eval/embodied-agent-eval",
+          "pdf_page": 1,
+          "pdf_sha256": "d10c7fee3594c88ff9f6a061a68b64a380a82d36c6652f3b08c42179044e2a9f",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/embodied-agent-eval/embodied-agent-eval",
+          "link_label": "Code",
+          "project_url": "https://embodied-agent-interface.github.io",
+          "page_sha256": "b4b22d4cd95fb1ab26c588300d9646a7b262525d007c8f6a480675d1129c4293"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/embodied-agent-eval/embodied-agent-eval/tree/main",
+          "link_label": "here",
+          "project_url": "https://embodied-agent-interface.github.io",
+          "page_sha256": "b4b22d4cd95fb1ab26c588300d9646a7b262525d007c8f6a480675d1129c4293"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P101",
+          "review_file": "content/github_review/reviews/P101.json",
+          "review_sha256": "4b2bf03310437a3de4eea21caacb378bec7efad7c120932d57ac8173486a014c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "辦公與教育"
+  ],
+  "source_review": {
+    "paper_id": "P101",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Embodied Agent Interface，arXiv 2410.07166v3。",
+    "scope_read": "4 modules完整I/O与metric、表2、BEHAVIOR100／VirtualHome標註與符號實作。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      21,
+      89,
+      90,
+      102,
+      103
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育"
+    ],
+    "role": "符號規劃與評測介面",
+    "environment": "VirtualHome與EvalGibson兩後端；EvalGibson為BEHAVIOR100建立的符號transition simulator，不是BEHAVIOR1K全物理執行。",
+    "tasks": "4 modules：goal interpretation、subgoal decomposition、action sequencing、transition modeling。VirtualHome表2為26task names／338instructions；BEHAVIOR100為100。",
+    "cases": "338＋100＝438 instruction instances；801/673 goals是組成標籤，平均4,164.4 goal options不是4,164題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "能力modules",
+        "pages": [
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "VirtualHome表2task names",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "BEHAVIOR100 tasks",
+        "pages": [
+          7,
+          89
+        ]
+      },
+      {
+        "field": "case",
+        "value": 438,
+        "unit": "instruction instances",
+        "qualifier": "338+100",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "goal／transition以logic F1；trajectory feasibility、goal satisfaction、partial goal success；PDDL planner成功另列。",
+      "模組評測其餘部分用GT／BFS／planner補齊，非端到端全系統分數；只實作LTL部分語法，globally/until尚未實作。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "zero-shot接口評估；固定單module與pipeline分析分開。",
+    "lineage": "BEHAVIOR100 VR demos、RobotHow/VirtualHome；重新標註抽象／具體goal以避免無關終態污染。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "表1–2、§2–3",
+        "supports": "modules、438、評分、符號後端"
+      },
+      {
+        "pages": [
+          89,
+          90
+        ],
+        "locator": "附錄M.2–M.4",
+        "supports": "BEHAVIOR100與RobotHow來源及action goals"
+      }
+    ],
+    "unresolved": [
+      "附錄稱VirtualHome30categories而表2為26names，待label清單對齊。"
+    ],
+    "reuse": "是統一任務語言、規則及模組評測的直接前作；應避免重造G/T軸而不交代與此接口差異。",
+    "reviewed_pdf_sha256": "d10c7fee3594c88ff9f6a061a68b64a380a82d36c6652f3b08c42179044e2a9f",
+    "reviewed_on": "2026-10-02",
+    "name": "Embodied Agent Interface",
+    "year": 2024,
+    "title": "Embodied Agent Interface: Benchmarking LLMs for Embodied Decision Making",
+    "source_url": "https://arxiv.org/abs/2410.07166",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "food",
+      "office"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P101",
+      "domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P101",
+          "domain_ids": [
+            "home",
+            "food",
+            "office"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            21,
+            89,
+            90,
+            102,
+            103
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4 modules：goal interpretation、subgoal decomposition、action sequencing、transition modeling。VirtualHome表2為26task names／338instructions；BEHAVIOR100為100。",
+            "VirtualHome與EvalGibson兩後端；EvalGibson為BEHAVIOR100建立的符號transition simulator，不是BEHAVIOR1K全物理執行。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "d10c7fee3594c88ff9f6a061a68b64a380a82d36c6652f3b08c42179044e2a9f"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d10c7fee3594c88ff9f6a061a68b64a380a82d36c6652f3b08c42179044e2a9f",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P101",
+      "name": "Embodied Agent Interface",
+      "expected_title": "Embodied Agent Interface: Benchmarking LLMs for Embodied Decision Making",
+      "source_url": "https://arxiv.org/abs/2410.07166",
+      "pdf_url": "https://arxiv.org/pdf/2410.07166",
+      "retrieved_at": "2026-10-02T21:34:10.324980+00:00",
+      "pdf_sha256": "d10c7fee3594c88ff9f6a061a68b64a380a82d36c6652f3b08c42179044e2a9f",
+      "text_sha256": "4866c8aee4fe2025657c34b4f56dbb3c4e04baa90239052d651ac5c61fd6bb2f",
+      "pdf_bytes": 25615464,
+      "pages": 107,
+      "text_characters": 495033,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2410.07166v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2410.07166v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "能力modules",
+        "pages": [
+          4,
+          5,
+          6
+        ],
+        "record_id": "review10:P101:1",
+        "paper_id": "P101",
+        "benchmark": "Embodied Agent Interface",
+        "native_term": "能力modules",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.07166v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.07166v3",
+            "locator": "PDF pp. 4, 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "VirtualHome表2task names",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P101:2",
+        "paper_id": "P101",
+        "benchmark": "Embodied Agent Interface",
+        "native_term": "VirtualHome表2task names",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.07166v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.07166v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 100,
+        "unit": "BEHAVIOR100 tasks",
+        "pages": [
+          7,
+          89
+        ],
+        "record_id": "review10:P101:3",
+        "paper_id": "P101",
+        "benchmark": "Embodied Agent Interface",
+        "native_term": "BEHAVIOR100 tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.07166v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.07166v3",
+            "locator": "PDF pp. 7, 89",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 438,
+        "unit": "instruction instances",
+        "qualifier": "338+100",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P101:4",
+        "paper_id": "P101",
+        "benchmark": "Embodied Agent Interface",
+        "native_term": "instruction instances",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.07166v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.07166v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "embodied-agent-interface/embodied-agent-interface"
+  ],
+  "external_repositories": []
+}

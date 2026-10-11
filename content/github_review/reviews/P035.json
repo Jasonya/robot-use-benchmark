@@ -1,0 +1,167 @@
+{
+  "paper_id": "P035",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoVLPv2 是跨模態預訓練方法與既有 benchmark 的適配實作，保持 related_reference 身份；沒有把其下載特徵和下游結果當作新環境或新題庫。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "README.md",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "ranges": [
+        [
+          1,
+          73
+        ]
+      ],
+      "why": "方法身份、來源與子目錄角色"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoTaskQA/README.md",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "ranges": [
+        [
+          1,
+          43
+        ]
+      ],
+      "why": "原 EgoTaskQA 資料與 direct/indirect 協定"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoTaskQA/EgoTaskQA_dataset.py",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "ranges": [
+        [
+          14,
+          103
+        ]
+      ],
+      "why": "加工影片、question/answer 與輸入截斷"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoTaskQA/main_end2end.py",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "ranges": [
+        [
+          100,
+          106
+        ],
+        [
+          111,
+          117
+        ],
+        [
+          122,
+          128
+        ],
+        [
+          184,
+          202
+        ],
+        [
+          218,
+          224
+        ],
+        [
+          227,
+          233
+        ],
+        [
+          246,
+          254
+        ],
+        [
+          258,
+          277
+        ],
+        [
+          310,
+          318
+        ],
+        [
+          349,
+          360
+        ],
+        [
+          364,
+          370
+        ],
+        [
+          383,
+          406
+        ]
+      ],
+      "why": "分散式評分、tag 報表與模型選取路徑"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoNLQ/utils/evaluate_ego4d_nlq.py",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "ranges": [
+        [
+          13,
+          117
+        ]
+      ],
+      "why": "NLQ 時窗、閾值與分母"
+    }
+  ],
+  "environment": "沿用 EgoClip/Ego4D、EPIC-100、Charades-Ego、EgoTaskQA、QFVS 等父來源；此方法不獨立定義一組新生活場景。",
+  "tasks": "預訓練與 video-text fusion，於 EgoMCQ、retrieval、動作、NLQ/MQ、QA／summarization 進行遷移。任務清單引用原 benchmark，模型比較本身不增加 canonical tasks。",
+  "data": "EgoTaskQA 子目錄明確沿原作者預處理，formatted_*_qas_encode.json 的 interval 加 .mp4 定位加工影片，question/answer_encode 和 reasoning_type 保留；tokenizer 以30 token 為上限截斷，frame 預算由配置定義。NLQ 保留 clip_uid/annotation_uid/query_idx/predicted_times。",
+  "evaluation": "核讀 NLQ 原生時間 overlap/top-K 閾值 recall，分母為傳入預測且只列 evaluated/GT。QA validate 在分散式 allgather 後 argmax 對 answer 索引，另計 reasoning tag 正確率；直接 all_acc 公式寫成 correct/B*world_size，需檢查分母與 tag 報表的一致性，不直接採用此摘要作新結果。",
+  "standardization": {
+    "profile": "method_transfer_reference",
+    "reuse": "父 benchmark adapters、固定特徵／模型版本、EgoTaskQA 的原生 ID 和 NLQ evaluator。",
+    "transform": "用 method→evaluated_on/source 與 derived_feature 邊連父資料，不新建一份重複環境／任務數。case 在原 benchmark namespace 下儲存，另記模型、16frame/224px、30token、分散式取樣與 adapter 提交版本。",
+    "missing": "未下載權重／features 或執行。需核驗 DistributedSampler padding 的去重、QA pooled 分母及 checkpoint 選擇 split；本次讀 EgoTaskQA/NLQ 核心，不能代替其他下游完整 adapter 審核。"
+  },
+  "version_note": "root README 指明基於 EgoVLP 的特定提交，不能與 P034 的當前固定快照視為完全相同程式。EgoTaskQA 的資料仍屬 P032/LEMMA 衍生範圍。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "README.md",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "sha256": "c55fec52d0bdedcc81d877b52f2d60f0d4ea35d20c7a50c0ff9d14d956989fba",
+      "url": "https://github.com/facebookresearch/EgoVLPv2/blob/550c0596b8aa7426083398502111430454571c84/README.md",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__EgoVLPv2/files/README.md"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoTaskQA/README.md",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "sha256": "9e6d2dc60c0d2a22257688397c76e60f1121ea23d94169c292dabde371f3425e",
+      "url": "https://github.com/facebookresearch/EgoVLPv2/blob/550c0596b8aa7426083398502111430454571c84/EgoTaskQA/README.md",
+      "local_file": "audit/.cache/github_review_worker/early/files/facebookresearch__EgoVLPv2/EgoTaskQA/README.md"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoTaskQA/EgoTaskQA_dataset.py",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "sha256": "cbfa8da150eaa11696048001ebe12f619de0dfc88b2d45093fcd0c387a68057e",
+      "url": "https://github.com/facebookresearch/EgoVLPv2/blob/550c0596b8aa7426083398502111430454571c84/EgoTaskQA/EgoTaskQA_dataset.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/facebookresearch__EgoVLPv2/EgoTaskQA/EgoTaskQA_dataset.py"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoTaskQA/main_end2end.py",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "sha256": "7540a96a241384401859864fbe2755620510561cbcea272e4a0b07b88dcea6e5",
+      "url": "https://github.com/facebookresearch/EgoVLPv2/blob/550c0596b8aa7426083398502111430454571c84/EgoTaskQA/main_end2end.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__EgoVLPv2/files/EgoTaskQA/main_end2end.py"
+    },
+    {
+      "repo": "facebookresearch/EgoVLPv2",
+      "path": "EgoNLQ/utils/evaluate_ego4d_nlq.py",
+      "commit": "550c0596b8aa7426083398502111430454571c84",
+      "sha256": "5bf9452dcd32aef4c5b8e95ce837744c7bd5846457687a4f4b991fcaa387d7e1",
+      "url": "https://github.com/facebookresearch/EgoVLPv2/blob/550c0596b8aa7426083398502111430454571c84/EgoNLQ/utils/evaluate_ego4d_nlq.py",
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__EgoVLPv2/files/EgoNLQ/utils/evaluate_ego4d_nlq.py"
+    }
+  ],
+  "source_role": "related_reference"
+}

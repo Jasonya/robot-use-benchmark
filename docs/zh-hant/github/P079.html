@@ -1,0 +1,120 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FMB｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="FMB有真實Franka資料轉RLDS與策略rollout，但環境step固定回reward=0、done=False；成功需依官方實物評測程式另行記錄。已追到combined／insert-only builder、ResNet reader與robot action，發現state/peg_id欄位不相容、負ID轉uint8、primitive過濾後episode邊界未重算等具體整合問題。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P079.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P079.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P079.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="FMB｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="FMB有真實Franka資料轉RLDS與策略rollout，但環境step固定回reward=0、done=False；成功需依官方實物評測程式另行記錄。已追到combined／insert-only builder、ResNet reader與robot action，發現state/peg_id欄位不相容、負ID轉uint8、primitive過濾後episode邊界未重算等具體整合問題。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P079.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P079.html","title":"FMB｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P079.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P079.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P079 · FMB</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P079 · FMB</h1><p class="lede">FMB: a Functional Manipulation Benchmark for Generalizable Robotic Learning</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>benchmark／資料／評測主來源</span><a href="https://arxiv.org/abs/2401.08553" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p079">用途與原生規模依據</a>
+    </div>
+    <p class="github-scope">核讀快照 2026-10-11。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">FMB有真實Franka資料轉RLDS與策略rollout，但環境step固定回reward=0、done=False；成功需依官方實物評測程式另行記錄。已追到combined／insert-only builder、ResNet reader與robot action，發現state/peg_id欄位不相容、負ID轉uint8、primitive過濾後episode邊界未重算等具體整合問題。</p>
+    <aside class="github-version"><b>版本與身份</b><p>固定rail-berkeley/fmb@d4da6ce044a9806f41e58bf7423b5a3c05289925（2024-05-28），早於論文v3（2024-09-03）；不能認定涵蓋v3所有實驗。官方procedure是以SHA256固定的網站文字快照，無與paper/commit同版的證明。combined、single、multi、insert-only TFDS builders是不同schema／subset，不能僅因均1.0.0合併；本輪選讀combined與insert-only。</p><p>固定論文為Luo、Xu等人的FMB: a Functional Manipulation Benchmark for Generalizable Robotic Learning，arXiv:2401.08553v3（2024-09-03）。PDF及README均指functional-manipulation-benchmark.github.io，README 136–140列相同作者與arXiv；繫結中的專案Code連結指rail-berkeley/fmb。此repo是控制器／資料builder／baseline，CAD與資料壓縮包另行發布。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>裝配與生產作業</dd></div><div><dt>環境</dt><dd>真實Franka Panda、兩個側面與兩個腕部RGB-D相機、抓取區、reorientation fixture及插入板。論文單物體位置隨機於20×20cm、板於35×35cm；多物體抓取區20×30cm，板固定。控制器預設10Hz；gripper切換會另等待，影片以20fps寫出，均不能用來推定原始資料有精確等間隔timestamp。形狀／顏色／長短／大小是物件屬性，板號或相機數不等於environment/case數。</dd></div><div><dt>任務</dt><dd>原生任務含single_object_manipulation及三種multi_object assembly；combined builder的primitive有grasp、place_on_fixture、regrasp、rotate、move_up、go_to_board、insert。論文Table 1的六種分段標籤與程式中的過渡primitive不強制一對一合併。22,550為論文統計的分段軌跡（single 15,350、multi 7,200），不等於完整任務episodes：論文另列2,700個single全流程、4,050個額外insert及每assembly150個multi全流程。本輪未下載檔案，無實際落地case計數。</dd></div><div><dt>題數與資料</dt><dd>combined builder 1.0.0讀.npy dictionary：actions(T,7)、primitive[T]、obs/{side_1,side_2,wrist_1,wrist_2及_depth,q,dq,tcp_pose,tcp_vel,tcp_force,tcp_torque,gripper_pose}，single另有object_info。RLDS steps.observation為256×256 JPEG RGB、float32 depth、joint_pos/vel(7)、eef_pose(7)、eef_vel(6)、eef_force/torque(3)、state_gripper_pose及object/shape/color/size/length；episode_metadata保留file_path、episode_task與生成語句，USE embedding為512D。depth僅astype，未提供raw depth到公尺的scale；size/length為類別字串。action是base-frame xyz增量（m）、左乘的xyz Euler增量（rad）及gripper 0=open/1=close；env裁剪前六維至±0.06m／±0.25rad。builder只有train，ResNet reader預設train[:95%]/train[95%:]，不是物件held-out benchmark split。reward在原始最後步硬設1、discount全1，不能作量測成功標籤。</dd></div><div><dt>評估方式</dt><dd>callchain：ResNet simulate_policy→rollout→FrankaFMB.step；env固定回(obs,0,False,{})，rollout亦丟棄reward/done、可按Esc停止，只存observation/action與影片。N=100是程式呼叫引數，不是官方protocol；grasp/regrasp 60步、insert/place_on_fixture 100步、rotate 200步、long_horizon 300步，action chunk可能跨越外層上限。官方procedure另定grasp/rotate/place/regrasp各50 trials（5 seen+5 unseen物件各5次）、insert 45（9 shapes各5次）、single multi-stage 10、每multi-object assembly 10（5初態各2次）。成功依牢固抓持、fixture上斜放、rotate ±15度、底面完全插入正確孔等實物條件；multi-object需全部插入。未找到此路徑的機器自動量測或success JSON，必須保留人工／外部判讀地位。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作數字：保留論文的單位與頁碼</summary><p>下列為既有原文審閱摘錄；GitHub快照和本庫取得範圍另見上文，不互相代替。</p><ul><li><strong>66</strong> 原生物件 · 原文頁 4</li><li><strong>5</strong> 額外未見測試物件 · 原文頁 4</li><li><strong>3</strong> multi-object assemblies · 原文頁 8</li><li><strong>22,550</strong> primitive demonstration trajectories · 原文頁 7</li></ul></details>
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/README.md#L1-L16" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>身份、builder與checkpoint設定、force/torque座標框架更動、實物評測入口。</p><small>L1–16 · L30–66 · L95–140</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 13bc324ee1a06b3e5e41dd4c1c7b736899be011b4cda0c42f5cc36a2d6f65122</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/README.md#L28-L46" target="_blank" rel="noopener noreferrer"><code>ResNet/README.md</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>dataset版本、primitive/object篩選、tcp_frame及action chunk選項。</p><small>L28–46 · L49–62</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 ff66ec3c511058ffb520582de314a5622492f6599cad24a2eddc00656ed6912f</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/fmb_dataset_builder/fmb_dataset/fmb_dataset_dataset_builder.py#L36-L97" target="_blank" rel="noopener noreferrer"><code>fmb_dataset_builder/fmb_dataset/fmb_dataset_dataset_builder.py</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>實際raw keys→RLDS欄位、語言生成、terminal reward、ID dtype與train-only split。</p><small>L36–97 · L135–280 · L285–469</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 47f5fe705bc736fe9d91b614add1cc77f5bbf6fe6fac525a7e7d929c7d4cb85a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/fmb_dataset_builder/fmb_single_object_insert_dataset/fmb_single_object_insert_dataset_dataset_builder.py#L166-L215" target="_blank" rel="noopener noreferrer"><code>fmb_dataset_builder/fmb_single_object_insert_dataset/fmb_single_object_insert_dataset_dataset_builder.py</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>只保留insert步卻沿用原始i計算is_first/is_last，以及其實際schema。</p><small>L166–215 · L241–397</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 7e6f557328dc0a3ac21091a684f57235ec19897f64c2ebf6dd6cebd299d5615b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rlds/rlds_dataset.py#L16-L181" target="_blank" rel="noopener noreferrer"><code>ResNet/src/rlds/rlds_dataset.py</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>95/5切分、primitive/peg filter、decoder必讀state、eef→tcp rename及chunk padding。</p><small>L16–181 · L229–260</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 f237ffb7d926411adfc107c4af22bbf32f2b36805f46d6d25f0621761f5e8f7a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/robot_infra/envs/franka_fmb_env.py#L36-L82" target="_blank" rel="noopener noreferrer"><code>robot_infra/envs/franka_fmb_env.py</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>10Hz、7D delta action、四相機觀測、實機HTTP狀態及無成功checker。</p><small>L36–82 · L133–149 · L197–221 · L225–270</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 39c81bef944156079fcfcd8f376d655b532c376cfaf95694bc96da54268f70e0</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/rail-berkeley/fmb/blob/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rollout_main.py#L24-L42" target="_blank" rel="noopener noreferrer"><code>ResNet/src/rollout_main.py</code> ↗</a><span>GitHub · rail-berkeley/fmb · d4da6ce044</span></div>
+      <p>人工reset/object ID、policy縮放、rollout忽略reward/done、影片儲存及每primitive預算。</p><small>L24–42 · L106–179 · L216–270 · L348–384</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 ad535a553460fd863d65eee9b5d6f0a7e44907074a8f0ada503b17e453bebe43</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>raw→RLDS欄位、primitive語句與object屬性、父軌跡file_path、控制器delta-action定義、官方逐skill初態／trial／成功準則。</p></section><section><h3>需要轉換</h3><p>source同時綁paper v3、repo commit與TFDS dataset名稱/1.0.0；task區分完整assembly與primitive；case保留父episode、原始frame index、board/object ID、切分後segment及protocol trial。物件泛化split需另存held-out清單，不沿用95/5切片。把raw depth scale、force/torque frame、gripper及action正規化作profile欄位；evaluator單列合成demo reward與實物成功判讀。</p></section><section><h3>仍需補齊</h3><p>combined及insert-only builder均無observation.state/peg_id，但ResNet decoder 137–140無條件讀state，peg filter/shape_vec又用peg_id；需版本化adapter，不能宣稱可直接串接。combined把-1 ID sentinel轉uint8後成255，schema文字卻仍說-1。insert-only過濾後仍用原始i標is_first/is_last，可能沒有first或terminal步。README說舊checkpoint force/torque在base frame、新dataset預期eef frame，不能只按同名欄位合併。尚缺深度尺度、物理資產／相機校正、protocol附圖座標、實際trial結果與觀察者判讀記錄。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P079-discovery.json&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/code_contexts/0&quot;,
+      &quot;/code_contexts/2&quot;
+    ],
+    &quot;paper_version&quot;: &quot;2401.08553v3&quot;,
+    &quot;pdf_sha256&quot;: &quot;c0d7c39378cfc46b87289276d517c5e9ef6aa5932fece6c5d2b0b4a4f120f9e8&quot;,
+    &quot;sha256&quot;: &quot;415824c31fac20069f5a488aa0362acaa739d3857c80739eb4d6cc9b77d1222d&quot;,
+    &quot;text_excerpts&quot;: [
+      {
+        &quot;json_pointer&quot;: &quot;/opening_text&quot;,
+        &quot;character_range&quot;: [
+          1581,
+          1618
+        ],
+        &quot;text&quot;: &quot;arXiv:2401.08553v3 [cs.RO] 3 Sep 2024&quot;,
+        &quot;scope&quot;: &quot;僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。&quot;
+      }
+    ]
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P079/pages.json&quot;,
+    &quot;sha256&quot;: &quot;77df76136703831965fdee18f3a112eea5cae0f7971e1607a42129c00e249115&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/6/text&quot;,
+      &quot;/7/text&quot;
+    ],
+    &quot;finding&quot;: &quot;論文Table 1的22,550是切分後primitive軌跡；第3.7節將初態與held-out物件作為protocol。&quot;
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review_worker/P077-P084/primary_pages/P079-procedure.html&quot;,
+    &quot;url&quot;: &quot;https://functional-manipulation-benchmark.github.io/procedure/index.html&quot;,
+    &quot;sha256&quot;: &quot;587a5f64e4cfc09c9e7b64c60e5c42e7ef4c0a8cd4e9ee615a223460a97ffa59&quot;,
+    &quot;source_manifest&quot;: &quot;audit/.cache/github_review_worker/P077-P084/P079-primary-page.json&quot;,
+    &quot;extracted_text_file&quot;: &quot;audit/.cache/github_review_worker/P077-P084/primary_pages/P079-procedure.txt&quot;,
+    &quot;text_sha256&quot;: &quot;2598da5ef076ba68c286f73ab99231f57c305e11331fdd2e538bc62bcdd1db8b&quot;,
+    &quot;read_ranges&quot;: [
+      [
+        1,
+        76
+      ]
+    ],
+    &quot;finding&quot;: &quot;官方procedure文字的實物成功條件與每skill／assembly的trial預算；未解析附圖的精確佈局座標。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P079.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P078.html">← 上一篇 · PerAct</a><a href="P080.html">下一篇 → · DexArt</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

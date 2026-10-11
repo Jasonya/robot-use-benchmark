@@ -1,0 +1,553 @@
+{
+  "paper_id": "P201",
+  "name": "EgoSAT",
+  "title": "EgoSAT: A Comprehensive Benchmark of Egocentric Streaming Interaction Understanding",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.24422",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P201",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoSAT已有streaming runner、query helper與正式main-table scorer；標準化時必須保留完整native JSON和effective queryset，單純壓成答案JSONL會丟掉判分資訊。",
+    "environment": "Ego4D的1997段第一人稱影片、約165h/56場景類型；場景類型不是已取得的56個simulator環境。原始Ego4D影片不在此repo重新分發。",
+    "tasks": "回顧、當下、預測三模式，約4800QA；另有answerability/branchiness/surprise與state-switch probes。group、step、兩probe配對及QA數分開，不從56×3推算task/case量。",
+    "data": "原生GT含video_uid、video_metadata.interval_start/end、samples；helper產effective queryset保留idx/t_eval/t_eval_rel/window/horizon/options/memory。runner只裁整個interval，真正每query可見prefix需由adapter依window執行；共通格式須保存原JSON、token probabilities、queryset references與model flavor。",
+    "evaluation": "MCQ對有效queryset中有GT的題計full denominator，缺/無效回答為錯；缺GT略過。scorer先掃現有prediction文件，所以整份缺失的GT仍需外部expected-case manifest檢查。confidence是有效cand_conf值均值，不能當accuracy或完整校準分數。state-switch需前後兩probe均對，主值用valid pairs，另有total/missing/invalid計數及僅成功pair的after-confidence。",
+    "standardization": {
+      "profile": "causal_egocentric_streaming_qa",
+      "reuse": "真正runner/helper/scorer、合法時間窗口、prediction flavor與透明分子/分母。",
+      "transform": "case保存source/video/interval/query idx與精確clock、options順序和pair ID；central input loader限定可見frame，GT獨立；score保留total/valid/missing和conditional confidence，不丟native payload。",
+      "missing": "完整Ego4D/QA資產與release split、每model相同expected queryset、adapter實際prefix稽核、全文件缺失計分及confidence欄位可用性驗證。"
+    },
+    "version_note": "固定7f65bbb；原作2606.24422。examples/evaluation_fixtures是合成格式例，不記為本庫新增真實評測題或原作模型跑分。本輪未執行模型/API/scorer。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 193,
+        "sha256": "6b9ff034f6adf7d38cea23f3d0a6408814410915915f4e1cda4e78a67de59a9a",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/README.md",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/README.md#L1-L85",
+        "why": "原作、Ego4D父來源、1997影片/約4800QA與三種時間推理",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "evaluation/README.md",
+        "ranges": [
+          [
+            1,
+            124
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 147,
+        "sha256": "b6635f208330ea3344a7cecad56de9d703c793e3519f24d2482b9ec1a0c91ccf",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/evaluation/README.md",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/evaluation/README.md#L1-L124",
+        "why": "正式輸入、不同prediction flavor與各metric分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "benchmark_val/runner.py",
+        "ranges": [
+          [
+            196,
+            225
+          ],
+          [
+            520,
+            599
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 772,
+        "sha256": "1bf3b5d7e8c7f86c3de39074185c70c4bce3a404377c5807baef945c18672b76",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/benchmark_val/runner.py",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/benchmark_val/runner.py#L196-L225",
+        "why": "interval影片裁切、空GT紀錄與source/query身份",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "benchmark_val/helper.py",
+        "ranges": [
+          [
+            1992,
+            2018
+          ],
+          [
+            2385,
+            2410
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2449,
+        "sha256": "5b5e46ac147ecdd2afbb89cde0fda27ef900925379fbeb29b79389a4efa126c9",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/benchmark_val/helper.py",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/benchmark_val/helper.py#L1992-L2018",
+        "why": "retrospective/prospective query時間與合法window",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "docs/model_guide.md",
+        "ranges": [
+          [
+            58,
+            82
+          ],
+          [
+            143,
+            211
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 337,
+        "sha256": "4d5802d02eb1de8324a149afac809349d83f4a1bff6ec0e1e744a977afe23b8b",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/docs/model_guide.md",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/docs/model_guide.md#L58-L82",
+        "why": "model adapter契約、time_offset/相對時間與因果取frame模板",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "evaluation/metrics.py",
+        "ranges": [
+          [
+            1,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 87,
+        "sha256": "527211607482d37f6560104b9660013d29e54c17c4cf14be7e8aa5fcf8f6a030",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/evaluation/metrics.py",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/evaluation/metrics.py#L1-L61",
+        "why": "零分母None與基本度量",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leiyj23/EgoSAT",
+        "requested_repo": "leiyj23/EgoSAT",
+        "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+        "ref": null,
+        "path": "evaluation/evaluate_main_table.py",
+        "ranges": [
+          [
+            351,
+            388
+          ],
+          [
+            463,
+            597
+          ],
+          [
+            600,
+            722
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 998,
+        "sha256": "d12316cbaa32df2171bf2bcbe796b3ee53c567355db01b78bc7884641ae93c0c",
+        "url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/evaluation/evaluate_main_table.py",
+        "reading_url": "https://github.com/leiyj23/EgoSAT/blob/7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8/evaluation/evaluate_main_table.py#L351-L388",
+        "why": "完整queryset MCQ、valid-only confidence與state-switch成對分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "379b8178386d5e7b492b0a8009bdf95555b1a9acd12825e9e7306a1cfa1444ab"
+  },
+  "repository_binding_review_sha256": "379b8178386d5e7b492b0a8009bdf95555b1a9acd12825e9e7306a1cfa1444ab",
+  "repository_bindings": [
+    {
+      "requested_repo": "leiyj23/EgoSAT",
+      "resolved_repo": "leiyj23/EgoSAT",
+      "aliases_in_this_review": [
+        "leiyj23/egosat"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "7f65bbb2014f1b3b5303d4530d9b4f40ca57ccd8",
+          "reviewed_files": [
+            "README.md",
+            "benchmark_val/helper.py",
+            "benchmark_val/runner.py",
+            "docs/model_guide.md",
+            "evaluation/README.md",
+            "evaluation/evaluate_main_table.py",
+            "evaluation/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/leiyj23/EgoSAT",
+          "link_label": "GitHub",
+          "project_url": "https://leiyj23.github.io/EgoSAT/",
+          "page_sha256": "512d64e12108553714dec8fa1ba1b1bd8b861daf5e41edcc53333d18b95f35ad"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/leiyj23/EgoSAT/blob/main/docs/model_guide.md",
+          "link_label": "Model Adapter Guide",
+          "project_url": "https://leiyj23.github.io/EgoSAT/",
+          "page_sha256": "512d64e12108553714dec8fa1ba1b1bd8b861daf5e41edcc53333d18b95f35ad"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P201",
+          "review_file": "content/github_review/reviews/P201.json",
+          "review_sha256": "379b8178386d5e7b492b0a8009bdf95555b1a9acd12825e9e7306a1cfa1444ab",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P201",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoSAT，arXiv 2606.24422v1。",
+    "scope_read": "interaction curation、stream prefix、六題型、QA數及confidence/answerability分析。",
+    "pages_read": [
+      1,
+      3,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      22,
+      28
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "串流理解與預測benchmark",
+    "environment": "Ego4D的56scenario labels；不是56有資產的機器人環境。",
+    "tasks": "present narration/state switch、short/multi-step anticipation、short/multi-step retrieval，共6題型。",
+    "cases": "1,997video sessions、約165h、約4,800QA；同一query的MC與open-ended版本不算獨立證據。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 56,
+        "unit": "Ego4D scenario labels",
+        "pages": [
+          9
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1997,
+        "unit": "video sessions",
+        "pages": [
+          9,
+          10
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4800,
+        "unit": "QA pairs",
+        "qualifier": "約數",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "QA task types",
+        "pages": [
+          11
+        ]
+      }
+    ],
+    "evaluation": [
+      "MCQ accuracy、interaction precision/recall、state switch兩端都正確；confidence slope與predictable/unpredictable分組。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每query嚴格截到當下prefix；online cache方法與每題prefix重處理成本不同；SFT cross-scenario另比較。",
+    "lineage": "Ego4D原影片/interaction labels加新queries；不重新計成獨立165h影片。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          9,
+          10,
+          11,
+          13,
+          14,
+          28
+        ],
+        "locator": "Benchmark Construction、Protocol、Diagnostics、SFT transfer",
+        "supports": "56/1997/4800、六題型與causal prefix"
+      }
+    ],
+    "unresolved": [
+      "約4,800的精確query及SFT/evaluation split IDs待release核；future answer多解性不能當單純模型錯誤。"
+    ],
+    "reuse": "預測題需記可預測性與合法觀測截止時間，不能讓未來frame洩漏。",
+    "reviewed_pdf_sha256": "3cdd4d6866e119e6133a58a10ad4eff1ec3dd77fc61f49704b61835d9c312199",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoSAT",
+    "year": 2026,
+    "title": "EgoSAT: A Comprehensive Benchmark of Egocentric Streaming Interaction Understanding",
+    "source_url": "https://arxiv.org/abs/2606.24422",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "工具使用",
+      "跨域人類活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P201",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P201",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            22,
+            28
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "present narration/state switch、short/multi-step anticipation、short/multi-step retrieval，共6題型。",
+            "Ego4D的56scenario labels；不是56有資產的機器人環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "3cdd4d6866e119e6133a58a10ad4eff1ec3dd77fc61f49704b61835d9c312199"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "3cdd4d6866e119e6133a58a10ad4eff1ec3dd77fc61f49704b61835d9c312199",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P201",
+      "name": "EgoSAT",
+      "expected_title": "EgoSAT: A Comprehensive Benchmark of Egocentric Streaming Interaction Understanding",
+      "source_url": "https://arxiv.org/abs/2606.24422",
+      "pdf_url": "https://arxiv.org/pdf/2606.24422",
+      "retrieved_at": "2026-10-02T21:35:02.235578+00:00",
+      "pdf_sha256": "3cdd4d6866e119e6133a58a10ad4eff1ec3dd77fc61f49704b61835d9c312199",
+      "text_sha256": "e7b2ab6a5a9e807e34281e2e9c1780f4d1739de6967c148de9cc8b4cbfb11611",
+      "pdf_bytes": 2642219,
+      "pages": 29,
+      "text_characters": 109523,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.24422v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.24422v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 56,
+        "unit": "Ego4D scenario labels",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P201:1",
+        "paper_id": "P201",
+        "benchmark": "EgoSAT",
+        "native_term": "Ego4D scenario labels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.24422v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.24422v1",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1997,
+        "unit": "video sessions",
+        "pages": [
+          9,
+          10
+        ],
+        "record_id": "review10:P201:2",
+        "paper_id": "P201",
+        "benchmark": "EgoSAT",
+        "native_term": "video sessions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.24422v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.24422v1",
+            "locator": "PDF pp. 9, 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 4800,
+        "unit": "QA pairs",
+        "qualifier": "約數",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P201:3",
+        "paper_id": "P201",
+        "benchmark": "EgoSAT",
+        "native_term": "QA pairs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.24422v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.24422v1",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "QA task types",
+        "pages": [
+          11
+        ],
+        "record_id": "review10:P201:4",
+        "paper_id": "P201",
+        "benchmark": "EgoSAT",
+        "native_term": "QA task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.24422v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.24422v1",
+            "locator": "PDF pp. 11",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "leiyj23/EgoSAT"
+  ],
+  "external_repositories": []
+}

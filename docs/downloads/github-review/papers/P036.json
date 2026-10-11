@@ -1,0 +1,256 @@
+{
+  "paper_id": "P036",
+  "name": "EgoT2",
+  "title": "Egocentric Video Task Translation",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2212.06301",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P036",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoT2 將七個 Ego4D 任務互相遷移，屬方法參考；已核讀資料來源與 OSCC/PNR 的實際輸入和評分，並辨識 eval_lta.py 的名字與當前輸出不同。",
+    "environment": "共用 Ego4D 影片，分人與人互動 HHI、人與物 HOI。任務融合不等於跨資料集新增七套環境。",
+    "tasks": "LAM、TTM、ASD、PNR、OSCC、AR、LTA；各有原生條件。faces localized/tracked 是 HHI 的前置輸入，PNR/OSCC 用狀態變化片段，LTA 與 AR 共用 verb/noun vocabulary。",
+    "data": "docs 分別連官方 social-interactions 的 lam/ttm 分支、ASD、hands-and-objects、forecasting。HOI batch 含 orig 的 frames/labels/state_change/fps/info，另有 recognition 或 pnr 輔助視覺輸入。提交以 unique_id+state_change bool 或 clip-relative pnr_frame 識別。",
+    "evaluation": "OSCC 逐例 argmax 後全樣本正確率；PNR 僅 GT 有變化時計16-bin到frame的距離，再除各自fps成秒。eval_pnr.py 平均 batch 平均，無正例預設0需保留。通用輸出 metric 在合法 token 子集再取 argmax，另列 out-of-task token 比率。當前 eval_lta.py 只評 forecast_labels 第一動作的 verb/noun accuracy，不是 README 的 ED@20。",
+    "standardization": {
+      "profile": "method_multitask_translation",
+      "reuse": "七項父任務關係、auxiliary inputs、輸出 token 子集與 OSCC/PNR adapters。",
+      "transform": "保持 source=P013 的 benchmark/case 身份，另記 translation method、可用輔助模型與輸入。evaluator 對 PNR 秒誤差、OSCC accuracy、LTA ED 各自留協定，不能依檔名將第一動作 accuracy 改叫長期 ED。",
+      "missing": "未執行訓練／推論。完整 HHI mAP 和 LTA ED 提交流程仍需追核；PNR/OSCC 通用 metric 的重複 unique_id 只列印、continue 被註解，需全量去重與分母檢查。不得由融合模型結果估算新的任務數。"
+    },
+    "version_note": "論文表的 ED@20、repo 某個 eval_lta.py 及 challenge submission 屬不同路徑，須固定可重現入口後比較。父資料版本仍依 Ego4D 原來源，related_reference 不加到183份 benchmark/data 來源量。",
+    "runtime_executed": false,
+    "source_role": "related_reference",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            87
+          ],
+          [
+            158,
+            229
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 255,
+        "sha256": "97eccdb2040154eadb5b242716e32eabee4855bb488d447865d456dfc89886bf",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/README.md",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/README.md#L1-L87",
+        "why": "七項原生任務、方法及報告指標",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "docs/PREPARE_HOI.md",
+        "ranges": [
+          [
+            1,
+            48
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 48,
+        "sha256": "b7a274554b22ef9242d03d8bbfd21fa8d3168ba08753587aa9103c6e0b85c3ab",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/docs/PREPARE_HOI.md",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/docs/PREPARE_HOI.md#L1-L48",
+        "why": "HOI 父資料與片段",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "docs/PREPARE_HHI.md",
+        "ranges": [
+          [
+            1,
+            53
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 53,
+        "sha256": "67d773507baab249cda79e454ded5474098ec29c64601f64291c0f5f6385f45a",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/docs/PREPARE_HHI.md",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/docs/PREPARE_HHI.md#L1-L53",
+        "why": "HHI 分支與原作者依賴",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "HOI/submission/eval_oscc.py",
+        "ranges": [
+          [
+            1,
+            89
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 89,
+        "sha256": "e8c866ac3e22f379101e6ccbd322d0468aab7fb6d4f2a073be25147277ed3c62",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/submission/eval_oscc.py",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/submission/eval_oscc.py#L1-L89",
+        "why": "auxiliary input、bool 提交與 accuracy",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "HOI/submission/eval_pnr.py",
+        "ranges": [
+          [
+            1,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 95,
+        "sha256": "0db9d452493ed7c6235be99ef17cbb9963602e72d3010272b4eacd60e2088d3f",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/submission/eval_pnr.py",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/submission/eval_pnr.py#L1-L95",
+        "why": "PNR 相對 frame 與 batch 聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "HOI/evaluation/pnr/metrics.py",
+        "ranges": [
+          [
+            1,
+            257
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 257,
+        "sha256": "62fcbe456153ea65c283c49f7a213965ed28eb3fa669bd1ee5fccf53ca498e9d",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/evaluation/pnr/metrics.py",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/evaluation/pnr/metrics.py#L1-L257",
+        "why": "有效樣本、秒誤差、token 錯誤與重複計數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/EgoT2",
+        "requested_repo": "facebookresearch/EgoT2",
+        "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+        "ref": null,
+        "path": "HOI/submission/eval_lta.py",
+        "ranges": [
+          [
+            19,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 103,
+        "sha256": "3140f3a33b0e67a10c5464c3ae6b3185b1d63e6c8a531114ce6bf0dc4cf65e62",
+        "url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/submission/eval_lta.py",
+        "reading_url": "https://github.com/facebookresearch/EgoT2/blob/1e261806cacfbbc350215adfdf034af13288719e/HOI/submission/eval_lta.py#L19-L61",
+        "why": "實際只計第一預測動作的 accuracy",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "01806e892a33c1ecffb8934bd7adb6bef9a292f5b3635df432eb7633a55cf4ac"
+  },
+  "repository_binding_review_sha256": "01806e892a33c1ecffb8934bd7adb6bef9a292f5b3635df432eb7633a55cf4ac",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/EgoT2",
+      "resolved_repo": "facebookresearch/EgoT2",
+      "aliases_in_this_review": [
+        "facebookresearch/egot2"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "1e261806cacfbbc350215adfdf034af13288719e",
+          "reviewed_files": [
+            "HOI/evaluation/pnr/metrics.py",
+            "HOI/submission/eval_lta.py",
+            "HOI/submission/eval_oscc.py",
+            "HOI/submission/eval_pnr.py",
+            "README.md",
+            "docs/PREPARE_HHI.md",
+            "docs/PREPARE_HOI.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/EgoT2",
+          "link_label": "Code",
+          "project_url": "https://vision.cs.utexas.edu/projects/egot2/",
+          "page_sha256": "06972add4a132ce976069fb485a7ca7efb79fbd97198e964e6e58789a854281e"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P036",
+          "review_file": "content/github_review/reviews/P036.json",
+          "review_sha256": "01806e892a33c1ecffb8934bd7adb6bef9a292f5b3635df432eb7633a55cf4ac",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "facebookresearch/EgoT2"
+  ],
+  "external_repositories": []
+}

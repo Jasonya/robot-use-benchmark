@@ -1,0 +1,570 @@
+{
+  "paper_id": "P220",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已核讀精確VISTA repo的STA reader、split設定、submission序列化與具體Top-5 mAP程式。公開train設定使用train+大部分val，僅24個holdout且每次只跑1個batch的proxy；最終ensemble預設version 2.0，庫內scorer卻只接受1.0，整合時須顯式處理。",
+  "identity_note": "arXiv:2605.20901v1，Qiaohui Chu等人的 VISTA: Technical Report for the Ego4D Short-Term Object Interaction Anticipation at EgoVis 2026，PDF第1頁直接指向CorrineQiu/VISTA；README與8張2FPS影片、Faster R-CNN still branch、四prediction heads相符。不是其他同名VISTA專案，也不是FROST-STA。",
+  "environment": "Ego4D v2人類第一人稱影片之STA query；資料被預先拆成train／val／test_unannotated sample directories，每例含短片歷史影格與最後高解析影格。沒有robot rollout或simulation場景。",
+  "tasks": "預測每個query下一互動的active-object box、noun、verb、TTC及score；一例可有多個GT物件。類別不是固定新任務清單：build_label_maps_from_roots掃train+val中有效noun/verb ID，排序重編成連續index，輸出時再還原；須保留mapping與母資料taxonomy版本。",
+  "data": "reader掃排序後的label.json，讀uid、split、video_uid、frame、observation.history_frames[*].file與last_history_frame_highres_file；GT優先future_prediction_target.objects，fallback raw_annotation.objects，讀box_xyxy/box/bbox、noun_category_id/noun_id、verb_category_id/verb_id、time_to_contact/ttc。train/val排除空標註與所有框無效的樣本；test仍需label.json但不要求GT。history_frames保留既有順序，超過8取最後8，不足8以前端第一張補齊，並不在reader內由fps重建時間戳。論文/設定為8張2FPS、影片384×384；still short-side train640–800、eval800，max1333。框隨影像縮放，dump依orig_size還原xyxy像素，TTC秒不縮放；可改讀split/uid.pt的1664維JEPA cache。train_include_val=true時以有效樣本排序後前24個作holdout，其餘val併train，並非take-disjoint的新split。",
+  "evaluation": "run_official_metric_only.py是真正本地scorer：以uid對齊，CLI要求所有GT uid都有results（可空list）；無GT物件的query不入評分。IoU面積使用(x2-x1+1)(y2-y1+1)，框須IoU>0.5，TTC條件為絕對誤差≤0.25秒。每query按score貪婪一對一匹配各metric的GT；Top-5不是截前5，而是每個metric忽略排序前4×該query GT數的FP。Noun／Noun+Verb／Noun+TTC／Overall皆按noun類別分組：recall分母是全評測集中該noun的GT物件數，AP以precision envelope對recall積分乘100，再只對出現GT的noun做macro平均。compute_proxy_hits則只查score前5，只要任一GT匹配就給該query一個hit，分母為batch中有GT的query；eval.py以batch size加權再跨rank平均，與mAP不同。預設train max_val_batches=1、run_official=false、best_metric_source=proxy；test設定只產生每head最多100個hypotheses，四headensemble再保留100。論文5.40為test server結果，本輪未重跑或證明本地Lite實作與server完全等價。",
+  "standardization": {
+    "profile": "offline_short_term_object_interaction_detection",
+    "reuse": "重用STASampleDirItem及label.json reader、noun/verb雙向map、UID submission schema、具體STAMeanAveragePrecisionLite與head ensemble參數，保留其來源commit。",
+    "transform": "case鍵為Ego4D版本+split+uid，video_uid/frame另存；框保留原影像像素xyxy、orig_size與resize比例，時間以TTC秒與實際history-frame序列描述。evaluator分開記proxy query-hit與noun-macro Top-5 mAP，保存FP-budget=4×GT、IoU+1、比較邊界與head/top100預算。",
+    "missing": "原始影片至sample label.json的可驗證製作流程、實際manifest/hash與frame時間戳仍需補齊；未取得資料、features、weights，無法報有效case總數。需固定24個holdout身份並按完整benchmark split評分；須對齊ensemble version 2.0與scorer要求1.0、以邊界例核驗本地scorer/server差異，不能只改字串便宣稱等價。"
+  },
+  "version_note": "讀取commit 62e39d137426e12f30fe4efd12122f8c188b4b33。初始prediction writer回傳version 1.0；dynamic_metric_head_ensemble與包裝shell預設最終version 2.0，而本地validate_results_json拒絕非1.0。ensemble/proxy使用無+1的連續IoU，scorer使用+1像素IoU；ensemble的IoU匹配可含0.5，scorer嚴格>0.5；論文寫TTC<0.25，程式為≤。README的scaffold稱呼不代表只有README，亦不代表已完整重現官方submission。",
+  "discovery_evidence": [
+    {
+      "kind": "cached_primary_paper",
+      "url": "https://arxiv.org/pdf/2605.20901",
+      "pdf_sha256": "371945fef3f43f17cf251f3ce0b6ba835a5b828cdb2e39d0158cd721c5825faf",
+      "local_file": "audit/.cache/fulltext_review/P220/pages.json",
+      "sha256": "991a1808c56d9bb9b0c2fb02ef811df337feb3615917c66394b7215d2da1ce48",
+      "json_pointers": [
+        "/0/text",
+        "/1/text",
+        "/2/text",
+        "/3/text"
+      ],
+      "finding": "精確paper→repo連結、8張2FPS、train+most-val、16epoch、四prediction heads及論文指標定義。"
+    }
+  ],
+  "reading_order": [
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__VISTA/files/README.md",
+      "sha256": "2c9d6f5782785d9b7d675a179f712a88f86c55c5de903e6915623e418c9433eb",
+      "ranges": [
+        [
+          1,
+          22
+        ],
+        [
+          69,
+          77
+        ],
+        [
+          95,
+          103
+        ],
+        [
+          158,
+          188
+        ],
+        [
+          197,
+          223
+        ]
+      ],
+      "why": "核對精確EgoVis 2026 STA方法、資料依存與公開評測入口。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/README.md",
+      "git_blob_sha": "9bf9cfbc321d9df12e244ceab01755360d9d1d97"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "configs/vista_train.yaml",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/configs/vista_train.yaml",
+      "sha256": "f16a3eafb16eb8f81cf64d513b44103d37efa411e3aea1db95c2c8631ea6f1e3",
+      "ranges": [
+        [
+          19,
+          40
+        ],
+        [
+          58,
+          110
+        ]
+      ],
+      "why": "固定train+val、24個holdout、8-frame輸入、proxy驗證與四prediction-head設定。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/configs/vista_train.yaml",
+      "git_blob_sha": "eaf0623a252a0aaf1bf1ca79fdf49cad7101473b"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "configs/vista_test.yaml",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/configs/vista_test.yaml",
+      "sha256": "3ebe01038ee193fe2cf706351f8d6a3f05551c954facb37f74ef5f6d025191aa",
+      "ranges": [
+        [
+          19,
+          40
+        ],
+        [
+          58,
+          106
+        ]
+      ],
+      "why": "test_unannotated、完整推論dump及top100輸出預算。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/configs/vista_test.yaml",
+      "git_blob_sha": "258e99dfaa88c6bc49fdf725d4ecfbc8554127d3"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/dataloader.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/dataloader.py",
+      "sha256": "871d07522b5a39f022ab96c0627ae1cc879590c414be4ae1f04c388d6e8b1c05",
+      "ranges": [
+        [
+          15,
+          114
+        ],
+        [
+          139,
+          182
+        ]
+      ],
+      "why": "實讀label-map來源、validation前24個holdout、其餘併入train及DataLoader分母。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/dataloader.py",
+      "git_blob_sha": "0a930aab5a532610b47eab4917449c5e82340134"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/ego4d_sta.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/ego4d_sta.py",
+      "sha256": "c20a4a37f8b35a9062e08c5e2d6f66012534aa3184d179e8562219f6a5d03355",
+      "ranges": [
+        [
+          84,
+          148
+        ],
+        [
+          171,
+          203
+        ],
+        [
+          258,
+          335
+        ],
+        [
+          436,
+          496
+        ],
+        [
+          512,
+          625
+        ],
+        [
+          664,
+          776
+        ]
+      ],
+      "why": "追到label.json欄位、歷史影格pad、類別重編碼、過濾與box/image座標。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/ego4d_sta.py",
+      "git_blob_sha": "3773b51f21d5e4f18dcd4d17d69c3c7d0610b4f5"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/losses.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/losses.py",
+      "sha256": "3ac838df396304520219af9816edfadf62947f293562d372a48501ce33c3c976",
+      "ranges": [
+        [
+          10,
+          20
+        ],
+        [
+          68,
+          150
+        ]
+      ],
+      "why": "區分top5樣本hit proxy與AP；核對原始像素框逆縮放及submission序列化。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/losses.py",
+      "git_blob_sha": "670081f1fabae9f8317c0ec62054ce42ec5ee9ff"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/eval.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__VISTA/files/evals/vista_sta/eval.py",
+      "sha256": "9fe708bd10d0e2dae9a60d0012eae8eda3b9b6de8098293060bfd36f38e7a67d",
+      "ranges": [
+        [
+          637,
+          640
+        ],
+        [
+          704,
+          718
+        ],
+        [
+          772,
+          843
+        ],
+        [
+          854,
+          875
+        ],
+        [
+          1321,
+          1346
+        ]
+      ],
+      "why": "追到batch proxy彙總、head選擇、scorer呼叫與test禁用本地GT評分。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/eval.py",
+      "git_blob_sha": "bb22608eb199c5d360d53b7cfeb1516b3b183ac5"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/utils.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__VISTA/files/evals/vista_sta/utils.py",
+      "sha256": "bc5506ed64d96aadf42005527faaa76824333275668db2998e16d3cedfde1196",
+      "ranges": [
+        [
+          230,
+          258
+        ]
+      ],
+      "why": "確定run_official_evaluator只是subprocess包裝，需另讀具體計分程式。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/utils.py",
+      "git_blob_sha": "62d970149e944812c00d7754a04c5f44f4c2564a"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/run_official_metric_only.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/run_official_metric_only.py",
+      "sha256": "de2a4318542440f8892b373e14f2174f0253168296b5d01a3dd6d0c2a44a4118",
+      "ranges": [
+        [
+          11,
+          15
+        ],
+        [
+          71,
+          144
+        ],
+        [
+          190,
+          345
+        ],
+        [
+          376,
+          428
+        ]
+      ],
+      "why": "核對+1像素IoU、TTC邊界、greedy匹配、4×GT之FP額度、noun-class AP分母與version檢查。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/run_official_metric_only.py",
+      "git_blob_sha": "87bcaeefd70b551f9c57d6c837598bb4633a5ae5"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/dynamic_metric_head_ensemble.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/dynamic_metric_head_ensemble.py",
+      "sha256": "b6bbae98922d6b23e6f8e86a22d51c759357bd06bbda868395f4e1dfd2e8ed70",
+      "ranges": [
+        [
+          23,
+          150
+        ],
+        [
+          153,
+          362
+        ]
+      ],
+      "why": "核對noun/verb/IoU/TTC合併、head權重與輸出version 2.0，不將ensemble當metric。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/dynamic_metric_head_ensemble.py",
+      "git_blob_sha": "7fbbcd9e5c7772c749d089103ba9ea6d2b78f9ff"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "scripts/ensemble_vista.sh",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/scripts/ensemble_vista.sh",
+      "sha256": "dc93858d019266bf22e2da320048f049ee05a63464ad72fe2d590bc2862a4aff",
+      "ranges": [
+        [
+          1,
+          22
+        ]
+      ],
+      "why": "最終四head包裝命令未覆寫ensemble的version 2.0預設。",
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/scripts/ensemble_vista.sh",
+      "git_blob_sha": "6ceb38baa1462828fefd3c261c26fe5d7346a2d1"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__VISTA/files/README.md",
+      "sha256": "2c9d6f5782785d9b7d675a179f712a88f86c55c5de903e6915623e418c9433eb",
+      "ranges": [
+        [
+          1,
+          22
+        ],
+        [
+          69,
+          77
+        ],
+        [
+          95,
+          103
+        ],
+        [
+          158,
+          188
+        ],
+        [
+          197,
+          223
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/README.md",
+      "git_blob_sha": "9bf9cfbc321d9df12e244ceab01755360d9d1d97"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "configs/vista_train.yaml",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/configs/vista_train.yaml",
+      "sha256": "f16a3eafb16eb8f81cf64d513b44103d37efa411e3aea1db95c2c8631ea6f1e3",
+      "ranges": [
+        [
+          19,
+          40
+        ],
+        [
+          58,
+          110
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/configs/vista_train.yaml",
+      "git_blob_sha": "eaf0623a252a0aaf1bf1ca79fdf49cad7101473b"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "configs/vista_test.yaml",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/configs/vista_test.yaml",
+      "sha256": "3ebe01038ee193fe2cf706351f8d6a3f05551c954facb37f74ef5f6d025191aa",
+      "ranges": [
+        [
+          19,
+          40
+        ],
+        [
+          58,
+          106
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/configs/vista_test.yaml",
+      "git_blob_sha": "258e99dfaa88c6bc49fdf725d4ecfbc8554127d3"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/dataloader.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/dataloader.py",
+      "sha256": "871d07522b5a39f022ab96c0627ae1cc879590c414be4ae1f04c388d6e8b1c05",
+      "ranges": [
+        [
+          15,
+          114
+        ],
+        [
+          139,
+          182
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/dataloader.py",
+      "git_blob_sha": "0a930aab5a532610b47eab4917449c5e82340134"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/ego4d_sta.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/ego4d_sta.py",
+      "sha256": "c20a4a37f8b35a9062e08c5e2d6f66012534aa3184d179e8562219f6a5d03355",
+      "ranges": [
+        [
+          84,
+          148
+        ],
+        [
+          171,
+          203
+        ],
+        [
+          258,
+          335
+        ],
+        [
+          436,
+          496
+        ],
+        [
+          512,
+          625
+        ],
+        [
+          664,
+          776
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/ego4d_sta.py",
+      "git_blob_sha": "3773b51f21d5e4f18dcd4d17d69c3c7d0610b4f5"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/losses.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/losses.py",
+      "sha256": "3ac838df396304520219af9816edfadf62947f293562d372a48501ce33c3c976",
+      "ranges": [
+        [
+          10,
+          20
+        ],
+        [
+          68,
+          150
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/losses.py",
+      "git_blob_sha": "670081f1fabae9f8317c0ec62054ce42ec5ee9ff"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/eval.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__VISTA/files/evals/vista_sta/eval.py",
+      "sha256": "9fe708bd10d0e2dae9a60d0012eae8eda3b9b6de8098293060bfd36f38e7a67d",
+      "ranges": [
+        [
+          637,
+          640
+        ],
+        [
+          704,
+          718
+        ],
+        [
+          772,
+          843
+        ],
+        [
+          854,
+          875
+        ],
+        [
+          1321,
+          1346
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/eval.py",
+      "git_blob_sha": "bb22608eb199c5d360d53b7cfeb1516b3b183ac5"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/utils.py",
+      "local_file": "audit/.cache/github_review/repos/CorrineQiu__VISTA/files/evals/vista_sta/utils.py",
+      "sha256": "bc5506ed64d96aadf42005527faaa76824333275668db2998e16d3cedfde1196",
+      "ranges": [
+        [
+          230,
+          258
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/utils.py",
+      "git_blob_sha": "62d970149e944812c00d7754a04c5f44f4c2564a"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/run_official_metric_only.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/run_official_metric_only.py",
+      "sha256": "de2a4318542440f8892b373e14f2174f0253168296b5d01a3dd6d0c2a44a4118",
+      "ranges": [
+        [
+          11,
+          15
+        ],
+        [
+          71,
+          144
+        ],
+        [
+          190,
+          345
+        ],
+        [
+          376,
+          428
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/run_official_metric_only.py",
+      "git_blob_sha": "87bcaeefd70b551f9c57d6c837598bb4633a5ae5"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "evals/vista_sta/dynamic_metric_head_ensemble.py",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/evals/vista_sta/dynamic_metric_head_ensemble.py",
+      "sha256": "b6bbae98922d6b23e6f8e86a22d51c759357bd06bbda868395f4e1dfd2e8ed70",
+      "ranges": [
+        [
+          23,
+          150
+        ],
+        [
+          153,
+          362
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/evals/vista_sta/dynamic_metric_head_ensemble.py",
+      "git_blob_sha": "7fbbcd9e5c7772c749d089103ba9ea6d2b78f9ff"
+    },
+    {
+      "provider": "github",
+      "repo": "CorrineQiu/VISTA",
+      "commit": "62e39d137426e12f30fe4efd12122f8c188b4b33",
+      "path": "scripts/ensemble_vista.sh",
+      "local_file": "audit/.cache/github_review_worker/p218-p225-20261011/sources/CorrineQiu__VISTA/scripts/ensemble_vista.sh",
+      "sha256": "dc93858d019266bf22e2da320048f049ee05a63464ad72fe2d590bc2862a4aff",
+      "ranges": [
+        [
+          1,
+          22
+        ]
+      ],
+      "url": "https://github.com/CorrineQiu/VISTA/blob/62e39d137426e12f30fe4efd12122f8c188b4b33/scripts/ensemble_vista.sh",
+      "git_blob_sha": "6ceb38baa1462828fefd3c261c26fe5d7346a2d1"
+    }
+  ],
+  "runtime_executed": false
+}

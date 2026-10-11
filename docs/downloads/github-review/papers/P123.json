@@ -1,0 +1,577 @@
+{
+  "paper_id": "P123",
+  "name": "WatchAct",
+  "title": "WatchAct: A Benchmark for Behavior-Grounded Robot Manipulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.26443",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P123",
+    "summary": "WatchAct有14種行為理解題型，規劃用符號狀態評分，LIBERO另跑物理執行；Plan Success、完整終態一致和實體成功不能合併成同一數值。",
+    "environment": "觀察人類影片後在LIBERO桌面執行；影片camera_perspective/spatial_reference與模擬相機／世界坐標要分開。符號場景圖不等於新的物理場景。",
+    "tasks": "14native題型如Imitation/Reversal/Temporal_Sort、Count/Moment、Implicit Intent與Episodic等，屬行為條件與推理方式；具體robot goal／物件／初態另定，不把14題型當14生活用途。",
+    "data": "row有id/original_id、language_instruction、video、camera_perspective、spatial_reference；按original_id群組抽樣。規劃輸出action_plan_json，翻譯/符號推演產initial/final/goal_state；執行端是BDDL、init_state、prompt切換與policy action chunk。",
+    "evaluation": "Plan SR對需變化的interest objects全對即成功，可能忽略side effects；all_success才要求完整終態相等。Imitation/Reversal可改用序列匹配SR。LIBERO物理成功從done取，progress另記max(0,final-initial)，Right/Horizontal檢查幾何且物件已釋放、接觸桌面。彙總依evaluated_count加權，error_count與缺題需另保留。",
+    "standardization": {
+      "profile": "human_video_grounded_planning_and_execution",
+      "reuse": "影片/語言/視角條件、原題型、original_id lineage、planning與physical兩種checker。",
+      "transform": "同一來源題分planning case與execution case，各固定translator/模型資訊/預算；存PlanSR/all_success/physical_success、原始及net progress不同metric。新加無副作用規則另版。",
+      "missing": "全影片與BDDL/init-state資產對齊、翻譯前後語義驗證、底層LIBERO版本、初態已達標剔除與完整missing/error分母協定。"
+    },
+    "version_note": "本次固定97d8873；先前原作索引使用7036927快照，不能直接當同版本。未呼叫VLM、translator或policy server，也未執行LIBERO。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Baiqi-Li/WatchAct",
+        "requested_repo": "Baiqi-Li/WatchAct",
+        "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            19
+          ],
+          [
+            38,
+            49
+          ],
+          [
+            66,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 107,
+        "sha256": "c157538cdd46a85d49d1696a38debf2c8c39784a99a60f7fbe1c0ccdba67314c",
+        "url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/README.md",
+        "reading_url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/README.md#L1-L19",
+        "why": "14題型/4能力與規劃、翻譯、物理執行分離",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Baiqi-Li/WatchAct",
+        "requested_repo": "Baiqi-Li/WatchAct",
+        "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+        "ref": null,
+        "path": "video_planning/scripts/run_vlm_evaluation.py",
+        "ranges": [
+          [
+            542,
+            608
+          ],
+          [
+            712,
+            732
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1070,
+        "sha256": "501e50c973f5c8a197588791ec7489ee33f0f20742fc0d4377e486b4995b1583",
+        "url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/video_planning/scripts/run_vlm_evaluation.py",
+        "reading_url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/video_planning/scripts/run_vlm_evaluation.py#L542-L608",
+        "why": "輸入欄位、影片採樣及original_id群組抽樣",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Baiqi-Li/WatchAct",
+        "requested_repo": "Baiqi-Li/WatchAct",
+        "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+        "ref": null,
+        "path": "video_planning/scripts/run_action_plan_simulation.py",
+        "ranges": [
+          [
+            205,
+            272
+          ],
+          [
+            476,
+            482
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 702,
+        "sha256": "df191f4005e4003f4e5aec8edadebc375dfd524be4b64ba3ea709fdc536145cd",
+        "url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/video_planning/scripts/run_action_plan_simulation.py",
+        "reading_url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/video_planning/scripts/run_action_plan_simulation.py#L205-L272",
+        "why": "planning simulation是符號狀態更新",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Baiqi-Li/WatchAct",
+        "requested_repo": "Baiqi-Li/WatchAct",
+        "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+        "ref": null,
+        "path": "video_planning/scripts/run_action_plan_scoring.py",
+        "ranges": [
+          [
+            370,
+            468
+          ],
+          [
+            586,
+            621
+          ],
+          [
+            708,
+            736
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 857,
+        "sha256": "f042706e1314074794e48d4292ff868119d3298a76634f25d19ccbb1cd4be849",
+        "url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/video_planning/scripts/run_action_plan_scoring.py",
+        "reading_url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/video_planning/scripts/run_action_plan_scoring.py#L370-L468",
+        "why": "目標變化、完整狀態、sequence覆寫與分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Baiqi-Li/WatchAct",
+        "requested_repo": "Baiqi-Li/WatchAct",
+        "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+        "ref": null,
+        "path": "action_execution/run_libero_execution.py",
+        "ranges": [
+          [
+            123,
+            140
+          ],
+          [
+            185,
+            215
+          ],
+          [
+            246,
+            269
+          ],
+          [
+            460,
+            498
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 516,
+        "sha256": "44f7a21a1f8dcb4bbd4e42780538a152b4c74308fd0b99019c32eb0e1569237f",
+        "url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/action_execution/run_libero_execution.py",
+        "reading_url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/action_execution/run_libero_execution.py#L123-L140",
+        "why": "物理執行done、原始/初始/net completion與trial聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Baiqi-Li/WatchAct",
+        "requested_repo": "Baiqi-Li/WatchAct",
+        "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+        "ref": null,
+        "path": "action_execution/custom_predicates.py",
+        "ranges": [
+          [
+            122,
+            199
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 256,
+        "sha256": "15c5f5fbc5a402fa7af008e72f32272547dd241293af23297e8b19d88df5e145",
+        "url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/action_execution/custom_predicates.py",
+        "reading_url": "https://github.com/Baiqi-Li/WatchAct/blob/97d8873e413601a2f511906a9860aa17740cb80e/action_execution/custom_predicates.py#L122-L199",
+        "why": "Right/Horizontal必須resting及幾何條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "eca2e986a1f9666e8f6117b41b1fb09e39b5591e55ca60a1c219a4fe306d1791"
+  },
+  "repository_binding_review_sha256": "eca2e986a1f9666e8f6117b41b1fb09e39b5591e55ca60a1c219a4fe306d1791",
+  "repository_bindings": [
+    {
+      "requested_repo": "Baiqi-Li/WatchAct",
+      "resolved_repo": "Baiqi-Li/WatchAct",
+      "aliases_in_this_review": [
+        "baiqi-li/watchact"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "97d8873e413601a2f511906a9860aa17740cb80e",
+          "reviewed_files": [
+            "README.md",
+            "action_execution/custom_predicates.py",
+            "action_execution/run_libero_execution.py",
+            "video_planning/scripts/run_action_plan_scoring.py",
+            "video_planning/scripts/run_action_plan_simulation.py",
+            "video_planning/scripts/run_vlm_evaluation.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Baiqi-Li/WatchAct",
+          "link_label": "💻 Code",
+          "project_url": "https://baiqi-li.github.io/watchact_page/",
+          "page_sha256": "81ed88a0c528527d696de0a927b77bdc837083bdcab84b03ec0861109295d23f"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "Baiqi-Li/WatchAct",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "7036927a94a160e7d420e3f7156cd5b2e9e8f3e6"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "Baiqi-Li/WatchAct",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "7036927a94a160e7d420e3f7156cd5b2e9e8f3e6"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P123",
+          "review_file": "content/github_review/reviews/P123.json",
+          "review_sha256": "eca2e986a1f9666e8f6117b41b1fb09e39b5591e55ca60a1c219a4fe306d1791",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P123",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "WatchAct，arXiv 2606.26443v1。",
+    "scope_read": "14task完整taxonomy、3K個案、video-sim配對、4項驗證與plan/physical/end-to-end協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      14,
+      15
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "LIBERO配對真實桌面影片；11桌面regions＋6container regions只是命名區域，非17個環境。",
+    "tasks": "14task scenarios歸4認知domains；event、procedure、implicit intent、episodic，含模仿、反轉、恢復舊位置、續作、修錯、條件分支。",
+    "cases": "3,000 video-language-simulator bundles；policy實驗每task10trials，與全部3K的plan reasoning範圍分開。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "task scenarios",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "認知capability groups",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3000,
+        "unit": "paired video-simulator instances",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "policy每task評測trials",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "Plan SR在symbolic executor；Task SR在物理simulation；PR完成子goal比例。",
+      "順序唯一task直接比oracle，允多解的task比symbolic終態；oracle-plan execution與integrated pipeline分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "LIBERO-finetuned policies轉到paired tasks；新物件/指令in/out-domain另列，固定每command300steps。",
+    "lineage": "LIBERO擴新物件／predicate；LLM先產spec再照spec拍人類video，不是從任意網路video全自動轉robot。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          14,
+          15
+        ],
+        "locator": "表2、§3.3–4.1、Evaluation Protocol",
+        "supports": "14/3K、來源與分離評測"
+      }
+    ],
+    "unresolved": [
+      "physical評測每task10trials中task指類型或instance的manifest需核，不先乘成3萬或宣稱3K全測。"
+    ],
+    "reuse": "最接近『影片→任務規格→可執行場景』的前作；還受限於Pick/Place/Open/Close，排除pour/wipe/cut/stir。",
+    "reviewed_pdf_sha256": "42a137d5b56c9e1dd7d421cba16f8f06fe42cace6418e7338136400df3e7954c",
+    "reviewed_on": "2026-10-02",
+    "name": "WatchAct",
+    "year": 2026,
+    "title": "WatchAct: A Benchmark for Behavior-Grounded Robot Manipulation",
+    "source_url": "https://arxiv.org/abs/2606.26443",
+    "primary_type": "T",
+    "category_name": "人類觀測到機器人轉移",
+    "domain_ids": [
+      "home",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活",
+      "人機協作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P123",
+      "domain_ids": [
+        "home",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P123",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            8,
+            14,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "14task scenarios歸4認知domains；event、procedure、implicit intent、episodic，含模仿、反轉、恢復舊位置、續作、修錯、條件分支。",
+            "LIBERO配對真實桌面影片；11桌面regions＋6container regions只是命名區域，非17個環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "42a137d5b56c9e1dd7d421cba16f8f06fe42cace6418e7338136400df3e7954c"
+        },
+        {
+          "paper_id": "P123",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            8,
+            14,
+            15
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "物件操作中的示範模仿、反向執行、記憶與條件流程。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "42a137d5b56c9e1dd7d421cba16f8f06fe42cace6418e7338136400df3e7954c"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "42a137d5b56c9e1dd7d421cba16f8f06fe42cace6418e7338136400df3e7954c",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P123",
+      "name": "WatchAct",
+      "expected_title": "WatchAct: A Benchmark for Behavior-Grounded Robot Manipulation",
+      "source_url": "https://arxiv.org/abs/2606.26443",
+      "pdf_url": "https://arxiv.org/pdf/2606.26443",
+      "retrieved_at": "2026-10-02T21:34:22.358622+00:00",
+      "pdf_sha256": "42a137d5b56c9e1dd7d421cba16f8f06fe42cace6418e7338136400df3e7954c",
+      "text_sha256": "56f9fb5499c8098f767cd4ab65b4863d25afe3bd022b929aa826ab0804c935d8",
+      "pdf_bytes": 2609407,
+      "pages": 21,
+      "text_characters": 70231,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.26443v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.26443v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "task scenarios",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P123:1",
+        "paper_id": "P123",
+        "benchmark": "WatchAct",
+        "native_term": "task scenarios",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.26443v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.26443v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "認知capability groups",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P123:2",
+        "paper_id": "P123",
+        "benchmark": "WatchAct",
+        "native_term": "認知capability groups",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.26443v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.26443v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 3000,
+        "unit": "paired video-simulator instances",
+        "pages": [
+          1,
+          4
+        ],
+        "record_id": "review10:P123:3",
+        "paper_id": "P123",
+        "benchmark": "WatchAct",
+        "native_term": "paired video-simulator instances",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.26443v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.26443v1",
+            "locator": "PDF pp. 1, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "policy每task評測trials",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P123:4",
+        "paper_id": "P123",
+        "benchmark": "WatchAct",
+        "native_term": "policy每task評測trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.26443v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.26443v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Baiqi-Li/WatchAct"
+  ],
+  "external_repositories": []
+}

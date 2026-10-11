@@ -1,0 +1,383 @@
+{
+  "paper_id": "P054",
+  "name": "EgoVid-5M / EgoDreamer",
+  "title": "EgoVid-5M: A Large-Scale Video-Action Dataset for Egocentric Video Generation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2411.08380",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "office",
+    "craft",
+    "leisure"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P054",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoVid的公開repo主要是Ego4D衍生影片標註與清洗工具；相機運動控制標註不能直接視為可執行機器人控制。",
+    "environment": "Ego4D v1/v2來源影片及clip窗口；來源影片須另行取得。",
+    "tasks": "文字／相機運動條件的第一人稱影片資料；本次固定tree見標註、pose及品質計算工具，未取得完整EgoDreamer生成／評測實作。",
+    "data": "CSV的video_id=來源影片_起始影格_終止影格，含fps、frame_num、noun/verb、llava_cap、name和各項品質分數；pose資產含3×3 intrinsics及逐影格4×4相機外參。README提醒raw IMU已知問題。",
+    "evaluation": "光流清洗程式每8影格取樣，將flow按平均影像尺寸縮放到512基準，再存均值／分箱比例；這是素材品質證據，不是操作成功率。flow_0_4程式實為>0且≤5，與欄名／README有差異。",
+    "standardization": {
+      "profile": "egocentric_video_generation_annotations",
+      "reuse": "父影片ID、精確clip範圍、文字／pose標註和清洗provenance。",
+      "transform": "source記Ego4D重用關係；case保留frame/fps、caption來源、pose座標與quality filter版本。5M名稱不能直接算成本庫已取得評測題數。",
+      "missing": "完整CSV與影片／pose資產閉合、實際clip去重、生成模型與正式evaluator，以及清洗欄名／實作差異校核。"
+    },
+    "version_note": "本筆覆蓋公開資料處理路徑；不宣稱EgoDreamer模型或所有外部清洗依賴已核讀。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "JeffWang987/EgoVid",
+        "requested_repo": "JeffWang987/EgoVid",
+        "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            120
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 122,
+        "sha256": "a966e32cd9fd9f54ecbfc699612e1ee8d3b7959bc506352898edfd4c58e3b042",
+        "url": "https://github.com/JeffWang987/EgoVid/blob/45c59d0df9c248bd88c08d96f4d9c038707f037c/README.md",
+        "reading_url": "https://github.com/JeffWang987/EgoVid/blob/45c59d0df9c248bd88c08d96f4d9c038707f037c/README.md#L1-L120",
+        "why": "確認來源素材、CSV、pose欄位與精確論文。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "JeffWang987/EgoVid",
+        "requested_repo": "JeffWang987/EgoVid",
+        "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c",
+        "ref": null,
+        "path": "processor/egovid-metadata/Optical-flow/optical-flow-score.py",
+        "ranges": [
+          [
+            1,
+            30
+          ],
+          [
+            45,
+            138
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 138,
+        "sha256": "d6cb996ba24fc5c4b5d332d5818b852cd0d8e3dbff47012f4eb4f92f7e3fe230",
+        "url": "https://github.com/JeffWang987/EgoVid/blob/45c59d0df9c248bd88c08d96f4d9c038707f037c/processor/egovid-metadata/Optical-flow/optical-flow-score.py",
+        "reading_url": "https://github.com/JeffWang987/EgoVid/blob/45c59d0df9c248bd88c08d96f4d9c038707f037c/processor/egovid-metadata/Optical-flow/optical-flow-score.py#L1-L30",
+        "why": "核對frame步長、尺寸正規化及分箱實作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "de55bee02c3c072d1cad365ec50e9c2a500ce393d038cc5760076feb73510650"
+  },
+  "repository_binding_review_sha256": "de55bee02c3c072d1cad365ec50e9c2a500ce393d038cc5760076feb73510650",
+  "repository_bindings": [
+    {
+      "requested_repo": "JeffWang987/EgoVid",
+      "resolved_repo": "JeffWang987/EgoVid",
+      "aliases_in_this_review": [
+        "jeffwang987/egovid"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "45c59d0df9c248bd88c08d96f4d9c038707f037c",
+          "reviewed_files": [
+            "README.md",
+            "processor/egovid-metadata/Optical-flow/optical-flow-score.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/JeffWang987/EgoVid",
+          "link_label": "Code",
+          "project_url": "https://egovid.github.io",
+          "page_sha256": "6cc42b39ac40b09da89ba58f67e9018910b1c2c7cbe2368b7fd158fec4d996b8"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P054",
+          "review_file": "content/github_review/reviews/P054.json",
+          "review_sha256": "de55bee02c3c072d1cad365ec50e9c2a500ce393d038cc5760076feb73510650",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "辦公與教育",
+    "工藝與修繕",
+    "休閒與運動"
+  ],
+  "source_review": {
+    "paper_id": "P054",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoVid-5M: A Large-Scale Video-Action Dataset for Egocentric Video Generation；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "role": "世界模型與影片生成評測",
+    "domains": [
+      "居家整理與清潔",
+      "辦公與教育",
+      "工藝與修繕",
+      "休閒與運動"
+    ],
+    "environment": "重用Ego4D來源，場景總數未報。",
+    "tasks": "文字與camera kinematics條件下video generation；kinematic label不是robot action。",
+    "cases": "名義5Mclips；正文4.9Mtrain、1.2Kval，只有65K具可用IMU的kinematic subset。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 5000000,
+        "unit": "EgoVid clips（名義約數）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1200,
+        "unit": "EgoVid-val samples（約數）",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "data",
+        "value": 65000,
+        "unit": "kinematic-annotated subset（約數）",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "CD-FVD、semantic/action alignment、clarity、motion smoothness/strength及pose errors。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "val按品質/多樣性選，已讀段未明示source-video-disjoint；三個1Mcleaning subsets不是新增資料。",
+    "lineage": "Ego4D→EgoVid，VIO/MLLM重標；generation評測沿用AIGCBench/VBench部分metrics。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "5M不能全部叫action-conditioned examples；4.9M與5M概述差異保留。"
+    ],
+    "reuse": "補ego世界模型，但評測視覺品質和實際可控物理成功需另驗證。",
+    "reviewed_pdf_sha256": "c878ace0c6d18cf230b26b97a809cdaeda44659ed1cdf693245c44b6681b7f9d",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoVid-5M / EgoDreamer",
+    "year": 2024,
+    "title": "EgoVid-5M: A Large-Scale Video-Action Dataset for Egocentric Video Generation",
+    "source_url": "https://arxiv.org/abs/2411.08380",
+    "primary_type": "W",
+    "category_name": "世界模型與預測表示",
+    "domain_ids": [
+      "home",
+      "office",
+      "craft",
+      "leisure"
+    ],
+    "review_tags": [
+      "居家生活",
+      "辦公活動",
+      "運動與身體技能",
+      "工藝與修繕",
+      "戶外活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "辦公與教育",
+      "工藝與修繕",
+      "休閒與運動"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P054",
+      "domain_ids": [
+        "home",
+        "office",
+        "craft",
+        "leisure"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P054",
+          "domain_ids": [
+            "home",
+            "office",
+            "craft",
+            "leisure"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "文字與camera kinematics條件下video generation；kinematic label不是robot action。",
+            "重用Ego4D來源，場景總數未報。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "c878ace0c6d18cf230b26b97a809cdaeda44659ed1cdf693245c44b6681b7f9d"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c878ace0c6d18cf230b26b97a809cdaeda44659ed1cdf693245c44b6681b7f9d",
+      "previous_domain_ids": [
+        "home",
+        "office",
+        "craft",
+        "leisure"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P054",
+      "name": "EgoVid-5M / EgoDreamer",
+      "expected_title": "EgoVid-5M: A Large-Scale Video-Action Dataset for Egocentric Video Generation",
+      "source_url": "https://arxiv.org/abs/2411.08380",
+      "pdf_url": "https://arxiv.org/pdf/2411.08380",
+      "retrieved_at": "2026-10-02T22:13:32.007802+00:00",
+      "pdf_sha256": "c878ace0c6d18cf230b26b97a809cdaeda44659ed1cdf693245c44b6681b7f9d",
+      "text_sha256": "9cf18e2663f47c36ab2b11426f66a9d127eb25c49c4687f3592b51e15bcb83e9",
+      "pdf_bytes": 18343746,
+      "pages": 18,
+      "text_characters": 111316,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2411.08380v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2411.08380v1"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 5000000,
+        "unit": "EgoVid clips（名義約數）",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P054:1",
+        "paper_id": "P054",
+        "benchmark": "EgoVid-5M / EgoDreamer",
+        "native_term": "EgoVid clips（名義約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.08380v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.08380v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1200,
+        "unit": "EgoVid-val samples（約數）",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P054:2",
+        "paper_id": "P054",
+        "benchmark": "EgoVid-5M / EgoDreamer",
+        "native_term": "EgoVid-val samples（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.08380v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.08380v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 65000,
+        "unit": "kinematic-annotated subset（約數）",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P054:3",
+        "paper_id": "P054",
+        "benchmark": "EgoVid-5M / EgoDreamer",
+        "native_term": "kinematic-annotated subset（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.08380v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.08380v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "JeffWang987/EgoVid"
+  ],
+  "external_repositories": []
+}

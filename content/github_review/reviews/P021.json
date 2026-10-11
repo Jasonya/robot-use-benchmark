@@ -1,0 +1,190 @@
+{
+  "paper_id": "P021",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoExoLearn 的核心是不同時間、不同視角的人類示範跟隨。已核讀標註、跨視角 association 的選項評分和 skill assessment 的成對排序，兩者不是同一種成功率。",
+  "reading_order": [
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "README.md",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "ranges": [
+        [
+          1,
+          78
+        ]
+      ],
+      "why": "精確論文身份、場景與發布範圍"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "annotations/README.md",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "ranges": [
+        [
+          1,
+          31
+        ]
+      ],
+      "why": "原生 CSV、生成文字與 test 版本"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "association_benchmark/main.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "ranges": [
+        [
+          33,
+          51
+        ],
+        [
+          54,
+          84
+        ],
+        [
+          102,
+          110
+        ],
+        [
+          137,
+          147
+        ],
+        [
+          166,
+          181
+        ],
+        [
+          275,
+          336
+        ],
+        [
+          342,
+          364
+        ]
+      ],
+      "why": "實際 association 輸入與雙向 accuracy"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "skill_benchmark/dataset.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "ranges": [
+        [
+          1,
+          117
+        ]
+      ],
+      "why": "better/worse 與隨機 exo 讀取"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "skill_benchmark/train.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "ranges": [
+        [
+          147,
+          166
+        ],
+        [
+          230,
+          253
+        ],
+        [
+          260,
+          281
+        ],
+        [
+          298,
+          313
+        ],
+        [
+          353,
+          361
+        ],
+        [
+          381,
+          420
+        ],
+        [
+          463,
+          476
+        ]
+      ],
+      "why": "validation 聚合與嚴格成對比較"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "skill_benchmark/losses.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "ranges": [
+        [
+          1,
+          22
+        ]
+      ],
+      "why": "辨別訓練 ranking loss"
+    }
+  ],
+  "environment": "資料列 kitchen／lab，用於日常協助與實驗室程式；scene 是粗場景用途，video_uid 才是影片 ID。ego/exo 是非同步示範關係，不可當同步多相機標定資料。",
+  "tasks": "跨視角 association、動作分割／anticipation／planning、參考示範的 skill assessment／captioning；2024-08 又加入 VQA。能力題型與程式活動類別分開。",
+  "data": "fine CSV 保留 video_uid、annotation_uid、subset、view、scene、start/end_sec、人工 narration_en；hand/no-hand prompt 文字是 GPT 改寫。skill list 每列 better/worse 影片，NPZ arr_0 提供特徵，use_exo 時依 action 從 exo 檔案隨機選一參考。association loader 回 query、options、answer、q_type、uid。",
+  "evaluation": "association 對 query/options 特徵相似度 argmax，按 Ego→Exo／Exo→Ego 分組 accuracy；skill train.py 的 accuracy 是 better 分數嚴格大於 worse 的配對比例，平手不算對。RankingAttentionLoss 為訓練 loss，不能拿它代替評測 accuracy。",
+  "standardization": {
+    "profile": "asynchronous_demo_skill_comparison",
+    "reuse": "原生標註／改寫來源、跨視角配對、better/worse 排序與兩種核心評分。",
+    "transform": "保留 demo_reference 邊及不同 video 時間線；同一影片多問答／配對透過 uid 共用，不能重算成新環境。case 儲存配對順序、選項、exo reference 與抽樣 seed；人工與生成字幕 provenance 分開。",
+    "missing": "尚未取得影片／gaze／特徵或執行。完整 segmentation/planning/captioning 與新增 VQA evaluator 尚未核讀；若比較參考示範版本，需鎖定具體 exo reference，不能每次隨機抽而不留紀錄。"
+  },
+  "version_note": "annotations README 開頭仍說只有 train/val，結尾與 root 更新已提供 test GT；標準化應鎖定實際檔案，不直接採信舊段落。VQA 與 full-size videos 為後續更新，不能併稱首發版本。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "README.md",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "sha256": "df9b9d01c9544eae59c79a74bf352c00928f3844d14d8afe4f6ccfbe6e592248",
+      "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/README.md",
+      "local_file": "audit/.cache/github_review/repos/OpenGVLab__EgoExoLearn/files/README.md"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "annotations/README.md",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "sha256": "e0fe9cf36fc0fca0692264cafb9dbfab2f812de5dcdf0fcbda7574c36209d89c",
+      "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/annotations/README.md",
+      "local_file": "audit/.cache/github_review/repos/OpenGVLab__EgoExoLearn/files/annotations/README.md"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "association_benchmark/main.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "sha256": "bc7313e4ab5f23304226166e07f7fba30cd54d5dbffa3989263fe3f3ed49d7e6",
+      "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/association_benchmark/main.py",
+      "local_file": "audit/.cache/github_review/repos/OpenGVLab__EgoExoLearn/files/association_benchmark/main.py"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "skill_benchmark/dataset.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "sha256": "7c50f81ac73392eb974c6c85069fae34f84ab28160707e5950df01bb878716d0",
+      "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/OpenGVLab__EgoExoLearn/files/skill_benchmark/dataset.py"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "skill_benchmark/train.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "sha256": "07a7856856836f7e9817f489e3bbef5c658fee2a84d7d3a8272214724cbcd299",
+      "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/train.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/OpenGVLab__EgoExoLearn/skill_benchmark/train.py"
+    },
+    {
+      "repo": "OpenGVLab/EgoExoLearn",
+      "path": "skill_benchmark/losses.py",
+      "commit": "e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6",
+      "sha256": "7e7af2cf9728170dae87c05b3b0e0cc97fe3c1cc50a87fb23400a02281e4ae4c",
+      "url": "https://github.com/OpenGVLab/EgoExoLearn/blob/e1f11b1ab1e9735634bfe5b457de1d8ff379e4a6/skill_benchmark/losses.py",
+      "local_file": "audit/.cache/github_review/repos/OpenGVLab__EgoExoLearn/files/skill_benchmark/losses.py"
+    }
+  ]
+}

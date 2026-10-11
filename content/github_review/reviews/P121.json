@@ -1,0 +1,108 @@
+{
+  "paper_id": "P121",
+  "summary": "EgoZero公開Aria示範前處理和Franka點軌跡控制；提供的Franka底層done固定False，不能直接把現有success日誌當自動任務成功評測。",
+  "reading_order": [
+    {
+      "repo": "vliu15/egozero",
+      "path": "README.md",
+      "ranges": [
+        [
+          6,
+          16
+        ],
+        [
+          50,
+          87
+        ]
+      ],
+      "why": "原作、手部缺席分段、人工點選與資料/部署流程",
+      "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5"
+    },
+    {
+      "repo": "vliu15/egozero",
+      "path": "preprocess.py",
+      "ranges": [
+        [
+          485,
+          521
+        ]
+      ],
+      "why": "每demo保存的影片、手部與姿態/對映欄位",
+      "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5"
+    },
+    {
+      "repo": "vliu15/egozero",
+      "path": "scripts/eval.sh",
+      "ranges": [
+        [
+          31,
+          45
+        ]
+      ],
+      "why": "真正部署入口為eval_point_track及歷史/查詢預算",
+      "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5"
+    },
+    {
+      "repo": "vliu15/egozero",
+      "path": "franka-env/franka_env/envs/franka_env.py",
+      "ranges": [
+        [
+          98,
+          113
+        ],
+        [
+          143,
+          204
+        ]
+      ],
+      "why": "底層action切片、RGB-D觀測、reward/done返回",
+      "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5"
+    },
+    {
+      "repo": "vliu15/egozero",
+      "path": "point_policy/suite/point_policy.py",
+      "ranges": [
+        [
+          219,
+          231
+        ],
+        [
+          277,
+          292
+        ],
+        [
+          435,
+          451
+        ]
+      ],
+      "why": "點動作轉實機指令與goal_achieved沿用done",
+      "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5"
+    },
+    {
+      "repo": "vliu15/egozero",
+      "path": "point_policy/eval_point_track.py",
+      "ranges": [
+        [
+          532,
+          566
+        ]
+      ],
+      "why": "末步goal_achieved平均的限制",
+      "commit": "51dc1c622b564bcc10515777c6a8489b5833b3b5"
+    }
+  ],
+  "environment": "人類Aria錄影與Franka/iPhone RGB-D實機部署，需ArUco/相機/robotframe的標定；手持示範場景不等於已可重播機器人環境。",
+  "tasks": "由人類點／手部軌跡學習操作；原README按指定手消失來分demo，用另一手reset，這是蒐集協定而非任務語義。",
+  "data": "每demo保存original.mp4、palm/wrist/index/thumb/grasp/pose.npy、fingers_keypoints及first_frame_g2w；人工標記物件點／triangulation另存。Frankafeatures為pos3+quat4+gripper1；底層宣告action_dim=7卻按pos/quat/gripper切片，須核對wrapper實際編碼。",
+  "evaluation": "eval.sh選eval_point_track、10queries/10history與temporal_agg；日誌平均goal_achieved。所讀Franka step總回done=False，wrapper把done設為goal_achieved，因此此路徑未提供task-specific自動成功checker。實機操作展示與論文實驗評分需另保留人工／任務規則。",
+  "standardization": {
+    "profile": "smart_glasses_point_policy_transfer",
+    "reuse": "示範切分規則、物件點／手軌跡、pose標定、部署query/history約定。",
+    "transform": "人類demo連原VRS/MPS與分段時間，policy action保留幾何/關節/夾爪轉換；case需加具體任務goal與判分器，不能直接沿用placeholder done。",
+    "missing": "全量資料/權重、原始校準與採樣紀錄、action形狀驗證、每task成功rubric及可重現測試初態。"
+  },
+  "version_note": "固定51dc1c6；公開code偏資料處理/實機部署，硬體另依Franka-Teach。未向MPS提交資料或執行機器人。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

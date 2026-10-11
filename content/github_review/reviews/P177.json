@@ -1,0 +1,136 @@
+{
+  "paper_id": "P177",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "H2RBench提供基於PolaRiS的6個Gym場景註冊與human-to-robot transfer評測。此版rubric按曾完成的子條件累積，與末態全部同時完成有差異。",
+  "reading_order": [
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          80
+        ]
+      ],
+      "why": "作者/原作項目與PolaRiS來源關係"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "src/polaris/environments/__init__.py",
+      "ranges": [
+        [
+          1,
+          128
+        ]
+      ],
+      "why": "6個具體環境與reach/lift/place/insert依賴條件"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "PolaRiS-Hub/put_red_cup_no_curtain/scene.json",
+      "ranges": [
+        [
+          1,
+          47
+        ]
+      ],
+      "why": "authoring scene的asset/path/pose/scale"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "src/polaris/utils.py",
+      "ranges": [
+        [
+          18,
+          59
+        ]
+      ],
+      "why": "instruction/poses與task randomization設定"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "src/polaris/utils_/eval_utils.py",
+      "ranges": [
+        [
+          6,
+          64
+        ]
+      ],
+      "why": "seed、僅取第一個基準pose、xyzw→wxyz轉換"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "scripts/eval_policy.py",
+      "ranges": [
+        [
+          20,
+          153
+        ]
+      ],
+      "why": "case抽樣/續跑、model接口、rubric結果和budget"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "src/polaris/environments/manager_based_rl_splat_environment.py",
+      "ranges": [
+        [
+          42,
+          96
+        ],
+        [
+          179,
+          198
+        ]
+      ],
+      "why": "reset/step均評rubric，缺rule不計正常progress"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "src/polaris/environments/rubrics/base.py",
+      "ranges": [
+        [
+          1,
+          77
+        ]
+      ],
+      "why": "max-ever criteria、依賴和progress/empty-rule"
+    },
+    {
+      "repo": "xiaochy/H2RBench",
+      "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+      "path": "src/polaris/environments/rubrics/checkers.py",
+      "ranges": [
+        [
+          8,
+          91
+        ],
+        [
+          222,
+          261
+        ]
+      ],
+      "why": "具體XY覆蓋和穩定插入checker"
+    }
+  ],
+  "environment": "Isaac Lab與PolaRiS真實場景重建/3D Gaussian splat；固定registry6個Gym ID為放紅杯、疊積木、套環、掛杯、玩具入盒、疊碗。authoring scene.json與runtime scene.usda/渲染資產不是同一種環境描述。",
+  "tasks": "6個原生task setup有Rubric前置依賴；新case須保存human/robot資料轉移的訓練條件與實際goal，不能把完整PolaRiS父資產庫當本篇全部已評任務。",
+  "data": "initial_conditions.json含instruction/poses；task_config.yaml有object_randomization/waypoints。當前randomize以poses[0]為底再取range，未逐條使用所有原始pose；旋轉入參xyzw、輸出wxyz。policy推論入口送obs+language，human示範訓練/配對資料另需manifest，不能從此eval入口推定已有video prompting。",
+  "evaluation": "每criterion曾達成即latched，progress=ever_reached/total，成功為全數曾達成；空criteria會success=True但progress0，應拒作合法case。放置看XY投影覆蓋與finger條件；插入有速度穩定/XY/Z檢查，其closure計數須確認跨episode重置。續跑先生成ic後快轉RNG，第一個恢復episode仍用舊ic，需修正或保存實際初態。影片固定15fps不是控制clock證據。",
+  "standardization": {
+    "profile": "real_to_sim_human_robot_transfer",
+    "reuse": "6環境註冊、scene/initial_conditions/task_config接口、可追溯predicate與依賴進度。",
+    "transform": "case綁定source episode、重建/碰撞/渲染資產版本與座標系；記實際初態、human訓練子集和固定budget；保持ever-success與同時末態成功分項。",
+    "missing": "human/robot完整配對資料、資產和training split、續跑初態一致性、stateful predicate reset、非空rubric/全部終態有效性及跨機體基線。"
+  },
+  "version_note": "固定5082e75。README arXiv仍TODO且clone示例為舊DavidZ2851/polaris；官方h2rbench.github.io連此庫並列精確2609.24778，身分相符。與P151影片生成H2R-Bench保持不同source。",
+  "runtime_executed": false
+}

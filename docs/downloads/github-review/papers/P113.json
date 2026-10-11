@@ -1,0 +1,334 @@
+{
+  "paper_id": "P113",
+  "name": "REPAIR-Bench",
+  "title": "REPAIR-Bench: A Benchmark for Robot Error Perception And Interaction Recovery",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.29937",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "medical",
+    "assistance"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P113",
+    "status": "no_confirmed_code_repository",
+    "summary": "已核對REPAIR-Bench原作與有界GitHub搜尋；目前未確認此篇的官方程式庫。同名軟體修復benchmarks不屬於這篇HRI研究。",
+    "environment": "原文是實驗室／醫院的crash-cart取物引導互動，重用RFM-HRI人類反應資料；不是可操作整套醫院任務的模擬環境。",
+    "tasks": "三種端點：失敗時刻定位、失敗類型分類、使用者偏好的恢復策略；人類偏好預測不同於機器人實際恢復成功。",
+    "data": "原作來源214互動/41人；排除後分析184互動/38人，含面部AU、頭姿、語音／文字與問卷。native code schema未核實，不能把論文欄位描述當可直接匯入的檔案規格。",
+    "evaluation": "原文有時序定位誤差／tIoU F1、分類F1及恢復Hit/precision/recall/F1@k。視覺與文字端點split不同；濾波等前處理敘述尚需程式釐清。未執行scorer。",
+    "standardization": {
+      "profile": "human_robot_failure_and_recovery_preference",
+      "reuse": "原文三種端點、排除規則、participant/session來源鏈與人類偏好標籤設計。",
+      "transform": "資料取得後以participant→interaction→temporal case編號；各端點保留資訊／時間截止及split，恢復偏好標明human label而非physical success。",
+      "missing": "官方實作／資料檔schema、184筆分析subset清單、前處理及端點split、GT時間與偏好對映。"
+    },
+    "version_note": "固定2606.29937v1 PDF與既有原文閱讀紀錄。搜尋未確認不代表作者永遠沒有code；不把GitHub軟體RepairBench套上這篇。",
+    "reviewed_on": "2026-10-10",
+    "runtime_executed": false,
+    "discovery_evidence": [
+      {
+        "kind": "pinned_paper_link_and_availability_context",
+        "paper_url": "https://arxiv.org/abs/2606.29937",
+        "pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd",
+        "supports": "exact source identity and available paper links"
+      },
+      {
+        "kind": "bounded_repository_search",
+        "query": "\"REPAIR-Bench\" robot",
+        "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+        "candidate_names": [],
+        "supports": "candidates screened for source identity; not exhaustive proof of code absence"
+      },
+      {
+        "kind": "bounded_repository_search",
+        "query": "REPAIR-Bench",
+        "sha256": "92ac497d742755643068902d68d7d35e585bdba2e4ced1b1f1395aa8b49476aa",
+        "candidate_names": [
+          "jd-opensource/joycode-agent",
+          "Acruid/RepairBench",
+          "jmerelnyc/repair-agent",
+          "Hyhyhyyy/fault-repair-benchmark",
+          "ayoubberiane/RepairBench",
+          "Dcooder/fix-terminal-bench-log-report",
+          "himanshu-raaj/fix-task-broken",
+          "CaiGuoHui123/RTL-RepairBench"
+        ],
+        "supports": "candidates screened for source identity; not exhaustive proof of code absence"
+      }
+    ],
+    "reading_order": [],
+    "review_sha256": "2373f7b69b3df0c56535d263bf9ed9a5384309bebeab7057ac7b6189ab864558"
+  },
+  "repository_binding_review_sha256": "2373f7b69b3df0c56535d263bf9ed9a5384309bebeab7057ac7b6189ab864558",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "醫療與手術支援",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P113",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "REPAIR-Bench，arXiv 2606.29937v1。",
+    "scope_read": "RFM-HRI來源、排除樣本、3端點、各split、時間與偏好評分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "醫療與手術支援",
+      "協助、交接與陪伴"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "lab與hospital的crash-cart guidance互動；不是完整醫療操作或手術任務。",
+    "tasks": "3端點：失敗時刻、失敗類型、使用者偏好恢復策略；4誘發failure conditions＋success。",
+    "cases": "來源214trials/41人；排30後正式analysis184trials/38人。不能將214全部寫成已用評測樣本。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "評測端點",
+        "pages": [
+          1,
+          2
+        ]
+      },
+      {
+        "field": "data",
+        "value": 214,
+        "unit": "來源interaction trials",
+        "pages": [
+          2
+        ]
+      },
+      {
+        "field": "case",
+        "value": 184,
+        "unit": "過濾後usable trials（含各split）",
+        "pages": [
+          3,
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "視覺failure classification F1等；localization秒級absolute error與tIoU F1。",
+      "recovery用Hit/precision/recall/F1@k，GT是人的偏好，未證明機器人執行恢復成功。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "visual tasks約75/25 participant分組；recovery文本60/20/20隨機split，不能宣稱三端點都participant-disjoint。visual任务刻意不給語音。",
+    "lineage": "RFM-HRI舊資料新增標註与preference；failure offset以機器人錯誤回應結束作標記，不是物理抓取失敗時刻。",
+    "evidence": [
+      {
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "locator": "Dataset／Sample Exclusions／Task1",
+        "supports": "214→184、38人與失敗時間定義"
+      },
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "Tasks2/3與Metrics",
+        "supports": "不同split、偏好top-k"
+      }
+    ],
+    "unresolved": [
+      "前處理階數/cutoff不同段落敘述不一，重現需code確認；source214與41×5亦不完全一致。"
+    ],
+    "reuse": "補user-centered interaction recovery；必須和物理任務恢復及其成功證據分開。",
+    "reviewed_pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd",
+    "reviewed_on": "2026-10-02",
+    "name": "REPAIR-Bench",
+    "year": 2026,
+    "title": "REPAIR-Bench: A Benchmark for Robot Error Perception And Interaction Recovery",
+    "source_url": "https://arxiv.org/abs/2606.29937",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "medical",
+      "assistance"
+    ],
+    "review_tags": [
+      "醫療支援",
+      "人機協作"
+    ],
+    "domain_names": [
+      "醫療與手術支援",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P113",
+      "domain_ids": [
+        "medical",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P113",
+          "domain_ids": [
+            "medical"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3端點：失敗時刻、失敗類型、使用者偏好恢復策略；4誘發failure conditions＋success。",
+            "lab與hospital的crash-cart guidance互動；不是完整醫療操作或手術任務。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd"
+        },
+        {
+          "paper_id": "P113",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "互動失敗後辨識使用者偏好的恢復策略。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd",
+      "previous_domain_ids": [
+        "medical"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P113",
+      "name": "REPAIR-Bench",
+      "expected_title": "REPAIR-Bench: A Benchmark for Robot Error Perception And Interaction Recovery",
+      "source_url": "https://arxiv.org/abs/2606.29937",
+      "pdf_url": "https://arxiv.org/pdf/2606.29937",
+      "retrieved_at": "2026-10-02T21:34:20.037813+00:00",
+      "pdf_sha256": "c63b11a21f43bad4c9a0709836fb1f9ca225602ea2192d55be74dd59ea385cfd",
+      "text_sha256": "ef7dd3cfc169353782c0165be1c9a052d7e0512ca2c05acde0555c45c410c171",
+      "pdf_bytes": 4625345,
+      "pages": 8,
+      "text_characters": 55953,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.29937v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.29937v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "評測端點",
+        "pages": [
+          1,
+          2
+        ],
+        "record_id": "review10:P113:1",
+        "paper_id": "P113",
+        "benchmark": "REPAIR-Bench",
+        "native_term": "評測端點",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.29937v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.29937v1",
+            "locator": "PDF pp. 1, 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 214,
+        "unit": "來源interaction trials",
+        "pages": [
+          2
+        ],
+        "record_id": "review10:P113:2",
+        "paper_id": "P113",
+        "benchmark": "REPAIR-Bench",
+        "native_term": "來源interaction trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.29937v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.29937v1",
+            "locator": "PDF pp. 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 184,
+        "unit": "過濾後usable trials（含各split）",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P113:3",
+        "paper_id": "P113",
+        "benchmark": "REPAIR-Bench",
+        "native_term": "過濾後usable trials（含各split）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.29937v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.29937v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

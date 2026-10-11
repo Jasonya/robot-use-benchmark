@@ -1,0 +1,1115 @@
+{
+  "paper_id": "P091",
+  "name": "UniFolding",
+  "title": "UniFolding: Towards Sample-efficient, Scalable, and Generalizable Robotic Garment Folding",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2311.01267",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P091",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已核讀 UniFolding 的 VR HDFStore、runtime YAML/NPZ/PLY、動作與標註格式、模擬幾何計分及真機狀態機。真機 SUCCESS 是流程狀態：fold1/fold2 條件以最後 action 類型推定，並無成品幾何驗收；原始論文10步內按摺法完成的成功率需另保留評閱證據。",
+    "identity_note": "README 明示官方 CoRL 2023 程式，完整題名、六位作者與 arXiv:2311.01267 相符。RFUniverse、CLOTH3D、VR-Garment 與 ClothFunnels 各有重用角色，不把框架／母資料集當成本篇新benchmark。",
+    "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+    "paper_evidence": {
+      "local_file": "audit/.cache/fulltext_review/P091/pages.json",
+      "sha256": "1e68011683ae0e166596a159cc236b385d58c1724102de1d9745ce44e8a6f147",
+      "pdf_sha256": "b51de4cbad0c9715a18e88ce74af68a21192ad10e130a1b956715c87706d8049",
+      "pages_read": [
+        6,
+        14
+      ],
+      "scope": "第6頁資料／train-test／10步10trials與指標；第14頁附錄C摺法及D對ClothFunnels指標的引用。"
+    },
+    "environment": "模擬是Unity 2022.3 LTS上的RFUniverse，README要求另取得Cloth Dynamics 2.0.9 beta；CLOTH3D衣物依category meta與instance filter載入。真機是雙Flexiv Rizon 4、AG-95與Photoneo MotionCam3D＋MindVision RGB。Unity左手系先轉Open3D右手系，再轉virtual/world/左右robot frames；virtual以z為高度，配置另有particle_scale=100與time_scale=4，不能直接沿用FleX的y-up或將步數當秒。",
+    "tasks": "兩種衣物tshirt_long／tshirt_short的展開→fold1→fold2流程；附錄C先同時摺兩袖，再對半摺本體，精確抓放點由VR人類示範生成。ActionTypeDef包含FLING/DRAG/FOLD_1/FOLD_2/PICK_AND_PLACE/DONE及恢復／HOME等，是動作enum而非同數量任務。ExperimentVirtual.execute_action只實作FLING，random_fold用於初態，不能宣稱runtime模擬提供完整摺衣動作集。論文60件真衣物以2:1分割，20件held-out各10trials＝200次測試；2432是訓練sample、每sample16次人類偏好比較，不是測試cases。",
+    "data": "VR data.h5 的Pandas df以instance_id/video_id/sample_id標識，讀pcd_path_frame1→NumPy Nx6 xyz/rgb、nocs_path_frame1、coverage_frame1/2、左右gripper_point/theta_frame1/2、action_type、folding_step、is_smoothed/is_smoothing。raw fold依folding_step映為fold1/fold2；pose內部順序為左pick、左place、右pick、右place，角度wrap至±π。VR依instance_id打亂切分，所讀stage1 config為8/1/1；runtime real/virtual卻依sample打亂，不能等同論文物件held-out split。runtime metadata按namespace記pcd.processed.begin、processed_nocs.begin、pose_virtual、reward.begin/end及episode_idx/trial_idx/action_step；NPZ鍵為points/nocs，real另接受PLY。annotation.action_poses原順序左pick、右pick、左place、右place，reader重排後將角度全設0；虛擬fling place亦用0佔位，應保存validity而非當有效目標。偏好0/1/2/3分別為左對優／右對優／相等／不可比較，經label smoothing後監督分數模型。 VR-Garment補查：PoseData包含dualHandPoses（position／Euler／手勢）、localParticles（solver renderable positions／normals）、左右grasp solver indices、solver／actor local-to-world矩陣和Time.time。Record名義每0.04秒呼叫，應保留實際timestamp而非假設等間隔。JSON錄製再回放輸出AnimationData及color/depth/mask影像引用的BSON；四個隨機相機視角共用同一段示範。",
+    "evaluation": "虛擬get_deformable_reward以canonical初態粒子覆蓋面積作max_coverage，在virtual XY平面用100×100粒子網格；IoU另外把兩組XY點共同縮放至0–99並畫半徑2圓，以點陣交集/聯集計算，不是RGB影像mask IoU。reward.py沿用ClothFunnels分解形式，但此版把z歸零、同頂點SVD配準5次、鏡像取min，距離除sqrt(初態粒子覆蓋面積)，stage2權重0.7；與P090用長×寬正規化不同。runtime學習用begin−end的l2/icp改善量；VR則用同instance的coverage_frame1最大值正規化、stage1以max(tanh(2Δcoverage+coverage_after),0)給fling標籤，fold等固定0.8、done為0，均非實測成功率。真機state machine把fold成功設為最後action_type==FOLD_1/FOLD_2，garment_fling_drag_success固定True且有TODO；operable只看mask面積上限、reachable看mask橫向均值，沒有成品摺法驗收。step_idx>max_num_steps非全域強制終止，部分轉移還要求不可操作，lift與fold前drag迴圈不按每個物理動作累加。論文要求10動作內按規則完成，這與狀態機SUCCESS需分欄。 VR收集工具的開始／清除／保存由手勢或按鍵觸發，超過maxFrameCount僅提示；錄完不表示通過摺疊成功判分。ClothImitation2／AnimationImitation2是錄製與回放場景，不能加成兩個新任務；四視角不加成四段獨立示範。",
+    "standardization": {
+      "profile": "vr_demonstration_and_runtime_pointcloud_folding_pipeline",
+      "reuse": "原生動作／觀測／annotation dataclasses、frame pairs與偏好、instance與sample索引、模擬幾何metric及真機流程狀態。",
+      "transform": "source固定commit並標記VR-Garment/CLOTH3D/ClothFunnels重用；environment保存Unity/Open3D/virtual/world/robot座標鏈；task保存衣物類與兩段摺法；case保留完整garment/trial/step、checkpoint、split粒度；evaluator分模擬距離、VR訓練reward、preference target、真機流程狀態及獨立成品成功。保留特權粒子/NOCS，勿當真機可觀測量；人類VR示範須經primitive與校正adapter才能成為robot命令。 VR原生Unity／solver座標、Euler順序、BSON/JSON與視角／timestamp對應須保留並校驗；不得直接視為米制robot命令。",
+      "missing": "VR→UniFolding前處理與data.h5/NPZ/annotation/instance清單閉合；物件held-out真機200trials的逐次成品評閱；嚴格10物理action budget；pure evaluation入口與網路／barrier相依隔離；Unity付費插件／CLOTH3D／硬體校正取得與執行驗證。"
+    },
+    "additional_repo_proposals": [
+      {
+        "repo": "xiaoxiaoxh/VR-Garment",
+        "role": "Stage0 VR示範收集上游",
+        "evidence": "UniFolding README直接連結；本輪已補固定VR-Garment版本並核讀PoseData錄製／回放匯出。"
+      }
+    ],
+    "integration_issues": [
+      "真機SUCCESS只作流程完成；需補獨立摺法成品checker或原始評閱，不可把FOLD_1/FOLD_2 action類型當成功證據。",
+      "runtime sample split與VR instance split、論文2:1 real與9:1 sim分割需分開版本化，補完整held-out清單。",
+      "明訂lift/drag/recovery的動作計數及硬性10步上限；state machine現有門檻不足以保證論文budget。",
+      "Makefile的test target仍繼承barrier與run_real.py資料量達門檻後訓練／finalize路徑；評測adapter需明確固定checkpoint並關閉這些分支。",
+      "ClothFunnels重用只代表公式親緣；此版z-up、粒子覆蓋面積正規化、點陣IoU與P090長寬面積／RGB-mask不同，不能合併為同一evaluator。"
+    ],
+    "version_note": "固定2024-10-18 commit，晚於2023論文。核讀限Python資料／task／metric與控制流程，未核讀所有電機控制／Unity插件底層，未執行上游程式、連線標註資料庫／通知或下載模型與大型資產。 已補讀VR-Garment c9014f62的收集與回放資料契約；它本是GarmentTracking工具，UniFolding引用作Stage0上游。未使用VR硬體或執行Unity。",
+    "reviewed_on": "2026-10-11",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            9
+          ],
+          [
+            48,
+            70
+          ],
+          [
+            109,
+            146
+          ],
+          [
+            154,
+            166
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 166,
+        "sha256": "132d3a926d0bec5fae55fa2ebb307932e289e04a13d2b8ade3affdb5dccc289e",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/README.md",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/README.md#L1-L9",
+        "why": "確認論文、資料／硬體、VR收集與四階段流程。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "RFUniverse/README.md",
+        "ranges": [
+          [
+            1,
+            38
+          ],
+          [
+            66,
+            76
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 76,
+        "sha256": "56ab0f65213bdb088377eedf8ae86adc8d878c9d148fe187075d8663fb260f25",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/RFUniverse/README.md",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/RFUniverse/README.md#L1-L38",
+        "why": "Unity/RFUniverse與需另取得的Cloth Dynamics版本，非完整自含模擬器。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "common/datamodels.py",
+        "ranges": [
+          [
+            13,
+            135
+          ],
+          [
+            182,
+            210
+          ],
+          [
+            236,
+            276
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 333,
+        "sha256": "d4fa0a5bd19594a1dd65796db92772cd6ece611db746dae3244ce768091a7fcb",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/common/datamodels.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/common/datamodels.py#L13-L135",
+        "why": "動作enum、兩支手臂pick/place、觀測與四類偏好標註。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "learning/datasets/vr_dataset.py",
+        "ranges": [
+          [
+            25,
+            60
+          ],
+          [
+            134,
+            137
+          ],
+          [
+            146,
+            227
+          ],
+          [
+            252,
+            314
+          ],
+          [
+            357,
+            422
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 499,
+        "sha256": "e988693742d4942ec9ad6979aa6671c83c105cfc1fa2443b622d0b7e66886dd3",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/datasets/vr_dataset.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/datasets/vr_dataset.py#L25-L60",
+        "why": "HDFStore df、frame pair／fold_step映射、虛擬示範reward與instance split。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "config/virtual_experiment_stage1/train_virtual_base.yaml",
+        "ranges": [
+          [
+            1,
+            31
+          ],
+          [
+            63,
+            86
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 98,
+        "sha256": "0f5f4258c80614627544a74023c876582ef51492d851ed022653bfec7be83ee6",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/virtual_experiment_stage1/train_virtual_base.yaml",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/virtual_experiment_stage1/train_virtual_base.yaml#L1-L31",
+        "why": "確認8/1/1 split、點雲抽樣、voxel與tanh reward設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "learning/components/obj_data_loader.py",
+        "ranges": [
+          [
+            9,
+            85
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 111,
+        "sha256": "4420f475d6957c5518c522e1b518d9332ec5fb284059ec3f34a2a75191905f47",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/components/obj_data_loader.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/components/obj_data_loader.py#L9-L85",
+        "why": "CLOTH3D instance filter、category meta與worker分塊，勿當資料split。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "learning/datasets/runtime_dataset_virtual.py",
+        "ranges": [
+          [
+            210,
+            231
+          ],
+          [
+            246,
+            302
+          ],
+          [
+            316,
+            359
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 444,
+        "sha256": "12c302322f640a8eadf779eb0f1c4df7e0f4a9307c9e60b8c6565d07b3c558ff",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/datasets/runtime_dataset_virtual.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/datasets/runtime_dataset_virtual.py#L210-L231",
+        "why": "虛擬log的NOCS／points、抓點零值佔位、metric delta及sample切分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "learning/datasets/runtime_dataset_real.py",
+        "ranges": [
+          [
+            131,
+            187
+          ],
+          [
+            216,
+            308
+          ],
+          [
+            323,
+            365
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 450,
+        "sha256": "407ec6e5c22c5669d651c8903aaf46d919e62995fa40711ea05a9c6d9883fbee",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/datasets/runtime_dataset_real.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/datasets/runtime_dataset_real.py#L131-L187",
+        "why": "metadata與annotation讀取、pose重排、偏好label及sample切分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "learning/components/cloth_dynamics_env.py",
+        "ranges": [
+          [
+            126,
+            158
+          ],
+          [
+            189,
+            208
+          ],
+          [
+            309,
+            330
+          ],
+          [
+            359,
+            375
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 376,
+        "sha256": "105f1c65184b1e8dde4e8bf75ad76ebd7f8ffc37705b053a42438800c63938cb",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/components/cloth_dynamics_env.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/components/cloth_dynamics_env.py#L126-L158",
+        "why": "讀Unity訊息解碼、左右手座標、depth前景及NOCS對應。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "manipulation/experiment_virtual.py",
+        "ranges": [
+          [
+            39,
+            113
+          ],
+          [
+            274,
+            355
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 372,
+        "sha256": "66acf48792c22c5cbcefde4887e85e4972b6324fdfe06e7d21438c3653233904",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/manipulation/experiment_virtual.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/manipulation/experiment_virtual.py#L39-L113",
+        "why": "虛擬座標轉換、只支援FLING的runtime執行與具體reward呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "common/metric_utils.py",
+        "ranges": [
+          [
+            1,
+            70
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 70,
+        "sha256": "2de743e720114a3a1199b2b9d0a65aeaf2bcb26bb9f4f91683ecbd54851403d0",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/common/metric_utils.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/common/metric_utils.py#L1-L70",
+        "why": "XY粒子面積與100×100點陣IoU的真正公式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "common/geometry_util.py",
+        "ranges": [
+          [
+            90,
+            142
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 142,
+        "sha256": "0619f3b664b7dfb1caf0bf85ccef4727fa2a5fce36852be9cb4f81bc1faf7341",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/common/geometry_util.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/common/geometry_util.py#L90-L142",
+        "why": "面積grid輔助函式與SVD剛體配準。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "learning/components/reward.py",
+        "ranges": [
+          [
+            1,
+            101
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 101,
+        "sha256": "5a8b527122e03dcd499d96dc9da8c24a6860321b9841f4865ad2a8e8d8bd0c26",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/components/reward.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/learning/components/reward.py#L1-L101",
+        "why": "投影、鏡像、分解距離及面積正規化的具體實作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "config/virtual_experiment_stage2/experiment_virtual_base.yaml",
+        "ranges": [
+          [
+            19,
+            78
+          ],
+          [
+            127,
+            140
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 140,
+        "sha256": "79639385fb8c7b0a4212bd4d3e350eb8f7f00c6d863e088c387d9ced59257f6c",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/virtual_experiment_stage2/experiment_virtual_base.yaml",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/virtual_experiment_stage2/experiment_virtual_base.yaml#L19-L78",
+        "why": "runtime粒子縮放／時間尺度、5步收集及0.7 reward權重。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "run_virtual.py",
+        "ranges": [
+          [
+            64,
+            113
+          ],
+          [
+            132,
+            155
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 264,
+        "sha256": "e93a348f95305ac2ed2ef6ab95bb10dab48a0e87791397709b3fe8d12f27cee5",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/run_virtual.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/run_virtual.py#L64-L113",
+        "why": "一筆action的begin/end觀測、metric及episode/garment/trial/step脈絡。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "Makefile",
+        "ranges": [
+          [
+            81,
+            98
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 151,
+        "sha256": "415fdb08caeb8d85acdf3461c918a3897f10fdfc0cbb4f79485e96a54d0a3d8f",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/Makefile",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/Makefile#L81-L98",
+        "why": "兩類衣物測試target覆寫每件10trials並關閉探索。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "config/real_experiment/experiment_real_base.yaml",
+        "ranges": [
+          [
+            5,
+            79
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 162,
+        "sha256": "2cc1baa1e9184ac5d88ff8cecd4e0d6f1a53351c244d88800cf73cc2fb354b18",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/real_experiment/experiment_real_base.yaml",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/real_experiment/experiment_real_base.yaml#L5-L79",
+        "why": "真機校正、mask門檻、10步與barrier／runtime training設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "config/real_experiment/experiment_real_tshirt_long.yaml",
+        "ranges": [
+          [
+            1,
+            19
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 19,
+        "sha256": "7519ea3917ae46c27a186479653bbf97b981e672878b6632b882788d8f82b2bd",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/real_experiment/experiment_real_tshirt_long.yaml",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/real_experiment/experiment_real_tshirt_long.yaml#L1-L19",
+        "why": "長袖test使用的base繼承與衣物設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "config/real_experiment/experiment_real_tshirt_short.yaml",
+        "ranges": [
+          [
+            1,
+            19
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 19,
+        "sha256": "35939194694fe28f10828b1796543e9a837552f8c026452ee0b5d1eb0adf10a8",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/real_experiment/experiment_real_tshirt_short.yaml",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/config/real_experiment/experiment_real_tshirt_short.yaml#L1-L19",
+        "why": "短袖test使用的base繼承與衣物設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "run_real.py",
+        "ranges": [
+          [
+            82,
+            117
+          ],
+          [
+            143,
+            228
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 232,
+        "sha256": "24a193d81e079ae0fc836951239eea271c05d2f085849b24e0158d08eea85828",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/run_real.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/run_real.py#L82-L117",
+        "why": "依garment與trial執行狀態機，及測試target仍可能進入訓練路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "manipulation/statemachine_garment.py",
+        "ranges": [
+          [
+            19,
+            138
+          ],
+          [
+            249,
+            306
+          ],
+          [
+            325,
+            348
+          ],
+          [
+            395,
+            459
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 504,
+        "sha256": "9c436cf4bebe5c8ad651ff1a3906ef90df6e2db51f63052c1b88fd86f8f613b7",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/manipulation/statemachine_garment.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/manipulation/statemachine_garment.py#L19-L138",
+        "why": "核對SUCCESS條件、TODO布林、非全域步數上限與錯誤處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/UniFolding",
+        "requested_repo": "xiaoxiaoxh/UniFolding",
+        "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+        "ref": null,
+        "path": "manipulation/experiment_real.py",
+        "ranges": [
+          [
+            493,
+            570
+          ],
+          [
+            635,
+            665
+          ],
+          [
+            742,
+            767
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 767,
+        "sha256": "4e7905be9032d208e8f69abe8d8d731a96b9e3da88161f4a1b35ee6da83dd257",
+        "url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/manipulation/experiment_real.py",
+        "reading_url": "https://github.com/xiaoxiaoxh/UniFolding/blob/cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f/manipulation/experiment_real.py#L493-L570",
+        "why": "mask／point cloud感測、可操作／可達判斷及實體fold動作dispatch。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/VR-Garment",
+        "requested_repo": "xiaoxiaoxh/VR-Garment",
+        "commit": "c9014f626e2269e52310d5acd5ca72557505b729",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            71
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 71,
+        "sha256": "add87ece9ea54be15227b0dc86b55c2bbf9763ca12c833f2796947e39c293a7e",
+        "url": "https://github.com/xiaoxiaoxh/VR-Garment/blob/c9014f626e2269e52310d5acd5ca72557505b729/README.md",
+        "reading_url": "https://github.com/xiaoxiaoxh/VR-Garment/blob/c9014f626e2269e52310d5acd5ca72557505b729/README.md#L1-L71",
+        "why": "核對VR硬體、Unity2021.3、record/replay兩場景及資料角色。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/VR-Garment",
+        "requested_repo": "xiaoxiaoxh/VR-Garment",
+        "commit": "c9014f626e2269e52310d5acd5ca72557505b729",
+        "ref": null,
+        "path": "Assets/Scripts/Imitation2/ObiSceneManagerImitation2.cs",
+        "ranges": [
+          [
+            62,
+            124
+          ],
+          [
+            160,
+            168
+          ],
+          [
+            457,
+            575
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 787,
+        "sha256": "41cdf61f3a81bdbc7a9b53ecce5190cf62ab48b5eeaaf05f13b6b695bcb30055",
+        "url": "https://github.com/xiaoxiaoxh/VR-Garment/blob/c9014f626e2269e52310d5acd5ca72557505b729/Assets/Scripts/Imitation2/ObiSceneManagerImitation2.cs",
+        "reading_url": "https://github.com/xiaoxiaoxh/VR-Garment/blob/c9014f626e2269e52310d5acd5ca72557505b729/Assets/Scripts/Imitation2/ObiSceneManagerImitation2.cs#L62-L124",
+        "why": "讀PoseData欄位、名義25Hz／Time.time、手姿及抓取粒子、JSON保存。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaoxiaoxh/VR-Garment",
+        "requested_repo": "xiaoxiaoxh/VR-Garment",
+        "commit": "c9014f626e2269e52310d5acd5ca72557505b729",
+        "ref": null,
+        "path": "Assets/Scripts/Imitation2/AnimateImitation2.cs",
+        "ranges": [
+          [
+            83,
+            129
+          ],
+          [
+            250,
+            324
+          ],
+          [
+            452,
+            476
+          ],
+          [
+            484,
+            541
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 820,
+        "sha256": "9b287f5a163e9b825af6daa6383cc78f85eae039203c9e4af64a2abe2dd72b73",
+        "url": "https://github.com/xiaoxiaoxh/VR-Garment/blob/c9014f626e2269e52310d5acd5ca72557505b729/Assets/Scripts/Imitation2/AnimateImitation2.cs",
+        "reading_url": "https://github.com/xiaoxiaoxh/VR-Garment/blob/c9014f626e2269e52310d5acd5ca72557505b729/Assets/Scripts/Imitation2/AnimateImitation2.cs#L83-L129",
+        "why": "讀四視角影像／相機矩陣、mesh/hand資料與BSON回放輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "61a21fb7ed156eacf8ef0d72839e6d5f87e33620aa0a6832f891db4160cff859"
+  },
+  "repository_binding_review_sha256": "61a21fb7ed156eacf8ef0d72839e6d5f87e33620aa0a6832f891db4160cff859",
+  "repository_bindings": [
+    {
+      "requested_repo": "xiaoxiaoxh/UniFolding",
+      "resolved_repo": "xiaoxiaoxh/UniFolding",
+      "aliases_in_this_review": [
+        "xiaoxiaoxh/unifolding"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "cbd0b374f1b7ab4d5ed3d66e7ad9e4736a42d81f",
+          "reviewed_files": [
+            "Makefile",
+            "README.md",
+            "RFUniverse/README.md",
+            "common/datamodels.py",
+            "common/geometry_util.py",
+            "common/metric_utils.py",
+            "config/real_experiment/experiment_real_base.yaml",
+            "config/real_experiment/experiment_real_tshirt_long.yaml",
+            "config/real_experiment/experiment_real_tshirt_short.yaml",
+            "config/virtual_experiment_stage1/train_virtual_base.yaml",
+            "config/virtual_experiment_stage2/experiment_virtual_base.yaml",
+            "learning/components/cloth_dynamics_env.py",
+            "learning/components/obj_data_loader.py",
+            "learning/components/reward.py",
+            "learning/datasets/runtime_dataset_real.py",
+            "learning/datasets/runtime_dataset_virtual.py",
+            "learning/datasets/vr_dataset.py",
+            "manipulation/experiment_real.py",
+            "manipulation/experiment_virtual.py",
+            "manipulation/statemachine_garment.py",
+            "run_real.py",
+            "run_virtual.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/xiaoxiaoxh/UniFolding",
+          "link_label": "here",
+          "project_url": "https://unifolding.robotflow.ai",
+          "page_sha256": "ed85c44aaf673f64dcab96e2f5bb500b97fc5fd38bafd17ae36a54d28618aa33"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P091",
+          "review_file": "content/github_review/reviews/P091.json",
+          "review_sha256": "61a21fb7ed156eacf8ef0d72839e6d5f87e33620aa0a6832f891db4160cff859",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "xiaoxiaoxh/VR-Garment",
+      "resolved_repo": "xiaoxiaoxh/VR-Garment",
+      "aliases_in_this_review": [
+        "xiaoxiaoxh/vr-garment"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c9014f626e2269e52310d5acd5ca72557505b729",
+          "reviewed_files": [
+            "Assets/Scripts/Imitation2/AnimateImitation2.cs",
+            "Assets/Scripts/Imitation2/ObiSceneManagerImitation2.cs",
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P091",
+          "review_sha256": "61a21fb7ed156eacf8ef0d72839e6d5f87e33620aa0a6832f891db4160cff859",
+          "proposal": {
+            "repo": "xiaoxiaoxh/VR-Garment",
+            "role": "Stage0 VR示範收集上游",
+            "evidence": "UniFolding README直接連結；本輪已補固定VR-Garment版本並核讀PoseData錄製／回放匯出。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P091",
+          "review_file": "content/github_review/reviews/P091.json",
+          "review_sha256": "61a21fb7ed156eacf8ef0d72839e6d5f87e33620aa0a6832f891db4160cff859",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P091",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "UniFolding: Towards Sample-efficient, Scalable, and Generalizable Robotic Garment Folding；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6
+    ],
+    "role": "柔性物操作benchmark",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "RFUniverse/ClothDynamics及雙Flexiv工作站；2garment categories。",
+    "tasks": "兩類衣物的unfold+fold流程；60realgarments的train/test40/20。",
+    "cases": "VR1,218+1,575＝2,793videos，real2,432samples；20heldoutgarments各10trial＝200realtrials。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 20,
+        "unit": "held-out real garments",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 200,
+        "unit": "real trials，20garments×10",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2793,
+        "unit": "VR manipulation videos",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "IoU、normalizedcoverage，wholeflow10steps內按rules摺好。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "環境狀態與過程檢查"
+    ],
+    "split": "realgarments2:1，simCLOTH3D9:1；onlinehumanpreference作訓練，不當test免介入證據。",
+    "lineage": "CLOTH3D、ClothFunnels目的函數及VR-human demonstrations。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "機器人reach/grasp自動recovery和policyactionbudget的共同計數需要adapter明定。"
+    ],
+    "reuse": "可取shirt具體fold規則和材料差異，human annotations與robotepisodes分开。",
+    "reviewed_pdf_sha256": "b51de4cbad0c9715a18e88ce74af68a21192ad10e130a1b956715c87706d8049",
+    "reviewed_on": "2026-10-02",
+    "name": "UniFolding",
+    "year": 2023,
+    "title": "UniFolding: Towards Sample-efficient, Scalable, and Generalizable Robotic Garment Folding",
+    "source_url": "https://arxiv.org/abs/2311.01267",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織",
+      "洗衣服務"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P091",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P091",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            2,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "兩類衣物的unfold+fold流程；60realgarments的train/test40/20。",
+            "RFUniverse/ClothDynamics及雙Flexiv工作站；2garment categories。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b51de4cbad0c9715a18e88ce74af68a21192ad10e130a1b956715c87706d8049"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b51de4cbad0c9715a18e88ce74af68a21192ad10e130a1b956715c87706d8049",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P091",
+      "name": "UniFolding",
+      "expected_title": "UniFolding: Towards Sample-efficient, Scalable, and Generalizable Robotic Garment Folding",
+      "source_url": "https://arxiv.org/abs/2311.01267",
+      "pdf_url": "https://arxiv.org/pdf/2311.01267",
+      "retrieved_at": "2026-10-02T22:13:39.537448+00:00",
+      "pdf_sha256": "b51de4cbad0c9715a18e88ce74af68a21192ad10e130a1b956715c87706d8049",
+      "text_sha256": "e7d56077b746066b3f58b8f13cf96830a9e25b32f096226499a4924c7ac99791",
+      "pdf_bytes": 16827806,
+      "pages": 21,
+      "text_characters": 69511,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2311.01267v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2311.01267v1"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 20,
+        "unit": "held-out real garments",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P091:1",
+        "paper_id": "P091",
+        "benchmark": "UniFolding",
+        "native_term": "held-out real garments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.01267v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.01267v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 200,
+        "unit": "real trials，20garments×10",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P091:2",
+        "paper_id": "P091",
+        "benchmark": "UniFolding",
+        "native_term": "real trials，20garments×10",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.01267v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.01267v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2793,
+        "unit": "VR manipulation videos",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P091:3",
+        "paper_id": "P091",
+        "benchmark": "UniFolding",
+        "native_term": "VR manipulation videos",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.01267v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.01267v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "xiaoxiaoxh/UniFolding",
+    "xiaoxiaoxh/VR-Garment"
+  ],
+  "external_repositories": []
+}

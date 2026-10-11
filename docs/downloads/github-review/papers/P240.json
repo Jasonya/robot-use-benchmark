@@ -1,0 +1,654 @@
+{
+  "paper_id": "P240",
+  "name": "ANTICIPATR",
+  "title": "Rethinking Learning Approaches for Long-Term Action Anticipation",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2210.11566",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P240",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已沿ANTICIPATR的TSV/feature reader→instance-set預測→timeline／集合前處理→evaluator核讀。其future比例以剩餘影片為基準，與P236/P237的全影片比例不同；公開commit的scorer鏈還有會阻止合法計分的變數、shape與case鍵錯誤，不能宣稱直接重現論文結果。",
+    "identity_note": "Rethinking Learning Approaches for Long-Term Action Anticipation，Megha Nawhal、Akash Abdu Jyothi、Greg Mori，ECCV 2022；快取arXiv:2210.11566v1（2022-10-20）。PDF p.3直接連Nmegha2601/anticipatr，README列同題名作者。原生方法是兩階段Anticipation Transformer；不是固定20個verb–noun的Ego4D LTA。",
+    "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+    "environment": "離線人類活動：Breakfast/50Salads第三人稱烹飪；EK55/EGTEA Gaze+第一人稱廚房。此release的stage2 build_dataset只註冊bf與ek，50Salads/EGTEA雖有pretraining名單及論文結果，不能視為stage2已接通。",
+    "tasks": "預測未來action instance集合，每instance是(label,start,end)，query數是最多預測槽數，不是任務數。stage1 snippet anticipation、stage2以凍結snippet encoder配合video encoder/decoder是論文方法關係，本次核心核讀以stage2資料／計分為主。Breakfast時間條件dense timeline評測；EK55時間無關future-label presence評測。固定Breakfast詞表48類含SIL；EK示例容量125 verbs/352 nouns/3806 actions，many-shot檔實際26 verbs/71 nouns，不能照ek.py的舊註解32 nouns。",
+    "data": "名為.csv的split實際無header、tab分隔：video_path,start_frame,end_frame,verb_id[,noun_id]；另*_nframes.csv是video_path與全長frame數。DatasetSegmentRecord.num_frames=end-start+1。外部feature pickle是video→frame_index→2048維向量，reader不載RGB；目前切取range(start-31,end+31)中存在的key，會涵蓋觀測終點之後至+30的feature index，須驗證提特徵的時間支援域。局部fps=1只是idx模數，不能解讀為1Hz；CLI fps預設60。target含video_id、labels_onehot、instance labels、label_mask、segments、duration、prediction_duration、observation_duration、ratio_idx、prediction_idx、observation_positions、fps；segments=(native_start/end-observation_duration)/prediction_duration，duration以秒存，observation/prediction_duration仍是frame數，單位混用不能抹平。EK action ID依各自CSV中的verb/noun頻率另建int_to_idx，可能造成train/val ID漂移。",
+    "evaluation": "實際入案：只取end<=t的完整past與start>t的future，且各至少3個action；Breakfast future另需end<=pred_t，跨邊界action被排除。EK α=.25/.5/.75預測全部remaining；Breakfast α=.2/.3、β=.1/.2/.3/.4/.5，pred_t=t+int(β*(T-t))，論文表只報β=.1/.2/.3/.5。以固定val_S1文字檔依相同條件作結構重算（未載features）：Breakfast252影片/1548segments只產生12個窗口、5個video keys；EK67影片/7742segments產生172窗口、60個video keys。這是入案邏輯統計，非成功跑分。模型輸出pred_logits[B,Q,C+1]及pred_segments[B,Q,2]；後者實作ReLU+0.1，並未保證<=1或end>=start。get_unrolled_timeline將segment乘prediction_duration，重疊處逐類取最大softmax，去no-action後argmax；卻把整個future multi-hot label複製到所有時間位置當GT，未重建instance的逐格GT。get_mAP再把timeline presence加總clip至0/1，外層預定呼叫sklearn average_precision_score macro/micro；get_accuracy預定用1-hamming_loss按class平均×100，不能等同論文的class-normalized逐格MoC。snapshot的get_accuracy寫acc[k]但k未定義，get_AP_perclass未初始化preds[k_ap]/targets[k_ap]便append，get_accuracy_perclass對1D陣列argmax(axis=1)；所以沒有可認定正確的實際評測分母／合法輸出。engine更以video name為唯一key覆寫不同α/β窗口；單process下前述12/172窗口最多隻留5/60筆。",
+    "standardization": {
+      "profile": "offline_future_action_instance_sets_and_dense_timelines",
+      "reuse": "版本化TSV與length table、dataset-specific video_id、instance(label,start,end)、觀測／future比例及原生query輸出介面；普通temporal IoU函式可作原生定義參照。",
+      "transform": "source記paper/commit及EgoTopo/MS-TCN feature來源；domain/environment保留view與dataset；task分instance-set模型、dense timeline與future-label set評測；case鍵必須包含dataset/split/video/α/β與有效窗口，而不只video。frame、秒、normalized-future座標分欄，native inclusive標註與rasterizer [start,end)保留差異；global action mapping與many-shot mask另版本化。evaluator必須重建合法GT timeline與每類正確/總GT格數，或保存per-case presence及score以計AP；β剩餘長度協定不可直接換算成P236/P237表格同一格。",
+      "missing": "優先修復criterion/evaluator未定義變數、mask形狀、GT timeline與engine窗口覆寫，再確認macro/micro／空類／frequent/rare的分母。須固定global action ID，noun分支instance[\"nouns\"]與建立時\"noun\"也不一致。確認末端+30 feature索引是否越界可見、實際feature pickle及stage1 checkpoint版本、min-three入案排除，並取得50Salads/EGTEA的stage2 reader/scorer。build_matcher永遠回GreedyMatcher，CLI hungarian未接；generalized_segment_iou只算普通IoU；greedy將targets依長度排序後未還原原索引，需對照label配對。以上靜態疑點尚未執行驗證，不可把程式已下載當可重現。"
+    },
+    "version_note": "固定 a7f0af215f50680e6b784df195a17884cb520bbf（2023-04-06）。論文§4與附錄A.1.3定義remaining-length protocol及dense重建，與其引用的全長比例benchmark需分項對待。主評測應保留模型提出的instance集合；loss配對不是scorer，loss_segment/loss_siou以跨rank平均target instance數（至少1）正規化，不是case成功率。僅核核心source區段與小型原生文字資料，未安裝、載入pickle／checkpoint或跑上游模型。",
+    "discovery_evidence": [
+      {
+        "provider": "primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P240/pages.json",
+        "sha256": "6269eca6277811932e39de6658d6cce66031b3ed32da0ac7666309c11380b944",
+        "url": "https://arxiv.org/pdf/2210.11566",
+        "json_pointers": [
+          "/0/text",
+          "/2/text",
+          "/9/text",
+          "/10/text",
+          "/11/text",
+          "/22/text",
+          "/23/text"
+        ],
+        "version": "arXiv:2210.11566v1; ECCV 2022",
+        "pdf_local_file": "audit/.cache/fulltext_review/P240/paper.pdf",
+        "pdf_sha256": "fbfa1cad24fb4349c62736e39187216e82e14ebecd5bd6987d04225b3e0133da",
+        "pages": [
+          1,
+          3,
+          10,
+          11,
+          12,
+          23,
+          24
+        ]
+      },
+      {
+        "provider": "private_structural_audit",
+        "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/P240_native_case_structure.json",
+        "sha256": "d48a20a1a4eda290d28738f5cfc02b4dc67e9ba443ed7aa9096cacbb3cf3cc28",
+        "json_pointers": [
+          "/bf",
+          "/ek"
+        ],
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "note": "以已核TSV全列作純文字入案／鍵碰撞統計；內含input SHA及計算方法，非上游執行。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            3
+          ],
+          [
+            15,
+            38
+          ],
+          [
+            42,
+            50
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 58,
+        "sha256": "8807e6f0b3dd4e296cd9136b36caba970b53bf4141848304d2e5e6a5ac7b6896",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/README.md",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/README.md#L1-L3",
+        "why": "精確論文與兩階段方法／外部資料來源。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/datasets/__init__.py",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 12,
+        "sha256": "9c8f3d29bb42cabfd6482c91bf6d153e4ba638c5ae8145b5d609529f015ae091",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/__init__.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/__init__.py#L1-L12",
+        "why": "此release實際註冊只有ek與bf。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/datasets/bf.py",
+        "ranges": [
+          [
+            13,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 45,
+        "sha256": "7582f4828ad2bdbb1b204e8419bbd30641242f82b270628b0e3e7bd3b06c7c5b",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/bf.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/bf.py#L13-L43",
+        "why": "Breakfast feature/split路徑與α=.2/.3。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/datasets/ek.py",
+        "ranges": [
+          [
+            14,
+            44
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 46,
+        "sha256": "f86f4e0309642e8c5ae8a999ec7e2903980614c9c88b09e96d86ee53e59da0d8",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/ek.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/ek.py#L14-L44",
+        "why": "EK55 feature/split與α=.25/.5/.75。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/datasets/baseds_longfuture.py",
+        "ranges": [
+          [
+            21,
+            53
+          ],
+          [
+            75,
+            180
+          ],
+          [
+            183,
+            277
+          ],
+          [
+            295,
+            372
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 373,
+        "sha256": "47a9c3b9d4852bf2cf5e5c3f09343801131ab0b13eb4d6d82ab25b0679f32c07",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/baseds_longfuture.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/baseds_longfuture.py#L21-L53",
+        "why": "原生TSV、instance/set target、入案條件、相對remaining窗口與features時間界線。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/datasets/ds_utils.py",
+        "ranges": [
+          [
+            19,
+            67
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 73,
+        "sha256": "4887fed8cc2f295aaeae96fd82f40009a28d5e0b5c0e480194901d6665cbf4de",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/ds_utils.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/datasets/ds_utils.py#L19-L67",
+        "why": "video_id編碼／反解，以及engine只按影片建立鍵。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/main.py",
+        "ranges": [
+          [
+            19,
+            86
+          ],
+          [
+            117,
+            131
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 219,
+        "sha256": "abae2f1675650c313aea5f21954f860d6e02b98d561fbb5dc9342cb9fa6da80e",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/main.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/main.py#L19-L86",
+        "why": "類別容量、matcher/query/fps預設與loader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "run_scripts/run_anticipatr.sh",
+        "ranges": [
+          [
+            1,
+            3
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 5,
+        "sha256": "a676117ccfc66568ecbc9bc02182742b2383fe991bb9c2218b9b71405fe072e2",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/run_scripts/run_anticipatr.sh",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/run_scripts/run_anticipatr.sh#L1-L3",
+        "why": "實際EK示例125 verbs/352 nouns/3806 actions、900 queries。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/models/antr.py",
+        "ranges": [
+          [
+            29,
+            95
+          ],
+          [
+            135,
+            190
+          ],
+          [
+            206,
+            229
+          ],
+          [
+            241,
+            324
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 329,
+        "sha256": "da0e1ccc4223844ae3952cbb8dade484804d0a568e236d4e2a1a4de62ecf4ed7",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/models/antr.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/models/antr.py#L29-L95",
+        "why": "pred_logits／pred_segments、timeline生成、loss分母與scorer前處理錯誤。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/models/matcher.py",
+        "ranges": [
+          [
+            21,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 83,
+        "sha256": "50319c5dd239abee5ca0ad91c4d54202371f84c55fb824365147c8c878d2225f",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/models/matcher.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/models/matcher.py#L21-L80",
+        "why": "實際greedy matching；import Hungarian不等於執行Hungarian。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/utils/segment_utils.py",
+        "ranges": [
+          [
+            4,
+            31
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 32,
+        "sha256": "690abd1319e245bbee3b3ee40da585b8c15a066716d5c821af3d2adf66f170bf",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/utils/segment_utils.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/utils/segment_utils.py#L4-L31",
+        "why": "所稱generalized_segment_iou實際是普通一維IoU。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/engine.py",
+        "ranges": [
+          [
+            73,
+            123
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 124,
+        "sha256": "af59228a611f8dad6901d33526475ee0dc6128aea8315ec1176e01b7bba7d351",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/engine.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/engine.py#L73-L123",
+        "why": "criterion→每例metric→video-key字典覆寫→all_gather→evaluator。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "src/metrics/longfuture_metrics.py",
+        "ranges": [
+          [
+            12,
+            96
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 96,
+        "sha256": "d9c89e39368d745f655c8cd8977b6935ab23712c72f84739fd98dd3fda73f4ad",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/metrics/longfuture_metrics.py",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/src/metrics/longfuture_metrics.py#L12-L96",
+        "why": "具體AP／accuracy實作、預期macro/micro與靜態可見失效點。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/bf/longfuture/annotations/bf_verbs.csv",
+        "ranges": [
+          [
+            1,
+            49
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 49,
+        "sha256": "65abcfb461c149f2864558c21a8babb364e5743ac0f239d794aa723bc5840afd",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/bf/longfuture/annotations/bf_verbs.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/bf/longfuture/annotations/bf_verbs.csv#L1-L49",
+        "why": "48類含SIL。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/bf/longfuture/split/val_S1.csv",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1548,
+        "sha256": "5e6b27a876047718e35fba79ef9d9532de4577f0e12d7716491174c527864ab3",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/bf/longfuture/split/val_S1.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/bf/longfuture/split/val_S1.csv#L1-L12",
+        "why": "無header的TSV segment樣例與單一verb欄。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/bf/longfuture/split/val_S1_nframes.csv",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 252,
+        "sha256": "8e0ceff711eca66c760998fe570cad34ca4164e562da8207661d48a985de663a",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/bf/longfuture/split/val_S1_nframes.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/bf/longfuture/split/val_S1_nframes.csv#L1-L12",
+        "why": "原生影片長度表。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/ek/longfuture/split/val_S1.csv",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 7742,
+        "sha256": "fe7791008de0f57b886760ce6995f1aefb1609c1bcd96939c4398153c1287b46",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/split/val_S1.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/split/val_S1.csv#L1-L12",
+        "why": "含重疊instance的TSV、verb/noun尾欄。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/ek/longfuture/split/val_S1_nframes.csv",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 67,
+        "sha256": "209b9a31c6997ff393aa2a7bd018274b9e20f045e02843158525770717c1c918",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/split/val_S1_nframes.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/split/val_S1_nframes.csv#L1-L12",
+        "why": "EK影片長度表與path身份。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/ek/longfuture/annotations/EPIC_many_shot_nouns.csv",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 72,
+        "sha256": "30ae015aa2371658d0da0fdbb03bba4489792779ae180eb0f468de85823db4bf",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/annotations/EPIC_many_shot_nouns.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/annotations/EPIC_many_shot_nouns.csv#L1-L72",
+        "why": "實際71個many-shot noun ID。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Nmegha2601/anticipatr",
+        "requested_repo": "Nmegha2601/anticipatr",
+        "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+        "ref": null,
+        "path": "data/ek/longfuture/annotations/EPIC_many_shot_verbs.csv",
+        "ranges": [
+          [
+            1,
+            27
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 27,
+        "sha256": "fae037c9b392f1998934e1cb0a1273152325834cf0c136e971b45c0f34fff759",
+        "url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/annotations/EPIC_many_shot_verbs.csv",
+        "reading_url": "https://github.com/Nmegha2601/anticipatr/blob/a7f0af215f50680e6b784df195a17884cb520bbf/data/ek/longfuture/annotations/EPIC_many_shot_verbs.csv#L1-L27",
+        "why": "實際26個many-shot verb ID。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b57d7c3bcd9771912d653b5129a62e7c4a8df531a8907e748205bfa340de70d1"
+  },
+  "repository_binding_review_sha256": "b57d7c3bcd9771912d653b5129a62e7c4a8df531a8907e748205bfa340de70d1",
+  "repository_bindings": [
+    {
+      "requested_repo": "Nmegha2601/anticipatr",
+      "resolved_repo": "Nmegha2601/anticipatr",
+      "aliases_in_this_review": [
+        "nmegha2601/anticipatr"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "a7f0af215f50680e6b784df195a17884cb520bbf",
+          "reviewed_files": [
+            "README.md",
+            "data/bf/longfuture/annotations/bf_verbs.csv",
+            "data/bf/longfuture/split/val_S1.csv",
+            "data/bf/longfuture/split/val_S1_nframes.csv",
+            "data/ek/longfuture/annotations/EPIC_many_shot_nouns.csv",
+            "data/ek/longfuture/annotations/EPIC_many_shot_verbs.csv",
+            "data/ek/longfuture/split/val_S1.csv",
+            "data/ek/longfuture/split/val_S1_nframes.csv",
+            "run_scripts/run_anticipatr.sh",
+            "src/datasets/__init__.py",
+            "src/datasets/baseds_longfuture.py",
+            "src/datasets/bf.py",
+            "src/datasets/ds_utils.py",
+            "src/datasets/ek.py",
+            "src/engine.py",
+            "src/main.py",
+            "src/metrics/longfuture_metrics.py",
+            "src/models/antr.py",
+            "src/models/matcher.py",
+            "src/utils/segment_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/Nmegha2601/anticipatr",
+          "pdf_page": 3,
+          "pdf_sha256": "fbfa1cad24fb4349c62736e39187216e82e14ebecd5bd6987d04225b3e0133da",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P240",
+          "review_file": "content/github_review/reviews/P240.json",
+          "review_sha256": "b57d7c3bcd9771912d653b5129a62e7c4a8df531a8907e748205bfa340de70d1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "Nmegha2601/anticipatr"
+  ],
+  "external_repositories": []
+}

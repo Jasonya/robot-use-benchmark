@@ -1,0 +1,104 @@
+{
+  "paper_id": "P145",
+  "summary": "NIABench有候選動作詞庫、何時/做什麼的ranker與AI2-THOR示例，但詞庫不等於評測題。所讀simulation示例是固定人機階段，尚需完整benchmark閉環。",
+  "reading_order": [
+    {
+      "repo": "Cognition2Action-Lab/NIABench",
+      "path": "readme.md",
+      "ranges": [
+        [
+          1,
+          11
+        ],
+        [
+          59,
+          86
+        ]
+      ],
+      "why": "原作、model/模擬入口與AI2-THOR來源",
+      "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a"
+    },
+    {
+      "repo": "Cognition2Action-Lab/NIABench",
+      "path": "datasets/robot_instructions.json",
+      "ranges": [
+        [
+          1,
+          80
+        ]
+      ],
+      "why": "候選primitive動作片段，不是完整case",
+      "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a"
+    },
+    {
+      "repo": "Cognition2Action-Lab/NIABench",
+      "path": "model.py",
+      "ranges": [
+        [
+          114,
+          158
+        ]
+      ],
+      "why": "human_task_seq/robot_vocab/oracle_labels轉訓練example",
+      "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a"
+    },
+    {
+      "repo": "Cognition2Action-Lab/NIABench",
+      "path": "reason.py",
+      "ranges": [
+        [
+          46,
+          164
+        ]
+      ],
+      "why": "step×candidate joint argmax與未知詞/預設路徑",
+      "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a"
+    },
+    {
+      "repo": "Cognition2Action-Lab/NIABench",
+      "path": "simulation/cut_tomato.py",
+      "ranges": [
+        [
+          1,
+          47
+        ],
+        [
+          103,
+          115
+        ]
+      ],
+      "why": "FloorPlan28兩agent固定示例流程",
+      "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a"
+    },
+    {
+      "repo": "Cognition2Action-Lab/NIABench",
+      "path": "simulation/utils.py",
+      "ranges": [
+        [
+          1,
+          43
+        ],
+        [
+          190,
+          214
+        ]
+      ],
+      "why": "原生步數計數、影片重複frame與輸出標籤",
+      "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a"
+    }
+  ],
+  "environment": "AI2-THOR多agent場景；公開7個simulation腳本是示例，沒有據此推算完整benchmark環境數。",
+  "tasks": "在不打斷人類多步活動的前提下選協助時刻及robot action；candidate primitive、human step、完整episode是不同層級。",
+  "data": "InterventionDataset期待human_task_seq、robot_vocab與oracle_labels(best_robot_action/human_step_idx)，每個oracle label成一訓練example；缺失action會落到index0/unknown no_op，匯入應另外檢查。公開robot_instructions為類別詞庫，訓練episode/權重另待取得。",
+  "evaluation": "reason.py對B×S×C logits joint argmax選step/action；simulation示例固定human→robot→human，不直接調用ranker結果。utils把total_step_count印為Human、人類實做數印Human Saved，需回讀真實分子/分母；影片每frame重複兩次也不能當實際時長。完整非幹擾/省力metric仍需閉合。",
+  "standardization": {
+    "profile": "non_intrusive_assistance_timing_and_action",
+    "reuse": "人類計畫/候選動作/oracle schema、joint決策接口、示例scene與步數紀錄。",
+    "transform": "case固定人類主計畫、合法協助時機與候選集合；原primitive詞庫映射task而非當題庫；evaluator另明定幹擾、助益、任務完成與計算分母。",
+    "missing": "完整benchmark episodes/split/權重、ranker到simulation接線、真正省力/非幹擾scorer、原始評估結果與實機協定。"
+  },
+  "version_note": "固定45065e5；README保留舊renytek13 clone路徑，當前官方組織庫與精確題名一致。未執行模擬或模型。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

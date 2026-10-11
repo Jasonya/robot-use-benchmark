@@ -1,0 +1,134 @@
+{
+  "paper_id": "P051",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "USST的實作包含EgoPAT3D-DT／H2O-PT重標註資料流程；未來手軌跡須連同觀測比例、相機座標與seen／unseen切分保存。",
+  "reading_order": [
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          110
+        ]
+      ],
+      "why": "確認論文身份、EgoPAT3D-DT／H2O-PT及模型設定。",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4"
+    },
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "src/EgoPAT3DLoader.py",
+      "ranges": [
+        [
+          28,
+          36
+        ],
+        [
+          38,
+          87
+        ],
+        [
+          90,
+          137
+        ],
+        [
+          146,
+          190
+        ],
+        [
+          194,
+          205
+        ],
+        [
+          208,
+          231
+        ],
+        [
+          233,
+          308
+        ]
+      ],
+      "why": "讀scene split、軌跡欄位、odometry與有效長度。",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4"
+    },
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "src/utils.py",
+      "ranges": [
+        [
+          57,
+          205
+        ]
+      ],
+      "why": "讀反正規化、觀測比例及實際ADE/FDE。",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4"
+    },
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "test.py",
+      "ranges": [
+        [
+          52,
+          74
+        ],
+        [
+          76,
+          88
+        ]
+      ],
+      "why": "確認seen／unseen及eval_space分項。",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4"
+    }
+  ],
+  "environment": "第一人稱影片中的既有拍攝場景；EgoPAT3D loader明列scene與record切分，不是新增可操作模擬場景。",
+  "tasks": "由過去影像／位置預測未來2D或3D手部軌跡；global與local版本是不同座標／輸入設定。",
+  "data": "EgoPAT3D的pkl含traj2d、traj3d及num_preserve；mp4和T×4×4 odometry以scene/record/clip對齊。loader保存有效長度、正規化參數並裁切或補零。",
+  "evaluation": "utils先反正規化，再依觀測比例計逐軌跡平均歐氏距離ADE、最後一點FDE及各軸絕對誤差；3D、2D像素、norm2d不可混報。test.py分開seen與unseen。",
+  "standardization": {
+    "profile": "egocentric_hand_trajectory_forecasting",
+    "reuse": "父資料ID、場景切分、軌跡／odometry欄位與原生距離函數。",
+    "transform": "case保留scene/record/clip、有效影格、觀測比例與座標系；camera pose是觀測或轉換證據，不能當作robot action。",
+    "missing": "原始影片與重標註資產閉合、H2O專用loader／評分分支細讀及可執行adapter驗證。"
+  },
+  "version_note": "已核讀EgoPAT3D主要資料與評分路徑；不將H2O分支或外部EgoPAT3D新版本視為已同等驗證。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "README.md",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+      "sha256": "2fdf0e13f01ca8edac56244b210214f1598da7303c73030377d60b6ffa0ad7ee",
+      "url": "https://raw.githubusercontent.com/oppo-us-research/USST/beebdb963a702b08de3a4cf8d1ac9924b544abc4/README.md",
+      "permalink": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/README.md",
+      "local_path": "audit/.cache/github_review/repos/oppo-us-research__USST/files/README.md"
+    },
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "src/EgoPAT3DLoader.py",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+      "sha256": "4daff30963fc2d8bf7b4cd937c512520e5bdb43cb479961e3c3f92aa6a559feb",
+      "url": "https://raw.githubusercontent.com/oppo-us-research/USST/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/EgoPAT3DLoader.py",
+      "permalink": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/EgoPAT3DLoader.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/oppo-us-research__USST/src/EgoPAT3DLoader.py"
+    },
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "src/utils.py",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+      "sha256": "00e1311afac424cfdaeb9c0d22f5e94c0ce6aef15776d1d33d4aca37908c80d9",
+      "url": "https://raw.githubusercontent.com/oppo-us-research/USST/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/utils.py",
+      "permalink": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/src/utils.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/oppo-us-research__USST/src/utils.py"
+    },
+    {
+      "repo": "oppo-us-research/USST",
+      "path": "test.py",
+      "commit": "beebdb963a702b08de3a4cf8d1ac9924b544abc4",
+      "sha256": "00f404d3e13e8cbc0f02ee590ec80b6a0fc8d32143a7fad97592b1a5b26798fb",
+      "url": "https://raw.githubusercontent.com/oppo-us-research/USST/beebdb963a702b08de3a4cf8d1ac9924b544abc4/test.py",
+      "permalink": "https://github.com/oppo-us-research/USST/blob/beebdb963a702b08de3a4cf8d1ac9924b544abc4/test.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/oppo-us-research__USST/test.py"
+    }
+  ]
+}

@@ -1,0 +1,472 @@
+{
+  "paper_id": "P212",
+  "name": "ARB4WM",
+  "title": "ARB4WM: An Adversarial Robustness Benchmark for World Models in Continuous Control",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.16605",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "general",
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P212",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "ARB4WM在既有DMC與Meta-World上加視覺攻擊/防禦評測；要保存攻擊強度、時間窗口與底層task版本，不能把攻擊條件當成新物理任務。",
+    "environment": "DeepMind Control Suite vision與Meta-World visual manipulation，MetaWorld wrapper使用MT1(name-v3)及train_tasks[0]。source/backend/seed需保留，不把同底層task的五種attack objective當新環境。",
+    "tasks": "4種Dreamer-family模型、policy/value/latent/RSSM等目標與temporal/full/partial攻擊是評估條件。動作任務仍來自父benchmark。",
+    "data": "sweep記epsilon/alpha/attack steps、optimizer、defense/adaptive模式、seed、task/model與run_tag；大型logs/checkpoints未包含。world-model image接口與attack前處理需一起固定，0–1/0–255尺度不能共用同數值epsilon。",
+    "evaluation": "DMC主值為累積return，MetaWorld sweep明確取success rate；同名returns容器仍需標metric。影像SSIM/PSNR按data_range255且在defense前計算。SES用SR×(1−平均首次成功步/該batch觀察到的max steps)，不是固定budget正規化。clean Tester用eval_envs，attack建構收到train_envs，需核對paired seeds/環境；success_once與影像統計對已結束env的遮罩也需驗證。",
+    "standardization": {
+      "profile": "adversarial_visual_world_model_control_evaluation",
+      "reuse": "父env wrapper、可重現attack配置/命名、原生return/SR/SES及影像差異分項。",
+      "transform": "case先綁定同父task/初態/seed，再加威脅模型/合法擾動budget；保留clean/attacked pairs、時間作用範圍、defense前後metrics及不同episode分母。",
+      "missing": "checkpoint/原始campaign、clean-attack環境與seed對齊、active-episode masking、固定budget效率指標與完整攻擊規範重現。"
+    },
+    "version_note": "固定66ebc33；read-only核對，不執行對抗算法或policy。MetaWorld-v3及conditional metric接口是此版具體行為，不等同所有Dreamer/MetaWorld標準協定。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "zaoanguai/ARB4WM",
+        "requested_repo": "zaoanguai/ARB4WM",
+        "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            37
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 215,
+        "sha256": "d7c13e6ff5838a818a06f3dce3926fddeb01ee90eb17cf6ec5800f571c7eb929",
+        "url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/README.md",
+        "reading_url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/README.md#L1-L37",
+        "why": "Dreamer系列、借用benchmark與release範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "zaoanguai/ARB4WM",
+        "requested_repo": "zaoanguai/ARB4WM",
+        "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+        "ref": null,
+        "path": "envs/metaworld.py",
+        "ranges": [
+          [
+            9,
+            26
+          ],
+          [
+            50,
+            84
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 92,
+        "sha256": "4877487bb1e4f21877349fb15fe1d0a7b6f590dc54ad875753975e36f1d03978",
+        "url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/envs/metaworld.py",
+        "reading_url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/envs/metaworld.py#L9-L26",
+        "why": "MT1-v3/固定train task、reward/success/terminated與repeat",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "zaoanguai/ARB4WM",
+        "requested_repo": "zaoanguai/ARB4WM",
+        "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+        "ref": null,
+        "path": "test_robustness.py",
+        "ranges": [
+          [
+            61,
+            158
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 206,
+        "sha256": "d324437b2f631cdf757be2b21263db9d3ad20bef0125c1e7f0435d944b93e89b",
+        "url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/test_robustness.py",
+        "reading_url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/test_robustness.py#L61-L158",
+        "why": "clean/attack環境對象、epsilon sweep與MetaWorld/DMC分開取值",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "zaoanguai/ARB4WM",
+        "requested_repo": "zaoanguai/ARB4WM",
+        "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+        "ref": null,
+        "path": "tester.py",
+        "ranges": [
+          [
+            36,
+            105
+          ],
+          [
+            117,
+            136
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 169,
+        "sha256": "e4bf371700abc03f14f723d732bef8642c966a6126c4ec941774e09a14124943",
+        "url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/tester.py",
+        "reading_url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/tester.py#L36-L105",
+        "why": "首episode masked return、success累積及conditional回傳",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "zaoanguai/ARB4WM",
+        "requested_repo": "zaoanguai/ARB4WM",
+        "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+        "ref": null,
+        "path": "Attack/attacker.py",
+        "ranges": [
+          [
+            15,
+            48
+          ],
+          [
+            76,
+            191
+          ],
+          [
+            200,
+            248
+          ],
+          [
+            345,
+            362
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1149,
+        "sha256": "88e8be87c52c47bcb38bcbfea08160ab39187024b0218b97f48b2814f0de5d58",
+        "url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/Attack/attacker.py",
+        "reading_url": "https://github.com/zaoanguai/ARB4WM/blob/66ebc330e63ada3b93149c8279a12376fa133db4/Attack/attacker.py#L15-L48",
+        "why": "攻擊後評估、image-quality metrics、success_once/步數與SES",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "01c0994e727118c47fe9009fe293bcd704e9ab5df7d4ed444afae1486606113d"
+  },
+  "repository_binding_review_sha256": "01c0994e727118c47fe9009fe293bcd704e9ab5df7d4ed444afae1486606113d",
+  "repository_bindings": [
+    {
+      "requested_repo": "zaoanguai/ARB4WM",
+      "resolved_repo": "zaoanguai/ARB4WM",
+      "aliases_in_this_review": [
+        "zaoanguai/arb4wm"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+          "reviewed_files": [
+            "Attack/attacker.py",
+            "README.md",
+            "envs/metaworld.py",
+            "test_robustness.py",
+            "tester.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/zaoanguai/ARB4WM",
+          "pdf_page": 1,
+          "pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P212",
+          "review_file": "content/github_review/reviews/P212.json",
+          "review_sha256": "01c0994e727118c47fe9009fe293bcd704e9ab5df7d4ed444afae1486606113d",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "通用物件與機動作業",
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P212",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "ARB4WM，arXiv 2606.16605v1。",
+    "scope_read": "20tasks完整列表、5objectives、20eval runs、nAUC真實分母與defense metrics。",
+    "pages_read": [
+      1,
+      2,
+      8,
+      9,
+      12
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業"
+    ],
+    "role": "世界模型與魯棒性benchmark",
+    "environment": "10MetaWorld＋10DMC任務，作者稱industrial proxy；未提供真實industrial scene。",
+    "tasks": "20host tasks在5white-box objectives、各optimizer/temporal exposure下重評。",
+    "cases": "每setting20evaluation runs，seed20–39；4Dreamer-family agents，不能把agent數乘入獨立題庫。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "existing host control tasks",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "adversarial loss objectives",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "每setting evaluation runs",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "MetaWorld SR、DMC return；nAUC公式除benchmark常數1或1000，不是各policy clean score，雖文中稱clean-normalized。defense recovery另用clean−attack分母。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "只在eval perturb pixels，不改dynamics/reward/parameters；cross-model transfer只是另subsetDMC Reacher Easy。",
+    "lineage": "MetaWorld/DMC task復用加新攻擊protocol；hosttask和規則variants分開。",
+    "related_paper_ids": [
+      "P063"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          8,
+          9,
+          12
+        ],
+        "locator": "§5.1–5.3、Eq14–17、transfer experiment",
+        "supports": "20/5/20、nAUC固定尺度及subset"
+      }
+    ],
+    "unresolved": [
+      "all-setting unique episode IDs未報；攻擊強度不是可跨任務直接相加的難度刻度。"
+    ],
+    "reuse": "可擴充感測失真規則，固定合法attacker access和預算；不要把視覺攻擊當材料或安全有效性驗證。",
+    "reviewed_pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b",
+    "reviewed_on": "2026-10-02",
+    "name": "ARB4WM",
+    "year": 2026,
+    "title": "ARB4WM: An Adversarial Robustness Benchmark for World Models in Continuous Control",
+    "source_url": "https://arxiv.org/abs/2606.16605",
+    "primary_type": "W",
+    "category_name": "世界模型與預測表示",
+    "domain_ids": [
+      "home",
+      "food",
+      "general"
+    ],
+    "review_tags": [
+      "跨域控制",
+      "桌面物件操作",
+      "移動與平衡"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P212",
+      "summary": "同時涵蓋物件操作與行走／平衡控制，歸入通用作業；門窗與咖啡／餐盤任務另標對應用途。",
+      "evidence": [
+        {
+          "paper_id": "P212",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            8
+          ],
+          "locator": "§5.1 Evaluation Environments",
+          "observed_tasks": [
+            "reacher、walker、hopper、cartpole、finger",
+            "reach、handle-press、plate-slide"
+          ],
+          "reasoning": "主體是跨任務控制及擾動下的可靠作業，涵蓋移動與平衡。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b"
+        },
+        {
+          "paper_id": "P212",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            8
+          ],
+          "locator": "§5.1選用任務清單",
+          "observed_tasks": [
+            "window-open／window-close",
+            "coffee-pull與plate-slide"
+          ],
+          "reasoning": "依已選取的10項Meta-World任務補具體用途，不整包繼承50項父庫。",
+          "basis": "inherited_task_scope",
+          "source_pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b"
+        }
+      ],
+      "domain_ids": [
+        "general",
+        "home",
+        "food"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P212",
+      "name": "ARB4WM",
+      "expected_title": "ARB4WM: An Adversarial Robustness Benchmark for World Models in Continuous Control",
+      "source_url": "https://arxiv.org/abs/2606.16605",
+      "pdf_url": "https://arxiv.org/pdf/2606.16605",
+      "retrieved_at": "2026-10-02T21:35:18.693817+00:00",
+      "pdf_sha256": "7164d9a676e577b14d43e71e8cc37115faf37eba06430b824a84b05822e11b4b",
+      "text_sha256": "acde90a43c961d235e66d346965e2aaffc627c4caf1ab2acd41934ce36d74908",
+      "pdf_bytes": 24867742,
+      "pages": 24,
+      "text_characters": 132193,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.16605v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.16605v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 20,
+        "unit": "existing host control tasks",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P212:1",
+        "paper_id": "P212",
+        "benchmark": "ARB4WM",
+        "native_term": "existing host control tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.16605v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.16605v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "adversarial loss objectives",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P212:2",
+        "paper_id": "P212",
+        "benchmark": "ARB4WM",
+        "native_term": "adversarial loss objectives",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.16605v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.16605v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "每setting evaluation runs",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P212:3",
+        "paper_id": "P212",
+        "benchmark": "ARB4WM",
+        "native_term": "每setting evaluation runs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.16605v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.16605v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "zaoanguai/ARB4WM"
+  ],
+  "external_repositories": []
+}

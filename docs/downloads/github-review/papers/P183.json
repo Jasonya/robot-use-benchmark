@@ -1,0 +1,385 @@
+{
+  "paper_id": "P183",
+  "name": "WireCraft",
+  "title": "WireCraft: A Simulation Benchmark for Industrial DLO Manipulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.18097",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry"
+  ],
+  "status": "public_readme_only",
+  "review": {
+    "paper_id": "P183",
+    "reviewed_on": "2026-10-11",
+    "status": "public_readme_only",
+    "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+    "identity_note": "收錄arXiv:2606.18097v1，第一作者Chongyu Zhu、University of Toronto。既有精化搜尋找到WireManip/WireCraft；本輪固定commit作者為GitHub ChongyuZhu，其公開profile同名且company=University of Toronto，README完整題名相符。共同作者Zachary Tang的第一方頁也確認原論文與本人參與，但該頁未直接連repo。作者身分證據足以提出高可信來源綁定候選，仍將綁定修改交協調者。",
+    "summary": "限量primary discovery找到作者身分支持的WireManip/WireCraft，固定tree不截斷且只含223 bytes／4行README。README宣告程式預計2026年11月初發布；當日2026-10-11尚無task、reader或scorer可核讀，因此本篇處置為公開README佔位，不再泛稱沒有候選，也不採用同名第三方專案。",
+    "discovery_evidence": [
+      {
+        "source_file": "audit/.cache/github_review/search/P183.json",
+        "json_pointers": [
+          "/query",
+          "/total_count",
+          "/results"
+        ],
+        "finding": "廣搜24筆、只列前8筆，含admin panel／CMS／Minecraft等無關專案；不當成論文repo。"
+      },
+      {
+        "source_file": "audit/.cache/github_review/search/P183-refined.json",
+        "json_pointers": [
+          "/query",
+          "/results/0"
+        ],
+        "finding": "WireCraft manipulation精化搜尋回WireManip/WireCraft，完整題名相符，僅作候選起點。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_commit.json",
+        "json_pointers": [
+          "/sha",
+          "/commit/message",
+          "/commit/author/name",
+          "/author/login"
+        ],
+        "finding": "commit=9acbc318，訊息repo creation and code release plan，作者Chongyu Zhu／ChongyuZhu。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_chongyu_github.json",
+        "json_pointers": [
+          "/login",
+          "/name",
+          "/company"
+        ],
+        "finding": "提交者profile的姓名／University of Toronto與論文第一作者一致。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/repo_tree.json",
+        "json_pointers": [
+          "/tree",
+          "/truncated"
+        ],
+        "finding": "完整tree只有README.md，無程式、任務config、資料或license檔。"
+      },
+      {
+        "source_file": "audit/.cache/github_review_worker/p178_p185_20261011/primary/P183/author_zachary.html",
+        "ranges": [
+          [
+            10,
+            14
+          ]
+        ],
+        "finding": "共同作者第一方頁列完整作者、同一arXiv與WireCraft專案；沒有把其他repo當作official code。"
+      }
+    ],
+    "environment": "以下為論文規格，尚無repo實作可驗證：Isaac Lab2.2.1／Isaac Sim4.5，另聲稱驗證5.1。DLO有PhysX D6剛性segment chain及FEM deformable兩種表示，對齊task／connector介面而非聲稱材料參數等價。模擬支援UR5、Franka、Trossen Stationary AI；實體validation用UR5+Robotiq2F-85、腕部與側視RGB、3D列印Ethernet接頭／task board。實體腕部force/torque sensor讀值未用於policy，只需在sim匹配其幾何offset。",
+    "tasks": "三個family為connector insertion、clip routing、channel seating。論文註冊五種connector geometry，其中cylinder/cuboid/Ethernet/DisplayPort進入所報實驗，USB-A為額外asset；不能把五個connector全當已評測tasks。clip difficulty最多3個clips；channel由5 segments組成，可為直線或每joint最多±20°彎曲。family、variant、fixture數、reset variation與episode均不同單位，無公開registry可確認精確全部task count。",
+    "data": "論文稱scripted、RL rollout、sim teleoperation、real UR5四種來源共用LeRobot-compatible schema。UR5 state/action各7D（6 joint+gripper），雙RGB與instruction同步；這是論文語義，未取得實際feature keys、parquet/video path、dataset revision或reader。IL/VLA比較使用同一1,000條scripted insertion trajectories，非全benchmark總case數。RL另用42D privileged observation與Cartesian delta pose+gripper action，clip到[-1,1]再乘0.01；不與joint-space dataset action直接合併。原生physics dt=1/120 s、decimation=2、control=60 Hz，其他實體資料時間約定需待公開。",
+    "evaluation": "只有paper-defined protocol：insertion分SRreach（夾持plug進入socket周邊2 cm）及SRinsert（tip就座），不得以reach代替insert；3 mm是Ethernet測試clearance，不是插入成功閾值。clip需seated於clips；channel需超過80%線長在channel內，尚無公開離散化／checker細節。RL報3 seeds的mean±std，8秒horizon；IL/VLA附錄F用4 seeds×16 rollouts=64/checkpoint、800 simulator steps，不可與8秒／60 Hz budget默認等同。checkpoint以相同evaluation rollouts的reach success取前三，並非held-out validation選模；insert來自同checkpoint、未另最佳化。公開tree無可執行scorer，不能聲稱已核對這些條件的程式實作。",
+    "standardization": {
+      "profile": "readme_placeholder_with_paper_specified_industrial_dlo_protocol",
+      "reuse": "可重用論文的task families／變化軸、兩種DLO表示、資料來源分類及reach/insert/channel的不同度量；README作release追蹤。",
+      "transform": "source保留paper v1及placeholder commit；environment按simulation model／robot／physical setup分開；task按family+fixture/connector geometry；case在公開reset seed／episode manifest後建立。evaluator先標paper_specified、runtime_unavailable，保存native units、budget、policy可見資訊及checkpoint選擇協定。各data-source mixing實驗保留R/S/P組成，不做語義等價合併。",
+      "missing": "11月release是否履行、真正task registry／reader／concrete scorer、dataset與3D assets manifest／授權、精確insert/clip判定、8秒vs800步預算對齊、各實驗checkpoint／split closure。"
+    },
+    "version_note": "pinned PDF June2026寫upon acceptance；9月新建README改成2026年11月初釋出計畫，當日仍在未來。這是作者公告，非程式已公開或會準時發布的保證。本輪只抓小型metadata／README與兩個作者頁，未下載資產或執行上游。",
+    "additional_repo_proposals": [
+      {
+        "requested_repo": "WireManip/WireCraft",
+        "role": "author_supported_code_release_placeholder",
+        "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+        "selection_status": "propose_binding_as_public_readme_only",
+        "basis": "精化搜尋精確題名＋README＋GitHub commit作者帳號與論文第一作者姓名／機構吻合；author webpage不含直接repo backlink，證據邊界已記錄。"
+      }
+    ],
+    "integration_issues": [
+      "請協調者審核並新增WireManip/WireCraft placeholder binding；勿仍顯示further_search_needed而漏掉已核讀README。",
+      "狀態應為public_readme_only，不能因repo存在就標成code-reviewed或可執行。",
+      "task family/geometry/case與reach/insert、RL/IL budgets及evaluation-based checkpoint selection均需保留。"
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "WireManip/WireCraft",
+        "requested_repo": "WireManip/WireCraft",
+        "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            4
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 4,
+        "sha256": "02e255d18f281f1663e76a5d9765127c529f75fce25245c48c7474e354eed2dc",
+        "url": "https://github.com/WireManip/WireCraft/blob/9acbc318c1ec8b8ae3caf773be1eb086fd5197c6/README.md",
+        "reading_url": "https://github.com/WireManip/WireCraft/blob/9acbc318c1ec8b8ae3caf773be1eb086fd5197c6/README.md#L1-L4",
+        "why": "完整題名及未來程式release計畫；完整tree確證此commit僅README。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "2d00f66495622877aa68969c88e0d2d86aa8f3198e909362e7f48b354c991688"
+  },
+  "repository_binding_review_sha256": "2d00f66495622877aa68969c88e0d2d86aa8f3198e909362e7f48b354c991688",
+  "repository_bindings": [
+    {
+      "requested_repo": "WireManip/WireCraft",
+      "resolved_repo": "WireManip/WireCraft",
+      "aliases_in_this_review": [
+        "wiremanip/wirecraft"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "public_readme_only",
+      "versions": [
+        {
+          "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P183",
+          "review_sha256": "2d00f66495622877aa68969c88e0d2d86aa8f3198e909362e7f48b354c991688",
+          "proposal": {
+            "requested_repo": "WireManip/WireCraft",
+            "role": "author_supported_code_release_placeholder",
+            "commit": "9acbc318c1ec8b8ae3caf773be1eb086fd5197c6",
+            "selection_status": "propose_binding_as_public_readme_only",
+            "basis": "精化搜尋精確題名＋README＋GitHub commit作者帳號與論文第一作者姓名／機構吻合；author webpage不含直接repo backlink，證據邊界已記錄。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P183",
+          "review_file": "content/github_review/reviews/P183.json",
+          "review_sha256": "2d00f66495622877aa68969c88e0d2d86aa8f3198e909362e7f48b354c991688",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P183",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "WireCraft，arXiv 2606.18097v1。",
+    "scope_read": "三類DLO tasks、兩種physics、robot/data流程、success與real對照。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      23,
+      25
+    ],
+    "domains": [
+      "裝配與生產作業"
+    ],
+    "role": "線材操作benchmark",
+    "environment": "IsaacLab/IsaacSim；chain或FEM wire、UR5/Franka/Trossen三robot；可生成配置，無固定環境總數。",
+    "tasks": "3families：connector insertion、clip routing、channel seating；insertion選4connector shapes，其他代表場景仍有限。",
+    "cases": "script、RL、sim teleop、real資料；已讀協定未報全庫固定cases。real Ethernet每metric/setting10rollouts。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "industrial DLO task families",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "real Ethernet每metric/setting rollouts",
+        "pages": [
+          23,
+          25
+        ]
+      }
+    ],
+    "evaluation": [
+      "reach為held plug距socket≤2cm，insert另要求真正插入；channel>80%wire length入槽。",
+      "最佳checkpoint依eval reach挑選，屬best-observed成績；不可假稱獨立validation selection。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "7種real/sim資料mixtures以同40K checkpoint比較；額外65K結果不納主公平比較。",
+    "lineage": "同一3family經不同physics/embodiment重現；不可把backend數相乘當新語義task。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          23,
+          25
+        ],
+        "locator": "Task Suite、Table 1、Experiments、Real Evaluation",
+        "supports": "3families、success差異、10trials與selection"
+      }
+    ],
+    "unresolved": [
+      "文章寫接受後release，未據此宣稱目前資產已取得；全庫demo/case manifest待查。"
+    ],
+    "reuse": "補線材穿引、插接與保持槽內的幾何判分，標示物理近似與場景覆蓋邊界。",
+    "reviewed_pdf_sha256": "7f2bbb231c2ff416c001d7c06e6efc0d68691404f48ed4e22afde76e1ff48e9a",
+    "reviewed_on": "2026-10-02",
+    "name": "WireCraft",
+    "year": 2026,
+    "title": "WireCraft: A Simulation Benchmark for Industrial DLO Manipulation",
+    "source_url": "https://arxiv.org/abs/2606.18097",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "industry"
+    ],
+    "review_tags": [
+      "工業製造",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P183",
+      "domain_ids": [
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P183",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            23,
+            25
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3families：connector insertion、clip routing、channel seating；insertion選4connector shapes，其他代表場景仍有限。",
+            "IsaacLab/IsaacSim；chain或FEM wire、UR5/Franka/Trossen三robot；可生成配置，無固定環境總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7f2bbb231c2ff416c001d7c06e6efc0d68691404f48ed4e22afde76e1ff48e9a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7f2bbb231c2ff416c001d7c06e6efc0d68691404f48ed4e22afde76e1ff48e9a",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P183",
+      "name": "WireCraft",
+      "expected_title": "WireCraft: A Simulation Benchmark for Industrial DLO Manipulation",
+      "source_url": "https://arxiv.org/abs/2606.18097",
+      "pdf_url": "https://arxiv.org/pdf/2606.18097",
+      "retrieved_at": "2026-10-02T21:34:54.828477+00:00",
+      "pdf_sha256": "7f2bbb231c2ff416c001d7c06e6efc0d68691404f48ed4e22afde76e1ff48e9a",
+      "text_sha256": "aac65d1613c25afbc9c2b1c2eda52ded2286b0e926a01ea6f0dc174fb44ee9b6",
+      "pdf_bytes": 44477661,
+      "pages": 27,
+      "text_characters": 99166,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.18097v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.18097v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "industrial DLO task families",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P183:1",
+        "paper_id": "P183",
+        "benchmark": "WireCraft",
+        "native_term": "industrial DLO task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.18097v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.18097v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "real Ethernet每metric/setting rollouts",
+        "pages": [
+          23,
+          25
+        ],
+        "record_id": "review10:P183:2",
+        "paper_id": "P183",
+        "benchmark": "WireCraft",
+        "native_term": "real Ethernet每metric/setting rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.18097v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.18097v1",
+            "locator": "PDF pp. 23, 25",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "WireManip/WireCraft"
+  ],
+  "external_repositories": []
+}

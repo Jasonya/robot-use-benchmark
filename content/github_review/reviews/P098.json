@@ -1,0 +1,92 @@
+{
+  "paper_id": "P098",
+  "summary": "Habitat-Lab負責episode／任務／評分，Habitat-Sim負責感測與物理。二者共同支援多代論文；目前HEAD不能直接代表2021的Habitat2.0原設定。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "path": "README.md",
+      "ranges": [
+        [
+          14,
+          78
+        ]
+      ],
+      "why": "原論文身份與Lab/Sim角色依賴",
+      "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e"
+    },
+    {
+      "repo": "facebookresearch/habitat-sim",
+      "path": "README.md",
+      "ranges": [
+        [
+          14,
+          27
+        ],
+        [
+          47,
+          70
+        ]
+      ],
+      "why": "引擎、資產與機體支援；非新增獨立任務庫",
+      "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "path": "habitat-lab/habitat/datasets/rearrange/rearrange_dataset.py",
+      "ranges": [
+        [
+          23,
+          76
+        ]
+      ],
+      "why": "具體rearrangement episode欄位與讀取時ID重設",
+      "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "path": "habitat-lab/habitat/tasks/rearrange/sub_tasks/pick_sensors.py",
+      "ranges": [
+        [
+          205,
+          249
+        ]
+      ],
+      "why": "具體pick成功條件及配置閾值",
+      "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e"
+    },
+    {
+      "repo": "facebookresearch/habitat-sim",
+      "path": "src_python/habitat_sim/utils/datasets_download.py",
+      "ranges": [
+        [
+          527,
+          539
+        ],
+        [
+          727,
+          767
+        ],
+        [
+          785,
+          825
+        ]
+      ],
+      "why": "資料UID、版本、LFS與實體資產取得狀態",
+      "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038"
+    }
+  ],
+  "environment": "Habitat2.0研究使用家居可互動重排環境；現行Sim另外支援多種掃描場景、CAD、機器人URDF與RGB-D。引擎支援的資料集列表不等於已取得或可對比的環境全集。",
+  "tasks": "物件重排及導航／抓放等子任務；具體task config和measure才決定條件。Lab的benchmark速度腳本與模型任務成功率不可混為同一評估。",
+  "data": "RearrangeEpisode包含ao_states、rigid_objs(handle,transform)、targets、markers、target/goal_receptacles與name_to_receptacle。現行from_json把episode_id重設為列序號，標準庫須保留原source檔案與record index避免ID碰撞。",
+  "evaluation": "具體RearrangePickSuccess檢查持有正確物件、未違反hold constraint，且末端到rest位置距離低於配置閾值；-1可關閉rest檢查。成功定義依配置改變，不能只存measure名稱；reward、渲染FPS及task success分開。",
+  "standardization": {
+    "profile": "simulator_platform_and_rearrangement_episode",
+    "reuse": "episode schema、資產UID／版本、任務配置與原生measure。",
+    "transform": "source拆論文/程式/資產角色，environment存scene及物件初態；case ID以來源版本＋原檔＋原索引生成；evaluator釘選實作與閾值。",
+    "missing": "2021論文匹配的Lab/Sim/資產版本及完整任務配置、LFS實體資產、原生重播與共同協定接線。"
+  },
+  "version_note": "現有README同時引用Habitat1/2/3。這次核讀指定現有commit中的具體介面，歷史2.0重現版本仍需另定；未將新增3.0能力歸給2021論文。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

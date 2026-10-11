@@ -1,0 +1,87 @@
+{
+  "paper_id": "P105",
+  "summary": "LIBERO-Plus的10,030是擾動任務條目；實際分類JSON確有10,030筆，但大量條目共享原LIBERO任務和初態。原difficulty level保留為來源標籤。",
+  "reading_order": [
+    {
+      "repo": "sylvestf/LIBERO-plus",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          43
+        ],
+        [
+          67,
+          91
+        ]
+      ],
+      "why": "精確來源、7擾動維度、外部資產與每變體1trial建議",
+      "commit": "4976dc30028e805ff8094b55501d532c48fec182"
+    },
+    {
+      "repo": "sylvestf/LIBERO-plus",
+      "path": "libero/libero/benchmark/task_classification.json",
+      "ranges": [],
+      "json_pointers": [
+        "/libero_spatial/0",
+        "/libero_spatial/1"
+      ],
+      "why": "抽讀id/name/category/difficulty_level；全量筆數僅結構計數，不宣稱每筆人工語義核對",
+      "commit": "4976dc30028e805ff8094b55501d532c48fec182"
+    },
+    {
+      "repo": "sylvestf/LIBERO-plus",
+      "path": "libero/libero/benchmark/__init__.py",
+      "ranges": [
+        [
+          37,
+          96
+        ],
+        [
+          154,
+          245
+        ]
+      ],
+      "why": "Task欄位、語言重寫與變體如何共用init-state",
+      "commit": "4976dc30028e805ff8094b55501d532c48fec182"
+    },
+    {
+      "repo": "sylvestf/LIBERO-plus",
+      "path": "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+      "ranges": [
+        [
+          253,
+          273
+        ]
+      ],
+      "why": "具體成功為全部goal predicate合取",
+      "commit": "4976dc30028e805ff8094b55501d532c48fec182"
+    },
+    {
+      "repo": "sylvestf/LIBERO-plus",
+      "path": "libero/lifelong/evaluate.py",
+      "ranges": [
+        [
+          261,
+          288
+        ]
+      ],
+      "why": "done成功累積與預算／分母",
+      "commit": "4976dc30028e805ff8094b55501d532c48fec182"
+    }
+  ],
+  "environment": "重用LIBERO桌面，擴充物件、紋理、相機、光照、機器人初態及noise。多擾動名稱不代表不同房屋或獨立原始資料。",
+  "tasks": "7擾動維度；分類檔結構計數：spatial2,402、object2,518、goal2,591、libero_10為2,519，合10,030。這是native variant entries，不是本庫10,030去重語義目標。",
+  "data": "Task保留name/language/problem_folder/bddl_file/init_states_file；getter依_language_/_view_/_table_/_light_等字樣回取共同或專屬初態。分類JSON的id基準與API task index需明確對映。",
+  "evaluation": "具體_check_success逐一AND goal_state predicate；rollout在max_steps內累積done成功。README要求num_trials_per_task由50改1，是該擾動協定，不等同所有來源都一試可充分估計成功率。difficulty_level為作者擾動級別，尚非跨benchmark校準難度。",
+  "standardization": {
+    "profile": "language_manipulation_perturbation_variants",
+    "reuse": "10,030原生分類條目、7維度與level、BDDL/語言和init-state來源。",
+    "transform": "保留base-task→perturbation variant→case關係，normalization不丟variant；level存native_difficulty，原假設／配置／seed與規則差異可追。",
+    "missing": "10,030條目逐筆asset/init-state閉合、語言/variant語義等價審核、外部training資料取得與分母／CI。"
+  },
+  "version_note": "fork替代LIBERO套件使用方式不代表資料獨立；RLDS/LeRobot連結是訓練資料表示，不能各自重複計數。當前分類筆數為檔案結構核對，未執行全部變體。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

@@ -1,0 +1,519 @@
+{
+  "paper_id": "P040",
+  "name": "RoboBench",
+  "title": "Robobench: A Comprehensive Evaluation Benchmark for Multimodal Large Language Models as Embodied Brain",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2510.17801",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P040",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboBench 的釘選版本已分 MCQ 與 Planning，並提供原生粒度表。本次核讀 loader、MCQ、Q1–Q3 planning 的核心規則，以及 point/IoU 輔助 evaluator；不把模型裁判等同物理執行。",
+    "environment": "影像／影片中的機器人或人類操作觀測；unique_id 中的 images 路徑定位樣本。cross-embodiment/object/view/attribute 是泛化條件，5 dimensions 是能力分類，不是5種生活用途。",
+    "tasks": "2026 release README 列5 dimensions、14 groups、25 tasks、32 subtask manifests、6,092 QA，MCQ=1,895、Planning=4,197；這是版本化原作者規模，非本次資料整合實數。Q1 多步計畫、Q2 下一步、Q3 狀態估計會共用同一來源影像。",
+    "data": "system_prompt.json 和 dimension/subtask/questions.json；question 有 unique_id、task_type、image_urls、robotic_type、question/options，轉 request_id/prompt。Q1–Q3 suffix 在找圖時去除；Q1另讀 dag.json 的 id→gt_dag，navigation 無同樣 DAG。human 在 prompt 被轉成 single-arm，原始 embodiment 不能因此覆寫。",
+    "evaluation": "MCQ 取 answer tag／清除 think 後比A–D集合，不明確輸出可用另設裁判正規化。Q1模型看首圖、GT nodes/DAG、預測計畫，給 node correctness與task completion各0–10後平均映0–100；空 critical-state集合依prompt直接Completion=10。Q2 skill/object/parameter三項平均，前兩任一0則parameter=0；Q3 yes/no精確比。Q1/Q2解析失敗排除均分但overall按原count加權；point/IoU亦只用有效解析作分母，需附valid率。",
+    "standardization": {
+      "profile": "robot_reasoning_mcqa_and_plan_judge",
+      "reuse": "原生32 manifest層級、題目/skill/DAG/prompt格式與逐項判分證據。",
+      "transform": "source 固定 release+commit，task 保留原25/32對映，不把 Q1/Q2/Q3 或新視角當新環境；case 保留 raw_question/來源圖/embodiment/DAG及觀測預算。evaluator 分MCQ、Q1/Q2/Q3和point/IoU等可選工具，native分數、parse_failures與分母同存。",
+      "missing": "未取得完整HF資料／DAG或執行模型裁判。需查 empty-goal cases、裁判一致性、skill語義與可用資產；MLLM imagined rollout 不能宣稱物理穩定性／真實任務成功。trajectory evaluator 未在本次核讀範圍。"
+    },
+    "version_note": "README已是ECCV2026 release，不能無版本註記地替換2025 arXiv表。IoU檔案開頭提mAP，但實際回傳平均IoU／pass rates，沒有AP排序積分；點／IoU工具存在也不代表32 manifest全都使用它們。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "yulin-luo/RoboBench",
+        "requested_repo": "yulin-luo/RoboBench",
+        "commit": "08314edc65800086656a0ff93332b023180eaa35",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            94
+          ],
+          [
+            161,
+            225
+          ],
+          [
+            279,
+            330
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 377,
+        "sha256": "80750435c9f97a21f94ffeaeef372cdddc9905639b91e97c5c755123de3e10a5",
+        "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/README.md",
+        "reading_url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/README.md#L1-L94",
+        "why": "2026 release原生粒度、兩種設定與程式結構",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "yulin-luo/RoboBench",
+        "requested_repo": "yulin-luo/RoboBench",
+        "commit": "08314edc65800086656a0ff93332b023180eaa35",
+        "ref": null,
+        "path": "src/robobench/data/dataset.py",
+        "ranges": [
+          [
+            1,
+            149
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 149,
+        "sha256": "53bbc5ada13b1f5025e7a63852c353333b23a34662babadfaf7385a53b4c2cf5",
+        "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/data/dataset.py",
+        "reading_url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/data/dataset.py#L1-L149",
+        "why": "manifest、request ID、Q suffix與prompt",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "yulin-luo/RoboBench",
+        "requested_repo": "yulin-luo/RoboBench",
+        "commit": "08314edc65800086656a0ff93332b023180eaa35",
+        "ref": null,
+        "path": "src/robobench/evaluation/multi_choice.py",
+        "ranges": [
+          [
+            1,
+            130
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 130,
+        "sha256": "04a0b2ad4d39b5c752b730d1726f4eb36791b726138298432884ac45214a3dc7",
+        "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/multi_choice.py",
+        "reading_url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/multi_choice.py#L1-L130",
+        "why": "MCQ解析、可選裁判和分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "yulin-luo/RoboBench",
+        "requested_repo": "yulin-luo/RoboBench",
+        "commit": "08314edc65800086656a0ff93332b023180eaa35",
+        "ref": null,
+        "path": "src/robobench/evaluation/planning.py",
+        "ranges": [
+          [
+            26,
+            104
+          ],
+          [
+            244,
+            270
+          ],
+          [
+            305,
+            321
+          ],
+          [
+            372,
+            415
+          ],
+          [
+            595,
+            631
+          ],
+          [
+            713,
+            774
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 781,
+        "sha256": "1c78e03840e04800090e047cd432b0244a48dc72c92b0cb39a62364630c00e0e",
+        "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/planning.py",
+        "reading_url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/planning.py#L26-L104",
+        "why": "Q1 prompt、DAG、Q2/Q3與聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "yulin-luo/RoboBench",
+        "requested_repo": "yulin-luo/RoboBench",
+        "commit": "08314edc65800086656a0ff93332b023180eaa35",
+        "ref": null,
+        "path": "src/robobench/evaluation/point.py",
+        "ranges": [
+          [
+            1,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 105,
+        "sha256": "1c8587c301cd88fb42817222534bcae06538a6f9a0b3aacbce249349ce600996",
+        "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/point.py",
+        "reading_url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/point.py#L1-L105",
+        "why": "點距離與valid-only分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "yulin-luo/RoboBench",
+        "requested_repo": "yulin-luo/RoboBench",
+        "commit": "08314edc65800086656a0ff93332b023180eaa35",
+        "ref": null,
+        "path": "src/robobench/evaluation/iou.py",
+        "ranges": [
+          [
+            1,
+            123
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 123,
+        "sha256": "0c73bf696a92a1461777edf780d41fa76e2c07f45762000e201e511d079ba6cf",
+        "url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/iou.py",
+        "reading_url": "https://github.com/yulin-luo/RoboBench/blob/08314edc65800086656a0ff93332b023180eaa35/src/robobench/evaluation/iou.py#L1-L123",
+        "why": "bbox IoU、門檻通過率與invalid處理",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "3556750c3e8a82290a56ced36dd1a967290473cfbc6ba1bb5831e89daa562fc0"
+  },
+  "repository_binding_review_sha256": "3556750c3e8a82290a56ced36dd1a967290473cfbc6ba1bb5831e89daa562fc0",
+  "repository_bindings": [
+    {
+      "requested_repo": "yulin-luo/RoboBench",
+      "resolved_repo": "yulin-luo/RoboBench",
+      "aliases_in_this_review": [
+        "yulin-luo/robobench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "08314edc65800086656a0ff93332b023180eaa35",
+          "reviewed_files": [
+            "README.md",
+            "src/robobench/data/dataset.py",
+            "src/robobench/evaluation/iou.py",
+            "src/robobench/evaluation/multi_choice.py",
+            "src/robobench/evaluation/planning.py",
+            "src/robobench/evaluation/point.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/yulin-luo/RoboBench",
+          "link_label": "Code",
+          "project_url": "https://robo-bench.github.io",
+          "page_sha256": "75ded49c7b39e44231eda2eb04feaeb21cf1a91b933dd34337fd25bcd0f889f6"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/yulin-luo/RoboBench",
+          "link_label": "GitHub",
+          "project_url": "https://robo-bench.github.io",
+          "page_sha256": "75ded49c7b39e44231eda2eb04feaeb21cf1a91b933dd34337fd25bcd0f889f6"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P040",
+          "review_file": "content/github_review/reviews/P040.json",
+          "review_sha256": "3556750c3e8a82290a56ced36dd1a967290473cfbc6ba1bb5831e89daa562fc0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P040",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboBench，arXiv 2510.17801v2（2026-07-05），已核官方網站與ECCV2026資料。",
+    "scope_read": "5維度／25端點、資料表、人機標註、Q1–Q3評分及下游控制驗證。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      18,
+      22
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "綜合具身認知評測",
+    "environment": "多來源robot影片與自錄配置；未報可相加的去重物理layout總量。",
+    "tasks": "5維度、14能力群、25評測端點；不同於25個生活工作任務。",
+    "cases": "6,092 questions／4,336 unique items；含1,895 MC與Q1/Q2/Q3各1,973／842／1,192，加190navigation。相同item衍生多種問題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 25,
+        "unit": "認知評測端點",
+        "pages": [
+          2,
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6092,
+        "unit": "questions",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4336,
+        "unit": "unique items",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "感知／affordance／failure用MC accuracy；Q3 binary accuracy。",
+      "Q1用MLLM評node correctness與milestone completion；Q2用MLLM評skill/object/parameter。所稱world-simulator是模型判斷，不是剛體物理模擬執行。",
+      "另以CALVIN／LIBERO控制結果查關聯，屬下游驗證子集。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "人工或模型評審"
+    ],
+    "split": "QA與下游CALVIN ABC→D、LIBERO-Long10任務／各50trials分開；模型全對題會被篩掉，難度帶有選模依赖。",
+    "lineage": "多robot來源及RoboMIND失敗軌跡；planning failure有人工注入，execution failure來自真rollouts，證據不能混。",
+    "related_paper_ids": [
+      "P064",
+      "P065",
+      "P109"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          8
+        ],
+        "locator": "表2、Quality Control",
+        "supports": "6,092／4,336與資料構造"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "§4 Evaluation Metrics",
+        "supports": "MLLM world-simulator評分"
+      },
+      {
+        "pages": [
+          22
+        ],
+        "locator": "Downstream Evaluation",
+        "supports": "控制關聯驗證的子集範圍"
+      }
+    ],
+    "unresolved": [
+      "來源unique item跨上游重用尚未逐ID去重；v1 unique items為4,333，不套用到v2。"
+    ],
+    "reuse": "最直接的all-in-one具身認知比較對象之一；我們需清楚提出場域／任務聯集與可驗證規則的新增部分。",
+    "reviewed_pdf_sha256": "b34e12bf6f096b03930eb63d6e6580345d4fc1330c8c54c7f9660c501b7ff204",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboBench",
+    "year": 2025,
+    "title": "Robobench: A Comprehensive Evaluation Benchmark for Multimodal Large Language Models as Embodied Brain",
+    "source_url": "https://arxiv.org/abs/2510.17801",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "桌面物件操作",
+      "室內導航"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P040",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P040",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            18,
+            22
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "5維度、14能力群、25評測端點；不同於25個生活工作任務。",
+            "多來源robot影片與自錄配置；未報可相加的去重物理layout總量。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b34e12bf6f096b03930eb63d6e6580345d4fc1330c8c54c7f9660c501b7ff204"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b34e12bf6f096b03930eb63d6e6580345d4fc1330c8c54c7f9660c501b7ff204",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P040",
+      "name": "RoboBench",
+      "expected_title": "Robobench: A Comprehensive Evaluation Benchmark for Multimodal Large Language Models as Embodied Brain",
+      "source_url": "https://arxiv.org/abs/2510.17801",
+      "pdf_url": "https://arxiv.org/pdf/2510.17801",
+      "retrieved_at": "2026-10-02T21:33:29.967399+00:00",
+      "pdf_sha256": "b34e12bf6f096b03930eb63d6e6580345d4fc1330c8c54c7f9660c501b7ff204",
+      "text_sha256": "1e19e15b49b82ea0c145c30a89db5acf36f88991909d91a8c6c50e6f58a18d6e",
+      "pdf_bytes": 11583578,
+      "pages": 54,
+      "text_characters": 184570,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2510.17801v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2510.17801v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 25,
+        "unit": "認知評測端點",
+        "pages": [
+          2,
+          8
+        ],
+        "record_id": "review10:P040:1",
+        "paper_id": "P040",
+        "benchmark": "RoboBench",
+        "native_term": "認知評測端點",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.17801v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.17801v2",
+            "locator": "PDF pp. 2, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 6092,
+        "unit": "questions",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P040:2",
+        "paper_id": "P040",
+        "benchmark": "RoboBench",
+        "native_term": "questions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.17801v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.17801v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4336,
+        "unit": "unique items",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P040:3",
+        "paper_id": "P040",
+        "benchmark": "RoboBench",
+        "native_term": "unique items",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.17801v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.17801v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "yulin-luo/RoboBench"
+  ],
+  "external_repositories": []
+}

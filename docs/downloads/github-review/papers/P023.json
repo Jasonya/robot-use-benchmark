@@ -1,0 +1,528 @@
+{
+  "paper_id": "P023",
+  "name": "EgoProceL",
+  "title": "My View is the Best View: Procedure Learning from Egocentric Videos",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2207.10883",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "craft",
+    "industry",
+    "garden"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P023",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoProceL 是程式學習資料與 CnC 方法的共同發布；它明確重用 CMU-MMAC、EGTEA、MECCANO、EPIC-Tent 並加入電腦組拆。已核讀資料來源、PC Assembly loader 和主評分呼叫。",
+    "environment": "烹飪、玩具／電腦組拆、帳篷搭建等人類程式影片；parent dataset→category→video 需要保留。16 個原生 task 是程式活動，不是 16 個獨立房間或全部錄製環境。",
+    "tasks": "由同一程式多段影片學習 key-step 與次序，包含缺步、重複步和背景。重用父資料的影片被加上程式標註，不可和父庫相加當全新影片。",
+    "data": "CSV 與原影片同名，三欄為 step 起始秒、結束秒、step 名；子集按來源／category 分目錄。PC_Assembly loader 配對影片與標註、抽 HDF5 frames/labels；train/val/test 分支尚為 NotImplemented，真正公開路徑是 mode=all。",
+    "evaluation": "procedure_learning→gen_print_results→compute_align_MoF_UoI，以 GT/pred frame overlap 做 Hungarian cluster-label assignment，再計 MoF/IoU/precision；per_keystep 模式排除無 GT 類別並平均。另有 procl_eval 函式實作補上未配對類別的 P/R/F1，但不是本主入口呼叫，二者不混用。GT 用於事後 cluster 對齊不代表模型已輸出語義標籤。",
+    "standardization": {
+      "profile": "procedure_discovery_video",
+      "reuse": "父資料重用清單、原生秒制 step CSV、PC 組裝新來源與聚類評分。",
+      "transform": "source→parent video→新 annotation 建 ancestry；task 記來源內 category，case 是指定多影片集合／取樣與合法 GT 使用範圍。cluster ID 儲存 Hungarian assignment 作評分證據；K、背景、per_keystep 與全體聚合明列。",
+      "missing": "尚未取得影片／標註、產生 HDF5 或執行。需要逐子集對應原影片及相同 frame 取樣；不能自行發明 train/test split 或把 mode=all 的結果標為未見環境泛化。"
+    },
+    "version_note": "download README 明列舊 OneDrive 過期與新 Google Drive，並說父庫只有部分影片被使用；以新程式標註清單作 subset 證據。PC_Assembly.py 開頭註解仍寫 MECCANO，但類別及配置實際為 PC_Assembly。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            96
+          ],
+          [
+            126,
+            158
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 158,
+        "sha256": "76059a8b9b74f5f81f799970d6cd1a8e67d124f5a784526d529fa101bba4863c",
+        "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/README.md",
+        "reading_url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/README.md#L1-L96",
+        "why": "精確論文身份、原生 task 與四項父資料",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+        "ref": null,
+        "path": "EgoProceL-download-README.md",
+        "ranges": [
+          [
+            1,
+            93
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "20753ce1b411cb670c5ad7ac5651a60a51831ea29bccb4780ed7f2572fc1e3d5",
+        "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/EgoProceL-download-README.md",
+        "reading_url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/EgoProceL-download-README.md#L1-L93",
+        "why": "逐來源取得與 CSV 單位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+        "ref": null,
+        "path": "datasets/PC_Assembly.py",
+        "ranges": [
+          [
+            1,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 95,
+        "sha256": "782673095bd99219615995554635b700665a4bf5dab5d26cd86619afc36009cb",
+        "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/datasets/PC_Assembly.py",
+        "reading_url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/datasets/PC_Assembly.py#L1-L95",
+        "why": "實際 PC 子集 loader 與 split 限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+        "ref": null,
+        "path": "RepLearn/TCC/procedure_learning.py",
+        "ranges": [
+          [
+            1,
+            29
+          ],
+          [
+            31,
+            43
+          ],
+          [
+            121,
+            127
+          ],
+          [
+            160,
+            171
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 205,
+        "sha256": "4ed651ff8be3cc04a330be80bf79588d22b102c89c83b2165b2bb935bb52011d",
+        "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/RepLearn/TCC/procedure_learning.py",
+        "reading_url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/RepLearn/TCC/procedure_learning.py#L1-L29",
+        "why": "主流程及子集 key-step 配置",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+        "ref": null,
+        "path": "RepLearn/TCC/utils.py",
+        "ranges": [
+          [
+            8,
+            26
+          ],
+          [
+            143,
+            206
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 238,
+        "sha256": "b77cf50c84a14f361cd6f872822462a9e345b1ddf193084fa6f4f521d1ea9ccd",
+        "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/RepLearn/TCC/utils.py",
+        "reading_url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/RepLearn/TCC/utils.py#L8-L26",
+        "why": "主入口呼叫哪個 evaluator",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+        "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+        "ref": null,
+        "path": "evaluate/metrics.py",
+        "ranges": [
+          [
+            1,
+            243
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 243,
+        "sha256": "5d9e5b1525892f2a6d869a23ef5d811d53448c712782dbd0e26508aa88675b4e",
+        "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/evaluate/metrics.py",
+        "reading_url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d/evaluate/metrics.py#L1-L243",
+        "why": "Hungarian assignment 與聚合差異",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "2e6bf1ac7e956e707910d1945c2a145514cd723d598b77800066e1460089cf3b"
+  },
+  "repository_binding_review_sha256": "2e6bf1ac7e956e707910d1945c2a145514cd723d598b77800066e1460089cf3b",
+  "repository_bindings": [
+    {
+      "requested_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "resolved_repo": "Sid2697/EgoProceL-egocentric-procedure-learning",
+      "aliases_in_this_review": [
+        "sid2697/egoprocel-egocentric-procedure-learning"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "bf4d9c2e7a02491d2fdcf11a1ca85beb62b6fa1d",
+          "reviewed_files": [
+            "EgoProceL-download-README.md",
+            "README.md",
+            "RepLearn/TCC/procedure_learning.py",
+            "RepLearn/TCC/utils.py",
+            "datasets/PC_Assembly.py",
+            "evaluate/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning",
+          "link_label": "Code",
+          "project_url": "https://sid2697.github.io/egoprocel/",
+          "page_sha256": "316eb60986b0a664c193bf8c5f48c9066e59d4ed12251c24abc82f6610585801"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning/blob/main/EgoProceL-download-README.md",
+          "link_label": "README",
+          "project_url": "https://sid2697.github.io/egoprocel/",
+          "page_sha256": "316eb60986b0a664c193bf8c5f48c9066e59d4ed12251c24abc82f6610585801"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Sid2697/EgoProceL-egocentric-procedure-learning",
+          "link_label": "Sid2697/EgoProceL-egocentric-procedure-learning",
+          "project_url": "https://sid2697.github.io/egoprocel/",
+          "page_sha256": "316eb60986b0a664c193bf8c5f48c9066e59d4ed12251c24abc82f6610585801"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P023",
+          "review_file": "content/github_review/reviews/P023.json",
+          "review_sha256": "2e6bf1ac7e956e707910d1945c2a145514cd723d598b77800066e1460089cf3b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "裝配與生產作業",
+    "農業與園藝"
+  ],
+  "source_review": {
+    "paper_id": "P023",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "My View is the Best View / EgoProceL，arXiv 2207.10883v1。",
+    "scope_read": "資料選取與聯集、procedure問題、key-step排序、评測協定。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10
+    ],
+    "domains": [
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "裝配與生產作業",
+      "農業與園藝"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "來源資料場景混合；沒有共同去重的獨立環境總數。",
+    "tasks": "16個程序，平均8.7 key-steps；含料理、玩具機車、搭帳篷、PC組裝／拆解。",
+    "cases": "62小時、130人；原作本文未在已讀統計表給單一可評test題總數。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "程序任務",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 62,
+        "unit": "影片小時",
+        "pages": [
+          1,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 130,
+        "unit": "參與者",
+        "pages": [
+          1
+        ]
+      }
+    ],
+    "evaluation": [
+      "Hungarian matching後按每個key-step計frame precision／recall／F1／IoU再平均，避免背景與長步驟壟斷分數。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "採task-specific self-supervised procedure learning設定；K是模型key-step數超參數，不是資料集總任務量。",
+    "lineage": "明確重用CMU-MMAC、EGTEA Gaze+、MECCANO、EPIC-Tents，再增自錄PC裝拆；不是全新獨立62小時。",
+    "related_paper_ids": [
+      "P008"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5
+        ],
+        "locator": "§3、表1",
+        "supports": "16任務及上游重用"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "§4.3、§5.1",
+        "supports": "排序與macro-style評分"
+      }
+    ],
+    "unresolved": [
+      "所有影片ID、跨上游重複量和各task可評片段數需manifest核對。"
+    ],
+    "reuse": "是從既有程序資料聯集再補缺域的直接先例；我們須說明新增任務／規則，不能把聯集本身當全部新貢獻。",
+    "reviewed_pdf_sha256": "533531617781659b6d42cbb81529f76f79277cb3cf1d05dad3504547b4ecdf9a",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoProceL",
+    "year": 2022,
+    "title": "My View is the Best View: Procedure Learning from Egocentric Videos",
+    "source_url": "https://arxiv.org/abs/2207.10883",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "food",
+      "craft",
+      "industry",
+      "garden"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "組裝與拆解",
+      "工藝與修繕",
+      "園藝與戶外"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "裝配與生產作業",
+      "農業與園藝"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P023",
+      "domain_ids": [
+        "food",
+        "craft",
+        "industry",
+        "garden"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P023",
+          "domain_ids": [
+            "food",
+            "craft",
+            "industry",
+            "garden"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            8,
+            9,
+            10
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "16個程序，平均8.7 key-steps；含料理、玩具機車、搭帳篷、PC組裝／拆解。",
+            "來源資料場景混合；沒有共同去重的獨立環境總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "533531617781659b6d42cbb81529f76f79277cb3cf1d05dad3504547b4ecdf9a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "533531617781659b6d42cbb81529f76f79277cb3cf1d05dad3504547b4ecdf9a",
+      "previous_domain_ids": [
+        "food",
+        "craft",
+        "industry",
+        "garden"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P023",
+      "name": "EgoProceL",
+      "expected_title": "My View is the Best View: Procedure Learning from Egocentric Videos",
+      "source_url": "https://arxiv.org/abs/2207.10883",
+      "pdf_url": "https://arxiv.org/pdf/2207.10883",
+      "retrieved_at": "2026-10-02T21:33:14.468474+00:00",
+      "pdf_sha256": "533531617781659b6d42cbb81529f76f79277cb3cf1d05dad3504547b4ecdf9a",
+      "text_sha256": "736428475b6a15030afdbedacc46789812c2cbcdf54fd1104828747e06036bcd",
+      "pdf_bytes": 7445629,
+      "pages": 25,
+      "text_characters": 81177,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2207.10883v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2207.10883v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 16,
+        "unit": "程序任務",
+        "pages": [
+          1,
+          5
+        ],
+        "record_id": "review10:P023:1",
+        "paper_id": "P023",
+        "benchmark": "EgoProceL",
+        "native_term": "程序任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.10883v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.10883v1",
+            "locator": "PDF pp. 1, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 62,
+        "unit": "影片小時",
+        "pages": [
+          1,
+          5
+        ],
+        "record_id": "review10:P023:2",
+        "paper_id": "P023",
+        "benchmark": "EgoProceL",
+        "native_term": "影片小時",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.10883v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.10883v1",
+            "locator": "PDF pp. 1, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 130,
+        "unit": "參與者",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P023:3",
+        "paper_id": "P023",
+        "benchmark": "EgoProceL",
+        "native_term": "參與者",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2207.10883v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2207.10883v1",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Sid2697/EgoProceL-egocentric-procedure-learning"
+  ],
+  "external_repositories": []
+}

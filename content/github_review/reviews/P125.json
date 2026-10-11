@@ -1,0 +1,53 @@
+{
+  "paper_id": "P125",
+  "summary": "Open X-Embodiment提供共用RLDS容器與資料讀取示例；相同tensor形狀並不自動統一不同機體動作的物理意義，父資料集也不能重複計數。",
+  "reading_order": [
+    {
+      "repo": "google-deepmind/open_x_embodiment",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          37
+        ],
+        [
+          45,
+          61
+        ]
+      ],
+      "why": "資料聚合角色、RLDS、RT-1-X輸入與native action差異",
+      "commit": "9eeb68b989efbcf474e8fb9019e01d02b962a604"
+    },
+    {
+      "repo": "google-deepmind/open_x_embodiment",
+      "path": "colabs/Open_X_Embodiment_Datasets.ipynb",
+      "ranges": [],
+      "json_pointers": [
+        "/cells/5/source",
+        "/cells/7/source",
+        "/cells/13/source",
+        "/cells/16/source",
+        "/cells/17/source",
+        "/cells/26/source",
+        "/cells/34/source",
+        "/cells/35/source"
+      ],
+      "why": "只讀列出的code cells：資料版本、Kuka/Mutex讀取與軌跡容器；未讀大型嵌入輸出或執行notebook",
+      "commit": "9eeb68b989efbcf474e8fb9019e01d02b962a604"
+    }
+  ],
+  "environment": "聚合多來源、多機體的robot episodes，包括Bridge、RoboNet等；每個子資料原有場景和授權/版本，OXE不是額外一份完全獨立的環境資料。",
+  "tasks": "主要是跨機體訓練資料與RT-X方法；不能把資料集數、機體數、skill labels和實際評測題數互換。",
+  "data": "RLDS episode含steps，notebook以TFDS builder從固定dataset/version讀取。Kuka示例拼world_vector/rotation_delta/gripper_closedness_action，Mutex直接取action；影像resize128。另一例保留is_first/is_last/is_terminal且只對齊影像，並未對齊所有action語義。",
+  "evaluation": "倉庫讀取／混合示例和RT-1-X inference不是覆蓋全部子資料的通用成功checker。README指出7個控制變量可能是absolute/delta/velocity；相等TensorSpec只是形狀檢查。tf.data.repeat重複採樣不增加獨立資料；train[:10]也是示例subset。",
+  "standardization": {
+    "profile": "cross_embodiment_episode_container",
+    "reuse": "RLDS episode/step結構、子資料dataset/version引用與來源引用規則。",
+    "transform": "source維持OXE→子dataset→原episode lineage，case保留子來源ID與split；另補ActionSpec的座標/單位/absolute-delta-velocity/夾爪約定及task-specific evaluator。",
+    "missing": "全子資料素材與精確manifest、跨來源重複episode、任務語義對齊、共同測試split與各機體可執行成功判定。"
+  },
+  "version_note": "固定9eeb68b；README的3Hz/單workspace RGB是RT-1-X模型接口，不代表所有OXE資料的原採樣率和可見模態。Notebook source cells與輸出分開核讀。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

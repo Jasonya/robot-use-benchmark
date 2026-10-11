@@ -1,0 +1,234 @@
+{
+  "paper_id": "P242",
+  "name": "NAOGAT",
+  "title": "Leveraging Next-Active Objects for Context-Aware Anticipation in Egocentric Videos",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2308.08303",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P242",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "已核NAOGAT原作、WACV刊載頁及作者現行project：GitHub仍標示Soon，EK-100新增NAO框標註須向作者索取。可收錄論文層級的STA方法與標註衍生關係，尚無可固定commit並核讀的官方reader／evaluator。",
+    "identity_note": "精確題名為Leveraging Next-Active Objects for Context-Aware Anticipation in Egocentric Videos；Sanket Thakur、Cigdem Beyan、Pietro Morerio、Vittorio Murino、Alessio Del Bue。核讀快取arXiv:2308.08303v3（2023-10-05）；CVF確認WACV 2024、pp.8657–8666。作者about以略不同的Short-Term題名連回同一arXiv及本project。ANACTO、GANOv2是另篇方法；網站模板richzhang/webpage-template亦非NAOGAT程式。",
+    "environment": "Ego4D人類第一人稱日常活動及EPIC-KITCHENS-100廚房影片，皆為離線觀測。STA假設下一互動物件在最後觀測影格可見；EK-100原有action anticipation並不保證此條件。未提供可reset的robot場景或動作控制介面。",
+    "tasks": "輸入截至T的RGB序列，預測下一active object的noun類別n、最後觀測影格中的bounding box b、未來動作verb v及距接觸的δ秒。NAO定位與動作／TTC聯合預測屬一個STA問題的不同輸出，不是四套機器人任務。EK-100實驗仍須和Ego4D STA分開記錄。",
+    "data": "§3–4.2：16影格、4 FPS；訓練resize高度248–280 pixels並crop224。Faster R-CNN偵測輸入為每物件4個框座標加confidence，固定Q筆不足時padding；Q/Nq的實際值、座標順序／正規化與序列化key未能由reader核實。Ego4D forecasting部分稱逾1000影片、STA標註30 FPS；EK-100母庫97 verbs／300 nouns／約90K action segments皆非本篇有效case數。附錄§7的EK-100框由GT noun匹配偵測器結果產生，失敗再用hand-object ROI及top-3 noun候選；noun仍沿用EK標籤，不是新人工重標整庫。12.5% training、6% Unseen及約22% Tail的NAO缺失分別有不同分母；附錄另把22%稱validation中的「Test Set」，需原始ID核對。現行project只提供索取標註的聯絡方式，沒有已取得的annotation檔、split manifest或loader。",
+    "evaluation": "僅核到paper protocol：§4.3以noun／verb top-1判對、box IoU≥0.5及|TTC誤差|≤0.25秒；聯合條件須全部滿足。Table1列8種b/n/v/δ組合的AP，但正文概述稱4組，應保留各欄位而非併成單一成功率。候選預算、AP積分／macro平均、confidence合成及漏標樣本處理沒有scorer可核，不能逕套另一篇Ego4D的Top-5實作。EK-100 Table2分Unseen/Tail/Overall及action/verb/noun；§4.3僅援引先前方法的metric，未在本版明列其Top-k／類別平均細節。§4.4剔除無NAO的tail clips後所得分數屬另一次過濾評測，不能覆蓋原validation分母。",
+    "standardization": {
+      "profile": "paper_only_short_term_object_interaction_anticipation",
+      "reuse": "可重用原作身份、Ego4D STA／EK-100衍生框標註關係、四項預測輸出、16frame/4FPS輸入及論文明列的IoU與TTC門檻；尚無已核可執行reader或scorer。",
+      "transform": "source保留arXiv v3及WACV 2024關係；domain/environment限定人類影片脈絡，task以STA定義建檔。未來case須帶video/segment身份、最後觀測影格、原生box參照、noun/verb taxonomy、δ秒及缺失NAO原因；Ego4D、EK原split及過濾子集分開。evaluator保存各AP組合與尚待核實的EK metric，不把母庫frames/segments或模型queries當case數。",
+      "missing": "作者可確認的官方方法repo／commit、EK衍生框檔案及授權、精確split與NAO缺失ID、座標／時間轉換reader、分類與AP evaluator。需釐清附錄Test Set／正文Tail Set及EK metric細節；ANACTO或GANOv2程式不可代填。"
+    },
+    "version_note": "2023年arXiv摘要承諾接受後提供code；2026-10-11讀到同篇project仍為GitHub(Soon)，有Code標題但沒有方法連結。project文末誤標WACV 2023，刊載年份以CVF 2024為準；本筆技術內容僅按已固定arXiv v3核讀，未聲稱和會議PDF逐段一致。探索用/wacv24短網址返回404，其後由作者about找到可用現行project；這不是GitHub repo不可用或全球無code的證明。本輪小型HTML讀取除該404外均200，未遇429／rate-limited403；未聯絡作者或讀取內嵌影片。",
+    "discovery_evidence": [
+      {
+        "provider": "pinned_primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P242/pages.json",
+        "sha256": "88676401a0e7b2676f1d9367953327a9159a183bb69b7919accbca02b0f7273a",
+        "json_pointers": [
+          "/0/text",
+          "/2/text",
+          "/3/text",
+          "/4/text",
+          "/5/text",
+          "/6/text",
+          "/7/text",
+          "/8/text",
+          "/9/text",
+          "/10/text",
+          "/11/text"
+        ],
+        "finding": "核讀身份與接受後公開code承諾、§3方法與輸出、§4資料／評測、附錄§7–8標註pipeline及缺失NAO限制。",
+        "url": "https://arxiv.org/pdf/2308.08303",
+        "version": "arXiv:2308.08303v3",
+        "page_ranges": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            12
+          ]
+        ],
+        "pages_read": [
+          1,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "page_line_ranges": [
+          {
+            "page": 1,
+            "ranges": [
+              [
+                1,
+                70
+              ]
+            ]
+          },
+          {
+            "page": 3,
+            "ranges": [
+              [
+                1,
+                88
+              ]
+            ]
+          },
+          {
+            "page": 4,
+            "ranges": [
+              [
+                1,
+                62
+              ]
+            ]
+          },
+          {
+            "page": 5,
+            "ranges": [
+              [
+                1,
+                65
+              ]
+            ]
+          },
+          {
+            "page": 6,
+            "ranges": [
+              [
+                1,
+                69
+              ]
+            ]
+          },
+          {
+            "page": 7,
+            "ranges": [
+              [
+                1,
+                56
+              ]
+            ]
+          },
+          {
+            "page": 8,
+            "ranges": [
+              [
+                1,
+                47
+              ]
+            ]
+          },
+          {
+            "page": 9,
+            "ranges": [
+              [
+                1,
+                15
+              ]
+            ]
+          },
+          {
+            "page": 10,
+            "ranges": [
+              [
+                1,
+                54
+              ]
+            ]
+          },
+          {
+            "page": 11,
+            "ranges": [
+              [
+                1,
+                34
+              ]
+            ]
+          },
+          {
+            "page": 12,
+            "ranges": [
+              [
+                1,
+                38
+              ]
+            ]
+          }
+        ],
+        "pdf_local_file": "audit/.cache/fulltext_review/P242/paper.pdf",
+        "pdf_sha256": "f46d68b508ee908dac64c3af6985d49eddde0ef8678d1fc85a914738de504635"
+      },
+      {
+        "provider": "cached_pdf_link_discovery",
+        "local_file": "audit/.cache/github_review/P242-discovery.json",
+        "sha256": "304ea57c719708622a86c64bfc93c2afc5d47f542be4df5cdc5d9ad9713eb49f",
+        "json_pointers": [
+          "/title",
+          "/paper_url",
+          "/pdf_sha256",
+          "/candidates",
+          "/code_contexts"
+        ],
+        "finding": "核對精確論文、PDF指紋、連結候選與code-availability摘錄；候選本身不等同官方repo。"
+      },
+      {
+        "provider": "cached_project_candidates",
+        "local_file": "audit/.cache/github_review/project_candidates.json",
+        "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+        "json_pointers": [
+          "/241"
+        ],
+        "finding": "本ID的project及repository候選均為空；enriched_projects亦無本ID條目。"
+      },
+      {
+        "provider": "cached_github_repository_search",
+        "local_file": "audit/.cache/github_review/search/P242.json",
+        "sha256": "20846836752c4e6724a492bce436e3418529f660bbcf8860860cd6ff7d76792b",
+        "json_pointers": [
+          "/query",
+          "/receipt",
+          "/total_count",
+          "/results"
+        ],
+        "finding": "cached query「NAOGAT」total_count=3；三筆為malteh/naogatewayRemoteClient、hannibalhh/naogateway、mr-samvel/gato-naogato，描述及身份均不匹配本篇。沒有把名稱命中當官方來源。"
+      },
+      {
+        "provider": "bounded_website_receipt",
+        "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P242/author_project.html.receipt.json",
+        "sha256": "dcd9591249fdb8f7fb759de81393911b76deee027a938584b7856ce421a9ad49",
+        "json_pointers": [
+          "/requested_url",
+          "/retrieved_at",
+          "/status"
+        ],
+        "finding": "探索用短網址/wacv24返回404；最終證據來自about實際連出的現行project，不以此404推論方法repo不存在。"
+      }
+    ],
+    "additional_repo_proposals": [],
+    "runtime_executed": false,
+    "reading_order": [],
+    "review_sha256": "aa38230f6a4d183af547719196dc9ee394acc560858fe81e4a4494b1f4a433fe"
+  },
+  "repository_binding_review_sha256": "aa38230f6a4d183af547719196dc9ee394acc560858fe81e4a4494b1f4a433fe",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [],
+  "source_review": null,
+  "repositories": [],
+  "external_repositories": []
+}

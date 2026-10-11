@@ -1,0 +1,602 @@
+{
+  "paper_id": "P177",
+  "name": "H2RBench（human transfer）",
+  "title": "H2RBench: A Real-to-Sim Benchmark for Evaluating Human-to-Robot Transfer",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.24778",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P177",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "H2RBench提供基於PolaRiS的6個Gym場景註冊與human-to-robot transfer評測。此版rubric按曾完成的子條件累積，與末態全部同時完成有差異。",
+    "environment": "Isaac Lab與PolaRiS真實場景重建/3D Gaussian splat；固定registry6個Gym ID為放紅杯、疊積木、套環、掛杯、玩具入盒、疊碗。authoring scene.json與runtime scene.usda/渲染資產不是同一種環境描述。",
+    "tasks": "6個原生task setup有Rubric前置依賴；新case須保存human/robot資料轉移的訓練條件與實際goal，不能把完整PolaRiS父資產庫當本篇全部已評任務。",
+    "data": "initial_conditions.json含instruction/poses；task_config.yaml有object_randomization/waypoints。當前randomize以poses[0]為底再取range，未逐條使用所有原始pose；旋轉入參xyzw、輸出wxyz。policy推論入口送obs+language，human示範訓練/配對資料另需manifest，不能從此eval入口推定已有video prompting。",
+    "evaluation": "每criterion曾達成即latched，progress=ever_reached/total，成功為全數曾達成；空criteria會success=True但progress0，應拒作合法case。放置看XY投影覆蓋與finger條件；插入有速度穩定/XY/Z檢查，其closure計數須確認跨episode重置。續跑先生成ic後快轉RNG，第一個恢復episode仍用舊ic，需修正或保存實際初態。影片固定15fps不是控制clock證據。",
+    "standardization": {
+      "profile": "real_to_sim_human_robot_transfer",
+      "reuse": "6環境註冊、scene/initial_conditions/task_config接口、可追溯predicate與依賴進度。",
+      "transform": "case綁定source episode、重建/碰撞/渲染資產版本與座標系；記實際初態、human訓練子集和固定budget；保持ever-success與同時末態成功分項。",
+      "missing": "human/robot完整配對資料、資產和training split、續跑初態一致性、stateful predicate reset、非空rubric/全部終態有效性及跨機體基線。"
+    },
+    "version_note": "固定5082e75。README arXiv仍TODO且clone示例為舊DavidZ2851/polaris；官方h2rbench.github.io連此庫並列精確2609.24778，身分相符。與P151影片生成H2R-Bench保持不同source。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 455,
+        "sha256": "5e92cf65f2a248c26acf880ee3762e18f523838d497dc8f828b7888ee531bc75",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/README.md",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/README.md#L1-L80",
+        "why": "作者/原作項目與PolaRiS來源關係",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "src/polaris/environments/__init__.py",
+        "ranges": [
+          [
+            1,
+            128
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 128,
+        "sha256": "a030ec4e6dae311c4a0cc76dd5475cd27ca8fe907c07347674e5caba34ddf6c4",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/__init__.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/__init__.py#L1-L128",
+        "why": "6個具體環境與reach/lift/place/insert依賴條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "PolaRiS-Hub/put_red_cup_no_curtain/scene.json",
+        "ranges": [
+          [
+            1,
+            47
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 47,
+        "sha256": "3a7eb467423708d2e8b77468bd7ecf8c9ac2401314287e84d621560fa3ed766f",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/PolaRiS-Hub/put_red_cup_no_curtain/scene.json",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/PolaRiS-Hub/put_red_cup_no_curtain/scene.json#L1-L47",
+        "why": "authoring scene的asset/path/pose/scale",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "src/polaris/utils.py",
+        "ranges": [
+          [
+            18,
+            59
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 156,
+        "sha256": "514f111ed6a6a9059b68687f44351657d00052d9b89aead54d2a65b9301c0e11",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/utils.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/utils.py#L18-L59",
+        "why": "instruction/poses與task randomization設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "src/polaris/utils_/eval_utils.py",
+        "ranges": [
+          [
+            6,
+            64
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 75,
+        "sha256": "6e46b8d800a3d2fd451cb451a7787590313332e8a28876fcad404efabcfd65f2",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/utils_/eval_utils.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/utils_/eval_utils.py#L6-L64",
+        "why": "seed、僅取第一個基準pose、xyzw→wxyz轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "scripts/eval_policy.py",
+        "ranges": [
+          [
+            20,
+            153
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 153,
+        "sha256": "ac93040f3abd27aa178fe1bb483874039a0af035b87dfbe10d864e03e62decd3",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/scripts/eval_policy.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/scripts/eval_policy.py#L20-L153",
+        "why": "case抽樣/續跑、model接口、rubric結果和budget",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "src/polaris/environments/manager_based_rl_splat_environment.py",
+        "ranges": [
+          [
+            42,
+            96
+          ],
+          [
+            179,
+            198
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 388,
+        "sha256": "5abe952d8df9aa3179bc527857dbb29cfe8f8b638d652def36575b76687e0e08",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/manager_based_rl_splat_environment.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/manager_based_rl_splat_environment.py#L42-L96",
+        "why": "reset/step均評rubric，缺rule不計正常progress",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "src/polaris/environments/rubrics/base.py",
+        "ranges": [
+          [
+            1,
+            77
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 77,
+        "sha256": "a9b2dcd1489f8f3dc0ebb6182c0915d1da6fb947c2aaf15cb75de0f6b0122e2f",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/rubrics/base.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/rubrics/base.py#L1-L77",
+        "why": "max-ever criteria、依賴和progress/empty-rule",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "xiaochy/H2RBench",
+        "requested_repo": "xiaochy/H2RBench",
+        "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+        "ref": null,
+        "path": "src/polaris/environments/rubrics/checkers.py",
+        "ranges": [
+          [
+            8,
+            91
+          ],
+          [
+            222,
+            261
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 313,
+        "sha256": "d24e814d4a39dcb695ee9fa54f395ce3fb14c122bc45a2a8ddf535328e576c94",
+        "url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/rubrics/checkers.py",
+        "reading_url": "https://github.com/xiaochy/H2RBench/blob/5082e75c4c6bbc1423a3b32bc095d29f1b23411d/src/polaris/environments/rubrics/checkers.py#L8-L91",
+        "why": "具體XY覆蓋和穩定插入checker",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "0922c3a7c64e610683911c1205a5a3f574740da9aa834234f7d3c7fbcaff6449"
+  },
+  "repository_binding_review_sha256": "0922c3a7c64e610683911c1205a5a3f574740da9aa834234f7d3c7fbcaff6449",
+  "repository_bindings": [
+    {
+      "requested_repo": "xiaochy/H2RBench",
+      "resolved_repo": "xiaochy/H2RBench",
+      "aliases_in_this_review": [
+        "xiaochy/h2rbench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5082e75c4c6bbc1423a3b32bc095d29f1b23411d",
+          "reviewed_files": [
+            "PolaRiS-Hub/put_red_cup_no_curtain/scene.json",
+            "README.md",
+            "scripts/eval_policy.py",
+            "src/polaris/environments/__init__.py",
+            "src/polaris/environments/manager_based_rl_splat_environment.py",
+            "src/polaris/environments/rubrics/base.py",
+            "src/polaris/environments/rubrics/checkers.py",
+            "src/polaris/utils.py",
+            "src/polaris/utils_/eval_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/xiaochy/H2RBench",
+          "link_label": "Code",
+          "project_url": "https://h2rbench.github.io/",
+          "page_sha256": "471a08b7f3fb6f41e3fd611edb8ca652d038ba724298f9feaa2328e64260fc08"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P177",
+          "review_file": "content/github_review/reviews/P177.json",
+          "review_sha256": "0922c3a7c64e610683911c1205a5a3f574740da9aa834234f7d3c7fbcaff6449",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P177",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "H2RBench（policy transfer），arXiv 2609.24778v2；非P151video-generation H2R-Bench。",
+    "scope_read": "4task全表、fixed robot/human scaling、real-to-sim、90rollout及transfer metrics。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      17
+    ],
+    "domains": [
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "人類示範與技能轉移",
+    "environment": "4個real-to-sim task環境，PolaRiS/Marble/IsaacLab，real human由第三人稱multi-view錄製。",
+    "tasks": "4families：mug-to-plate、bowl stacking、donut insertion、sequential blocks-to-box。",
+    "cases": "robot demo budgets40/100/100/100；human上限100/300/300/300；每method/task90randomized rollouts across3seeds。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "manipulation task families",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 340,
+        "unit": "固定robot demonstration預算",
+        "qualifier": "40+100+100+100",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "human demonstration上限預算",
+        "qualifier": "100+300+300+300",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 90,
+        "unit": "每method/task eval rollouts",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "final/mean-stage SR；human增益用Δlogit；sim/real分別訓練policy，再以r/ρ/MMRV比排名。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "fixed robot data、只增加human demos；sim與real是不同pipeline驗證，不是同一policy直接sim2real。",
+    "lineage": "PolaRiS、TRELLIS、GELLO、四種既有H2R方法；與human-only預訓練資料庫不同。",
+    "related_paper_ids": [
+      "P151",
+      "P104",
+      "P119"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§3–5、表2",
+        "supports": "4、340/1000、90与雙pipeline比較"
+      }
+    ],
+    "unresolved": [
+      "各human/robot pair是否一對一不應由demo預算推定；完整IDs需原生release。"
+    ],
+    "reuse": "提供人類資料規模增益的受控比較，無需靠多拿robot data製造規模優勢。",
+    "reviewed_pdf_sha256": "dd841fb3a72307c335d2c7268ac813f8209a448dd2242d6e49db90da7a0169d1",
+    "reviewed_on": "2026-10-02",
+    "name": "H2RBench（human transfer）",
+    "year": 2026,
+    "title": "H2RBench: A Real-to-Sim Benchmark for Evaluating Human-to-Robot Transfer",
+    "source_url": "https://arxiv.org/abs/2609.24778",
+    "primary_type": "T",
+    "category_name": "人類觀測到機器人轉移",
+    "domain_ids": [
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P177",
+      "domain_ids": [
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P177",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            17
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4families：mug-to-plate、bowl stacking、donut insertion、sequential blocks-to-box。",
+            "4個real-to-sim task環境，PolaRiS/Marble/IsaacLab，real human由第三人稱multi-view錄製。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "dd841fb3a72307c335d2c7268ac813f8209a448dd2242d6e49db90da7a0169d1"
+        },
+        {
+          "paper_id": "P177",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            17
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "杯碗處理之外，另有donut插入、方塊順序裝盒的通用作業。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "dd841fb3a72307c335d2c7268ac813f8209a448dd2242d6e49db90da7a0169d1"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "dd841fb3a72307c335d2c7268ac813f8209a448dd2242d6e49db90da7a0169d1",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P177",
+      "name": "H2RBench（human transfer）",
+      "expected_title": "H2RBench: A Real-to-Sim Benchmark for Evaluating Human-to-Robot Transfer",
+      "source_url": "https://arxiv.org/abs/2609.24778",
+      "pdf_url": "https://arxiv.org/pdf/2609.24778",
+      "retrieved_at": "2026-10-02T21:34:51.640276+00:00",
+      "pdf_sha256": "dd841fb3a72307c335d2c7268ac813f8209a448dd2242d6e49db90da7a0169d1",
+      "text_sha256": "89ca0ae5d56682dcc59ccf176bdc8e60642a108548aa8fe5c9dfe850b508c600",
+      "pdf_bytes": 19851827,
+      "pages": 27,
+      "text_characters": 106453,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.24778v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.24778v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "manipulation task families",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P177:1",
+        "paper_id": "P177",
+        "benchmark": "H2RBench（human transfer）",
+        "native_term": "manipulation task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.24778v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.24778v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 340,
+        "unit": "固定robot demonstration預算",
+        "qualifier": "40+100+100+100",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P177:2",
+        "paper_id": "P177",
+        "benchmark": "H2RBench（human transfer）",
+        "native_term": "固定robot demonstration預算",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.24778v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.24778v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 1000,
+        "unit": "human demonstration上限預算",
+        "qualifier": "100+300+300+300",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P177:3",
+        "paper_id": "P177",
+        "benchmark": "H2RBench（human transfer）",
+        "native_term": "human demonstration上限預算",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.24778v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.24778v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 90,
+        "unit": "每method/task eval rollouts",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P177:4",
+        "paper_id": "P177",
+        "benchmark": "H2RBench（human transfer）",
+        "native_term": "每method/task eval rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.24778v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.24778v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "xiaochy/H2RBench"
+  ],
+  "external_repositories": []
+}

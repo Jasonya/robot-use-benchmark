@@ -1,0 +1,469 @@
+{
+  "paper_id": "P238",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已核 ObjectPrompt 的 Ego4D clips→視覺／物件features→K序列→ED/AUED 與submission核心。現行release有README維度及fps矛盾，物件特徵／prompt生成資產未閉合；論文的50Salads MoC和EGTEA next-action實驗不能因共用論文而視為已核可執行。",
+  "identity_note": "arXiv:2311.00180v1（2023-10-31），Ce Zhang、Changcheng Fu、Shijie Wang、Nakul Agarwal、Kwonjoon Lee、Chiho Choi、Chen Sun。PDF p.1直接連brown-palm/ObjectPrompt，README對應同名WACV2024論文。清單2023是初稿年；程式固定2023-12-31 commit。",
+  "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+  "reading_order": [
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          3
+        ],
+        [
+          34,
+          71
+        ],
+        [
+          95,
+          110
+        ]
+      ],
+      "why": "精確論文、Ego4D v1、外部 features 說明與維度／fps歧義。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "configs/ego4d/sf_video_image_object_glip.yaml",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "why": "N=3/Z=20、30fps、10物件、GLIP256維及checkpoint指標。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "configs/ego4d/sf_video_image_object_clip.yaml",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "why": "同協定的CLIP768維對照。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "src/defaults.py",
+      "ranges": [
+        [
+          104,
+          113
+        ],
+        [
+          169,
+          210
+        ],
+        [
+          232,
+          296
+        ]
+      ],
+      "why": "K=5、naive sampling、strict、mask與輸入來源預設。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "src/datasets/base_dataset.py",
+      "ranges": [
+        [
+          34,
+          48
+        ],
+        [
+          84,
+          174
+        ],
+        [
+          239,
+          336
+        ],
+        [
+          338,
+          472
+        ],
+        [
+          474,
+          522
+        ],
+        [
+          528,
+          649
+        ]
+      ],
+      "why": "原生clips／case建立、秒→feature索引、multi-modal tensor、split和reader。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "src/datasets/clip_samplers.py",
+      "ranges": [
+        [
+          11,
+          44
+        ]
+      ],
+      "why": "random／last／uniform clip取樣與短片段回傳差異。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "src/models/model.py",
+      "ranges": [
+        [
+          147,
+          199
+        ],
+        [
+          340,
+          352
+        ],
+        [
+          406,
+          482
+        ]
+      ],
+      "why": "物件尾6欄的實際切片、confidence處理及K序列生成。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "src/tasks/video_classification_task.py",
+      "ranges": [
+        [
+          16,
+          52
+        ],
+        [
+          107,
+          214
+        ]
+      ],
+      "why": "GT label只供loss/scorer，逐head/step分數、epoch聚合與test submission。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "src/utils/eval_util.py",
+      "ranges": [
+        [
+          9,
+          13
+        ],
+        [
+          34,
+          50
+        ],
+        [
+          52,
+          152
+        ],
+        [
+          154,
+          168
+        ]
+      ],
+      "why": "top-k分母、best-of-K ED/AUED與不等價的submission缺件檢查。"
+    },
+    {
+      "repo": "brown-palm/ObjectPrompt",
+      "path": "scripts/run.py",
+      "ranges": [
+        [
+          23,
+          98
+        ],
+        [
+          136,
+          151
+        ]
+      ],
+      "why": "validation checkpoint選擇、固定seed、test限定單GPU。"
+    }
+  ],
+  "environment": "人類離線影片。Ego4D與EGTEA Gaze+為第一人稱；50Salads為第三人稱烹飪。物件box及attention token是觀測表徵，不是robot pose、抓取目標或可執行動作。",
+  "tasks": "公開設定做Ego4D LTA：N=3個已標註過去segment、Z=20個未來verb–noun、K=5序列，115 verbs／478 nouns。ObjectPrompt detector的81類embedding槽、每frame 10 detections與action taxonomy不同。論文另有EGTEA Gaze+ next-action top1/class-mean accuracy，以及50Salads α/β dense MoC；本repo tree只有Ego4D配置與clips reader，後兩者的資料／scorer未閉合。",
+  "data": "fho_lta_{train,val,test_unannotated}.json根clips，以相鄰clip_uid分組再按action_idx排序；用action_clip_start_sec/end_sec切.mp4，forecast_labels_idx為[Z,2]且次序verb,noun，last_observed_id=clip_uid_最後observed action_idx。設定input_segments=[-3,0)、output=[0,20)，mask預設false，名義上L個連續segments提供max(0,L-3-20+1)個完整視窗，仍須檢驗排序、短segment及資產可讀性。test label填-1。image/object檔為各clip_uid.pt；object每token先D維特徵，尾6欄是xyxy四值、class_id、confidence；依模型切片及配置，GLIP是256+6=262，CLIP是768+6=774；image維度分別256／768。bbox原始座標單位／縮放未由讀取器驗證。每segment選4個frame，每frame10物件，image token另存，可對應論文把整張frame算第11個object的敘述。README寫1FPS及GLIP232、CLIP image256，與配置image/object.fps=30和實際維度不符。索引由int(t*fps)取用，strict只把最後觀測segment末端扣半個feature frame；validation/test仍random抽interval frame，不能聲稱固定center sampling。",
+  "evaluation": "ClassificationModule.generate的naive方法先把head logits clamp(min=0)，各verb/noun head獨立Categorical抽K序列；k=1才argmax。Task用[B,Z,K]逐head呼叫distributed_AUED：每case/prefix取min_k(editdistance.eval/該prefix長度)，再case平均；prefix 1..20積分trapz/(20-1)，ED_19即ED@20，AUED_mean只是verb/noun兩head平均。epoch再不按batch size加權平均；DDP all_gather後仍須檢查sampler重複和最後batch分母。這條鏈沒有joint action-pair ED；論文稱Damerau–Levenshtein，本地實際用editdistance.eval，正式server一致性未驗證。top1/top5為每position正確case/該batch case，對時間位置與head再平均，並非EGTEA所需class-mean。AUED在Z=1硬回1.0，不可拿來評next-action。test單GPU、無本地GT scorer，submission是{last_observed_id:{verb:K×Z,noun:K×Z}}。",
+  "standardization": {
+    "profile": "offline_object_augmented_action_sequence_forecasting",
+    "reuse": "Ego4D原始case key／label欄位、multimodal feature尾欄解析、confidence閾值及ED/AUED原生邏輯。",
+    "transform": "source保存paper/repo/Ego4D版本與GLIP/CLIP prompt／features來源；domain/environment按資料集視角分離；task區分Ego4D sequence、EGTEA next-action、50Salads dense timeline。case=(dataset revision,split,clip_uid,last_observed_action_idx,N,Z)，時間保留原video秒、feature fps及index；box另記座標系，object_class_id與action noun分開。evaluator保留K、clamped-logit sampling、prefix normalization、head mean、batch aggregation與正式server角色；不產生共通success。",
+    "missing": "取得並固定外部object/image features、prompt詞表（most-common/kmeans/coco）與其只由training資料建立的證據；先解決30vs1FPS、GLIP262vs232與CLIP image768vs256，再驗證shape與索引邊界。reader只load特徵、模型只信任尾欄，不能由README認定完整feature extraction已核。RandomClipSampler在短segment時回[a,b]，fill_video卻期待[[a,b]]，要修復或給出可追蹤排除規則。若任一啟用modality缺anno，convert仍可能以至少一modality收案，getitem卻要求全部啟用key，須檢查case完整性。submission checker硬從i=7起查且用位置i組key，與N=3的actual action_idx reader不同；不能當全case覆蓋驗證。50Salads/EGTEA仍需對應release與各自scorer。"
+  },
+  "version_note": "固定 a826b3d0317f03ee2636c200fb6255ac36f305ba；README、YAML、論文附錄的影片取樣與特徵維度須逐項核合，不能以下載到README/feature說明代替核心碼核讀。paper最終test報action ED但本地Task只評兩head。source tree中的ego4dv2僅見範例註解，不能當實際存在的v2設定。未載入模型、PT資產或重跑任何結果。",
+  "discovery_evidence": [
+    {
+      "provider": "primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P238/pages.json",
+      "sha256": "678d243ea5e6b23a924192c2f59c4c4ede0b295a4a6d5d560519543ed4f6a0d0",
+      "url": "https://arxiv.org/pdf/2311.00180",
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/4/text",
+        "/5/text",
+        "/7/text",
+        "/11/text"
+      ],
+      "version": "arXiv:2311.00180v1; WACV 2024",
+      "pdf_local_file": "audit/.cache/fulltext_review/P238/paper.pdf",
+      "pdf_sha256": "f011c5827266b420ce96b768db64418026cb6a33634248506a025059673f593c",
+      "pages": [
+        1,
+        3,
+        5,
+        6,
+        8,
+        12
+      ]
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "README.md",
+      "git_blob_sha": "8c938e12a8066b6ca301c11a587a2ab318fd89b9",
+      "sha256": "4ab52674e87e28ccaa6efa461629e67f3091263ee50497b48dc86ebe04a4ff11",
+      "local_file": "audit/.cache/github_review/repos/brown-palm__ObjectPrompt/files/README.md",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/README.md",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/README.md",
+      "ranges": [
+        [
+          1,
+          3
+        ],
+        [
+          34,
+          71
+        ],
+        [
+          95,
+          110
+        ]
+      ],
+      "why": "精確論文、Ego4D v1、外部 features 說明與維度／fps歧義。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "configs/ego4d/sf_video_image_object_glip.yaml",
+      "git_blob_sha": "1797de06a88329585434deb2da9c57ce973d1dfc",
+      "sha256": "6acd72b34eb9d53a291fdce72055deb1f7c15c45bffcfbd02f2342e37bb02212",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/brown-palm__ObjectPrompt/configs/ego4d/sf_video_image_object_glip.yaml",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/configs/ego4d/sf_video_image_object_glip.yaml",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/configs/ego4d/sf_video_image_object_glip.yaml",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "why": "N=3/Z=20、30fps、10物件、GLIP256維及checkpoint指標。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "configs/ego4d/sf_video_image_object_clip.yaml",
+      "git_blob_sha": "ff4b3819cd88980b5ca3f4eb6172127def679abb",
+      "sha256": "e5e3fa26123610b05c0e5b49c651cdc0106539cc1aee58c96faf2178737635c1",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/brown-palm__ObjectPrompt/configs/ego4d/sf_video_image_object_clip.yaml",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/configs/ego4d/sf_video_image_object_clip.yaml",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/configs/ego4d/sf_video_image_object_clip.yaml",
+      "ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "why": "同協定的CLIP768維對照。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "src/defaults.py",
+      "git_blob_sha": "fe9c958fc5f29e0ff63a53f7805d02f88345fcdc",
+      "sha256": "59eba98f6e18da9e9657963e54fab8a9387dd1f052e1a9c477c0a7aab5b3213d",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/brown-palm__ObjectPrompt/src/defaults.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/defaults.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/defaults.py",
+      "ranges": [
+        [
+          104,
+          113
+        ],
+        [
+          169,
+          210
+        ],
+        [
+          232,
+          296
+        ]
+      ],
+      "why": "K=5、naive sampling、strict、mask與輸入來源預設。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "src/datasets/base_dataset.py",
+      "git_blob_sha": "97743a696dc6606e0312a0d1aad3ded4c4762bc7",
+      "sha256": "eec6935ccb358666a24a3fb6c9329d224e0798e9cdfa638ea3d315c59222dbe4",
+      "local_file": "audit/.cache/github_review/repos/brown-palm__ObjectPrompt/files/src/datasets/base_dataset.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/datasets/base_dataset.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/datasets/base_dataset.py",
+      "ranges": [
+        [
+          34,
+          48
+        ],
+        [
+          84,
+          174
+        ],
+        [
+          239,
+          336
+        ],
+        [
+          338,
+          472
+        ],
+        [
+          474,
+          522
+        ],
+        [
+          528,
+          649
+        ]
+      ],
+      "why": "原生clips／case建立、秒→feature索引、multi-modal tensor、split和reader。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "src/datasets/clip_samplers.py",
+      "git_blob_sha": "b91cbdfb882d542565dd1972a1de4f68c2ee79df",
+      "sha256": "fb90309537b744e65cd025de05ef870e1e5d8488f55c39e70d061da04685489a",
+      "local_file": "audit/.cache/github_review/repos/brown-palm__ObjectPrompt/files/src/datasets/clip_samplers.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/datasets/clip_samplers.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/datasets/clip_samplers.py",
+      "ranges": [
+        [
+          11,
+          44
+        ]
+      ],
+      "why": "random／last／uniform clip取樣與短片段回傳差異。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "src/models/model.py",
+      "git_blob_sha": "f1e93ec404c370fa7aad9516c50e753f0d339199",
+      "sha256": "8a0d2f283cf97060d357cf5bbc8f56e94540b6b9a937a367269763adc2373a7d",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/brown-palm__ObjectPrompt/src/models/model.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/models/model.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/models/model.py",
+      "ranges": [
+        [
+          147,
+          199
+        ],
+        [
+          340,
+          352
+        ],
+        [
+          406,
+          482
+        ]
+      ],
+      "why": "物件尾6欄的實際切片、confidence處理及K序列生成。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "src/tasks/video_classification_task.py",
+      "git_blob_sha": "0061d9ccd7cfccd1eb5b7057a82c6a593550f44f",
+      "sha256": "e697bf861dd6b2fa67b46c65f22395b4480ae5b97497c679fcc0ebef584ebec9",
+      "local_file": "audit/.cache/github_review/repos/brown-palm__ObjectPrompt/files/src/tasks/video_classification_task.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/tasks/video_classification_task.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/tasks/video_classification_task.py",
+      "ranges": [
+        [
+          16,
+          52
+        ],
+        [
+          107,
+          214
+        ]
+      ],
+      "why": "GT label只供loss/scorer，逐head/step分數、epoch聚合與test submission。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "src/utils/eval_util.py",
+      "git_blob_sha": "a8093f0a9cc3f2e21f64fd9ba61cdda27a3ca7e2",
+      "sha256": "1f8831f15aae1128796f423f064331998a5334603a4d8d02a327387a89754a54",
+      "local_file": "audit/.cache/github_review/repos/brown-palm__ObjectPrompt/files/src/utils/eval_util.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/utils/eval_util.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/src/utils/eval_util.py",
+      "ranges": [
+        [
+          9,
+          13
+        ],
+        [
+          34,
+          50
+        ],
+        [
+          52,
+          152
+        ],
+        [
+          154,
+          168
+        ]
+      ],
+      "why": "top-k分母、best-of-K ED/AUED與不等價的submission缺件檢查。"
+    },
+    {
+      "provider": "github",
+      "repo": "brown-palm/ObjectPrompt",
+      "commit": "a826b3d0317f03ee2636c200fb6255ac36f305ba",
+      "path": "scripts/run.py",
+      "git_blob_sha": "b2c7531d558e27c4f66af1430aeffc1a78f91f94",
+      "sha256": "9cdd6f4a728f13cb38d2de895e616f89290b503e6ab2393ee6b532229bb3303c",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/brown-palm__ObjectPrompt/scripts/run.py",
+      "url": "https://github.com/brown-palm/ObjectPrompt/blob/a826b3d0317f03ee2636c200fb6255ac36f305ba/scripts/run.py",
+      "raw_url": "https://raw.githubusercontent.com/brown-palm/ObjectPrompt/a826b3d0317f03ee2636c200fb6255ac36f305ba/scripts/run.py",
+      "ranges": [
+        [
+          23,
+          98
+        ],
+        [
+          136,
+          151
+        ]
+      ],
+      "why": "validation checkpoint選擇、固定seed、test限定單GPU。"
+    }
+  ],
+  "runtime_executed": false
+}

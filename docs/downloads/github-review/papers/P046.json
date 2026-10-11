@@ -1,0 +1,174 @@
+{
+  "paper_id": "P046",
+  "name": "RULSTM",
+  "title": "What Would You Expect? Anticipating Egocentric Actions with Rolling-Unrolling LSTMs and Modality Attention",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1905.09035",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P046",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RULSTM同一倉庫含2019方法、PAMI擴展及EK55/EK100版本；動作前時間窗、資料身份與原生取樣設定須保留。",
+    "environment": "第一人稱影片和特徵LMDB；程式中的env是LMDB讀取環境，不是機器人場景。",
+    "tasks": "動作預測及early recognition；同一標註在多個提前量報分，不等於多個新活動任務。",
+    "data": "CSV含標註ID、video、start/end frame與verb/noun/action；LMDB特徵按frame索引。SequenceDataset設定time_step、fps、sequence_length及action_samples，不足歷史者列入discarded_ids。",
+    "evaluation": "utils.py實作top-k accuracy、逐類平均top-k recall與多時間點結果；TTA使用原生2.0至0.25秒格。EK55/EK100 label space、split及官方JSON需分開。",
+    "standardization": {
+      "profile": "action_anticipation",
+      "reuse": "原生CSV/LMDB欄位、動作映射、時間取樣、排除清單及metrics。",
+      "transform": "保存context截止點、提前量、frame到時間換算及label空間；action_features只在合法協定中暴露。",
+      "missing": "特徵素材閉合、排除樣本分母、父EPIC資料重複及訓練汙染核對。"
+    },
+    "version_note": "現行repo含EK100等後續版本；P046原作EK55設定及後續基線不可合成新資料來源。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/rulstm",
+        "requested_repo": "fpv-iplab/rulstm",
+        "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            15,
+            94
+          ],
+          [
+            180,
+            229
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 323,
+        "sha256": "9da58396b10fff5dae0e5fd2086dc075dbe6d494fb6e2d9e1936272166d9db3a",
+        "url": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/README.md",
+        "reading_url": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/README.md#L15-L94",
+        "why": "核對論文及兩代資料與CSV。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/rulstm",
+        "requested_repo": "fpv-iplab/rulstm",
+        "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+        "ref": null,
+        "path": "RULSTM/dataset.py",
+        "ranges": [
+          [
+            23,
+            64
+          ],
+          [
+            110,
+            158
+          ],
+          [
+            184,
+            209
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 210,
+        "sha256": "ed9afc9f81a852700161ec00cf35398155250613cbb2a11dc1e6d68502fd695d",
+        "url": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/dataset.py",
+        "reading_url": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/dataset.py#L23-L64",
+        "why": "核對過去和動作內特徵、時間設定與discarded IDs。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "fpv-iplab/rulstm",
+        "requested_repo": "fpv-iplab/rulstm",
+        "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+        "ref": null,
+        "path": "RULSTM/utils.py",
+        "ranges": [
+          [
+            43,
+            96
+          ],
+          [
+            108,
+            155
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 177,
+        "sha256": "1b2fd26db8c2c84e7aa248222161a8482cc61a44885dbda6e4e031132a9fe25f",
+        "url": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/utils.py",
+        "reading_url": "https://github.com/fpv-iplab/rulstm/blob/e648c7ee40a1a71381bfaa7563f2e8a6935275ab/RULSTM/utils.py#L43-L96",
+        "why": "核對top-k、macro recall、TTA和官方輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "5dbe702cc33fc4ce22b1738c871394a2659f7682aaf34b324a619ff056b8095a"
+  },
+  "repository_binding_review_sha256": "5dbe702cc33fc4ce22b1738c871394a2659f7682aaf34b324a619ff056b8095a",
+  "repository_bindings": [
+    {
+      "requested_repo": "fpv-iplab/rulstm",
+      "resolved_repo": "fpv-iplab/rulstm",
+      "aliases_in_this_review": [
+        "fpv-iplab/rulstm"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "e648c7ee40a1a71381bfaa7563f2e8a6935275ab",
+          "reviewed_files": [
+            "README.md",
+            "RULSTM/dataset.py",
+            "RULSTM/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://iplab.dmi.unict.it/live/code",
+          "page_sha256": "b4e2b95b2d44be17e3339c79d34b42a6c2f04e6b0d7b0132c75cb16359e8d2ac",
+          "url": "https://github.com/fpv-iplab/rulstm",
+          "link_label": "https://github.com/fpv-iplab/rulstm"
+        },
+        {
+          "kind": "repository_search_candidate",
+          "query": "rulstm",
+          "search_receipt_sha256": "8a7591c26fd4c54ef241c65e0e94d14ef0ec3e9d0b0b04c2b255a99c4531728a",
+          "url": "https://github.com/fpv-iplab/rulstm",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P046",
+          "review_file": "content/github_review/reviews/P046.json",
+          "review_sha256": "5dbe702cc33fc4ce22b1738c871394a2659f7682aaf34b324a619ff056b8095a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "fpv-iplab/rulstm"
+  ],
+  "external_repositories": []
+}

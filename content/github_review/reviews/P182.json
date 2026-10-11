@@ -1,0 +1,768 @@
+{
+  "paper_id": "P182",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+  "version_alignment": "public_v0_1_not_aligned_with_pinned_paper",
+  "identity_note": "arXiv:2608.18701v1 第1頁直接連至此repo，作者與README的Bowen Jing、Mingxin Wang等一致，故為第一方來源。但2026-07-22固定commit的README／專案頁仍連2607.04234並使用Safety-Aware舊題名；不能據此改寫收錄PDF身分或當作新paper版本已完整發布。",
+  "summary": "核讀的是舊v0.1的四suite task/config、HDF5 reader、具體goal checker、FEM Kabsch變形計算、per-object calibration及正式softvtbench_metrics。它與收錄論文的資料規模、asset清單及90th-percentile門檻不同，且runtime停用了drop termination；本筆是有版本限制的程式核讀，不代表已重現4,000示範版DSR。",
+  "reading_order": [
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "README.md",
+      "ranges": [
+        [
+          3,
+          33
+        ],
+        [
+          47,
+          105
+        ],
+        [
+          229,
+          238
+        ],
+        [
+          375,
+          407
+        ]
+      ],
+      "why": "第一方作者身分、舊資料規模、v0.1模型範圍與50次/task預算。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "configs/benchmark_protocol_v1.json",
+      "ranges": [],
+      "why": "正式程式protocol與README文字差異。",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "configs/object_soft/libero_object.json",
+      "ranges": [],
+      "why": "task_id、language、native BDDL來源、goals、assets／regions與robot pose。",
+      "json_pointers": [
+        "/task_suite_name",
+        "/total_tasks",
+        "/tasks/0"
+      ]
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/config/franka/franka_libero_env_cfg.py",
+      "ranges": [
+        [
+          90,
+          126
+        ],
+        [
+          388,
+          401
+        ],
+        [
+          829,
+          835
+        ]
+      ],
+      "why": "JSON task reader、success term註冊，soft物件跳過rigid contact sensor建置。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/mdp/terminations.py",
+      "ranges": [
+        [
+          103,
+          169
+        ]
+      ],
+      "why": "實際位置／高度／可用時contact-force合取；IN與ON共用位置近似。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/common/closedloop_policy_inference.py",
+      "ranges": [
+        [
+          43,
+          66
+        ],
+        [
+          89,
+          104
+        ]
+      ],
+      "why": "取出success後由client檢查；runtime停用timeout與object_dropped。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/openpi/openpi_inference_client.py",
+      "ranges": [
+        [
+          555,
+          594
+        ],
+        [
+          726,
+          789
+        ],
+        [
+          2053,
+          2069
+        ],
+        [
+          2178,
+          2186
+        ]
+      ],
+      "why": "action模式、30×10預算、8連續成功step與debug success_now欄位。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/object_soft/replay_format/assemble_object_soft_replay_format.py",
+      "ranges": [
+        [
+          29,
+          52
+        ],
+        [
+          66,
+          83
+        ],
+        [
+          168,
+          180
+        ],
+        [
+          243,
+          257
+        ]
+      ],
+      "why": "native示範metadata、FEM summaries、success篩選及task/demo去重。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/common/convert_all_libero_to_lerobot_openpi.py",
+      "ranges": [
+        [
+          122,
+          176
+        ],
+        [
+          257,
+          348
+        ]
+      ],
+      "why": "7D／legacy8D轉換、wxyz到axis-angle、影片對齊與13D拒絕條件。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/common/deformation.py",
+      "ranges": [
+        [
+          6,
+          53
+        ]
+      ],
+      "why": "metric ID、proper Kabsch去平移／旋轉後的RMS與bbox百分比。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/common/calibrate_safety_thresholds.py",
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          36,
+          89
+        ]
+      ],
+      "why": "舊版tau=0.5×最大stable compression peak，並非PDF的90th percentile。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "configs/safety_thresholds.json",
+      "ranges": [],
+      "why": "每asset的tau、d_ref、kappa、stable trial數及calibration版本。",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/common/softvtbench_metrics.py",
+      "ranges": [
+        [
+          55,
+          98
+        ],
+        [
+          109,
+          225
+        ],
+        [
+          233,
+          274
+        ],
+        [
+          302,
+          331
+        ]
+      ],
+      "why": "正式HDF5/JSONL scorer、missing-evidence語義、百分比與不同分母。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/spatial_soft/evaluation/spatial_soft_safety_metrics.py",
+      "ranges": [
+        [
+          1,
+          14
+        ]
+      ],
+      "why": "此global-threshold舊檔已deprecated，不能作正式scorer。"
+    },
+    {
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/common/metrics.py",
+      "ranges": [
+        [
+          121,
+          189
+        ],
+        [
+          261,
+          300
+        ]
+      ],
+      "why": "附加force診斷的local-frame定義及max其實為Top5%均值。"
+    }
+  ],
+  "environment": "Isaac Sim／Isaac Lab，Franka Panda及雙指GelSight Mini，FEM deformable物件、剛性對照與tactile proxy；與Tabero／LIBERO有重用關係。task JSON分fixtures、objects、regions、robot_base_pos／wxyz orientation、obj_of_interest與tactile_targets，soft／rigid twin及場景variation要各自保留，不將舊LIBERO BDDL檔名當作當前soft task身分。",
+  "tasks": "Object-Soft、Spatial-Soft、Object-Rigid、Spatial-Rigid是2×2 matched suites，核心為pick-and-place。收錄論文每suite10 tasks／1,000 demos，另500 ID evaluation episodes／suite（50/task），soft suites各9種單因子OOD條件、每suite/config合計900 OOD trials。程式的generic softvtbench_tasks.json另列libero_10/spatial/object/goal各0–9，不能直接當四個soft/rigid suite mapping。實查object_soft config有10 tasks；task0為取white swirled soft pastry放basket，其asset soft_pastry001與舊alphabet_soup BDDL並存。",
+  "data": "PDF宣稱4,000 demonstrations、50+ assets；README舊v0.1是1,628 demonstrations（500/500/421/207）與33 assets，均非本輪實際下載數。20 Hz同步第三人稱／腕部RGB、左右tactile RGB/marker motion、proprioception、language及binary/continuous gripper；FEM為evaluator-only。所讀HDF5使用data/demo_*、actions、obs/eef_pose（xyz+wxyz）、obs/gripper_pos、states/deformable_object/<asset>/nodal_pos_w與soft_extras。assembly保留original_demo_id並按(task_id,demo_id)去重；缺success attr預設True，匯入需額外驗證。7D converter以xyz+axis-angle+單指gripper為state，接受7D或legacy8D action，13D force-in-action需另一converter；較短影片路徑有隨機drop state/action再切video的分支，不能宣稱與PDF『無重採樣』完全一致。模型7D、legacy8D、13D及server padded32D不可混為一種action space。",
+  "evaluation": "goal checker逐個goals合取xy距離與(|Δz|−height_diff)<height_threshold；IN/ON尚共用此公式，force條件只在enable_force_threshold='True'且sensor存在時啟用。task0閾值xy=0.2、height=0.2、force=0.05（原生模擬尺度），soft asset建置會跳過該rigid contact sensor。client預設30次推論×10動作、8連續success steps；但正式JSONL scorer取最後success_now，須核對其與experiment_success一致，且成功／terminated會在debug記錄前break。FEM正式metric_id=fem_rms_rigid_aligned_bbox_pct_v1，以首個節點狀態作reference，proper Kabsch禁止reflection，D(t)=100×RMS位移／reference bbox diagonal，D_peak=max_t D(t)。程式SafeSuccess=GoalSuccess且D_peak≤tau，未另檢NoDrop，harness也停用*_dropped；不能宣稱符合PDF的drop即停。舊calibrator用0.5×max stable peak；例如soft_pastry001 tau=0.44692%，PDF表9的90th-percentile tau為7.6%，差異不是單純改名。正式scorer重算HDF5 nodes、檢JSONL metric ID；goal rate分母是已知goal episodes，safe rate分母是全部episodes，未知safety保留n_safe_unknown且不算safe。strict通過且分母一致前，goal_safe_gap不具有PDF TSR−DSR的精確語義。rigid診斷可令safe=goal，公表仍應保留N/A／適用性。",
+  "standardization": {
+    "profile": "versioned_visuotactile_fem_manipulation",
+    "reuse": "具體task/config、native HDF5與影片索引、policy/evaluator通道分離、Kabsch FEM公式、per-asset門檻及explicit metric ID。",
+    "transform": "source綁PDF v1與程式v0.1兩個版本；environment記solver／scene／tactile assets；task以suite+native task_id+asset identity建立；case分demo、ID trial、OOD trial並保存paired seed／initial state。evaluator保留TSR/DSR與程式Goal/Safe label的版本關係，另記tau生成方法、reference nodes、百分比尺度、成功horizon及drop規則。domain依實際pick/place用途映射。附加force的squeeze=2min(|fLz|,|fRz|)，applied-force z扣除成對squeeze，*_max是非零Top5%均值，不映成物理peak。",
+    "missing": "對應2608.18701的4,000版release／split manifest、90th-percentile calibration與rescorer、soft_stw_cuboid_hq等新版asset對照；drop termination及300-step協定閉合；terminal debug／sustained goal的對齊；資料與USD／Tabero tactile runtime資產取得驗證；原生HDF5 success型別、跨root重複JSONL/HDF5及影片時間對齊。"
+  },
+  "version_note": "固定58056111f（2026-07-22）。repo身分由PDF明鏈與相同作者確認，但README的2607.04234、1,628/33、pi05-only、半最大值calibration都屬舊版；PDF為2608.18701、4,000/50+、Diffusion/π0.5/FastWAM、90th-percentile。另有README NoDrop敘述與正式code不一致，以及deprecated global-threshold scorer，全部分開記錄。未執行任何模擬或上游模型。",
+  "integration_issues": [
+    "P182不可直接使用此commit的thresholds／資料規模作收錄PDF標準；需先建立明確release alignment。",
+    "runtime停用drop、JSONL最後瞬時success與8連續step判定可能不一致，須先閉合再宣稱可執行DSR。",
+    "區分canonical FEM scorer、deprecated spatial scorer和Top5% force diagnostics；缺值與混合demo/rollout分母須驗證。"
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/github_review/P182-discovery.json",
+      "sha256": "e64ae8f8ab718a074c8baacb8fa5d70c164431d1bbd9a1186b7b3dd47eeeaca4",
+      "json_pointers": [
+        "/candidates/0",
+        "/candidates/1",
+        "/candidates/2",
+        "/paper_url",
+        "/pdf_sha256",
+        "/title"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/TuojingAI__SoftVTBench/files/README.md",
+      "sha256": "7a7067978e09eb775ba925fe8fcf234290f05000e9e03ec6fbb5744cfe148008",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "README.md",
+      "git_blob_sha": "329af72e3b18f741a767e8062cfc0096720541ec",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/README.md",
+      "read_ranges": [
+        [
+          1,
+          183
+        ],
+        [
+          202,
+          238
+        ],
+        [
+          297,
+          417
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/TuojingAI__SoftVTBench/tree.json",
+      "sha256": "c920fa074617af90403c6d06124d5e5ac545e2b15dd9244ba725fc6d3dcc270d",
+      "kind": "pinned_repository_tree",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "url": "https://api.github.com/repos/TuojingAI/SoftVTBench/git/trees/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be?recursive=1",
+      "json_pointers": [
+        "/tree/11",
+        "/tree/139",
+        "/tree/14",
+        "/tree/140",
+        "/tree/143",
+        "/tree/144",
+        "/tree/147",
+        "/tree/148",
+        "/tree/149",
+        "/tree/15",
+        "/tree/156",
+        "/tree/157",
+        "/tree/158",
+        "/tree/16",
+        "/tree/164",
+        "/tree/17",
+        "/tree/171",
+        "/tree/172",
+        "/tree/178",
+        "/tree/18",
+        "/tree/181",
+        "/tree/188",
+        "/tree/189",
+        "/tree/19",
+        "/tree/190",
+        "/tree/191",
+        "/tree/192",
+        "/tree/193",
+        "/tree/194",
+        "/tree/195",
+        "/tree/196",
+        "/tree/197",
+        "/tree/198",
+        "/tree/2",
+        "/tree/20",
+        "/tree/201",
+        "/tree/202",
+        "/tree/203",
+        "/tree/204",
+        "/tree/205",
+        "/tree/207",
+        "/tree/208",
+        "/tree/209",
+        "/tree/21",
+        "/tree/210",
+        "/tree/211",
+        "/tree/212",
+        "/tree/213",
+        "/tree/214",
+        "/tree/215",
+        "/tree/216",
+        "/tree/217",
+        "/tree/22",
+        "/tree/222",
+        "/tree/223",
+        "/tree/224",
+        "/tree/225",
+        "/tree/226",
+        "/tree/227",
+        "/tree/228",
+        "/tree/23",
+        "/tree/233",
+        "/tree/234",
+        "/tree/235",
+        "/tree/236",
+        "/tree/237",
+        "/tree/238",
+        "/tree/239",
+        "/tree/24",
+        "/tree/240",
+        "/tree/243",
+        "/tree/25",
+        "/tree/26",
+        "/tree/27",
+        "/tree/28",
+        "/tree/29",
+        "/tree/30",
+        "/tree/31",
+        "/tree/32",
+        "/tree/33",
+        "/tree/34",
+        "/tree/35",
+        "/tree/350",
+        "/tree/36",
+        "/tree/365",
+        "/tree/366",
+        "/tree/369",
+        "/tree/37",
+        "/tree/375",
+        "/tree/38",
+        "/tree/39",
+        "/tree/40",
+        "/tree/41",
+        "/tree/42",
+        "/tree/43",
+        "/truncated"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P182/pages.json",
+      "sha256": "b417b494047929eba4b11a84c8ba158b6933f7c9e005c978fbebc52a9edd9832",
+      "kind": "pinned_pdf_text",
+      "pdf_pages": [
+        1,
+        6,
+        7,
+        8,
+        9,
+        18
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/17/text",
+        "/5/text",
+        "/6/text",
+        "/7/text",
+        "/8/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P182/paper.pdf",
+      "pdf_sha256": "1f353c40268ba3a98d5a2f51892e92c042f89ea87c7ccbe49c10c3ce956fe827"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/TuojingAI__SoftVTBench/files/SoftVTBench/benchmarks/common/metrics.py",
+      "sha256": "8783b8f8fa5a1911c3c043a1c4be8069998f6387c62aa725509105f862d732e7",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/common/metrics.py",
+      "git_blob_sha": "75796576b651974a81e03c129fd3906695ec2b70",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/benchmarks/common/metrics.py",
+      "read_ranges": [
+        [
+          1,
+          339
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/TuojingAI__SoftVTBench/files/experiments/common/deformation.py",
+      "sha256": "e97d1ab04d9ed099c0405bedca1b91bd2651d3e5264eff0fcf23d735fbb5a1fe",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/common/deformation.py",
+      "git_blob_sha": "d2f5985ecfec733e3fae338d2aabebe2cc5f430e",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/experiments/common/deformation.py",
+      "read_ranges": [
+        [
+          1,
+          53
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/TuojingAI__SoftVTBench/files/experiments/object_soft/replay_format/assemble_object_soft_replay_format.py",
+      "sha256": "9a124b25addd79786f3b111fa546956bd7150cc7bc035f6c9b69c1fbeffccb0f",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/object_soft/replay_format/assemble_object_soft_replay_format.py",
+      "git_blob_sha": "58986027aa5ab137bd461dbc3934b551153d2e9d",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/experiments/object_soft/replay_format/assemble_object_soft_replay_format.py",
+      "read_ranges": [
+        [
+          1,
+          125
+        ],
+        [
+          157,
+          259
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/TuojingAI__SoftVTBench/files/experiments/spatial_soft/evaluation/spatial_soft_safety_metrics.py",
+      "sha256": "c6910b39c17cafebaa188c47ce129056f2d62c54f64b0876b0442e7d1c79e7e1",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/spatial_soft/evaluation/spatial_soft_safety_metrics.py",
+      "git_blob_sha": "ecd5dffc19e7c7286fd0087e7db1af3bc1541727",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/experiments/spatial_soft/evaluation/spatial_soft_safety_metrics.py",
+      "read_ranges": [
+        [
+          1,
+          355
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/configs/benchmark_protocol_v1.json",
+      "sha256": "f0e7a425996e5062a484e3aa0affc4ef0024b50d6576e7ada5ec9837dfb4494e",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "configs/benchmark_protocol_v1.json",
+      "git_blob_sha": "302be5b10b33fa597e345ef0fccbd7332a8d8a4d",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/configs/benchmark_protocol_v1.json",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/configs/safety_thresholds.json",
+      "sha256": "d30c802c7489a7812a3d3d9a7e3cdc76177326ddd5475161e72c74bb8be7858d",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "configs/safety_thresholds.json",
+      "git_blob_sha": "78d7746bba4f3439afe3359e0d05e6a9ec6789c0",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/configs/safety_thresholds.json",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/benchmarks/datasets/softvtbench/config/softvtbench_tasks.json",
+      "sha256": "2358131b35fb43cf0f9577b2b2866f1312d4edc253a8dbfa29fc8e00afe39ed4",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/datasets/softvtbench/config/softvtbench_tasks.json",
+      "git_blob_sha": "049764b20bf8528cce991782ede1c598d266f8aa",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/benchmarks/datasets/softvtbench/config/softvtbench_tasks.json",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/experiments/common/softvtbench_metrics.py",
+      "sha256": "cfd050298b13d22ab713b2df95e0cecc884b0c2ef05e83a223875adbc05aa866",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/common/softvtbench_metrics.py",
+      "git_blob_sha": "aefe7a21e3872db657289957bc878f396352b7b0",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/experiments/common/softvtbench_metrics.py",
+      "read_ranges": [
+        [
+          1,
+          356
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/mdp/terminations.py",
+      "sha256": "68d3908df2e57618af93c98eca2843a29bad5bb66c4d75110eb3be8619072c3c",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/mdp/terminations.py",
+      "git_blob_sha": "910f59c657e153aea1e2c0aaa7a0f444842b09e1",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/mdp/terminations.py",
+      "read_ranges": [
+        [
+          1,
+          169
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/configs/object_soft/libero_object.json",
+      "sha256": "ed8bf34970003dc086d3fbee43cabb435f343b0906d54dd0c2e6787f7d34b1dd",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "configs/object_soft/libero_object.json",
+      "git_blob_sha": "f82fb835226130d16005f0da98004ba497de90cb",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/configs/object_soft/libero_object.json",
+      "json_pointers": [
+        "/task_suite_name",
+        "/tasks/0",
+        "/total_tasks"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/benchmarks/openpi/env.py",
+      "sha256": "6332bd6e3dfb67fc0025cdaee8d02f33e59948f8286ffaf171014161baf7bb41",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/openpi/env.py",
+      "git_blob_sha": "9d51cf786e81714c66f6adc6e33150ff83ee047a",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/benchmarks/openpi/env.py",
+      "read_ranges": [
+        [
+          19,
+          50
+        ],
+        [
+          86,
+          138
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/benchmarks/common/convert_all_libero_to_lerobot_openpi.py",
+      "sha256": "5c34baef50755133fe38602f20547503eb5fcedea58d6da5fda8ae9352f81e3b",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/common/convert_all_libero_to_lerobot_openpi.py",
+      "git_blob_sha": "fab9290d9f1195be5fd6feada5847ca666bb153f",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/benchmarks/common/convert_all_libero_to_lerobot_openpi.py",
+      "read_ranges": [
+        [
+          122,
+          178
+        ],
+        [
+          257,
+          350
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/experiments/common/calibrate_safety_thresholds.py",
+      "sha256": "c46c89dac52c84600bf08dc82ced458993481012d8a31945fd682b3f5dbca23b",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "experiments/common/calibrate_safety_thresholds.py",
+      "git_blob_sha": "548fd31cc4f5352f913281a6624092196ee6f867",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/experiments/common/calibrate_safety_thresholds.py",
+      "read_ranges": [
+        [
+          1,
+          12
+        ],
+        [
+          1,
+          106
+        ],
+        [
+          36,
+          89
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/benchmarks/openpi/openpi_inference_client.py",
+      "sha256": "fb0269ae1ff3b1537c0b9a18e62f80aa86e281ec168dfabee6d6c40da3608265",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/openpi/openpi_inference_client.py",
+      "git_blob_sha": "fe09fc105059aa4755977988f000f06813fc3297",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/benchmarks/openpi/openpi_inference_client.py",
+      "read_ranges": [
+        [
+          1,
+          52
+        ],
+        [
+          519,
+          555
+        ],
+        [
+          555,
+          594
+        ],
+        [
+          726,
+          789
+        ],
+        [
+          1150,
+          1192
+        ],
+        [
+          2053,
+          2088
+        ],
+        [
+          2160,
+          2200
+        ],
+        [
+          2480,
+          2524
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/benchmarks/common/closedloop_policy_inference.py",
+      "sha256": "c54254b9cddd3a258b294adbc55aa08133677416a4f9981478da123c976b620b",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/benchmarks/common/closedloop_policy_inference.py",
+      "git_blob_sha": "a1e6986a9e6297bc04e6c1eb8b45798bf3db172f",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/benchmarks/common/closedloop_policy_inference.py",
+      "read_ranges": [
+        [
+          1,
+          107
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/source/tac_manip/tac_manip/utils/decorators.py",
+      "sha256": "474376cd02183533e1d2f7b7b7cb9ceab3cebddcc52ed0ce3c31ab268eb960db",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/source/tac_manip/tac_manip/utils/decorators.py",
+      "git_blob_sha": "49b37a54b89f539653dfc494fc32c17f811507df",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/source/tac_manip/tac_manip/utils/decorators.py",
+      "read_ranges": [
+        [
+          1,
+          30
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/181/projects"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/p178_p185_20261011/sources/TuojingAI__SoftVTBench/SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/config/franka/franka_libero_env_cfg.py",
+      "sha256": "f2017f016c658c6cd687b553d5caced8b48404986f75317f9a6896272022ec64",
+      "kind": "pinned_repository_file",
+      "repo": "TuojingAI/SoftVTBench",
+      "commit": "58056111f01e05bf1a4ae1dee75db4e3d9e7c5be",
+      "path": "SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/config/franka/franka_libero_env_cfg.py",
+      "git_blob_sha": "e1801044468625980e67b0741fcf89b7c54b6952",
+      "url": "https://raw.githubusercontent.com/TuojingAI/SoftVTBench/58056111f01e05bf1a4ae1dee75db4e3d9e7c5be/SoftVTBench/source/tac_manip/tac_manip/tasks/manipulation/libero/config/franka/franka_libero_env_cfg.py",
+      "read_ranges": [
+        [
+          77,
+          128
+        ],
+        [
+          388,
+          405
+        ],
+        [
+          826,
+          853
+        ]
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

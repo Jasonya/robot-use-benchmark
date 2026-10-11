@@ -1,0 +1,68 @@
+{
+  "paper_id": "P062",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RLBench 以 Python Task、CoppeliaSim 場景／模型和 condition 物件組成任務。應沿 task 的成功條件讀到 backend，而不是隻看任務名稱或示範檔。",
+  "reading_order": [
+    {
+      "repo": "stepjam/RLBench",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          55
+        ]
+      ],
+      "why": "辨認套件、action API 版本與任務／示範入口。"
+    },
+    {
+      "repo": "stepjam/RLBench",
+      "path": "rlbench/tasks/open_drawer.py",
+      "ranges": [
+        [
+          1,
+          33
+        ]
+      ],
+      "why": "看任務變體、語言描述、關節選擇及成功條件註冊。"
+    },
+    {
+      "repo": "stepjam/RLBench",
+      "path": "rlbench/backend/conditions.py",
+      "ranges": [
+        [
+          1,
+          194
+        ]
+      ],
+      "why": "核對關節位移、偵測、抓握，以及有序／無序 condition 組合的真實邏輯。"
+    },
+    {
+      "repo": "stepjam/RLBench",
+      "path": "rlbench/dataset_generator.py",
+      "ranges": [
+        [
+          26,
+          66
+        ],
+        [
+          104,
+          144
+        ]
+      ],
+      "why": "看每個視角的 RGB／depth／mask 與低維 observation 如何分檔保存。"
+    }
+  ],
+  "environment": "CoppeliaSim/PyRep 任務場景與模型；任務 class 數、variation 數和獨立環境數不能直接等同。",
+  "tasks": "Task class 綁定場景物件與 condition。open_drawer 包含 top/middle/bottom 三個 variation，並以 JointCondition 門檻0.15檢查絕對關節位移。",
+  "data": "示範將多視角 RGB、depth、mask 分檔，並把影像從 observation 移除後保存低維資料；載入時需閉合影像與狀態引用。",
+  "evaluation": "各 task 註冊具體 condition。ConditionSet 可累積有序條件或做同時 AND；OrConditions 做 OR。這些狀態／過程語義要一起保留。",
+  "standardization": {
+    "profile": "interactive_task_definitions",
+    "reuse": "task ID、variation、場景模型、語言描述、示範與 condition 程式。",
+    "transform": "task、variation、初態、感測及 action mode 分開存；evaluator 指向具體條件程式。原生variation可作綁定變化，不自動當新增共同任務。",
+    "missing": "完整模型／示範資產閉合、跨來源語義對齊及統一協定下的執行驗證。"
+  },
+  "version_note": "README 明示action mode曾有破壞性變更；本輪固定公開commit，不能混用其他版本的動作約定。",
+  "runtime_executed": false
+}

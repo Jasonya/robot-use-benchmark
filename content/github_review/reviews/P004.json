@@ -1,0 +1,68 @@
+{
+  "paper_id": "P004",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "CrossTask 的核心是從教學影片定位有順序的步驟。18 個 primary tasks 有時段標註；65 個 related tasks 用於跨任務學習，不能全部當成同樣有答案的評測題。",
+  "reading_order": [
+    {
+      "repo": "DmZhukov/CrossTask",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          54
+        ]
+      ],
+      "why": "先分清83活動、18/65子集、外部資料包和1秒特徵時間格。"
+    },
+    {
+      "repo": "DmZhukov/CrossTask",
+      "path": "data.py",
+      "ranges": [
+        [
+          1,
+          109
+        ]
+      ],
+      "why": "讀 task/step 列表、影片 CSV、時間邊界轉成指派矩陣及 train/test 分割。"
+    },
+    {
+      "repo": "DmZhukov/CrossTask",
+      "path": "train.py",
+      "ranges": [
+        [
+          1,
+          85
+        ],
+        [
+          144,
+          182
+        ]
+      ],
+      "why": "找到 get_recalls 與 eval，核對可用 GT 子集及逐 task 平均方式。"
+    },
+    {
+      "repo": "DmZhukov/CrossTask",
+      "path": "dp.pyx",
+      "ranges": [
+        [
+          1,
+          72
+        ]
+      ],
+      "why": "確認順序限制與 exactly_one 的動態規劃指派，這會影響輸出與評分。"
+    }
+  ],
+  "environment": "教學影片來源；沒有互動場景清單。",
+  "tasks": "原生人類活動包含有序 step descriptions；primary 與 related 任務資格需保留。",
+  "data": "tasks 檔、task/video/URL CSV、每影片特徵 NumPy、敘述限制 CSV 及逐步時間標註。read_assignment 對 start floor、end ceil 並使用半開時段。",
+  "evaluation": "train.py 的 eval 以 DP 產生步驟指派；get_recalls 按有 GT 的步驟計匹配，再以 task 平均。這是步驟定位召回，不是整個程序的物理完成率。",
+  "standardization": {
+    "profile": "human_procedure_and_temporal_labels",
+    "reuse": "83個原生活動 ID、primary/related 資格、步驟順序、影片與時間標註、原作 recall 邏輯。",
+    "transform": "原始秒數與衍生時間格分欄；固定影片分割與隨機分割種子。人類活動、定位 case 和模型重跑分開計數。",
+    "missing": "完整來源素材及標註包、當前依賴環境重現、本庫 split 血緣核對與 evaluator 接線。"
+  },
+  "version_note": "公開程式的版本已固定；README 的外部下載與舊依賴尚未作完整可執行重現。",
+  "runtime_executed": false
+}

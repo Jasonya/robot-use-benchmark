@@ -1,0 +1,155 @@
+{
+  "paper_id": "P134",
+  "name": "OpenVLA",
+  "title": "OpenVLA: An Open-Source Vision-Language-Action Model",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2406.09246",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P134",
+    "summary": "OpenVLA是VLA方法，重用OXE/Bridge/LIBERO資料與任務。模型action解碼依dataset專屬q01/q99，LIBERO部署再改gripper範圍與方向。",
+    "environment": "BridgeData V2真實WidowX和LIBERO模擬設定；新增模型／微調不新建獨立benchmark環境。",
+    "tasks": "語言條件操作策略與既有task-suite評測。原作訓練資料量和LIBERO任務數應追到父來源，不累加成新的任務聯集。",
+    "data": "predict_action以dataset專屬unnorm_key解碼action tokens，依mask使用q01/q99還原。維度由stats的q01長度決定；雖範例7D，不能忽略dataset/controller。LIBERO observation字典含state，但程式註明OpenVLA不使用proprio作輸入。",
+    "evaluation": "LIBERO使用固定initial_states[episode_idx]，suite預算220/280/300/520/400步，另有暖機；gripper[0,1]→[-1,+1]且OpenVLA再反號。成功取原env.done，原goals沿LIBERO。需記下成功/例外和整體分母。",
+    "standardization": {
+      "profile": "vla_policy_on_existing_benchmarks",
+      "reuse": "模型與原dataset/suite對應、action解碼統計、各task評測腳本。",
+      "transform": "method與source task/case分離；case固定預算/初態/影像前處理，policy adapter保存unnorm_key/mask/gripper方向。原native分數與我們新增規則各有版本。",
+      "missing": "完整checkpoint/資料/資產、各來源訓練重疊與holdout、normalize與實機controller對照、原生執行再現。"
+    },
+    "version_note": "固定c8f03f4；README後加OFT/FAST並非vanilla OpenVLA同版本。此庫是Prismatic fork且由原作者頁認領，fork屬性不代表非官方。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "openvla/openvla",
+        "requested_repo": "openvla/openvla",
+        "commit": "c8f03f48af692657d3060c19588038c7220e9af9",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            37
+          ],
+          [
+            65,
+            83
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 645,
+        "sha256": "ba8e9a2884e38a8000dafc98af4116512e37b0e143dad2f940100482bfd6b75c",
+        "url": "https://github.com/openvla/openvla/blob/c8f03f48af692657d3060c19588038c7220e9af9/README.md",
+        "reading_url": "https://github.com/openvla/openvla/blob/c8f03f48af692657d3060c19588038c7220e9af9/README.md#L1-L37",
+        "why": "原作、後續OFT/FAST、資料重用及模型接口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "openvla/openvla",
+        "requested_repo": "openvla/openvla",
+        "commit": "c8f03f48af692657d3060c19588038c7220e9af9",
+        "ref": null,
+        "path": "prismatic/models/vlas/openvla.py",
+        "ranges": [
+          [
+            90,
+            131
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 131,
+        "sha256": "5a54e9f2f7975b7e8fa8676ddfb6ce3320b397f0bdd3632167a7044dbeb9b47b",
+        "url": "https://github.com/openvla/openvla/blob/c8f03f48af692657d3060c19588038c7220e9af9/prismatic/models/vlas/openvla.py",
+        "reading_url": "https://github.com/openvla/openvla/blob/c8f03f48af692657d3060c19588038c7220e9af9/prismatic/models/vlas/openvla.py#L90-L131",
+        "why": "依unnorm_key取stats、mask與action維度",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "openvla/openvla",
+        "requested_repo": "openvla/openvla",
+        "commit": "c8f03f48af692657d3060c19588038c7220e9af9",
+        "ref": null,
+        "path": "experiments/robot/libero/run_libero_eval.py",
+        "ranges": [
+          [
+            150,
+            235
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 286,
+        "sha256": "369d9fc3d59067998ebfadafbd516872c7ff6f9f06a0a48cda8b6ca48051de77",
+        "url": "https://github.com/openvla/openvla/blob/c8f03f48af692657d3060c19588038c7220e9af9/experiments/robot/libero/run_libero_eval.py",
+        "reading_url": "https://github.com/openvla/openvla/blob/c8f03f48af692657d3060c19588038c7220e9af9/experiments/robot/libero/run_libero_eval.py#L150-L235",
+        "why": "原生init-state、各suite步數、合法輸入與gripper變換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "72215ebed6eb8259be15d4b0bc27523728fbec6b06c30c2d51e523bcb0284eed"
+  },
+  "repository_binding_review_sha256": "72215ebed6eb8259be15d4b0bc27523728fbec6b06c30c2d51e523bcb0284eed",
+  "repository_bindings": [
+    {
+      "requested_repo": "openvla/openvla",
+      "resolved_repo": "openvla/openvla",
+      "aliases_in_this_review": [
+        "openvla/openvla"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c8f03f48af692657d3060c19588038c7220e9af9",
+          "reviewed_files": [
+            "README.md",
+            "experiments/robot/libero/run_libero_eval.py",
+            "prismatic/models/vlas/openvla.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/openvla/openvla",
+          "link_label": "Code",
+          "project_url": "https://openvla.github.io",
+          "page_sha256": "fc8d7c59138ef1d5b668e12986d7b94d247b0ecf21e04063a2a65846b2aa824c"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P134",
+          "review_file": "content/github_review/reviews/P134.json",
+          "review_sha256": "72215ebed6eb8259be15d4b0bc27523728fbec6b06c30c2d51e523bcb0284eed",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "openvla/openvla"
+  ],
+  "external_repositories": []
+}

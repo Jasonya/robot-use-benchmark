@@ -1,0 +1,379 @@
+{
+  "paper_id": "P061",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "SocialEgoNet 是 JPL-Social 的官方分類實作；已追到人物 JSON、133點姿態圖與 weighted F1/accuracy。attitude 只評有互動真值的人物，且訓練程式把 test 目錄兼作 validation，整合不能忽略這兩個協定限制。",
+  "identity_note": "本地 arXiv:2412.16698v3（2025-05-08）第1頁直接連 biantongfei/SocialEgoNet。README 列 ICME2025、同一 arXiv ID 與五位作者；上方連結標題使用 joint prediction/self-centred 字樣，正式引用仍是 Joint Egocentric Forecasting of Intent to Interact, Attitude and Social Actions，屬同一作品。JPL-Social 是既有 JPL-Interaction 的人物層級擴充標註，不是新拍攝的獨立影片庫。",
+  "reading_order": [
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          21
+        ],
+        [
+          28,
+          82
+        ],
+        [
+          85,
+          111
+        ]
+      ],
+      "why": "確認 exact paper、父資料／下載入口、metadata 與命令。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/constants.py",
+      "ranges": [
+        [
+          22,
+          54
+        ]
+      ],
+      "why": "核對三組類別順序、133點與30FPS及各身體區域圖邊。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/data.py",
+      "ranges": [
+        [
+          11,
+          66
+        ]
+      ],
+      "why": "讀人物JSON、首次偵測錨點、補幀、座標公式及attitude真值過濾。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/DataLoader.py",
+      "ranges": [
+        [
+          5,
+          55
+        ]
+      ],
+      "why": "確認23身體／68臉／42手部點分圖，x/y/score三個node特徵。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "config/test.yaml",
+      "ranges": [
+        [
+          1,
+          14
+        ]
+      ],
+      "why": "確認30幀、測試batch128及相對資料路徑。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "config/train.yaml",
+      "ranges": [
+        [
+          1,
+          17
+        ]
+      ],
+      "why": "確認訓練40epochs與相同人物序列設定。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/Models.py",
+      "ranges": [
+        [
+          6,
+          35
+        ],
+        [
+          75,
+          95
+        ]
+      ],
+      "why": "核對attitude仍有3個logits與chain輸出，避免誤當純二分類模型。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/test.py",
+      "ranges": [
+        [
+          19,
+          43
+        ],
+        [
+          46,
+          69
+        ]
+      ],
+      "why": "核對weighted F1／accuracy百分比、依真值排除attitude=2及完整test目錄彙整。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/train.py",
+      "ranges": [
+        [
+          28,
+          42
+        ],
+        [
+          58,
+          91
+        ],
+        [
+          107,
+          128
+        ]
+      ],
+      "why": "核對validation/test共用目錄、訓練保留第三attitude類及最後權重輸出。"
+    }
+  ],
+  "environment": "JPL-Interaction 的人形觀察者／機器人第一視角社交影片，背景與照明有變化。論文 §III 報告200段影片、16位受試者、6種場景設定、320×240與30FPS；JPL-Social 對可見人物建立290條person tracks。影片、人物tracks、姿態影格和場景數不能互換。",
+  "tasks": "預測 intent、attitude、action。constants 的 intent=[Interacting,Interested,Not_Interested]；attitude=[Positive,Negative,Not_Interacting]，前兩者是論文的兩種有效態度，2是非互動狀態；action=[Handshake,Hug,Pet,Wave,Punch,Throw,Point,Gaze,Leave,No_Response]。論文新增Gaze/No_Response並以人物為標註單位，並非十種機器人可執行指令。",
+  "data": "一個人物JSON描述 video_name/person_id、frame_size=[w,h]、偵測／互動起訖、三項class與frames；實際reader取 frames[*].{frame_id,keypoints}，keypoints=[133,3]為像素x/y及confidence。x/y轉為2*(xy/[w,h]-0.5)，score保留；輸出固定[30,133,3]。以frames[0].frame_id作起點，時間缺口及不足30幀以最近姿態補齊，不套confidence門檻，也不回傳補幀mask。walk_frame、interact_start_frame、gaze、box與contact_class沒有被此reader用作模型輸入。README誤寫key points，實際必須是keypoints；檔案／人物來源ID須另行保留以免只剩feature張量。",
+  "evaluation": "scripts/test.py 對每項logits做softmax/argmax，彙總所有test樣本後計 sklearn f1_score(average=\"weighted\")×100 與accuracy×100。attitude先依真值!=2排除非互動人物，仍保留3個輸出logits；誤預測Not_Interacting仍會計錯，不能依預測intent過濾。論文表II的83.15%是三項accuracy的算術平均，其分母並不相同，也不是三項同時正確率。公開測試程式沒有計算latency或三項平均；論文latency另外區分姿態抽取成本。",
+  "standardization": {
+    "profile": "person_track_social_forecasting",
+    "reuse": "人物JSON與video/person識別、三組label字典、姿態圖邊、分身體部位特徵及具體weighted F1／accuracy算法。",
+    "transform": "case以父影片+person_id+觀測錨點定位，task分開intent/attitude/action，保留attitude=2的訓練類與評分排除規則；保存像素原值、正規化公式、confidence及補幀來源。evaluation記錄每項有效樣本數，合併指標明列算術平均。",
+    "missing": "需取得並固定外部人物JSON及train/test清單，核對同影片／受試者是否跨split及augmentation來源；建立真正獨立validation協定、確認首次偵測錨點與論文觀測窗口一致，再做執行驗證。"
+  },
+  "version_note": "固定d81ad122080ca734a866dfcf3c4bd4db60078390（2026-02-26）。train.py 的validation與test都讀test/，每epoch評一次同一目錄，結束後保存最後模型；不能宣稱獨立validation或由此推斷論文實驗的split。config資料路徑是../JPL_Social/，與README「放於專案內」須對齊工作目錄。僅讀程式／論文，未下載Google Drive資料或載入repo內權重。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P061-discovery.json",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0",
+        "/code_contexts/0"
+      ],
+      "sha256": "971e416d54c52ca2a61349d80a93f9a466d688c83e4740ef266dfcc0072d89d8"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P061/pages.json",
+      "sha256": "e5199cd6dd8eb46c38f495cb341e824a13c3c4ad93a725450a26987d0d7aad15",
+      "json_pointers": [
+        "/1/text",
+        "/2/text",
+        "/3/text",
+        "/4/text"
+      ],
+      "why": "PDF 頁2–5：父資料與290人物tracks、標註適用範圍、骨架點數及正式評測表。"
+    },
+    {
+      "local_file": "audit/.cache/github_review/P061-discovery.json",
+      "sha256": "971e416d54c52ca2a61349d80a93f9a466d688c83e4740ef266dfcc0072d89d8",
+      "json_pointers": [
+        "/candidates/0",
+        "/code_contexts/0"
+      ],
+      "why": "固定PDF第1頁直接連官方repo，摘要／標題一致。"
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/constants.py",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/constants.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/constants.py",
+        "retrieved_at": "2026-10-10T23:37:36.208844+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/constants.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2582,
+        "sha256": "87ae60bf86b4c68ba51ed5d82e059fbb7a444f36fa517a39ff7f7ec3849c3718"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/scripts/constants.py",
+      "sha256": "87ae60bf86b4c68ba51ed5d82e059fbb7a444f36fa517a39ff7f7ec3849c3718",
+      "git_blob_sha": "ba17c9649b26a0f34a104380ced270f0aac2f4be",
+      "lines": 54,
+      "ranges": [
+        [
+          22,
+          54
+        ]
+      ]
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/data.py",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/data.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/data.py",
+        "retrieved_at": "2026-10-10T23:37:37.218502+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/data.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2561,
+        "sha256": "fa89a231621828af6518c1dbdaf0968ac94b4fefed82c8e17bca25820e47b4be"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/scripts/data.py",
+      "sha256": "fa89a231621828af6518c1dbdaf0968ac94b4fefed82c8e17bca25820e47b4be",
+      "git_blob_sha": "f5d4ed23465f547c0f65514fc2dac1a08a9090b0",
+      "lines": 66,
+      "ranges": [
+        [
+          11,
+          66
+        ]
+      ]
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "config/test.yaml",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/config/test.yaml",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/config/test.yaml",
+        "retrieved_at": "2026-10-10T23:37:39.215213+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/config/test.yaml",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 205,
+        "sha256": "4da5f0296f11dc49f4357fa55f9d0d90f77d35b2b3c67cb987f392fa9fe193bd"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/config/test.yaml",
+      "sha256": "4da5f0296f11dc49f4357fa55f9d0d90f77d35b2b3c67cb987f392fa9fe193bd",
+      "git_blob_sha": "3bbf142a06bf9c3ed776870ce88a5851b71bfd7f",
+      "lines": 14,
+      "ranges": [
+        [
+          1,
+          14
+        ]
+      ]
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "config/train.yaml",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/config/train.yaml",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/config/train.yaml",
+        "retrieved_at": "2026-10-10T23:37:40.216271+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/config/train.yaml",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 264,
+        "sha256": "fdb47454524fbc500e1dadec530da9ecdd0901dcb7b4843eb41eb27c797b6b43"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/config/train.yaml",
+      "sha256": "fdb47454524fbc500e1dadec530da9ecdd0901dcb7b4843eb41eb27c797b6b43",
+      "git_blob_sha": "1f703b3382a5556a6d721341903569854ebaa49d",
+      "lines": 17,
+      "ranges": [
+        [
+          1,
+          17
+        ]
+      ]
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/Models.py",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/Models.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/Models.py",
+        "retrieved_at": "2026-10-10T23:38:04.994053+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/Models.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 4425,
+        "sha256": "a787995623a1908813c2979b4bb6334b17723e9ce75ff22823abcbf0a7e580ac"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/scripts/Models.py",
+      "sha256": "a787995623a1908813c2979b4bb6334b17723e9ce75ff22823abcbf0a7e580ac",
+      "git_blob_sha": "4634073bf2e0c42e528ddda2dcdfdc2ff8eae653",
+      "lines": 95,
+      "ranges": [
+        [
+          6,
+          35
+        ],
+        [
+          75,
+          95
+        ]
+      ]
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/test.py",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/test.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/test.py",
+        "retrieved_at": "2026-10-10T23:37:38.216616+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/test.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2755,
+        "sha256": "694ced70273dd31bd10e131d9a4066779315f15d76905cd201df62dcbf676660"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/scripts/test.py",
+      "sha256": "694ced70273dd31bd10e131d9a4066779315f15d76905cd201df62dcbf676660",
+      "git_blob_sha": "4b5932fafe84ce0ee34b323ad3778ccfe0f10a35",
+      "lines": 73,
+      "ranges": [
+        [
+          19,
+          43
+        ],
+        [
+          46,
+          69
+        ]
+      ]
+    },
+    {
+      "repo": "biantongfei/SocialEgoNet",
+      "path": "scripts/train.py",
+      "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+      "url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/train.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/train.py",
+        "retrieved_at": "2026-10-10T23:38:05.996507+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/biantongfei/SocialEgoNet/d81ad122080ca734a866dfcf3c4bd4db60078390/scripts/train.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 5617,
+        "sha256": "f5d87133ad1754ad9a05a7a840093cd4e986221d789fd857dd40bb1386f02d87"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/biantongfei__SocialEgoNet/scripts/train.py",
+      "sha256": "f5d87133ad1754ad9a05a7a840093cd4e986221d789fd857dd40bb1386f02d87",
+      "git_blob_sha": "51bb51d54d880907d330d8e2beafcc1e3149a5d4",
+      "lines": 132,
+      "ranges": [
+        [
+          28,
+          42
+        ],
+        [
+          58,
+          91
+        ],
+        [
+          107,
+          128
+        ]
+      ]
+    }
+  ],
+  "commit": "d81ad122080ca734a866dfcf3c4bd4db60078390",
+  "source_manifest": "audit/.cache/github_review/repos/biantongfei__SocialEgoNet/manifest.json",
+  "runtime_executed": false,
+  "source_manifest_sha256": "a0547899d7a2b61bb3c10b3e9945a202af144846684d7bc61c07cb82ec76c198"
+}

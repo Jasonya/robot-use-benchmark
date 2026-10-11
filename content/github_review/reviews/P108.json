@@ -1,0 +1,92 @@
+{
+  "paper_id": "P108",
+  "summary": "RoboArena主庫是遠端policy接口，志工client收集實機A/B偏好與部分成功。它是跨站實機評測流程，不是固定題庫自動判分器。",
+  "reading_order": [
+    {
+      "repo": "robo-arena/roboarena",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          72
+        ]
+      ],
+      "why": "原benchmark、policy服務與DROID/模擬測試角色",
+      "commit": "a07f93db004e2357aee931069a7011d7e52774ed"
+    },
+    {
+      "repo": "robo-arena/roboarena",
+      "path": "roboarena/policy.py",
+      "ranges": [
+        [
+          7,
+          30
+        ]
+      ],
+      "why": "觀測欄位、action chunk和session reset",
+      "commit": "a07f93db004e2357aee931069a7011d7e52774ed"
+    },
+    {
+      "repo": "robo-arena/roboarena",
+      "path": "roboarena/policy_server.py",
+      "ranges": [
+        [
+          12,
+          48
+        ]
+      ],
+      "why": "相機需求、控制space及服務schema",
+      "commit": "a07f93db004e2357aee931069a7011d7e52774ed"
+    },
+    {
+      "repo": "pranavatreya/roboarena_evaluator",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          60,
+          75
+        ]
+      ],
+      "why": "志工client的A/B偏好／部分分數／有效session流程",
+      "commit": "5992b26f91a94137424c5f79d31119b8a14eb067"
+    },
+    {
+      "repo": "pranavatreya/roboarena_evaluator",
+      "path": "evaluation_client/main.py",
+      "ranges": [
+        [
+          385,
+          465
+        ],
+        [
+          474,
+          552
+        ],
+        [
+          552,
+          586
+        ]
+      ],
+      "why": "15Hz控制、部分分數轉binary、媒體／NPZ回傳及人工reset",
+      "commit": "5992b26f91a94137424c5f79d31119b8a14eb067"
+    }
+  ],
+  "environment": "DROID真實機器人各站點、相機和桌面設定；evaluation session記錄現場任務及A/B兩次rollout。自願站點數、機體、任務及試驗各是不同單位。",
+  "tasks": "現場人員先輸入任務，再分配A/B policies；人工重設同一初態，兩者是成對試驗，不是兩種任務。另連sim-evals是提交前模擬檢查。",
+  "data": "policy obs有wrist/exterior RGB、7joint/6cartesian/1gripper state與prompt；actions為N×8或N×7且整chunk執行。client存逐步state/action NPZ、3視角影片、session/command、partial/binary success及valid標記；控頻約15Hz但影片編碼10fps，媒體時間需對齊。",
+  "evaluation": "人員給0–100部分分數後除100，只有==1才binary成功；另給A/B/tie偏好、長文字和session有效性。主庫沒有本機全局排名scorer，中央服務未訪問；須保留人評protocol和成對初態／有效性，不能以主觀partial當物理predicate。",
+  "standardization": {
+    "profile": "distributed_real_robot_pairwise_evaluation",
+    "reuse": "policy介面、感測／action chunk需求、A/B session設計、人評與逐步證據schema。",
+    "transform": "environment記站點/配置，case記任務與reset證據；trial按session×policy獨立存，pairwise preference作比較記錄。去識別人員資訊，公開報表保留站點分組與有效性。",
+    "missing": "中央排名算法與完整資料存取、人工rubric一致性、各站機體/時間校準、實體任務初態對等及完整分母。"
+  },
+  "version_note": "主庫與志工client分開固定commit；後者owner名與原第一作者Pranav Atreya相符且明示RoboArena志工用途。未執行其服務登入、上傳或機器人指令。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

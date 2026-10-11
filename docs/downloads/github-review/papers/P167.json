@@ -1,0 +1,533 @@
+{
+  "paper_id": "P167",
+  "name": "DexGarmentLab",
+  "title": "DexGarmentLab: Dexterous Garment Manipulation Environment with Generalizable Policy",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2505.11032",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment",
+    "care"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P167",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "DexGarmentLab的15個衣物任務場景與2500+衣物資產可擴充柔性物覆蓋；所讀Fold Tops驗收主要看終態點雲的XY範圍比例，尚不能單獨證明指定摺法。",
+    "environment": "IsaacSim4.5.0、雙UR10e/靈巧手、衣物與衣架/人體/收納等資產。README的15 task scenes、8衣物類別、2500+garments屬不同計量，不能相乘作已測環境量。",
+    "tasks": "6種衣物自身任務(fling/fold×tops/dress/trousers)與9種衣物–環境互動(hang/wear/store)。衣物位置/形狀、材質與環境資產設定是case條件。",
+    "data": "Zarr原生keys為state/action/object_point_cloud/garment_point_cloud/environment_point_cloud/points_affordance_feature；SequenceSampler有horizon/padding/episode mask。Fold Tops控制以action前30維/後30維分雙手joint position，每個action執行5physics步；HALO含腳本接近/離開和分stage策略，不能只截神經網路輸出當完整policy。",
+    "evaluation": "Fold Tops依預測操作點定義XY boundary，終態分割點雲至少88%在該範圍即通過；不看Z/層拓撲/邊緣對應。腳本中還有暫時gravity_scale=10再還原，需納入protocol。隨機位置/asset取time.time種子，未固定測例不能只靠run次數重現。",
+    "standardization": {
+      "profile": "dexterous_deformable_garment_simulation",
+      "reuse": "15任務原生列表、Zarr特徵、分stage控制、現有點雲/影像判分規則。",
+      "transform": "environment保存衣物mesh/材料/接觸與robot關節規格；case明定asset/seed/實際初態及全部scripted stage；evaluator保留原88%區域標準，另版本化指定摺法/拓撲/穩定檢查。",
+      "missing": "資產和測試衣物split取得、固定seed/metadata、全部task checker、joint單位/物理時間、真實摺疊正確性標註與原生基線。"
+    },
+    "version_note": "固定e4e298e；論文2505.11032v3。只核讀Fold Tops實際判分鏈和共用reader；公開15任務不表示本次已逐場執行，未下載大資產或權重。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "wayrise/DexGarmentLab",
+        "requested_repo": "wayrise/DexGarmentLab",
+        "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            114
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 385,
+        "sha256": "b7d05874ccd47a6d5dabcef3ba00977010ed48b1e8fd57f11ead39fd7c76fbf0",
+        "url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/README.md",
+        "reading_url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/README.md#L1-L114",
+        "why": "原作、IsaacSim版本、15task與衣物/環境互動分組",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wayrise/DexGarmentLab",
+        "requested_repo": "wayrise/DexGarmentLab",
+        "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+        "ref": null,
+        "path": "Validation_Core.md",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 72,
+        "sha256": "521afc26dbe2c5499aec22b03f78ad7b4fc9be2acc8d1b2a5fb4d9d08b2fdac2",
+        "url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Validation_Core.md",
+        "reading_url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Validation_Core.md#L1-L72",
+        "why": "HALO/DP3/DP不同觀測介面",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wayrise/DexGarmentLab",
+        "requested_repo": "wayrise/DexGarmentLab",
+        "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+        "ref": null,
+        "path": "Model_HALO/SADP/structure_aware_diffusion_policy/dataset/robot_dataset.py",
+        "ranges": [
+          [
+            1,
+            109
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 109,
+        "sha256": "bfb3e70c2fe2da2972f92c8f3ad8c826fdf95a2d602153d4178fbe24f54e2504",
+        "url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Model_HALO/SADP/structure_aware_diffusion_policy/dataset/robot_dataset.py",
+        "reading_url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Model_HALO/SADP/structure_aware_diffusion_policy/dataset/robot_dataset.py#L1-L109",
+        "why": "Zarr state/action/點雲/affordance、序列取樣與normalizer",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wayrise/DexGarmentLab",
+        "requested_repo": "wayrise/DexGarmentLab",
+        "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+        "ref": null,
+        "path": "Env_Validation/Fold_Tops_HALO.py",
+        "ranges": [
+          [
+            207,
+            261
+          ],
+          [
+            384,
+            443
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 450,
+        "sha256": "92cc7c8464f4782751f3803e00b999218fa6d830b62d7abd895c4a09d9688a49",
+        "url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Env_Validation/Fold_Tops_HALO.py",
+        "reading_url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Env_Validation/Fold_Tops_HALO.py#L207-L261",
+        "why": "雙手各30joint目標、物理子步/重力、最後驗收及時間seed",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "wayrise/DexGarmentLab",
+        "requested_repo": "wayrise/DexGarmentLab",
+        "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+        "ref": null,
+        "path": "Env_Config/Utils_Project/Position_Judge.py",
+        "ranges": [
+          [
+            1,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 75,
+        "sha256": "94c61f0705a43736d94d71d01407bc834fe004303976d8fd60f137fb2ced3804",
+        "url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Env_Config/Utils_Project/Position_Judge.py",
+        "reading_url": "https://github.com/wayrise/DexGarmentLab/blob/e4e298e696bae5d866ded3b31e0ae27becea5376/Env_Config/Utils_Project/Position_Judge.py#L1-L75",
+        "why": "RGB yellow比例與點雲XY box比例checker，實際選用後者",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e2218d1717fb2980f9c316d3368728db6b04f9f6afb3faad28aa734e302b3ba0"
+  },
+  "repository_binding_review_sha256": "e2218d1717fb2980f9c316d3368728db6b04f9f6afb3faad28aa734e302b3ba0",
+  "repository_bindings": [
+    {
+      "requested_repo": "wayrise/DexGarmentLab",
+      "resolved_repo": "wayrise/DexGarmentLab",
+      "aliases_in_this_review": [
+        "wayrise/dexgarmentlab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376",
+          "reviewed_files": [
+            "Env_Config/Utils_Project/Position_Judge.py",
+            "Env_Validation/Fold_Tops_HALO.py",
+            "Model_HALO/SADP/structure_aware_diffusion_policy/dataset/robot_dataset.py",
+            "README.md",
+            "Validation_Core.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/wayrise/DexGarmentLab",
+          "link_label": "Code",
+          "project_url": "https://wayrise.github.io/DexGarmentLab/",
+          "page_sha256": "4221c1da69c8c07abd2a2905f035d62b6ba757dec76db2f9d3a44be03b4a1571"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "wayrise/DexGarmentLab",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "wayrise/DexGarmentLab",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "e4e298e696bae5d866ded3b31e0ae27becea5376"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P167",
+          "review_file": "content/github_review/reviews/P167.json",
+          "review_sha256": "e2218d1717fb2980f9c316d3368728db6b04f9f6afb3faad28aa734e302b3ba0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護",
+    "個人照護"
+  ],
+  "source_review": {
+    "paper_id": "P167",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DexGarmentLab，arXiv 2505.11032v3。",
+    "scope_read": "15task場景、物理抓持修正、14實測task、100demo/50episode、real驗證。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      18,
+      20,
+      32
+    ],
+    "domains": [
+      "衣物與洗護",
+      "個人照護"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "雙UR10e＋ShadowHand，15task scene設定；>2500garments/8類不是2500不同task。",
+    "tasks": "15定義含fling/fold/hang/wear/store；主simulation實驗14task（wear glove未在主表），不能報全15同程度測完。",
+    "cases": "每實測task100generated demonstrations；每task50episodes與3seeds；real4task各3garments×5初態＝15trials。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "task definitions",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "主simulation eval tasks",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2500,
+        "unit": "garment models",
+        "qualifier": "超過",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task評測episodes／seed設定",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "real每task trials",
+        "pages": [
+          10
+        ]
+      }
+    ],
+    "evaluation": [
+      "task-specific成功與mean/std；demo生成成功率和policy成功率分開。",
+      "以friction/adhesion取代GarmentLab attach blocks，兩者同名摺衣控制難度並不相同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "garment形狀/初態/位置變化；文中2%test training data是模型離線切分，不等於50episode物理eval。",
+    "lineage": "ClothesNet與UniGarmentManip/GarmentLab相關資產和方法；更改抓持物理具實質差異。",
+    "related_paper_ids": [
+      "P087"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          8,
+          10,
+          18
+        ],
+        "locator": "§3.2–3.4、§6、表2–5",
+        "supports": "15vs14、phys不同、demo/eval分母"
+      }
+    ],
+    "unresolved": [
+      "各task成功predicate與garment ID split仍需完整config清單，不能只以模型shape庫算coverage。"
+    ],
+    "reuse": "靈巧雙手與穿衣／收納廣度的重要來源；應追實際物理規則差異。",
+    "reviewed_pdf_sha256": "447ce546d76be47536883a64aac1e9fc7ea1f214433bc6915d9acce2eab57f65",
+    "reviewed_on": "2026-10-02",
+    "name": "DexGarmentLab",
+    "year": 2025,
+    "title": "DexGarmentLab: Dexterous Garment Manipulation Environment with Generalizable Policy",
+    "source_url": "https://arxiv.org/abs/2505.11032",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment",
+      "care"
+    ],
+    "review_tags": [
+      "衣物與柔性物操作",
+      "洗衣服務",
+      "照護與個人活動"
+    ],
+    "domain_names": [
+      "衣物與洗護",
+      "個人照護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P167",
+      "domain_ids": [
+        "garment",
+        "care"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P167",
+          "domain_ids": [
+            "garment",
+            "care"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            18,
+            20,
+            32
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "15定義含fling/fold/hang/wear/store；主simulation實驗14task（wear glove未在主表），不能報全15同程度測完。",
+            "雙UR10e＋ShadowHand，15task scene設定；>2500garments/8類不是2500不同task。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "447ce546d76be47536883a64aac1e9fc7ea1f214433bc6915d9acce2eab57f65"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "447ce546d76be47536883a64aac1e9fc7ea1f214433bc6915d9acce2eab57f65",
+      "previous_domain_ids": [
+        "garment",
+        "care"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P167",
+      "name": "DexGarmentLab",
+      "expected_title": "DexGarmentLab: Dexterous Garment Manipulation Environment with Generalizable Policy",
+      "source_url": "https://arxiv.org/abs/2505.11032",
+      "pdf_url": "https://arxiv.org/pdf/2505.11032",
+      "retrieved_at": "2026-10-02T21:34:45.763724+00:00",
+      "pdf_sha256": "447ce546d76be47536883a64aac1e9fc7ea1f214433bc6915d9acce2eab57f65",
+      "text_sha256": "ec830a06139fdd667f27d481c00d7f28a5e6b5f234e381f3391febcb425403fe",
+      "pdf_bytes": 34198212,
+      "pages": 33,
+      "text_characters": 144204,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2505.11032v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2505.11032v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "task definitions",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P167:1",
+        "paper_id": "P167",
+        "benchmark": "DexGarmentLab",
+        "native_term": "task definitions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.11032v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.11032v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 14,
+        "unit": "主simulation eval tasks",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P167:2",
+        "paper_id": "P167",
+        "benchmark": "DexGarmentLab",
+        "native_term": "主simulation eval tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.11032v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.11032v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2500,
+        "unit": "garment models",
+        "qualifier": "超過",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P167:3",
+        "paper_id": "P167",
+        "benchmark": "DexGarmentLab",
+        "native_term": "garment models",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.11032v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.11032v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task評測episodes／seed設定",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P167:4",
+        "paper_id": "P167",
+        "benchmark": "DexGarmentLab",
+        "native_term": "每task評測episodes／seed設定",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.11032v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.11032v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 15,
+        "unit": "real每task trials",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P167:5",
+        "paper_id": "P167",
+        "benchmark": "DexGarmentLab",
+        "native_term": "real每task trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.11032v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.11032v3",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "wayrise/DexGarmentLab"
+  ],
+  "external_repositories": []
+}

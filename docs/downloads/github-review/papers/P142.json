@@ -1,0 +1,508 @@
+{
+  "paper_id": "P142",
+  "name": "Habitat 3.0",
+  "title": "Habitat 3.0: A Co-Habitat for Humans, Avatars and Robots",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2310.13724",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P142",
+    "summary": "Habitat3.0把人類avatar和機器人互動加入同一平臺；已深入核對social navigation配置與成功判定，其他協作場景仍需各自的task配置。",
+    "environment": "HSSD等父資產中的Spot和human avatar，含互動/協作設定；Habitat3是平臺版本，不新增整份與Habitat2不重疊的房屋資料。",
+    "tasks": "social navigation、人機共同場景與協作重排；本筆以social navigation深入讀code，不能由平臺支援列表計所有可評task。",
+    "data": "YAML固定agent0 Spot/agent1 human，分別有velocity/停止/oracle等actions，局部定位、另一agent資訊、humanoid detection與RGB-D/深度等配置。所列sensor與policy實際obs_keys要分別保存。",
+    "evaluation": "SocialNavSeekSuccess在安全距離區間且朝向條件成立時累加following_step，未在離開區間時歸零；達門檻後可再要求當前角度。不是連續跟隨時長；use_geo_distance、min/max距離、face/look配置及機體索引均影響判定。",
+    "standardization": {
+      "profile": "human_avatar_robot_social_simulation",
+      "reuse": "agent/機體/資產配置、互動action/sensor契約、具體social success與細項measure。",
+      "transform": "environment連HSSD父來源，case固定各agent可見資訊、控制/模擬模式及人類行為來源；metric存累積步數/距離/朝向與時間單位。",
+      "missing": "原Habitat3論文版本的全episode/asset組合、其他協作task predicates、真實human traces與共同protocol、原生執行驗證。"
+    },
+    "version_note": "本次讀現有Lab0fb6f43/Sim57ee494固定快照，不能當2023原文全部實驗的精確重現；HSSD Spot範例明確採kinematic模式。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            14,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 227,
+        "sha256": "49ffbba6a3e459e382aebcc1724a9682ebb3c4eec85df7f6e2aa92ee0eefa8a7",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/README.md",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/README.md#L14-L78",
+        "why": "三代Habitat同庫、HITL與multi-agent角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-sim",
+        "requested_repo": "facebookresearch/habitat-sim",
+        "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            14,
+            27
+          ],
+          [
+            47,
+            70
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 269,
+        "sha256": "2422fd0b1c58dc9939fc3e74d6b39415e202df651dd93b87204d3871bfc803b8",
+        "url": "https://github.com/facebookresearch/habitat-sim/blob/57ee4941dc4765240f0f91f70b2c97a919bf9038/README.md",
+        "reading_url": "https://github.com/facebookresearch/habitat-sim/blob/57ee4941dc4765240f0f91f70b2c97a919bf9038/README.md#L14-L27",
+        "why": "模擬器／資產角色和三代引用",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+        "ref": null,
+        "path": "habitat-lab/habitat/config/benchmark/multi_agent/hssd_spot_human_social_nav.yaml",
+        "ranges": [
+          [
+            1,
+            66
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 180,
+        "sha256": "c5a1b76c860a68067d4f59a0c1956304f4d63d5bf00e0263b031e2924cd23720",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/config/benchmark/multi_agent/hssd_spot_human_social_nav.yaml",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/config/benchmark/multi_agent/hssd_spot_human_social_nav.yaml#L1-L66",
+        "why": "Spot+human、HSSD、actions/sensors與kinematic模式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+        "ref": null,
+        "path": "habitat-lab/habitat/tasks/rearrange/social_nav/social_nav_sensors.py",
+        "ranges": [
+          [
+            469,
+            551
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 697,
+        "sha256": "ba5bd8612df6776fee4822f0a00f3273fa094dfa6d711f5ac3bf21cdcbf4d9bf",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/tasks/rearrange/social_nav/social_nav_sensors.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/0fb6f43ffe806a8088a171b036336c093bcf604e/habitat-lab/habitat/tasks/rearrange/social_nav/social_nav_sensors.py#L469-L551",
+        "why": "距離/朝向/累積跟隨步數的具體成功條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "379b897965eb9d6a10cb8de4aa1e47c621441d04287bd27dc884a4365a2c3238"
+  },
+  "repository_binding_review_sha256": "379b897965eb9d6a10cb8de4aa1e47c621441d04287bd27dc884a4365a2c3238",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/habitat-lab",
+      "resolved_repo": "facebookresearch/habitat-lab",
+      "aliases_in_this_review": [
+        "facebookresearch/habitat-lab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "0fb6f43ffe806a8088a171b036336c093bcf604e",
+          "reviewed_files": [
+            "README.md",
+            "habitat-lab/habitat/config/benchmark/multi_agent/hssd_spot_human_social_nav.yaml",
+            "habitat-lab/habitat/tasks/rearrange/social_nav/social_nav_sensors.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/habitat-lab/",
+          "link_label": "",
+          "project_url": "http://aihabitat.org/habitat3",
+          "page_sha256": "0d5b02d604c0d296edf4141d689d4a4e64f310743061b6f00e0c9704133fcf94"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/habitat-lab",
+          "link_label": "Github",
+          "project_url": "http://aihabitat.org/habitat3",
+          "page_sha256": "0d5b02d604c0d296edf4141d689d4a4e64f310743061b6f00e0c9704133fcf94"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/habitat-lab",
+          "link_label": "Go to paper",
+          "project_url": "http://aihabitat.org/habitat3",
+          "page_sha256": "0d5b02d604c0d296edf4141d689d4a4e64f310743061b6f00e0c9704133fcf94"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/habitat-lab",
+          "link_label": "Habitat Lab",
+          "project_url": "http://aihabitat.org/habitat3",
+          "page_sha256": "0d5b02d604c0d296edf4141d689d4a4e64f310743061b6f00e0c9704133fcf94"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P142",
+          "review_file": "content/github_review/reviews/P142.json",
+          "review_sha256": "379b897965eb9d6a10cb8de4aa1e47c621441d04287bd27dc884a4365a2c3238",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "facebookresearch/habitat-sim",
+      "resolved_repo": "facebookresearch/habitat-sim",
+      "aliases_in_this_review": [
+        "facebookresearch/habitat-sim"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "57ee4941dc4765240f0f91f70b2c97a919bf9038",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/habitat-sim",
+          "link_label": "Habitat Sim",
+          "project_url": "http://aihabitat.org/habitat3",
+          "page_sha256": "0d5b02d604c0d296edf4141d689d4a4e64f310743061b6f00e0c9704133fcf94"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P142",
+          "review_file": "content/github_review/reviews/P142.json",
+          "review_sha256": "379b897965eb9d6a10cb8de4aa1e47c621441d04287bd27dc884a4365a2c3238",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P142",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Habitat3.0，arXiv 2310.13724v1。",
+    "scope_read": "avatar/HITL、2任務、59scene split、合作人口與metrics。",
+    "pages_read": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      20,
+      25,
+      26
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "協助、交接與陪伴"
+    ],
+    "role": "對話協作與任務完成",
+    "environment": "HSSD211源scene中的59實驗scene＝37train/12val/10test；12base avatars不是12場景。",
+    "tasks": "2families：social navigation找/跟人；social rearrangement兩代理搬2物件。",
+    "cases": "附錄按scene抽train1000、val100、test15；即37Ktrain、1,200val、150test基底episodes，協作partners另作條件。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 59,
+        "unit": "實驗HSSD scenes",
+        "pages": [
+          7,
+          26
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "social task families",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 150,
+        "unit": "基底test episodes",
+        "qualifier": "10scene×15",
+        "pages": [
+          26
+        ]
+      }
+    ],
+    "evaluation": [
+      "導航Finding Success/SPS/Following Rate/Collision Rate；rearrangement SR與relative efficiency對human-alone比較。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "未見scene＋new partner population；oracle/learned low-level skills分開。導航主設定有持續humanoid GPS，不是只憑RGB找人。",
+    "lineage": "HSSD、AMASS、SMPL-X、Habitat底座；human avatar使用kinematic attach等簡化，與real人類動力不同。",
+    "related_paper_ids": [
+      "P098",
+      "P099",
+      "P143"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          26
+        ],
+        "locator": "§4.1–4.2、附錄E",
+        "supports": "2/59/150、partner與oracle條件"
+      }
+    ],
+    "unresolved": [
+      "全來源211scenes和59實验子集不能合併計數；不同HSSD版本與HomeRobot/PARTNR需scene ID對齐。"
+    ],
+    "reuse": "是可比較human/robot角色與partner泛化的重要底座，不能再當全新場景資產。",
+    "reviewed_pdf_sha256": "6383018901acbf7677050585da9a30707437cf7119def797be500f33a68021af",
+    "reviewed_on": "2026-10-02",
+    "name": "Habitat 3.0",
+    "year": 2023,
+    "title": "Habitat 3.0: A Co-Habitat for Humans, Avatars and Robots",
+    "source_url": "https://arxiv.org/abs/2310.13724",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "home",
+      "assistance"
+    ],
+    "review_tags": [
+      "人機協作",
+      "室內導航",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P142",
+      "domain_ids": [
+        "home",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P142",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            5,
+            6,
+            7,
+            8,
+            20,
+            25,
+            26
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "2families：social navigation找/跟人；social rearrangement兩代理搬2物件。",
+            "HSSD211源scene中的59實驗scene＝37train/12val/10test；12base avatars不是12場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "6383018901acbf7677050585da9a30707437cf7119def797be500f33a68021af"
+        },
+        {
+          "paper_id": "P142",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            5,
+            6,
+            7,
+            8,
+            20,
+            25,
+            26
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "找人、跟人及兩代理社交整理。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "6383018901acbf7677050585da9a30707437cf7119def797be500f33a68021af"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "6383018901acbf7677050585da9a30707437cf7119def797be500f33a68021af",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P142",
+      "name": "Habitat 3.0",
+      "expected_title": "Habitat 3.0: A Co-Habitat for Humans, Avatars and Robots",
+      "source_url": "https://arxiv.org/abs/2310.13724",
+      "pdf_url": "https://arxiv.org/pdf/2310.13724",
+      "retrieved_at": "2026-10-02T21:34:26.542861+00:00",
+      "pdf_sha256": "6383018901acbf7677050585da9a30707437cf7119def797be500f33a68021af",
+      "text_sha256": "7ae28f6906c7ffe748b40902cc203fc25193bf2e724e38a8d3dbd1466e4df8be",
+      "pdf_bytes": 8852187,
+      "pages": 30,
+      "text_characters": 137180,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2310.13724v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2310.13724v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 59,
+        "unit": "實驗HSSD scenes",
+        "pages": [
+          7,
+          26
+        ],
+        "record_id": "review10:P142:1",
+        "paper_id": "P142",
+        "benchmark": "Habitat 3.0",
+        "native_term": "實驗HSSD scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.13724v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.13724v1",
+            "locator": "PDF pp. 7, 26",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 2,
+        "unit": "social task families",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P142:2",
+        "paper_id": "P142",
+        "benchmark": "Habitat 3.0",
+        "native_term": "social task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.13724v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.13724v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 150,
+        "unit": "基底test episodes",
+        "qualifier": "10scene×15",
+        "pages": [
+          26
+        ],
+        "record_id": "review10:P142:3",
+        "paper_id": "P142",
+        "benchmark": "Habitat 3.0",
+        "native_term": "基底test episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2310.13724v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2310.13724v1",
+            "locator": "PDF pp. 26",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/habitat-lab",
+    "facebookresearch/habitat-sim"
+  ],
+  "external_repositories": []
+}

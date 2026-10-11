@@ -1,0 +1,100 @@
+{
+  "paper_id": "P212",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "ARB4WM在既有DMC與Meta-World上加視覺攻擊/防禦評測；要保存攻擊強度、時間窗口與底層task版本，不能把攻擊條件當成新物理任務。",
+  "reading_order": [
+    {
+      "repo": "zaoanguai/ARB4WM",
+      "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          37
+        ]
+      ],
+      "why": "Dreamer系列、借用benchmark與release範圍"
+    },
+    {
+      "repo": "zaoanguai/ARB4WM",
+      "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+      "path": "envs/metaworld.py",
+      "ranges": [
+        [
+          9,
+          26
+        ],
+        [
+          50,
+          84
+        ]
+      ],
+      "why": "MT1-v3/固定train task、reward/success/terminated與repeat"
+    },
+    {
+      "repo": "zaoanguai/ARB4WM",
+      "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+      "path": "test_robustness.py",
+      "ranges": [
+        [
+          61,
+          158
+        ]
+      ],
+      "why": "clean/attack環境對象、epsilon sweep與MetaWorld/DMC分開取值"
+    },
+    {
+      "repo": "zaoanguai/ARB4WM",
+      "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+      "path": "tester.py",
+      "ranges": [
+        [
+          36,
+          105
+        ],
+        [
+          117,
+          136
+        ]
+      ],
+      "why": "首episode masked return、success累積及conditional回傳"
+    },
+    {
+      "repo": "zaoanguai/ARB4WM",
+      "commit": "66ebc330e63ada3b93149c8279a12376fa133db4",
+      "path": "Attack/attacker.py",
+      "ranges": [
+        [
+          15,
+          48
+        ],
+        [
+          76,
+          191
+        ],
+        [
+          200,
+          248
+        ],
+        [
+          345,
+          362
+        ]
+      ],
+      "why": "攻擊後評估、image-quality metrics、success_once/步數與SES"
+    }
+  ],
+  "environment": "DeepMind Control Suite vision與Meta-World visual manipulation，MetaWorld wrapper使用MT1(name-v3)及train_tasks[0]。source/backend/seed需保留，不把同底層task的五種attack objective當新環境。",
+  "tasks": "4種Dreamer-family模型、policy/value/latent/RSSM等目標與temporal/full/partial攻擊是評估條件。動作任務仍來自父benchmark。",
+  "data": "sweep記epsilon/alpha/attack steps、optimizer、defense/adaptive模式、seed、task/model與run_tag；大型logs/checkpoints未包含。world-model image接口與attack前處理需一起固定，0–1/0–255尺度不能共用同數值epsilon。",
+  "evaluation": "DMC主值為累積return，MetaWorld sweep明確取success rate；同名returns容器仍需標metric。影像SSIM/PSNR按data_range255且在defense前計算。SES用SR×(1−平均首次成功步/該batch觀察到的max steps)，不是固定budget正規化。clean Tester用eval_envs，attack建構收到train_envs，需核對paired seeds/環境；success_once與影像統計對已結束env的遮罩也需驗證。",
+  "standardization": {
+    "profile": "adversarial_visual_world_model_control_evaluation",
+    "reuse": "父env wrapper、可重現attack配置/命名、原生return/SR/SES及影像差異分項。",
+    "transform": "case先綁定同父task/初態/seed，再加威脅模型/合法擾動budget；保留clean/attacked pairs、時間作用範圍、defense前後metrics及不同episode分母。",
+    "missing": "checkpoint/原始campaign、clean-attack環境與seed對齊、active-episode masking、固定budget效率指標與完整攻擊規範重現。"
+  },
+  "version_note": "固定66ebc33；read-only核對，不執行對抗算法或policy。MetaWorld-v3及conditional metric接口是此版具體行為，不等同所有Dreamer/MetaWorld標準協定。",
+  "runtime_executed": false
+}

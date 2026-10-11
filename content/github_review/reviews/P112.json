@@ -1,0 +1,72 @@
+{
+  "paper_id": "P112",
+  "summary": "EgoOops官方庫公開程序／影片／錯誤標註；檔案5種task key對應論文4類活動。實際instruction有-1特殊值，不能照README的零基索引直接取句子。",
+  "reading_order": [
+    {
+      "repo": "Y-Haneji/EgoOops-annotations",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          72
+        ]
+      ],
+      "why": "標註schema、影片來源與資料/論文名稱對映",
+      "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e"
+    },
+    {
+      "repo": "Y-Haneji/EgoOops-annotations",
+      "path": "meta/metadata.json",
+      "ranges": [
+        [
+          1,
+          80
+        ]
+      ],
+      "json_pointers": [
+        "/videos/1/segments/4",
+        "/instructions/cardboard/0"
+      ],
+      "why": "完整首例與一筆-1錯誤片段、程序文本；全量只做結構計數",
+      "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e"
+    },
+    {
+      "repo": "Y-Haneji/EgoOops-annotations",
+      "path": "meta/mistake_classes.json",
+      "ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "why": "6個原生mistake label類別",
+      "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e"
+    },
+    {
+      "repo": "Y-Haneji/EgoOops-annotations",
+      "path": "meta/microqr/blacklight.json",
+      "ranges": [
+        [
+          1,
+          16
+        ]
+      ],
+      "why": "同一程序內QR物件編號對映",
+      "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e"
+    }
+  ],
+  "environment": "第一人稱程序活動影片，包括化學演示、紙板製作、電路和積木；task key/QR物件不是可執行機器人場景。",
+  "tasks": "程序文字對齊與錯誤動作偵測/解釋。blacklight與ion都映射論文IR活動；6個mistake labels包括修正動作，不能一律當物理失敗。",
+  "data": "已取得metadata結構計數50video紀錄、538segments、5個procedure key。segment有秒制startTime/endTime、instruction、labels/caption；[]和空caption表示正確步。實際有instruction=-1，應保留特殊值而非Python負索引。全量只結構掃描，未逐段人工驗證。",
+  "evaluation": "此倉庫是annotations/metadata，未包含官方模型scorer或可用split定義；原文評分需另接入。538標註片段不是538道已驗證測試題，影片資產與合法觀測尚未閉合。",
+  "standardization": {
+    "profile": "human_procedural_video_mistake_annotations",
+    "reuse": "影片/task/segment身份、秒制時間、程序文本、multi-label與QR物件對映。",
+    "transform": "保留原5task keys並連論文4活動名稱；case連video/time/instruction，-1轉明確特殊狀態而不丟原值；錯誤/修正/正確和字幕各保留。",
+    "missing": "影片取得、participant/split清單、-1語義正式確認、原文scorer與原生評測再現。"
+  },
+  "version_note": "官方README明示資料task名稱與paper不同；annotations快照和外部影片ZIP版本需雙重固定。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

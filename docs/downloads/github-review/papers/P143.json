@@ -1,0 +1,582 @@
+{
+  "paper_id": "P143",
+  "name": "PARTNR",
+  "title": "PARTNR: A Benchmark for Planning and Reasoning in Embodied Multi-agent Tasks",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2411.00081",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P143",
+    "summary": "PARTNR的題目已包含命題、依賴與過程限制。判分追蹤何時完成，並用約束取消不合法的命題，不能只比對最後物件位置。",
+    "environment": "Habitat中的人/機器人協作與HSSD partnr資產；房屋與episode分開，val_mini/train_2k是原split子集而非新獨立資料。",
+    "tasks": "自然語言規劃/協作、具體物件目標與前後順序/同物件等約束；Agent使用Tool/Skill和WorldGraph，因此可支援多模態工具流程的來源設計。",
+    "data": "CollaborationEpisode繼承scene/初態，再存instruction、evaluation_propositions、proposition_dependencies、evaluation_constraints、object_states。quantity可unroll成多命題，需保留原/展開ID；真值條件和planner可見world graph不同。",
+    "evaluation": "先按依賴決定哪些proposition能評，記首次滿足時間；TemporalConstraint要求前置嚴格更早，TerminalSatisfaction要求指定命題在最後仍成立。percent_complete是已滿足且未被任一constraint取消的命題比例，空命題回0；success需比例==1。",
+    "standardization": {
+      "profile": "multi_agent_tool_planning_with_temporal_constraints",
+      "reuse": "原生episode、命題/依賴/DAG/終態規則、agent/tool資訊契約與評分軌跡。",
+      "transform": "case保存原命題及展開映射、agent權限/觀測/工具/步數預算；evaluator保留首次時間和完整state sequence，不能扁平化為一組終態AND。",
+      "missing": "全部scene/asset/skill版本閉合、原始split和環境去重、模態/工具預算公平性、原生與共同grader對照執行。"
+    },
+    "version_note": "固定ddfff19；先前已取得111652train+1000val題目metadata是不同階段的庫存，不因本次code核讀再加一次。Habitat-Sim0.3.3及HSSD partnr版本需要與本paper綁定。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/partnr-planner",
+        "requested_repo": "facebookresearch/partnr-planner",
+        "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            36
+          ],
+          [
+            46,
+            79
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 197,
+        "sha256": "61ea05390c45fd45c5bb66f3b69f7ff219ba32b5cc45c54ccefba61e54fa3400",
+        "url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/README.md",
+        "reading_url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/README.md#L1-L36",
+        "why": "原作、agent/planner/tool/skill、集中/分散與資訊流",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/partnr-planner",
+        "requested_repo": "facebookresearch/partnr-planner",
+        "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2",
+        "ref": null,
+        "path": "INSTALLATION.md",
+        "ranges": [
+          [
+            14,
+            26
+          ],
+          [
+            32,
+            62
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 116,
+        "sha256": "02ecb0305f360bb82af1ed78fcff95aa2c75752231857fc34a7c7a901e2a449e",
+        "url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/INSTALLATION.md",
+        "reading_url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/INSTALLATION.md#L14-L26",
+        "why": "Habitat0.3.3、HSSD partnr和原episodes依賴",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/partnr-planner",
+        "requested_repo": "facebookresearch/partnr-planner",
+        "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2",
+        "ref": null,
+        "path": "habitat_llm/agent/env/dataset.py",
+        "ranges": [
+          [
+            30,
+            54
+          ],
+          [
+            101,
+            129
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 163,
+        "sha256": "3b05425cd7a3711c031a8744f7e4bc858c5b10d24347fe4a86ba96ae1a5a0255",
+        "url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/habitat_llm/agent/env/dataset.py",
+        "reading_url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/habitat_llm/agent/env/dataset.py#L30-L54",
+        "why": "CollaborationEpisode欄位與constraint類別解析",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/partnr-planner",
+        "requested_repo": "facebookresearch/partnr-planner",
+        "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2",
+        "ref": null,
+        "path": "habitat_llm/agent/env/measures.py",
+        "ranges": [
+          [
+            84,
+            154
+          ],
+          [
+            182,
+            196
+          ],
+          [
+            219,
+            259
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 438,
+        "sha256": "947b669b0fdd1d81b82541fbdcc77cdf5c06b749baeb0c790cd7dc2a27092d59",
+        "url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/habitat_llm/agent/env/measures.py",
+        "reading_url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/habitat_llm/agent/env/measures.py#L84-L154",
+        "why": "數量展開、首次滿足時間、constraint與success鏈",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/partnr-planner",
+        "requested_repo": "facebookresearch/partnr-planner",
+        "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2",
+        "ref": null,
+        "path": "habitat_llm/agent/env/evaluation/evaluation_functions.py",
+        "ranges": [
+          [
+            354,
+            381
+          ],
+          [
+            421,
+            450
+          ],
+          [
+            453,
+            525
+          ],
+          [
+            601,
+            677
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 688,
+        "sha256": "f1b62ec89bc41fef1b1f711dd9ea4b5f0c1650df8f4e5a85540dbdbaa05175d9",
+        "url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/habitat_llm/agent/env/evaluation/evaluation_functions.py",
+        "reading_url": "https://github.com/facebookresearch/partnr-planner/blob/ddfff19f4b6c098a31edea4d19e7b75db72433c2/habitat_llm/agent/env/evaluation/evaluation_functions.py#L354-L381",
+        "why": "時序DAG、終態持續條件與percent-complete分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e69a5c4ff976c6ad348adeaf69deefdedd699068de2ebd14f9a052322b78a821"
+  },
+  "repository_binding_review_sha256": "e69a5c4ff976c6ad348adeaf69deefdedd699068de2ebd14f9a052322b78a821",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/partnr-planner",
+      "resolved_repo": "facebookresearch/partnr-planner",
+      "aliases_in_this_review": [
+        "facebookresearch/partnr-planner"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2",
+          "reviewed_files": [
+            "INSTALLATION.md",
+            "README.md",
+            "habitat_llm/agent/env/dataset.py",
+            "habitat_llm/agent/env/evaluation/evaluation_functions.py",
+            "habitat_llm/agent/env/measures.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/facebookresearch/partnr-planner",
+          "pdf_page": 1,
+          "pdf_sha256": "7da62f6f2b031d78908d6f063d44b6eaeb491bb31d03536218f6ee61dd300efd",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/partnr-planner/",
+          "link_label": "",
+          "project_url": "https://aihabitat.org/partnr",
+          "page_sha256": "93cc339097fa54f42949a297ea52942ff6a06a20e7bf77ab7d231834071f53c3"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/partnr-planner/tree/main/",
+          "link_label": "Github",
+          "project_url": "https://aihabitat.org/partnr",
+          "page_sha256": "93cc339097fa54f42949a297ea52942ff6a06a20e7bf77ab7d231834071f53c3"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "facebookresearch/partnr-planner",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "facebookresearch/partnr-planner",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P143",
+          "review_file": "content/github_review/reviews/P143.json",
+          "review_sha256": "e69a5c4ff976c6ad348adeaf69deefdedd699068de2ebd14f9a052322b78a821",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P143",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PARTNR，arXiv 2411.00081v1（2024-10-31）。",
+    "scope_read": "生成與評分完整章、原生100K口徑、types、split、generation audit及agent資訊條件。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      24,
+      40
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "協助、交接與陪伴"
+    ],
+    "role": "对话協作與任務完成",
+    "environment": "60HSSD houses（37train/13val/10test），5,819OVMM objects；與其他HSSD來源重用。",
+    "tasks": "4非互斥特性：constraint-free/spatial/temporal/heterogeneous；原作task以unique scene-goal pair計，100K不是100K語義family。",
+    "cases": "本文100,000train＋1,000val＋1,000test；全val/test及2Ktrain人工審核。固定公開HF檔案本庫實數111,652train＋1,000val是另一版本，不能覆蓋本文或補造test。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 60,
+        "unit": "論文house scenes",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "task characteristic types",
+        "pages": [
+          4,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100000,
+        "unit": "論文train scene-goal episodes",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "論文test episodes",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "完整state sequence檢查propositions、dependencies、temporal/same-argument/terminal constraints；PC、success、failure explanation。",
+      "中央/分散、partial/full、oracle/learned skills、privileged/perceived graph分開評。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "source houses互斥；支援human-only技能差異；生成時會排除不能做的摺衣。",
+    "lineage": "Habitat3/HSSD/OVMM底座；1K人工seed衍生100K。原文generation audit約90%instruction、92%evaluator、83%joint，與本庫舊92.5%小試作無關。",
+    "related_paper_ids": [
+      "P142",
+      "P099"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "表1、§3.1–3.3",
+        "supports": "scene-goal單位、60/100K、時間規則"
+      },
+      {
+        "pages": [
+          24
+        ],
+        "locator": "附錄A.6.1",
+        "supports": "生成品質抽樣83%joint，非policy成功"
+      }
+    ],
+    "unresolved": [
+      "本文某處稱全tasks HITL，統計處實際描述val/test+2Ktrain審核，應按具體audit範圍理解。",
+      "HF公開版本無test素材；111,652只是該快照metadata實數。"
+    ],
+    "reuse": "為十萬級rule-conditioned episodes及共同協作評測的關鍵前作；數量比較須用scene-goal案例粒度。",
+    "reviewed_pdf_sha256": "7da62f6f2b031d78908d6f063d44b6eaeb491bb31d03536218f6ee61dd300efd",
+    "reviewed_on": "2026-10-02",
+    "name": "PARTNR",
+    "year": 2024,
+    "title": "PARTNR: A Benchmark for Planning and Reasoning in Embodied Multi-agent Tasks",
+    "source_url": "https://arxiv.org/abs/2411.00081",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "home",
+      "food",
+      "assistance"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "人機協作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P143",
+      "domain_ids": [
+        "home",
+        "food",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P143",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            24,
+            40
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4非互斥特性：constraint-free/spatial/temporal/heterogeneous；原作task以unique scene-goal pair計，100K不是100K語義family。",
+            "60HSSD houses（37train/13val/10test），5,819OVMM objects；與其他HSSD來源重用。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7da62f6f2b031d78908d6f063d44b6eaeb491bb31d03536218f6ee61dd300efd"
+        },
+        {
+          "paper_id": "P143",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            24,
+            40
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "人類與機器人的互補限制及協作家務。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "7da62f6f2b031d78908d6f063d44b6eaeb491bb31d03536218f6ee61dd300efd"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7da62f6f2b031d78908d6f063d44b6eaeb491bb31d03536218f6ee61dd300efd",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P143",
+      "name": "PARTNR",
+      "expected_title": "PARTNR: A Benchmark for Planning and Reasoning in Embodied Multi-agent Tasks",
+      "source_url": "https://arxiv.org/abs/2411.00081",
+      "pdf_url": "https://arxiv.org/pdf/2411.00081",
+      "retrieved_at": "2026-10-02T21:34:26.573740+00:00",
+      "pdf_sha256": "7da62f6f2b031d78908d6f063d44b6eaeb491bb31d03536218f6ee61dd300efd",
+      "text_sha256": "ebef7005398581e50bed44c24abbc4880c8beeaef6169361b5f380511b353326",
+      "pdf_bytes": 5736431,
+      "pages": 63,
+      "text_characters": 262356,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2411.00081v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2411.00081v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 60,
+        "unit": "論文house scenes",
+        "pages": [
+          5,
+          7
+        ],
+        "record_id": "review10:P143:1",
+        "paper_id": "P143",
+        "benchmark": "PARTNR",
+        "native_term": "論文house scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.00081v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.00081v1",
+            "locator": "PDF pp. 5, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "task characteristic types",
+        "pages": [
+          4,
+          7
+        ],
+        "record_id": "review10:P143:2",
+        "paper_id": "P143",
+        "benchmark": "PARTNR",
+        "native_term": "task characteristic types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.00081v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.00081v1",
+            "locator": "PDF pp. 4, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100000,
+        "unit": "論文train scene-goal episodes",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P143:3",
+        "paper_id": "P143",
+        "benchmark": "PARTNR",
+        "native_term": "論文train scene-goal episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.00081v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.00081v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1000,
+        "unit": "論文test episodes",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P143:4",
+        "paper_id": "P143",
+        "benchmark": "PARTNR",
+        "native_term": "論文test episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2411.00081v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2411.00081v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/partnr-planner"
+  ],
+  "external_repositories": []
+}

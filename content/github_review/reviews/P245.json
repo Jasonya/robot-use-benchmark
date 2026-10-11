@@ -1,0 +1,231 @@
+{
+  "paper_id": "P245",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "已核ICVL的原作方法、訓練例子選擇與兩套評測協定；快取查詢及精確arXiv-ID查詢均無repo，另查的候選作者帳號只有其他題名的專案。尚未確認官方ICVL實作；院校作者頁的412存取限制另列，不能當成沒有code的證明。",
+  "identity_note": "Vision and Intention Boost Large Language Model in Long-Term Action Anticipation；Congqi Cao、Lanshu Hu、Yating Yu、Yanning Zhang，Northwestern Polytechnical University。固定arXiv:2505.01713v1（2025-05-03）；ICVL在本篇指Intention-Conditioned Vision-Language，不是同縮寫的其他資料庫或實驗室。AntGPT、PALM及候選帳號的STDD／Open-MeDe／Cue-R1均非本篇code。",
+  "reading_order": [],
+  "environment": "Ego4D人類第一人稱日常環境，及EPIC-KITCHENS-55／EGTEA Gaze+的廚房活動影片；都是離線影片預測。意圖是VLM從已觀測影格推斷的文字，並非新增人工意圖真值集，也沒有robot場景／控制介面。",
+  "tasks": "ICVL先辨識歷史verb–noun labels，再從按時間順序抽取的觀測影格逐步推斷intention；每次VLM輸入包含先前生成的intention context，以最後結果作最終意圖。ICAF以意圖embedding為query、視覺embedding為key/value，再與文字prompt合併預測未來序列。Ego4D目標是noun／verb／action序列；EK-55與EGTEA明定為剩餘影片中會出現的verb集合，不能把兩者共用一個sequence evaluator。",
+  "data": "§3：segment Si對應Ai=(vi,ni)；每段均勻取k影格形成visual embeddings，總數T=Nseg×k，意圖另取Nfrm影格；k/Nfrm的數值、FPS、實際annotation key及split manifest未提供可核reader。歷史action recognition用CLIP ViT-L/14與Transformer加兩個MLP heads；ICAF的visual encoder為BLIP2-OPT-2.7B，意圖VLM原文明寫「LLaMA 3.2-9B」，text encoder及預測LLM為LLaMA 3-8B，精確模型ID／revision仍待設定檔核實。例子只從training pool取observed labels與future labels；先對視覺及文字embedding的L2距離各自min–max正規化，再用α加權，距離較小為較相似。α實際值、零距離範圍／ties處理未核到。§4.4雖說7例最佳，最終結果明確採3個例子。Ego4D的243小時／3472 clips、117 verbs／521 nouns以及EK-55的125／352與EGTEA的19／51詞彙量皆為原作母庫描述，非ICVL已核case數。",
+  "evaluation": "§4.1的Ego4D：Nseg=8、Z=20、K=5，對noun／verb／action分別報minimum Damerau–Levenshtein ED。完整距離實作、正規化分母、三項是否各自取min及生成錯誤處理未核到。Ego4D只稱standard splits，Table1未明列具體版本／評測split ID。EK-55與EGTEA則沿EGO-TOPO設定：觀測首P%=25/50/75%，預測其餘部分的verbs only，於validation報multi-label mAP All/Freq/Rare；未取得序列轉verb分數、頻率分組與AP聚合程式。3個ICL例子、5條生成候選、8個觀測segments及20步預測是不同預算，均非題數。",
+  "standardization": {
+    "profile": "paper_only_intention_conditioned_multimodal_forecasting",
+    "reuse": "可重用observed video→辨識labels／生成intention→ICAF→LLM的資料流、training-only例子來源、距離融合規則、3-shot例子預算與原生Ego4D ED／EK-EGTEA verb-mAP規格。沒有已核ICVL模型實作或evaluator可接線。",
+    "transform": "source保留arXiv v1及母資料集依存；domain/environment限定離線人類影片。task分有序verb–noun forecasting與無序verb presence。case應保存觀測窗口、原生labels、生成意圖、visual/text表示引用、3個training example IDs與5條預測；intention標為model_generated，訓練例子的future labels與test GT隔離。evaluator分開保存ED與All/Freq/Rare mAP，母庫clips、frames及詞彙不展開成虛構案例。",
+    "missing": "官方ICVL repo／commit、精確模型型號與版本、影格／segment reader、資料／類別與split IDs、example pool及去重隔離規則、prompt/輸出parser、ED與verb-mAP scorer。需確認原文LLaMA 3.2-9B型號、α及frame抽樣值；不能借用AntGPT、PALM或STDD的程式視為ICVL已實作。"
+  },
+  "version_note": "核讀範圍為固定arXiv v1方法與實驗，未建立新的會議／期刊版本假設。cached「ICVL egocentric」為0筆；一次「\"2505.01713\" in:readme」亦HTTP200、0筆、incomplete_results=false。另核Mia-YatingYu候選帳號返回的3筆公開repo metadata，題名均不匹配ICVL；帳號候選不構成作者為本篇公開code的證明。Congqi Cao院校頁一次返回HTTP412 Precondition Failed，未讀到正文且未重試；此為author-page access limitation，非rate limit或repository unavailable。結論限已查證來源，非宣稱全球沒有code。",
+  "discovery_evidence": [
+    {
+      "provider": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P245/pages.json",
+      "sha256": "43c277d15a9ab6d089eedf60b2278f32246e256ee8edfd3d68f2a0049b89dfee",
+      "json_pointers": [
+        "/0/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text"
+      ],
+      "finding": "核讀身份、§3辨識／意圖／ICAF／例子來源、§4.1兩套評測、§4.2模型設定及§4.4的最終3-example預算。",
+      "url": "https://arxiv.org/pdf/2505.01713",
+      "version": "arXiv:2505.01713v1",
+      "page_ranges": [
+        [
+          1,
+          1
+        ],
+        [
+          3,
+          7
+        ]
+      ],
+      "pages_read": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "page_line_ranges": [
+        {
+          "page": 1,
+          "ranges": [
+            [
+              1,
+              55
+            ]
+          ]
+        },
+        {
+          "page": 3,
+          "ranges": [
+            [
+              1,
+              46
+            ]
+          ]
+        },
+        {
+          "page": 4,
+          "ranges": [
+            [
+              1,
+              72
+            ]
+          ]
+        },
+        {
+          "page": 5,
+          "ranges": [
+            [
+              1,
+              60
+            ]
+          ]
+        },
+        {
+          "page": 6,
+          "ranges": [
+            [
+              1,
+              59
+            ]
+          ]
+        },
+        {
+          "page": 7,
+          "ranges": [
+            [
+              1,
+              59
+            ]
+          ]
+        }
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P245/paper.pdf",
+      "pdf_sha256": "49dfd96415798345e801cd8dbb8f83797bd23d869137277bc1ec09e702594042"
+    },
+    {
+      "provider": "cached_pdf_link_discovery",
+      "local_file": "audit/.cache/github_review/P245-discovery.json",
+      "sha256": "c26234fe635759df6b3c45674dd082a98a13dbcb6f930d746ee11808e2d421bd",
+      "json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "核對精確論文、PDF指紋、連結候選與code-availability摘錄；候選本身不等同官方repo。"
+    },
+    {
+      "provider": "cached_project_candidates",
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/244"
+      ],
+      "finding": "本ID的project及repository候選均為空；enriched_projects亦無本ID條目。"
+    },
+    {
+      "provider": "cached_github_repository_search",
+      "local_file": "audit/.cache/github_review/search/P245.json",
+      "sha256": "ef1c9d48b9d7208b9c9204320fe768a6f44ccae58c5a2093f705143352dd5da4",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "cached GitHub repository query「ICVL egocentric」HTTP200、total_count=0，PDF discovery沒有code/project候選。"
+    },
+    {
+      "provider": "bounded_exact_github_repository_search",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P245/exact_id_search.json",
+      "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+      "json_pointers": [
+        "/total_count",
+        "/incomplete_results",
+        "/items"
+      ],
+      "finding": "精確2505.01713 in:readme repository search返回0筆，並非全球不存在repo的證明。"
+    },
+    {
+      "provider": "shared_paced_search_receipt",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P245/exact_id_search.json.receipt.json",
+      "sha256": "4d52e41e786e2719d029774eb356535d8afd41458394fcab5f08918f6b93ea91",
+      "json_pointers": [
+        "/requested_url",
+        "/retrieved_at",
+        "/status",
+        "/sha256"
+      ],
+      "finding": "沿共享network.py的GitHub search節流讀取；HTTP200。"
+    },
+    {
+      "provider": "candidate_author_public_repository_metadata",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P245/coauthor_repository_candidates.json",
+      "sha256": "d276cf397df582d38f75c342e00026b76b2ce4e4ed337caf7ab1c011dad47d45",
+      "json_pointers": [
+        "/0/full_name",
+        "/0/description",
+        "/0/html_url",
+        "/0/homepage",
+        "/0/fork",
+        "/0/default_branch",
+        "/1/full_name",
+        "/1/description",
+        "/1/html_url",
+        "/1/homepage",
+        "/1/fork",
+        "/1/default_branch",
+        "/2/full_name",
+        "/2/description",
+        "/2/html_url",
+        "/2/homepage",
+        "/2/fork",
+        "/2/default_branch"
+      ],
+      "finding": "返回Cue-R1、Open-MeDe、STDD共3筆；description各指向其他论文／方法，未讀其code，也不提議綁到ICVL。"
+    },
+    {
+      "provider": "shared_paced_api_receipt",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P245/coauthor_repository_candidates.json.receipt.json",
+      "sha256": "0d0f8cf457f2de3b4e6edaa96b2ebf6b689cb081607ad68e27f9f212085efba3",
+      "json_pointers": [
+        "/requested_url",
+        "/retrieved_at",
+        "/status",
+        "/sha256"
+      ],
+      "finding": "候選帳號owner repo metadata的精確GET，HTTP200，未遞迴查找或下載repo。"
+    },
+    {
+      "provider": "deferred_primary_author_page_receipt",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P245/author_institution.html.receipt.json",
+      "sha256": "abaa4f0ee9c29fcd252fb48adacc777003fb4d5fa9dfcfb74124995136c4cbfe",
+      "json_pointers": [
+        "/requested_url",
+        "/retrieved_at",
+        "/status",
+        "/error"
+      ],
+      "finding": "院校作者頁一次HTTP412；未取得正文，不宣稱已讀其publication／code清單。"
+    }
+  ],
+  "deferred_sources": [
+    {
+      "url": "https://teacher.nwpu.edu.cn/en/caocongqi.html",
+      "status": "http_412_precondition_failed",
+      "reason": "官方院校作者頁正文未取得；不將存取限制推成無公開repo。",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P245/author_institution.html.receipt.json"
+    }
+  ],
+  "additional_repo_proposals": [],
+  "source_files": [],
+  "runtime_executed": false
+}

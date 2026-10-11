@@ -1,0 +1,109 @@
+{
+  "paper_id": "P141",
+  "summary": "HoloAssist提供多感測程序互動資料和多種任務；PyHoloAssist另提供投影工具。recognition、anticipation、hand forecasting各用不同觀測窗口與分母。",
+  "reading_order": [
+    {
+      "repo": "Ember-HoloAssist/holoassist-release",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          10
+        ],
+        [
+          30,
+          88
+        ],
+        [
+          139,
+          181
+        ]
+      ],
+      "why": "主論文、同步模態、四種原始標註與正誤行為",
+      "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970"
+    },
+    {
+      "repo": "taeinkwon/PyHoloAssist",
+      "path": "README.md",
+      "text_encoding": "utf-16",
+      "ranges": [
+        [
+          1,
+          17
+        ]
+      ],
+      "why": "原檔UTF16，已正確解碼；投影用途和PSI/校準資料依賴",
+      "commit": "9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae"
+    },
+    {
+      "repo": "taeinkwon/PyHoloAssist",
+      "path": "hand_eye_project.py",
+      "ranges": [
+        [
+          17,
+          34
+        ]
+      ],
+      "why": "逐時間前進的nearest-neighbor同步方式",
+      "commit": "9d0dfe238ff6ac99c510f8ce8a8c0e125317dbae"
+    },
+    {
+      "repo": "Ember-HoloAssist/holoassist-release",
+      "path": "src/data_loader/raw_loader.py",
+      "ranges": [
+        [
+          54,
+          64
+        ],
+        [
+          193,
+          250
+        ],
+        [
+          296,
+          322
+        ]
+      ],
+      "why": "原事件ID、識別/預測窗口、正確動作hand子集",
+      "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970"
+    },
+    {
+      "repo": "Ember-HoloAssist/holoassist-release",
+      "path": "src/test_net.py",
+      "ranges": [
+        [
+          114,
+          126
+        ],
+        [
+          394,
+          424
+        ],
+        [
+          483,
+          550
+        ],
+        [
+          719,
+          726
+        ]
+      ],
+      "why": "top-k分類、手部prefix15/30/45及masked距離",
+      "commit": "f53ad2b5c3889784ef068e11fea10ba4ecf99970"
+    }
+  ],
+  "environment": "人類HoloLens工作session與指導者互動，RGB/depth/眼動/手/頭/IMU/音訊同步到RGB；session/裝置/活動不是可直接執行的robot environment。",
+  "tasks": "細/粗動作識別與anticipation、錯誤與介入偵測/預測、手部forecast；原Narration/Conversation/細/粗行為是標註種類，與生活用途/robot task不同層。",
+  "data": "session中*_synced資料按RGB時鐘排列，原annotation有id/start/end（秒）及attributes。anticipation取[0,t_start-time_range]並篩長度，hand forecast只取correct action，用過去3秒預測起始後1.5秒；不能把全量mistake資料當hand test分母。",
+  "evaluation": "分類top1/top5與precision/recall依class平均設定；hand分支ks=15/30/45是前綴frame數，不是候選數，且輸出名稱*_acc實際為masked 3D Euclidean距離。NUM_CLASSES<=10分支優先，配置要固定。投影工具nearest-neighbor假設時間順序。",
+  "standardization": {
+    "profile": "multisensor_human_instruction_and_intervention",
+    "reuse": "session/事件/模態同步、label字典、各任務窗口和有效mask、投影校準。",
+    "transform": "case固定benchmark kind、觀測截止/預測horizon、原事件/participant/split；相同session多題連父來源，手部距離/分類百分比/介入標籤分開。",
+    "missing": "全量素材與同步校準、手部座標/單位核對、每任務split/排除清單、不同感測缺失處理和全部端點重現。"
+  },
+  "version_note": "主release與PyHoloAssist各固定commit；後者是作者工具，不替代完整benchmark。UTF16 README行號指解碼文字，外部連結定位到檔案，不捏造GitHub逐行fragment。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

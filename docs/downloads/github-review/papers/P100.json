@@ -1,0 +1,580 @@
+{
+  "paper_id": "P100",
+  "name": "BEHAVIOR-1K",
+  "title": "BEHAVIOR-1K: A Human-Centered, Embodied AI Benchmark with 1,000 Everyday Activities and Realistic Simulation",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2403.09227",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "garment",
+    "office",
+    "retail",
+    "garden"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P100",
+    "summary": "BEHAVIOR-1K的activity、definition、instance已在原程式分開；1,000種活動不等於1,000個已載入case。Q-score與全條件成功也有不同分母。",
+    "environment": "OmniGibson場景、物件／材料／系統、機器人與預取樣狀態；scene_model和activity_instance_id共同定位初態，不按並行num_envs增算場景種類。",
+    "tasks": "原生activity_name是活動，activity_definition_id選同一活動不同完成規格，activity_instance_id選預配置狀態。新增definition可能改規則；重跑rollout_id只改試驗，不增加活動數。",
+    "data": "cached filename含scene_model/activity/definition/instance；evaluator逐例項寫task、instance_id、rollout_id、steps、success及metrics。可選online sampling、robot pose、asset whitelist/blacklist及task highlighting，均影響合法題目配置。",
+    "evaluation": "PredicateGoal委派compiled BDDL目標檢查，各env用獨立object scope。成功Q=1；未成功時對每一備選goal，計初態不滿足而現在滿足的predicate數÷該option全部predicate數，再取最大。此分母不是初態未滿足數。timeout可依人類示範長度乘係數或明定max_steps；時間標準化需保留human stats版本。",
+    "standardization": {
+      "profile": "predicate_defined_household_simulation",
+      "reuse": "活動/definition/instance、BDDL目標、預取樣場景與細項metrics。",
+      "transform": "來源活動與本庫語義任務分開，environment接scene+assets，case保留definition/instance/機體/感測/初態；Q-score及success分欄並保存初始predicate mask和備選goal。",
+      "missing": "資產／知識庫／BDDL／模擬器版本閉合、全部活動定義及可執行子集清單、物理有效性與原生重播。"
+    },
+    "version_note": "本次HEAD為2026-10快照，內含新BDDL3及向量化eval；README引用2024論文。此前庫存用4b0f43d版本，兩次快照不混算已取得任務與cases。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "StanfordVL/BEHAVIOR-1K",
+        "requested_repo": "StanfordVL/BEHAVIOR-1K",
+        "commit": "cd484e0477e79bf1f17d373af232c53431ccc660",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            24
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 24,
+        "sha256": "79744543130b07483bf58c2c2d217a33606747458cab564cd70fe1f14d90c427",
+        "url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/README.md",
+        "reading_url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/README.md#L1-L24",
+        "why": "精確論文、1,000活動為作者聲明",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "StanfordVL/BEHAVIOR-1K",
+        "requested_repo": "StanfordVL/BEHAVIOR-1K",
+        "commit": "cd484e0477e79bf1f17d373af232c53431ccc660",
+        "ref": null,
+        "path": "OmniGibson/omnigibson/tasks/behavior_task.py",
+        "ranges": [
+          [
+            65,
+            99
+          ],
+          [
+            166,
+            181
+          ],
+          [
+            201,
+            250
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 947,
+        "sha256": "44db7998933da4111292a1ce343b11126ea024b2492482b13156058accf29f6d",
+        "url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/tasks/behavior_task.py",
+        "reading_url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/tasks/behavior_task.py#L65-L99",
+        "why": "活動/定義/例項身份、各並行環境的predicate scope",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "StanfordVL/BEHAVIOR-1K",
+        "requested_repo": "StanfordVL/BEHAVIOR-1K",
+        "commit": "cd484e0477e79bf1f17d373af232c53431ccc660",
+        "ref": null,
+        "path": "OmniGibson/omnigibson/termination_conditions/predicate_goal.py",
+        "ranges": [
+          [
+            1,
+            53
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 53,
+        "sha256": "f0c7e87e06bf3b3fe17b505638be944c7f69b8e6eac73b6792bac58fd7440b8e",
+        "url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/termination_conditions/predicate_goal.py",
+        "reading_url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/termination_conditions/predicate_goal.py#L1-L53",
+        "why": "BDDL目標判斷與成功終止",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "StanfordVL/BEHAVIOR-1K",
+        "requested_repo": "StanfordVL/BEHAVIOR-1K",
+        "commit": "cd484e0477e79bf1f17d373af232c53431ccc660",
+        "ref": null,
+        "path": "OmniGibson/omnigibson/metrics/task_metric.py",
+        "ranges": [
+          [
+            1,
+            81
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 81,
+        "sha256": "9f9c20fa5c3b8e57c46d81e04e71eb2b63c007809a43631a6b4fe3c791ceef8e",
+        "url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/metrics/task_metric.py",
+        "reading_url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/metrics/task_metric.py#L1-L81",
+        "why": "Q-score確切分子／分母、時間與初態",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "StanfordVL/BEHAVIOR-1K",
+        "requested_repo": "StanfordVL/BEHAVIOR-1K",
+        "commit": "cd484e0477e79bf1f17d373af232c53431ccc660",
+        "ref": null,
+        "path": "OmniGibson/omnigibson/eval/evaluator.py",
+        "ranges": [
+          [
+            265,
+            295
+          ],
+          [
+            636,
+            697
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 736,
+        "sha256": "5885dceea636ce206accbb26d153b90c3004e3d5e959eced27529487c18ae870",
+        "url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/eval/evaluator.py",
+        "reading_url": "https://github.com/StanfordVL/BEHAVIOR-1K/blob/cd484e0477e79bf1f17d373af232c53431ccc660/OmniGibson/omnigibson/eval/evaluator.py#L265-L295",
+        "why": "相機/超時設定、instance和rollout輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b021dbe7516fd9cc4e12507ac993c1b20b4b5291a75026179c925d3d5c02c625"
+  },
+  "repository_binding_review_sha256": "b021dbe7516fd9cc4e12507ac993c1b20b4b5291a75026179c925d3d5c02c625",
+  "repository_bindings": [
+    {
+      "requested_repo": "StanfordVL/BEHAVIOR-1K",
+      "resolved_repo": "StanfordVL/BEHAVIOR-1K",
+      "aliases_in_this_review": [
+        "stanfordvl/behavior-1k"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "cd484e0477e79bf1f17d373af232c53431ccc660",
+          "reviewed_files": [
+            "OmniGibson/omnigibson/eval/evaluator.py",
+            "OmniGibson/omnigibson/metrics/task_metric.py",
+            "OmniGibson/omnigibson/tasks/behavior_task.py",
+            "OmniGibson/omnigibson/termination_conditions/predicate_goal.py",
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/StanfordVL/BEHAVIOR-1K",
+          "link_label": "StanfordVL/BEHAVIOR-1K",
+          "project_url": "https://behavior.stanford.edu",
+          "page_sha256": "2ae88feaf8ceb03c25edfe24b7fa743bd9d709d5e71f0d7ddeee9c6d1432999c"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/StanfordVL/BEHAVIOR-1K",
+          "link_label": "Source Code",
+          "project_url": "https://behavior.stanford.edu",
+          "page_sha256": "2ae88feaf8ceb03c25edfe24b7fa743bd9d709d5e71f0d7ddeee9c6d1432999c"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "StanfordVL/BEHAVIOR-1K",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "4b0f43dfb7f7f759e5e9f575e8d72f56492eab5f"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "StanfordVL/BEHAVIOR-1K",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "4b0f43dfb7f7f759e5e9f575e8d72f56492eab5f"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P100",
+          "review_file": "content/github_review/reviews/P100.json",
+          "review_sha256": "b021dbe7516fd9cc4e12507ac993c1b20b4b5291a75026179c925d3d5c02c625",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "衣物與洗護",
+    "辦公與教育",
+    "零售與購物",
+    "農業與園藝"
+  ],
+  "source_review": {
+    "paper_id": "P100",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "BEHAVIOR-1K，arXiv 2403.09227v1。",
+    "scope_read": "人類需求survey、1K activity來源、scene/object表、BDDL與Transition Machine、baseline範圍。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      20,
+      24
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "衣物與洗護",
+      "辦公與教育",
+      "零售與購物",
+      "農業與園藝"
+    ],
+    "role": "室內長流程操作",
+    "environment": "50scenes／373rooms／8scene types；包含house、garden、restaurant、office等；不能把rooms和scenes相加。",
+    "tasks": "1,000 BDDL activities＝人類需求排序選909＋沿用BEHAVIOR100的91項；2,090是survey候選池，不是已實作任務。",
+    "cases": "程序生成滿足initial predicates的配置；原文baseline只實測CollectTrash、StoreDecoration、CleanTable三活動，非1,000活動全模型成績。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 50,
+        "unit": "scenes",
+        "pages": [
+          1,
+          4
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 373,
+        "unit": "rooms（包含於50scene）",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "domain",
+        "value": 8,
+        "unit": "原作scene types",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1000,
+        "unit": "BDDL activities",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "原文baseline活動",
+        "pages": [
+          6,
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "success、goal score Q、時間、導航距離、擾動物件量。",
+      "低階RL與assistive grasp/teleport primitive分開；高分primitive不能代稱低階policy已解題。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "原文3活動實驗；初態生成規格與實驗seed／rollout需另外記錄。",
+    "lineage": "BEHAVIOR100的延伸；ATUS等time-use survey及WikiHow為活動來源。OmniGibson混用物理與temperature/烘焙等heuristic transition，非所有現象都是精密物理。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4
+        ],
+        "locator": "§2、表1",
+        "supports": "909+91、50/373/8"
+      },
+      {
+        "pages": [
+          6,
+          7
+        ],
+        "locator": "§5–6、表2",
+        "supports": "Transition Machine與僅3活動baseline"
+      }
+    ],
+    "unresolved": [
+      "全1K activities的去重semantic goal、可用資產及可解性應逐規格核，不用1K宣稱1K模型可評結果。"
+    ],
+    "reuse": "全庫廣度與生活活動規格的核心比較基準；新庫要提出超過其已有activity和規則的具體聯集。",
+    "reviewed_pdf_sha256": "ab4033f3e8a8187ad2cfdf11f1979d33996ecce1e81fa3d62af33a92bbb17a2b",
+    "reviewed_on": "2026-10-02",
+    "name": "BEHAVIOR-1K",
+    "year": 2024,
+    "title": "BEHAVIOR-1K: A Human-Centered, Embodied AI Benchmark with 1,000 Everyday Activities and Realistic Simulation",
+    "source_url": "https://arxiv.org/abs/2403.09227",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "food",
+      "garment",
+      "office",
+      "retail",
+      "garden"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "零售與購物",
+      "辦公活動",
+      "園藝與戶外",
+      "衣物與柔性物操作",
+      "表面清潔"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "衣物與洗護",
+      "辦公與教育",
+      "零售與購物",
+      "農業與園藝"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P100",
+      "domain_ids": [
+        "home",
+        "food",
+        "garment",
+        "office",
+        "retail",
+        "garden"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P100",
+          "domain_ids": [
+            "home",
+            "food",
+            "garment",
+            "office",
+            "retail",
+            "garden"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            20,
+            24
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "1,000 BDDL activities＝人類需求排序選909＋沿用BEHAVIOR100的91項；2,090是survey候選池，不是已實作任務。",
+            "50scenes／373rooms／8scene types；包含house、garden、restaurant、office等；不能把rooms和scenes相加。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "ab4033f3e8a8187ad2cfdf11f1979d33996ecce1e81fa3d62af33a92bbb17a2b"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "ab4033f3e8a8187ad2cfdf11f1979d33996ecce1e81fa3d62af33a92bbb17a2b",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "garment",
+        "office",
+        "retail",
+        "garden"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P100",
+      "name": "BEHAVIOR-1K",
+      "expected_title": "BEHAVIOR-1K: A Human-Centered, Embodied AI Benchmark with 1,000 Everyday Activities and Realistic Simulation",
+      "source_url": "https://arxiv.org/abs/2403.09227",
+      "pdf_url": "https://arxiv.org/pdf/2403.09227",
+      "retrieved_at": "2026-10-02T21:34:06.752983+00:00",
+      "pdf_sha256": "ab4033f3e8a8187ad2cfdf11f1979d33996ecce1e81fa3d62af33a92bbb17a2b",
+      "text_sha256": "7ff0ca322e8cdb0473cbbf77b9563ddbf0d3e26d63ee361ee0b1201f62154dc6",
+      "pdf_bytes": 14233640,
+      "pages": 43,
+      "text_characters": 205185,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2403.09227v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2403.09227v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 50,
+        "unit": "scenes",
+        "pages": [
+          1,
+          4
+        ],
+        "record_id": "review10:P100:1",
+        "paper_id": "P100",
+        "benchmark": "BEHAVIOR-1K",
+        "native_term": "scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.09227v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.09227v1",
+            "locator": "PDF pp. 1, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 373,
+        "unit": "rooms（包含於50scene）",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P100:2",
+        "paper_id": "P100",
+        "benchmark": "BEHAVIOR-1K",
+        "native_term": "rooms（包含於50scene）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.09227v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.09227v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "domain",
+        "value": 8,
+        "unit": "原作scene types",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P100:3",
+        "paper_id": "P100",
+        "benchmark": "BEHAVIOR-1K",
+        "native_term": "原作scene types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.09227v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.09227v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1000,
+        "unit": "BDDL activities",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P100:4",
+        "paper_id": "P100",
+        "benchmark": "BEHAVIOR-1K",
+        "native_term": "BDDL activities",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.09227v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.09227v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "原文baseline活動",
+        "pages": [
+          6,
+          7
+        ],
+        "record_id": "review10:P100:5",
+        "paper_id": "P100",
+        "benchmark": "BEHAVIOR-1K",
+        "native_term": "原文baseline活動",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2403.09227v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2403.09227v1",
+            "locator": "PDF pp. 6, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "StanfordVL/BEHAVIOR-1K"
+  ],
+  "external_repositories": []
+}

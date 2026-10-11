@@ -1,0 +1,576 @@
+{
+  "paper_id": "P071",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RoboCasa365 應從 TASK_SET_REGISTRY、split 建環境、LeRobot extras 和具體 task checker 讀起。現行程式的 all_tasks 來自資料registry而非365項完整任務名冊；論文與後續文件的trial數、horizon也已不同。",
+  "identity_note": "對應 arXiv:2603.04356v1（2026-03-04／ICLR 2026），四位作者及題名與README的RoboCasa365引用一致。與P070共用官方倉庫，但這份筆記固定365時代main：456174f62b89b8fca99eaaf33949c29fec9cfc2a。",
+  "discovery_evidence": [
+    {
+      "kind": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P071/pages.json",
+      "pages": [
+        1,
+        22
+      ],
+      "pdf_sha256": "f3e6877b8de3dd471afb6951c1e067729e2a57c53fcb3d6daaa0f4af5080206b"
+    },
+    {
+      "kind": "primary_paper_section_record",
+      "local_file": "content/fulltext_review/batch07.json",
+      "paper_id": "P071"
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "robocasa/robocasa",
+      "path": "README.md",
+      "ranges": [
+        [
+          5,
+          22
+        ],
+        [
+          129,
+          150
+        ]
+      ],
+      "why": "辨認2024/365兩篇論文及v1.0.1 horizon、2026-07標註更新。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "docs/benchmarking/benchmarking_overview.md",
+      "ranges": [
+        [
+          16,
+          33
+        ]
+      ],
+      "why": "當前文件的50 rollouts與1.5倍horizon，對照論文30 trials。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "docs/datasets/datasets_overview.md",
+      "ranges": [
+        [
+          3,
+          71
+        ]
+      ],
+      "why": "300 pretrain、50 target與18/16/16三組資料。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/utils/dataset_registry.py",
+      "ranges": [
+        [
+          1,
+          40
+        ],
+        [
+          2130,
+          2170
+        ],
+        [
+          2802,
+          2860
+        ],
+        [
+          2931,
+          2962
+        ]
+      ],
+      "why": "task資料條目、target清單與all_tasks實際組成。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/utils/dataset_registry_utils.py",
+      "ranges": [
+        [
+          11,
+          89
+        ],
+        [
+          121,
+          169
+        ],
+        [
+          240,
+          253
+        ]
+      ],
+      "why": "資料路徑、demo_fraction/filter_key、缺資料時略過及task horizon取得。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/models/scenes/scene_registry.py",
+      "ranges": [
+        [
+          14,
+          92
+        ],
+        [
+          162,
+          199
+        ]
+      ],
+      "why": "1–10 target與11–60 pretrain的layout/style群組。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/utils/env_utils.py",
+      "ranges": [
+        [
+          57,
+          154
+        ],
+        [
+          157,
+          193
+        ]
+      ],
+      "why": "split到場景／物件的映射、12維action切片與成功時計數的參考loop。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/wrappers/gym_wrapper.py",
+      "ranges": [
+        [
+          33,
+          140
+        ],
+        [
+          143,
+          177
+        ],
+        [
+          303,
+          328
+        ],
+        [
+          342,
+          385
+        ],
+        [
+          400,
+          424
+        ]
+      ],
+      "why": "typed observation/action、預設split、success、done與未註冊TimeLimit的行為。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/environments/kitchen/atomic/kitchen_pick_place.py",
+      "ranges": [
+        [
+          24,
+          137
+        ]
+      ],
+      "why": "具體PickPlaceCounterToCabinet的物件配置、指令與checker。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/utils/object_utils.py",
+      "ranges": [
+        [
+          14,
+          64
+        ],
+        [
+          645,
+          652
+        ]
+      ],
+      "why": "完整追到fixture內部幾何投影及eef距離。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/environments/kitchen/kitchen.py",
+      "ranges": [
+        [
+          376,
+          396
+        ],
+        [
+          424,
+          445
+        ],
+        [
+          1167,
+          1214
+        ],
+        [
+          1530,
+          1540
+        ]
+      ],
+      "why": "20 Hz、場景組合排除、ep_meta及reward委派。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/scripts/dataset_scripts/playback_dataset.py",
+      "ranges": [
+        [
+          254,
+          304
+        ],
+        [
+          315,
+          345
+        ]
+      ],
+      "why": "LeRobot重播的真實reader呼叫與filter/absolute-action限制。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "path": "robocasa/utils/lerobot_utils.py",
+      "ranges": [
+        [
+          63,
+          79
+        ],
+        [
+          123,
+          165
+        ],
+        [
+          199,
+          346
+        ]
+      ],
+      "why": "Parquet action排序、meta/modality.json與必需extras實體欄位。",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a"
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/eval_utils.py",
+      "ranges": [
+        [
+          14,
+          57
+        ]
+      ],
+      "why": "核對main殘留的PandaMobile、B物件split與五場景舊介面，避免誤用於365評測。"
+    }
+  ],
+  "analysis_artifacts": [
+    {
+      "kind": "static_registry_ast_inspection",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/P071-registry-counts.json",
+      "description": "只解析固定來源AST；保存原生keys與集合成員，未import或執行上游程式。"
+    }
+  ],
+  "environment": "pretrain由layout 11–60與style 11–60交叉組成2500組；target只用(1,1)…(10,10)十組，不是10×10。create_env同時切換obj_instance_split。Kitchen會再排除任務不支援的layout/style；2500不能保證每task都有2500個有效場景。",
+  "tasks": "論文365＝65 atomic＋300 composite；target50明列18 atomic-seen、16 composite-seen、16 composite-unseen。固定registry經AST計數為65 atomic＋252 composite＝317個key，all_tasks直接串接這兩表；pretrain300與target50聯集316，另外一個key是PlaceOnDishRack。這是資料／評測入口的覆蓋差異，不以317覆蓋論文365，也不推論未列者沒有環境實作。",
+  "data": "get_ds_meta輸出path/horizon/filter_key/task/split/source；human預設pretrain100、target500 demos，MimicGen一般10000但OpenCabinet特例5000。缺folder回None，soup會略過。LeRobot讀data/*/episode_NNNNNN.parquet的action，按meta/modality.json重排；重播另需extras/dataset_meta.json的env_args，及每episode的states.npz、model.xml.gz、ep_meta.json。ep_meta保留layout_id/style_id/object_cfgs/fixture_refs/cam_configs/lang及底盤初態。action原始順序為eef平移3、旋轉3、gripper1、base/torso4、mode1；Gym提供三個video.*視角、state.*與annotation.human.task_description，不能直接按LeRobot欄位字典順序拼接。",
+  "evaluation": "Gym.step→Kitchen.reward／具體_check_success；PickPlaceCounterToCabinet要求bbox位於某一櫃內區域且eef離物件>0.25公尺。obj_inside_of仍在未正規化軸投影使用0.05，非固定5公分容差。Gym將checker轉為reward 0/1與info.success；ignore_done=True且truncated固定False，registry的horizon必須由policy runner另行取用。論文§G.2每task30 trials、期限內曾成功即算成功、跨task平均；現行文件改50 rollouts且v1.0.1把horizon增至1.5倍。",
+  "standardization": {
+    "profile": "kitchen_task_definitions_and_lerobot_episodes",
+    "reuse": "有版本的task sets、pretrain/target分割、LeRobot modality及extras、場景／物件生成設定與具體bool checker。",
+    "transform": "source記論文v1及commit；task全集、資料覆蓋、target集合分欄。case記split、layout/style pair、物件分割、seed、控制頻率及實際horizon；evaluator保存trial數、期限內成功與跨task平均，禁止和P070或不同horizon結果直接合併。",
+    "missing": "365任務與317個資料key的完整對照、正式policy runner依賴commit／seed清單、per-frame subtask標註的實際檔案schema，以及LeRobot影片／extras／資產的閉合驗證。"
+  },
+  "version_note": "主倉庫同時殘留舊eval_utils的PandaMobile/B split；365應沿env_utils＋Gym讀取。Gym預設split=\"test\"，create_env只接受None/all/pretrain/target，因此呼叫時需明設split。LeRobot playback拒絕filter_key；--use_abs_actions沒有進入use_actions分支，而底層get_episode_actions(abs_actions=True)也明確未實作。README要求robosuite master，LeRobot與policy runner版本尚未固定；本次沒有宣稱執行相容。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/robocasa__robocasa/files/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/robocasa__robocasa/manifest.json",
+      "sha256": "7c0c1a7ce2f12e459fe8b2bf79be8ecf065e13740ecd8bcf6e207d2a3a196eb6",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/README.md",
+      "read_ranges": [
+        [
+          5,
+          22
+        ],
+        [
+          129,
+          150
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "docs/benchmarking/benchmarking_overview.md",
+      "local_file": "audit/.cache/github_review/repos/robocasa__robocasa/files/docs/benchmarking/benchmarking_overview.md",
+      "source_manifest": "audit/.cache/github_review/repos/robocasa__robocasa/manifest.json",
+      "sha256": "476353c8054bfaac67d9a6a522769cad0cca6dadd33925f9884f6f872436f201",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/docs/benchmarking/benchmarking_overview.md",
+      "read_ranges": [
+        [
+          16,
+          33
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "docs/datasets/datasets_overview.md",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/docs/datasets/datasets_overview.md",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/docs/datasets/datasets_overview.md.receipt.json",
+      "sha256": "8a4839fc0fdd127e03113adcef519455d279848a66ca1214c083dfd7c3e59a2a",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/docs/datasets/datasets_overview.md",
+      "read_ranges": [
+        [
+          3,
+          71
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/dataset_registry.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/dataset_registry.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/dataset_registry.py.receipt.json",
+      "sha256": "23e8e31bb56bae80de86c34eafadfe32dd1e1eba6608376152ba9fdda5532a4b",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/dataset_registry.py",
+      "read_ranges": [
+        [
+          1,
+          40
+        ],
+        [
+          2130,
+          2170
+        ],
+        [
+          2802,
+          2860
+        ],
+        [
+          2931,
+          2962
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/dataset_registry_utils.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/dataset_registry_utils.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/dataset_registry_utils.py.receipt.json",
+      "sha256": "9ea74602711ab9c499314bc3d94c4b61db6fe85bebf616cce573b9d39ba02e3b",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/dataset_registry_utils.py",
+      "read_ranges": [
+        [
+          11,
+          89
+        ],
+        [
+          121,
+          169
+        ],
+        [
+          240,
+          253
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/models/scenes/scene_registry.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/models/scenes/scene_registry.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/models/scenes/scene_registry.py.receipt.json",
+      "sha256": "284f4b019d50f3960045666c461e54e8663dbcaf2f68ac19ff4cbc60c30e4901",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/models/scenes/scene_registry.py",
+      "read_ranges": [
+        [
+          14,
+          92
+        ],
+        [
+          162,
+          199
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/env_utils.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/env_utils.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/env_utils.py.receipt.json",
+      "sha256": "2543d593897008b104c0fa7bb83c987675b4e583ae519b324de98f99c71a5fcd",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/env_utils.py",
+      "read_ranges": [
+        [
+          57,
+          154
+        ],
+        [
+          157,
+          193
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/wrappers/gym_wrapper.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/wrappers/gym_wrapper.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/wrappers/gym_wrapper.py.receipt.json",
+      "sha256": "356d61ca9e4b777ca0515323d38167cb7560b837cb37ea460f16ba01b4cf2d49",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/wrappers/gym_wrapper.py",
+      "read_ranges": [
+        [
+          33,
+          140
+        ],
+        [
+          143,
+          177
+        ],
+        [
+          303,
+          328
+        ],
+        [
+          342,
+          385
+        ],
+        [
+          400,
+          424
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/environments/kitchen/atomic/kitchen_pick_place.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/environments/kitchen/atomic/kitchen_pick_place.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/environments/kitchen/atomic/kitchen_pick_place.py.receipt.json",
+      "sha256": "f7157fb5809e73d4ee954974d8c8e199f18d9a0f48ce41f84c2b5d7b74eaf676",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/environments/kitchen/atomic/kitchen_pick_place.py",
+      "read_ranges": [
+        [
+          24,
+          137
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/object_utils.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/object_utils.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/object_utils.py.receipt.json",
+      "sha256": "3a7ddb8ba503c5f397baa1513b7b5f370c3c3b2a6a67fa723e83c9472c58af4a",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/object_utils.py",
+      "read_ranges": [
+        [
+          14,
+          64
+        ],
+        [
+          645,
+          652
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/environments/kitchen/kitchen.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/environments/kitchen/kitchen.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/environments/kitchen/kitchen.py.receipt.json",
+      "sha256": "35b1395ce65d51b993296aff1881fd5371542aec4c4e8ffc38c3f775327b5c56",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/environments/kitchen/kitchen.py",
+      "read_ranges": [
+        [
+          376,
+          396
+        ],
+        [
+          424,
+          445
+        ],
+        [
+          1167,
+          1214
+        ],
+        [
+          1530,
+          1540
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/scripts/dataset_scripts/playback_dataset.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/scripts/dataset_scripts/playback_dataset.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/scripts/dataset_scripts/playback_dataset.py.receipt.json",
+      "sha256": "9a3556e941f364862177e85d339b519f657d9be8308f76a09c642b560a9ceba7",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/scripts/dataset_scripts/playback_dataset.py",
+      "read_ranges": [
+        [
+          254,
+          304
+        ],
+        [
+          315,
+          345
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/lerobot_utils.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/lerobot_utils.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/robocasa__robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/files/robocasa/utils/lerobot_utils.py.receipt.json",
+      "sha256": "4d6aafd67753576917546c487e960a3fadf5ba1f32c5fb5604e69336f5262f6c",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/lerobot_utils.py",
+      "read_ranges": [
+        [
+          63,
+          79
+        ],
+        [
+          123,
+          165
+        ],
+        [
+          199,
+          346
+        ]
+      ]
+    },
+    {
+      "repo": "robocasa/robocasa",
+      "commit": "456174f62b89b8fca99eaaf33949c29fec9cfc2a",
+      "path": "robocasa/utils/eval_utils.py",
+      "local_file": "audit/.cache/github_review/repos/robocasa__robocasa/files/robocasa/utils/eval_utils.py",
+      "source_manifest": "audit/.cache/github_review/repos/robocasa__robocasa/manifest.json",
+      "sha256": "7f8cd36e49941b463ff3ea6ecaf3ae52653d1bfa543147c6830e8977e1f2e6b6",
+      "url": "https://raw.githubusercontent.com/robocasa/robocasa/456174f62b89b8fca99eaaf33949c29fec9cfc2a/robocasa/utils/eval_utils.py",
+      "read_ranges": [
+        [
+          14,
+          57
+        ]
+      ]
+    }
+  ]
+}

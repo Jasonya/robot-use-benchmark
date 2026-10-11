@@ -1,0 +1,142 @@
+{
+  "paper_id": "P026",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoHOS 是細粒度手物件分割，第一／第二階互動關係和 contact mask 有明確定義。已核讀原生類別、資料配置與實際 MMSegmentation 評分路徑。",
+  "reading_order": [
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "README.md",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "ranges": [
+        [
+          1,
+          111
+        ],
+        [
+          152,
+          200
+        ]
+      ],
+      "why": "身份、label schema、四個 split 與模型流程"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/mmseg/datasets/egohos.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "ranges": [
+        [
+          1,
+          34
+        ]
+      ],
+      "why": "實際類別／palette 與副檔名"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/configs/_base_/datasets/egohos_handobj2.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "ranges": [
+        [
+          1,
+          59
+        ]
+      ],
+      "why": "背景、ignore 與 split 配置"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/mmseg/datasets/custom.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "ranges": [
+        [
+          85,
+          93
+        ],
+        [
+          384,
+          392
+        ],
+        [
+          419,
+          427
+        ],
+        [
+          439,
+          447
+        ]
+      ],
+      "why": "實際 mIoU 呼叫與 nanmean 聚合"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/mmseg/core/evaluation/metrics.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "ranges": [
+        [
+          55,
+          103
+        ],
+        [
+          348,
+          395
+        ]
+      ],
+      "why": "畫素計數與 IoU/Dice/F 定義"
+    }
+  ],
+  "environment": "真實第一人稱影像；來源內明列 train/val/test_indomain/test_outdomain。這裡 domain 指來源分佈測試條件，不直接等於生活用途領域數。",
+  "tasks": "左右手、由左／右／雙手互動的第一階／第二階物件，以及 dense contact。9 個 label IDs 含背景，是畫素類別，不能當 9 個操作任務或物件身份。",
+  "data": "資料夾 image/label/contact，EgoHOSDataset 讀 .jpg 和 .png，classes/palette 固定 0–8。handobj2 config 保留背景（reduce_zero_label=False）、padding ignore=255；test 預設 test_indomain，crop/resize 360×480。",
+  "evaluation": "CustomDataset 預設 mIoU；metrics.py 先套 label map／ignore_index，再累加逐類 intersection、pred、GT、union，算 IoU/Acc，summary 以 nanmean。還支援 Dice/Fscore，但不能由支援函式推定原論文都採用。contact 二值 mask 需用其獨立配置，不與 9-class 平均混算。",
+  "standardization": {
+    "profile": "image_hand_object_segmentation",
+    "reuse": "原生 label/palette、contact 與 split、實際 dataset→metrics 呼叫。",
+    "transform": "case 保留來源影像／split／raw label mask、接觸關係與第一／第二階；畫素座標、resize、ignore=255、背景納入和 nan 規則都進 evaluator profile。手物件分割與物理接觸／抓取成功不同。",
+    "missing": "尚未下載影像、mask、checkpoint 或執行。需取得各 head 配置與來源影片 ID 才能避免跨 split 同源影片；contact 與分階段模型的全部依賴仍須逐配置測試。"
+  },
+  "version_note": "此倉庫內含 MMSegmentation，已釘選其本地版本；不能換成最新版同名套件而不記錄差異。README 中 LaMa／FGVC／homan 等是應用依賴，不是額外 EgoHOS benchmark 來源。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "README.md",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "sha256": "c5fd714f892eeb50622b82c8d7340d32316df9db8f90e31c1071e3acdcba46b3",
+      "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/README.md",
+      "local_file": "audit/.cache/github_review/repos/owenzlz__EgoHOS/files/README.md"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/mmseg/datasets/egohos.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "sha256": "a3a10508b5090aa436a5cfd9d7754250c721bafd5b9b9c754fa4bed19ee4289e",
+      "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/datasets/egohos.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/owenzlz__EgoHOS/mmsegmentation/mmseg/datasets/egohos.py"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/configs/_base_/datasets/egohos_handobj2.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "sha256": "6c2f91139bf90561fbd7188ead310813d2beb37a61faf950a09f4c2d3794d5b3",
+      "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/configs/_base_/datasets/egohos_handobj2.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/owenzlz__EgoHOS/mmsegmentation/configs/_base_/datasets/egohos_handobj2.py"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/mmseg/datasets/custom.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "sha256": "58aeb8b22ce231c2dda7f5fc88787a4cccbbc813f75937677d5780daca518b83",
+      "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/datasets/custom.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/owenzlz__EgoHOS/mmsegmentation/mmseg/datasets/custom.py"
+    },
+    {
+      "repo": "owenzlz/EgoHOS",
+      "path": "mmsegmentation/mmseg/core/evaluation/metrics.py",
+      "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "sha256": "d9687f205e37a1fac1970419b5d41e20ae2d61cf34f15fca5f604f1ae91040b0",
+      "url": "https://github.com/owenzlz/EgoHOS/blob/cd9bdf427ef1d94582334ebba4188d5aa18433e7/mmsegmentation/mmseg/core/evaluation/metrics.py",
+      "local_file": "audit/.cache/github_review/repos/owenzlz__EgoHOS/files/mmsegmentation/mmseg/core/evaluation/metrics.py"
+    }
+  ]
+}

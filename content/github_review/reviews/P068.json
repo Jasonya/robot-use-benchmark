@@ -1,0 +1,87 @@
+{
+  "paper_id": "P068",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "ManiSkill3的核心是向量化場景／任務API，資料以HDF5+JSON連結episode、env kwargs和觀測。讀取訓練loader時還要檢查它是否刪掉最終觀測或改寫label。",
+  "reading_order": [
+    {
+      "repo": "mani-skill/ManiSkill",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          94
+        ]
+      ],
+      "why": "核對RSS2025論文、版本、機體與執行平臺範圍。"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "path": "mani_skill/envs/tasks/tabletop/pick_cube.py",
+      "ranges": [
+        [
+          132,
+          159
+        ]
+      ],
+      "why": "讀實際extra observation與success組合。"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "path": "mani_skill/envs/sapien_env.py",
+      "ranges": [
+        [
+          1050,
+          1079
+        ],
+        [
+          1155,
+          1165
+        ]
+      ],
+      "why": "追get_info/evaluate及success/fail/terminated的關係。"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "path": "mani_skill/trajectory/dataset.py",
+      "ranges": [
+        [
+          13,
+          20
+        ],
+        [
+          36,
+          154
+        ]
+      ],
+      "why": "核對HDF5/JSON、動作與觀測長度、label及device分支。"
+    },
+    {
+      "repo": "mani-skill/ManiSkill",
+      "path": "examples/baselines/tdmpc2/evaluate.py",
+      "ranges": [
+        [
+          21,
+          61
+        ],
+        [
+          82,
+          122
+        ]
+      ],
+      "why": "核對實際baseline的checkpoint、eval episode和成功／失敗／回報輸出。"
+    }
+  ],
+  "environment": "SAPIEN向量化環境可變機體、scene與物件；環境ID、asset場景與並行env數不是同一個數量。",
+  "tasks": "具體task子類提供evaluate，基底scene evaluate可能是空字典。PickCube成功為物件到位且機器人靜止；is_grasped則另列。",
+  "data": "JSON記episodes/env_info/env_id/env_kwargs；HDF5保存traj_ID和多模態obs/actions/terminated/truncated，reward/success/fail可選。訓練Dataset會裁掉最後一筆obs，不適合作為原始保存格式。",
+  "evaluation": "BaseEnv將success/fail合成terminated，time limit另由外層處理。baseline可輸出回報、成功和失敗；必須保留各自定義及向量化episode邊界。",
+  "standardization": {
+    "profile": "robot_episodes_with_reset_contract",
+    "reuse": "Task/evaluate、JSON episode metadata、HDF5資料與原生控制／觀測模式。",
+    "transform": "以原始檔建立可逆episode view，再提供訓練／評測視圖；保留T+1末態、資訊白名單、control mode、機體與逐episode指標。",
+    "missing": "完整素材、跨版本任務對齊、GPU/CPU實測與adapter回讀一致性驗證。"
+  },
+  "version_note": "固定commit62ff3a58…。發現trajectory/dataset.py的device分支把success指定成terminated、fail指定成truncated；本庫匯入應保留原始label並針對此分支驗證，不能盲用loader輸出。本輪為靜態核讀，未執行重現此問題。",
+  "runtime_executed": false
+}

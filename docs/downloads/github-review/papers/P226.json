@@ -1,0 +1,401 @@
+{
+  "paper_id": "P226",
+  "name": "EgoTraj",
+  "title": "EgoTraj: Real-World Egocentric Human Trajectory Dataset for Multimodal Prediction",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.19004",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "transport",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P226",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoTraj提供戶外行人頭部/視線/影片資料與EgoViz reader；公開檔案可支持資料對齊，但不是完整trajectory預測baseline實作。四元數順序在README與reader註解不一致，需核驗。",
+    "environment": "真實都市步行、7個預設waypoints間自行選路，MetaQuestPro錄制；75participants不是75個不同物理環境，位置為session-relative、Y向上、地平面x-z，沒有地理坐標。",
+    "tasks": "行人trajectory forecasting與AR導航研究，原文/README採1.5秒觀測→3.5秒預測；不同participant/waypoint/unfamiliar splits另列。不是robot實際導航任務完成benchmark。",
+    "data": "HDF5按session含pose position/rotation/velocity/angular_velocity/timestamp、gaze origin/direction、video segment/frame/has_video；scene annotations為1fps，用pose_idx回連30Hz資料。README稱quaternion wxyz，reader按xyzw解讀；原始資料必須核定。未匹配影片frame以NaN標示。",
+    "evaluation": "README列ADE/FDE(m)、L1_head與bootstrap結果，但repo主要EgoViz，未確認完整baseline/scorer。影片在拍攝時已疊紅色gaze dot，RGB-only是否允許這個線索需在case條件明示；1fps VLM scene descriptions也需有獨立可見性/生成版本。",
+    "standardization": {
+      "profile": "egocentric_urban_trajectory_and_gaze_data",
+      "reuse": "session/pose_idx跨模態join、原生視線與local坐標、資料reader和source split設計。",
+      "transform": "case固定participant/session/觀測截止與預測窗口；統一quaternion及clock、保留has_video mask、原始/疊點影像與VLM annotation來源；模態消融先界定合法可見線索。",
+      "missing": "全部資料/split manifest、quaternion查核、baseline/scorer與姿態metric定義、含gaze-dot版本的公平輸入設計。"
+    },
+    "version_note": "固定902c354、原作2605.19004；README結果是原作報告，本輪只核讀資料/視覺化介面，未重跑預測模型。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "yehiahmad/EgoTraj",
+        "requested_repo": "yehiahmad/EgoTraj",
+        "commit": "902c354d178c625820851c9a9c184f7932c83472",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            60
+          ],
+          [
+            61,
+            79
+          ],
+          [
+            124,
+            167
+          ],
+          [
+            222,
+            248
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 311,
+        "sha256": "5fde0a8e6589d298eecc0ced971b12a6bfbf788c50dcd08791a091e01d27c168",
+        "url": "https://github.com/yehiahmad/EgoTraj/blob/902c354d178c625820851c9a9c184f7932c83472/README.md",
+        "reading_url": "https://github.com/yehiahmad/EgoTraj/blob/902c354d178c625820851c9a9c184f7932c83472/README.md#L1-L60",
+        "why": "原作、75participants、sensor clock、預測/split與資料契約",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "yehiahmad/EgoTraj",
+        "requested_repo": "yehiahmad/EgoTraj",
+        "commit": "902c354d178c625820851c9a9c184f7932c83472",
+        "ref": null,
+        "path": "ego_viz.py",
+        "ranges": [
+          [
+            1079,
+            1120
+          ],
+          [
+            1235,
+            1275
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1515,
+        "sha256": "1bacfc4f6cc73789b66ad517a901641abac4b68e807f187745355df8bf8bda67",
+        "url": "https://github.com/yehiahmad/EgoTraj/blob/902c354d178c625820851c9a9c184f7932c83472/ego_viz.py",
+        "reading_url": "https://github.com/yehiahmad/EgoTraj/blob/902c354d178c625820851c9a9c184f7932c83472/ego_viz.py#L1079-L1120",
+        "why": "30Hz近鄰重採樣及HDF5/annotation/video join讀取",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "1ccf89e77067290134bad620e39b0737ea761a28b2954ec11d02f547f2f7c6c0"
+  },
+  "repository_binding_review_sha256": "1ccf89e77067290134bad620e39b0737ea761a28b2954ec11d02f547f2f7c6c0",
+  "repository_bindings": [
+    {
+      "requested_repo": "yehiahmad/EgoTraj",
+      "resolved_repo": "yehiahmad/EgoTraj",
+      "aliases_in_this_review": [
+        "yehiahmad/egotraj"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "902c354d178c625820851c9a9c184f7932c83472",
+          "reviewed_files": [
+            "README.md",
+            "ego_viz.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/yehiahmad/EgoTraj",
+          "pdf_page": 1,
+          "pdf_sha256": "c6789c21ac3754c8b4f240cc614ab7712284681a8b02fa63e9ec08d9dbcfea82",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P226",
+          "review_file": "content/github_review/reviews/P226.json",
+          "review_sha256": "1ccf89e77067290134bad620e39b0737ea761a28b2954ec11d02f547f2f7c6c0",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "交通移動與車輛維修",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P226",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoTraj: Real-World Egocentric Human Trajectory Dataset for Multimodal Prediction；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "交通移動與車輛維修",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "7outdoorwaypoints/21origin-destinationpairs；waypoint和route不等於21獨立地理環境。",
+    "tasks": "wearer6DoFtrajectoryprediction，gaze/sceneannotations作modalities。",
+    "cases": "75participants各1session，10.7h/1.15Mframes；38,606annotatedframes非相同數量testcases。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 75,
+        "unit": "participants and recording sessions",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 10.7,
+        "unit": "recording hours",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 7,
+        "unit": "navigation landmarks",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "ADE/FDE與headrotationL1error；route多樣性另用DTW。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "held-outsessions；地理場域和路徑可能重用，不等於unseencitygeneralization。",
+    "lineage": "新QuestProcapture；VLMsemanticlabels與真實trajectory/pose區分。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "exactheld-outwindowcount和完整protocol需要release核；不將1.15Mframes當predictionquestions。"
+    ],
+    "reuse": "擴到戶外行走的預測用途；屬人類導航資料，不是機器人互動模擬房屋。",
+    "reviewed_pdf_sha256": "c6789c21ac3754c8b4f240cc614ab7712284681a8b02fa63e9ec08d9dbcfea82",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoTraj",
+    "year": 2026,
+    "title": "EgoTraj: Real-World Egocentric Human Trajectory Dataset for Multimodal Prediction",
+    "source_url": "https://arxiv.org/abs/2605.19004",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "transport",
+      "wearable"
+    ],
+    "review_tags": [
+      "交通與移動",
+      "戶外活動"
+    ],
+    "domain_names": [
+      "交通移動與車輛維修",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P226",
+      "domain_ids": [
+        "transport",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P226",
+          "domain_ids": [
+            "transport"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "wearer6DoFtrajectoryprediction，gaze/sceneannotations作modalities。",
+            "7outdoorwaypoints/21origin-destinationpairs；waypoint和route不等於21獨立地理環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "c6789c21ac3754c8b4f240cc614ab7712284681a8b02fa63e9ec08d9dbcfea82"
+        },
+        {
+          "paper_id": "P226",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "眼鏡／頭盔使用者的6DoF移動與凝視訊號。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "c6789c21ac3754c8b4f240cc614ab7712284681a8b02fa63e9ec08d9dbcfea82"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "c6789c21ac3754c8b4f240cc614ab7712284681a8b02fa63e9ec08d9dbcfea82",
+      "previous_domain_ids": [
+        "transport"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P226",
+      "name": "EgoTraj",
+      "expected_title": "EgoTraj: Real-World Egocentric Human Trajectory Dataset for Multimodal Prediction",
+      "source_url": "https://arxiv.org/abs/2605.19004",
+      "pdf_url": "https://arxiv.org/pdf/2605.19004",
+      "retrieved_at": "2026-10-02T22:14:30.881005+00:00",
+      "pdf_sha256": "c6789c21ac3754c8b4f240cc614ab7712284681a8b02fa63e9ec08d9dbcfea82",
+      "text_sha256": "a516688be886fbae032aa34cbc120819c34c2db2bdde7386b3c0d5aec1d2bb9c",
+      "pdf_bytes": 43767612,
+      "pages": 21,
+      "text_characters": 76295,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2605.19004v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2605.19004v1"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 75,
+        "unit": "participants and recording sessions",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P226:1",
+        "paper_id": "P226",
+        "benchmark": "EgoTraj",
+        "native_term": "participants and recording sessions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.19004v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.19004v1",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 10.7,
+        "unit": "recording hours",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P226:2",
+        "paper_id": "P226",
+        "benchmark": "EgoTraj",
+        "native_term": "recording hours",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.19004v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.19004v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 7,
+        "unit": "navigation landmarks",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P226:3",
+        "paper_id": "P226",
+        "benchmark": "EgoTraj",
+        "native_term": "navigation landmarks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.19004v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.19004v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "yehiahmad/EgoTraj"
+  ],
+  "external_repositories": []
+}

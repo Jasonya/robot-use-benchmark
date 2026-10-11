@@ -1,0 +1,612 @@
+{
+  "paper_id": "P171",
+  "name": "Bench2Dex",
+  "title": "Bench2Dex: Benchmarking Visuo-Tactile Bimanual Dexterous Manipulation Across Dexterous Hands",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.15726",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P171",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Bench2Dex有可追溯的YAML任務、視觸覺HDF5 reader與具體success engine。26任務、12機體、8模態和1300示範各有不同單位；雙手/多模態不直接倍增任務。",
+    "environment": "IsaacSim5.1/IsaacLab2.3.2；26個task YAML包含桌面、資產路徑、物理屬性、佈局與generalization flags，跨12種robot embodiment。相同場景的雙手與多感測不算獨立環境。",
+    "tasks": "原生26task從放置/分類、清潔、工具使用、拼圖到盛湯/琴鍵等；YAML stages可有depends_on。task_manifest先選scenes_final再scenes；其中task.md只有3欄但parser要求6欄，可能退回Unknown，需我們的匯入器自行正確對映原表。",
+    "data": "HDF5 robot/qpos、action/commanded、cameras/*/rgb、robot/tactile/tacmap/*與site_names。同一start_ts取所有模態；缺commanded會改用qpos作action，必須記來源。tactile為uint8影像且順序跨episode嚴格一致；activeDOF/padding/NaN mask保存，尾chunk mask長度仍需測試。1300demo為原作宣告，未取得payload。",
+    "evaluation": "core-v1.8：reach_and_stop以terminal條件持續dwell(預設0.5秒)為成功，fixed_horizon改看budget末態；instant/at_end/stable分開。Soup Serving以湯杓進鍋→到碗上方兩次，再歸杓/擺碗/碗直立判分，沒有直接量測流體體積。安全成功另排drop/high-speed；joint limits預設diagnostic。空結果回0在本庫應標N/A；robust ratio需baseline和perturbed兩組才定義。",
+    "standardization": {
+      "profile": "visuotactile_bimanual_manipulation",
+      "reuse": "26task目錄、YAML stage/terminal規格、視觸覺schema、成功/安全/魯棒聚合公式。",
+      "transform": "task映射原ID及領域用途，保留scene版本；case固定control/physics/query時計與embodiment/activeDOF；evaluator原樣報stable/instant/safety，新增實際舀取量規則另版本化。",
+      "missing": "完整assets/HDF5取得、12機體適配、所有task checker/時鐘實測、manifest欄位修復、NaN/padding與空結果處理、感測單位/校準。"
+    },
+    "version_note": "固定fd90dcc；success語義依metric_schema_version與evaluation_protocol而變，不能拿不同版本同名success_rate直接合併。只核讀所列實際片段，未跑Isaac或policy。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            88
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 182,
+        "sha256": "5932d41bcf2a64248b8ce7c518f798f173a1a7411310b37194b30c30915516ca",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/README.md",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/README.md#L1-L88",
+        "why": "原作ID、規模宣告與Isaac版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "scenes/task.md",
+        "ranges": [
+          [
+            1,
+            39
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 39,
+        "sha256": "d2203c6ea109b708053e00fc93925f2c869f5d439efbdbbd35c4830ee1016f51",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/scenes/task.md",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/scenes/task.md#L1-L39",
+        "why": "26個release task ID與YAML入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "collector/task_manifest.py",
+        "ranges": [
+          [
+            12,
+            105
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 105,
+        "sha256": "d720e9e2b86a885d245cb109bd6ef1a2d446e223f4c8bb43f0db93e49062293f",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/collector/task_manifest.py",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/collector/task_manifest.py#L12-L105",
+        "why": "scene優先序、metadata parser與缺值fallback",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "scenes/76_soup_serving.yaml",
+        "ranges": [
+          [
+            1,
+            137
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 137,
+        "sha256": "f87a6bcf600695d8ba4c40bc3c1caec592fc79329c6cc18b126092c7d52481f5",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/scenes/76_soup_serving.yaml",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/scenes/76_soup_serving.yaml#L1-L137",
+        "why": "實例資產/初態/custom checker/stage DAG/dwell與safety設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "success/engine.py",
+        "ranges": [
+          [
+            1,
+            86
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 86,
+        "sha256": "eba696e5d4fe61141ed204c848e7b3dbae5e4236df9babfba40b9be8920a18b6",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/success/engine.py",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/success/engine.py#L1-L86",
+        "why": "all/any/sequence/hold_duration/custom語義",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "success/custom/task_76_soup_serving.py",
+        "ranges": [
+          [
+            1,
+            44
+          ],
+          [
+            54,
+            152
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 152,
+        "sha256": "46603bf8abdccef414c87d299ec292116f16773e6d86f20b90840723f6ee93f4",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/success/custom/task_76_soup_serving.py",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/success/custom/task_76_soup_serving.py#L1-L44",
+        "why": "兩次舀取狀態機與實際末態條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "policy/ACT-Tactile/act_tactile_dataset.py",
+        "ranges": [
+          [
+            20,
+            36
+          ],
+          [
+            47,
+            169
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 169,
+        "sha256": "3d1500056d84c2ba0034c17fa5f06e7568dab9b90a80fea7203d8bdeb4cb3bfd",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/policy/ACT-Tactile/act_tactile_dataset.py",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/policy/ACT-Tactile/act_tactile_dataset.py#L20-L36",
+        "why": "tactile site順序、同步sampling、command/qpos fallback與padding",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Bench2Dex/Bench2Dex",
+        "requested_repo": "Bench2Dex/Bench2Dex",
+        "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+        "ref": null,
+        "path": "benchmark/metrics.py",
+        "ranges": [
+          [
+            1,
+            70
+          ],
+          [
+            413,
+            491
+          ],
+          [
+            498,
+            515
+          ],
+          [
+            549,
+            575
+          ],
+          [
+            817,
+            874
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 874,
+        "sha256": "4f4a1f9e083679ca3273933dd0294c867b705e5fac8690d392dcfb19e8cd4a87",
+        "url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/benchmark/metrics.py",
+        "reading_url": "https://github.com/Bench2Dex/Bench2Dex/blob/fd90dcc625b66c2e535a8b25bcf75bc81c7b080d/benchmark/metrics.py#L1-L70",
+        "why": "success protocol、空結果/有效結果分母與OOD比例",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e9b4d960884280d18f5844b2774195ab16f4b96f97bcf90e456291a36e7bb674"
+  },
+  "repository_binding_review_sha256": "e9b4d960884280d18f5844b2774195ab16f4b96f97bcf90e456291a36e7bb674",
+  "repository_bindings": [
+    {
+      "requested_repo": "Bench2Dex/Bench2Dex",
+      "resolved_repo": "Bench2Dex/Bench2Dex",
+      "aliases_in_this_review": [
+        "bench2dex/bench2dex"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "fd90dcc625b66c2e535a8b25bcf75bc81c7b080d",
+          "reviewed_files": [
+            "README.md",
+            "benchmark/metrics.py",
+            "collector/task_manifest.py",
+            "policy/ACT-Tactile/act_tactile_dataset.py",
+            "scenes/76_soup_serving.yaml",
+            "scenes/task.md",
+            "success/custom/task_76_soup_serving.py",
+            "success/engine.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/Bench2Dex/Bench2Dex",
+          "pdf_page": 1,
+          "pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Bench2Dex/Bench2Dex",
+          "link_label": "GitHub",
+          "project_url": "https://bench2dex.github.io",
+          "page_sha256": "4813a54b813333e6fdb7e710b38cf11327db9493e2ff9e9ad611e9af0f17d1fe"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Bench2Dex/Bench2Dex",
+          "link_label": "Bench2Dex GitHub repository",
+          "project_url": "https://bench2dex.github.io/doc/",
+          "page_sha256": "9e70765e500576f5588b205786193a3f4400467558fb2049e00d6272e70a958b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P171",
+          "review_file": "content/github_review/reviews/P171.json",
+          "review_sha256": "e9b4d960884280d18f5844b2774195ab16f4b96f97bcf90e456291a36e7bb674",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P171",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Bench2Dex，arXiv 2609.15726v1。",
+    "scope_read": "12hands、26task-embodiment settings、tactile界面、stable success及4channel協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10
+    ],
+    "domains": [
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "靈巧手操作benchmark",
+    "environment": "IsaacLab bimanual配置；12hand morphologies、6views，無獨立房屋總數。",
+    "tasks": "26task-embodiment settings，不能先乘12手型為312已完成tasks。",
+    "cases": "約1.3Kteleop demonstrations；4policy×26settings×4channels×50rollouts＝20,800evaluation executions。每policy每channel1,300。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "task-embodiment settings",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 12,
+        "unit": "dexterous-hand morphologies",
+        "pages": [
+          2,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 20800,
+        "unit": "跨4policy的evaluation rollouts",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每policy/task/channel rollouts",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "terminal predicate需穩持預設0.5s；LSCR記錄依賴合法的階段；success time只在成功episode量。",
+      "baseline只用RGB/關節，觸覺資料支援不等於已證實tactile policy收益；觸覺為幾何depth proxy。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "None/Equi/Inv對齊anchor，Full獨立抽樣，不假定逐case困難單調。",
+    "lineage": "已有hand meshes＋統一tactile registry；未對齊真實觸覺hardware。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7,
+          8,
+          10
+        ],
+        "locator": "§3–4",
+        "supports": "26/12/20800、stable success、RGB-only baselines與tactile限制"
+      }
+    ],
+    "unresolved": [
+      "26設定的unique semantic task去重與tactile-conditioned baseline尚不等同完成。"
+    ],
+    "reuse": "可借跨手型／觸覺訊號規格與穩定判分；不要把支援的感測軸當實評完成量。",
+    "reviewed_pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03",
+    "reviewed_on": "2026-10-02",
+    "name": "Bench2Dex",
+    "year": 2026,
+    "title": "Bench2Dex: Benchmarking Visuo-Tactile Bimanual Dexterous Manipulation Across Dexterous Hands",
+    "source_url": "https://arxiv.org/abs/2609.15726",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "工具使用",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P171",
+      "domain_ids": [
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P171",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            10
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "26task-embodiment settings，不能先乘12手型為312已完成tasks。",
+            "IsaacLab bimanual配置；12hand morphologies、6views，無獨立房屋總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03"
+        },
+        {
+          "paper_id": "P171",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            10
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "多手型下26種任務—機體操作設定。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P171",
+      "name": "Bench2Dex",
+      "expected_title": "Bench2Dex: Benchmarking Visuo-Tactile Bimanual Dexterous Manipulation Across Dexterous Hands",
+      "source_url": "https://arxiv.org/abs/2609.15726",
+      "pdf_url": "https://arxiv.org/pdf/2609.15726",
+      "retrieved_at": "2026-10-02T21:34:47.011318+00:00",
+      "pdf_sha256": "f70ca3ecb4dd8fc9a1acc6410a0bd4e370203ca65331b3fcc76209996fb8ed03",
+      "text_sha256": "9f52d92ee25ad0bf1a26c30a46190eca9c5f9640f5eebc39052ffce6eb3c6d17",
+      "pdf_bytes": 42043294,
+      "pages": 43,
+      "text_characters": 163306,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.15726v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.15726v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 26,
+        "unit": "task-embodiment settings",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P171:1",
+        "paper_id": "P171",
+        "benchmark": "Bench2Dex",
+        "native_term": "task-embodiment settings",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.15726v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.15726v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 12,
+        "unit": "dexterous-hand morphologies",
+        "pages": [
+          2,
+          5
+        ],
+        "record_id": "review10:P171:2",
+        "paper_id": "P171",
+        "benchmark": "Bench2Dex",
+        "native_term": "dexterous-hand morphologies",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.15726v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.15726v1",
+            "locator": "PDF pp. 2, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 20800,
+        "unit": "跨4policy的evaluation rollouts",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P171:3",
+        "paper_id": "P171",
+        "benchmark": "Bench2Dex",
+        "native_term": "跨4policy的evaluation rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.15726v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.15726v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每policy/task/channel rollouts",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P171:4",
+        "paper_id": "P171",
+        "benchmark": "Bench2Dex",
+        "native_term": "每policy/task/channel rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.15726v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.15726v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Bench2Dex/Bench2Dex"
+  ],
+  "external_repositories": []
+}

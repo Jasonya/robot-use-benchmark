@@ -1,0 +1,170 @@
+{
+  "paper_id": "P005",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "作者ProcNets倉庫將YouCook2影片程式分段、Lua Torch訓練/驗證與Python proposal評分放在一起；應讀實際公式，不把所有分數都當同一種IoU。",
+  "reading_order": [
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "README.md",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "ranges": [
+        [
+          1,
+          77
+        ]
+      ],
+      "why": "匹配作者論文、資料與評測路徑。"
+    },
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "misc/DataLoader.lua",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "ranges": [
+        [
+          8,
+          12
+        ],
+        [
+          14,
+          18
+        ],
+        [
+          22,
+          30
+        ],
+        [
+          37,
+          41
+        ],
+        [
+          58,
+          63
+        ],
+        [
+          89,
+          97
+        ],
+        [
+          102,
+          106
+        ],
+        [
+          108,
+          112
+        ],
+        [
+          122,
+          135
+        ],
+        [
+          145,
+          149
+        ]
+      ],
+      "why": "原始時間、均勻取樣與augmentation換算。"
+    },
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "train_bilstm_seq.lua",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "ranges": [
+        [
+          23,
+          31
+        ],
+        [
+          165,
+          231
+        ],
+        [
+          247,
+          273
+        ],
+        [
+          292,
+          298
+        ],
+        [
+          301,
+          315
+        ],
+        [
+          355,
+          362
+        ],
+        [
+          367,
+          376
+        ],
+        [
+          379,
+          394
+        ]
+      ],
+      "why": "IoU/Jacc實際公式及驗證聚合。"
+    },
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "script/eval_recall_precision.py",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "ranges": [
+        [
+          1,
+          80
+        ],
+        [
+          120,
+          186
+        ]
+      ],
+      "why": "proposal格式、split與tIoU判分。"
+    }
+  ],
+  "environment": "網路烹飪影片的觀測脈絡；未提供可互動場景。",
+  "tasks": "程式片段提議/分段；步驟文字與時間段不是機器人控制任務。",
+  "data": "database JSON的annotations/segment、影片duration/total_frame CSV與ResNet特徵；均勻取樣和temporal augmentation會改變時間到特徵索引的換算。",
+  "evaluation": "Lua iou是intersection/union；名稱為jacc的函式實際除以預測片段長度。驗證對每個GT找最佳proposal，再逐影片平均。Python另按tIoU算precision/recall並限制每影片proposal數。",
+  "standardization": {
+    "profile": "instructional_video_temporal_proposals",
+    "reuse": "原生video ID、segment、split、duration/frame資訊和兩套明確指標。",
+    "transform": "原始秒數與取樣索引分欄；記proposal上限、tIoU與逐影片分母，保留原生指標名及公式，不能直接改成robot success。",
+    "missing": "完整素材/特徵與split閉合、Lua/Python2依賴移植，以及指標等價性驗證。"
+  },
+  "version_note": "當前公開碼是舊Lua Torch/Python2實作；README的PyTorch未來發布敘述不代表已取得該版本。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "README.md",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "sha256": "617881861a25238ca6efa4ebf6153f437a479416df115d8d1dd90c5c8f17d501",
+      "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/README.md",
+      "local_file": "audit/.cache/github_review/repos/LuoweiZhou__ProcNets-YouCook2/files/README.md"
+    },
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "misc/DataLoader.lua",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "sha256": "304a7c4b76e85b1c8ef03c826e08e4e736aaef4382af5901fe20f9e0d3ecb7d5",
+      "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/misc/DataLoader.lua",
+      "local_file": "audit/.cache/github_review_worker/early/files/LuoweiZhou__ProcNets-YouCook2/misc/DataLoader.lua"
+    },
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "train_bilstm_seq.lua",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "sha256": "ff91bc0d635b36754d50177e5b109e5572d2e36b7fd81568086b584a1a7b6e9a",
+      "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/train_bilstm_seq.lua",
+      "local_file": "audit/.cache/github_review_worker/early/files/LuoweiZhou__ProcNets-YouCook2/train_bilstm_seq.lua"
+    },
+    {
+      "repo": "LuoweiZhou/ProcNets-YouCook2",
+      "path": "script/eval_recall_precision.py",
+      "commit": "815ae582b5a93ef2d85ddac9e2783454d2114efb",
+      "sha256": "f78a70b10ab4290373fc387307f283e96455badb690ec57f397fef41bb2a2b19",
+      "url": "https://github.com/LuoweiZhou/ProcNets-YouCook2/blob/815ae582b5a93ef2d85ddac9e2783454d2114efb/script/eval_recall_precision.py",
+      "local_file": "audit/.cache/github_review/repos/LuoweiZhou__ProcNets-YouCook2/files/script/eval_recall_precision.py"
+    }
+  ]
+}

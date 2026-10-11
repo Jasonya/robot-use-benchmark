@@ -1,0 +1,211 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Decision-aware uncertainty｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="已核固定v2全文的抽樣、三種聚合與不確定性評測公式；原作、cached search、精確arXiv-ID查詢及通訊作者lab頁仍未指向confirmed方法repo。可建立paper-level evaluator規格，但沒有reader、聚合器或scorer可宣稱已核讀；HRI結果是confidence gating模擬，非實體部署。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P246.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P246.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P246.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="Decision-aware uncertainty｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="已核固定v2全文的抽樣、三種聚合與不確定性評測公式；原作、cached search、精確arXiv-ID查詢及通訊作者lab頁仍未指向confirmed方法repo。可建立paper-level evaluator規格，但沒有reader、聚合器或scorer可宣稱已核讀；HRI結果是confidence gating模擬，非實體部署。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P246.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P246.html","title":"Decision-aware uncertainty｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P246.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P246.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P246 · Decision-aware uncertainty</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P246 · Decision-aware uncertainty</h1><p class="lede">Decision-Aware Uncertainty Evaluation of Vision-Language Model-Based Early Action Anticipation for Human-Robot Interaction</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status unresolved">實作尚未確認</span>
+      <span>benchmark／資料／評測主來源</span><a href="https://arxiv.org/abs/2603.10061" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p246">用途與原生規模依據</a>
+    </div>
+    <p class="github-scope">核讀快照 2026-10-11。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">已核固定v2全文的抽樣、三種聚合與不確定性評測公式；原作、cached search、精確arXiv-ID查詢及通訊作者lab頁仍未指向confirmed方法repo。可建立paper-level evaluator規格，但沒有reader、聚合器或scorer可宣稱已核讀；HRI結果是confidence gating模擬，非實體部署。</p>
+    <aside class="github-version"><b>版本與身份</b><p>cached「decision aware uncertainty egocentric」repository query為0；一次「&quot;2603.10061&quot; in:readme」亦HTTP200、0筆、incomplete_results=false。arXiv v2摘要與PDF沒有本篇code連結；官方Mines lab的publications列表從2022開始，未列2026本篇，不能當作完整現時code庫清單。下列來源只支援尚未確認官方repo，不支援repo絕對不存在；本輪小型補查均200，未遇429或rate-limited403，未執行API模型、聚合器或robot。</p><p>Decision-Aware Uncertainty Evaluation of Vision-Language Model-Based Early Action Anticipation for Human-Robot Interaction；Zhaoda Du、Michael Bowman、Qiaojie Zheng、Xiaoli Zhang。固定arXiv:2603.10061v2（2026-03-12），不是2026-03-09的v1。Mines lab首頁的Xiaoli Zhang及聯絡地址與論文對上。PDF第8頁的OpenReview DWkJCSxKU5屬引用的Generating with Confidence，不能借其code作本篇實作。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>餐飲與烹飪</dd></div><div><dt>環境</dt><dd>EGTEA Gaze+與EPIC-KITCHENS-100離線人類第一人稱影片，包含廚房活動；沒有本篇可reset的robot環境。§VI明言interaction analysis使用模擬confidence-gated decision policy，尚非real robotic deployment。母資料庫約10K及逾90K action segments不是本篇已核test case清單。</dd></div><div><dt>任務</dt><dd>雖摘要反覆使用short-term action recognition／temporal prefix措辭，§IV-A明確指定觀測action onset之前的影像、預測緊接的next action。因此保留pre-onset anticipation標記，不將本篇逕改成已開始動作的early recognition。輸出是同一未來動作的Top-K候選verb–noun labels及confidence，K是候選數，不是K步未來序列。Fig.1的after 1 s為示意；實際觀測時窗、提前量、取樣FPS與prefix切點並未由reader固定。</dd></div><div><dt>題數與資料</dt><dd>每input以Gemini 2.5 Flash-lite black-box API及相同prompt獨立抽樣M=5次，temperature=0.8，每次K=10。以a[i,k]記第i次第k順位動作、p[i,k]為該動作的verbalized confidence；這些是論文符號，非已核JSON key。Consistency逐rank多數決，c[k]為該rank支援勝出label的次數/M；Confidence-weighted逐rank以p加權，c[k]=勝出label的confidence總和／所有runs於該rank的confidence總和。PairRank先取跨runs唯一label集合A，由順位生成pairwise preferences，再以Bradley–Terry MLE擬合s(a)，softmax成P(a)並選Top-K。rank-wise confidence不必形成總和1的類別分佈，須保留各方法的原生尺度。單次baseline只有1次抽樣；M、K及唯一label數不能計成額外case。缺prompt、label正規化／parser、實際prediction檔案、model revision、test ID與split reader。</dd></div><div><dt>評估方式</dt><dd>§III-C／IV-D：Top-1 accuracy與Recall@K按每input唯一GT動作比對。Top-1 ECE及Set-ECE均用[0,1]上的10個等寬bins；Set-ECE以z=1[GT在Top-K]為target、c_bar=(Σ_k c[k])/K為set confidence，再按bin樣本佔比加權絕對校準差。這是作者明定的平均confidence，不能暗換成Top-K機率總和。Selective policy只對首位label採c[1]≥τ；coverage分母為全部N個inputs，selective accuracy分母為通過門檻的inputs。Entropy另先將Top-K的c除以其總和，再算−Σp log p/log K；不得把此正規化後的p倒灌到原生ECE／gating。§IV-A稱官方train/test與test結果，但精確case IDs、GT取得／提交路徑、匹配規則、bin邊界與空bin／零coverage處理均未核到。Fig.5的K=5、τ=0.39只是澄清範例，不是預設整批評測設定或安全保證。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作數字：保留論文的單位與頁碼</summary><p>下列為既有原文審閱摘錄；GitHub快照和本庫取得範圍另見上文，不互相代替。</p><ul><li><strong>5</strong> stochastic model calls per input · 原文頁 5</li></ul></details>
+    <h2 id="reading">依這個順序讀</h2>
+    <p>未確認可核讀的實作；下方保留已查過的原作、專案頁與檢索依據。</p>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>可保留pre-onset next-action目標、M=5／K=10／temperature0.8、三種aggregation公式、10-bin ECE、作者定義的Set-ECE、coverage/selective-accuracy分母及entropy診斷。尚無可直接重用的已核程式。</p></section><section><h3>需要轉換</h3><p>source固定v2與母資料集版本關係；domain/environment記人類影片觀測，HRI是評測動機。每case保留onset/observation boundary、GT verb/noun、每run每rank的raw label/confidence及聚合結果；evaluator分correctness、calibration、selective utility與confidence geometry，明記confidence構造及entropy專用正規化。保留abstain／retained case集合、model/prompt與取樣預算，不建立跨方法通用success score。</p></section><section><h3>仍需補齊</h3><p>作者可確認的repo／commit、精確觀測與test manifest、API model/prompt設定、動作同義詞／label-ID parser、重複label及rank ties規則、Bradley–Terry擬合與正則化、零confidence／零分母／K=1 entropy邊界，以及完整ECE與gating實作。實體HRI控制、clarification真值及安全驗證不在本輪已取得來源內。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;provider&quot;: &quot;pinned_primary_paper&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P246/pages.json&quot;,
+    &quot;sha256&quot;: &quot;9bd6eed76c916decf8902b3d3cd7e040dd9d8991d9b7c45058b288aaa03cac0d&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/0/text&quot;,
+      &quot;/1/text&quot;,
+      &quot;/2/text&quot;,
+      &quot;/3/text&quot;,
+      &quot;/4/text&quot;,
+      &quot;/5/text&quot;,
+      &quot;/6/text&quot;,
+      &quot;/7/text&quot;
+    ],
+    &quot;finding&quot;: &quot;核讀全部8頁，包括身份、§III-A/B聚合公式、§III-C評測、§IV資料與M/K/temperature、§VI模擬HRI限制及引用的OpenReview連結身份。&quot;,
+    &quot;url&quot;: &quot;https://arxiv.org/pdf/2603.10061&quot;,
+    &quot;version&quot;: &quot;arXiv:2603.10061v2&quot;,
+    &quot;page_ranges&quot;: [
+      [
+        1,
+        8
+      ]
+    ],
+    &quot;pages_read&quot;: [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    &quot;page_line_ranges&quot;: [
+      {
+        &quot;page&quot;: 1,
+        &quot;ranges&quot;: [
+          [
+            1,
+            75
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 2,
+        &quot;ranges&quot;: [
+          [
+            1,
+            65
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 3,
+        &quot;ranges&quot;: [
+          [
+            1,
+            80
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 4,
+        &quot;ranges&quot;: [
+          [
+            1,
+            75
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 5,
+        &quot;ranges&quot;: [
+          [
+            1,
+            65
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 6,
+        &quot;ranges&quot;: [
+          [
+            1,
+            50
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 7,
+        &quot;ranges&quot;: [
+          [
+            1,
+            64
+          ]
+        ]
+      },
+      {
+        &quot;page&quot;: 8,
+        &quot;ranges&quot;: [
+          [
+            1,
+            76
+          ]
+        ]
+      }
+    ],
+    &quot;pdf_local_file&quot;: &quot;audit/.cache/fulltext_review/P246/paper.pdf&quot;,
+    &quot;pdf_sha256&quot;: &quot;4efc1650b0634e90b675a99e738d4660ad1c454cbd8b1023bc814cafbc53992c&quot;
+  },
+  {
+    &quot;provider&quot;: &quot;cached_pdf_link_discovery&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P246-discovery.json&quot;,
+    &quot;sha256&quot;: &quot;cef275ad603f829490826d7bb0529bf9b29dfbf4202139db0ef70385d2ab1756&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/candidates&quot;,
+      &quot;/code_contexts&quot;
+    ],
+    &quot;finding&quot;: &quot;核對精確論文、PDF指紋、連結候選與code-availability摘錄；候選本身不等同官方repo。&quot;
+  },
+  {
+    &quot;provider&quot;: &quot;cached_project_candidates&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/project_candidates.json&quot;,
+    &quot;sha256&quot;: &quot;da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/245&quot;
+    ],
+    &quot;finding&quot;: &quot;本ID的project及repository候選均為空；enriched_projects亦無本ID條目。&quot;
+  },
+  {
+    &quot;provider&quot;: &quot;cached_github_repository_search&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/search/P246.json&quot;,
+    &quot;sha256&quot;: &quot;a5e97b303755ca04fbae26e41302c749d8c53c502f7262643fc55863983fd995&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/query&quot;,
+      &quot;/receipt&quot;,
+      &quot;/total_count&quot;,
+      &quot;/results&quot;
+    ],
+    &quot;finding&quot;: &quot;cached GitHub repository query「decision aware uncertainty egocentric」HTTP200、total_count=0；PDF候選只有arXiv自身及另一篇引用的OpenReview，不是本篇code。&quot;
+  },
+  {
+    &quot;provider&quot;: &quot;bounded_exact_github_repository_search&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review_worker/P242-P246_20261011/P246/exact_id_search.json&quot;,
+    &quot;sha256&quot;: &quot;4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/total_count&quot;,
+      &quot;/incomplete_results&quot;,
+      &quot;/items&quot;
+    ],
+    &quot;finding&quot;: &quot;精確2603.10061 in:readme query返回0筆；限定範圍的discovery，非repo不存在證明。&quot;
+  },
+  {
+    &quot;provider&quot;: &quot;shared_paced_search_receipt&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review_worker/P242-P246_20261011/P246/exact_id_search.json.receipt.json&quot;,
+    &quot;sha256&quot;: &quot;df7f66650ba6f6a71857d04284d8afbc8052b2c070a1a0a8dc6b3c18004b3a24&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/requested_url&quot;,
+      &quot;/retrieved_at&quot;,
+      &quot;/status&quot;,
+      &quot;/sha256&quot;
+    ],
+    &quot;finding&quot;: &quot;使用共享network.py節流，HTTP200、無立即重試。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P246.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P245.html">← 上一篇 · ICVL</a><a href="P247.html">下一篇 → · EgoSpanLift</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

@@ -1,0 +1,41 @@
+{
+  "paper_id": "P247",
+  "reviewed_on": "2026-10-11",
+  "status": "public_readme_only",
+  "summary": "Gaze Beyond the Frame 的方法名為 EgoSpanLift，資料名為 FoVS-Aria／FoVS-EgoExo。官方 repo 目前只有發布預告，不能把論文的 364.6K samples 說成本案已取得資料。已從原文核對四層視覺區域、兩套父資料及時間窗。",
+  "reading_order": [
+    {
+      "repo": "hs-yn/GazeBeyondFrame",
+      "commit": "71e26f0b641bf6f5be84941cd7cd733be4d60b63",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          4
+        ]
+      ],
+      "why": "官方題名與 NeurIPS 2025 身分相符；明示 Code and details will be released soon。"
+    }
+  ],
+  "environment": "FoVS-Aria 衍生自 Aria Everyday Activities（143 recordings、7.3 小時原始資料）；FoVS-EgoExo 衍生自 EgoExo4D 的 cooking／music／health／repair／bouldering 五類活動。物理 location、recording、活動用途與 voxel grid 各自不同單位。",
+  "tasks": "一個 3D visual-span forecasting 任務、四個輸出層：foveal 2°、central 8°、peripheral 30°、head orientation/FoV 約 55°。GT 是未來區間內看過區域的聯集，不保證逐幀 gaze 次序；四層不是四批獨立資料。",
+  "data": "論文約 364.6K samples：FoVS-Aria 約 23.2K、FoVS-EgoExo 約 341.4K。Aria 2 秒歷史→2 秒未來、stride 1 秒、16³ grid／3.2 m cube／20 cm cell，test 使用 location 4；EgoExo 默認預測 4 秒。原文 rounded split numbers 僅作約數保存，不自行調整成精確整數。",
+  "evaluation": "四層分別計 3D IoU／F1，另有 precision／recall 與 foveal metric distance。semi-dense SLAM 點與 gaze 產生區域，foveal 缺失不能自動當全負例；地圖可見時間、空 grid、threshold、聚合分母仍需未發布 evaluator 核對。",
+  "standardization": {
+    "profile": "egocentric_3d_visual_span_forecasting",
+    "reuse": "重用論文清楚定義的 gaze cone／voxel／future union 任務與父資料關係，可納入感知／預測任務目錄。",
+    "transform": "case 應保留 recording、location、observation_end、future window、SLAM map 可用範圍、gaze 校正、四層角度與 voxel 原點／尺寸；不把 gaze prediction 當 robot navigation success。",
+    "missing": "公開 repo 沒有 loader、標註 manifest 或 evaluator；本次未取得產生後樣本、未執行方法，故不能列為可立即評測。"
+  },
+  "version_note": "官方 README 的題名是 Gaze Beyond the Frame；EgoSpanLift 是方法別名而非另一獨立 benchmark。論文、資料子集、程式預告分開。",
+  "runtime_executed": false,
+  "discovery_evidence": [
+    {
+      "kind": "paper",
+      "url": "https://arxiv.org/abs/2511.18470",
+      "checked_sections": [
+        "頁 1 摘要；頁 5–6 第 3.3／4 節；頁 7–8 第 5.1／5.2 節與表 2／3。"
+      ]
+    }
+  ]
+}

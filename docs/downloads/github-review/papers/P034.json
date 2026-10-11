@@ -1,0 +1,430 @@
+{
+  "paper_id": "P034",
+  "name": "EgoVLP",
+  "title": "Egocentric Video-Language Pretraining",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2206.01670",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "craft"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P034",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoVLP 同時提供 EgoClip 預訓練與 EgoMCQ 開發評測；本次核讀 EgoMCQ 格式、chunk loader 和實際 accuracy。其他 Ego4D／EPIC／Charades 評測保留父來源。",
+    "environment": "影片來自 Ego4D；600 秒 chunk 是儲存切塊，不是物理環境。intra/inter-video 指候選來自同／異影片的難度條件，不等於生活用途。",
+    "tasks": "EgoMCQ 給文字查詢，從五個影片候選找正解；與從影片選文字答案的 QA 方向不同。EgoClip 數百萬 narration clips 是訓練單位，不能當 EgoMCQ 測試題或新動作任務。",
+    "data": "EgoClip TSV 含 clip_idx/video_uid/narration_source/narration_ind/narration_time/clip_start/end/clip_text/tag_verb/tag_noun；MCQ JSON 有 query/choices/answer/types。loader 依 clip 秒數取可能跨兩個600秒檔案的 frames，返回 video/text/text_ops/correct/type。val 與 test 都讀同一 egomcq.json。",
+    "evaluation": "egomcq_accuracy_metrics 在各 type 內 argmax 對 label 算 accuracy。重要不一致：loader 註解寫 1=inter、2=intra，但 metric 將排序後 type 配給 Intra-video、Inter-video；需對原 JSON 定義後判斷，不能直接抄標題。eval config 4frames/224px/loading=lax，失敗會以黑圖補，應另計資料讀取失敗。",
+    "standardization": {
+      "profile": "text_to_video_multiple_choice",
+      "reuse": "原生五候選 query/choice metadata、來源切塊對映、pretraining 與 development 分界。",
+      "transform": "case 保留 EgoMCQ ID、候選順序及各父 video/time；source 分 EgoClip/EgoMCQ/下游父 benchmark，tag 字典作原生訓練詞彙。evaluator 儲存 type 數值與已核定名稱、4frame 預算、缺檔回退，不能把同 JSON 的 val/test 加成兩套題。",
+      "missing": "尚未取得 egoclip/egomcq 全量 metadata、影片或執行。需解決 type 名稱矛盾、有效樣本清單與跨來源影片去重；下游 NLQ/MQ/PNR/OSCC 完整 adapters 仍另按父協定驗證。"
+    },
+    "version_note": "EgoMCQ 被用來選預訓練 checkpoint，應標 development set，不自動當獨立最後測試。EgoVLPv2 為後續方法，新聞連結不代表本 repo 已包含其新增結果與全部程式。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "showlab/EgoVLP",
+        "requested_repo": "showlab/EgoVLP",
+        "commit": "928406c2d5d42b4d76421f6500e43feb61fc9d68",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            99
+          ],
+          [
+            124,
+            201
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 235,
+        "sha256": "1a98a7e2f09c44b0f606196147999afc456a87cf2644f714f6184b709c15d464",
+        "url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/README.md",
+        "reading_url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/README.md#L1-L99",
+        "why": "EgoClip／EgoMCQ 與父 benchmark 角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "showlab/EgoVLP",
+        "requested_repo": "showlab/EgoVLP",
+        "commit": "928406c2d5d42b4d76421f6500e43feb61fc9d68",
+        "ref": null,
+        "path": "configs/eval/egomcq.json",
+        "ranges": [
+          [
+            1,
+            78
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 78,
+        "sha256": "170c8cd379568ed36f011d81766684b73762157c13054c0c1e01c6fc72f5fe77",
+        "url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/configs/eval/egomcq.json",
+        "reading_url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/configs/eval/egomcq.json#L1-L78",
+        "why": "開發評測輸入配置",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "showlab/EgoVLP",
+        "requested_repo": "showlab/EgoVLP",
+        "commit": "928406c2d5d42b4d76421f6500e43feb61fc9d68",
+        "ref": null,
+        "path": "data_loader/EgoClip_EgoMCQ_dataset.py",
+        "ranges": [
+          [
+            13,
+            95
+          ],
+          [
+            128,
+            183
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 183,
+        "sha256": "569b675c784a6ee032cb6959683673188b9c988cef22438e5c8f08a259a8437b",
+        "url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/data_loader/EgoClip_EgoMCQ_dataset.py",
+        "reading_url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/data_loader/EgoClip_EgoMCQ_dataset.py#L13-L95",
+        "why": "chunk 跨界、原生 MCQ 格式與黑圖回退",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "showlab/EgoVLP",
+        "requested_repo": "showlab/EgoVLP",
+        "commit": "928406c2d5d42b4d76421f6500e43feb61fc9d68",
+        "ref": null,
+        "path": "model/metric.py",
+        "ranges": [
+          [
+            208,
+            241
+          ],
+          [
+            341,
+            361
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 397,
+        "sha256": "ecebeae59d9e4af393ce478a24faf1b25ee3c04316b4cd5146a69e62f1493eb2",
+        "url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/model/metric.py",
+        "reading_url": "https://github.com/showlab/EgoVLP/blob/928406c2d5d42b4d76421f6500e43feb61fc9d68/model/metric.py#L208-L241",
+        "why": "實際 type 分組與 accuracy",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "091158bed493843f8242460f96d192bb10971285f6a9fdf43a0ecbf39dc30424"
+  },
+  "repository_binding_review_sha256": "091158bed493843f8242460f96d192bb10971285f6a9fdf43a0ecbf39dc30424",
+  "repository_bindings": [
+    {
+      "requested_repo": "showlab/EgoVLP",
+      "resolved_repo": "showlab/EgoVLP",
+      "aliases_in_this_review": [
+        "showlab/egovlp"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "928406c2d5d42b4d76421f6500e43feb61fc9d68",
+          "reviewed_files": [
+            "README.md",
+            "configs/eval/egomcq.json",
+            "data_loader/EgoClip_EgoMCQ_dataset.py",
+            "model/metric.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/showlab/EgoVLP",
+          "pdf_page": 1,
+          "pdf_sha256": "cd7cf25aa25da8a2a88d0875ec2f0a5cf56f99a045eb7c11957a6e27784f584f",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/showlab/EgoVLP",
+          "link_label": "Code",
+          "project_url": "https://ego4d-data.org/workshops/cvpr22/",
+          "page_sha256": "a59dd3d2a92a05dc9ca41635959435b733df648118b3de7dd3c17d547af17f09"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P034",
+          "review_file": "content/github_review/reviews/P034.json",
+          "review_sha256": "091158bed493843f8242460f96d192bb10971285f6a9fdf43a0ecbf39dc30424",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "工藝與修繕"
+  ],
+  "source_review": {
+    "paper_id": "P034",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Egocentric Video-Language Pretraining；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "role": "影片資料與感知評測",
+    "domains": [
+      "居家整理與清潔",
+      "工藝與修繕"
+    ],
+    "environment": "Ego4D的129scenario labels；來源環境重用。",
+    "tasks": "EgoMCQ包含inter-video/intra-video兩種五選一video-text配對；EgoClip是訓練庫。",
+    "cases": "EgoClip約3.85M narrations/2,927h；EgoMCQ約39K題＝24K inter+15K intra。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 39000,
+        "unit": "EgoMCQ development questions（約數）",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3850000,
+        "unit": "EgoClip narrations（約數）",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 129,
+        "unit": "source scenario labels",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "EgoMCQ accuracy；下游retrieval、NLQ、recognition分開。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "EgoClip排除Ego4D val/test；EgoMCQ再人工移除和pretraining共用multi-view的影片。",
+    "lineage": "Ego4D→EgoClip/EgoMCQ；兩位narrators不代表兩份獨立行為。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "39K是概述約數；最終題ID與選項去重需原始manifest。"
+    ],
+    "reuse": "原先只列成方法會漏掉真正新增的EgoMCQ；應把論文與其多個資源分開登記。",
+    "reviewed_pdf_sha256": "cd7cf25aa25da8a2a88d0875ec2f0a5cf56f99a045eb7c11957a6e27784f584f",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoVLP",
+    "year": 2022,
+    "title": "Egocentric Video-Language Pretraining",
+    "source_url": "https://arxiv.org/abs/2206.01670",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "craft"
+    ],
+    "review_tags": [
+      "跨域人類活動",
+      "居家生活",
+      "工藝與修繕"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "工藝與修繕"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P034",
+      "domain_ids": [
+        "home",
+        "craft"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P034",
+          "domain_ids": [
+            "home",
+            "craft"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "EgoMCQ包含inter-video/intra-video兩種五選一video-text配對；EgoClip是訓練庫。",
+            "Ego4D的129scenario labels；來源環境重用。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "cd7cf25aa25da8a2a88d0875ec2f0a5cf56f99a045eb7c11957a6e27784f584f"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "cd7cf25aa25da8a2a88d0875ec2f0a5cf56f99a045eb7c11957a6e27784f584f",
+      "previous_domain_ids": [
+        "home",
+        "craft"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P034",
+      "name": "EgoVLP",
+      "expected_title": "Egocentric Video-Language Pretraining",
+      "source_url": "https://arxiv.org/abs/2206.01670",
+      "pdf_url": "https://arxiv.org/pdf/2206.01670",
+      "retrieved_at": "2026-10-02T22:13:13.817679+00:00",
+      "pdf_sha256": "cd7cf25aa25da8a2a88d0875ec2f0a5cf56f99a045eb7c11957a6e27784f584f",
+      "text_sha256": "1bb960f31a6c55fd732fb24acf2727a28ca39f17a43bd07aefdce113aee85870",
+      "pdf_bytes": 7558749,
+      "pages": 23,
+      "text_characters": 121581,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2206.01670v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2206.01670v2"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 39000,
+        "unit": "EgoMCQ development questions（約數）",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P034:1",
+        "paper_id": "P034",
+        "benchmark": "EgoVLP",
+        "native_term": "EgoMCQ development questions（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2206.01670v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2206.01670v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3850000,
+        "unit": "EgoClip narrations（約數）",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P034:2",
+        "paper_id": "P034",
+        "benchmark": "EgoVLP",
+        "native_term": "EgoClip narrations（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2206.01670v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2206.01670v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 129,
+        "unit": "source scenario labels",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P034:3",
+        "paper_id": "P034",
+        "benchmark": "EgoVLP",
+        "native_term": "source scenario labels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2206.01670v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2206.01670v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "showlab/EgoVLP"
+  ],
+  "external_repositories": []
+}

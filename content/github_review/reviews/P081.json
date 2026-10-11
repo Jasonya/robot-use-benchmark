@@ -1,0 +1,877 @@
+{
+  "paper_id": "P081",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "ARNOLD已追到NPZ重建、兩階段策略、具體joint／pickup／orientation／water checker及score聚合。水量實作是cup world-AABB內粒子比例，成功還需連續穩定；normalized訓練state不可直接當checker原生target。checkpoint選擇有list.argmax靜態錯誤，且GT輔助結果必須獨立保存。",
+  "identity_note": "固定論文為Gong、Huang等人的ARNOLD: A Benchmark for Language-Grounded Task Learning With Continuous States in Realistic 3D Scenes，arXiv:2304.04321v2（2023-09-11）。PDF第7頁直接指arnold-benchmark/arnold，README作者、題名與arXiv相符。此repo含benchmark與改寫的PerAct/6D-CLIPort基線；它們是P077/P078方法的重用，不是原倉庫資料或同一評測協定。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P081-discovery.json",
+      "selected_json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/code_contexts/1"
+      ],
+      "paper_version": "2304.04321v2",
+      "pdf_sha256": "5a2b6c0126bde99772c888036524fd071cf3890034be184e26c437bd42f50fdb",
+      "finding": "精確identity及PDF第7頁直接repository link。",
+      "sha256": "de2700df09e39d005a981baba8863e399dcb93ef292a6fbe9752e450551393bc",
+      "text_excerpts": [
+        {
+          "json_pointer": "/opening_text",
+          "character_range": [
+            917,
+            955
+          ],
+          "text": "arXiv:2304.04321v2 [cs.AI] 11 Sep 2023",
+          "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+        }
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P081/pages.json",
+      "sha256": "143954d5357f2049854411ecab1b650981560c89891bcc09a1c6539255464614",
+      "selected_json_pointers": [
+        "/6/text"
+      ],
+      "finding": "Table 4黑／灰結果區別完整與first-phase GT；論文要求planner最後動作完成才評成功。"
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          22
+        ],
+        [
+          32,
+          60
+        ]
+      ],
+      "why": "精確身份、8-task/7-split宣告、外部資料及尚待發布的demonstration generator。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "configs/default.yaml",
+      "ranges": [
+        [
+          23,
+          40
+        ],
+        [
+          75,
+          108
+        ]
+      ],
+      "why": "GT介入、五個eval splits、相機、兩階段策略與planner預算。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "dataset.py",
+      "ranges": [
+        [
+          19,
+          37
+        ],
+        [
+          40,
+          76
+        ],
+        [
+          78,
+          206
+        ],
+        [
+          228,
+          279
+        ],
+        [
+          282,
+          325
+        ]
+      ],
+      "why": "npz gt、四／六關鍵幀、cm/wxyz轉換、act1/act2與normalized state。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "utils/env.py",
+      "ranges": [
+        [
+          1,
+          7
+        ]
+      ],
+      "why": "五視角的固定順序。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "utils/transforms.py",
+      "ranges": [
+        [
+          145,
+          165
+        ]
+      ],
+      "why": "camera內參／pose與點雲座標轉換。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "utils/compute_points.pyx",
+      "ranges": [
+        [
+          7,
+          28
+        ]
+      ],
+      "why": "depth乘100進cm camera frame；未編譯此Cython程式。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/__init__.py",
+      "ranges": [
+        [
+          39,
+          109
+        ],
+        [
+          111,
+          210
+        ]
+      ],
+      "why": "npz info重建USD資產、物理與fluid欄位、checker dispatch及y-up/cm stage。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "environment/parameters.py",
+      "ranges": [
+        [
+          16,
+          44
+        ],
+        [
+          55,
+          87
+        ]
+      ],
+      "why": "Object/Scene/Robot與CheckerParameters的實際schema。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/base_task.py",
+      "ranges": [
+        [
+          122,
+          179
+        ],
+        [
+          332,
+          374
+        ]
+      ],
+      "why": "120Hz、RMPFlow與Franka／sensor setup。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/open_drawer.py",
+      "ranges": [
+        [
+          104,
+          227
+        ]
+      ],
+      "why": "兩次policy step、三planner stages、2400 tick timeout與末階段checker讀取。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/pour_water.py",
+      "ranges": [
+        [
+          66,
+          94
+        ],
+        [
+          123,
+          125
+        ],
+        [
+          145,
+          194
+        ],
+        [
+          265,
+          295
+        ]
+      ],
+      "why": "pour檢查原容器殘餘水量；六stage動作完成後才讀success。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/transfer_water.py",
+      "ranges": [
+        [
+          41,
+          100
+        ]
+      ],
+      "why": "transfer檢查接收杯、原杯upright及spill；不是pour同一目標。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/checkers/base_checker.py",
+      "ranges": [
+        [
+          14,
+          39
+        ],
+        [
+          44,
+          93
+        ]
+      ],
+      "why": "physics callback與連續超過2秒保持條件，失敗即清零。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/checkers/joint_checker.py",
+      "ranges": [
+        [
+          36,
+          84
+        ],
+        [
+          87,
+          153
+        ]
+      ],
+      "why": "關節範圍比例、方向翻轉、±0.1與每step變化門檻。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/checkers/pickup_checker.py",
+      "ranges": [
+        [
+          7,
+          74
+        ]
+      ],
+      "why": "y高度目標、5cm容差與每physics-step位移。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/checkers/orient_checker.py",
+      "ranges": [
+        [
+          8,
+          69
+        ]
+      ],
+      "why": "物件y軸相對世界y的角度、20度容差；穩定度仍取y位置。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "tasks/checkers/water_checker.py",
+      "ranges": [
+        [
+          13,
+          30
+        ],
+        [
+          55,
+          82
+        ],
+        [
+          100,
+          112
+        ],
+        [
+          126,
+          207
+        ]
+      ],
+      "why": "AABB粒子比例、±10百分點、upright<30度與spill<10%。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "ckpt_selection.py",
+      "ranges": [
+        [
+          84,
+          110
+        ],
+        [
+          133,
+          214
+        ]
+      ],
+      "why": "val成功率及跨task平均選模型；list.argmax靜態缺陷。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "eval.py",
+      "ranges": [
+        [
+          29,
+          49
+        ],
+        [
+          82,
+          111
+        ],
+        [
+          113,
+          229
+        ]
+      ],
+      "why": "GT模式、NPZ case讀取、-1錯誤、分母與逐task/split輸出JSON。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "path": "eval_pipeline.sh",
+      "ranges": [
+        [
+          1,
+          34
+        ]
+      ],
+      "why": "官方串接checkpoint選擇與0gt/1gt分開評測。",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823"
+    }
+  ],
+  "environment": "Isaac Sim／USD、Franka與五相機front/base/left/wrist_bottom/wrist（配置128×128）。load_task將stage設為y-up、1單位=0.01m、gravity=(0,-1,0)且magnitude=981；physics設120Hz。場景／機器人／物件／material USD依NPZ info重建，路徑改寫假設原始路徑含VRKitchen2.0或指定materials字串。README的20 scenes／40 objects／10k demos是來源宣告，未以本地asset／NPZ列舉驗證。",
+  "tasks": "8個原生task為pickup_object、reorient_object、open/close_drawer、open/close_cabinet、pour_water、transfer_water。訓練樣本分act1抓取／act2操作，sample_weights=0.2/0.8；一般四keyframes（初態、預抓、抓住、終態），water六幀並混合frame3位置與frame4姿態作第二動作。二次policy決策不等於3或6個planner stages。7個split需保留train/val/test/novel_object/novel_scene/novel_state/any_state；預設eval只跑後五者。",
+  "data": "每case是.npz，gt為keyframe物件序列，info包含scene_parameters、robot_parameters、objects_parameters及robot_shift。gt使用instruction、robot_base、position_rotation_world、gripper_joint_positions、images；每camera有rgb、semanticSegmentation、depthLinear、camera內參／pose。Reader把position/finger由cm除100成m、wxyz轉xyzw，以機器人前方0.5m為中心；PerAct點雲維持y-up，CLIPort heightmap換軸成z-up。depthLinear先clip到[0,10]，Cython反投影乘100到cm、世界變換後再除100；不能把raw depth直接當cm。target_points註解寫[6]，實際concat xyz+xyzw是7D（rot=None才3D）。parse_state從檔名取標籤：pickup目標/40、reorient角度/180、pour為(100-p)/100、transfer為p/100，其他直接取浮點；runtime CheckerParameters.target_state另取info中的cm／度／比例／百分點原生單位。尚未讀任何示範NPZ內容，欄位證據來自reader。",
+  "evaluation": "eval→load_task→OpenDrawer或PourWater/TransferWater.step→120Hz physics callback→具體Checker.start_checking→BaseChecker。joint把位置按lower/upper化為0–100%，必要時翻轉target，要求比例差<0.1且每physics-step百分點差<0.05；pickup要求相對初始y高度誤差<5cm且每step y位移<0.1原生單位；orientation要求物件y軸相對世界y的角度誤差<20度，穩定性檢查同樣是y位移，不是角速度。water用所有粒子落在cupShape世界AABB的比例，誤差<10百分點、受約束杯偏離直立<30度，transfer另需兩杯外spill<10%；pour只看原杯殘餘量。各條件需連續success_steps>steps_per_second*2，失敗清零；末planner stage完成後最多再step 300次讀success，callback已從reset啟動，並未在末階段重新開始2秒計時。horizon=2400是planner主迴圈tick預算，額外gripper等待及success period另計。eval寫stats[fname]=1/0/-1、score=correct/total（0–1），-1包含timeout及捕捉到的例外並留在分母；console另乘100。0gt/1gt/2gt與use_gt旗標必須區分。",
+  "standardization": {
+    "profile": "continuous_state_keyframe_simulation_with_physics_hold_checkers",
+    "reuse": "NPZ欄位／USD物理設定、語言與native continuous target、四類checker、兩階段policy／多stage planner、task/split/case成功記錄。",
+    "transform": "source綁v2+commit；case保留NPZ檔名、object/scene/state split、raw info和asset引用。建立cm↔m、wxyz↔xyzw、y-up↔z-up的明確轉換，normalized learning goal與runtime target分欄。evaluator保存每步穩定性單位、hold ticks、planner耗時、GT介入、checkpoint及-1原因，水量保留particle-AABB proxy名稱。",
+    "missing": "ckpt_selection.py 204產生Python list、205直接.argmax()，在此靜態路徑不能完成best checkpoint挑選，需協調者處理且保留修補版本；本輪未執行確認。缺USD/material/fluid資產及實際NPZ manifest、其餘具體task stage覆寫的逐項核對。water AABB不是精確杯內幾何或真實體積，須保留限制。GT log名稱對任意use_gt組合未全區分；bare except把不同錯誤壓成-1且已有score會跳過整個split，需追加設定hash／錯誤分類。README尚列demonstration generator為TODO。"
+  },
+  "version_note": "固定arnold-benchmark/arnold@40ad6861f45b676bf538b7a0e180d81c8d454823（2024-04-01），晚於論文v2，README另含CVPR 2024 Challenge公告；不能混用Challenge與ICCV paper的case/split。P077/P078方法在此的軸、單位、keypoint及checker均已改寫，需標為重用方法的另一實驗版本。未執行Isaac Sim、policy、Cython或上游shell。",
+  "runtime_executed": false,
+  "reviewed_on": "2026-10-11",
+  "source_files": [
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/README.md",
+      "sha256": "335646a950869ab7e7768b74f8bb272214d707eb607d407241d66a5e27184c79",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          22
+        ],
+        [
+          32,
+          60
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "configs/default.yaml",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/configs/default.yaml",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/configs/default.yaml",
+      "sha256": "81e5340be569c92efc76fe3aa68f89ccf3210bd57a4a4ca376b753943ff9d42c",
+      "lines": 108,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/configs/default.yaml",
+        "retrieved_at": "2026-10-11T00:21:23.640682+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/configs/default.yaml",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2339,
+        "sha256": "81e5340be569c92efc76fe3aa68f89ccf3210bd57a4a4ca376b753943ff9d42c"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          23,
+          40
+        ],
+        [
+          75,
+          108
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "dataset.py",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/dataset.py",
+      "sha256": "93afc70c41db8981a35f412e8243d1903b449551e482571430519f7d5744b215",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/dataset.py",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          19,
+          37
+        ],
+        [
+          40,
+          76
+        ],
+        [
+          78,
+          206
+        ],
+        [
+          228,
+          279
+        ],
+        [
+          282,
+          325
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "utils/env.py",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/utils/env.py",
+      "sha256": "4887444285073475ce56077198b32a08b8827d78870bd4fb58452a205f29ab80",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/env.py",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "utils/transforms.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/transforms.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/transforms.py",
+      "sha256": "c53207c17cc97edcea83614feddceabec197ac7edec80e4dae79fadff5bd19d6",
+      "lines": 165,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/transforms.py",
+        "retrieved_at": "2026-10-11T00:22:14.526102+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/transforms.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 4558,
+        "sha256": "c53207c17cc97edcea83614feddceabec197ac7edec80e4dae79fadff5bd19d6"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          145,
+          165
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "utils/compute_points.pyx",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/compute_points.pyx",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/compute_points.pyx",
+      "sha256": "64a51e7bb50bc9c6bdbd268ba69b9e9557ac1df2a5bb1c9e4bbd492a9077e1ec",
+      "lines": 29,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/compute_points.pyx",
+        "retrieved_at": "2026-10-11T00:22:40.445518+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/utils/compute_points.pyx",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 1111,
+        "sha256": "64a51e7bb50bc9c6bdbd268ba69b9e9557ac1df2a5bb1c9e4bbd492a9077e1ec"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          7,
+          28
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/__init__.py",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/tasks/__init__.py",
+      "sha256": "8385da4138fa4869059f8b39e1ba01509064310dc5a76db4d02957485883e78a",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/__init__.py",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          39,
+          109
+        ],
+        [
+          111,
+          210
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "environment/parameters.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/environment/parameters.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/environment/parameters.py",
+      "sha256": "2c0c04ce435543723341d8fe4b4266ceee82a32648af36381e607b43d7935e12",
+      "lines": 87,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/environment/parameters.py",
+        "retrieved_at": "2026-10-11T00:21:24.649915+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/environment/parameters.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 3745,
+        "sha256": "2c0c04ce435543723341d8fe4b4266ceee82a32648af36381e607b43d7935e12"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          16,
+          44
+        ],
+        [
+          55,
+          87
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/base_task.py",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/tasks/base_task.py",
+      "sha256": "3024474fd4fc6e69b45ec2a096263cf5d8e3567770d6f929f1cdd63ef521835c",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/base_task.py",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          122,
+          179
+        ],
+        [
+          332,
+          374
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/open_drawer.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/open_drawer.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/open_drawer.py",
+      "sha256": "caf139387ad8a486f5ae9daf3516b41f71dfc40a66cdb0b99db73cc4ee0eaf1f",
+      "lines": 227,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/open_drawer.py",
+        "retrieved_at": "2026-10-11T00:21:25.653378+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/open_drawer.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 9821,
+        "sha256": "caf139387ad8a486f5ae9daf3516b41f71dfc40a66cdb0b99db73cc4ee0eaf1f"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          104,
+          227
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/pour_water.py",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/tasks/pour_water.py",
+      "sha256": "272e7b3f107490676f13900ccf3b9f63c36ef5b1b6947d1a89db8757c7ed4359",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/pour_water.py",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          66,
+          94
+        ],
+        [
+          123,
+          125
+        ],
+        [
+          145,
+          194
+        ],
+        [
+          265,
+          295
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/transfer_water.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/transfer_water.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/transfer_water.py",
+      "sha256": "33a3be979b064be3d1bb44c7e439a1162cacd85e563fd78bfb02d07c31939f2e",
+      "lines": 100,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/transfer_water.py",
+        "retrieved_at": "2026-10-11T00:22:13.520931+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/transfer_water.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 4574,
+        "sha256": "33a3be979b064be3d1bb44c7e439a1162cacd85e563fd78bfb02d07c31939f2e"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          41,
+          100
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/checkers/base_checker.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/base_checker.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/base_checker.py",
+      "sha256": "a7044f2bfef39456bc12fc98b267ec1205e6a9e68d4a5d0930f0417107202047",
+      "lines": 93,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/base_checker.py",
+        "retrieved_at": "2026-10-11T00:21:26.643290+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/base_checker.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2557,
+        "sha256": "a7044f2bfef39456bc12fc98b267ec1205e6a9e68d4a5d0930f0417107202047"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          14,
+          39
+        ],
+        [
+          44,
+          93
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/checkers/joint_checker.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/joint_checker.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/joint_checker.py",
+      "sha256": "9357e867c6cdeeaf27537c908c4faa16b031af41d04e8e0a80172ed186108538",
+      "lines": 153,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/joint_checker.py",
+        "retrieved_at": "2026-10-11T00:21:27.643085+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/joint_checker.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 5631,
+        "sha256": "9357e867c6cdeeaf27537c908c4faa16b031af41d04e8e0a80172ed186108538"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          36,
+          84
+        ],
+        [
+          87,
+          153
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/checkers/pickup_checker.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/pickup_checker.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/pickup_checker.py",
+      "sha256": "3521a4e93747b7e87376513d3a7669068e37968fbe5a094ce35daf24caea2da1",
+      "lines": 74,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/pickup_checker.py",
+        "retrieved_at": "2026-10-11T00:21:28.650636+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/pickup_checker.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2896,
+        "sha256": "3521a4e93747b7e87376513d3a7669068e37968fbe5a094ce35daf24caea2da1"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          7,
+          74
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/checkers/orient_checker.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/orient_checker.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/orient_checker.py",
+      "sha256": "c06ffd4a5484f1ee8e4be76fd9c4d6d29b9117d2abfe3209711a1ffb778a583e",
+      "lines": 69,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/orient_checker.py",
+        "retrieved_at": "2026-10-11T00:21:29.648276+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/orient_checker.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2333,
+        "sha256": "c06ffd4a5484f1ee8e4be76fd9c4d6d29b9117d2abfe3209711a1ffb778a583e"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          8,
+          69
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "tasks/checkers/water_checker.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/water_checker.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/water_checker.py",
+      "sha256": "f53b4f677683dc7e6c2924fa073843229769b76bd6db84b0ed13d88755c3feaf",
+      "lines": 207,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/water_checker.py",
+        "retrieved_at": "2026-10-11T00:21:30.648274+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/tasks/checkers/water_checker.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 7992,
+        "sha256": "f53b4f677683dc7e6c2924fa073843229769b76bd6db84b0ed13d88755c3feaf"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          13,
+          30
+        ],
+        [
+          55,
+          82
+        ],
+        [
+          100,
+          112
+        ],
+        [
+          126,
+          207
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "ckpt_selection.py",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/ckpt_selection.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/arnold-benchmark__arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/ckpt_selection.py",
+      "sha256": "0cc74a8c93330d2222d0199c8494096b8a3ae2320a590bc1ec81d0311b7406cd",
+      "lines": 223,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/ckpt_selection.py",
+        "retrieved_at": "2026-10-11T00:22:41.454619+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/ckpt_selection.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 8437,
+        "sha256": "0cc74a8c93330d2222d0199c8494096b8a3ae2320a590bc1ec81d0311b7406cd"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          84,
+          110
+        ],
+        [
+          133,
+          214
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "eval.py",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/eval.py",
+      "sha256": "99ca95ea9ae64bd465024e958836eb9bf6e00c0e98e9d2f2a9d5baa84a497256",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/eval.py",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          29,
+          49
+        ],
+        [
+          82,
+          111
+        ],
+        [
+          113,
+          229
+        ]
+      ]
+    },
+    {
+      "repo": "arnold-benchmark/arnold",
+      "commit": "40ad6861f45b676bf538b7a0e180d81c8d454823",
+      "path": "eval_pipeline.sh",
+      "local_file": "audit/.cache/github_review/repos/arnold-benchmark__arnold/files/eval_pipeline.sh",
+      "sha256": "a31a6bf9392f93f89f002ae0418f6bdfa8a309979e8a1c9cdd1adae8f90c9b03",
+      "url": "https://raw.githubusercontent.com/arnold-benchmark/arnold/40ad6861f45b676bf538b7a0e180d81c8d454823/eval_pipeline.sh",
+      "source_manifest": "audit/.cache/github_review/repos/arnold-benchmark__arnold/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          34
+        ]
+      ]
+    }
+  ]
+}

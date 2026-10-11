@@ -1,0 +1,604 @@
+{
+  "paper_id": "P250",
+  "name": "EgoMAN",
+  "title": "Flowing from Reasoning to Motion: Learning 3D Hand Trajectory Prediction from Egocentric Human Interaction Videos",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2512.16907",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "transport",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P250",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoMAN 將人類 6DoF 手部軌跡和推理 QA 配對，適合加入語意→預測的共同目錄；官方明確表示 processed dataset 與 model weights 不發布。已核資料建立、loader、trajectory／waypoint 評分鏈，不能把 repo 可讀當成 219K 軌跡或 3M QA 已可下載評測。",
+    "environment": "人體互動影片的 EgoExo4D／Nymeria 衍生資料，HOT3D 作 OOD。camera-relative 手腕軌跡與人體視角推理不是機器人 actuator 命令；需保留原資料 take/sequence 關係。",
+    "tasks": "語意／空間／時間／階段 QA 與 3D 雙手 6DoF trajectory prediction。approach/contact/end stage、任務文字和兩種輸出共用 interaction clip；不把 3M QA 與 219K 軌跡相加成獨立情境。",
+    "data": "README 報告 219K 軌跡／3M structured QA，processed dataset 及權重不公開。原生 meters、10 Hz、position+xyzw；模型以每手 position3+rotation6 的 18D 表達、past 5 frames，未來 tensor 最多 50 slots、−1000 sentinel。影片／tracking timestamp ns/us、reference camera transform、stage annotation 及自動 QA provenance 必須同存。品質篩選要求接觸／結束可見且非平凡動作，會影響難度分佈。",
+    "evaluation": "trajectory：ADE/FDE 公尺、DTW按 warping path length 正規化、ROT度。GT有效 mask 為每 frame 任一座標非−1000，未逐手遮罩；空 GT 回零值且少 best_idx 欄，正式入口需拒收此情況。summary 的 best-of-K 選 ADE+0.001×ROT 最小同一條候選，再報四項，與單純 minADE／各指標各取最小不同。waypoint 取各方法 key 交集，>2 點以 GT 選最佳成對候選；--shift 僅對非 EgoMAN/GT 方法向 GT／最近軌跡點移最多 0.06m，各欄忽略 NaN 後平均。這是帶 oracle／容忍補償的協定，不能當實際物理接觸成功率。",
+    "standardization": {
+      "profile": "egocentric_reasoning_and_stage_aware_6dof_hand_forecasting",
+      "reuse": "可重用 trajectory／QA／stage 關聯結構、來源追蹤、建立標註的方法和四種幾何誤差定義；code 與 data 授權及發布範圍各自保存。",
+      "transform": "case 固定 parent clip、標註者／模型與生成版本、起訖與合法過去輸入、meters／xyzw／rot6d、validity mask。將 raw single prediction、oracle best-of-K、shifted waypoint 分開報表；所有 expected cases 的遺漏／失敗另報 coverage。評測 loader 禁止訓練式壞樣本換下一筆。",
+      "missing": "未發布 processed dataset／模型權重，所以本案未取得這 219K／3M 樣本，也未跑推論或 GPT 標註。QA correctness evaluator 與完整基線資產不在本次 trajectory 核讀範圍；新任務需要獨立取得合法資料並完成標註／評分驗證。"
+    },
+    "version_note": "固定官方 commit；README 提到新 DINOv3／Qwen3-VL 等依賴，不能假設與 paper checkpoints 完全相同。raw metrics 的 closest_pred 選 minADE，summary 則用 ADE+ROT 係數，兩種 best index 必須分清；已有 processed.pkl 時會跳過重算，需用來源／evaluator hash 隔離。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            140
+          ],
+          [
+            159,
+            244
+          ],
+          [
+            319,
+            416
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 416,
+        "sha256": "6fd2a8138390e1cf1b2886507486e390306bd81d4caf9b78c19b9c220647c97b",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/README.md",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/README.md#L1-L140",
+        "why": "核對 219K／3M、未發布資料與權重、座標／頻率、QA 與評分入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "dataset/scripts/step4_6dof_traj_process.py",
+        "ranges": [
+          [
+            106,
+            140
+          ],
+          [
+            626,
+            651
+          ],
+          [
+            786,
+            855
+          ],
+          [
+            866,
+            885
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1317,
+        "sha256": "51d548cbf6fb57326d5b6077e8f39da0041506a26869659fd02f43c27931428a",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/dataset/scripts/step4_6dof_traj_process.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/dataset/scripts/step4_6dof_traj_process.py#L106-L140",
+        "why": "追蹤 ns→us 最近幀、10 Hz、reference-camera 轉換與輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "dataset/scripts/step6_traj_quality_filter_rules.py",
+        "ranges": [
+          [
+            137,
+            258
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 258,
+        "sha256": "df10149f57e64f5794de815e5f63f898146be61758bd1d64152d55177ae6fa13",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/dataset/scripts/step6_traj_quality_filter_rules.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/dataset/scripts/step6_traj_quality_filter_rules.py#L137-L258",
+        "why": "讀 contact/end 可見性、位移／旋轉與 grasp/pick approach 篩選規則。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "dataset/dataloaders/joint_finetune_dataset.py",
+        "ranges": [
+          [
+            489,
+            566
+          ],
+          [
+            638,
+            715
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 992,
+        "sha256": "29c3da681a4ea939124f1ff54b83f3157a7ea9d2cd341e186537a19d4050392f",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/dataset/dataloaders/joint_finetune_dataset.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/dataset/dataloaders/joint_finetune_dataset.py#L489-L566",
+        "why": "確認 value→past/future tensor、xyzw→rot6d、sentinel 與壞樣本替換。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "model/tools/egomanbench_metrics.py",
+        "ranges": [
+          [
+            21,
+            164
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 164,
+        "sha256": "d83f2ea1a4bef0b3b8d41a89fa1ee603894e3696143e08dae3564ff0d42a0be1",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/model/tools/egomanbench_metrics.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/model/tools/egomanbench_metrics.py#L21-L164",
+        "why": "查核 5 past frame 移除、HOT3D／unseen routing、K=1/5/10 與結果快取。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "utils/eval_utils/metrics.py",
+        "ranges": [
+          [
+            14,
+            152
+          ],
+          [
+            185,
+            352
+          ],
+          [
+            435,
+            499
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 499,
+        "sha256": "825f188d7163cb9432e67522e3c2d3ea259bf9f181d34ab0341769e99fd6aeb7",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/utils/eval_utils/metrics.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/utils/eval_utils/metrics.py#L14-L152",
+        "why": "核對 ADE／FDE／DTW／ROT、frame mask、空標註與最優候選。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "utils/eval_utils/metrics_summary.py",
+        "ranges": [
+          [
+            279,
+            455
+          ],
+          [
+            463,
+            555
+          ],
+          [
+            636,
+            676
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 748,
+        "sha256": "286488b5b6bc05de0305a938c37e3ebd03ddd1cdb6c0d58ed2f26209ea8d7112",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/utils/eval_utils/metrics_summary.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/utils/eval_utils/metrics_summary.py#L279-L455",
+        "why": "追蹤 summary 使用 ADE+0.001×ROT 選同一候選、每 sample 平均與 K cap。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/egoman",
+        "requested_repo": "facebookresearch/egoman",
+        "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+        "ref": null,
+        "path": "model/tools/waypoint_metrics.py",
+        "ranges": [
+          [
+            34,
+            53
+          ],
+          [
+            106,
+            138
+          ],
+          [
+            283,
+            340
+          ],
+          [
+            388,
+            423
+          ],
+          [
+            456,
+            474
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 478,
+        "sha256": "26f5e6655d17ab7bdb86d6a4746dcd2e626e56a3adc2fdd8e1b6ffeaa24048d5",
+        "url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/model/tools/waypoint_metrics.py",
+        "reading_url": "https://github.com/facebookresearch/egoman/blob/20f19ccf3135748496febf06bcd917e71b000a87/model/tools/waypoint_metrics.py#L34-L53",
+        "why": "核對 GT-oracle candidate pair、最多 6 cm shift、method交集與有限值分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f17f229981fc5189051676bb385b4a2d91552ff608cbd535b679f4122ed57f90"
+  },
+  "repository_binding_review_sha256": "f17f229981fc5189051676bb385b4a2d91552ff608cbd535b679f4122ed57f90",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/egoman",
+      "resolved_repo": "facebookresearch/egoman",
+      "aliases_in_this_review": [
+        "facebookresearch/egoman"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "20f19ccf3135748496febf06bcd917e71b000a87",
+          "reviewed_files": [
+            "README.md",
+            "dataset/dataloaders/joint_finetune_dataset.py",
+            "dataset/scripts/step4_6dof_traj_process.py",
+            "dataset/scripts/step6_traj_quality_filter_rules.py",
+            "model/tools/egomanbench_metrics.py",
+            "model/tools/waypoint_metrics.py",
+            "utils/eval_utils/metrics.py",
+            "utils/eval_utils/metrics_summary.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/egoman",
+          "link_label": "Code",
+          "project_url": "https://egoman-project.github.io/",
+          "page_sha256": "a1265575bcd2aab72f35a0e0e55a60ed90f3565aaa04d2bbcc5fa6bb84bb970b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P250",
+          "review_file": "content/github_review/reviews/P250.json",
+          "review_sha256": "f17f229981fc5189051676bb385b4a2d91552ff608cbd535b679f4122ed57f90",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "交通移動與車輛維修",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P250",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Flowing from Reasoning to Motion: Learning 3D Hand Trajectory Prediction from Egocentric Human Interaction Videos；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "交通移動與車輛維修",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "EgoExo4D/Nymeria以1014pretrain/498finetune/78testscene標籤分開；HOT3D testonly。",
+    "tasks": "interactionstage-aware6DoFwristforecast；semantic/spatial/motionQA三訓練類別。",
+    "cases": "EgoMAN-Bench2844unseen+990HOT3DOOD＝3834trajectories；3MQA為生成supervision概述，非3Mtestquestions。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 2844,
+        "unit": "EgoMAN-Unseen trajectory cases",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 990,
+        "unit": "HOT3D-OOD trajectory cases",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3000000,
+        "unit": "structured QA supervision（概要約數）",
+        "pages": [
+          1,
+          2
+        ]
+      }
+    ],
+    "evaluation": [
+      "ADE/FDE/rotation/DTW，best-ofK1/5/10；waypointcontact/traj-distance另報。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "sceneheldout及datasetOOD；up-to5sforecast，GTduration/masks用於判分。",
+    "lineage": "EgoExo4D/Nymeria/HOT3D重用，再生成interaction/QAlabels；可與OpenEgo、UniHand有父素材重疊。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "219K/220K+trajectory概要與74K+17Ktrain分項不是同一層；待release對hand/clip單位核。"
+    ],
+    "reuse": "是端點/規則擴充產生大QA量的對照；主benchmark應以3834testtrajectory分母比較。",
+    "reviewed_pdf_sha256": "3edd340c61e8cb14c7aee576baa1f86ace5b4367000ec8ea612f039df07d7c24",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoMAN",
+    "year": 2025,
+    "title": "Flowing from Reasoning to Motion: Learning 3D Hand Trajectory Prediction from Egocentric Human Interaction Videos",
+    "source_url": "https://arxiv.org/abs/2512.16907",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "home",
+      "food",
+      "transport",
+      "wearable"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "交通工具與維修"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "交通移動與車輛維修",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P250",
+      "domain_ids": [
+        "home",
+        "food",
+        "transport",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P250",
+          "domain_ids": [
+            "home",
+            "food",
+            "transport"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "interactionstage-aware6DoFwristforecast；semantic/spatial/motionQA三訓練類別。",
+            "EgoExo4D/Nymeria以1014pretrain/498finetune/78testscene標籤分開；HOT3D testonly。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "3edd340c61e8cb14c7aee576baa1f86ace5b4367000ec8ea612f039df07d7c24"
+        },
+        {
+          "paper_id": "P250",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "動作意圖與手腕6DoF軌跡連接的交互介面。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "3edd340c61e8cb14c7aee576baa1f86ace5b4367000ec8ea612f039df07d7c24"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "3edd340c61e8cb14c7aee576baa1f86ace5b4367000ec8ea612f039df07d7c24",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "transport"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P250",
+      "name": "EgoMAN",
+      "expected_title": "Flowing from Reasoning to Motion: Learning 3D Hand Trajectory Prediction from Egocentric Human Interaction Videos",
+      "source_url": "https://arxiv.org/abs/2512.16907",
+      "pdf_url": "https://arxiv.org/pdf/2512.16907",
+      "retrieved_at": "2026-10-02T22:14:47.589347+00:00",
+      "pdf_sha256": "3edd340c61e8cb14c7aee576baa1f86ace5b4367000ec8ea612f039df07d7c24",
+      "text_sha256": "c8ae99e024437c781ae354a868c56b2c3396b91300375c3bc85abcb28647e0ad",
+      "pdf_bytes": 11925547,
+      "pages": 20,
+      "text_characters": 110811,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2512.16907v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2512.16907v2"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 2844,
+        "unit": "EgoMAN-Unseen trajectory cases",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P250:1",
+        "paper_id": "P250",
+        "benchmark": "EgoMAN",
+        "native_term": "EgoMAN-Unseen trajectory cases",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2512.16907v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2512.16907v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 990,
+        "unit": "HOT3D-OOD trajectory cases",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P250:2",
+        "paper_id": "P250",
+        "benchmark": "EgoMAN",
+        "native_term": "HOT3D-OOD trajectory cases",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2512.16907v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2512.16907v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 3000000,
+        "unit": "structured QA supervision（概要約數）",
+        "pages": [
+          1,
+          2
+        ],
+        "record_id": "review10:P250:3",
+        "paper_id": "P250",
+        "benchmark": "EgoMAN",
+        "native_term": "structured QA supervision（概要約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2512.16907v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2512.16907v2",
+            "locator": "PDF pp. 1, 2",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/egoman"
+  ],
+  "external_repositories": []
+}

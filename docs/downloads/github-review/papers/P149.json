@@ -1,0 +1,266 @@
+{
+  "paper_id": "P149",
+  "name": "V-JEPA 2",
+  "title": "V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2506.09985",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P149",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "V-JEPA 2同庫包含2、2-AC及較新2.1。可復用EPIC動作預測評測與DROID reader，但既有資料集和新模型結果不能另算一套獨立任務庫。",
+    "environment": "自然影片理解/預測與DROID真實機器人軌跡；原資料的廚房、場景和相機沿用父來源，不因V-JEPA checkpoint新增環境。",
+    "tasks": "影片理解、下一動作anticipation、action-conditioned latent預測與影像目標規劃是不同評估用途；本次程式核讀重點為EK100與DROID，不據此列出完整機器人測例。",
+    "data": "EK100使用start_frame/stop_frame、verb_class/noun_class；32frame、8fps及1秒時間設定需保留。實作取af=sf×ap+(1−ap)×ef−at×fps，val預設ap=0，應核定該stop-frame基準與目標協定；不足歷史以首frame補。DROID從trajectory.h5載入cartesian_position/gripper_position及相機外參，降採樣後算平移/相對旋轉/夾爪變化量；失敗樣本會隨機換另一樣本。",
+    "evaluation": "ClassMeanRecall預設top5，recall對有出現的類別平均，accuracy對樣本平均，均乘100。validation對多個probe分別取accuracy/recall最大值，可能不是同一probe；不能當單一固定模型完整結果。機器人任務成功checker未在本次所讀路徑確認。",
+    "standardization": {
+      "profile": "video_anticipation_and_robot_world_model",
+      "reuse": "EK100評估公式與split接口、DROID姿態/外參/視角的資料流程。",
+      "transform": "來源關聯指向EPIC/DROID；case顯式保存觀測截止、target frame、補幀與樣本替代策略；action保存delta與camera_frame選項；evaluator保留topk、分母和probe選擇規則。",
+      "missing": "觀測時間基準核驗、完整robot planning/evaluation協定、資產/權重取得、固定case而非重抽樣及原生重現。"
+    },
+    "version_note": "固定204698b；當前README已加入2.1，本條文獻仍為2506.09985的V-JEPA 2，不把2.1新增內容當作原版論文成果。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 551,
+        "sha256": "55f8485d734a08d23170322cd13ad5ac2f4d63b3d1fd542b10ec0907042c5bb6",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/README.md",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/README.md#L1-L75",
+        "why": "論文身分與2/2-AC/2.1版本範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "configs/eval/vitl/ek100.yaml",
+        "ranges": [
+          [
+            1,
+            38
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 196,
+        "sha256": "b7f2128340b472493c3674aed5391469e51c9e36c8429bbcef8621b26f07c667",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/configs/eval/vitl/ek100.yaml",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/configs/eval/vitl/ek100.yaml#L1-L38",
+        "why": "EK100 split、32frame/8fps與預測時間設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "evals/action_anticipation_frozen/dataloader.py",
+        "ranges": [
+          [
+            15,
+            81
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 236,
+        "sha256": "84bf76fe2b4c8e4389796f45614a8b08441701ab09a4bcf406dfe16ea85d7b95",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/dataloader.py",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/dataloader.py#L15-L81",
+        "why": "實際導向EK100 reader",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "evals/action_anticipation_frozen/epickitchens.py",
+        "ranges": [
+          [
+            99,
+            154
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 323,
+        "sha256": "9f232719e8046f0b9830de18df44c2178ffd3b194ea8fcde6d6a1ffee504e4ce",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/epickitchens.py",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/epickitchens.py#L99-L154",
+        "why": "標註frame到合法觀測區間的實際公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "evals/action_anticipation_frozen/eval.py",
+        "ranges": [
+          [
+            90,
+            101
+          ],
+          [
+            230,
+            277
+          ],
+          [
+            640,
+            710
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 749,
+        "sha256": "13ed35c211bcef6ae2e629f3dc2711736a8f3b3361122d168385b1333790b1cc",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/eval.py",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/eval.py#L90-L101",
+        "why": "val時間點預設及多probe分項max聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "evals/action_anticipation_frozen/metrics.py",
+        "ranges": [
+          [
+            1,
+            58
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 58,
+        "sha256": "69c6891c45c66526112f5ed6cbb48b259683643d6126325e96df767c2e5ed4c2",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/metrics.py",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/evals/action_anticipation_frozen/metrics.py#L1-L58",
+        "why": "class-mean recall和sample accuracy不同分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/vjepa2",
+        "requested_repo": "facebookresearch/vjepa2",
+        "commit": "204698b45b3712590f06245fbfba32d3be539812",
+        "ref": null,
+        "path": "app/vjepa_droid/droid.py",
+        "ranges": [
+          [
+            87,
+            229
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 232,
+        "sha256": "25f3fe88d6d29af0460155f5e0f2b2d05e005f6201a2090bf351fc3daee1d549",
+        "url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/app/vjepa_droid/droid.py",
+        "reading_url": "https://github.com/facebookresearch/vjepa2/blob/204698b45b3712590f06245fbfba32d3be539812/app/vjepa_droid/droid.py#L87-L229",
+        "why": "DROID影片/HDF5對齊、相機座標與相鄰狀態差分action",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "635fc24800c842d48d5341a37fe8196875caeb468e4087b3530b7ae2b5741529"
+  },
+  "repository_binding_review_sha256": "635fc24800c842d48d5341a37fe8196875caeb468e4087b3530b7ae2b5741529",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/vjepa2",
+      "resolved_repo": "facebookresearch/vjepa2",
+      "aliases_in_this_review": [
+        "facebookresearch/vjepa2"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "204698b45b3712590f06245fbfba32d3be539812",
+          "reviewed_files": [
+            "README.md",
+            "app/vjepa_droid/droid.py",
+            "configs/eval/vitl/ek100.yaml",
+            "evals/action_anticipation_frozen/dataloader.py",
+            "evals/action_anticipation_frozen/epickitchens.py",
+            "evals/action_anticipation_frozen/eval.py",
+            "evals/action_anticipation_frozen/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/facebookresearch/vjepa2",
+          "pdf_page": 1,
+          "pdf_sha256": "9cfcfde5fb0d9730637da5b9e7317825c3f3d09e91f3553e22eeba42c74d2226",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/vjepa2",
+          "link_label": "GitHub",
+          "project_url": "https://ai.meta.com/blog/v-jepa-2-world-model-benchmarks",
+          "page_sha256": "eb92e03b49a358f578576378633371031c6645a87843352d9b0845b7aa87ebd6"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P149",
+          "review_file": "content/github_review/reviews/P149.json",
+          "review_sha256": "635fc24800c842d48d5341a37fe8196875caeb468e4087b3530b7ae2b5741529",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "facebookresearch/vjepa2"
+  ],
+  "external_repositories": []
+}

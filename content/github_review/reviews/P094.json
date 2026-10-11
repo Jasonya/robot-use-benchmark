@@ -1,0 +1,68 @@
+{
+  "paper_id": "P094",
+  "summary": "R2R的基本身份是scan→path_id→instruction_id；同一路徑的3份語言說明是不同題目，共用環境與路徑。評分逐條檢查軌跡連通性與終點距離。",
+  "reading_order": [
+    {
+      "repo": "peteanderson80/Matterport3DSimulator",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          50
+        ],
+        [
+          77,
+          84
+        ]
+      ],
+      "why": "原始論文身份、Matterport資產及版本變更",
+      "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925"
+    },
+    {
+      "repo": "peteanderson80/Matterport3DSimulator",
+      "path": "tasks/R2R/env.py",
+      "ranges": [
+        [
+          104,
+          152
+        ],
+        [
+          157,
+          211
+        ],
+        [
+          215,
+          222
+        ]
+      ],
+      "why": "路徑／多說明拆題、初態、teacher與合法觀測",
+      "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925"
+    },
+    {
+      "repo": "peteanderson80/Matterport3DSimulator",
+      "path": "tasks/R2R/eval.py",
+      "ranges": [
+        [
+          1,
+          106
+        ]
+      ],
+      "why": "預期題目ID、3公尺嚴格閾值、軌跡有效性和SPL",
+      "commit": "589d091b111333f9e9f9d6cfd021b2eb68435925"
+    }
+  ],
+  "environment": "Matterport3D真實室內RGB-D全景與離散導航圖。README的90個原始環境是父資產規模，不能當R2R每個split的已取得環境數。",
+  "tasks": "自然語言引導導航；scan是環境、path_id是一條來源路徑、instr_id=path_id_說明序號是一道語言條件題。每路徑3句的假設寫在原evaluator，擴充語言數時不能原樣沿用。",
+  "data": "原生item含scan/path/heading/instructions；R2RBatch拆instructions成多筆，reset由首viewpoint和heading開始。觀測字典有feature、navigableLocations和teacher最短路徑；teacher屬監督訊號，不能默認作測試輸入。",
+  "evaluation": "輸出instr_id與(viewpoint,heading,elevation)序列。程式要求完整ID集合、正確起點與合法圖邊；navigation error／oracle error用圖上最短距離。成功為誤差<3m，SPL=成功×最短路長/max(實走長,最短路長)，按指令題平均。",
+  "standardization": {
+    "profile": "discrete_graph_language_navigation",
+    "reuse": "scan／viewpoint／path／instruction身份、導航圖、語言和原生evaluator。",
+    "transform": "environment鍵連Matterport父資產；task存導航目標語義；case保留instr_id與語言、split、起點／朝向、感測／步數預算；teacher隔離為reference。",
+    "missing": "Matterport資產存取、圖與影像版本閉合、split防洩漏、動作／停止規則和模擬器API匹配。"
+  },
+  "version_note": "主README說2019API由單筆改為batched並有v0.1舊版。釘選現有commit的R2R實作，未宣稱重現2018所有設定；RxR共享父環境需去重。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

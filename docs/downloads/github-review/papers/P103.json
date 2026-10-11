@@ -1,0 +1,408 @@
+{
+  "paper_id": "P103",
+  "name": "Follow-Bench",
+  "title": "Follow-Bench: A Unified Motion Planning Benchmark for Socially-Aware Robot Person Following",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2509.10796",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "assistance",
+    "care",
+    "public",
+    "logistics"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P103",
+    "summary": "正確的Follow-Bench是MedlarTea的機器人跟隨規劃庫；社交距離、搜尋、無碰撞分開記錄，不能混同另一個LLM指令遵循同名benchmark。",
+    "identity_note": "官方project頁的Benchmark Code按鈕仍為空href；另以完整題名、來源owner自述Hanjing YE（原第一作者）與mobile navigation/person-following身分核對MedlarTea/follow-bench。",
+    "discovery_evidence": [
+      {
+        "url": "https://api.github.com/users/MedlarTea",
+        "sha256": "01691504db02fc518794feec3aa307f1c6eb0eef5f3c6cf3359805ba1ef0dfa3",
+        "supports": "owner name matches original first author"
+      },
+      {
+        "url": "https://follow-bench.github.io/",
+        "sha256": "1e19a40c136cef1fd634ce57712df352270727cf330a24b23a1a2fb93523660f",
+        "supports": "exact paper title; code buttons empty"
+      }
+    ],
+    "environment": "內含ir-sim模擬器與socialRPF規劃器；走廊、交叉口、門口、雜物場地及動態人群。人數、寬度、障礙、跟隨距離和隨機初態是場景設定。",
+    "tasks": "跟隨特定人的後方或側方、失去視線後搜尋；README每設定100 seeds是原規劃，不表示本次已有100次新結果。seed改人物／佈局時是新instance，policy-only重跑另計trial。",
+    "data": "env_basic_info.json存step_time、robot/target半徑；object_info.json實際按JSONL逐行讀count、target_visible、robot/target/obstacles/humans。robot位置為索引1:3，速度4:6，碰撞旗標6，需保留schema與單位。",
+    "evaluation": "無碰撞與搜尋成功分開；連續失蹤>max_search_steps才search失敗。可見率分母max_steps，路徑按差分，zone時間按step_time累加。avg_velocity直接mean速度分量，並非速度模長；private-zone計算扣target_radius，與人群半徑異質情況須核對。",
+    "standardization": {
+      "profile": "social_person_following_simulation",
+      "reuse": "佈局/人群/目標軌跡配置、原log與多項距離/舒適度/搜尋metrics。",
+      "transform": "case記target identity、follow位置/距離、seed、max_steps與step_time；evaluator保留碰撞與搜尋各分母，不把單一無碰撞當完成全部任務。",
+      "missing": "完整場景包／log對齊、速度與社交區域計量修訂審核、真實ROS部署repo認領、各planner同預算驗證。"
+    },
+    "version_note": "原2025paper有2026-05v4；此repo5月建立，site仍有舊6planner與paper8planner敘述差異。ir-sim/RDA-planner為上游元件，不能當獨立新benchmark。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "MedlarTea/follow-bench",
+        "requested_repo": "MedlarTea/follow-bench",
+        "commit": "202d1645015f44b965a474211d5ef2bc67a00fe3",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            105
+          ],
+          [
+            171,
+            208
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 208,
+        "sha256": "e0c4b3a49af82f77c08927cfa8f6a843ff94e7be8b74a6968cd63b5d82d22e70",
+        "url": "https://github.com/MedlarTea/follow-bench/blob/202d1645015f44b965a474211d5ef2bc67a00fe3/README.md",
+        "reading_url": "https://github.com/MedlarTea/follow-bench/blob/202d1645015f44b965a474211d5ef2bc67a00fe3/README.md#L1-L105",
+        "why": "場景、人數/寬度/跟隨條件、計量單位與上游元件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "MedlarTea/follow-bench",
+        "requested_repo": "MedlarTea/follow-bench",
+        "commit": "202d1645015f44b965a474211d5ef2bc67a00fe3",
+        "ref": null,
+        "path": "socialRPF/example/robot_person_following/evaluate_scripts/evaluate_iso.py",
+        "ranges": [
+          [
+            1,
+            162
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 194,
+        "sha256": "3e499f02b2e35768ee91625ffbcfe17c33c3d8af382b77da61c9e8d3daaa3249",
+        "url": "https://github.com/MedlarTea/follow-bench/blob/202d1645015f44b965a474211d5ef2bc67a00fe3/socialRPF/example/robot_person_following/evaluate_scripts/evaluate_iso.py",
+        "reading_url": "https://github.com/MedlarTea/follow-bench/blob/202d1645015f44b965a474211d5ef2bc67a00fe3/socialRPF/example/robot_person_following/evaluate_scripts/evaluate_iso.py#L1-L162",
+        "why": "逐步log schema、碰撞/可見率/搜尋/舒適度確切計算",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e9fe8646933a3d868b839ad341bc7ad5fe49492d2bf2220d151715fe70e8bd65"
+  },
+  "repository_binding_review_sha256": "e9fe8646933a3d868b839ad341bc7ad5fe49492d2bf2220d151715fe70e8bd65",
+  "repository_bindings": [
+    {
+      "requested_repo": "MedlarTea/follow-bench",
+      "resolved_repo": "MedlarTea/follow-bench",
+      "aliases_in_this_review": [
+        "medlartea/follow-bench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "202d1645015f44b965a474211d5ef2bc67a00fe3",
+          "reviewed_files": [
+            "README.md",
+            "socialRPF/example/robot_person_following/evaluate_scripts/evaluate_iso.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "Follow-Bench",
+          "search_receipt_sha256": "27fdbf78cd5a4d00e556c9c162c680c5123d3a18ff06ebd7e592287a4aa44cad",
+          "url": "https://github.com/MedlarTea/follow-bench",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P103",
+          "review_file": "content/github_review/reviews/P103.json",
+          "review_sha256": "e9fe8646933a3d868b839ad341bc7ad5fe49492d2bf2220d151715fe70e8bd65",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "協助、交接與陪伴",
+    "個人照護",
+    "公共場館與服務",
+    "包裝、倉儲與物流"
+  ],
+  "source_review": {
+    "paper_id": "P103",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Follow-Bench，arXiv 2509.10796v4。",
+    "scope_read": "16scenario、配置表、8planners、100trials與安全/舒適metric。",
+    "pages_read": [
+      1,
+      6,
+      7,
+      8,
+      9,
+      10,
+      20
+    ],
+    "domains": [
+      "包裝、倉儲與物流",
+      "個人照護",
+      "公共場館與服務",
+      "協助、交接與陪伴"
+    ],
+    "role": "社交導航benchmark",
+    "environment": "CPU 2D simulator；16scenario types分target trajectories、4crowd模式、4layouts；非16個真實場所。",
+    "tasks": "1核心family＝跟隨指定人，變更跟隨角／距離、密度、狹窄通道及遮擋。",
+    "cases": "各configuration100個隨機trial；表V包含多種人數／寬度／距離，不能簡化為16×100而漏掉配置。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 16,
+        "unit": "scenario types",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "person-following family",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每configuration trials",
+        "pages": [
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "無碰撞且重新找到target才成功；TVR、目標personal-zone時間、侵入他人空間、jerk、路徑等。",
+      "10Hz同步sim clock計jerk，wall-clock planner耗時另外量。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度",
+      "人工或模型評審"
+    ],
+    "split": "motion-planning測試假設可見人位置完美；真人主觀偏好另經real interviews，不冒充sim幾何metric。",
+    "lineage": "既有2D人群simulator／ORCA/SFM扩充；不是端到端camera跟人辨識benchmark。",
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "locator": "§III、表IV–V",
+        "supports": "16、100、perception假設與物理指標"
+      }
+    ],
+    "unresolved": [
+      "全部配置去重後的trial總量需按發布config列舉。"
+    ],
+    "reuse": "補持續陪伴與社交距離規則；任務完成、安全與舒適分開比。",
+    "reviewed_pdf_sha256": "d0c3862a5ceea33af287b35df24c711ee5e923e829b298b2688ed9c280e18ace",
+    "reviewed_on": "2026-10-02",
+    "name": "Follow-Bench",
+    "year": 2025,
+    "title": "Follow-Bench: A Unified Motion Planning Benchmark for Socially-Aware Robot Person Following",
+    "source_url": "https://arxiv.org/abs/2509.10796",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "logistics",
+      "care",
+      "public",
+      "assistance"
+    ],
+    "review_tags": [
+      "人機協作",
+      "室內導航",
+      "戶外移動"
+    ],
+    "domain_names": [
+      "包裝、倉儲與物流",
+      "個人照護",
+      "公共場館與服務",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P103",
+      "summary": "跟隨指定人是陪伴服務；原作亦明列照護、巡邏、導覽與物流的應用方向。",
+      "evidence": [
+        {
+          "paper_id": "P103",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            6
+          ],
+          "locator": "摘要、§III Follow-Bench",
+          "observed_tasks": [
+            "持續跟隨指定人",
+            "在人群與轉角維持距離、重新找回目標"
+          ],
+          "reasoning": "由要服務的人與持續陪伴目標歸類。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "d0c3862a5ceea33af287b35df24c711ee5e923e829b298b2688ed9c280e18ace"
+        },
+        {
+          "paper_id": "P103",
+          "domain_ids": [
+            "care",
+            "public",
+            "logistics"
+          ],
+          "pages": [
+            1
+          ],
+          "locator": "Abstract／Note to Practitioners／Introduction",
+          "observed_tasks": [
+            "eldercare",
+            "security patrols／guided tours",
+            "logistics"
+          ],
+          "reasoning": "這些是原文明列的應用方向；實測範圍仍以跟隨情境與物理指標記錄。",
+          "basis": "stated_application",
+          "source_pdf_sha256": "d0c3862a5ceea33af287b35df24c711ee5e923e829b298b2688ed9c280e18ace"
+        }
+      ],
+      "domain_ids": [
+        "assistance",
+        "care",
+        "public",
+        "logistics"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d0c3862a5ceea33af287b35df24c711ee5e923e829b298b2688ed9c280e18ace",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process",
+      "distance",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P103",
+      "name": "Follow-Bench",
+      "expected_title": "Follow-Bench: A Unified Motion Planning Benchmark for Socially-Aware Robot Person Following",
+      "source_url": "https://arxiv.org/abs/2509.10796",
+      "pdf_url": "https://arxiv.org/pdf/2509.10796",
+      "retrieved_at": "2026-10-02T21:34:21.305504+00:00",
+      "pdf_sha256": "d0c3862a5ceea33af287b35df24c711ee5e923e829b298b2688ed9c280e18ace",
+      "text_sha256": "454d26169a6f8d645be7957051bcf4e95d5ce1461c51867ce9b57a2b317e7f50",
+      "pdf_bytes": 22745662,
+      "pages": 26,
+      "text_characters": 170926,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2509.10796v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2509.10796v4"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 16,
+        "unit": "scenario types",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P103:1",
+        "paper_id": "P103",
+        "benchmark": "Follow-Bench",
+        "native_term": "scenario types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2509.10796v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2509.10796v4",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "person-following family",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P103:2",
+        "paper_id": "P103",
+        "benchmark": "Follow-Bench",
+        "native_term": "person-following family",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2509.10796v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2509.10796v4",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "每configuration trials",
+        "pages": [
+          7,
+          8
+        ],
+        "record_id": "review10:P103:3",
+        "paper_id": "P103",
+        "benchmark": "Follow-Bench",
+        "native_term": "每configuration trials",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2509.10796v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2509.10796v4",
+            "locator": "PDF pp. 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "MedlarTea/follow-bench"
+  ],
+  "external_repositories": []
+}

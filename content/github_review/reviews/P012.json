@@ -1,0 +1,275 @@
+{
+  "paper_id": "P012",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "HD-EPIC 的標註包含動作、物件移動、凝視、食譜／營養與音訊；VQA 原始 schema 支援多影片／片段。已追到主程式實際使用的 BaseVLM 與 LlavaVideo 評分，而非把舊單影片 Dataset 當作全部介面。",
+  "reading_order": [
+    {
+      "repo": "hd-epic/hd-epic-annotations",
+      "path": "README.md",
+      "commit": "aa1f833febdfa14253328d11d0585c9eb1fe0b72",
+      "ranges": [
+        [
+          1,
+          186
+        ],
+        [
+          218,
+          269
+        ]
+      ],
+      "why": "多層標註、座標與 VQA 原生格式"
+    },
+    {
+      "repo": "hd-epic/hd-epic-downloader",
+      "path": "README.md",
+      "commit": "d3431a3a9051cbcadeca98fbb86137605a017525",
+      "ranges": [
+        [
+          1,
+          44
+        ]
+      ],
+      "why": "資產分包與下載角色"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "README.md",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          1,
+          45
+        ]
+      ],
+      "why": "原作者 benchmark 程式與配置入口"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "data/vqa_dataset.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          1,
+          99
+        ]
+      ],
+      "why": "舊單影片 loader 限制"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "utils/questions.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          1,
+          70
+        ]
+      ],
+      "why": "原始 inputs 分組及時間轉換"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "models/base_model.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          8,
+          17
+        ],
+        [
+          22,
+          30
+        ],
+        [
+          35,
+          76
+        ],
+        [
+          110,
+          118
+        ],
+        [
+          122,
+          139
+        ],
+        [
+          163,
+          203
+        ],
+        [
+          207,
+          232
+        ],
+        [
+          235,
+          254
+        ],
+        [
+          256,
+          264
+        ],
+        [
+          267,
+          275
+        ],
+        [
+          282,
+          308
+        ]
+      ],
+      "why": "正式多輸入讀取、取樣與選項解析"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "models/llavavideo.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          32,
+          42
+        ],
+        [
+          65,
+          75
+        ],
+        [
+          91,
+          109
+        ],
+        [
+          112,
+          122
+        ]
+      ],
+      "why": "具體答案比較和輸出欄位"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "run_benchmark.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          2,
+          17
+        ],
+        [
+          57,
+          67
+        ],
+        [
+          72,
+          82
+        ],
+        [
+          95,
+          105
+        ],
+        [
+          130,
+          140
+        ]
+      ],
+      "why": "實際入口及跨快取結果平均"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "scripts/analyse_output.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "ranges": [
+        [
+          1,
+          91
+        ]
+      ],
+      "why": "題型統計與失敗分類"
+    }
+  ],
+  "environment": "佩戴 Aria 眼鏡的真實廚房活動及對應 digital twin／fixture。video、participant、capture、fixture、3D 場景的 ID 分開，不把多個感測流計成新環境。",
+  "tasks": "以每個 JSON 的 question prototype 管理五選一 VQA；動作、物件關聯、凝視 priming、食譜和聲音是標註層，各自不自動成為可執行任務。",
+  "data": "敘述含 unique_narration_id、秒制 start/end_timestamp、另列 narration_timestamp、多個 verb/noun pairs 與 main_actions；assoc_info 連到 mask_info 的 0-based MP4 frame、XYZ、XYXY bbox、fixture。音訊以 48kHz sample index 標示。VQA 含 inputs/question/choices/correct_idx（0-based），保留多個 input 的 id 與時間窗。",
+  "evaluation": "主程式呼叫模型 run_eval；核讀 LlavaVideo 的 answer==correct_idx，再由 run_benchmark 對結果平均。BaseVLM 取回覆第一個大寫字母轉選項索引；invalid 回 -1。analyse_output 按 prototype 字首分組，另列 invalid／failure。輸入會按模型 max_video_length_seconds 降取樣，須一併報告 input_total_seconds 與 input_subsampled_seconds。",
+  "standardization": {
+    "profile": "multimodal_video_mcqa",
+    "reuse": "原始標註層關聯、五選一題目、時間／框 tag 解析、同輸入題目分組及正確率流程。",
+    "transform": "用原生 question ID 建 case，inputs 保留多影片與框；同一次 capture 的多感測／多題重用同一環境記錄。保留完整毫秒時間和原始座標，另記 native adapter 對時間取整秒、框轉 0–1000 的行為；模式 visual_text／narration 與取樣預算入 evaluator 約定。",
+    "missing": "尚未下載數 TB 感測資料、校準／digital twin 或執行模型。各模型 wrapper 的 parsing／API 版本仍需個別驗證；data/vqa_dataset.py 只支援單影片且舊欄位與正式 VQA 不同，不能直接通用。"
+  },
+  "version_note": "固定提交檔案已新增 MP4 對齊的中介 calibration／pose／gaze；不得假定與原論文首發資產同版。檔案明列 mask 與 bbox 由不同團隊標註可能不一致；YouTube 版本只供觀看，不作復現輸入。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "hd-epic/hd-epic-annotations",
+      "path": "README.md",
+      "commit": "aa1f833febdfa14253328d11d0585c9eb1fe0b72",
+      "sha256": "8e9627915b3ed2eacfc41b4da6d6b368a82377c35a5e3b5a5e0f4f7783e0095f",
+      "url": "https://github.com/hd-epic/hd-epic-annotations/blob/aa1f833febdfa14253328d11d0585c9eb1fe0b72/README.md",
+      "local_file": "audit/.cache/github_review/repos/hd-epic__hd-epic-annotations/files/README.md"
+    },
+    {
+      "repo": "hd-epic/hd-epic-downloader",
+      "path": "README.md",
+      "commit": "d3431a3a9051cbcadeca98fbb86137605a017525",
+      "sha256": "7fa03dcc608dff8dc8ce13631ee581f080a39eec8effec583b76d944f418bee5",
+      "url": "https://github.com/hd-epic/hd-epic-downloader/blob/d3431a3a9051cbcadeca98fbb86137605a017525/README.md",
+      "local_file": "audit/.cache/github_review/repos/hd-epic__hd-epic-downloader/files/README.md"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "README.md",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "b67e86428607ad6a99b8e1c0a151eb17f5a857c83047d97ec7b65122206cd0ad",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/README.md",
+      "local_file": "audit/.cache/github_review/repos/hd-epic__hd-epic-vqa-eval/files/README.md"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "data/vqa_dataset.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "6088f668499f5d39a98c07277205e928715e3e7aaa65ad0150b32728a3098c32",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/data/vqa_dataset.py",
+      "local_file": "audit/.cache/github_review/repos/hd-epic__hd-epic-vqa-eval/files/data/vqa_dataset.py"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "utils/questions.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "20cffb528d4ddf87622334c696304514fdc311f68805b1ebb171c9d67b41c128",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/utils/questions.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/hd-epic__hd-epic-vqa-eval/utils/questions.py"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "models/base_model.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "435af848ef85d9d171a76aa67088ec150ffa3c7f9eb01853971034ef0b15ecde",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/models/base_model.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/hd-epic__hd-epic-vqa-eval/models/base_model.py"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "models/llavavideo.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "d741a7bba6cd2292e7f846f105053416afe436ca0f7d55132f4ecec15812d191",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/models/llavavideo.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/hd-epic__hd-epic-vqa-eval/models/llavavideo.py"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "run_benchmark.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "25cb5c7b3ea3caf327b76cbc6f0a1576e1ac79bf46efedfcfc32ab423836a740",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/run_benchmark.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/hd-epic__hd-epic-vqa-eval/run_benchmark.py"
+    },
+    {
+      "repo": "hd-epic/hd-epic-vqa-eval",
+      "path": "scripts/analyse_output.py",
+      "commit": "d0c233be1f92dcbaad0bdffc349c4df02d393a34",
+      "sha256": "1d8e2a71f4c2f68df49ad2ea8bdcc715ae94017f2dbb86126748f6e26b3a4471",
+      "url": "https://github.com/hd-epic/hd-epic-vqa-eval/blob/d0c233be1f92dcbaad0bdffc349c4df02d393a34/scripts/analyse_output.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/hd-epic__hd-epic-vqa-eval/scripts/analyse_output.py"
+    }
+  ],
+  "identity_note": "vqa-eval README 自述為 HD-EPIC CVPR2025 benchmark 程式，指向官方 annotations；已核對專案名稱和實際資料路徑。"
+}

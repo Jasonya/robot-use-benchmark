@@ -1,0 +1,213 @@
+{
+  "paper_id": "P136",
+  "name": "pi0",
+  "title": "$π_0$: A Vision-Language-Action Flow Model for General Robot Control",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2410.24164",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P136",
+    "summary": "π0的openpi接口保留機體與模型兩種表示；模型預設輸出50步、32維，ALOHA adapter再轉成14維控制。",
+    "environment": "原π0研究機體與openpi公開ALOHA/DROID示例應分開；checkpoint場景標籤與原私有訓練資料不是公開環境manifest。",
+    "tasks": "通用VLA與任務微調，含towel等示例；訓練10k+小時和各checkpoint不當新獨立benchmark task/case量。",
+    "data": "模型預設action_horizon50/action_dim32；ALOHA外部state/action14D，input轉換關節sign/gripper angular，缺wrist圖片填零且image_maskFalse；output只回前14維。DeltaActions/AbsoluteActions依mask和當前state轉換。",
+    "evaluation": "policy.infer返回action和infer_ms；timer只包模型sample_actions，不含input/output轉換或網路。此policy接口不是task成功checker；各示例要承接原環境或實機rubric，不能以推論成功當任務完成。",
+    "standardization": {
+      "profile": "flow_matching_vla_policy_adapter",
+      "reuse": "機體adapter、相機mask、state/action表示、checkpoint/config與normalization鏈。",
+      "transform": "method與task/case分開；保留原生維度、padding、關節/夾爪映射、delta mask、history/horizon和全流程預算，模型輸出容器不拿來計環境或任務量。",
+      "missing": "原π0訓練資料/正式測試清單、各機體scorer、完整素材/校準/模型與control spec對照、原生基線執行。"
+    },
+    "version_note": "固定215abfb現行openpi同時含π0/FAST/π0.5；此筆以π0接口為主，不能把後續π0.5功能與成績歸到最初π0版本。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            19
+          ],
+          [
+            59,
+            84
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 323,
+        "sha256": "567fc57766bd736664f50126cab8145af4071ca16cc5e238f2b11e369169c3b5",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/README.md",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/README.md#L1-L19",
+        "why": "原π0與FAST/π0.5、base與task checkpoints分開",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "src/openpi/models/pi0_config.py",
+        "ranges": [
+          [
+            18,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 117,
+        "sha256": "d321858c30b398126035ea2b6da09e1c422eeeebb5ebf8df631daf9dc77647fa",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/models/pi0_config.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/models/pi0_config.py#L18-L55",
+        "why": "action維度/長度及π0/π0.5旗標",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "src/openpi/policies/aloha_policy.py",
+        "ranges": [
+          [
+            25,
+            102
+          ],
+          [
+            181,
+            202
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 202,
+        "sha256": "50d7ad972d80142ecb0f03b0780dacfd3af212946f4c9aac31a204b02db4543d",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/policies/aloha_policy.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/policies/aloha_policy.py#L25-L102",
+        "why": "相機缺失mask、關節/夾爪轉換與14D輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "src/openpi/transforms.py",
+        "ranges": [
+          [
+            204,
+            242
+          ],
+          [
+            328,
+            337
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 460,
+        "sha256": "a1b94e9e72849a18834778f229c6bb389a495eb7fbe0aa800edea728b9424ff4",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/transforms.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/transforms.py#L204-L242",
+        "why": "依state與mask做delta/absolute及padding",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "src/openpi/policies/policy.py",
+        "ranges": [
+          [
+            67,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 135,
+        "sha256": "a2ac5236e23b11d0f5a840d4a8fef148d89dba921d5452ec5dfcd5a6ffa46f20",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/policies/policy.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/policies/policy.py#L67-L106",
+        "why": "input→model→output轉換與infer_ms範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "d535e7a19e51fee151043f7606262dde5dead89229d92ed6518d6231029b0fff"
+  },
+  "repository_binding_review_sha256": "d535e7a19e51fee151043f7606262dde5dead89229d92ed6518d6231029b0fff",
+  "repository_bindings": [
+    {
+      "requested_repo": "Physical-Intelligence/openpi",
+      "resolved_repo": "Physical-Intelligence/openpi",
+      "aliases_in_this_review": [
+        "physical-intelligence/openpi"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+          "reviewed_files": [
+            "README.md",
+            "src/openpi/models/pi0_config.py",
+            "src/openpi/policies/aloha_policy.py",
+            "src/openpi/policies/policy.py",
+            "src/openpi/transforms.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "openpi",
+          "search_receipt_sha256": "91bc75c88db5974ccd9993705399e29be89d0ce3a7816bda161c76412b1543f7",
+          "url": "https://github.com/Physical-Intelligence/openpi",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P136",
+          "review_file": "content/github_review/reviews/P136.json",
+          "review_sha256": "d535e7a19e51fee151043f7606262dde5dead89229d92ed6518d6231029b0fff",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "Physical-Intelligence/openpi"
+  ],
+  "external_repositories": []
+}

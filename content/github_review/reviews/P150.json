@@ -1,0 +1,112 @@
+{
+  "paper_id": "P150",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "DreamDojo具有動作條件影片生成的真實評估入口；核心輸出為PSNR/SSIM/LPIPS。預訓練影片時數、評估樣本與機器人可執行任務需分開。",
+  "reading_order": [
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          56
+        ]
+      ],
+      "why": "官方論文、資料/模型與公開範圍"
+    },
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "docs/EVAL.md",
+      "ranges": [
+        [
+          1,
+          47
+        ]
+      ],
+      "why": "三類評估集及49frame/100sample抽樣設定"
+    },
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "eval.sh",
+      "ranges": [
+        [
+          1,
+          16
+        ]
+      ],
+      "why": "實際入口與本機路徑/連續checkpoint輪詢設定"
+    },
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "groot_dreams/data/schema.py",
+      "ranges": [
+        [
+          28,
+          105
+        ]
+      ],
+      "why": "LeRobot state/action切片、absolute與rotation metadata"
+    },
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "groot_dreams/dataloader.py",
+      "ranges": [
+        [
+          1,
+          168
+        ],
+        [
+          193,
+          227
+        ]
+      ],
+      "why": "資料類型dispatch、欄位、抽樣和restrict_len語義"
+    },
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "cosmos_predict2/action_conditioned.py",
+      "ranges": [
+        [
+          278,
+          304
+        ],
+        [
+          366,
+          407
+        ]
+      ],
+      "why": "case選取、生成/GT比較及metric聚合"
+    },
+    {
+      "repo": "NVIDIA/DreamDojo",
+      "commit": "02f119b759d5c7f84a399fdeea3c6e82e7ed6cff",
+      "path": "scripts/plot_psnr.py",
+      "ranges": [
+        [
+          15,
+          40
+        ]
+      ],
+      "why": "繪圖依固定輸出檔案數篩選的限制"
+    }
+  ],
+  "environment": "GR-1實驗室機器人影片、EgoDex與DreamDojo-HV評估素材；人類影片庫是預訓練來源。README宣稱44k小時不表示本次已取得或等量可評測。",
+  "tasks": "由首影格和動作序列預測後續影片；文件In-lab清單含10個原生dataset路徑，另有EgoDex/HV兩組來源。路徑、100個抽樣與49frame是不同單位。",
+  "data": "統一reader輸出video/lam_video/action/fps/num_frames/__key__/padding_mask/image_size/ai_caption；根據path字串選MANO、一般影片或LeRobot。LeRobot schema保留state/action的start/end、rotation_type、absolute。restrict_len可以指定100，不等於底層獨立episode總量；文件定義train前95%、test後5%，full全量，須落實固定抽樣清單。",
+  "evaluation": "生成片與GT先轉[0,1]逐frame算PIQ PSNR/SSIM/LPIPS，再對樣本平均；這段沒有排除首個條件影格。恢復篩選查找*_psnr.json但輸出為*_metrics.json，可能重算；plot腳本只接受恰501個檔的資料夾。以上是程式限制，尚未執行驗證，也不是robot物理成功率。",
+  "standardization": {
+    "profile": "action_conditioned_video_prediction",
+    "reuse": "評估集分組、LeRobot modality metadata、可追到metric實作的生成入口。",
+    "transform": "以原生clip/episode ID和實際採樣frame作case；保存action representation、完整GT影片及不可見未來、scorer前處理；預測影片與物理環境分列，父EgoDex重用關係明確。",
+    "missing": "固定抽樣及ID清單、checkpoint/套件版本、條件影格是否計分與斷點恢復修正、原生跑分和物理行為有效性checker。"
+  },
+  "version_note": "固定02f119b；從docs/EVAL追到cosmos_predict2/action_conditioned.py，不誤把套件內一般VQA metrics當作本論文主scorer。沒有下載44k小時資料或權重。",
+  "runtime_executed": false
+}

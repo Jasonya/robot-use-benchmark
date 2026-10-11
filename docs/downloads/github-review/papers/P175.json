@@ -1,0 +1,331 @@
+{
+  "paper_id": "P175",
+  "name": "Pipette",
+  "title": "Pipette: An Embodied Simulation Platform, Benchmark, and Data-Efficient Augmentation Framework for Wet-Lab Robotics",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.12936",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "lab"
+  ],
+  "status": "repository_unavailable",
+  "review": {
+    "paper_id": "P175",
+    "reviewed_on": "2026-10-11",
+    "status": "repository_unavailable",
+    "summary": "Pipette原文明確提供GitHub，但本次取得回404。已整理12個wet-lab任務的共通格式與成功驗證augmentation設計，實作仍待取得。",
+    "environment": "Isaac Sim/Isaac Lab、100+交互USD/消耗品資產；主要Franka Panda，部分task使用AgileX。三個RGB視角是感測配置，非三環境。",
+    "tasks": "12個sample handling、instrument/lid interaction、placement/alignment等wet-lab任務；NL parser輔助產生場景/任務設定，原文仍要求人工和模擬驗證。",
+    "data": "原文HDF5逐步記top/main/wrist RGB、proprio、sim state、action、language；成功驗證後轉LeRobot、去stale frame、對齊並降到10Hz，影像400²、robot-command8D。raw與augmented episode分別存，關聯同一原示範；資料增強不是新增語義task。",
+    "evaluation": "原文依物件pose、actuator state或幾何關係與registered threshold判success；每episode JSON應記成功/失敗理由/runtime/policy及control頻率/gripper threshold。code及文中另提的technical supplement未取得，尚無法驗證12task具體判分。",
+    "standardization": {
+      "profile": "wetlab_simulation_with_verified_augmentation",
+      "reuse": "task entry(scene/robot/sensor/instruction/target/constraints/criterion)與HDF5→LeRobot對齊流程。",
+      "transform": "建立原demo→augmentation lineage和各自render/action；case固定scene/初態/clock/8D命令語義，evaluator保留task-specific threshold與有效性。",
+      "missing": "可取GitHub、12task/資產/episode清單、technical supplement、實際converter/evaluator與simulation重現。"
+    },
+    "version_note": "同一2606.12936的v3題名已改為Success-Verified Simulation Augmentation，書目舊題名Data-Efficient保留版本註記。官方hbhuiyou/Pipette取得404，只作當次不可用判定。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2606.12936",
+      "pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+      "paper_pages_read": [
+        3,
+        5
+      ],
+      "repository_access": {
+        "requested_url": "https://api.github.com/repos/hbhuiyou/Pipette",
+        "retrieved_at": "2026-10-10T07:45:40.670001+00:00",
+        "status": 404,
+        "error": "Not Found"
+      }
+    },
+    "identity_note": "精確arXiv ID相同；論文版本改題名，不建立成另一份獨立benchmark。",
+    "repository_candidate_dispositions": [
+      {
+        "repo": "hbhuiyou/Pipette",
+        "status": "announced_repository_unavailable",
+        "reason": "原作／作者頁明列的入口；保存於2026-10-10T07:45:40.670001+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/hbhuiyou/Pipette",
+            "retrieved_at": "2026-10-10T07:45:40.670001+00:00",
+            "status": 404,
+            "error": "Not Found"
+          }
+        ]
+      }
+    ],
+    "reading_order": [],
+    "review_sha256": "d93e58964bd11304aff7a9d9f51916f3648187de02c86093fdd813e59b2a50a4"
+  },
+  "repository_binding_review_sha256": "d93e58964bd11304aff7a9d9f51916f3648187de02c86093fdd813e59b2a50a4",
+  "repository_bindings": [],
+  "repository_candidates": [
+    {
+      "requested_repo": "hbhuiyou/Pipette",
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/hbhuiyou/Pipette",
+          "pdf_page": 1,
+          "pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+          "basis": "pdf_extracted_text"
+        }
+      ],
+      "selection_status": "explained_source_lead",
+      "candidate_scope": "Retained discovery lead, not a confirmed implementation for this paper.",
+      "disposition_type": "announced_repository_unavailable",
+      "disposition_note": "原作／作者頁明列的入口；保存於2026-10-10T07:45:40.670001+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+      "disposition_evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/hbhuiyou/Pipette",
+          "retrieved_at": "2026-10-10T07:45:40.670001+00:00",
+          "status": 404,
+          "error": "Not Found"
+        }
+      ]
+    }
+  ],
+  "group": "unresolved",
+  "domains": [
+    "實驗室操作"
+  ],
+  "source_review": {
+    "paper_id": "P175",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Pipette，arXiv 2606.12936v3；新版題名為Success-Verified Simulation Augmentation。",
+    "scope_read": "12tasks全表、資產庫、structured task註冊、augmentation验证與100episode協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      11,
+      12,
+      17
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "IsaacSim/IsaacLab場景；3robots、12tools、26equipment、55consumables、9instruments為資產分量。",
+    "tasks": "12wet-lab tasks＝4sample/culture、4lid/hatch、4placement；pipette-to-petri positioning不等同已量測真正移液量。",
+    "cases": "每task30human train demos＋成功篩選augmented；每model每task100eval episodes，即單資料設定1,200。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "wet-lab tasks",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1200,
+        "unit": "每policy每資料設定eval episodes",
+        "qualifier": "12×100",
+        "pages": [
+          17
+        ]
+      },
+      {
+        "field": "data",
+        "value": 360,
+        "unit": "raw human training trajectories",
+        "qualifier": "12×30",
+        "pages": [
+          17
+        ]
+      }
+    ],
+    "evaluation": [
+      "依task pose/joint/geometric thresholds及持續時間判success；macro task SR。",
+      "語言parser只草擬配置，prim/threshold/evaluator仍需人驗證；success-verified augmentation不是新task。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "3models×raw/augmented條件，Panda為主但flask-shaker用AgileX；同task內固定機體比較。",
+    "lineage": "existing/generated USD assets、Hunyuan；replay重新渲染並同步state/action，不只是改像素。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          7,
+          17
+        ],
+        "locator": "Asset/Task Registration、表3、附錄E.1",
+        "supports": "12、30/100、機體例外與驗證"
+      }
+    ],
+    "unresolved": [
+      "all-asset唯一ID與各task primitives的實際精度需原生配置；某lid為virtual button觸發，不能當直接靈巧開蓋。"
+    ],
+    "reuse": "可補biomedical wet-lab器材用途與scene/task登記；須區分設備操作與完成真正生物實驗。",
+    "reviewed_pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+    "reviewed_on": "2026-10-02",
+    "name": "Pipette",
+    "year": 2026,
+    "title": "Pipette: An Embodied Simulation Platform, Benchmark, and Data-Efficient Augmentation Framework for Wet-Lab Robotics",
+    "source_url": "https://arxiv.org/abs/2606.12936",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "lab"
+    ],
+    "review_tags": [
+      "實驗室操作"
+    ],
+    "domain_names": [
+      "實驗室操作"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P175",
+      "domain_ids": [
+        "lab"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P175",
+          "domain_ids": [
+            "lab"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            11,
+            12,
+            17
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "12wet-lab tasks＝4sample/culture、4lid/hatch、4placement；pipette-to-petri positioning不等同已量測真正移液量。",
+            "IsaacSim/IsaacLab場景；3robots、12tools、26equipment、55consumables、9instruments為資產分量。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+      "previous_domain_ids": [
+        "lab"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P175",
+      "name": "Pipette",
+      "expected_title": "Pipette: An Embodied Simulation Platform, Benchmark, and Data-Efficient Augmentation Framework for Wet-Lab Robotics",
+      "source_url": "https://arxiv.org/abs/2606.12936",
+      "pdf_url": "https://arxiv.org/pdf/2606.12936",
+      "retrieved_at": "2026-10-02T21:34:43.962267+00:00",
+      "pdf_sha256": "72ad55814d9958242cd534f45f540f9bcd86bcd2bfbf21beaa2278e6c2bb93a3",
+      "text_sha256": "5508e726b8bce8cd76fc651a6f33d66fe7c279f51f709e5fbf85d79277745b87",
+      "pdf_bytes": 12796859,
+      "pages": 20,
+      "text_characters": 99727,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.12936v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.12936v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "wet-lab tasks",
+        "pages": [
+          5,
+          7
+        ],
+        "record_id": "review10:P175:1",
+        "paper_id": "P175",
+        "benchmark": "Pipette",
+        "native_term": "wet-lab tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.12936v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.12936v3",
+            "locator": "PDF pp. 5, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 1200,
+        "unit": "每policy每資料設定eval episodes",
+        "qualifier": "12×100",
+        "pages": [
+          17
+        ],
+        "record_id": "review10:P175:2",
+        "paper_id": "P175",
+        "benchmark": "Pipette",
+        "native_term": "每policy每資料設定eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.12936v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.12936v3",
+            "locator": "PDF pp. 17",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 360,
+        "unit": "raw human training trajectories",
+        "qualifier": "12×30",
+        "pages": [
+          17
+        ],
+        "record_id": "review10:P175:3",
+        "paper_id": "P175",
+        "benchmark": "Pipette",
+        "native_term": "raw human training trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.12936v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.12936v3",
+            "locator": "PDF pp. 17",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

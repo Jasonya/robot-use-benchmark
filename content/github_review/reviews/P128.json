@@ -1,0 +1,68 @@
+{
+  "paper_id": "P128",
+  "summary": "RoboNet原生loader會檢查資料hash，統一T個影像/狀態與T−1個action；不同機體維度可補零、截短或推估autograsp，必須保留轉換來源。",
+  "reading_order": [
+    {
+      "repo": "SudeepDasari/RoboNet",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          20
+        ]
+      ],
+      "why": "原作、資料與inverse/video prediction方法角色",
+      "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7"
+    },
+    {
+      "repo": "SudeepDasari/RoboNet",
+      "path": "robonet/datasets/util/hdf5_loader.py",
+      "ranges": [
+        [
+          78,
+          174
+        ]
+      ],
+      "why": "state/action維度、autograsp推估、標註縮放與T對齊",
+      "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7"
+    },
+    {
+      "repo": "SudeepDasari/RoboNet",
+      "path": "robonet/datasets/variants/annotation_benchmark_dataset.py",
+      "ranges": [
+        [
+          1,
+          54
+        ]
+      ],
+      "why": "有/無標註與robot-specific評測模式",
+      "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7"
+    },
+    {
+      "repo": "SudeepDasari/RoboNet",
+      "path": "robonet/video_prediction/metrics.py",
+      "ranges": [
+        [
+          13,
+          88
+        ]
+      ],
+      "why": "像素距離與MSE/PSNR的實際計量公式",
+      "commit": "d83eee20f39653c3f8e7c349df7350e8a9e9f7a7"
+    }
+  ],
+  "environment": "多機器人HDF5 interaction sequences，metadata帶robot/ncam/維度/長度/檔案hash。任務環境或物件配置不能由機體名與record數推定。",
+  "tasks": "動作條件影片預測、逆動態／視覺控制及標註點預測；frame、subsequence、同episode多camera皆不是新增語義任務。",
+  "data": "env/state、policy/actions、camera影像及可選bbox_annotations；loader以min(state_T,img_T,action_T+1)決定可用T，action取T−1。Mismatch模式可PAD_ZERO/CLEAVE，autograsp根據後一state及邊界推估新增控制維。",
+  "evaluation": "標註variant預設拆non-annotated train/val/test並另列annotated robots；指定train_ex_per_source時另走分支，須固定split規則。metrics提供分佈像素距離和normalize到1的PSNR/MSE等，值受resize/camera/horizon影響，不是物理task完成率。",
+  "standardization": {
+    "profile": "multi_robot_action_conditioned_video_prediction",
+    "reuse": "內容hash、原robot/相機/維度、T/T−1對齊、標註模式與視覺metrics。",
+    "transform": "case記parent HDF5、選取camera/起始frame/context/horizon、原維度和補零/截斷/autograsp推估；像素誤差附影像解析度，原標註缺失與零placeholder分開。",
+    "missing": "資料資產與完整metadata、場景/語義目標映射、原train/test與annotated子集隔離、視覺控制真實成功協定及跨來源去重。"
+  },
+  "version_note": "固定d83eee2的2019來源實作；RoboNet另被OXE重發為RLDS，需保留同一父episode關係。未執行TF模型或原資料loader。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

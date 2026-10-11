@@ -1,0 +1,121 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EmbodiedMemory-Bench｜GitHub怎么读与整理 · Robot-use Benchmark</title>
+  <meta name="description" content="循官方 project 搬移页确认 ZJU-OmniAI/Embodied-Omni 的 embodied_memory/ 为本篇公开程序，已追 manifest loader、history sanitization、simulator runner、四家族具体 success／ERR 与 macro 分母。HF 有 frozen release，但公开 loader 与发布路径不一致；code 亦将任一 ERR 视为不能成功，与 paper 的可恢复终态 SR 有实质差异。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P206.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P206.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P206.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="EmbodiedMemory-Bench｜GitHub怎么读与整理 · Robot-use Benchmark"><meta property="og:description" content="循官方 project 搬移页确认 ZJU-OmniAI/Embodied-Omni 的 embodied_memory/ 为本篇公开程序，已追 manifest loader、history sanitization、simulator runner、四家族具体 success／ERR 与 macro 分母。HF 有 frozen release，但公开 loader 与发布路径不一致；code 亦将任一 ERR 视为不能成功，与 paper 的可恢复终态 SR 有实质差异。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P206.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"github/P206.html","title":"EmbodiedMemory-Bench｜GitHub怎么读与整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hans.js?v=081237f01e25","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原作定义／设置","staticOnly":"本卡记录来源索引；任务环境规格的对齐和运行验证分别记录。","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"索引出处与对应细节","empty":"没有符合的索引条目","showing":"显示","records":"笔索引条目","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原作任务ID","native_task_class":"原作任务类别","native_task_registration":"原作任务注册","native_task_module":"原作任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务schema","generator_configuration":"生成器设置","integration_registration_group":"框架注册组","evaluation_protocol":"评测协定","video_task_schema":"视频／任务题型","human_sim_task_mapping":"人类／模拟任务对应","native_task_template":"任务模板","instructional_activity_definition":"人类活动定义","native_task_definition":"原作任务定义","information_task_schema":"信息题型定义"},"buckets":{"native_task_candidates":"原作robot任务条目（待对齐）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类活动／流程定义（视频来源）","information_task_definitions":"信息任务／问答题型定义"},"recordMeaning":"索引型态","meaningByBucket":{"native_task_candidates":"原作者列出的robot任务条目；在本库等待共同规格与来源对齐。","human_activity_definitions":"人类活动类别与流程来源，可对应多部视频；任务环境另建对应。","integration_or_protocol":"框架注册、协定或生成设置，可指向多个任务／样本；一条索引不等于一个环境。","video_pairing":"视频题型或人类／模拟任务对应；观测数据与物理环境规格分开。","documented_examples":"示范程序入口；可作定义与实作线索，尚不直接代表独立环境。","information_task_definitions":"原作的信息任务或问题类型；题目实数另外按question_id或case_id计数。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../coverage.html">覆盖与比较</a><a href="../native-tasks.html">任务清单</a><a href="../survey-union.html">来源名录</a><a href="../design.html">整体设计</a><a href="../collection-pipeline.html">数据流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核读</a><a href="../library.html">文献</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/github/P206.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="P206.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>P206 · EmbodiedMemory-Bench</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P206 · EmbodiedMemory-Bench</h1><p class="lede">EmbodiedMemory-Bench: Benchmarking Embodied Memory for Long-Horizon Embodied Tasks</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇总表</a><span class="github-status core">内核内容已核读</span>
+      <span>benchmark／数据／评测主来源</span><a href="https://arxiv.org/abs/2609.28236" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p206">用途与原生规模依据</a>
+    </div>
+    <p class="github-scope">核读快照 2026-10-11。已读范围限所列片段；本轮未运行上游程序。</p>
+    <p class="github-summary">循官方 project 搬移页确认 ZJU-OmniAI/Embodied-Omni 的 embodied_memory/ 为本篇公开程序，已追 manifest loader、history sanitization、simulator runner、四家族具体 success／ERR 与 macro 分母。HF 有 frozen release，但公开 loader 与发布路径不一致；code 亦将任一 ERR 视为不能成功，与 paper 的可恢复终态 SR 有实质差异。</p>
+    <aside class="github-version"><b>版本与身份</b><p>code 固定 f0409a8ecd858acd1f53c69f6424e0c4af83737b，只核 embodied_memory 子项目。HF 固定 3b45bd3f3a67a23b09b78d27c3ab563a700e832a；README 说公开 episode-level 名称／描述／probe instructions 已英文化并更新 hash，原语言 revision 为 28694bf83b78049ac96ba01c9ffb13aeac7eaef9，不能混用。HF canonical manifest SHA256=6c69644b9fc4755065830e4884a12898e3ed0db32c1825dbecf623c37b9b1bc2 是发布者 metadata 声明，本轮未下载 full2554 逐例重播验算。</p><p>pinned arXiv:2609.28236v1 题名及 Lizhou Liang 等作者与 embodied_memory/README 一致。PDF 原始 ZJU-OmniAI project 转址到 Embodied-Omni/EmbodiedMemoryBench，新页直接连官方 monorepo 与 lzLiang/EmbodiedMemoryBench；不将参考文献的 OpenBMB/MiniCPM-V 当成 benchmark。只核本篇 embodied_memory 子树，未扩读同 monorepo 的 reasoner／navigator。</p></aside>
+    <dl class="github-five-fields"><div><dt>领域</dt><dd>居家整理与清洁</dd></div><div><dt>环境</dt><dd>AI2-THOR 单房间组合的多房间脉络与 ProcTHOR 场景；论文 Table 9 报 1,118 个 globally unique source scene IDs、四 room types，不能加总各家族重叠 scene counts。当前 env 以 probe.scene reset，使用 500×500 RGB、visible_objects、agent_state、available_actions 与高级离散目标动作。原生 x/y/z、objectId、rotation_y（0–360）及相机角度须保留；不把 Navigate／PickUp 等界面当连续机器人关节控制。</dd></div><div><dt>任务</dt><dd>manifest 四家族 l2_passive、l2_dynamic、l2_interaction、l3_owner_habit 分别对应 Passive Observation、Dynamic Tracking、Interaction Failure、Experience Generalization。probe_retrieve／probe_track_location 要到记忆位置并拾取目标；probe_avoid_failure 要选非已知锁定容器存放物品；owner_habit 以先前 correction 对新对象选择合规 receptacle。construction schema 的 L0–L3 enums 不等于四个发布家族。</dd></div><div><dt>题数与数据</dt><dd>data.load_manifest 读 JSONL 的 id、family、source.episode_path、source.episode_sha256；拒绝重复 id，先依 family／per_family 选择，再检查 episode 档与可选 SHA256。run 另以 source.probe_id 精确配对一个 probe。episode JSON loader 是 json.load；schema 含 episode_id/name/difficulty、sessions[].context_trajectory.steps[] 的 step_id/image_path/visible_objects/agent_state/action/feedback、micro_probe 或 macro_probe，以及 hidden_rules／memory_cues／expected_actions／evaluation_hooks。时间原生单位是有序 session／step，非视频秒。paper 与 HF metadata／audit report 同报 2,554=1,036+1,052+263+203、split=all；本轮仅机械清点小型 experience_generalization manifest 的 203 个唯一 id，未重新验证全部 2,554 episodes。</dd></div><div><dt>评估方式</dt><dd>实际链为 CLI evaluate→load_manifest→run.evaluate→env.step→EpisodeEvaluator.evaluate_probe。env 为每次 action 尝试记 success／feedback，无效动作及 Done／Stop 也计入 actual_steps；预设 8-step budget 覆盖 schema 的 30／60 预设。success 读 simulator world_state 的持物／parent／状态并核对成功运行的导航或放置；L2 可接受原生指定的同类且同记忆容器对象，owner_habit 保留 executable receptacle alias。ERR 只比对成功动作的 frozen triggers，L2 是先去不同 receptacle type、interaction 是重复已知错误 action–target、owner_habit 是违规放置；每 subtask ERR=min(1,触发数/max(1,required_memory_integration 数))，probe 对 subtasks 平均。run.summarize 以每家族 task_completed 布尔值／已记录 rows 计 SR，再对实际出现家族等权 macro；ERR 同样先家族平均。不能将 smoke 选样或中止前 summary 当 Full-2554。InvalidPhaseOutput 保留作该例失败，infra exception 写错误并中止，不产生新的完整 summary。RAR/AES/MAE 是附带 diagnostics，不等于 paper 主 metric。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作数字：保留论文的单位与页码</summary><p>下列为既有原文审阅摘录；GitHub快照和本库取得范围另见上文，不互相代替。</p><ul><li><strong>1,118</strong> benchmark source scenes · 原文页 6</li><li><strong>4</strong> memory task families · 原文页 5</li><li><strong>2,554</strong> validated executable episodes · 原文页 6</li><li><strong>800</strong> history介入paired base episodes · 原文页 27</li></ul></details>
+    <h2 id="reading">依这个顺序读</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/README.md#L10-L31" target="_blank" rel="noopener noreferrer"><code>embodied_memory/README.md</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>确认 paper／project／data 身分及 compact public evaluation 入口。</p><small>L10–31 · L49–77 · L127–196</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 14af5c5e095343e810342d46ad845ff0e063e49c4db8263171dac06f289586bb</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/data.py#L8-L58" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/data.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>核 manifest id／family／source path、hash 检查与 history 图片解析。</p><small>L8–58 · L61–112</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 06cafa91afbf61a0a0b1679755a8197a3948ea9715673b14b555b5c42a3fee55</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/construction/schema.py#L153-L225" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/construction/schema.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>核对 actions／feedback、sessions、micro／macro probes 及 evaluator-only annotations。</p><small>L153–225 · L243–344</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 a20135cfd45f85dcb90ac2464de1a2fc0963bc7dc7521c04b97f0fd27cffb2fb</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/cli.py#L20-L28" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/cli.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>确认预设每家族 1 例、8 steps、evaluate／offline score 不同路径。</p><small>L20–28 · L132–157 · L182–217</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 4ff53f6874d62c9bb3f8f1c66f8b04e88e5dab8b9d40cd012b984c1bb2938ef8</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/run.py#L18-L38" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/run.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>追实际 simulator 运行、单一 manifest probe 配对、infra failure 与分母。</p><small>L18–38 · L58–175</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 18ae30f0342388bfaff84094a313d676a551086c4d885d4e6fc0adbdf1bde231</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/env.py#L135-L193" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/env.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>看场景 reset、动作尝试、终止、世界状态及当前 action ID。</p><small>L135–193 · L209–374 · L711–748 · L845–977</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 f47fc262e58145563dc61d5d6a4748c3095e85d9b5fde47dcf159a8dfe4662b1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/evaluator.py#L202-L357" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/evaluator.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>追四家族可运行终态判定、同类 receptacle alias、ERR 触发与聚合；不是采用 ordered-subsequence stub。</p><small>L202–357 · L377–424 · L518–562 · L717–866 · L1073–1152 · L1154–1288 · L1405–1438</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 02db5bd67a63d1f10007c7b484bfcf5a5e771ef1f8b1bdbeb3c5ea6c1aa4f9d1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/planner.py#L409-L461" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/planner.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>核对 full_context 真正给模型的字段及每 session 80-step 上限。</p><small>L409–461 · L740–806</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 62b484a1faadaf6abbd06b9cfe52e117379f960fcc75f87bd3fdbfa6658d00c1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/protocol.py#L902-L971" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/protocol.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>核对 emem ingestion 可见数据、串行动作重新绑定与 simulator fail 处理。</p><small>L902–971 · L1017–1161</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 4ced96a7991683c9f4594e791f9c0fb725c6e578af86f6057b5ee9332e90b817</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/tool_agent.py#L160-L290" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/tool_agent.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>核对先 ingest 历史再接 target，仅从可见 feedback 作后续 memory writes。</p><small>L160–290</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 ec73cc9122fd26760452380d5ca4e833fd7c448b4f7092760666d3ca35f47912</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/grounding.py#L98-L269" target="_blank" rel="noopener noreferrer"><code>embodied_memory/src/emem_bench/evaluation/grounding.py</code> ↗</a><span>GitHub · ZJU-OmniAI/Embodied-Omni · f0409a8ecd</span></div>
+      <p>确认依当前 available_actions 修复／绑定模型预测并保存修复纪录。</p><small>L98–269 · L272–459</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 1331964b6c3001cc25f241b1eebd079c3c57930e65ef844f611629a5b9fb0ab6</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎么接入我们的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>官方 frozen manifest 身分／family／hash、episode schema、session-step 脉络、模型可见字段过滤、动态 action registry、trace 与具体 state／ERR evaluator 可重用；case、probe、action attempts 需分开。</p></section><section><h3>需要转换</h3><p>source 同时记 paper v1、GitHub commit 与 HF revision；domain／environment 保留 room type、host simulator、scene provenance 与重用关系。task 维持四家族／probe 规则；case key 用 manifest id 及 episode_id+probe_id，另以 organized_view 建可携 execution_path，不覆写原研究路径或 lineage。history/action/feedback、model-visible context 与 evaluator-only rules 分开映射；evaluator 保存 terminal-state SR 与此版 ERR-veto SR 差异、逐类分母、8-step／80-per-session budget、grounding repair 与实际 world-state。</p></section><section><h3>仍需补齐</h3><p>修正 published manifest→loader 路径桥接、核对 ERR-veto 与论文 scorer、全 release hashes／素材／scene reset 闭合、完整 runtime 及同一预算重现。单一 nested episode 尝试超过本轮 512 KiB 小文字上限，已停止且保留 receipt；不把该档视为已读或不存在，亦未下载 RGB／模型／simulator。</p></section></div>
+    <details class="github-discovery"><summary>查看来源确认纪录</summary><pre><code>[
+  {
+    &quot;source&quot;: &quot;audit/.cache/github_review/projects/933f70e98505167917485649b47cbf67ff9abacd705eeec2fead2592d5ac1856.txt&quot;,
+    &quot;ranges&quot;: [
+      [
+        1,
+        5
+      ]
+    ],
+    &quot;finding&quot;: &quot;原 project 的明示搬移鏈。&quot;
+  },
+  {
+    &quot;source&quot;: &quot;audit/.cache/github_review_worker/P202_P209_2026-10-11/P206/project.html&quot;,
+    &quot;ranges&quot;: [
+      [
+        24,
+        30
+      ],
+      [
+        92,
+        98
+      ]
+    ],
+    &quot;finding&quot;: &quot;新官方頁直接連 GitHub 與 HF；既有兩個名稱搜尋為空已被此 primary evidence 補正。&quot;
+  },
+  {
+    &quot;source&quot;: &quot;audit/.cache/github_review/P206-discovery.json&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/candidates/0&quot;,
+      &quot;/candidates/59&quot;,
+      &quot;/code_contexts&quot;
+    ],
+    &quot;finding&quot;: &quot;MiniCPM-V 是文獻中的模型參考，非本篇 benchmark code。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同结构与格式说明 →</a><a href="../../downloads/github-review/papers/P206.json" download>本篇JSON与证据 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇阅读"><a href="P205.html">← 上一篇 · CapMem</a><a href="P207.html">下一篇 → · EgoCoT-Bench</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理与逐篇报告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hans.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆盖总览与前作比较</a><a href="../design.html">目前主设计</a><a href="../research.html">文献与分类</a><a href="../counting.html">计数细节与旧代号</a><a href="../../downloads/source-review/source-review-zh-hans.pdf">用途归纳PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">历史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初筛、183份关键章节审阅、672笔原生数量摘录；183/183份来源完成21类用途归纳；4类判分分项保留。GitHub核读增补：250/250篇有处理结果，范围与程序运行分开。旧配额已撤回，全库任务与环境去重仍待完成。 <a href="../github-review.html">逐篇GitHub与标准化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

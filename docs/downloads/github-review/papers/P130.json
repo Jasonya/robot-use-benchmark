@@ -1,0 +1,306 @@
+{
+  "paper_id": "P130",
+  "name": "ALOHA / ACT",
+  "title": "Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2304.13705",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P130",
+    "summary": "ALOHA提供雙臂蒐集，ACT提供訓練及兩個模擬任務。sim的成功從最高reward判定；真實模式的reward佔位不能當原文實機成功率。",
+    "environment": "真實雙臂ALOHA與MuJoCo/DM-Control兩個模擬場景分開；資料中的四相機／四個主從臂不算四種任務環境。",
+    "tasks": "ACT repo兩個sim任務為Transfer Cube/Bimanual Insertion；joint-control和EE-control是執行表示，scripted/human是示範來源，不能各算新的語義task。",
+    "data": "HDF5 obs qpos/qvel/effort與action均14D，RGB相機分key。蒐集T次action產T+1 timesteps，但儲存配對只取前T。ACT real資料從start_ts−1取action，sim從start_ts取，padding與mean/std要保存。",
+    "evaluation": "sim Transfer reward4為左gripper接觸且方塊不接觸桌；Insertion reward4為peg碰到pin。eval用全episode最高reward==max_reward作成功，非最後穩定狀態。real_env.get_reward固定0，eval real分支max_reward也0，此自動數值不能代替實機任務審核。",
+    "standardization": {
+      "profile": "bimanual_demonstration_and_sim_benchmark",
+      "reuse": "HDF5原結構、兩個sim checker、機體/相機配置、action/padding與示範來源。",
+      "transform": "real/sim分protocol；case固定初態與目標、joint或EE動作、資料時間偏移、temporal aggregation及原最高reward指標。新加穩定性規則另版。",
+      "missing": "原實機任務rubric、全量素材／split、終端觀測與T對齊、sim/real重播與獨立成功判定。"
+    },
+    "version_note": "ALOHA/ACT各固定commit；真實環境中的0 reward是軟體接口佔位，不能推論原論文實機研究使用此欄自動評分。未執行硬體或sim。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/aloha",
+        "requested_repo": "tonyzhaozh/aloha",
+        "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 180,
+        "sha256": "cd9acec866f2f0aef55d88ca99da085fd75b9dc90e81faa3611317f60571e47b",
+        "url": "https://github.com/tonyzhaozh/aloha/blob/06369f03cd8e0a47e16d3a90167853fd33af7557/README.md",
+        "reading_url": "https://github.com/tonyzhaozh/aloha/blob/06369f03cd8e0a47e16d3a90167853fd33af7557/README.md#L1-L12",
+        "why": "硬體/蒐集與ACT的角色分工",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/act",
+        "requested_repo": "tonyzhaozh/act",
+        "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            25
+          ],
+          [
+            55,
+            68
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 89,
+        "sha256": "5059f601c1f0409556fd467150b99e93208de5d5594e9049f87ca92b24a5e7a2",
+        "url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/README.md",
+        "reading_url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/README.md#L1-L25",
+        "why": "兩個原生sim環境與示範/方法入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/aloha",
+        "requested_repo": "tonyzhaozh/aloha",
+        "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557",
+        "ref": null,
+        "path": "aloha_scripts/record_episodes.py",
+        "ranges": [
+          [
+            88,
+            101
+          ],
+          [
+            127,
+            165
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 228,
+        "sha256": "b84cabf12f36a776b79b5f539c0e5d4e64aee05fc2b0c3a8b5cec36041bdbec1",
+        "url": "https://github.com/tonyzhaozh/aloha/blob/06369f03cd8e0a47e16d3a90167853fd33af7557/aloha_scripts/record_episodes.py",
+        "reading_url": "https://github.com/tonyzhaozh/aloha/blob/06369f03cd8e0a47e16d3a90167853fd33af7557/aloha_scripts/record_episodes.py#L88-L101",
+        "why": "T+1觀測蒐集後存T、14D雙臂HDF5",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/aloha",
+        "requested_repo": "tonyzhaozh/aloha",
+        "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557",
+        "ref": null,
+        "path": "aloha_scripts/real_env.py",
+        "ranges": [
+          [
+            111,
+            112
+          ],
+          [
+            142,
+            151
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 205,
+        "sha256": "30482952e73c0385bd8edfb238ceb4201458ce5fa5afae218cf03b75549150f4",
+        "url": "https://github.com/tonyzhaozh/aloha/blob/06369f03cd8e0a47e16d3a90167853fd33af7557/aloha_scripts/real_env.py",
+        "reading_url": "https://github.com/tonyzhaozh/aloha/blob/06369f03cd8e0a47e16d3a90167853fd33af7557/aloha_scripts/real_env.py#L111-L112",
+        "why": "真實reward佔位與每臂6關節+gripper",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/act",
+        "requested_repo": "tonyzhaozh/act",
+        "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488",
+        "ref": null,
+        "path": "utils.py",
+        "ranges": [
+          [
+            23,
+            76
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 189,
+        "sha256": "71315de9e613024e781f089c2f46baa6a94be79daa97a45c8601829fc1badcec",
+        "url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/utils.py",
+        "reading_url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/utils.py#L23-L76",
+        "why": "sim/real不同action時間偏移、padding與normalization",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/act",
+        "requested_repo": "tonyzhaozh/act",
+        "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488",
+        "ref": null,
+        "path": "sim_env.py",
+        "ranges": [
+          [
+            143,
+            169
+          ],
+          [
+            192,
+            229
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 278,
+        "sha256": "691f555cb3d8ede94c8ddc9c76a996f03b00f3bbdee9726efa44cd75b19d0ada",
+        "url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/sim_env.py",
+        "reading_url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/sim_env.py#L143-L169",
+        "why": "Transfer/Insertion具體接觸式分階reward",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "tonyzhaozh/act",
+        "requested_repo": "tonyzhaozh/act",
+        "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488",
+        "ref": null,
+        "path": "imitate_episodes.py",
+        "ranges": [
+          [
+            179,
+            194
+          ],
+          [
+            280,
+            313
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 435,
+        "sha256": "f2b057cd497f3fef20bdc4197879d1c02e1c751f83154cce0183fcc10f7e2540",
+        "url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/imitate_episodes.py",
+        "reading_url": "https://github.com/tonyzhaozh/act/blob/742c753c0d4a5d87076c8f69e5628c79a8cc5488/imitate_episodes.py#L179-L194",
+        "why": "最高reward成功聚合及real模式限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e7d17aac339bdfe21eb7984ae85c94f5e6a5ba672cd8c4cebcf18a0303c91c7c"
+  },
+  "repository_binding_review_sha256": "e7d17aac339bdfe21eb7984ae85c94f5e6a5ba672cd8c4cebcf18a0303c91c7c",
+  "repository_bindings": [
+    {
+      "requested_repo": "tonyzhaozh/act",
+      "resolved_repo": "tonyzhaozh/act",
+      "aliases_in_this_review": [
+        "tonyzhaozh/act"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488",
+          "reviewed_files": [
+            "README.md",
+            "imitate_episodes.py",
+            "sim_env.py",
+            "utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/tonyzhaozh/act",
+          "link_label": "[ACT+Sim Codebase]",
+          "project_url": "https://tonyzhaozh.github.io/aloha/",
+          "page_sha256": "61caeeef121e9a5d114a9b22cfe382452c8d9b0eac9afaf7ab4cf447c3d74eec"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P130",
+          "review_file": "content/github_review/reviews/P130.json",
+          "review_sha256": "e7d17aac339bdfe21eb7984ae85c94f5e6a5ba672cd8c4cebcf18a0303c91c7c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "tonyzhaozh/aloha",
+      "resolved_repo": "tonyzhaozh/aloha",
+      "aliases_in_this_review": [
+        "tonyzhaozh/aloha"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557",
+          "reviewed_files": [
+            "README.md",
+            "aloha_scripts/real_env.py",
+            "aloha_scripts/record_episodes.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/tonyzhaozh/aloha",
+          "link_label": "[ALOHA Codebase]",
+          "project_url": "https://tonyzhaozh.github.io/aloha/",
+          "page_sha256": "61caeeef121e9a5d114a9b22cfe382452c8d9b0eac9afaf7ab4cf447c3d74eec"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P130",
+          "review_file": "content/github_review/reviews/P130.json",
+          "review_sha256": "e7d17aac339bdfe21eb7984ae85c94f5e6a5ba672cd8c4cebcf18a0303c91c7c",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "tonyzhaozh/aloha",
+    "tonyzhaozh/act"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,437 @@
+{
+  "paper_id": "P102",
+  "name": "NavVerse",
+  "title": "NavVerse: Benchmarking Indoor-to-Outdoor Embodied Navigation in Continuous Robot Simulation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2607.19695",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "public"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P102",
+    "summary": "NavVerse提供室內、室外與連接場景的連續導航；原程式的成功距離是參考路徑近似值，collision指標是卡住代理量，不等同接觸感測。",
+    "environment": "作者報100室內＋50室外＋50連接場景，來源USD/navmesh/scene_scale/collider設定另存。這是作者release聲明，尚非本庫已取得200個資產。",
+    "tasks": "ObjNav/VLN/PlaceNav三種條件導航；原episode_target_type分obj/place，instruction_type分target/vln，避免把同一終點的兩種指令視為新場景。",
+    "data": "VLNEpisode含scene_id/scene_type/episode_id/path/scale/navmesh_preset、goals(instance/type/location/radius/reference_path)、start_position/start_rotation；episode_label=scene_id+episode_id。JSON讀取錯誤會continue，匯入應另列遺漏。",
+    "evaluation": "距離取當前點到各reference_path點的直距＋後續路徑長，再扣目標半徑；成功需STOP且距離<1.6。SPL由該初始距離與實走長計。collision以有移動指令但pose變化<0.015判斷，collision_rate平均此代理訊號，非直接物理碰撞次數；保留原名與操作定義。",
+    "standardization": {
+      "profile": "continuous_indoor_outdoor_navigation",
+      "reuse": "場景與episode schema、split manifests、語言/目標條件和native measures。",
+      "transform": "environment固定場景包hash+navmesh/collider；case存scene_episode+目標/指令/機體/控制模式；metric存實際距離近似、STOP及卡住判定而非僅縮寫。",
+      "missing": "10,000作者報episode的全量取得／ID完整性、各機體控制與場景有效性、物理contact及近似指標對照。"
+    },
+    "version_note": "原PDF p1連umich-curly.github.io/NavVerse-Benchmark，與此同名組織庫和題名相符；本次固定2026-09後更新之commit，非宣稱逐項重現7月版本。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "UMich-CURLY/NavVerse-Benchmark",
+        "requested_repo": "UMich-CURLY/NavVerse-Benchmark",
+        "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            17
+          ],
+          [
+            48,
+            81
+          ],
+          [
+            130,
+            155
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 155,
+        "sha256": "42255555661a6507b96fe401dcbef1fd0e547f2bc391f6e09e9c991842ab4cc2",
+        "url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/README.md",
+        "reading_url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/README.md#L1-L17",
+        "why": "原作範圍、版本化場景包與episode檔分離",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMich-CURLY/NavVerse-Benchmark",
+        "requested_repo": "UMich-CURLY/NavVerse-Benchmark",
+        "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b",
+        "ref": null,
+        "path": "navverse/episode.py",
+        "ranges": [
+          [
+            23,
+            142
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 238,
+        "sha256": "15c2d899a8c7390123d321701802fac7c2c307c8992159964ef4f13d54ff1790",
+        "url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/navverse/episode.py",
+        "reading_url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/navverse/episode.py#L23-L142",
+        "why": "scene/episode/goal與兩種instruction schema",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMich-CURLY/NavVerse-Benchmark",
+        "requested_repo": "UMich-CURLY/NavVerse-Benchmark",
+        "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b",
+        "ref": null,
+        "path": "navverse/measures.py",
+        "ranges": [
+          [
+            1,
+            12
+          ],
+          [
+            194,
+            265
+          ],
+          [
+            291,
+            350
+          ],
+          [
+            430,
+            462
+          ],
+          [
+            546,
+            642
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 846,
+        "sha256": "9931a404afa9bd5c2d7846999e563db92dca29ca5989aed8244746bffdf092d9",
+        "url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/navverse/measures.py",
+        "reading_url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/navverse/measures.py#L1-L12",
+        "why": "success/SPL/碰撞率的實際公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "UMich-CURLY/NavVerse-Benchmark",
+        "requested_repo": "UMich-CURLY/NavVerse-Benchmark",
+        "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b",
+        "ref": null,
+        "path": "baselines/eval_navverse.py",
+        "ranges": [
+          [
+            1400,
+            1420
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1538,
+        "sha256": "a4c3d7625c56047de0f137acc8737187262754c21eaf31fccb5648043c129f02",
+        "url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/baselines/eval_navverse.py",
+        "reading_url": "https://github.com/UMich-CURLY/NavVerse-Benchmark/blob/8b89bfee4f6d55de6e8e767516313b8c8941098b/baselines/eval_navverse.py#L1400-L1420",
+        "why": "split manifest驗證與隔離episode目錄",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7efb275830d836f3079c6519e206250572ed866b57f2d05d62b9b11f7949ab77"
+  },
+  "repository_binding_review_sha256": "7efb275830d836f3079c6519e206250572ed866b57f2d05d62b9b11f7949ab77",
+  "repository_bindings": [
+    {
+      "requested_repo": "UMich-CURLY/NavVerse-Benchmark",
+      "resolved_repo": "UMich-CURLY/NavVerse-Benchmark",
+      "aliases_in_this_review": [
+        "umich-curly/navverse-benchmark"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8b89bfee4f6d55de6e8e767516313b8c8941098b",
+          "reviewed_files": [
+            "README.md",
+            "baselines/eval_navverse.py",
+            "navverse/episode.py",
+            "navverse/measures.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "NavVerse",
+          "search_receipt_sha256": "80236beeefce8b9d716aeea777492fe21ca41b368ec49707bcc5efea8fbb2074",
+          "url": "https://github.com/UMich-CURLY/NavVerse-Benchmark",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P102",
+          "review_file": "content/github_review/reviews/P102.json",
+          "review_sha256": "7efb275830d836f3079c6519e206250572ed866b57f2d05d62b9b11f7949ab77",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "公共場館與服務"
+  ],
+  "source_review": {
+    "paper_id": "P102",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "NavVerse，arXiv 2607.19695v1。",
+    "scope_read": "200scene構造、3task、10K episodes、物理導航與metric／難度。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      12,
+      13
+    ],
+    "domains": [
+      "公共場館與服務"
+    ],
+    "role": "導航benchmark",
+    "environment": "100 indoor GRScenes＋50 outdoor城市＋50 indoor-outdoor組合；混合scene重用前兩組幾何，不是200獨立底層環境。",
+    "tasks": "ObjNav／PlaceNav／VLN三類；PlaceNav沒有純室內split，不能機械做3×3完整coverage。",
+    "cases": "4,027 ObjNav＋2,973 PlaceNav＋3,000VLN＝10,000episodes（全生成benchmark）；與evaluation subset量分開。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 200,
+        "unit": "含組合的scene entries",
+        "pages": [
+          3,
+          12
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "navigation task types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10000,
+        "unit": "生成episodes（全benchmark）",
+        "qualifier": "4027+2973+3000",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "SR、SPL、coverage efficiency、collision rate、obstacle distance、navigable surface ratio；Spot goal tolerance1.6m。",
+      "難度按各task自身path length的1/3、2/3分位，不是跨benchmark通用難度。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "indoor90/10、outdoor40/10，mixed沿outdoor split；共享PID waypoint follower。",
+    "lineage": "GRUtopia/GRScenes＋Virtual Community城市、Google tiles、Objaverse；mixed環境需追父scene。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          8,
+          12
+        ],
+        "locator": "§3.3、Difficulty、附錄Inventory",
+        "supports": "10K、200組成、split及metrics"
+      }
+    ],
+    "unresolved": [
+      "各task evaluation split的精確case ID量與mixed scene父ID需要manifest匯入。"
+    ],
+    "reuse": "補室內到戶外的連續導航與工作用途；可用組合環境擴題，但須報重用關係。",
+    "reviewed_pdf_sha256": "9e578a0112fb1c6b3969bc02b262c7f35fa90e3321692f5dfa0ad033fef1fc68",
+    "reviewed_on": "2026-10-02",
+    "name": "NavVerse",
+    "year": 2026,
+    "title": "NavVerse: Benchmarking Indoor-to-Outdoor Embodied Navigation in Continuous Robot Simulation",
+    "source_url": "https://arxiv.org/abs/2607.19695",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "public"
+    ],
+    "review_tags": [
+      "室內導航",
+      "戶外移動",
+      "配送與公共場館"
+    ],
+    "domain_names": [
+      "公共場館與服務"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P102",
+      "domain_ids": [
+        "public"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P102",
+          "domain_ids": [
+            "public"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            8,
+            12,
+            13
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "ObjNav／PlaceNav／VLN三類；PlaceNav沒有純室內split，不能機械做3×3完整coverage。",
+            "100 indoor GRScenes＋50 outdoor城市＋50 indoor-outdoor組合；混合scene重用前兩組幾何，不是200獨立底層環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "9e578a0112fb1c6b3969bc02b262c7f35fa90e3321692f5dfa0ad033fef1fc68"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "9e578a0112fb1c6b3969bc02b262c7f35fa90e3321692f5dfa0ad033fef1fc68",
+      "previous_domain_ids": [
+        "public"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P102",
+      "name": "NavVerse",
+      "expected_title": "NavVerse: Benchmarking Indoor-to-Outdoor Embodied Navigation in Continuous Robot Simulation",
+      "source_url": "https://arxiv.org/abs/2607.19695",
+      "pdf_url": "https://arxiv.org/pdf/2607.19695",
+      "retrieved_at": "2026-10-02T21:34:14.693266+00:00",
+      "pdf_sha256": "9e578a0112fb1c6b3969bc02b262c7f35fa90e3321692f5dfa0ad033fef1fc68",
+      "text_sha256": "b1b4ad640ed830f7f6756a465fdbc8e757edf51466b71d7ddfc5eb33d2eebb2e",
+      "pdf_bytes": 21492210,
+      "pages": 25,
+      "text_characters": 87679,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2607.19695v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2607.19695v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 200,
+        "unit": "含組合的scene entries",
+        "pages": [
+          3,
+          12
+        ],
+        "record_id": "review10:P102:1",
+        "paper_id": "P102",
+        "benchmark": "NavVerse",
+        "native_term": "含組合的scene entries",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.19695v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.19695v1",
+            "locator": "PDF pp. 3, 12",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "navigation task types",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P102:2",
+        "paper_id": "P102",
+        "benchmark": "NavVerse",
+        "native_term": "navigation task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.19695v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.19695v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10000,
+        "unit": "生成episodes（全benchmark）",
+        "qualifier": "4027+2973+3000",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P102:3",
+        "paper_id": "P102",
+        "benchmark": "NavVerse",
+        "native_term": "生成episodes（全benchmark）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.19695v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.19695v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "UMich-CURLY/NavVerse-Benchmark"
+  ],
+  "external_repositories": []
+}

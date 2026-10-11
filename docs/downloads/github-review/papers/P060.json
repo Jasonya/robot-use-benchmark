@@ -1,0 +1,672 @@
+{
+  "paper_id": "P060",
+  "name": "Continuous 4D interaction forecasting",
+  "title": "From Where to How: Continuous 4D Interaction Forecasting from Egocentric Video",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.08636",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "medical",
+    "transport",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P060",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "review_scope": "已讀 Coherent4D 資料建置核心與論文指標；固定 tree 未公開 HIGFlow 模型或 forecasting evaluator。",
+    "summary": "此來源不只是專案頁：有 Coherent4D 的事件分段、共同座標及 SMPL 附加程式。正式預測指標只能讀到論文定義，尚無公開評分器可直接沿用。",
+    "identity_note": "README 的完整標題、六位作者及 arXiv:2609.08636 與本地 v1 論文一致，論文作者頁直接連 CorrineQiu/from-where-to-how。Coherent4D 是在 Ego-Exo4D 上建置的配對位置／姿態資料；HIGFlow 是方法名稱。FIction、Detic、Llama 與 WHAM 是來源／依賴，不能替代本論文版本。",
+    "environment": "Ego-Exo4D 的 Aria 第一視角程序影片；Cooking、Health、Bike Repair 三個 domain。第三視角用於離線標註／SMPL 重建，不是預測輸入。787 unique takes 是來源錄製單位，不能當成787個獨立機器人環境。",
+    "tasks": "共同預測有序3D互動位置與同時間的全身 SMPL 狀態。原生21個程序任務由 CSV 按 domain 指定；Cooking/Health/Bike Repair 分別預測10/5/4個事件，並非秒數。公開統計為233828 samples（train193598、val20484、test19746）、1594186個非padding未來 targets、跨domain去重535個物件標籤；這些均為來源統計，未以完整資產重算。",
+    "data": "build_chunks 讀 pickle 根層 dataset，按 interactions.time 排序並以 chunk_size 不重疊切分，產生 id={take_name}_{datum_idx}_{chunk_idx}。每筆含 observation_start/end_time_s、history_interactions、target_interactions、target_mask、source_meta 及可選 env_objects；事件有 time_s、time_rel_s、location_norm、object。首個未來事件是時間零，history 嚴格在前30秒（起點截於0）；尾段以 None 加 mask=0。F0 取自 source_meta.source_observation_end_time_s，不隨 chunk 時間原點重新設定；位置用 clip(R0.T@(p-t0)/5,-1,1)。SMPL 附加 history/target_pose_mask、*_pose_frame、*_pose_time_delta_s、*_root_orient6d_f0、*_root_trans_f0_m、*_body_pose_local6d（23×6）、*_joints_f0_m（19×3）。pose位置保留公尺，6D旋轉為3×3矩陣前兩欄按列展平；不能套用不同6D排列。",
+    "evaluation": "固定 tree 沒有 HIGFlow 預測／benchmark 評分器。已讀論文 §III-C：位置先反縮放至度量空間，ADE 先平均每樣本有效事件再跨樣本平均，ADE90 是每樣本 ADE 的90百分位，FDE 取最後有效事件；姿態用19關節 MPJPE、每姿態相似變換對齊的 PA-MPJPE、Root Trans. 及23個非root關節 Body Geo.，位置報mm、旋轉報度。Single 用第一候選；Best-5 以各樣本有效步的關節誤差選一條候選，再用同一候選算所有pose指標。資料建置的最近影格檢查採 floor(time_s×fps)，預設fps30、誤差上限0.49秒；它只是標註有效性檢查，不能充作預測評分。配對有效性須用 target_mask & target_pose_mask。",
+    "standardization": {
+      "profile": "paired_3d_interaction_and_smpl_forecasting",
+      "reuse": "原生 domain/task_name 統計、take/datum/chunk 身分、事件時間、F0 metadata、位置／pose 分離遮罩與實際建置函式。",
+      "transform": "source 記 Ego-Exo4D 派生與外部重建版本；task 保留 CSV domain/task_name，case 用 take+datum+chunk，保存30秒觀測引用、事件horizon、絕對／相對秒與空間參照。位置正規化／裁切、公尺pose及毫米／角度評分分開記；不可由裁切座標還原超界真值。",
+      "missing": "需取得原始takes、確定的take-level split清單、建置後位置／pose caches、SMPL/19關節regressor與模型依賴；補公開預測/evaluator及30張觀測影格抽取對照。再驗證mask、資料規模、共同座標與論文報表一致性。"
+    },
+    "version_note": "固定67386704bf335af977232594d0f86428d0623c8e（2026-09-14）。非截斷tree有網站、統計與process程式，沒有釋出完整訓練／評分實作。SMPL指南指定外部 FIction-WHAM b520bc8f1d755be658c4d2bafdffe5081d09cfe2；本輪只讀該依賴宣告，未讀取／執行外部模型。chunk腳本不建立split，須承接來源take分割，不能把每個chunk隨機切分。",
+    "integration_issues": [
+      "現有 literature_snapshot 將 P060 記為 contribution_types=M、new_benchmark_contribution=no；README 與論文 §III 明列 Coherent4D 資料集及連續評測定義，請協調者覆核 D/B 分類。",
+      "來源已有資料建置程式，不能標成網站／README-only；同時不能以此宣稱 HIGFlow evaluator 已公開或已驗證。"
+    ],
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P060-discovery.json",
+        "json_pointers": [
+          "/title",
+          "/pdf_sha256",
+          "/candidates/0"
+        ],
+        "sha256": "bcd982d35d44d847636730cf0e7561f95db43eee07305ea13782ba0baf01b217"
+      }
+    ],
+    "commit": "67386704bf335af977232594d0f86428d0623c8e",
+    "runtime_executed": false,
+    "source_manifest_sha256": "33843b8b2616798a7e04ee3207c27ef08e7571e48d37c0f28f0f90ea4814bb77",
+    "classification_note": "既有Coverage已將本作納入資料／評測主來源；本次維持此判定。原文定義Coherent4D資料、固定split、聯合預測目標和具體指標，應同時承認資料、評測與方法貢獻。早期書目M／no標記屬初篩快照，不能用來否定此後原文審閱結果。公開倉庫未釋出預測scorer是另一項可得性缺口。",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            57
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 57,
+        "sha256": "f5589d92e34e7fe823f073ed109c161af3045f28c7dad06a940b191c24ee27d0",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/README.md",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/README.md#L1-L57",
+        "why": "辨認論文、Coherent4D/HIGFlow 角色、資料規模及 Ego-Exo4D 重用。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "data/README.md",
+        "ranges": [
+          [
+            1,
+            13
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 13,
+        "sha256": "8f151af3975f42e965581434cd7e4a0e51862f610129a05d62307482ee40158a",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/data/README.md",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/data/README.md#L1-L13",
+        "why": "確認事件步數、有效 target 與跨 domain 物件標籤去重單位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "data/dataset_statistics.csv",
+        "ranges": [
+          [
+            1,
+            5
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 5,
+        "sha256": "3611384a25eb476f3dc7e8e2d116b809b3526b22e71089077fa52ce04f09a924",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/data/dataset_statistics.csv",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/data/dataset_statistics.csv#L1-L5",
+        "why": "核對各 domain、split、takes、samples、targets 與 object labels。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "data/dataset_task_sunburst_stats.csv",
+        "ranges": [
+          [
+            1,
+            22
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 22,
+        "sha256": "2cde46d08a829f8cd63a739aaf7b4dab10de453bd373b8ca97940c155e3f2775",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/data/dataset_task_sunburst_stats.csv",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/data/dataset_task_sunburst_stats.csv#L1-L22",
+        "why": "讀21個原生程序任務及其 domain／樣本統計。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "process/README.md",
+        "ranges": [
+          [
+            1,
+            39
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 39,
+        "sha256": "b9573867b9ca26e7518238521d4a652704e737d11859167be47f0a48202c0469",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/README.md",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/README.md#L1-L39",
+        "why": "釐清五階段建置、外置資產與 pose 附加順序。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "process/02_shared_coordinate_construction/README.md",
+        "ranges": [
+          [
+            1,
+            40
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 40,
+        "sha256": "7235495a6a7d2ab117ed2b2e6f18aae62c54bfd72f04b5f02cbeaa5d83635e67",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/02_shared_coordinate_construction/README.md",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/02_shared_coordinate_construction/README.md#L1-L40",
+        "why": "確認 F0 空間參照、5公尺縮放、pose 公尺欄位與 chunk 繼承關係。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "process/05_forecast_sample_generation/README.md",
+        "ranges": [
+          [
+            1,
+            48
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 48,
+        "sha256": "26dd30225f8add84baec4400d4ef7df89192be72bb6c24b3fc8493946f7442a6",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/README.md",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/README.md#L1-L48",
+        "why": "核對事件 horizon、30秒觀測、history 壓縮及 split 前提。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "process/05_forecast_sample_generation/build_chunks.py",
+        "ranges": [
+          [
+            31,
+            36
+          ],
+          [
+            106,
+            137
+          ],
+          [
+            151,
+            225
+          ],
+          [
+            227,
+            261
+          ],
+          [
+            267,
+            463
+          ],
+          [
+            517,
+            533
+          ],
+          [
+            571,
+            629
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 652,
+        "sha256": "11bbff4c7dbde04385429f7c27f476fdaf939626de0745299fc2888b31a7be8a",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/build_chunks.py",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/05_forecast_sample_generation/build_chunks.py#L31-L36",
+        "why": "讀實際 pickle schema、非重疊事件分段、時間原點、history、padding mask 與輸出 metadata。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "process/04_smpl_state_attachment/README.md",
+        "ranges": [
+          [
+            1,
+            29
+          ],
+          [
+            59,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 110,
+        "sha256": "c26029b03c41420fe613b9b1c32565f4726c209520245fa4aaa0458c253ccdb5",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/README.md",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/README.md#L1-L29",
+        "why": "確認外部 WHAM/SMPL、19關節、配對遮罩、時間容差與姿態單位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "CorrineQiu/from-where-to-how",
+        "requested_repo": "CorrineQiu/from-where-to-how",
+        "commit": "67386704bf335af977232594d0f86428d0623c8e",
+        "ref": null,
+        "path": "process/04_smpl_state_attachment/attach_smpl.py",
+        "ranges": [
+          [
+            101,
+            116
+          ],
+          [
+            158,
+            174
+          ],
+          [
+            210,
+            226
+          ],
+          [
+            521,
+            535
+          ],
+          [
+            883,
+            977
+          ],
+          [
+            1054,
+            1079
+          ],
+          [
+            1194,
+            1249
+          ],
+          [
+            1264,
+            1302
+          ],
+          [
+            1309,
+            1377
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1567,
+        "sha256": "0cf4fffcb925d23091866c46f07e91fddde78c30b5b9f2ded1bc82c1bb5968ac",
+        "url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/attach_smpl.py",
+        "reading_url": "https://github.com/CorrineQiu/from-where-to-how/blob/67386704bf335af977232594d0f86428d0623c8e/process/04_smpl_state_attachment/attach_smpl.py#L101-L116",
+        "why": "核對最近影格實作、F0 復用、旋轉6D排列、米制姿態欄位與逐 token 成功遮罩。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "5f97131d194b6f3148e9bd47ef38de3371de9c5f9d84b101ba22f23ca321a971"
+  },
+  "repository_binding_review_sha256": "5f97131d194b6f3148e9bd47ef38de3371de9c5f9d84b101ba22f23ca321a971",
+  "repository_bindings": [
+    {
+      "requested_repo": "CorrineQiu/from-where-to-how",
+      "resolved_repo": "CorrineQiu/from-where-to-how",
+      "aliases_in_this_review": [
+        "corrineqiu/from-where-to-how"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "67386704bf335af977232594d0f86428d0623c8e",
+          "reviewed_files": [
+            "README.md",
+            "data/README.md",
+            "data/dataset_statistics.csv",
+            "data/dataset_task_sunburst_stats.csv",
+            "process/02_shared_coordinate_construction/README.md",
+            "process/04_smpl_state_attachment/README.md",
+            "process/04_smpl_state_attachment/attach_smpl.py",
+            "process/05_forecast_sample_generation/README.md",
+            "process/05_forecast_sample_generation/build_chunks.py",
+            "process/README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/CorrineQiu/from-where-to-how",
+          "link_label": "⌘ Code",
+          "project_url": "https://corrineqiu.github.io/from-where-to-how/",
+          "page_sha256": "f51894b8895243586a4695efc1e37bdd4b247f5741b4f99109d97d6c992c6e53"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P060",
+          "review_file": "content/github_review/reviews/P060.json",
+          "review_sha256": "5f97131d194b6f3148e9bd47ef38de3371de9c5f9d84b101ba22f23ca321a971",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "醫療與手術支援",
+    "交通移動與車輛維修",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P060",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "From Where to How: Continuous 4D Interaction Forecasting from Egocentric Video；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "餐飲與烹飪",
+      "醫療與手術支援",
+      "交通移動與車輛維修",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "Ego-Exo4D的787takes，不等於787獨立場地。",
+    "tasks": "3D interaction location＋full-body pose聯合預測；Cooking/Health/BikeRepair三用途。",
+    "cases": "233,828windows＝193,598train+20,484val+19,746test；1,594,186是有效future targets。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 3,
+        "unit": "source procedural domains",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 19746,
+        "unit": "test forecast samples",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 233828,
+        "unit": "all forecast samples",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "continuous location errors與MPJPE/PA-MPJPE；兩種target和validity mask分開。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "take-level split；三域horizon為10/5/4interaction steps，不是固定秒數。",
+    "lineage": "Ego-Exo4D＋FIction式事件＋WHAM重建；exoviews僅供offline labels。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "take-level不自動證明不同take沒有共用實體環境；作者scene-disjoint說法需place IDs核。"
+    ],
+    "reuse": "擴展where-to-how預測；source-domain與camera/pose時間對應都可入共同規格。",
+    "reviewed_pdf_sha256": "831ddd738803ba93751f328695856f63519cd1327b28140774d76cb95ae0ba35",
+    "reviewed_on": "2026-10-02",
+    "name": "Continuous 4D interaction forecasting",
+    "year": 2026,
+    "title": "From Where to How: Continuous 4D Interaction Forecasting from Egocentric Video",
+    "source_url": "https://arxiv.org/abs/2609.08636",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "food",
+      "medical",
+      "transport",
+      "wearable"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "醫療支援",
+      "交通工具與維修"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "醫療與手術支援",
+      "交通移動與車輛維修",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P060",
+      "domain_ids": [
+        "food",
+        "medical",
+        "transport",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P060",
+          "domain_ids": [
+            "food",
+            "medical",
+            "transport"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3D interaction location＋full-body pose聯合預測；Cooking/Health/BikeRepair三用途。",
+            "Ego-Exo4D的787takes，不等於787獨立場地。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "831ddd738803ba93751f328695856f63519cd1327b28140774d76cb95ae0ba35"
+        },
+        {
+          "paper_id": "P060",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "3D互動位置與全身姿態的聯合預測。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "831ddd738803ba93751f328695856f63519cd1327b28140774d76cb95ae0ba35"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "831ddd738803ba93751f328695856f63519cd1327b28140774d76cb95ae0ba35",
+      "previous_domain_ids": [
+        "food",
+        "medical",
+        "transport"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P060",
+      "name": "Continuous 4D interaction forecasting",
+      "expected_title": "From Where to How: Continuous 4D Interaction Forecasting from Egocentric Video",
+      "source_url": "https://arxiv.org/abs/2609.08636",
+      "pdf_url": "https://arxiv.org/pdf/2609.08636",
+      "retrieved_at": "2026-10-02T22:13:35.363995+00:00",
+      "pdf_sha256": "831ddd738803ba93751f328695856f63519cd1327b28140774d76cb95ae0ba35",
+      "text_sha256": "d3329d7a40201f903be3047f234f82a352dd99f5ea90dedb539b168076b239d4",
+      "pdf_bytes": 32291117,
+      "pages": 16,
+      "text_characters": 134225,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.08636v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.08636v1"
+    },
+    "counts": [
+      {
+        "field": "domain",
+        "value": 3,
+        "unit": "source procedural domains",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P060:1",
+        "paper_id": "P060",
+        "benchmark": "Continuous 4D interaction forecasting",
+        "native_term": "source procedural domains",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.08636v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.08636v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 19746,
+        "unit": "test forecast samples",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P060:2",
+        "paper_id": "P060",
+        "benchmark": "Continuous 4D interaction forecasting",
+        "native_term": "test forecast samples",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.08636v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.08636v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 233828,
+        "unit": "all forecast samples",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P060:3",
+        "paper_id": "P060",
+        "benchmark": "Continuous 4D interaction forecasting",
+        "native_term": "all forecast samples",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.08636v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.08636v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "CorrineQiu/from-where-to-how"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,403 @@
+{
+  "paper_id": "P247",
+  "name": "EgoSpanLift",
+  "title": "Gaze Beyond the Frame: Forecasting Egocentric 3D Visual Span",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2511.18470",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "medical",
+    "transport",
+    "leisure",
+    "music",
+    "wearable"
+  ],
+  "status": "public_readme_only",
+  "review": {
+    "paper_id": "P247",
+    "reviewed_on": "2026-10-11",
+    "status": "public_readme_only",
+    "summary": "Gaze Beyond the Frame 的方法名為 EgoSpanLift，資料名為 FoVS-Aria／FoVS-EgoExo。官方 repo 目前只有發布預告，不能把論文的 364.6K samples 說成本案已取得資料。已從原文核對四層視覺區域、兩套父資料及時間窗。",
+    "environment": "FoVS-Aria 衍生自 Aria Everyday Activities（143 recordings、7.3 小時原始資料）；FoVS-EgoExo 衍生自 EgoExo4D 的 cooking／music／health／repair／bouldering 五類活動。物理 location、recording、活動用途與 voxel grid 各自不同單位。",
+    "tasks": "一個 3D visual-span forecasting 任務、四個輸出層：foveal 2°、central 8°、peripheral 30°、head orientation/FoV 約 55°。GT 是未來區間內看過區域的聯集，不保證逐幀 gaze 次序；四層不是四批獨立資料。",
+    "data": "論文約 364.6K samples：FoVS-Aria 約 23.2K、FoVS-EgoExo 約 341.4K。Aria 2 秒歷史→2 秒未來、stride 1 秒、16³ grid／3.2 m cube／20 cm cell，test 使用 location 4；EgoExo 默認預測 4 秒。原文 rounded split numbers 僅作約數保存，不自行調整成精確整數。",
+    "evaluation": "四層分別計 3D IoU／F1，另有 precision／recall 與 foveal metric distance。semi-dense SLAM 點與 gaze 產生區域，foveal 缺失不能自動當全負例；地圖可見時間、空 grid、threshold、聚合分母仍需未發布 evaluator 核對。",
+    "standardization": {
+      "profile": "egocentric_3d_visual_span_forecasting",
+      "reuse": "重用論文清楚定義的 gaze cone／voxel／future union 任務與父資料關係，可納入感知／預測任務目錄。",
+      "transform": "case 應保留 recording、location、observation_end、future window、SLAM map 可用範圍、gaze 校正、四層角度與 voxel 原點／尺寸；不把 gaze prediction 當 robot navigation success。",
+      "missing": "公開 repo 沒有 loader、標註 manifest 或 evaluator；本次未取得產生後樣本、未執行方法，故不能列為可立即評測。"
+    },
+    "version_note": "官方 README 的題名是 Gaze Beyond the Frame；EgoSpanLift 是方法別名而非另一獨立 benchmark。論文、資料子集、程式預告分開。",
+    "runtime_executed": false,
+    "discovery_evidence": [
+      {
+        "kind": "paper",
+        "url": "https://arxiv.org/abs/2511.18470",
+        "checked_sections": [
+          "頁 1 摘要；頁 5–6 第 3.3／4 節；頁 7–8 第 5.1／5.2 節與表 2／3。"
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "HS-YN/GazeBeyondFrame",
+        "requested_repo": "hs-yn/GazeBeyondFrame",
+        "commit": "71e26f0b641bf6f5be84941cd7cd733be4d60b63",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            4
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 4,
+        "sha256": "b06e5eb1f42732efc2cd40865427b1e3aa00d5c13533ebecd8f0a1a8a9684844",
+        "url": "https://github.com/HS-YN/GazeBeyondFrame/blob/71e26f0b641bf6f5be84941cd7cd733be4d60b63/README.md",
+        "reading_url": "https://github.com/HS-YN/GazeBeyondFrame/blob/71e26f0b641bf6f5be84941cd7cd733be4d60b63/README.md#L1-L4",
+        "why": "官方題名與 NeurIPS 2025 身分相符；明示 Code and details will be released soon。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "579f9d271664169527094acb2acbde1ed68d7b8a7dd28f206c3478c977da7572"
+  },
+  "repository_binding_review_sha256": "579f9d271664169527094acb2acbde1ed68d7b8a7dd28f206c3478c977da7572",
+  "repository_bindings": [
+    {
+      "requested_repo": "hs-yn/GazeBeyondFrame",
+      "resolved_repo": "HS-YN/GazeBeyondFrame",
+      "aliases_in_this_review": [
+        "hs-yn/gazebeyondframe"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "public_readme_only",
+      "versions": [
+        {
+          "commit": "71e26f0b641bf6f5be84941cd7cd733be4d60b63",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/hs-yn/GazeBeyondFrame/",
+          "link_label": "Code",
+          "project_url": "https://hs-yn.github.io/GazeBeyondFrame/",
+          "page_sha256": "16049851f485ec18c8831b0b0b3185c1641e4750651c04965cefeb5c1b7dcfd0"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P247",
+          "review_file": "content/github_review/reviews/P247.json",
+          "review_sha256": "579f9d271664169527094acb2acbde1ed68d7b8a7dd28f206c3478c977da7572",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "docs",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "醫療與手術支援",
+    "交通移動與車輛維修",
+    "休閒與運動",
+    "音樂與表演",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P247",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "Gaze Beyond the Frame: Forecasting Egocentric 3D Visual Span；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      5,
+      7,
+      8
+    ],
+    "role": "動作與軌跡預測",
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "醫療與手術支援",
+      "交通移動與車輛維修",
+      "休閒與運動",
+      "音樂與表演",
+      "穿戴互動與動作介面"
+    ],
+    "environment": "AEA的143recordings/7.3h與EgoExo4D五活動子集；排除soccer/basketball/dance。",
+    "tasks": "3Dvisualspanforecast，多個視角範圍是同target不同granularity。",
+    "cases": "FoVS-Aria約23.2Ksample（19.3K/1.9K/2.1K）；FoVS-EgoExo341.4K（274.7K/29.6K/37K），概述364.6K。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 2100,
+        "unit": "FoVS-Aria test windows（約數）",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 37000,
+        "unit": "FoVS-EgoExo test windows（約數）",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 364600,
+        "unit": "combined forecast windows（約數）",
+        "pages": [
+          1,
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "3DIoU/F1、fovealregiondistance；16格/3.2m＝20cmcell resolution，不當精確gaze接觸。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度"
+    ],
+    "split": "AEA location4heldout；look2spredict2s，EgoExo預測4s；split約數四捨五入不精確加總。",
+    "lineage": "AEA/EgoExo4DSLAM+gaze衍生volume；windowoverlap與sourcecaptures要追蹤。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          5,
+          7,
+          8
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "visualspan≠robotactiveperceptionpolicy；也未覆蓋所有EgoExo8activities。"
+    ],
+    "reuse": "補注視/可見區域預測，讓世界觀測能力不只侷限於問答或手軌跡。",
+    "reviewed_pdf_sha256": "b2ea7307cbe26217da35558970ceadb9f521d3f0841c60ff431031d39a98003f",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoSpanLift",
+    "year": 2025,
+    "title": "Gaze Beyond the Frame: Forecasting Egocentric 3D Visual Span",
+    "source_url": "https://arxiv.org/abs/2511.18470",
+    "primary_type": "P",
+    "category_name": "未來動作／互動預測",
+    "domain_ids": [
+      "home",
+      "food",
+      "medical",
+      "transport",
+      "leisure",
+      "music",
+      "wearable"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "醫療支援",
+      "交通工具與維修",
+      "運動與身體技能",
+      "音樂與表演"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "醫療與手術支援",
+      "交通移動與車輛維修",
+      "休閒與運動",
+      "音樂與表演",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P247",
+      "domain_ids": [
+        "home",
+        "food",
+        "medical",
+        "transport",
+        "leisure",
+        "music",
+        "wearable"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P247",
+          "domain_ids": [
+            "home",
+            "food",
+            "medical",
+            "transport",
+            "leisure",
+            "music"
+          ],
+          "pages": [
+            1,
+            5,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3Dvisualspanforecast，多個視角範圍是同target不同granularity。",
+            "AEA的143recordings/7.3h與EgoExo4D五活動子集；排除soccer/basketball/dance。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b2ea7307cbe26217da35558970ceadb9f521d3f0841c60ff431031d39a98003f"
+        },
+        {
+          "paper_id": "P247",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            1,
+            5,
+            7,
+            8
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "使用者未來3D視覺範圍與凝視預測。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "b2ea7307cbe26217da35558970ceadb9f521d3f0841c60ff431031d39a98003f"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b2ea7307cbe26217da35558970ceadb9f521d3f0841c60ff431031d39a98003f",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "medical",
+        "transport",
+        "leisure",
+        "music"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P247",
+      "name": "EgoSpanLift",
+      "expected_title": "Gaze Beyond the Frame: Forecasting Egocentric 3D Visual Span",
+      "source_url": "https://arxiv.org/abs/2511.18470",
+      "pdf_url": "https://arxiv.org/pdf/2511.18470",
+      "retrieved_at": "2026-10-02T22:14:44.758990+00:00",
+      "pdf_sha256": "b2ea7307cbe26217da35558970ceadb9f521d3f0841c60ff431031d39a98003f",
+      "text_sha256": "1f72763819c2a946dfb1e28d3e558173880a5cbd4a1060569a43388e3d8d3c1b",
+      "pdf_bytes": 4566676,
+      "pages": 14,
+      "text_characters": 65489,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2511.18470v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2511.18470v1"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 2100,
+        "unit": "FoVS-Aria test windows（約數）",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P247:1",
+        "paper_id": "P247",
+        "benchmark": "EgoSpanLift",
+        "native_term": "FoVS-Aria test windows（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.18470v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.18470v1",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 37000,
+        "unit": "FoVS-EgoExo test windows（約數）",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P247:2",
+        "paper_id": "P247",
+        "benchmark": "EgoSpanLift",
+        "native_term": "FoVS-EgoExo test windows（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.18470v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.18470v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 364600,
+        "unit": "combined forecast windows（約數）",
+        "pages": [
+          1,
+          7,
+          8
+        ],
+        "record_id": "review10:P247:3",
+        "paper_id": "P247",
+        "benchmark": "EgoSpanLift",
+        "native_term": "combined forecast windows（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2511.18470v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2511.18470v1",
+            "locator": "PDF pp. 1, 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "HS-YN/GazeBeyondFrame"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,132 @@
+{
+  "paper_id": "P126",
+  "summary": "DROID有原始蒐集平臺與policy-learning兩個官方倉庫；raw/RLDS、更新語言與相機標定是同一來源的不同發行物。實機成功由人員標記。",
+  "reading_order": [
+    {
+      "repo": "droid-dataset/droid",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          22
+        ]
+      ],
+      "why": "平臺、論文與官方policy-learning連結",
+      "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7"
+    },
+    {
+      "repo": "droid-dataset/droid_policy_learning",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          43
+        ],
+        [
+          46,
+          74
+        ]
+      ],
+      "why": "語言/標定更新、RLDS與Octo固定依賴",
+      "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581"
+    },
+    {
+      "repo": "droid-dataset/droid",
+      "path": "docs/the-droid-dataset.md",
+      "ranges": [
+        [
+          44,
+          82
+        ],
+        [
+          84,
+          103
+        ]
+      ],
+      "why": "RLDS與原HDF5/MP4/SVO層級",
+      "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7"
+    },
+    {
+      "repo": "droid-dataset/droid",
+      "path": "droid/postprocessing/schema.py",
+      "ranges": [
+        [
+          12,
+          89
+        ]
+      ],
+      "why": "UUID/lab/scene、success未知值、版本與相機標定",
+      "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7"
+    },
+    {
+      "repo": "droid-dataset/droid",
+      "path": "droid/robot_env.py",
+      "ranges": [
+        [
+          16,
+          33
+        ],
+        [
+          49,
+          63
+        ]
+      ],
+      "why": "cartesian7D/joint8D、15Hz與velocity範圍",
+      "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7"
+    },
+    {
+      "repo": "droid-dataset/droid_policy_learning",
+      "path": "examples/droid_dataloader.py",
+      "ranges": [
+        [
+          14,
+          79
+        ]
+      ],
+      "why": "過濾/視角/窗口/normalization的訓練view",
+      "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581"
+    },
+    {
+      "repo": "droid-dataset/droid_policy_learning",
+      "path": "robomimic/utils/rlds_utils.py",
+      "ranges": [
+        [
+          1,
+          65
+        ]
+      ],
+      "why": "success路徑篩選、絕對10D動作與action時間截取",
+      "commit": "9a29c832b4c81bf38401111f5e4cdddaca217581"
+    },
+    {
+      "repo": "droid-dataset/droid",
+      "path": "droid/user_interface/eval_gui.py",
+      "ranges": [
+        [
+          552,
+          578
+        ],
+        [
+          611,
+          625
+        ]
+      ],
+      "why": "A/B按鍵標記成功/失敗與實機eval來源",
+      "commit": "33ae6a67274f36d2e29525b86f23a56616ef43a7"
+    }
+  ],
+  "environment": "多站點DROID robot及相機配置；schema有lab/building/scene_id/robot_serial與外參，不用平臺數代替環境數。scene_id=-1表示未提供值，須保留未知而非新場景。",
+  "tasks": "language/goal條件物件操作；示範、失敗、下游自選任務和eval trials不同集合。三句語言描述對同episode不增加實體軌跡。",
+  "data": "raw為trajectory.h5、metadata與多視角MP4/SVO；RLDS有episode_metadata和steps含3圖、state、action_dict、多語言與episode flags。training transform用cartesian_position轉pos3+rot6+gripper1，另移除第一action；預設只取success路徑及有語言資料。",
+  "evaluation": "實機GUI由人員按鍵保存success/failure，metadata未提供success時為None。RobotEnv的step返回action_info，不能當task success。文件flat action7D註解提6joint velocities，但RobotEnv區分cartesian7/joint8，使用時應以明確action_dict及converter核對語義。",
+  "standardization": {
+    "profile": "distributed_robot_episode_and_training_views",
+    "reuse": "UUID/lab/scene/version、原始與RLDS對映、相機標定、action_dict、人評標籤。",
+    "transform": "一個parent episode連raw/RLDS/語言更新/標定版本；case固定模型可見相機、座標/control mode、初態與人評rubric；training選樣不得當完整benchmark分母。",
+    "missing": "大型素材、UUID至更新標定/語言的全量join、原成功標籤和case集合、原生評分者一致性、實機或匹配模擬執行。"
+  },
+  "version_note": "2024-12新增75k成功episodes的多語言、2025-04更新36k標定為作者公佈更新，不新增獨立資料集。policy loader依賴Octo85b83fc，不能自動換成目前HEAD。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

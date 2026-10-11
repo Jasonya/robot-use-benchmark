@@ -1,0 +1,483 @@
+{
+  "paper_id": "P211",
+  "name": "AssemblyGrid",
+  "title": "AssemblyGrid v1: A Benchmark for Multi-Robot Production with Temporary Coalitions, Local Information, and Geometric Constraints",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.16075",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P211",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "AssemblyGrid提供明確的問題/instance/schema與KPI，可借鏡標準化設計；其canonical環境是無量綱任務層幾何，不能直接當接觸式robot物理操作。",
+    "environment": "official abstract-v1 geometry，tick無量綱；固定robot base/reach/payload及操作位置，沒有joint、grasp/contact或collision-free軌跡保證。UR10派生驗證是另一非canonical profile。",
+    "tasks": "Flow、Coalition、Concurrency各easy/medium/hard，共9官方scenario；recipe規定材料/先後/XOR選項/coalition角色。歷史Geometry及AG-*擴充tracks不直接加進官方9。",
+    "data": "instance_definition保存grid/topology、robot population、recipe、資源、demand、時間、合作、local資訊及generation_seed；演算法/執行seed另存。local proposal_support是聚合支持比例，不是free-form message或global可行性oracle。",
+    "evaluation": "completion=delivered/spawned，throughput=delivered/ticks；delivered-only mean flow需連unfinished count看。restricted flow把未完成者截尾到目前t；batch_makespan只在batch全部完成時有效，generic makespan仍可回局部值，不能混用。coalition成功分母committed+expired；utilization只對exact-capacity且有機會的狀態平均，approx upper bounds分開。",
+    "standardization": {
+      "profile": "decentralized_production_and_coalition_gridworld",
+      "reuse": "規範recipe/schema/semantic/realizability三層驗證、instance hash、訓練seed與execution seed分離、canonical KPI明確化。",
+      "transform": "source固定v1/abstract profile；task按recipe目標，environment按grid與geometry配置，case加generation/execution seeds與資訊契約；維持tick及抽象reach單位，實體秒/碰撞另驗證。",
+      "missing": "官方instance全量manifest取得、neural candidate-slot/identity alias上限測試、與物理robot的適配/抽象誤差驗證、同seed範圍的基線。"
+    },
+    "version_note": "固定3bb72dd；easy/medium/hard只在同family內排序。doc規則與core的legacy同名欄位須選canonical口徑，未執行training或simulation。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "requested_repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 295,
+        "sha256": "31f36883b372d724edd8566226a3f5db2bbdda160821a154e7e47df93768d21b",
+        "url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/README.md",
+        "reading_url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/README.md#L1-L90",
+        "why": "9個官方scenario與3family×3level",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "requested_repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+        "ref": null,
+        "path": "docs/BENCHMARK_SPEC.md",
+        "ranges": [
+          [
+            1,
+            199
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 199,
+        "sha256": "820761b3be6c2675ae9104b843d6f887f6ba3e7f894756ef4658a6ba2c81f298",
+        "url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/docs/BENCHMARK_SPEC.md",
+        "reading_url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/docs/BENCHMARK_SPEC.md#L1-L199",
+        "why": "normative範圍、recipe有效性、local資訊、regime、KPI與統計單位",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "requested_repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+        "ref": null,
+        "path": "Experiments/env/benchmark.py",
+        "ranges": [
+          [
+            74,
+            112
+          ],
+          [
+            149,
+            204
+          ],
+          [
+            264,
+            310
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 310,
+        "sha256": "0546201f9c561d03fe94170e355cb871abc0ceefaa9d8841fea077ff760e925d",
+        "url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/Experiments/env/benchmark.py",
+        "reading_url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/Experiments/env/benchmark.py#L74-L112",
+        "why": "擴充tracks與instance hash欄位、canonical/legacy metric字典",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "requested_repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+        "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+        "ref": null,
+        "path": "Experiments/env/core.py",
+        "ranges": [
+          [
+            925,
+            955
+          ],
+          [
+            995,
+            1005
+          ],
+          [
+            1465,
+            1474
+          ],
+          [
+            1797,
+            1838
+          ],
+          [
+            2310,
+            2416
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2416,
+        "sha256": "361ff6d6ab93bcc00e372682a7b8b9b99b32536a691c237b6d656eb233cabdb8",
+        "url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/Experiments/env/core.py",
+        "reading_url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1/blob/3bb72ddc2ff6b15e1561b46c5120697544ffe6d2/Experiments/env/core.py#L925-L955",
+        "why": "實際completion/flow/makespan、terminal/truncation及conditional KPI",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e840fcc6e557b133353f2bc35de758909deb5ded7be9fa85fc44c511973a49ad"
+  },
+  "repository_binding_review_sha256": "e840fcc6e557b133353f2bc35de758909deb5ded7be9fa85fc44c511973a49ad",
+  "repository_bindings": [
+    {
+      "requested_repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+      "resolved_repo": "Fouad-Bahrpeyma/AssemblyGrid_v1",
+      "aliases_in_this_review": [
+        "fouad-bahrpeyma/assemblygrid_v1"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "3bb72ddc2ff6b15e1561b46c5120697544ffe6d2",
+          "reviewed_files": [
+            "Experiments/env/benchmark.py",
+            "Experiments/env/core.py",
+            "README.md",
+            "docs/BENCHMARK_SPEC.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/Fouad-Bahrpeyma/AssemblyGrid_v1",
+          "pdf_page": 36,
+          "pdf_sha256": "8661b2c5550168645f05f00d371e18fbdb54c431355ebf45b56a117ba5934f2d",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P211",
+          "review_file": "content/github_review/reviews/P211.json",
+          "review_sha256": "e840fcc6e557b133353f2bc35de758909deb5ded7be9fa85fc44c511973a49ad",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "裝配與生產作業"
+  ],
+  "source_review": {
+    "paper_id": "P211",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "AssemblyGrid v1，arXiv 2609.16075v1。",
+    "scope_read": "decentralized資訊、9scenario全表、instance/seed區分、production metrics及held-out protocol；未逐式讀57頁全部附錄。",
+    "pages_read": [
+      1,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      54,
+      56
+    ],
+    "domains": [
+      "裝配與生產作業"
+    ],
+    "role": "多機器人生產調度benchmark",
+    "environment": "抽象grid生產模擬，geometry/reach/workspace限制；不模擬robot-specific接觸physics。",
+    "tasks": "Flow/Coalition/Concurrency三workload families×easy/medium/hard＝9official scenarios，程度為family內配置，不保證每policy單調。",
+    "cases": "每scenario50held-out instances；3algorithms×9scenarios×10trainingseeds＝270training runs，每個final checkpoint同50test instances。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "workload families",
+        "pages": [
+          12,
+          13
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "official scenarios",
+        "pages": [
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每scenario held-out instances",
+        "pages": [
+          20
+        ]
+      },
+      {
+        "field": "data",
+        "value": 270,
+        "unit": "MARL training runs",
+        "pages": [
+          20
+        ]
+      }
+    ],
+    "evaluation": [
+      "主要delivered products/throughput，admitted completion與offered-demand fulfilment分母不同；候選admission/coalition/blocking為diagnostics。",
+      "finite-batch timeout的makespan未定，不把未完成當正常完成時間；RL與nonlearning的不確定性分別按trainingseeds與instances。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "train/val/finaltest generationseeds分離，主測unseen realizations而非新topology；finalcheckpoint，無事後best選擇。",
+    "lineage": "local support-fraction cue為合法interface；centralized privileged reference與decentralizedpolicy分組。",
+    "evidence": [
+      {
+        "pages": [
+          11,
+          12,
+          14,
+          15,
+          16,
+          20,
+          22
+        ],
+        "locator": "Tables3–5、§3.4–3.5、§4.1",
+        "supports": "9/50/270、production分母、資訊和seed"
+      }
+    ],
+    "unresolved": [
+      "robot-specificphysics、newtopology、failure/communication interventions明列未納v1實驗；不要稱完整工廠機器人控制。"
+    ],
+    "reuse": "補生產規劃與協作資源約束；可借明確區分instance、executionseed、trainingseed的計數方式。",
+    "reviewed_pdf_sha256": "8661b2c5550168645f05f00d371e18fbdb54c431355ebf45b56a117ba5934f2d",
+    "reviewed_on": "2026-10-02",
+    "name": "AssemblyGrid",
+    "year": 2026,
+    "title": "AssemblyGrid v1: A Benchmark for Multi-Robot Production with Temporary Coalitions, Local Information, and Geometric Constraints",
+    "source_url": "https://arxiv.org/abs/2609.16075",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "industry"
+    ],
+    "review_tags": [
+      "工業製造",
+      "多機器人協作"
+    ],
+    "domain_names": [
+      "裝配與生產作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P211",
+      "domain_ids": [
+        "industry"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P211",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            54,
+            56
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "Flow/Coalition/Concurrency三workload families×easy/medium/hard＝9official scenarios，程度為family內配置，不保證每policy單調。",
+            "抽象grid生產模擬，geometry/reach/workspace限制；不模擬robot-specific接觸physics。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "8661b2c5550168645f05f00d371e18fbdb54c431355ebf45b56a117ba5934f2d"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "8661b2c5550168645f05f00d371e18fbdb54c431355ebf45b56a117ba5934f2d",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P211",
+      "name": "AssemblyGrid",
+      "expected_title": "AssemblyGrid v1: A Benchmark for Multi-Robot Production with Temporary Coalitions, Local Information, and Geometric Constraints",
+      "source_url": "https://arxiv.org/abs/2609.16075",
+      "pdf_url": "https://arxiv.org/pdf/2609.16075",
+      "retrieved_at": "2026-10-02T21:35:07.300832+00:00",
+      "pdf_sha256": "8661b2c5550168645f05f00d371e18fbdb54c431355ebf45b56a117ba5934f2d",
+      "text_sha256": "29f31825040aa06e0d06b6caa7b6d9789080931862401841b09a8abbf7f3f77d",
+      "pdf_bytes": 1631431,
+      "pages": 57,
+      "text_characters": 214857,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.16075v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.16075v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "workload families",
+        "pages": [
+          12,
+          13
+        ],
+        "record_id": "review10:P211:1",
+        "paper_id": "P211",
+        "benchmark": "AssemblyGrid",
+        "native_term": "workload families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.16075v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.16075v1",
+            "locator": "PDF pp. 12, 13",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 9,
+        "unit": "official scenarios",
+        "pages": [
+          14
+        ],
+        "record_id": "review10:P211:2",
+        "paper_id": "P211",
+        "benchmark": "AssemblyGrid",
+        "native_term": "official scenarios",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.16075v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.16075v1",
+            "locator": "PDF pp. 14",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每scenario held-out instances",
+        "pages": [
+          20
+        ],
+        "record_id": "review10:P211:3",
+        "paper_id": "P211",
+        "benchmark": "AssemblyGrid",
+        "native_term": "每scenario held-out instances",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.16075v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.16075v1",
+            "locator": "PDF pp. 20",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 270,
+        "unit": "MARL training runs",
+        "pages": [
+          20
+        ],
+        "record_id": "review10:P211:4",
+        "paper_id": "P211",
+        "benchmark": "AssemblyGrid",
+        "native_term": "MARL training runs",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.16075v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.16075v1",
+            "locator": "PDF pp. 20",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Fouad-Bahrpeyma/AssemblyGrid_v1"
+  ],
+  "external_repositories": []
+}

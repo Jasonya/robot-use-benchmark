@@ -1,0 +1,238 @@
+{
+  "paper_id": "P011",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "VISOR 是 EPIC-KITCHENS 影片上的分割與物件關係標註。五個倉庫分別承擔 VOS、HOS、來源追溯、視覺化與抽幀工作，不能算成五批獨立環境。",
+  "reading_order": [
+    {
+      "repo": "epic-kitchens/VISOR-FrameExtraction",
+      "path": "README.md",
+      "commit": "095cb98a7d8c03cada86fe5ed57dc79c617fa7cd",
+      "ranges": [
+        [
+          1,
+          23
+        ],
+        [
+          86,
+          151
+        ]
+      ],
+      "why": "稀疏／插值欄位、抽幀修正與 EPIC 重用"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "README.md",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "ranges": [
+        [
+          1,
+          54
+        ],
+        [
+          85,
+          145
+        ]
+      ],
+      "why": "首影格條件與轉換流程"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "dataset/visor.py",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "ranges": [
+        [
+          22,
+          134
+        ]
+      ],
+      "why": "逐片段讀圖、mask 色碼與取樣"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "evaldavis2017/davis2017/evaluation.py",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "ranges": [
+        [
+          1,
+          111
+        ]
+      ],
+      "why": "評測影格範圍及逐物件統計"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "evaldavis2017/davis2017/metrics.py",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "ranges": [
+        [
+          14,
+          52
+        ],
+        [
+          101,
+          152
+        ]
+      ],
+      "why": "IoU 與邊界 F 實際公式"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-HOS",
+      "path": "README.md",
+      "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+      "ranges": [
+        [
+          1,
+          59
+        ],
+        [
+          99,
+          151
+        ]
+      ],
+      "why": "HOS／active 子任務"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-HOS",
+      "path": "hos/evaluation/epick_evaluation.py",
+      "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+      "ranges": [
+        [
+          28,
+          145
+        ]
+      ],
+      "why": "COCO 輸出轉換"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-WDTCF",
+      "path": "README.md",
+      "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+      "ranges": [
+        [
+          1,
+          82
+        ]
+      ],
+      "why": "來源追溯輸入與標籤"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-WDTCF",
+      "path": "evaluation.py",
+      "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+      "ranges": [
+        [
+          25,
+          184
+        ]
+      ],
+      "why": "嚴格證據影格條件與失敗歸零"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VIS",
+      "path": "README.md",
+      "commit": "c4865d0c53a3546e1b70420e4c2d0a652291c758",
+      "ranges": [
+        [
+          1,
+          31
+        ]
+      ],
+      "why": "視覺化工具角色"
+    }
+  ],
+  "environment": "EPIC-100 的廚房影片子集；video、subsequence、image 各是不同層級。VISOR 重新抽幀，需 frame_mapping.json 才能對回 EPIC。",
+  "tasks": "VOS 在給定首影格物件遮罩後追蹤分割；HOS 判斷手側、接觸與手物件組合；WDTCF 用查詢物件遮罩追溯來源物件與證據影格。這些為視覺理解，不是機器人完成操作。",
+  "data": "每影片 JSON 的 video_annotations 含 image.name/video/subsequence 及 mask id/name/class_id/segments/exhaustive/in_contact_object/on_which_hand。dense type=0 為插值、type=1 為端點 GT，不可同當人工標註。VOS 轉成 DAVIS 的 JPEGImages、Annotations、ImageSets 與物件色碼對映。",
+  "evaluation": "VOS 實作排除首影格但保留末影格，以逐物件 J（IoU）與 F（邊界 F-measure）評分；空 union 的 J=1。HOS 將手側／接觸轉類別、遮罩轉 RLE，交給 COCO evaluator。WDTCF 必須 query 類別、證據影格字串吻合，source 類別才可計分，另算 query/source mask IoU；錯類別或錯影格會歸零，非單純來源分類正確率。",
+  "standardization": {
+    "profile": "video_segmentation_relations",
+    "reuse": "原生分割多邊形、接觸 ID、首影格輸入限制、VOS evaluator、WDTCF JSON 與四項輸出。",
+    "transform": "保留 parent=EPIC-100、frame mapping、subsequence 和 mask ID；人工／插值標註分開；以 VOS／HOS／WDTCF 建立獨立 case/evaluator profile，且記錄 480p／1080p 座標與縮放。",
+    "missing": "尚未取得影格與 mask；HOS 的外部 COCO 實作和線上 C6 提交流程未完整追核；資料轉換需驗證色碼與 frame mapping，不能從視覺化結果推定可評測。"
+  },
+  "version_note": "VISOR-FrameExtraction 要求先修正插值並列出 P02_01、P03_14；新版名詞表追加左右手／手套，仍保留舊 hand/glove 類別。VOS 不是未修改的 DAVIS 評分：末影格被納入。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "epic-kitchens/VISOR-FrameExtraction",
+      "path": "README.md",
+      "commit": "095cb98a7d8c03cada86fe5ed57dc79c617fa7cd",
+      "sha256": "9c092992bb5fced9af394284c89826dbc4358441dd5548182dea0a813b72ee9e",
+      "url": "https://github.com/epic-kitchens/VISOR-FrameExtraction/blob/095cb98a7d8c03cada86fe5ed57dc79c617fa7cd/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-FrameExtraction/files/README.md"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "README.md",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "sha256": "86c2e94f75999362497adb9b6f6c8e19f8a6dab2921c3cd04898108950528c54",
+      "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-VOS/files/README.md"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "dataset/visor.py",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "sha256": "ca2027216194cb2a8e118437ce5ba602c1f36216d18deea98cfda7408c7e7eec",
+      "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/dataset/visor.py",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-VOS/files/dataset/visor.py"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "evaldavis2017/davis2017/evaluation.py",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "sha256": "41734896094474cc50e4d5046f3f4687081d2cabc9e64a1c53929cd9966e055c",
+      "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/evaldavis2017/davis2017/evaluation.py",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-VOS/files/evaldavis2017/davis2017/evaluation.py"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VOS",
+      "path": "evaldavis2017/davis2017/metrics.py",
+      "commit": "0707a688b94a606e867adc20d5ec04efe42651a6",
+      "sha256": "7d9ec157ca2f7797d1eccac6646d9b48e085ef2b9895e8b44ebe014ebbf324ae",
+      "url": "https://github.com/epic-kitchens/VISOR-VOS/blob/0707a688b94a606e867adc20d5ec04efe42651a6/evaldavis2017/davis2017/metrics.py",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-VOS/files/evaldavis2017/davis2017/metrics.py"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-HOS",
+      "path": "README.md",
+      "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+      "sha256": "48ffb9e649bc49dacb90d362bef7a49d5cf767e04c9668ace9bc725989bd8de8",
+      "url": "https://github.com/epic-kitchens/VISOR-HOS/blob/8566507382add7dd037a83e7233950e0ad1ea78e/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-HOS/files/README.md"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-HOS",
+      "path": "hos/evaluation/epick_evaluation.py",
+      "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+      "sha256": "b01477e5a6d551bba5f7b90dbf8e239f9f0ce759d86a933e1fbab81a97a9d22d",
+      "url": "https://github.com/epic-kitchens/VISOR-HOS/blob/8566507382add7dd037a83e7233950e0ad1ea78e/hos/evaluation/epick_evaluation.py",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-HOS/files/hos/evaluation/epick_evaluation.py"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-WDTCF",
+      "path": "README.md",
+      "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+      "sha256": "21d9d7d9902ce51b8f9be65fede3548214fce640ccefc4b6a7fd7520760d7be4",
+      "url": "https://github.com/epic-kitchens/VISOR-WDTCF/blob/02829f09072cc4726ffd4aed4150c70108fc0b02/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-WDTCF/files/README.md"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-WDTCF",
+      "path": "evaluation.py",
+      "commit": "02829f09072cc4726ffd4aed4150c70108fc0b02",
+      "sha256": "70517231dd15aa1f8e8aa00305742167c3a44198067e78c0eb9cdddcfbe35483",
+      "url": "https://github.com/epic-kitchens/VISOR-WDTCF/blob/02829f09072cc4726ffd4aed4150c70108fc0b02/evaluation.py",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-WDTCF/files/evaluation.py"
+    },
+    {
+      "repo": "epic-kitchens/VISOR-VIS",
+      "path": "README.md",
+      "commit": "c4865d0c53a3546e1b70420e4c2d0a652291c758",
+      "sha256": "cd330d2d8e0297d232d77d2791232202c30055c32220671348ff0a0e312a2e2d",
+      "url": "https://github.com/epic-kitchens/VISOR-VIS/blob/c4865d0c53a3546e1b70420e4c2d0a652291c758/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__VISOR-VIS/files/README.md"
+    }
+  ]
+}

@@ -1,0 +1,557 @@
+{
+  "paper_id": "P097",
+  "name": "TEACh",
+  "title": "TEACh: Task-driven Embodied Agents that Chat",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2110.00534",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P097",
+    "summary": "TEACh需要保留game→EDH/TfD instance的關係；兩種題目檢查不同目標。現有CLI有靜態可見的漏題／變數問題，不能下載後直接宣稱可評測。",
+    "environment": "AI2-THOR家務場景，Commander與Driver/Follower不同視角和角色；game可派生多個EDH或TfD片段，不能各自算新屋子。",
+    "tasks": "EDH依對話／操作歷史完成後續指定狀態改變，TfD依完整任務參數檢查終態。task definition有components、數量determiner及relations；Toast要求BreadSliced且isCooked=1。",
+    "data": "game_id、instance_id、driver_actions_future、state_changes、expected_init_goal_conditions_*，輸出game含初／終態objects及custom_object_metadata。dialog acts是後加da_metadata；答案狀態不能當一般模型輸入。",
+    "evaluation": "EDH從state_changes建checker；TfD取原task_id並套task_params。check_episode_progress合成component/relation的成功與條件數。GC分母扣除初態已滿足部分；PLW依future動作長度。cli/eval.py有未定義edh_instance_files紀錄行，且缺輸出題建立error紀錄後未加入traj_stats；需修正並保留原版差異，否則可能阻斷／漏計分母。這是靜態閱讀發現，未執行重現。",
+    "standardization": {
+      "profile": "dialogue_conditioned_household_state_change",
+      "reuse": "game/instance/task參數、角色視角、歷史、state-change和task checker。",
+      "transform": "EDH/TfD各自protocol，case連game父來源與歷史截止；state/reference隔離；evaluator保存初／終條件數、完整預期ID、失敗原因和step/API預算。",
+      "missing": "資料修訂版閉合、原始重播與instance有效性、CLI修正驗證、缺輸出／零分母政策、原生對照跑通。"
+    },
+    "version_note": "2022-12修訂只保留有助主任務的EDH狀態變化，刪無相關變化instances與2個valid_unseen game；不能混用早期paper數字與當前檔案。軟體／影像／其他資料授權分開。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "alexa/teach",
+        "requested_repo": "alexa/teach",
+        "commit": "903191e256da866a603d1bbfb21db34e0874392d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 434,
+        "sha256": "a9d684666822030685fd541ff22f42492342d6cfd0fba864cce73d38d9161cd5",
+        "url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/README.md",
+        "reading_url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/README.md#L1-L95",
+        "why": "精確論文、授權分件與2022資料修訂",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "alexa/teach",
+        "requested_repo": "alexa/teach",
+        "commit": "903191e256da866a603d1bbfb21db34e0874392d",
+        "ref": null,
+        "path": "src/teach/meta_data_files/task_definitions/101__toast.json",
+        "ranges": [
+          [
+            1,
+            23
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 23,
+        "sha256": "eba9cb5fd852ea279f7e993f280edfd8526828c12c2f7992955aa3e83fb264a4",
+        "url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/meta_data_files/task_definitions/101__toast.json",
+        "reading_url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/meta_data_files/task_definitions/101__toast.json#L1-L23",
+        "why": "原生component與可機器檢查的吐司條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "alexa/teach",
+        "requested_repo": "alexa/teach",
+        "commit": "903191e256da866a603d1bbfb21db34e0874392d",
+        "ref": null,
+        "path": "src/teach/dataset/task_THOR.py",
+        "ranges": [
+          [
+            22,
+            48
+          ],
+          [
+            1057,
+            1197
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1197,
+        "sha256": "2950d50fdcd466e89fcf7554aceba88509211221ff9c627568ed52667db9203d",
+        "url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/dataset/task_THOR.py",
+        "reading_url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/dataset/task_THOR.py#L22-L48",
+        "why": "任務component/relation與遞迴成功聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "alexa/teach",
+        "requested_repo": "alexa/teach",
+        "commit": "903191e256da866a603d1bbfb21db34e0874392d",
+        "ref": null,
+        "path": "src/teach/eval/compute_metrics.py",
+        "ranges": [
+          [
+            1,
+            202
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 202,
+        "sha256": "6230070cd2c7d4c832fc157bffd022dc44b291c320e54fd60d22012604c54130",
+        "url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/eval/compute_metrics.py",
+        "reading_url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/eval/compute_metrics.py#L1-L202",
+        "why": "EDH/TfD差異、初態未滿足條件與PLW/SR聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "alexa/teach",
+        "requested_repo": "alexa/teach",
+        "commit": "903191e256da866a603d1bbfb21db34e0874392d",
+        "ref": null,
+        "path": "src/teach/cli/eval.py",
+        "ranges": [
+          [
+            23,
+            130
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 134,
+        "sha256": "d0ffbab755440ef10867646f953ed6db4abd10ea3989e25df719de36effb4d1e",
+        "url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/cli/eval.py",
+        "reading_url": "https://github.com/alexa/teach/blob/903191e256da866a603d1bbfb21db34e0874392d/src/teach/cli/eval.py#L23-L130",
+        "why": "預期instance集合、步數/API失敗限制、漏題處理問題",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "99aba1f48e31b06e9bea1be183076ec01895db32af360767cfe213fd2ff168de"
+  },
+  "repository_binding_review_sha256": "99aba1f48e31b06e9bea1be183076ec01895db32af360767cfe213fd2ff168de",
+  "repository_bindings": [
+    {
+      "requested_repo": "alexa/teach",
+      "resolved_repo": "alexa/teach",
+      "aliases_in_this_review": [
+        "alexa/teach"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "903191e256da866a603d1bbfb21db34e0874392d",
+          "reviewed_files": [
+            "README.md",
+            "src/teach/cli/eval.py",
+            "src/teach/dataset/task_THOR.py",
+            "src/teach/eval/compute_metrics.py",
+            "src/teach/meta_data_files/task_definitions/101__toast.json"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/alexa/teach",
+          "pdf_page": 1,
+          "pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a",
+          "basis": "pdf_extracted_text"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "alexa/teach",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "alexa/teach",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "903191e256da866a603d1bbfb21db34e0874392d"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P097",
+          "review_file": "content/github_review/reviews/P097.json",
+          "review_sha256": "99aba1f48e31b06e9bea1be183076ec01895db32af360767cfe213fd2ff168de",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P097",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "TEACh，arXiv 2110.00534v3。",
+    "scope_read": "TDL與12task、session→EDH、三種benchmark、全部split與success。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      21
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "協助、交接與陪伴"
+    ],
+    "role": "對話協作與任務完成",
+    "environment": "AI2-THOR；表2成功收集池覆蓋109 rooms，重用ALFRED場景與unseen split。",
+    "tasks": "12task types、438參數variants（收集池）；3端點EDH／TfD／TATC，最後一種要同時建模Commander/Follower。",
+    "cases": "正文3,047可replay sessions；表3分量合3,045。EDH表3總11,176＝5475train+608val-seen+2157val-unseen+666test-seen+2270test-unseen。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 109,
+        "unit": "表2收集池rooms",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "task types",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 438,
+        "unit": "收集池parameter variants",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 11176,
+        "unit": "表3 EDH instances（全部split）",
+        "qualifier": "分量相加",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2270,
+        "unit": "test-unseen EDH instances",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "EDH完成全部expected state changes為success，GC給部分分；trajectory length weighting另列。",
+      "TATC與TfD重用session母資料，不是三倍獨立任務量。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "seen/unseen場景；train/val/test按session；舊版EDH因只保留推進任務的state changes而縮減。",
+    "lineage": "同AI2-THOR與ALFRED场景，語言／session新human-human收集；TDL支持量詞、階層與共享object約束。",
+    "related_paper_ids": [
+      "P096"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§3–4、表2–3",
+        "supports": "109/12/438、session/EDH及TDL判分"
+      }
+    ],
+    "unresolved": [
+      "本文3,047與split3,045差2；表1還留早期3,215，必須以版本manifest查明。"
+    ],
+    "reuse": "對話工具、澄清、任務階層與量詞規則有可復用形式；收集成功與可重播數需分開。",
+    "reviewed_pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a",
+    "reviewed_on": "2026-10-02",
+    "name": "TEACh",
+    "year": 2021,
+    "title": "TEACh: Task-driven Embodied Agents that Chat",
+    "source_url": "https://arxiv.org/abs/2110.00534",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home",
+      "food",
+      "assistance"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "人機協作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P097",
+      "domain_ids": [
+        "home",
+        "food",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P097",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            9,
+            21
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "12task types、438參數variants（收集池）；3端點EDH／TfD／TATC，最後一種要同時建模Commander/Follower。",
+            "AI2-THOR；表2成功收集池覆蓋109 rooms，重用ALFRED場景與unseen split。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a"
+        },
+        {
+          "paper_id": "P097",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            9,
+            21
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "Commander／Follower對話協作完成家務。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P097",
+      "name": "TEACh",
+      "expected_title": "TEACh: Task-driven Embodied Agents that Chat",
+      "source_url": "https://arxiv.org/abs/2110.00534",
+      "pdf_url": "https://arxiv.org/pdf/2110.00534",
+      "retrieved_at": "2026-10-02T21:34:06.582622+00:00",
+      "pdf_sha256": "512d9ea49367fc5ec3559ab9b866c1aaafb015585dd2363bc7e918b20e42e40a",
+      "text_sha256": "541ce2a62683f872c22f05ee8753211d83534c6bf03af4a939fc9d0c4d706185",
+      "pdf_bytes": 19973145,
+      "pages": 28,
+      "text_characters": 133266,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2110.00534v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2110.00534v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 109,
+        "unit": "表2收集池rooms",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P097:1",
+        "paper_id": "P097",
+        "benchmark": "TEACh",
+        "native_term": "表2收集池rooms",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.00534v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.00534v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "task types",
+        "pages": [
+          3,
+          5
+        ],
+        "record_id": "review10:P097:2",
+        "paper_id": "P097",
+        "benchmark": "TEACh",
+        "native_term": "task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.00534v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.00534v3",
+            "locator": "PDF pp. 3, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 438,
+        "unit": "收集池parameter variants",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P097:3",
+        "paper_id": "P097",
+        "benchmark": "TEACh",
+        "native_term": "收集池parameter variants",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.00534v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.00534v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 11176,
+        "unit": "表3 EDH instances（全部split）",
+        "qualifier": "分量相加",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P097:4",
+        "paper_id": "P097",
+        "benchmark": "TEACh",
+        "native_term": "表3 EDH instances（全部split）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.00534v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.00534v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2270,
+        "unit": "test-unseen EDH instances",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P097:5",
+        "paper_id": "P097",
+        "benchmark": "TEACh",
+        "native_term": "test-unseen EDH instances",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2110.00534v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2110.00534v3",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "alexa/teach"
+  ],
+  "external_repositories": []
+}

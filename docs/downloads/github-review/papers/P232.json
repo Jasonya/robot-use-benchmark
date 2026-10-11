@@ -1,0 +1,304 @@
+{
+  "paper_id": "P232",
+  "name": "Diff-IP2D",
+  "title": "Diff-IP2D: Diffusion-Based Hand-Object Interaction Prediction on Egocentric Videos",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2405.04370",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P232",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "Diff-IP2D 重用 OCT／EPIC 的軌跡與接觸標註，但實際軌跡入口評的是 WDE／FDE。逐段追到 runtime caller 後，已把它和 repo 內沿用但未在該路徑呼叫的 OCT evaluator 分開；不能只看檔名就判斷評估方式。",
+    "environment": "來源影片與人工評測 labels 重用 EPIC-KITCHENS／OCT；論文也包含其他 Ego 資料實驗，README 的當前完整部署僅 EK100，EK55／EG 發布仍列待補。",
+    "tasks": "未來 2D 雙手 waypoint 與 object affordance/contact hotspot；典型 10 個過去 token→4 future 點。改 diffusion 架構不是新增語義任務，沿用 label 要連回 OCT 父來源。",
+    "data": "features／bbox／有效性、uid／raw frame 與 homography 均有原生欄位。training loader 會加 future features，evaluation loader 不加；manual-merged annotations 不等同 OCT 原始 annotation folder。各外部檔案與 checkpoint 要固定 hash／split，不能只記 repo commit。",
+    "evaluation": "主迴圈將預測轉 numpy 後呼叫 compute_wde：4 未來點權重 0.25／0.5／0.75／1.0，求和未除以權重總和；FDE 為末點，normalized image 單位。tensor 分支反而為普通平均，但不是此路徑。輸出先按 batch 的有效手平均，再跨抽樣／batch／rank 平均，與全資料有效手池化不同。heatmap SIM/AUC-J/NSS 沿用 OCT，仍需按 uid 配對、NaN 分母明示；原始 metrics rank equal-average 也要保留。",
+    "standardization": {
+      "profile": "egocentric_diffusion_hand_trajectory_and_hotspot",
+      "reuse": "重用 OCT lineage、native labels／split、真正在主迴圈呼叫的 WDE／FDE 與熱圖 evaluator。；保留 full／fast diffusion 與 sample_times，不能將 10 次抽樣當 10 道題。",
+      "transform": "source 同時記 paper version、code commit、data archive hash；canonical case 禁止 training-only future features 出現在評測輸入。；原生 WDE、FDE、heatmap 各列公式和有效分母；若改為 sample-weighted global mean，需新增 evaluator 版本。；以父 participant/video/time 去重；EPIC55/100、OCT／Diff-IP2D 保留 overlap 關係。",
+      "missing": "未下載 weights／features 或執行，README checkpoint links 與其他資料部署仍需逐一取得。；已有函式不等於已有完整測試任務，case metadata 與 raw video 權限尚未整合。"
+    },
+    "version_note": "原生程式 import 了 evaluate_traj_stochastic，但所讀實際軌跡路徑使用 compute_wde／compute_fde；OCT wrapper 的名稱對調不能直接套到此主結果。固定版本的來源差異均保留。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            163
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 163,
+        "sha256": "72828035dff43146adf9c98975c9d3d2db19b93a282d3a123e0f341af9533bb2",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/README.md",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/README.md#L1-L163",
+        "why": "確認 EK100 發布範圍、OCT 資料沿用、自製 training features 與各外部檔。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "datasets/datasetopts.py",
+        "ranges": [
+          [
+            5,
+            65
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 75,
+        "sha256": "18beeb167f45725ecbc4fb6224aea0fabe91683e3383a3bdd8bc425036bbcf38",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/datasets/datasetopts.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/datasets/datasetopts.py#L5-L65",
+        "why": "確認 4 Hz、2.5+1 s 與 split 約定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "datasets/ho_utils.py",
+        "ranges": [
+          [
+            12,
+            103
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 114,
+        "sha256": "c950742992570823ae8a85b2e4d219d17ffcd374057dce8a8d882ae188f0a046",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/datasets/ho_utils.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/datasets/ho_utils.py#L12-L103",
+        "why": "與 OCT 逐行比較 normalized hand labels／missing mask，新增 homography 子取樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "datasets/holoaders.py",
+        "ranges": [
+          [
+            87,
+            124
+          ],
+          [
+            193,
+            258
+          ],
+          [
+            303,
+            366
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 406,
+        "sha256": "9ee460419e4ea21d6eafcbc07fcfa587dc8e4dd4ca1fd940d4276cccb5583ad1",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/datasets/holoaders.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/datasets/holoaders.py#L87-L124",
+        "why": "查核 future features 限 train、observation homographies、uid／label 對齊。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "options/expopts.py",
+        "ranges": [
+          [
+            1,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 28,
+        "sha256": "177b86edd827243db3dd5c5ade7e7706a5bc03144f8ca2fae44888cb31934445",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/options/expopts.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/options/expopts.py#L1-L28",
+        "why": "固定 10 observation／4 future、sample_times=10、fast_test。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "netscripts/epoch_feat.py",
+        "ranges": [
+          [
+            44,
+            100
+          ],
+          [
+            103,
+            140
+          ],
+          [
+            460,
+            567
+          ],
+          [
+            626,
+            676
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 677,
+        "sha256": "e43bc0cd838b86437b29717dd81635cbeade6e5f6511de8fdfba5d2ed43e92c1",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/netscripts/epoch_feat.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/netscripts/epoch_feat.py#L44-L100",
+        "why": "追蹤 numpy WDE 與 FDE 真正路徑、batch／rank 平均與 affordance caller。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "evaluation/traj_eval.py",
+        "ranges": [
+          [
+            5,
+            122
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "b46ec8c6d87bab27915eed7d19c204c7a6a6665d701306e9c42e7d593b83f32e",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/evaluation/traj_eval.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/evaluation/traj_eval.py#L5-L122",
+        "why": "逐行比較 OCT 檔案：除註解外相同；此 wrapper 不是所讀主迴圈的 WDE caller。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "IRMVLab/Diff-IP2D",
+        "requested_repo": "IRMVLab/Diff-IP2D",
+        "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+        "ref": null,
+        "path": "evaluation/affordance_eval.py",
+        "ranges": [
+          [
+            8,
+            32
+          ],
+          [
+            46,
+            160
+          ],
+          [
+            163,
+            206
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 206,
+        "sha256": "680fec76cbbf41f037e21471060925885b2f9e731a402998a29b50efb8f16cdd",
+        "url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/evaluation/affordance_eval.py",
+        "reading_url": "https://github.com/IRMVLab/Diff-IP2D/blob/733ae0150f24d78e705946f5647caeb6fa5fc461/evaluation/affordance_eval.py#L8-L32",
+        "why": "與 OCT 對照 heatmap／score 原生公式及省略 logging 的差別。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "0749d231af932c37330abd02a9fa5d435f4d707ee63d2daf3fcf66430294e0ef"
+  },
+  "repository_binding_review_sha256": "0749d231af932c37330abd02a9fa5d435f4d707ee63d2daf3fcf66430294e0ef",
+  "repository_bindings": [
+    {
+      "requested_repo": "IRMVLab/Diff-IP2D",
+      "resolved_repo": "IRMVLab/Diff-IP2D",
+      "aliases_in_this_review": [
+        "irmvlab/diff-ip2d"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+          "reviewed_files": [
+            "README.md",
+            "datasets/datasetopts.py",
+            "datasets/ho_utils.py",
+            "datasets/holoaders.py",
+            "evaluation/affordance_eval.py",
+            "evaluation/traj_eval.py",
+            "netscripts/epoch_feat.py",
+            "options/expopts.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/IRMVLab/Diff-IP2D",
+          "pdf_page": 1,
+          "pdf_sha256": "d4ce088ce1570f32fe5c97a94674e9f2cdd4a94b2c476d3c211704b5baa7c203",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P232",
+          "review_file": "content/github_review/reviews/P232.json",
+          "review_sha256": "0749d231af932c37330abd02a9fa5d435f4d707ee63d2daf3fcf66430294e0ef",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "IRMVLab/Diff-IP2D"
+  ],
+  "external_repositories": []
+}

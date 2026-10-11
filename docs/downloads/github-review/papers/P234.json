@@ -1,0 +1,453 @@
+{
+  "paper_id": "P234",
+  "name": "I-CVAE",
+  "title": "Intention-Conditioned Long-Term Human Egocentric Action Forecasting",
+  "year": 2022,
+  "paper_url": "https://arxiv.org/abs/2207.12080",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P234",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "已沿 Ego4D clips→視窗／意圖→ICVAE generate→本地 ED/AUED 核讀核心程式。這是重用 Ego4D 的方法來源；52 個 scenario-derived intention、20 個未來位置與 K=5 候選是不同單位。串接預測、GT 條件消融及 challenge 分數必須分開。",
+    "identity_note": "清單題名為 Intention-Conditioned Long-Term Human Egocentric Action Forecasting（2022 初稿）；已核快取為 arXiv:2207.12080v4（2024-04-08），題名改為 Intention-Conditioned Long-Term Human Egocentric Action Anticipation。作者均為 Esteve Valls Mascaró、Hyemin Ahn、Dongheui Lee。repo README 保留 Forecasting 標題，但連結並引用 WACV 2023 的 Anticipation，且具名第一作者維護，可確認為同一方法的作者程式，而非同名第三方。",
+    "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+    "environment": "離線人類第一人稱 Ego4D 日常活動；物理場景資訊來自 ego4d.json 的 scenarios，程式將單一 scenario 視為高層 intention。沒有 robot reset、control 或可執行成功條件；scenario 數不代表場景 layout 或機器人任務數。",
+    "tasks": "H3M 由過去片段辨識 verb、noun、intention；I-CVAE 預測 Z=20 個未來 verb–noun 標籤，通常產生 K=5 序列。固定 taxonomy 為 115 verbs、478 nouns、52 intentions；論文 p.6 的 53 scenarios 是另一統計口徑。設定檔 N=8，論文端到端表格包含 N=2/4/6/8，最佳結果用 N=6，不能一律寫 N=4。",
+    "data": "外部 fho_lta_{train,val,test_unannotated}.json 根為 clips；使用 video_uid、clip_uid、action_idx、verb_label、noun_label、action_clip_start_sec/end_sec，預處理另讀 action_clip_start_frame/end_frame。按 clip_uid 分組、action_idx 排序；case key 為最後觀測的 clip_uid_action_idx。input_clips／forecast_clips 各為 N／Z 筆，標籤 tensor 次序 [verb,noun]，forecast_times.label_clip_times 保留秒；缺 test label 補 -1，不能當有效類別。意圖 mapper 僅納入恰一個且在 52 類 taxonomy 中的 scenario，未提供多 scenario 的明確處置。SlowFast 特徵存 clip_uid_action_idx.pt；frame_to_feat 實際 int(frame/16)，W 參數未用；slice [start_feat:end_feat]，預設左補至 15 格。論文描述 2304 維特徵，不能把 feature index 當秒或控制步。完整標註／features／ego4d.json 未隨本次取得，沒有聲稱完整 case 數。原生每 clip 視窗數為 max(0,L-N-Z)，迴圈缺 +1，最後一個完整視窗未取。",
+    "evaluation": "ICVAE_Task.validation_step 分別評 verbs、nouns；pred [B,K,Z]→[B,Z,K]。lta_metrics.edit_distance 對每 case 取 min_k(editdistance.eval(pred_seq,gt_seq)/prefix_length)，再對 case 平均；AUED 對長度 1..Z 的 ED 做 trapz/(Z-1)，ED_19 是 Z=20 的末點，非第 19 個未來動作。validation_epoch_end 再不加權平均各 batch 指標；非 test 的 test_epoch_end 先依 clip key 合併去重後評分，兩者分母流程不同。論文稱 Damerau–Levenshtein 並報 action ED；此檔實際 import editdistance、呼叫 eval，未見 transposition 專用實作，也未在這條 Task 鏈計 action-pair ED，不能直接宣稱重現 challenge scorer。單模組 validation 使用 GT observed_labels 與 GT intention；create_prediction 才設 FROM_PREDICTION 串接 H3M。test GT 未公開，submission 每 case 含 verb／noun 的 K×Z 整數陣列。",
+    "standardization": {
+      "profile": "offline_egocentric_action_sequence_forecasting",
+      "reuse": "固定 taxonomy、clips 欄位及排序、case key、原生 ED/AUED 實作與 H3M→ICVAE 預測介面。",
+      "transform": "source 記 paper version+repo commit 並指回 Ego4D；domain 記人類活動，environment 記 video/scenario provenance；task 分 H3M recognition 與 LTA forecasting；case 用 dataset revision+split+clip_uid+最後 observed action_idx+N/Z；保留觀測秒／影格與特徵索引三種座標、GT/predicted intention 來源及不可見未來 label。evaluator 保留 verb/noun、best-of-K、prefix normalization、AUED 與 batch/global 聚合差別；不轉成機器人 success。",
+      "missing": "須固定 Ego4D v1 標註／feature revision 與 split manifest；核對 52 類 intention 排除的影片與 case 分母、末視窗少取及 batch 平均；比對正式 Damerau/action scorer。FROM_PREDICTION 缺 clip 時會借用隨機其他 clip 的 intention 並填 -1，接軌須改成可追蹤缺件。preprocess_dataset.py 的 Namespace 以字典取用且未定義 dir_annotations 參數，Quickstart 的 test_model.py 也不在固定 tree；這些都須在允許執行前修復／指定正確入口。"
+    },
+    "version_note": "固定作者 repo commit 5b95d85e0bec6bd94851c867054c535c1afc6248；此程式快照早於 arXiv v4，沒有宣稱逐版結果一致。README 的已提供完整 code 不是本次核讀完整碼庫的證據；本次僅核以上核心區段與 taxonomy 結構。未取得權重、完整資料或重跑模型。",
+    "discovery_evidence": [
+      {
+        "provider": "primary_paper",
+        "local_file": "audit/.cache/fulltext_review/P234/pages.json",
+        "sha256": "31d23110cedd1fd5dc0286ac604186bd8195fe08c3e613646d305c13de3eb343",
+        "url": "https://arxiv.org/pdf/2207.12080",
+        "json_pointers": [
+          "/0/text",
+          "/3/text",
+          "/4/text",
+          "/5/text",
+          "/6/text",
+          "/7/text"
+        ],
+        "version": "arXiv:2207.12080v4; WACV 2023",
+        "pdf_local_file": "audit/.cache/fulltext_review/P234/paper.pdf",
+        "pdf_sha256": "5ae68434318b290bbc454610e2030a8ec3b3a82e0ebb4425d3fef0ed260211d8",
+        "pages": [
+          1,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      {
+        "provider": "cached_github_search",
+        "local_file": "audit/.cache/github_review/search/P234.json",
+        "sha256": "6f028f295210dd1068ca1adea0f60fa688d379becf60c5a11bf4a65fbfbba142",
+        "json_pointers": [
+          "/query",
+          "/receipt",
+          "/total_count",
+          "/results/0"
+        ],
+        "note": "搜尋僅作候選；以 README 具名作者、正式論文引用及 PDF 核對身分。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            5
+          ],
+          [
+            10,
+            40
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 40,
+        "sha256": "5180b92a0cf02a2daa51612cc0b5238be28f3d3d0ee85be6baf2d8b9739fbf81",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/README.md",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/README.md#L1-L5",
+        "why": "題名、WACV 2023 引文與第一作者維護身分。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "Quickstart.MD",
+        "ranges": [
+          [
+            11,
+            44
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 44,
+        "sha256": "7f68a18f3cd970ca5a7d90ca1e3c548160f4ac57e547a337b90acdf045f7d605",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/Quickstart.MD",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/Quickstart.MD#L11-L44",
+        "why": "Ego4D 外部特徵／標註依賴及單模組、串接測試的區別。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/datasets/ptv_dataset_helper_features.py",
+        "ranges": [
+          [
+            108,
+            170
+          ],
+          [
+            371,
+            457
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 460,
+        "sha256": "055fdd98d4d9503a4068325ae8cb47bbd0f8c2f8304cc242c136acc285d3f510",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/datasets/ptv_dataset_helper_features.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/datasets/ptv_dataset_helper_features.py#L108-L170",
+        "why": "原生 clips JSON、秒欄位改名、按 action_idx 排序及實際視窗數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/datasets/LTA_features.py",
+        "ranges": [
+          [
+            197,
+            263
+          ],
+          [
+            296,
+            313
+          ],
+          [
+            336,
+            402
+          ],
+          [
+            405,
+            499
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 499,
+        "sha256": "b43579eea276cb03b205e460080f44b0ba7de3bc534b704d84388ee1d518d4cc",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/datasets/LTA_features.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/datasets/LTA_features.py#L197-L263",
+        "why": "split、scenario→intention、verb/noun 次序、case key 及預測缺失時的回退。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "preprocess_dataset.py",
+        "ranges": [
+          [
+            6,
+            56
+          ],
+          [
+            66,
+            142
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 142,
+        "sha256": "221a3f6ac785bcf32ec73ae5c2824dfc8ac67588858dbb432c13857a9b1ecd02",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/preprocess_dataset.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/preprocess_dataset.py#L6-L56",
+        "why": "影格到特徵索引、左側補零與預處理入口限制。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "data/config/config_ICVAE.yaml",
+        "ranges": [
+          [
+            1,
+            18
+          ],
+          [
+            28,
+            82
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 82,
+        "sha256": "3da17d28fc308c1429ac5d425831ca56814ea0932c12a6c49232940e734d74aa",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/data/config/config_ICVAE.yaml",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/data/config/config_ICVAE.yaml#L1-L18",
+        "why": "此設定的 8 observed／20 future、115 verbs／478 nouns／52 intentions。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/config/defaults.py",
+        "ranges": [
+          [
+            666,
+            687
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 985,
+        "sha256": "2c25944f64a7d0bdbea9cac2c6fd32f3212545b00bff7c94976c39d13648dd71",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/config/defaults.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/config/defaults.py#L666-L687",
+        "why": "實際 K 預設為 5；不能把未覆寫的預設 horizon 當論文設定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/models/lta_models.py",
+        "ranges": [
+          [
+            15,
+            58
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 485,
+        "sha256": "19b7da17f5966b972ff9a888a4b5f780293e6e65e8ec1039fb13f7b9146abc83",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/models/lta_models.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/models/lta_models.py#L15-L58",
+        "why": "ICVAE 繼承 CAE，定位實際 generate 實作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/models/architectures/cae.py",
+        "ranges": [
+          [
+            72,
+            131
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 134,
+        "sha256": "056b711ce09d5364b0003ad33da3098af853456891e02d3303457c91f10301bc",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/models/architectures/cae.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/models/architectures/cae.py#L72-L131",
+        "why": "從觀測與意圖取樣 K 個 latent，只經 decoder／head 生成未來類別。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/tasks/ICVAE_Task.py",
+        "ranges": [
+          [
+            122,
+            246
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 246,
+        "sha256": "eebea8d0bcb14e0875a0c303b263d5dd6fe497eed37aaaa8a1f5f8b047b440ef",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/tasks/ICVAE_Task.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/tasks/ICVAE_Task.py#L122-L246",
+        "why": "GT 條件 validation、batch 平均、去重輸出與本地計分呼叫鏈。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "ego4d/evaluation/lta_metrics.py",
+        "ranges": [
+          [
+            6,
+            14
+          ],
+          [
+            71,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 115,
+        "sha256": "3dab0fb933611363f5b845919153bdb3f02ec56825bdb29c5fd88280e80f80dd",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/evaluation/lta_metrics.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/ego4d/evaluation/lta_metrics.py#L6-L14",
+        "why": "best-of-K ED、prefix 正規化、AUED 梯形積分與函式註解差異。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Evm7/ego4dlta-icvae",
+        "requested_repo": "Evm7/ego4dlta-icvae",
+        "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+        "ref": null,
+        "path": "create_prediction.py",
+        "ranges": [
+          [
+            140,
+            165
+          ],
+          [
+            172,
+            212
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 213,
+        "sha256": "90df040338fb85447497d00625455e392febc1cc57b76709bf473056cec471d5",
+        "url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/create_prediction.py",
+        "reading_url": "https://github.com/Evm7/ego4dlta-icvae/blob/5b95d85e0bec6bd94851c867054c535c1afc6248/create_prediction.py#L140-L165",
+        "why": "H3M action／intention 預測合併與 FROM_PREDICTION 串接。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b9116746395675cda9cee3a2c7d041a23d7a2c8b9d2eeaf2b1a678567793222e"
+  },
+  "repository_binding_review_sha256": "b9116746395675cda9cee3a2c7d041a23d7a2c8b9d2eeaf2b1a678567793222e",
+  "repository_bindings": [
+    {
+      "requested_repo": "Evm7/ego4dlta-icvae",
+      "resolved_repo": "Evm7/ego4dlta-icvae",
+      "aliases_in_this_review": [
+        "evm7/ego4dlta-icvae"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5b95d85e0bec6bd94851c867054c535c1afc6248",
+          "reviewed_files": [
+            "Quickstart.MD",
+            "README.md",
+            "create_prediction.py",
+            "data/config/config_ICVAE.yaml",
+            "ego4d/config/defaults.py",
+            "ego4d/datasets/LTA_features.py",
+            "ego4d/datasets/ptv_dataset_helper_features.py",
+            "ego4d/evaluation/lta_metrics.py",
+            "ego4d/models/architectures/cae.py",
+            "ego4d/models/lta_models.py",
+            "ego4d/tasks/ICVAE_Task.py",
+            "preprocess_dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "ego4dlta icvae",
+          "search_receipt_sha256": "e58311b18298223c1ce0ce0d92d66a62859dee8e81025acb35b03f5ebaf15094",
+          "url": "https://github.com/Evm7/ego4dlta-icvae",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P234",
+          "review_file": "content/github_review/reviews/P234.json",
+          "review_sha256": "b9116746395675cda9cee3a2c7d041a23d7a2c8b9d2eeaf2b1a678567793222e",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "Evm7/ego4dlta-icvae"
+  ],
+  "external_repositories": []
+}

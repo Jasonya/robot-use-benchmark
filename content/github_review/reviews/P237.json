@@ -1,0 +1,767 @@
+{
+  "paper_id": "P237",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已核 GTDA 的 Breakfast/50Salads 與 Assembly101 loader、DDIM inference 及 Mean/Max MoC／Frame Diversity。三個指標有不同分母：candidate-pooled class accuracy、逐 case/β oracle 選樣後 class accuracy，以及候選兩兩 frame disagreement；不可折成共同 success 或把 Top-1 當部署模型選出的最佳預測。",
+  "identity_note": "arXiv:2407.11954v1（2024-07-16），Olga Zatsarynna、Emad Bahrami、Yazan Abu Farha、Gianpiero Francesca、Juergen Gall；PDF p.1 直接給 olga-zats/GTDA，README 引同一 ECCV 2024 論文。GTD 是 stochastic diffusion、GTAN 是其 deterministic backbone；同 repo 兩個模式不增加獨立來源數。",
+  "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+  "reading_order": [
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          25
+        ],
+        [
+          34,
+          94
+        ]
+      ],
+      "why": "正式題名、作者與 Breakfast/Assembly features／annotation 外部依賴。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/main.py",
+      "ranges": [
+        [
+          148,
+          224
+        ]
+      ],
+      "why": "資料分支、真實 action dict、α 與 evaluation 入口。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/batch_gen.py",
+      "ranges": [
+        [
+          34,
+          136
+        ],
+        [
+          159,
+          216
+        ]
+      ],
+      "why": "bundle、3 個訓練 observation case、部分未來長度、零補 features 與 masks。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/batch_gen_assembly.py",
+      "ranges": [
+        [
+          18,
+          20
+        ],
+        [
+          78,
+          179
+        ],
+        [
+          182,
+          255
+        ],
+        [
+          278,
+          332
+        ]
+      ],
+      "why": "view/action_type identity、coarse segment/end-exclusive 展開與缺 feature 排除。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/trainers.py",
+      "ranges": [
+        [
+          22,
+          55
+        ],
+        [
+          283,
+          341
+        ],
+        [
+          345,
+          456
+        ],
+        [
+          459,
+          569
+        ]
+      ],
+      "why": "EMA sampling、原 frame 回復、Mean/Max MoC、輸出 pickle 與無效 stochastic Acc。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/bit_diffusion.py",
+      "ranges": [
+        [
+          305,
+          352
+        ],
+        [
+          380,
+          471
+        ]
+      ],
+      "why": "確認 x_0 僅供形狀；self-condition 是先前預測，輸入 features 按觀測 mask。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/evaluation.py",
+      "ranges": [
+        [
+          12,
+          87
+        ]
+      ],
+      "why": "實際 class TP/FN 計數、frame mismatch、segment edit 距離。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/diff_evaluate.py",
+      "ranges": [
+        [
+          14,
+          150
+        ]
+      ],
+      "why": "預存候選選擇、best-per-case-and-horizon、成對 Frame Diversity 與聚合分母。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "src/main_diff_evaluate.py",
+      "ranges": [
+        [
+          16,
+          29
+        ],
+        [
+          43,
+          83
+        ]
+      ],
+      "why": "precomputed 評測缺 mapping 的入口與 Assembly 空 dict 問題。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "scripts/prob/predict_bf_prob.sh",
+      "ranges": [
+        [
+          1,
+          33
+        ]
+      ],
+      "why": "Breakfast split4、K=25、sample_rate=3、50/1000步與 epoch85。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "scripts/prob/predict_assembly_prob.sh",
+      "ranges": [
+        [
+          1,
+          30
+        ]
+      ],
+      "why": "Assembly val、K=25、sample_rate=6與部分觀測。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "scripts/determ/predict_bf_determ.sh",
+      "ranges": [
+        [
+          2,
+          29
+        ]
+      ],
+      "why": "GTAN 無 diffusion，且示例用不同 split1。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "scripts/prob/predict_precomp_bf_prob.sh",
+      "ranges": [
+        [
+          1,
+          19
+        ]
+      ],
+      "why": "K=25 的 precomputed 示例未傳 --mapping_file。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/50salads/mapping.txt",
+      "ranges": [
+        [
+          1,
+          19
+        ]
+      ],
+      "why": "17 動作外另含 action_start/action_end，原生19類。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/breakfast/mapping.txt",
+      "ranges": [
+        [
+          1,
+          48
+        ]
+      ],
+      "why": "48類含 SIL，保留原始ID。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/assembly101/actions.csv",
+      "ranges": [
+        [
+          1,
+          16
+        ],
+        [
+          195,
+          203
+        ]
+      ],
+      "why": "coarse action_id/verb_id/noun_id/action_cls 欄位與邊界 ID；不等於 fine labels。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/assembly101/train.csv",
+      "ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "why": "原生訓練 CSV 的 video、view、action_type、起訖影格樣例。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/assembly101/val.csv",
+      "ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "why": "原生 validation CSV 與多視角身份。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/breakfast/splits/train.split4.bundle",
+      "ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "why": "固定 split4 訓練名單樣例；另以全列 key scan 檢驗計數。"
+    },
+    {
+      "repo": "olga-zats/GTDA",
+      "path": "datasets/breakfast/splits/test.split4.bundle",
+      "ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "why": "固定 split4 評測名單樣例；另以全列 key scan 檢驗計數。"
+    }
+  ],
+  "environment": "離線烹飪（Breakfast、50 Salads）及玩具車組裝／拆解（Assembly101）。Assembly CSV 含固定 RGB 相機與頭戴 HMC view，程式按存在的 numpy feature 過濾，沒有隻選 Ego view 的條件；視角欄位必須留在 case，不能把所有來源標第一人稱。",
+  "tasks": "以 α=0.2/0.3 的觀測預測 β=0.1/0.2/0.3/0.5 的逐格動作標籤。Breakfast mapping=48類含 SIL；50Salads mapping=19類（17動作+action_start/action_end）；Assembly 使用 coarse action_cls/action_id，附帶 actions.csv 有202類，不是全部細粒度 action 組合。每訓練 video/view 衍生 α=.2/.3/.5 的3個 observation case，另有40%機率改為 .15+.25U；這些不是3支新增影片。",
+  "data": "Breakfast/50s 為 D×T 的 .npy、逐行 label .txt、mapping.txt、split bundle。sample 回傳 features、classes、classes_all、classes_one_hot、mask_past、mask_future、vid_len、file_name；feature 只取 [:int(αT)] 並 [::sample_rate]，collate 在未來／padding補零，label padding=C+1。--part_obs 將 prediction span設為全影片的 .5，所需長度仍源自完整 GT T。Assembly CSV 為 video_id,view,action_type,video_start_frame,video_end_frame；coarse_labels/{action_type}_{video_id}.txt 每行 tab 分隔 start,end,label（尾空欄依實作），依 end-start 展開，程式註明 @30fps；TSM_features/{video_id}/{view}/features.npy 用 [start:end] 裁切。feature缺檔、空segment或無長度會跳過，lmdb分支未實作。固定 split4 bundle 1136 train／576 test unique video keys，無交集；這是名單數。Assembly train/val CSV 4684/1424列、204/61個 video_id，各16種view；尚非有效執行case數。保存預測 pickle 以 action_type_video_id_view 或 Breakfast file_name 為key，值為K組復原逐格預測，gt_ 前綴是全長GT。",
+  "evaluation": "線上 validate 強制 batch_size=1，stochastic 用 EMA 產生 K=25 候選；Breakfast示例 sample_rate=3，Assembly=6，預測每個採樣位置重複該倍數回原格。對 [int(αT):int((α+β)T)] 計 n_T/n_F。Mean MoC 先把所有影片、全部K候選的每GT類別正誤格數相加，再對有GT的類別平均 T/(T+F)，輸出0..1；不是每影片MoC的平均。Max/Top-1 MoC 對每影片及每β依GT挑該範圍MoC最高的一個候選，累積其類別計數後再宏平均，同影片不同β可選不同候選。precomputed Frame Diversity 對每case取 K(K-1)/2 配對的 [1-相同frame數/該future窗長] 平均，再等權平均case。完整K=25對應300配對；test_num_samples 預設1會除零，不能沿用其預設。eval_file 另算 normalized segment Levenshtein error，但目前 MoC caller 丟棄該回傳，不能當正式主指標。程式把 x_0 GT傳到 predict，但底層只用 zeros_like取得形狀，生成值起於高斯噪聲；仍依賴GT長度，與GT action值洩漏需分辨。",
+  "standardization": {
+    "profile": "offline_stochastic_dense_action_forecasting",
+    "reuse": "原生 mapping、split與view身份、coarse-to-frame規則、TP/FN累積、候選pickle結構及Frame Diversity程式。",
+    "transform": "source 記paper/repo/data-feature revision，domain/environment依烹飪或組裝與view分類；task區分deterministic GTAN／stochastic GTD；case=(dataset revision,fold或train/val,video,action_type,view,α,β)，candidate_index屬case內試樣。保留annotation frame reference、sample_rate、GT-length protocol、K、EMA/checkpoint、diffusion T/D；evaluator標明Mean MoC／oracle Top-1 MoC／pairwise diversity各自分母與0..1尺度，不能直接對齊P236的百分比或P240的mAP。",
+    "missing": "固定TSM/I3D及Assembly coarse annotation版本、實際feature存在清單，驗證start/end與view長度裁切。線上stochastic分支沒有累加frame error/num_frames卻仍輸出Acc，會得到0/0，應列為無效欄位。precomputed讀取硬編碼 /home/user/diff_results/final，與writer的 ./diff_results 不同；predict_precomp_bf_prob.sh未傳mapping_file；Assembly的main_diff_evaluate把actions_dict設空，eval_file會以零長類別陣列索引，須修復後才能重評。固定test_num_samples>=2並檢查候選數／長度、有效GT窗；原程式min(pred_len,GT_len)可能縮短評測分母。尚未閉合50Salads的示例腳本／checkpoints與完整跨fold聚合。"
+  },
+  "version_note": "固定 010bad63c802e1666f64943dd098f3ac7be13118（2025-05-29），晚於ECCV 2024。readme所稱 precomputed_<dataset> 命名與實際 predict_precomp_bf_prob.sh 不同。論文對Breakfast/Assembly用50 DDIM steps，50Salads用10；不能把兩個已讀腳本的50套全資料集。paper p.14 明指ANTICIPATR協定不同，不應與P240數值直接合併。僅讀核心區段及小型split/label來源，未跑模型或載入pickle／大資產。",
+  "discovery_evidence": [
+    {
+      "provider": "primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P237/pages.json",
+      "sha256": "43da9448312f48c6d6173c3eb64909bfdcbd8d9c7a0829984b7ab40f9380a791",
+      "url": "https://arxiv.org/pdf/2407.11954",
+      "json_pointers": [
+        "/0/text",
+        "/8/text",
+        "/9/text",
+        "/13/text",
+        "/19/text",
+        "/28/text"
+      ],
+      "version": "arXiv:2407.11954v1; ECCV 2024",
+      "pdf_local_file": "audit/.cache/fulltext_review/P237/paper.pdf",
+      "pdf_sha256": "f6c21ba878b3a9f3a21fb3198b583f08ba445805d677655b101b549d90b450f5",
+      "pages": [
+        1,
+        9,
+        10,
+        14,
+        20,
+        29
+      ]
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "README.md",
+      "git_blob_sha": "40b4b3711affe197658e8dca108b7e06f5218ab9",
+      "sha256": "881b66f8dff8aef566bfbf26bda7c7a5d408f90cbc9a93a4e58a5b1541685adc",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/README.md",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/README.md",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/README.md",
+      "ranges": [
+        [
+          1,
+          25
+        ],
+        [
+          34,
+          94
+        ]
+      ],
+      "why": "正式題名、作者與 Breakfast/Assembly features／annotation 外部依賴。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/main.py",
+      "git_blob_sha": "e6ccfa0c8992c97844f3b4a949aa6b49e3c9a7d6",
+      "sha256": "6c65b4cb8936a1699d311aa95c2a894950e8b567b2b2817f58eb48a499d3254b",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/src/main.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/main.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/main.py",
+      "ranges": [
+        [
+          148,
+          224
+        ]
+      ],
+      "why": "資料分支、真實 action dict、α 與 evaluation 入口。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/batch_gen.py",
+      "git_blob_sha": "39fd77654d5dbd0882b397285e39c21448189cfc",
+      "sha256": "7f14d82d8faf567e5e9600d386a9badd0baf89b7015857b42ebaa7c2316f5cb2",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/src/batch_gen.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/batch_gen.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/batch_gen.py",
+      "ranges": [
+        [
+          34,
+          136
+        ],
+        [
+          159,
+          216
+        ]
+      ],
+      "why": "bundle、3 個訓練 observation case、部分未來長度、零補 features 與 masks。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/batch_gen_assembly.py",
+      "git_blob_sha": "933780095037ac0c8f1cdb2667b6524d71bc3894",
+      "sha256": "30dedde3e1372edac250e7ac95185d0859a84e222df6dca6c474513711f6e892",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/src/batch_gen_assembly.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/batch_gen_assembly.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/batch_gen_assembly.py",
+      "ranges": [
+        [
+          18,
+          20
+        ],
+        [
+          78,
+          179
+        ],
+        [
+          182,
+          255
+        ],
+        [
+          278,
+          332
+        ]
+      ],
+      "why": "view/action_type identity、coarse segment/end-exclusive 展開與缺 feature 排除。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/trainers.py",
+      "git_blob_sha": "97b810b7354c74fbc625ed2abd0618ea4726b474",
+      "sha256": "3c61b9b9fb7dda80252f892755c13bf4059d7a424836d35f2f44628034c6a9f1",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/src/trainers.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/trainers.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/trainers.py",
+      "ranges": [
+        [
+          22,
+          55
+        ],
+        [
+          283,
+          341
+        ],
+        [
+          345,
+          456
+        ],
+        [
+          459,
+          569
+        ]
+      ],
+      "why": "EMA sampling、原 frame 回復、Mean/Max MoC、輸出 pickle 與無效 stochastic Acc。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/bit_diffusion.py",
+      "git_blob_sha": "43cd799d0ea095391456881b332be42c0f878a6d",
+      "sha256": "59ef285a47179eba40a53f2ecda3aeaf77b5e749848b4e3228709bdb94ef4969",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/src/bit_diffusion.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/bit_diffusion.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/bit_diffusion.py",
+      "ranges": [
+        [
+          305,
+          352
+        ],
+        [
+          380,
+          471
+        ]
+      ],
+      "why": "確認 x_0 僅供形狀；self-condition 是先前預測，輸入 features 按觀測 mask。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/evaluation.py",
+      "git_blob_sha": "1954ea1814099193071b7268a72eaba8abe34518",
+      "sha256": "82269649ba165793b4074e497468dc1b9248e991cd0a10a8ce56c106f8e18891",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/src/evaluation.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/evaluation.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/evaluation.py",
+      "ranges": [
+        [
+          12,
+          87
+        ]
+      ],
+      "why": "實際 class TP/FN 計數、frame mismatch、segment edit 距離。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/diff_evaluate.py",
+      "git_blob_sha": "b93054c4e15e3907202ea0f09e8b6b75c15a3d82",
+      "sha256": "8953ac52ffa243005ef761e40b1db5ad2e359436bef8c44ceb531b25034986c0",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/src/diff_evaluate.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/diff_evaluate.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/diff_evaluate.py",
+      "ranges": [
+        [
+          14,
+          150
+        ]
+      ],
+      "why": "預存候選選擇、best-per-case-and-horizon、成對 Frame Diversity 與聚合分母。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "src/main_diff_evaluate.py",
+      "git_blob_sha": "c69675a210187c730def25bb77166eac134b7957",
+      "sha256": "5845452e3e76181bac6c6acbec692d6218a16f3178c35d47e332c9e078348fea",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/src/main_diff_evaluate.py",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/src/main_diff_evaluate.py",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/src/main_diff_evaluate.py",
+      "ranges": [
+        [
+          16,
+          29
+        ],
+        [
+          43,
+          83
+        ]
+      ],
+      "why": "precomputed 評測缺 mapping 的入口與 Assembly 空 dict 問題。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "scripts/prob/predict_bf_prob.sh",
+      "git_blob_sha": "ad152ae33d1dca71bb66e932ec7b0a012511e8b7",
+      "sha256": "495c3138e0f4dde8a1a09fba354ff2181f653a271cd079f381ed4c32f489d70a",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/scripts/prob/predict_bf_prob.sh",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_bf_prob.sh",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_bf_prob.sh",
+      "ranges": [
+        [
+          1,
+          33
+        ]
+      ],
+      "why": "Breakfast split4、K=25、sample_rate=3、50/1000步與 epoch85。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "scripts/prob/predict_assembly_prob.sh",
+      "git_blob_sha": "233b58a6822cc52afb4816492cb7cf96e19a53b1",
+      "sha256": "17638ef1d24aa1033f699b4195a51345d55deb3c076fb0d488a6687a881e26ac",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/scripts/prob/predict_assembly_prob.sh",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_assembly_prob.sh",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_assembly_prob.sh",
+      "ranges": [
+        [
+          1,
+          30
+        ]
+      ],
+      "why": "Assembly val、K=25、sample_rate=6與部分觀測。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "scripts/determ/predict_bf_determ.sh",
+      "git_blob_sha": "210d9bccd7be70ab9f485761009484fdfe8165f1",
+      "sha256": "59030a2305bf9b05687fe042bdb527d42cd88537cb8e6706ef23ffeec5c90e0d",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/scripts/determ/predict_bf_determ.sh",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/determ/predict_bf_determ.sh",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/scripts/determ/predict_bf_determ.sh",
+      "ranges": [
+        [
+          2,
+          29
+        ]
+      ],
+      "why": "GTAN 無 diffusion，且示例用不同 split1。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "scripts/prob/predict_precomp_bf_prob.sh",
+      "git_blob_sha": "3bb5f777dbc85bc2a466a76fd446173a9798c012",
+      "sha256": "0138fb3e5e4c31a56cce626c3073d78e2a55b0c15c8d42593c0aeaeafd9a809c",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/scripts/prob/predict_precomp_bf_prob.sh",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_precomp_bf_prob.sh",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/scripts/prob/predict_precomp_bf_prob.sh",
+      "ranges": [
+        [
+          1,
+          19
+        ]
+      ],
+      "why": "K=25 的 precomputed 示例未傳 --mapping_file。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/50salads/mapping.txt",
+      "git_blob_sha": "3edb46bd918f84b47956904ba57b17e72d936213",
+      "sha256": "d9896add0c02ba39649eb1745a8082c294d37b758961d4c4f425526630c549f7",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/datasets/50salads/mapping.txt",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/50salads/mapping.txt",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/50salads/mapping.txt",
+      "ranges": [
+        [
+          1,
+          19
+        ]
+      ],
+      "why": "17 動作外另含 action_start/action_end，原生19類。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/breakfast/mapping.txt",
+      "git_blob_sha": "875ff24e159013e63f9c067f4460b65fd53bb126",
+      "sha256": "7352004e679ab525bd8e0f0b82c29e64f394f4f5cee4d860dbefd594453c6f6e",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/datasets/breakfast/mapping.txt",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/mapping.txt",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/mapping.txt",
+      "ranges": [
+        [
+          1,
+          48
+        ]
+      ],
+      "why": "48類含 SIL，保留原始ID。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/assembly101/actions.csv",
+      "git_blob_sha": "81ffddb943130da6eaae76a9ff761dcded1bd357",
+      "sha256": "65cb686c26016ee500947b0a4d48f7d403d77c47fb02d76e4fb678393ee18795",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/datasets/assembly101/actions.csv",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/actions.csv",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/actions.csv",
+      "ranges": [
+        [
+          1,
+          16
+        ],
+        [
+          195,
+          203
+        ]
+      ],
+      "why": "coarse action_id/verb_id/noun_id/action_cls 欄位與邊界 ID；不等於 fine labels。"
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/assembly101/train.csv",
+      "git_blob_sha": "6bafebbfea57b7d8768595a4f24e701ea921d769",
+      "sha256": "597fe9a03b795f60b799ce36e90801c5ced83255a2bcbb78e08122ebedc4f84f",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/datasets/assembly101/train.csv",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/train.csv",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/train.csv",
+      "ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "why": "原生訓練 CSV 的 video、view、action_type、起訖影格樣例。",
+      "structural_scan": {
+        "ranges": [
+          [
+            1,
+            4685
+          ]
+        ],
+        "data_rows": 4684,
+        "unique_video_id": 204,
+        "unique_view": 16,
+        "method": "csv.DictReader 全列欄位／唯一鍵計數；有效 feature case 數未確認。"
+      }
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/assembly101/val.csv",
+      "git_blob_sha": "ec77fe4bac2f9d1c903de2c3c7f17a862477780b",
+      "sha256": "6f602de17e9013c04721dae94bd0e59f1687ee9cceb4e766c876aa1d34afc033",
+      "local_file": "audit/.cache/github_review/repos/olga-zats__GTDA/files/datasets/assembly101/val.csv",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/val.csv",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/assembly101/val.csv",
+      "ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "why": "原生 validation CSV 與多視角身份。",
+      "structural_scan": {
+        "ranges": [
+          [
+            1,
+            1425
+          ]
+        ],
+        "data_rows": 1424,
+        "unique_video_id": 61,
+        "unique_view": 16,
+        "method": "csv.DictReader 全列欄位／唯一鍵計數；有效 feature case 數未確認。"
+      }
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/breakfast/splits/train.split4.bundle",
+      "git_blob_sha": "e760b0195478ef5ecddad6b681c073cb8536f1cc",
+      "sha256": "b3d2994cb981e466272d7fc562f8af5bce8ed886551c76953fb075e22aae6de9",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/datasets/breakfast/splits/train.split4.bundle",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/splits/train.split4.bundle",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/splits/train.split4.bundle",
+      "ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "why": "固定 split4 訓練名單樣例；另以全列 key scan 檢驗計數。",
+      "structural_scan": {
+        "ranges": [
+          [
+            1,
+            1136
+          ]
+        ],
+        "line_count": 1136,
+        "unique_keys": 1136,
+        "intersection_with_test_split4": 0,
+        "method": "全檔文字列解析／集合計數，非逐例內容語義核讀。"
+      }
+    },
+    {
+      "provider": "github",
+      "repo": "olga-zats/GTDA",
+      "commit": "010bad63c802e1666f64943dd098f3ac7be13118",
+      "path": "datasets/breakfast/splits/test.split4.bundle",
+      "git_blob_sha": "2b8aed357622206a7c4962e5278057619b0b7289",
+      "sha256": "bf9bc8ed43860632ef5b86df64ccee51b8e9db35eff9d379067494c76427d4e6",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/olga-zats__GTDA/datasets/breakfast/splits/test.split4.bundle",
+      "url": "https://github.com/olga-zats/GTDA/blob/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/splits/test.split4.bundle",
+      "raw_url": "https://raw.githubusercontent.com/olga-zats/GTDA/010bad63c802e1666f64943dd098f3ac7be13118/datasets/breakfast/splits/test.split4.bundle",
+      "ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "why": "固定 split4 評測名單樣例；另以全列 key scan 檢驗計數。",
+      "structural_scan": {
+        "ranges": [
+          [
+            1,
+            576
+          ]
+        ],
+        "line_count": 576,
+        "unique_keys": 576,
+        "intersection_with_train_split4": 0,
+        "method": "全檔文字列解析／集合計數，非逐例內容語義核讀。"
+      }
+    }
+  ],
+  "runtime_executed": false
+}

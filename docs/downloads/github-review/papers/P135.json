@@ -1,0 +1,166 @@
+{
+  "paper_id": "P135",
+  "name": "Octo",
+  "title": "Octo: An Open-Source Generalist Robot Policy",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2405.12213",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P135",
+    "summary": "Octo提供可組合的多相機/語言/goal接口及OXE loader；其80萬軌跡是訓練混合，模型task字典與benchmark語義任務不是同一計數單位。",
+    "environment": "重用多來源robot資料及既有ALOHA/WidowX執行環境；模型支援的機體/相機種類不等於獨立benchmark環境。",
+    "tasks": "多任務goal-image或language條件policy；create_tasks組裝的是一次條件輸入，並不定義全庫獨立task。",
+    "data": "task含goal/text及pad_mask_dict；缺模態填零但mask=False。observations為B×window×...，timestep_pad_mask區分padding。output為sample_shape×B×action_horizon×action_dim；以mean/std或p01/p99和mask反正規化並裁到機體維度。",
+    "evaluation": "例子在aloha-sim-cube-v0用history=1、exec_horizon=50，跑3次400step上限並記episode return。它是示例protocol，不能作全部Octo/所有機體的統一成功判定；底層checker仍屬原環境。",
+    "standardization": {
+      "profile": "multimodal_generalist_policy_and_rlds_loader",
+      "reuse": "task/obs/action模組接口、missing/timestep masks、資料來源stat與normalization。",
+      "transform": "保留OXE子來源/episode與method分離；case固定language或goal、可見相機/歷史、sample_shape與exec horizon，數值表示和缺失mask不可丟。",
+      "missing": "完整pretraining mixture與來源去重、模型版本/目標機體stat、各原benchmark正式protocol、素材與原生執行驗證。"
+    },
+    "version_note": "固定241fb35；DROID另釘較早Octo85b83fc，不可互相套用。README連1.5 checkpoint，模型版本、程式版本與資料版本分開保存。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "octo-models/octo",
+        "requested_repo": "octo-models/octo",
+        "commit": "241fb3514b7c40957a86d869fecb7c7fc353f540",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            28
+          ],
+          [
+            65,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 168,
+        "sha256": "057e41b4866d4c1c19eaf8882c5f1551594476f1b2193f52ec626833381de262",
+        "url": "https://github.com/octo-models/octo/blob/241fb3514b7c40957a86d869fecb7c7fc353f540/README.md",
+        "reading_url": "https://github.com/octo-models/octo/blob/241fb3514b7c40957a86d869fecb7c7fc353f540/README.md#L1-L28",
+        "why": "原方法、訓練混合與evaluation/loader入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "octo-models/octo",
+        "requested_repo": "octo-models/octo",
+        "commit": "241fb3514b7c40957a86d869fecb7c7fc353f540",
+        "ref": null,
+        "path": "octo/model/octo_model.py",
+        "ranges": [
+          [
+            76,
+            134
+          ],
+          [
+            174,
+            253
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 580,
+        "sha256": "93d96015bc43ee92910127421e17697d372f0bbc1a4d3589a0addb22efb819e0",
+        "url": "https://github.com/octo-models/octo/blob/241fb3514b7c40957a86d869fecb7c7fc353f540/octo/model/octo_model.py",
+        "reading_url": "https://github.com/octo-models/octo/blob/241fb3514b7c40957a86d869fecb7c7fc353f540/octo/model/octo_model.py#L76-L134",
+        "why": "task/missing-modality mask、候選維度和反正規化",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "octo-models/octo",
+        "requested_repo": "octo-models/octo",
+        "commit": "241fb3514b7c40957a86d869fecb7c7fc353f540",
+        "ref": null,
+        "path": "examples/03_eval_finetuned.py",
+        "ranges": [
+          [
+            43,
+            110
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 114,
+        "sha256": "00536ee90b51db9f8e2bd3f1429c0bdb2fa973765ff415d562401709894c00bb",
+        "url": "https://github.com/octo-models/octo/blob/241fb3514b7c40957a86d869fecb7c7fc353f540/examples/03_eval_finetuned.py",
+        "reading_url": "https://github.com/octo-models/octo/blob/241fb3514b7c40957a86d869fecb7c7fc353f540/examples/03_eval_finetuned.py#L43-L110",
+        "why": "既有ALOHA sim wrapper、history與exec-horizon及回報方式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4c531fbd9968922791cedf71d19bf266a6b76f6c36c8024f9530b9640a7befdd"
+  },
+  "repository_binding_review_sha256": "4c531fbd9968922791cedf71d19bf266a6b76f6c36c8024f9530b9640a7befdd",
+  "repository_bindings": [
+    {
+      "requested_repo": "octo-models/octo",
+      "resolved_repo": "octo-models/octo",
+      "aliases_in_this_review": [
+        "octo-models/octo"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "241fb3514b7c40957a86d869fecb7c7fc353f540",
+          "reviewed_files": [
+            "README.md",
+            "examples/03_eval_finetuned.py",
+            "octo/model/octo_model.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/octo-models/octo",
+          "link_label": "Code",
+          "project_url": "https://octo-models.github.io",
+          "page_sha256": "4f23c47e37533137b1e3845afd57bbbd74ed37865f3fce0699ca673a8cde0b6b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/octo-models/octo/blob/main/scripts/configs/finetune_config.py",
+          "link_label": "the same finetuning recipe",
+          "project_url": "https://octo-models.github.io",
+          "page_sha256": "4f23c47e37533137b1e3845afd57bbbd74ed37865f3fce0699ca673a8cde0b6b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P135",
+          "review_file": "content/github_review/reviews/P135.json",
+          "review_sha256": "4c531fbd9968922791cedf71d19bf266a6b76f6c36c8024f9530b9640a7befdd",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "octo-models/octo"
+  ],
+  "external_repositories": []
+}

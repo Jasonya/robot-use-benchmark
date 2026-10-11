@@ -1,0 +1,148 @@
+{
+  "paper_id": "P152",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RoboWM-Bench把生成影片經IDM/手部軌跡抽取後放入Isaac Lab評估，能連到真實task checker；其成功定義仍須逐題保留，不能只比較影片品質。",
+  "reading_order": [
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          125
+        ],
+        [
+          149,
+          218
+        ]
+      ],
+      "why": "世界模型→動作→模擬流程、環境版本和兩種track"
+    },
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "tools/parquet_actions_to_json.py",
+      "ranges": [
+        [
+          24,
+          43
+        ],
+        [
+          70,
+          95
+        ]
+      ],
+      "why": "parquet action逐行輸出及重新編號/pose配對"
+    },
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "scripts/robot/eval_franka.py",
+      "ranges": [
+        [
+          123,
+          138
+        ],
+        [
+          207,
+          241
+        ],
+        [
+          285,
+          355
+        ],
+        [
+          419,
+          439
+        ],
+        [
+          481,
+          505
+        ]
+      ],
+      "why": "動作裁切、30step穩定、any-time success與分母"
+    },
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "source/lehome/lehome/tasks/franka_task/Task00_Pick/pick.py",
+      "ranges": [
+        [
+          125,
+          156
+        ],
+        [
+          291,
+          300
+        ]
+      ],
+      "why": "joint target與pick checker實際呼叫"
+    },
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "source/lehome/lehome/tasks/franka_task/Task01_Put_on_plate/tableware.py",
+      "ranges": [
+        [
+          328,
+          372
+        ]
+      ],
+      "why": "分階段contact/lift/place"
+    },
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "source/lehome/lehome/utils/success_checker.py",
+      "ranges": [
+        [
+          1,
+          26
+        ],
+        [
+          63,
+          90
+        ],
+        [
+          115,
+          141
+        ],
+        [
+          197,
+          208
+        ],
+        [
+          430,
+          467
+        ]
+      ],
+      "why": "間隔檢查、絕對高度差、XY對齊和水粒子近似"
+    },
+    {
+      "repo": "fffstrong/RoboWM-Bench",
+      "commit": "0a8b0eab3ebfb7993f6ab895f12eac41dfefa1c1",
+      "path": "source/lehome/lehome/tasks/human_task/Task07_Franka_Tableware_Pour_Water/tableware.py",
+      "ranges": [
+        [
+          364,
+          373
+        ]
+      ],
+      "why": "human track倒水實際呼叫預設checker"
+    }
+  ],
+  "environment": "IsaacSim5.1與庫內IsaacLab_5_1、LeHome式操作場景；robot track列7個Gym名稱，其中pull_and_push共享名稱。human track列12個原生task目錄；不能加上隨附IsaacLab全部任務當RoboWM規模。",
+  "tasks": "robot影片經IDM解碼為Franka動作；human影片經Phantom抽手軌跡再執行。pick/擺盤/丟垃圾/抽屜/按鈕/推拉及human track柔性、倒水等，各有獨立判分。",
+  "data": "World-model輸入為初始RGB和prompt；robot軌跡檔名.json實為每行一個action，pose.jsonl依episode檔名索引。parquet轉檔按episode尾3位排序後重編0..N，須保存映射避免pose錯配。Franka為7arm+2gripper joint targets，夾爪有額外閾值與關節裁切。",
+  "evaluation": "回放先30step穩定，再取軌跡中曾成功；例外回False列入attempts。pick用abs(z−ori_z)>0.05，未限制向上；擺盤成功只看XY各≤0.15；倒水預設至少1%粒子落在XY±0.02、Z±0.5的對稱盒內。step_interval計數跨呼叫，部分成功條件不檢查穩定、容器內部或釋放；需保留原版並另定嚴格擴充。",
+  "standardization": {
+    "profile": "generated_video_to_simulated_action",
+    "reuse": "兩條video-to-action管線、原始初圖/prompt、具體success與stage score。",
+    "transform": "case固定原影片ID、解碼器/軌跡/pose映射及sim資產；將影片生成、動作解碼、物理回放結果分別保存；新增規則用新evaluator版本，不覆寫原作score。",
+    "missing": "完整初態/資產取得、原生case清單、各task checker全覆蓋、時間/間隔計數核驗、IDM/Phantom抽取誤差與GPU執行基線。"
+  },
+  "version_note": "固定0a8b0ea；README的Code badge實際連HF權重，核讀本GitHub內實作。未安裝Isaac或執行任何世界模型。",
+  "runtime_executed": false
+}

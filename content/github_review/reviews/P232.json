@@ -1,0 +1,144 @@
+{
+  "paper_id": "P232",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Diff-IP2D 重用 OCT／EPIC 的軌跡與接觸標註，但實際軌跡入口評的是 WDE／FDE。逐段追到 runtime caller 後，已把它和 repo 內沿用但未在該路徑呼叫的 OCT evaluator 分開；不能只看檔名就判斷評估方式。",
+  "reading_order": [
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          163
+        ]
+      ],
+      "why": "確認 EK100 發布範圍、OCT 資料沿用、自製 training features 與各外部檔。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "datasets/datasetopts.py",
+      "ranges": [
+        [
+          5,
+          65
+        ]
+      ],
+      "why": "確認 4 Hz、2.5+1 s 與 split 約定。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "datasets/ho_utils.py",
+      "ranges": [
+        [
+          12,
+          103
+        ]
+      ],
+      "why": "與 OCT 逐行比較 normalized hand labels／missing mask，新增 homography 子取樣。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "datasets/holoaders.py",
+      "ranges": [
+        [
+          87,
+          124
+        ],
+        [
+          193,
+          258
+        ],
+        [
+          303,
+          366
+        ]
+      ],
+      "why": "查核 future features 限 train、observation homographies、uid／label 對齊。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "options/expopts.py",
+      "ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "why": "固定 10 observation／4 future、sample_times=10、fast_test。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "netscripts/epoch_feat.py",
+      "ranges": [
+        [
+          44,
+          100
+        ],
+        [
+          103,
+          140
+        ],
+        [
+          460,
+          567
+        ],
+        [
+          626,
+          676
+        ]
+      ],
+      "why": "追蹤 numpy WDE 與 FDE 真正路徑、batch／rank 平均與 affordance caller。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "evaluation/traj_eval.py",
+      "ranges": [
+        [
+          5,
+          122
+        ]
+      ],
+      "why": "逐行比較 OCT 檔案：除註解外相同；此 wrapper 不是所讀主迴圈的 WDE caller。"
+    },
+    {
+      "repo": "IRMVLab/Diff-IP2D",
+      "commit": "733ae0150f24d78e705946f5647caeb6fa5fc461",
+      "path": "evaluation/affordance_eval.py",
+      "ranges": [
+        [
+          8,
+          32
+        ],
+        [
+          46,
+          160
+        ],
+        [
+          163,
+          206
+        ]
+      ],
+      "why": "與 OCT 對照 heatmap／score 原生公式及省略 logging 的差別。"
+    }
+  ],
+  "environment": "來源影片與人工評測 labels 重用 EPIC-KITCHENS／OCT；論文也包含其他 Ego 資料實驗，README 的當前完整部署僅 EK100，EK55／EG 發布仍列待補。",
+  "tasks": "未來 2D 雙手 waypoint 與 object affordance/contact hotspot；典型 10 個過去 token→4 future 點。改 diffusion 架構不是新增語義任務，沿用 label 要連回 OCT 父來源。",
+  "data": "features／bbox／有效性、uid／raw frame 與 homography 均有原生欄位。training loader 會加 future features，evaluation loader 不加；manual-merged annotations 不等同 OCT 原始 annotation folder。各外部檔案與 checkpoint 要固定 hash／split，不能只記 repo commit。",
+  "evaluation": "主迴圈將預測轉 numpy 後呼叫 compute_wde：4 未來點權重 0.25／0.5／0.75／1.0，求和未除以權重總和；FDE 為末點，normalized image 單位。tensor 分支反而為普通平均，但不是此路徑。輸出先按 batch 的有效手平均，再跨抽樣／batch／rank 平均，與全資料有效手池化不同。heatmap SIM/AUC-J/NSS 沿用 OCT，仍需按 uid 配對、NaN 分母明示；原始 metrics rank equal-average 也要保留。",
+  "standardization": {
+    "profile": "egocentric_diffusion_hand_trajectory_and_hotspot",
+    "reuse": "重用 OCT lineage、native labels／split、真正在主迴圈呼叫的 WDE／FDE 與熱圖 evaluator。；保留 full／fast diffusion 與 sample_times，不能將 10 次抽樣當 10 道題。",
+    "transform": "source 同時記 paper version、code commit、data archive hash；canonical case 禁止 training-only future features 出現在評測輸入。；原生 WDE、FDE、heatmap 各列公式和有效分母；若改為 sample-weighted global mean，需新增 evaluator 版本。；以父 participant/video/time 去重；EPIC55/100、OCT／Diff-IP2D 保留 overlap 關係。",
+    "missing": "未下載 weights／features 或執行，README checkpoint links 與其他資料部署仍需逐一取得。；已有函式不等於已有完整測試任務，case metadata 與 raw video 權限尚未整合。"
+  },
+  "version_note": "原生程式 import 了 evaluate_traj_stochastic，但所讀實際軌跡路徑使用 compute_wde／compute_fde；OCT wrapper 的名稱對調不能直接套到此主結果。固定版本的來源差異均保留。",
+  "runtime_executed": false
+}

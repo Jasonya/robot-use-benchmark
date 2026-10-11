@@ -1,0 +1,92 @@
+{
+  "paper_id": "P229",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "UniEgoMotion 把重建、生成和預測放在同一人體動作框架；它的 EE4D-Motion 是 EgoExo4D 的處理版本。已核對切窗／split、可見資訊 mask、3D 評分與地面接觸代理量，不能把三種設定當成三批獨立原始資料。",
+  "reading_order": [
+    {
+      "repo": "chaitanya100100/UniEgoMotion",
+      "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          60
+        ]
+      ],
+      "why": "確認方法、官方 repo 與資料依賴。"
+    },
+    {
+      "repo": "chaitanya100100/UniEgoMotion",
+      "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+      "path": "DATASET.md",
+      "ranges": [
+        [
+          1,
+          56
+        ]
+      ],
+      "why": "核對父 take、資料篩選、原生 30 Hz index 與 10 Hz motion、validation 抽樣。"
+    },
+    {
+      "repo": "chaitanya100100/UniEgoMotion",
+      "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+      "path": "dataset/ee4d_motion_dataset.py",
+      "ranges": [
+        [
+          36,
+          91
+        ],
+        [
+          230,
+          250
+        ]
+      ],
+      "why": "檢查訓練統計來源、20-frame stride、reconstruction／generation／forecast mask。"
+    },
+    {
+      "repo": "chaitanya100100/UniEgoMotion",
+      "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+      "path": "eval/compute_3d_metrics.py",
+      "ranges": [
+        [
+          15,
+          109
+        ],
+        [
+          113,
+          124
+        ]
+      ],
+      "why": "追蹤 GT key 分母、whole-clip／20-frame segment、缺失 trajectory 的替代。"
+    },
+    {
+      "repo": "chaitanya100100/UniEgoMotion",
+      "commit": "580c92c6d70a91672c4106bab30ca82cdd80f379",
+      "path": "eval/metrics.py",
+      "ranges": [
+        [
+          9,
+          127
+        ],
+        [
+          192,
+          275
+        ]
+      ],
+      "why": "確認 rotation norm、body／hand joint subsets、PA 與 foot／floor 指標的真正計算。"
+    }
+  ],
+  "environment": "EgoExo4D 多用途人類活動的 Aria 影片、軌跡與擬合 SMPL-X 身體；沒有新增可執行機器人環境。EE4D-Motion 使用父資料 take／train-val 關係。",
+  "tasks": "原生三種 model task：recon 全觀測重建；gen 僅第一影格可見；fore 可見 window 前 1/4（典型 20/80 幀）。這些是觀測協定差異，不能直接增加三倍獨立情境。",
+  "data": "DATASET.md：原始 4,792 takes、約 208 小時，篩選為 train 2,032／val 560 takes、約 110 小時。segment key 的 start/end 使用 30 Hz 原始 index、含末端；motion 為 10 Hz。dataset 每 20 motion frames 建窗，正式 evaluation 再用每第十個 validation sample。SMPL-X 是擬合結果，需保留失敗／遮蔽篩選及父 take ID。",
+  "evaluation": "評分含全身／body 前 22 joints／hand 25:55 的 MPJPE 與 PA-MPJPE、head／trajectory 誤差、足滑、穿地、騰空與接地距離。rotation error 是 R差的 Frobenius norm，非角度。接觸指標各有 4 cm／8 cm 等閾值；足滑按序列長度歸一且乘 1000，不是成功率。compute_3d_metrics 遍歷 GT key，評整段和每 20 幀；pred trajectory=None 時以 GT trajectory 替代，此條件下 trajectory 誤差不能證明模型預測能力。",
+  "standardization": {
+    "profile": "egocentric_body_motion_reconstruction_generation_forecasting",
+    "reuse": "重用 take lineage、SMPL-X／Aria 對照、明確 mask 與 evaluator 各原生欄位。；保留 reconstruction／generation／forecast 的條件差異，不混合 rank。",
+    "transform": "canonical case 固定 take、start/end、30→10 Hz 對照、valid frames、觀測 mask 和 train-only normalization revision。；把 supplied-GT trajectory 與 predicted trajectory 設為不同 evaluation condition；報分時明示。；全段與分段 metrics 分開；若另評純未來區間，新增 evaluator 版本並保留原生成績。",
+    "missing": "未下載受原始資料／SMPL-X 授權約束的完整資產，未跑模型。；語義生成評分與模型內部 diffusion 未在本次列出的 3D reader 範圍內完整審核。"
+  },
+  "version_note": "本次固定官方 commit，三種 task 共用 EE4D-Motion。論文／README 的資料量為來源報告量，不是本案已取得題數；時間窗口和 eval 抽樣不可省略。",
+  "runtime_executed": false
+}

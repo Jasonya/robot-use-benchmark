@@ -1,0 +1,884 @@
+{
+  "paper_id": "P003",
+  "name": "COIN",
+  "title": "COIN: A Large-scale Dataset for Comprehensive Instructional Video Analysis",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1903.02874",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft",
+    "care",
+    "transport",
+    "leisure"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P003",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "COIN 將標註、下載與評測拆成不同倉庫。要先讀 annotations 的 domain/task/step 與影片 JSON，再讀 code 的時段定位／逐影格分割評測。 2026-10-11 補讀 annotation-tool 的實際匯出與時段生成。",
+    "auxiliary_scope": "annotation-tool 為輔助標註工具，另列取得與閱讀狀態；本紀錄針對資料與評測核心。 本次補讀已固定 b4b3d527298b7dd6b97e0264f9e6223cc095ac10；僅涵蓋下列輸入與匯出路徑。",
+    "environment": "影片觀測脈絡；原作生活用途不是互動場景 ID。",
+    "tasks": "原生 domain/task/step 分類與人類程序活動；定位、分割是資訊評測題型，不能等同機器人工作規格。",
+    "data": "ActivityNet 風格 database JSON、YouTube ID、影片 URL、步驟 label/segment 及 taxonomy。README 範例的 class 與下載器的 recipe_type 欄位需對實際版本檢查。 補讀：annotation-tool 讀 URLID/URL、TagID/Tag、URLID/Frame/Time 三表，匯出 instruction_時間.txt 的 CSV 八欄 URLID,URL,TagID,Tag,Start,End,Time,State。輸出 Time 為 times（確認儲存次數），有別於 frame.txt 的抽幀秒數；Start/End 為時段秒數。影格模式依 newSpace 分開不連續區段，影片模式先以 toFixed(0) 儲存整秒文字。匯出只保留有 URLID/TagID 的 tagInfo 列，不含沒有標註的影片。",
+    "evaluation": "定位結果包含 action_id、start、end、confidence、video_name；evaluate.number_label 需設為相符的原生標籤空間。分割另報逐影格 accuracy；各自保留分母。 補讀工具的 State=0/1/2 分別是未標註／已標註／刪除；checked 是另存於瀏覽器的布林值，八欄匯出沒有帶出。這些是標註流程狀態，並非 AP/F1、GT 品質或獨立複核指標。",
+    "standardization": {
+      "profile": "human_procedure_and_temporal_labels",
+      "reuse": "活動／步驟 ID、影片血緣、原生時段及 AP/F1 等判分程式。 可另重用工具輸入字典、逐影片 tagInfo 與匯出欄位。",
+      "transform": "活動放 human_activity_definition；影片與時間標註放 context/annotation；定位與分割 case 分開建立，保留秒與影格換算。 工具 URLID/URL → 來源影片引用，TagID/Tag → 工具版本內標籤，Start/End → 原生秒區段；Time/State 放標註流程 metadata。需明確建立這些本地 ID 與已發布 COIN JSON/taxonomy 的對映。",
+      "missing": "影片有效取得、完整 split 清單、欄位別名核對及本庫資訊題型的 evaluator 接線。 工具讀寫採直接逗號／換行切分，未處理引號包覆的逗號；仍需匯出往返、整秒精度、缺列及 checked 遺失驗證。此補讀未取得影片或執行瀏覽器工具。"
+    },
+    "version_note": "12 domains／180 tasks 是作者的活動分類，並非本庫21類用途或180個已去重的機器人任務。 annotation-tool 為獨立固定提交，CSV 標註工作檔不能視為已發布的 database JSON；sample 的 0.5 秒間隔不能推為所有影片 fps。",
+    "runtime_executed": false,
+    "follow_up": {
+      "reviewed_on": "2026-10-11",
+      "repo": "coin-dataset/annotation-tool",
+      "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+      "status": "source_sections_reviewed",
+      "scope": "輔助標註工具的輸入／時段生成／CSV 匯出；既有核心資料與評測核讀保留。"
+    },
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotations",
+        "requested_repo": "coin-dataset/annotations",
+        "commit": "67e31260e9c25951e27cda8d4336a23eacf62a80",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            65
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 104,
+        "sha256": "038966fe6c4305e38bc5b8a5d7305cd4a589fa2ba4b6ea6b66552f8b5cd3d0e7",
+        "url": "https://github.com/coin-dataset/annotations/blob/67e31260e9c25951e27cda8d4336a23eacf62a80/README.md",
+        "reading_url": "https://github.com/coin-dataset/annotations/blob/67e31260e9c25951e27cda8d4336a23eacf62a80/README.md#L1-L65",
+        "why": "看三層活動分類與影片、步驟時段的 JSON 結構。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotations",
+        "requested_repo": "coin-dataset/annotations",
+        "commit": "67e31260e9c25951e27cda8d4336a23eacf62a80",
+        "ref": null,
+        "path": "download_videos.py",
+        "ranges": [
+          [
+            1,
+            26
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 26,
+        "sha256": "5f7e3e7edbde769bd174fb3608270de6040a37d9ff8034982e3219bc387f45a1",
+        "url": "https://github.com/coin-dataset/annotations/blob/67e31260e9c25951e27cda8d4336a23eacf62a80/download_videos.py",
+        "reading_url": "https://github.com/coin-dataset/annotations/blob/67e31260e9c25951e27cda8d4336a23eacf62a80/download_videos.py#L1-L26",
+        "why": "看影片 ID、recipe_type 與 video_url 的實際使用方式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/code",
+        "requested_repo": "coin-dataset/code",
+        "commit": "c1e09e74aa0f7863cdb89dff6c05f6bdadae457a",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 46,
+        "sha256": "5b537bbe0f6055f4291b3f0ed4463f684bacc3d83de4bfe92da9e08665e213fc",
+        "url": "https://github.com/coin-dataset/code/blob/c1e09e74aa0f7863cdb89dff6c05f6bdadae457a/README.md",
+        "reading_url": "https://github.com/coin-dataset/code/blob/c1e09e74aa0f7863cdb89dff6c05f6bdadae457a/README.md#L1-L46",
+        "why": "區分 step localization 與 frame-wise action segmentation；確認輸出格式及所需標籤空間。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/code",
+        "requested_repo": "coin-dataset/code",
+        "commit": "c1e09e74aa0f7863cdb89dff6c05f6bdadae457a",
+        "ref": null,
+        "path": "evaluate.py",
+        "ranges": [
+          [
+            16,
+            26
+          ],
+          [
+            57,
+            64
+          ],
+          [
+            75,
+            96
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 131,
+        "sha256": "6db8a2fdb16881f469495df26fc9f129c1ce83fe701602eeb9e71961627eaec9",
+        "url": "https://github.com/coin-dataset/code/blob/c1e09e74aa0f7863cdb89dff6c05f6bdadae457a/evaluate.py",
+        "reading_url": "https://github.com/coin-dataset/code/blob/c1e09e74aa0f7863cdb89dff6c05f6bdadae457a/evaluate.py#L16-L26",
+        "why": "核對同影片同 action 的時段重疊、F1 與 AP。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            29
+          ],
+          [
+            35,
+            81
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 81,
+        "sha256": "7d4a11618d0b3fc5526c77f16536e4451935b2a8d676bb74120dea5d3a776e16",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/README.md",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/README.md#L1-L29",
+        "why": "輔助標註工具的三份輸入、影格／影片模式及匯出入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "input/video.txt",
+        "ranges": [
+          [
+            1,
+            2
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2,
+        "sha256": "1c6398b203e131a4eea9c621ea7d9e6338b628de0376ab2e6f5e3063a8de4ba1",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/input/video.txt",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/input/video.txt#L1-L2",
+        "why": "URLID 與影片檔名範例；不是直接套用公開資料的 YouTube key。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "input/label.txt",
+        "ranges": [
+          [
+            1,
+            6
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 6,
+        "sha256": "562c6bb74809b0c33aa7470dff74ed751fddba1b7e21ab16b97c5e6cef94584b",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/input/label.txt",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/input/label.txt#L1-L6",
+        "why": "工具本地 TagID／Tag 字典範例。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "input/frame.txt",
+        "ranges": [
+          [
+            1,
+            8
+          ],
+          [
+            49,
+            52
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 52,
+        "sha256": "bb9b3024937784c0ec726ce7af7aa7036991f24fea962e1927019d074e7a7f6b",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/input/frame.txt",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/input/frame.txt#L1-L8",
+        "why": "URLID／Frame／Time 表與範例每 0.5 秒抽幀；非全資料集 fps。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "lib/js/index.js",
+        "ranges": [
+          [
+            26,
+            124
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 263,
+        "sha256": "d984b71f04a62083157a5989f535811809a8755f73d350fbec0a64db7ad8e592",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/lib/js/index.js",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/lib/js/index.js#L26-L124",
+        "why": "實際匯出八欄 CSV 文字、列過濾與匯入欄名檢查／localStorage。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "lib/js/config.js",
+        "ranges": [
+          [
+            1,
+            23
+          ],
+          [
+            79,
+            105
+          ],
+          [
+            232,
+            251
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 274,
+        "sha256": "5ae309f37beb9d4f1cdc27584c6598bc825768ebbded8fefc36370fbc8940125",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/lib/js/config.js",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/lib/js/config.js#L1-L23",
+        "why": "簡易逗號切分、按 URLID 合併及 state／checked 工作流程。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "coin-dataset/annotation-tool",
+        "requested_repo": "coin-dataset/annotation-tool",
+        "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+        "ref": null,
+        "path": "lib/js/imageTag.js",
+        "ranges": [
+          [
+            301,
+            318
+          ],
+          [
+            400,
+            426
+          ],
+          [
+            674,
+            700
+          ],
+          [
+            728,
+            766
+          ],
+          [
+            770,
+            826
+          ],
+          [
+            903,
+            1011
+          ],
+          [
+            1019,
+            1034
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1097,
+        "sha256": "055f897a0318e76fda1dae19b64db4da674719eb734bd29df8a6f37733633baf",
+        "url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/lib/js/imageTag.js",
+        "reading_url": "https://github.com/coin-dataset/annotation-tool/blob/b4b3d527298b7dd6b97e0264f9e6223cc095ac10/lib/js/imageTag.js#L301-L318",
+        "why": "追到標註儲存及區段生成；影格間距分段、影片秒數取整、times 與 checked 的更新。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "685cd23c6812a028fe581d7c1f17ff9e68300a13d5040847badf80304723ddbf"
+  },
+  "repository_binding_review_sha256": "685cd23c6812a028fe581d7c1f17ff9e68300a13d5040847badf80304723ddbf",
+  "repository_bindings": [
+    {
+      "requested_repo": "coin-dataset/annotation-tool",
+      "resolved_repo": "coin-dataset/annotation-tool",
+      "aliases_in_this_review": [
+        "coin-dataset/annotation-tool"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b4b3d527298b7dd6b97e0264f9e6223cc095ac10",
+          "reviewed_files": [
+            "README.md",
+            "input/frame.txt",
+            "input/label.txt",
+            "input/video.txt",
+            "lib/js/config.js",
+            "lib/js/imageTag.js",
+            "lib/js/index.js"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/annotation-tool",
+          "link_label": "https://github.com/coin-dataset/annotation-tool",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P003",
+          "review_file": "content/github_review/reviews/P003.json",
+          "review_sha256": "685cd23c6812a028fe581d7c1f17ff9e68300a13d5040847badf80304723ddbf",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "coin-dataset/annotations",
+      "resolved_repo": "coin-dataset/annotations",
+      "aliases_in_this_review": [
+        "coin-dataset/annotations"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "67e31260e9c25951e27cda8d4336a23eacf62a80",
+          "reviewed_files": [
+            "README.md",
+            "download_videos.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/annotations",
+          "link_label": "COIN",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/annotations/blob/master/download_videos.py",
+          "link_label": "script",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/annotations/blob/master/License.docx",
+          "link_label": "license agreement",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/annotations/blob/master/link.txt",
+          "link_label": "here",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/annotations",
+          "link_label": "taxonomy",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "coin-dataset/annotations",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "67e31260e9c25951e27cda8d4336a23eacf62a80"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P003",
+          "review_file": "content/github_review/reviews/P003.json",
+          "review_sha256": "685cd23c6812a028fe581d7c1f17ff9e68300a13d5040847badf80304723ddbf",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "coin-dataset/code",
+      "resolved_repo": "coin-dataset/code",
+      "aliases_in_this_review": [
+        "coin-dataset/code"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c1e09e74aa0f7863cdb89dff6c05f6bdadae457a",
+          "reviewed_files": [
+            "README.md",
+            "evaluate.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/coin-dataset/code",
+          "link_label": "source codes",
+          "project_url": "https://coin-dataset.github.io/",
+          "page_sha256": "4dee32e8cf344661a62852c9ffddd74da0e7bf8a81771159878dd6c61cfe9f5b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P003",
+          "review_file": "content/github_review/reviews/P003.json",
+          "review_sha256": "685cd23c6812a028fe581d7c1f17ff9e68300a13d5040847badf80304723ddbf",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕",
+    "個人照護",
+    "交通移動與車輛維修",
+    "休閒與運動"
+  ],
+  "source_review": {
+    "paper_id": "P003",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF 標題相符；arXiv 1903.02874v1。",
+    "scope_read": "資料定義、階層分類、標註規模、切分與評測章節。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "個人照護",
+      "交通移動與車輛維修",
+      "休閒與運動"
+    ],
+    "role": "人類程序影片與步驟定位",
+    "environment": "YouTube 教學影片；原作12 domains是活動分類，未提供12個物理環境。",
+    "tasks": "原作階層為12 domains、180人類程序任務、778步驟定義。180個活動可作任務候選，不能直接當已實作的robot task。",
+    "cases": "11,827影片、46,354步驟片段、476小時；影片split為9,030 train及2,797 test。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 12,
+        "unit": "原作活動領域",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 180,
+        "unit": "人類程序任務",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 778,
+        "unit": "步驟定義",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 11827,
+        "unit": "影片",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 46354,
+        "unit": "時間標註步驟片段",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2797,
+        "unit": "test影片",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "步驟時段定位，以 temporal IoU 0.1–0.5 的 mAP／mAR 衡量。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "9,030 train／2,797 test；不可把46,354步驟片段全稱為test題。",
+    "lineage": "YouTube 影片與人類程序階層；與其他網路教學資料可能影片重疊，尚無逐video ID跨庫去重。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "資料階層、步驟標註與統計",
+        "supports": "12／180／778／11,827／46,354的不同單位"
+      },
+      {
+        "pages": [
+          7
+        ],
+        "locator": "實驗與evaluation metrics",
+        "supports": "步驟定位評測"
+      }
+    ],
+    "unresolved": [
+      "完整12個原作domain到共同領域的逐條映射需保留原生label清單。",
+      "跨資料集YouTube ID重疊未核。"
+    ],
+    "reuse": "可引入來源有據的180項程序及778步驟；需另審機器人可行性與每一步的判分。",
+    "reviewed_pdf_sha256": "4625e83e6d9eaecd1acdfb5c39fa7132bbe4c4c6a58e541473c24c9f738f6762",
+    "reviewed_on": "2026-10-02",
+    "name": "COIN",
+    "year": 2019,
+    "title": "COIN: A Large-scale Dataset for Comprehensive Instructional Video Analysis",
+    "source_url": "https://arxiv.org/abs/1903.02874",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft",
+      "care",
+      "transport",
+      "leisure"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "照護與個人活動",
+      "交通工具與維修",
+      "工藝與修繕",
+      "休閒活動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕",
+      "個人照護",
+      "交通移動與車輛維修",
+      "休閒與運動"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P003",
+      "domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "care",
+        "transport",
+        "leisure"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P003",
+          "domain_ids": [
+            "home",
+            "food",
+            "craft",
+            "care",
+            "transport",
+            "leisure"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "原作階層為12 domains、180人類程序任務、778步驟定義。180個活動可作任務候選，不能直接當已實作的robot task。",
+            "YouTube 教學影片；原作12 domains是活動分類，未提供12個物理環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "4625e83e6d9eaecd1acdfb5c39fa7132bbe4c4c6a58e541473c24c9f738f6762"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "4625e83e6d9eaecd1acdfb5c39fa7132bbe4c4c6a58e541473c24c9f738f6762",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "craft",
+        "care",
+        "transport",
+        "leisure"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P003",
+      "name": "COIN",
+      "expected_title": "COIN: A Large-scale Dataset for Comprehensive Instructional Video Analysis",
+      "source_url": "https://arxiv.org/abs/1903.02874",
+      "pdf_url": "https://arxiv.org/pdf/1903.02874",
+      "retrieved_at": "2026-10-02T21:32:55.570987+00:00",
+      "pdf_sha256": "4625e83e6d9eaecd1acdfb5c39fa7132bbe4c4c6a58e541473c24c9f738f6762",
+      "text_sha256": "fb8b90c1e4ffe25ee7df99d643a3de665edd4c6880cfa42fe293cda068012c1d",
+      "pdf_bytes": 7135318,
+      "pages": 12,
+      "text_characters": 182459,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1903.02874v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1903.02874v1"
+    },
+    "counts": [
+      {
+        "field": "domain",
+        "value": 12,
+        "unit": "原作活動領域",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P003:1",
+        "paper_id": "P003",
+        "benchmark": "COIN",
+        "native_term": "原作活動領域",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.02874v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.02874v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 180,
+        "unit": "人類程序任務",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P003:2",
+        "paper_id": "P003",
+        "benchmark": "COIN",
+        "native_term": "人類程序任務",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.02874v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.02874v1",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 778,
+        "unit": "步驟定義",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P003:3",
+        "paper_id": "P003",
+        "benchmark": "COIN",
+        "native_term": "步驟定義",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.02874v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.02874v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 11827,
+        "unit": "影片",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P003:4",
+        "paper_id": "P003",
+        "benchmark": "COIN",
+        "native_term": "影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.02874v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.02874v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 46354,
+        "unit": "時間標註步驟片段",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P003:5",
+        "paper_id": "P003",
+        "benchmark": "COIN",
+        "native_term": "時間標註步驟片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.02874v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.02874v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2797,
+        "unit": "test影片",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P003:6",
+        "paper_id": "P003",
+        "benchmark": "COIN",
+        "native_term": "test影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1903.02874v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1903.02874v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "coin-dataset/annotations",
+    "coin-dataset/code",
+    "coin-dataset/annotation-tool"
+  ],
+  "external_repositories": []
+}

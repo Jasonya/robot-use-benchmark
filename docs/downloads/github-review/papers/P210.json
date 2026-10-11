@@ -1,0 +1,555 @@
+{
+  "paper_id": "P210",
+  "name": "RoCo Challenge",
+  "title": "RoCo Challenge at AAAI 2026: Benchmarking Robotic Collaborative Manipulation for Assembly Towards Industrial Automation",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2603.15469",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry",
+    "assistance"
+  ],
+  "status": "identity_or_version_unresolved",
+  "review": {
+    "paper_id": "P210",
+    "reviewed_on": "2026-10-11",
+    "status": "identity_or_version_unresolved",
+    "summary": "收錄論文是AAAI2026第一屆RoCo齒輪箱組裝；目前找到的兩個devkit是IROS2026第二屆Task Board/Brick，不能當作同版原作實驗。已核讀其新介面作延伸來源並明列版本缺口。",
+    "environment": "原文為Isaac Sim Galaxea R1及onsite R1Lite齒輪箱；新TaskBoard/Brick devkit是另一edition的場景/機體配置，不合併為同一環境版本。",
+    "tasks": "AAAI原文3情境：從零組裝、接手partial state、錯誤檢測/恢復。新TaskBoard的9個parts是單一板件任務的計分部件；Brick有2種起始/目標結構格式。上述數字不可加總作原文task數。",
+    "data": "新TaskBoard API有physics step、joint rad/metre、wxyz EE pose、RGB/depth(m)/intrinsics及snap_fired；Brick用23Djoint array與structure_start/goal或structure.json。原文第一屆case/資產/資料版本尚未完整取得對應。",
+    "evaluation": "AAAI原文S_sim=(4S1+2S2+4S3)/10；新TaskBoard按part pass/total，snap parts看觸發，open parts看mesh/AABB位置距goal<0.01m且不檢朝向。新Brick main只到Policy.is_done，完整grader需另接。原文重現不能套用第二屆這套分母/吸附機制。",
+    "standardization": {
+      "profile": "versioned_industrial_collaborative_assembly",
+      "reuse": "原文3種assembly/recovery情境，以及新devkit清楚的observation/action/part-target契約作延伸參考。",
+      "transform": "source明確分AAAI2026與IROS2026 editions；task/instance/scorer各綁版本，原作weighted score保持原協定；新9part和brick規則只在對應來源比較。",
+      "missing": "第一屆有效code/data入口、原作初態/GT/evaluator；新Brick完整評分接線與privileged input隔離；各edition獨立baseline與真實物理驗證。"
+    },
+    "version_note": "TaskBoard45dd6ad、Brick8e7ad4d均明示2nd IROS2026且建立於原文3月之後。原文RoCo2026網站/同名repo取404，org首頁轉向IROS2026。原作到實作版本未閉合，故identity_or_version_unresolved。",
+    "runtime_executed": false,
+    "identity_note": "組織相同但edition/task/scoring不同；這是版本差異，不把兩個新repo錯標成AAAI2026齒輪箱程式。",
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2603.15469",
+      "pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29",
+      "paper_pages_read": [
+        3,
+        4
+      ],
+      "original_project": {
+        "requested_url": "https://rocochallenge.github.io/RoCo2026/",
+        "retrieved_at": "2026-10-10T07:37:52.509575+00:00",
+        "status": 404,
+        "error": "Not Found"
+      },
+      "organizer_root": {
+        "requested_url": "https://rocochallenge.github.io/",
+        "retrieved_at": "2026-10-11T02:16:04.178320+00:00",
+        "status": 200,
+        "resolved_url": "https://rocochallenge.github.io/",
+        "content_type": "text/html; charset=utf-8",
+        "bytes": 339,
+        "sha256": "f12d8933e0fb543c267ece423c6502dd0b557bb002af6c2af0d50fa8438faded"
+      },
+      "original_repo_probe": {
+        "requested_url": "https://api.github.com/repos/rocochallenge/RoCo2026",
+        "retrieved_at": "2026-10-11T02:16:43.914452+00:00",
+        "status": 404,
+        "error": "Not Found"
+      }
+    },
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "rocochallenge/RoCo_TaskBoardAssembly",
+        "requested_repo": "rocochallenge/RoCo_TaskBoardAssembly",
+        "commit": "45dd6ad6e0792faf3450bdd2f81bb143b11bc43f",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 405,
+        "sha256": "ecf3d5046e3be0788363b366945b200fa5c753d95f84f4b8b94789dd3575372a",
+        "url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly/blob/45dd6ad6e0792faf3450bdd2f81bb143b11bc43f/README.md",
+        "reading_url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly/blob/45dd6ad6e0792faf3450bdd2f81bb143b11bc43f/README.md#L1-L90",
+        "why": "明示2nd IROS2026、9parts及active/unused資產",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rocochallenge/RoCo_TaskBoardAssembly",
+        "requested_repo": "rocochallenge/RoCo_TaskBoardAssembly",
+        "commit": "45dd6ad6e0792faf3450bdd2f81bb143b11bc43f",
+        "ref": null,
+        "path": "task/policy_api.py",
+        "ranges": [
+          [
+            130,
+            175
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 222,
+        "sha256": "0bea667ffba6408908a8c62cd99548ed9e2c16a60efac8a7be3aed00b348ad48",
+        "url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly/blob/45dd6ad6e0792faf3450bdd2f81bb143b11bc43f/task/policy_api.py",
+        "reading_url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly/blob/45dd6ad6e0792faf3450bdd2f81bb143b11bc43f/task/policy_api.py#L130-L175",
+        "why": "當前step/關節/EE/camera/snap訊號約定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rocochallenge/RoCo_TaskBoardAssembly",
+        "requested_repo": "rocochallenge/RoCo_TaskBoardAssembly",
+        "commit": "45dd6ad6e0792faf3450bdd2f81bb143b11bc43f",
+        "ref": null,
+        "path": "task/run_pick_place.py",
+        "ranges": [
+          [
+            493,
+            515
+          ],
+          [
+            552,
+            653
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1193,
+        "sha256": "33a1d5446329e619c2246d8c6806b8db30edca80ad3bcb6bb7a7acc8029feaaa",
+        "url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly/blob/45dd6ad6e0792faf3450bdd2f81bb143b11bc43f/task/run_pick_place.py",
+        "reading_url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly/blob/45dd6ad6e0792faf3450bdd2f81bb143b11bc43f/task/run_pick_place.py#L493-L515",
+        "why": "當前TaskBoard具體位置/snap判分與per-part輸出",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rocochallenge/RoCo_BrickAssembly",
+        "requested_repo": "rocochallenge/RoCo_BrickAssembly",
+        "commit": "8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            90
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "81d0e82c0c8dd8ba3bd35df0b56d7f0731cd1c42e814c4d3b7d1fe5b17916f21",
+        "url": "https://github.com/rocochallenge/RoCo_BrickAssembly/blob/8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3/README.md",
+        "reading_url": "https://github.com/rocochallenge/RoCo_BrickAssembly/blob/8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3/README.md#L1-L90",
+        "why": "第二屆brick場景、23D控制及禁止runtime privileged訊號",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rocochallenge/RoCo_BrickAssembly",
+        "requested_repo": "rocochallenge/RoCo_BrickAssembly",
+        "commit": "8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3",
+        "ref": null,
+        "path": "src/rocobrick/task_config/Task.py",
+        "ranges": [
+          [
+            21,
+            83
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 123,
+        "sha256": "94a7a1b3d142f3f65cab37bd88f85e0682dc28bdf56e23b94a20da5d77cac495",
+        "url": "https://github.com/rocochallenge/RoCo_BrickAssembly/blob/8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3/src/rocobrick/task_config/Task.py",
+        "reading_url": "https://github.com/rocochallenge/RoCo_BrickAssembly/blob/8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3/src/rocobrick/task_config/Task.py#L21-L83",
+        "why": "type1/type2結構/初態與topology解析",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "rocochallenge/RoCo_BrickAssembly",
+        "requested_repo": "rocochallenge/RoCo_BrickAssembly",
+        "commit": "8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3",
+        "ref": null,
+        "path": "run/main.py",
+        "ranges": [
+          [
+            1,
+            29
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 29,
+        "sha256": "f95979c83bd215330b83e37eaf76cc02c2aa63fa0703d543ff4bfd628140b005",
+        "url": "https://github.com/rocochallenge/RoCo_BrickAssembly/blob/8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3/run/main.py",
+        "reading_url": "https://github.com/rocochallenge/RoCo_BrickAssembly/blob/8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3/run/main.py#L1-L29",
+        "why": "執行到policy完成；完整grading未在此入口彙總",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ab2063fdc1b0111714ecbbe32f9cf60836f912fa64501b12f7419d6619cc1a78"
+  },
+  "repository_binding_review_sha256": "ab2063fdc1b0111714ecbbe32f9cf60836f912fa64501b12f7419d6619cc1a78",
+  "repository_bindings": [
+    {
+      "requested_repo": "rocochallenge/RoCo_BrickAssembly",
+      "resolved_repo": "rocochallenge/RoCo_BrickAssembly",
+      "aliases_in_this_review": [
+        "rocochallenge/roco_brickassembly"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "identity_or_version_unresolved",
+      "versions": [
+        {
+          "commit": "8e7ad4dae651fd96cad5b8aa145f3fe81d3a48f3",
+          "reviewed_files": [
+            "README.md",
+            "run/main.py",
+            "src/rocobrick/task_config/Task.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "RoCo Challenge",
+          "search_receipt_sha256": "763983e2001c40bf1291e5fe0a5b7dd4d1872ef4a80dc5c35dd49985e8785e27",
+          "url": "https://github.com/rocochallenge/RoCo_BrickAssembly",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P210",
+          "review_file": "content/github_review/reviews/P210.json",
+          "review_sha256": "ab2063fdc1b0111714ecbbe32f9cf60836f912fa64501b12f7419d6619cc1a78",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "rocochallenge/RoCo_TaskBoardAssembly",
+      "resolved_repo": "rocochallenge/RoCo_TaskBoardAssembly",
+      "aliases_in_this_review": [
+        "rocochallenge/roco_taskboardassembly"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "identity_or_version_unresolved",
+      "versions": [
+        {
+          "commit": "45dd6ad6e0792faf3450bdd2f81bb143b11bc43f",
+          "reviewed_files": [
+            "README.md",
+            "task/policy_api.py",
+            "task/run_pick_place.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "RoCo Challenge",
+          "search_receipt_sha256": "763983e2001c40bf1291e5fe0a5b7dd4d1872ef4a80dc5c35dd49985e8785e27",
+          "url": "https://github.com/rocochallenge/RoCo_TaskBoardAssembly",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P210",
+          "review_file": "content/github_review/reviews/P210.json",
+          "review_sha256": "ab2063fdc1b0111714ecbbe32f9cf60836f912fa64501b12f7419d6619cc1a78",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "裝配與生產作業",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P210",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoCo Challenge，arXiv 2603.15469v1。",
+    "scope_read": "三scenario、sim/real差異、兩種demo、single model與weighted score。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      12
+    ],
+    "domains": [
+      "裝配與生產作業",
+      "協助、交接與陪伴"
+    ],
+    "role": "協作組裝benchmark",
+    "environment": "IsaacSim工作站與Galaxea R1 Lite實機；simulation人類參與由初始化partial state模擬。",
+    "tasks": "1gearbox workflow的3scenario：從零組裝、partial state續作、error recovery。real只3planet gears，sim含sun/ring更多parts。",
+    "cases": "sim>300automatically generated demos，real另>300teleop demos；精確官方eval回合數在已讀protocol未報。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "assembly scenarios per track",
+        "pages": [
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 300,
+        "unit": "sim demonstrations",
+        "qualifier": ">300",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 300,
+        "unit": "real demonstrations",
+        "qualifier": ">300；不同資料",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "single model需處理三scenario；assembled-parts/recovery分數以0.4/0.2/0.4加權。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "私有工作站上統一random lighting/texture/colors；real track任務規格有縮減，不能視為完全同題sim-real transfer。",
+    "lineage": "同gearbox assembly的起始狀態/恢復規則擴充；與人類實時協作要分開。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "§2.1–2.2",
+        "supports": "3scenario、兩份>300、weighted score與real簡化"
+      }
+    ],
+    "unresolved": [
+      "完整task/case IDs及官方評測分母待competition config；結論的300+泛稱不能覆蓋兩份不同demo。"
+    ],
+    "reuse": "可借從零/續作/修復三類規則；不同backend的task目標改動要版本化。",
+    "reviewed_pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29",
+    "reviewed_on": "2026-10-02",
+    "name": "RoCo Challenge",
+    "year": 2026,
+    "title": "RoCo Challenge at AAAI 2026: Benchmarking Robotic Collaborative Manipulation for Assembly Towards Industrial Automation",
+    "source_url": "https://arxiv.org/abs/2603.15469",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "industry",
+      "assistance"
+    ],
+    "review_tags": [
+      "工業製造",
+      "組裝與拆解",
+      "人機協作"
+    ],
+    "domain_names": [
+      "裝配與生產作業",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P210",
+      "domain_ids": [
+        "industry",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P210",
+          "domain_ids": [
+            "industry"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            12
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "1gearbox workflow的3scenario：從零組裝、partial state續作、error recovery。real只3planet gears，sim含sun/ring更多parts。",
+            "IsaacSim工作站與Galaxea R1 Lite實機；simulation人類參與由初始化partial state模擬。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29"
+        },
+        {
+          "paper_id": "P210",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            12
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "從人交付的部分裝配狀態續作和錯誤修復。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29",
+      "previous_domain_ids": [
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P210",
+      "name": "RoCo Challenge",
+      "expected_title": "RoCo Challenge at AAAI 2026: Benchmarking Robotic Collaborative Manipulation for Assembly Towards Industrial Automation",
+      "source_url": "https://arxiv.org/abs/2603.15469",
+      "pdf_url": "https://arxiv.org/pdf/2603.15469",
+      "retrieved_at": "2026-10-02T21:35:06.929723+00:00",
+      "pdf_sha256": "1b91dade9b97b3cbbde4f382166932d5d38a29b4038328808755568fc5b47c29",
+      "text_sha256": "54dfa5e526f4a52f6ba8cd02c62184028a551eedecd545f99cbea5bf72d350f4",
+      "pdf_bytes": 13286163,
+      "pages": 16,
+      "text_characters": 58453,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2603.15469v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2603.15469v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "assembly scenarios per track",
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "record_id": "review10:P210:1",
+        "paper_id": "P210",
+        "benchmark": "RoCo Challenge",
+        "native_term": "assembly scenarios per track",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2603.15469v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2603.15469v1",
+            "locator": "PDF pp. 3, 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 300,
+        "unit": "sim demonstrations",
+        "qualifier": ">300",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P210:2",
+        "paper_id": "P210",
+        "benchmark": "RoCo Challenge",
+        "native_term": "sim demonstrations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2603.15469v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2603.15469v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 300,
+        "unit": "real demonstrations",
+        "qualifier": ">300；不同資料",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P210:3",
+        "paper_id": "P210",
+        "benchmark": "RoCo Challenge",
+        "native_term": "real demonstrations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2603.15469v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2603.15469v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "rocochallenge/RoCo_TaskBoardAssembly",
+    "rocochallenge/RoCo_BrickAssembly"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,174 @@
+{
+  "paper_id": "P160",
+  "name": "Rliable",
+  "title": "Deep Reinforcement Learning at the Edge of the Statistical Precipice",
+  "year": 2021,
+  "paper_url": "https://arxiv.org/abs/2108.13264",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P160",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "rliable可為已有的多run、多task結果加上分佈與不確定性；它不定義robot任務，也不能讓不同原生metric自動變可比。",
+    "environment": "方法評估庫，不新增環境；原展示使用Atari/ALE/DM Control/Procgen。robot使用時仍保留原environment/source lineage。",
+    "tasks": "對既有task結果作聚合、bootstrap與performance profile，不是新增task registry或case dataset。",
+    "data": "輸入每個algorithm的num_runs×num_tasks(×其他維度)矩陣，需固定同一task列順序、metric尺度與missing值策略。不能把不同分佈的未知/不適用填0。",
+    "evaluation": "mean先按task平均再總平均；median是task均值的中位數；IQM將所有run×task分數flatten後trim25%；optimality gap=gamma−mean(min(score,gamma))。bootstrap預設只重抽run，task_bootstrap才同時抽task；機率提升按task算Mann–Whitney再平均。不同方法同case配對與共享source的相依性需另設計。",
+    "standardization": {
+      "profile": "statistical_evaluation_aggregation",
+      "reuse": "原生公式、CI與performance profiles、固定task集合/未知task母體兩種推論區分。",
+      "transform": "先對同協定同單位結果建立可比score矩陣；保存run/case/scene群組與分層權重，再報per-domain及整體CI。公式不直接混合SR、距離與LPIPS。",
+      "missing": "真實policy結果矩陣、不同來源群聚重抽樣策略、缺失結果規則、正規化依據；所讀update_indices使用全域np.random，重現時需驗證RNG設定。"
+    },
+    "version_note": "固定3ccd9f4；API標示archived。這是來源實作核讀，未安裝套件或宣稱CI已計算。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "google-research/rliable",
+        "requested_repo": "google-research/rliable",
+        "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            38
+          ],
+          [
+            62,
+            83
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 186,
+        "sha256": "c4d474f8a018c6faf8ab5d365bad135258a2af851e2a5672e07999438fcc6237",
+        "url": "https://github.com/google-research/rliable/blob/3ccd9f4dea577a04d3d2b557f259aac08badbd81/README.md",
+        "reading_url": "https://github.com/google-research/rliable/blob/3ccd9f4dea577a04d3d2b557f259aac08badbd81/README.md#L1-L38",
+        "why": "原論文身分與run×task矩陣使用方法",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/rliable",
+        "requested_repo": "google-research/rliable",
+        "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+        "ref": null,
+        "path": "rliable/metrics.py",
+        "ranges": [
+          [
+            20,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 95,
+        "sha256": "caf0c74e6238a12d2f59d6bcd47115e56167ea73c3b851c3f7981de17e5230cc",
+        "url": "https://github.com/google-research/rliable/blob/3ccd9f4dea577a04d3d2b557f259aac08badbd81/rliable/metrics.py",
+        "reading_url": "https://github.com/google-research/rliable/blob/3ccd9f4dea577a04d3d2b557f259aac08badbd81/rliable/metrics.py#L20-L95",
+        "why": "mean/median/IQM/optimality gap/提升機率的具體公式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "google-research/rliable",
+        "requested_repo": "google-research/rliable",
+        "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+        "ref": null,
+        "path": "rliable/library.py",
+        "ranges": [
+          [
+            26,
+            49
+          ],
+          [
+            71,
+            122
+          ],
+          [
+            211,
+            283
+          ],
+          [
+            301,
+            323
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 354,
+        "sha256": "0af084e4040fad3ae02a612b16fbcc59d9a141ac8259ad47dc1932bcc168ac14",
+        "url": "https://github.com/google-research/rliable/blob/3ccd9f4dea577a04d3d2b557f259aac08badbd81/rliable/library.py",
+        "reading_url": "https://github.com/google-research/rliable/blob/3ccd9f4dea577a04d3d2b557f259aac08badbd81/rliable/library.py#L26-L49",
+        "why": "stratified resampling、固定task或task-bootstrap、CI與profile接口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "d3f8d519b1f6224266a6ce5c915a6a83d49581e0cf064759adcd4c255032cf97"
+  },
+  "repository_binding_review_sha256": "d3f8d519b1f6224266a6ce5c915a6a83d49581e0cf064759adcd4c255032cf97",
+  "repository_bindings": [
+    {
+      "requested_repo": "google-research/rliable",
+      "resolved_repo": "google-research/rliable",
+      "aliases_in_this_review": [
+        "google-research/rliable"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "3ccd9f4dea577a04d3d2b557f259aac08badbd81",
+          "reviewed_files": [
+            "README.md",
+            "rliable/library.py",
+            "rliable/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/google-research/rliable",
+          "pdf_page": 1,
+          "pdf_sha256": "a6a5abb49e58a9e4a0be8556c8351ce8c3b52e70216bffc9fa80eac0823ec5ed",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/google-research/rliable",
+          "pdf_page": 10,
+          "pdf_sha256": "a6a5abb49e58a9e4a0be8556c8351ce8c3b52e70216bffc9fa80eac0823ec5ed",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P160",
+          "review_file": "content/github_review/reviews/P160.json",
+          "review_sha256": "d3f8d519b1f6224266a6ce5c915a6a83d49581e0cf064759adcd4c255032cf97",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "google-research/rliable"
+  ],
+  "external_repositories": []
+}

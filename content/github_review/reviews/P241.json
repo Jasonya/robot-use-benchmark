@@ -1,0 +1,829 @@
+{
+  "paper_id": "P241",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已核STA reader→預測affordance prior→AFF ROI head→OverallMeanAveragePrecision，以及新增EPIC STA pickle的讀取格式。固定release的v2設定仍遇v1欄位硬編碼及未隨repo提供的import；AFF、hotspots和完整執行環境尚未閉合，不能以README結果或外部權重連結宣稱可重現整篇。",
+  "identity_note": "AFF-ttention! Affordances and Attention models for Short-Term Object Interaction Anticipation，Lorenzo Mur-Labadia、Ruben Martinez-Cantin、Jose J. Guerrero、Giovanni Maria Farinella、Antonino Furnari；Guerrero在清單/README也寫Josechu。快取arXiv:2406.01194v2（2024-06-05），README對應ECCV 2024，PDF hyperlink discovery直接指lmur98/AFFttention。README另連2407.04369 challenge report，不能混為本篇PDF版本或後續STAformer++。",
+  "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+  "reading_order": [
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "README.md",
+      "ranges": [
+        [
+          3,
+          14
+        ],
+        [
+          25,
+          51
+        ],
+        [
+          55,
+          76
+        ]
+      ],
+      "why": "精確論文、STAformer/AFF/hotspot角色、Ego4D版本及新增EPIC STA標註。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/test_dir/Aff_ttention_v1/config.yaml",
+      "ranges": [
+        [
+          13,
+          35
+        ],
+        [
+          39,
+          76
+        ],
+        [
+          114,
+          162
+        ]
+      ],
+      "why": "v1類別、16-frame輸入、aff head、split與輸出開關。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+      "ranges": [
+        [
+          11,
+          35
+        ],
+        [
+          39,
+          76
+        ],
+        [
+          115,
+          162
+        ]
+      ],
+      "why": "v2類別與資料路徑；不能用folder名稱代替reader版本核對。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/datasets/ego4d_sta_still.py",
+      "ranges": [
+        [
+          22,
+          38
+        ],
+        [
+          40,
+          82
+        ],
+        [
+          102,
+          153
+        ],
+        [
+          180,
+          203
+        ],
+        [
+          232,
+          258
+        ]
+      ],
+      "why": "原始STA schema、train清理、硬編碼v1 key與label offsets。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/datasets/ego4d_sta_still_video.py",
+      "ranges": [
+        [
+          9,
+          17
+        ],
+        [
+          72,
+          110
+        ],
+        [
+          168,
+          226
+        ]
+      ],
+      "why": "past-frame sampler、預測AFF載入／lookup、缺件均勻prior與batch欄位。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/datasets/sta_hlmdb.py",
+      "ranges": [
+        [
+          8,
+          21
+        ],
+        [
+          36,
+          56
+        ]
+      ],
+      "why": "LMDB父目錄／10位frame key與JPEG bytes。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/models/stillfast.py",
+      "ranges": [
+        [
+          1,
+          25
+        ],
+        [
+          73,
+          128
+        ]
+      ],
+      "why": "Dino/EgoVLP及aff head實際分派、外部StillFast依賴與缺import。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/models/faster_rcnn.py",
+      "ranges": [
+        [
+          120,
+          154
+        ]
+      ],
+      "why": "noun_labels改名labels並把AFF附加target送入head。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/models/faster_rcnn_AFF_sta.py",
+      "ranges": [
+        [
+          190,
+          260
+        ],
+        [
+          287,
+          391
+        ],
+        [
+          396,
+          441
+        ],
+        [
+          443,
+          584
+        ]
+      ],
+      "why": "Bayes乘prior再正規化、verb_topk、score/NMS與最終預測。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/tasks/sta.py",
+      "ranges": [
+        [
+          36,
+          92
+        ],
+        [
+          94,
+          193
+        ]
+      ],
+      "why": "跨rank收集後uid去重、去AFF target、實際Overall mAP及提交ID還原。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/evaluation/sta_metrics.py",
+      "ranges": [
+        [
+          4,
+          59
+        ],
+        [
+          121,
+          205
+        ],
+        [
+          207,
+          359
+        ],
+        [
+          416,
+          523
+        ]
+      ],
+      "why": "具體GT配對、FP預算、VOC積分與global AP/noun-macro mAP分母。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "code_extract_affordances/generate_AFF_labels.py",
+      "ranges": [
+        [
+          1,
+          26
+        ],
+        [
+          28,
+          61
+        ],
+        [
+          83,
+          91
+        ]
+      ],
+      "why": "cluster/node/visit/STA→每zone標籤分佈與資料檔格式。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "propagate_affordances/propagate_AFF_dataset.py",
+      "ranges": [
+        [
+          8,
+          30
+        ],
+        [
+          80,
+          96
+        ]
+      ],
+      "why": "v2 validation query v_id/frame/STA targets；標籤供diagnostics。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "propagate_affordances/propagate_AFF_from_node.py",
+      "ranges": [
+        [
+          24,
+          50
+        ],
+        [
+          61,
+          122
+        ],
+        [
+          124,
+          165
+        ],
+        [
+          281,
+          391
+        ],
+        [
+          396,
+          412
+        ]
+      ],
+      "why": "train-node descriptors、query visual matching、weighted-max priors、診斷分母與輸出未寫檔。"
+    },
+    {
+      "repo": "lmur98/AFFttention",
+      "path": "stillfast_code/datasets/ek_55_sta_dataset.py",
+      "ranges": [
+        [
+          79,
+          120
+        ],
+        [
+          138,
+          213
+        ],
+        [
+          224,
+          256
+        ],
+        [
+          260,
+          405
+        ]
+      ],
+      "why": "EPIC專用pickle/eid/timestamp、class merge/filter、normalized框與frame偏移。"
+    }
+  ],
+  "environment": "Ego4D v1/v2日常活動與作者整理的EPIC-Kitchens STA第一人稱影片。affordance node/zone是影片中視覺相似的活動區域及其已觀察互動，不是3D場景layout或機器人可執行技能；hotspot是影像中的人手互動機率。",
+  "tasks": "下一次物件互動的box、noun、verb、TTC與confidence。v1 taxonomy87 nouns/74 verbs，v2 128/81；類別、prediction frame、GT object、zone/visit與policy trial各為不同單位。P241有新的curated EPIC STA標註貢獻，不能與P235的EK100 pseudo-box實驗或母EK action資料直接合併計數。",
+  "data": "Ego4D JSON讀info.video_metadata與annotations；每ann含uid、video_id(v1)/video_uid(v2)、frame、objects[{box,noun_category_id,verb_category_id,time_to_contact}]。still圖為video_id_七位frame.jpg；fast LMDB以video_id為父目錄、video_id_十位frame為key，值是JPEG；sampler取frame-15..frame共16格、早於0補0，沒有取未來影格。frame索引與TTC秒保留各自單位。target是boxes/noun_labels/verb_labels/ttc_targets；noun固定+1，verb在ROI_HEADS.VERSION不含v1時+1，因此兩個aff設定都+1，與資料集v1/v2名稱無關。train移除退化框／無物件ann；test無objects時loader製造假框與0 label，不能作GT。AFF檔是list[dict]的numpy物件容器，key為v_id、frame、AFF_N_top3、AFF_V_top3等；reader把它們命名AFF_N_GT/AFF_V_GT，實際來源是predicted_AFF檔，缺項填全1 prior。EPIC pickle則是[{eid,video_id,timestamp,objects:{noun_category_id[],verb_category_id[],boxes[],time_to_contact[]}}]；框被當normalized xyxy乘(1920,1080,1920,1080)。影像frame=int(timestamp*30+1)，AFF lookup卻round(timestamp*30)+2；timestamp秒與這兩個索引不可混用。EPIC noun合群/排除others、verb刪除稀用詞都會改case分母；test分支實際重用val_annotations.pkl。未取得完整標註資產，未宣稱有效case總數。",
+  "evaluation": "STATask.validation_epoch_end先list_gather所有rank、以uid建立pred/GT dict去重，再OverallMeanAveragePrecision(top_k=5)。每圖依score排序，針對各配對條件對尚未匹配的GT選最大IoU；IoU用xyxy像素端點+1面積，門檻>0.5，TTC abs(error)<=0.25秒。Top-5對每圖每條件豁免(5-1)×GT物件數個最高分FP；餘下按confidence建立precision=TP/(TP+FP)、recall=TP/該類GT物件數，取單調precision envelope的VOC積分。12個輸出中前8個是合併類別的AP，後4個map_box_noun、map_box_noun_verb、map_box_noun_ttc、map_box_noun_verb_ttc才按有GT的noun類別宏平均×100；checkpoint用最後一項，不能把global AP混入主表mAP。AFF head將預測prior×各head softmax後重新正規化，去背景、每proposal保留verb_topk=1、noun×verb分數>0.002（不是config的0.05），per verb–noun NMS後最多100 detections；此預測budget與scorer的Top-5 FP豁免不同。export把noun減1、verb減相應offset，輸出results[uid]的box/score/noun_category_id/verb_category_id/time_to_contact。test僅匯出，無公開GT scorer結果。",
+  "standardization": {
+    "profile": "offline_short_term_interactions_with_affordance_memory",
+    "reuse": "Ego4D v1/v2 taxonomy、STA JSON與EPIC pickle reader的原生欄位、predicted-prior lookup／Bayes fusion、具體mAP與submission adapter。",
+    "transform": "source記paper/commit、Ego4D或curated EPIC annotation revision、StillFast base與prior/hotspot資產；domain/environment為人類影片和zone provenance。task保持STA；case用dataset+split+uid/eid，另存video/frame/timestamp、原框座標、class_remap/背景offset。zone/visit/node及其training STA/narration是source附屬資料，不增加case。evaluator固定score生成、verb_topk/NMS/100候選、Top-5豁免、TTC門檻、noun macro AP與uid去重；跨source不等價為robot success。",
+    "missing": "優先修復Ego4D reader的video_id硬編碼與v2 video_uid；固定StillFast base commit／安裝佈局，補缺的ego4d_sta_hands_still_video、faster_rcnn_HANDS_sta、faster_rcnn_prior_HANDS_sta、detr_criterion等被無條件import的模組。移除...及作者絕對路徑，固定完整split/annotation與predicted_AFF/hotspot SHA。AFF資料庫生成／descriptor取樣仍需train-only及時間可見性核驗；當前code以train_nodes匹配visual query，不能因GT欄名就指為oracle，也不能因檔名train就視為已證明無洩漏。EPIC需要固定class_names、實際class remap及兩套frame偏移，且test=val不能當獨立test。hotspot讀入有外部placeholder，當前Ego4D __getitem__的contact-point呼叫與heatmap target被註解，selected aff鏈未核到完整hotspot重權重執行路徑。"
+  },
+  "version_note": "固定 1a1253fa2bde09ef1de4894f3bf872c1fbf270de（2024-07-15）。已核propagate_AFF_from_node.py用top1/3/5 visual及cross-modal鄰居、1.5×最近距離篩選、softmax(2×similarity)加權後逐類max、max-normalize再softmax；論文式(3)是加權sum後exp，不能混成同一prior配方。該腳本np.save被註解，不能直接認定會產出reader所需檔；其diagnostic n_samples從1起算、最後分母多1，也不是STA mAP。generate_AFF_labels.py是另一cluster頻率版本，root標TRAIN但輸出名含VAL，需要provenance而非靠檔名判split。README連的weights與config checkpoint亦不同。只核以上核心source／小型詞表，未跑模型、simulator或下載大資產。",
+  "discovery_evidence": [
+    {
+      "provider": "primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P241/pages.json",
+      "sha256": "d400f4c6f4fc201703bd9f88efabe8090a65d20b994d8166fc7d3b9026b7f926",
+      "url": "https://arxiv.org/pdf/2406.01194",
+      "json_pointers": [
+        "/0/text",
+        "/3/text",
+        "/6/text",
+        "/7/text",
+        "/8/text",
+        "/9/text",
+        "/10/text",
+        "/12/text"
+      ],
+      "version": "arXiv:2406.01194v2; ECCV 2024",
+      "pdf_local_file": "audit/.cache/fulltext_review/P241/paper.pdf",
+      "pdf_sha256": "5bc6b87af40d139d6f59d0cb6bd989130ccd236b866623dc409b6fe248d789a5",
+      "pages": [
+        1,
+        4,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13
+      ]
+    },
+    {
+      "provider": "cached_paper_discovery",
+      "local_file": "audit/.cache/github_review/P241-discovery.json",
+      "sha256": "fb8e66188c3187c9dbfc82d5671be9c152d79d9d3a81e5359e0788258b725d9c",
+      "json_pointers": [
+        "/pdf_sha256",
+        "/candidates/0"
+      ],
+      "note": "固定PDF hyperlink→作者repo。"
+    },
+    {
+      "provider": "github_tree_snapshot",
+      "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/tree.json",
+      "sha256": "37cf77cd06ef6ee1482a0f5b4e0524a2f486ee00d4ba7ca081b48061e0fc9cbd",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree"
+      ],
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "note": "完整178項tree；核對無條件import的缺件，不把不存在的路徑列為已讀source。"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "README.md",
+      "git_blob_sha": "a7b11261b463880b80b3d9f6dc2659d7df63e9a7",
+      "sha256": "a4c37c474099ed28ecbecdf1d247f2feb9ceee85cb8d06634e25a7d3743cd672",
+      "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/files/README.md",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/README.md",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/README.md",
+      "ranges": [
+        [
+          3,
+          14
+        ],
+        [
+          25,
+          51
+        ],
+        [
+          55,
+          76
+        ]
+      ],
+      "why": "精確論文、STAformer/AFF/hotspot角色、Ego4D版本及新增EPIC STA標註。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/test_dir/Aff_ttention_v1/config.yaml",
+      "git_blob_sha": "d13e8f801a9f561ce1614bdb28fb25ae9ca4531b",
+      "sha256": "d8ed72a7f475f6db8ce0073b13ebac5447a7b352e31a281a570f2c03ab88b2a3",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/test_dir/Aff_ttention_v1/config.yaml",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v1/config.yaml",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v1/config.yaml",
+      "ranges": [
+        [
+          13,
+          35
+        ],
+        [
+          39,
+          76
+        ],
+        [
+          114,
+          162
+        ]
+      ],
+      "why": "v1類別、16-frame輸入、aff head、split與輸出開關。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+      "git_blob_sha": "49b6d7042034d85821d178d8a67e8e37500021c5",
+      "sha256": "c2003b9a4830b711750a6e6b0b5f4dd438a327cc5e97d20c228e7bfcef12829b",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v2/config.yaml",
+      "ranges": [
+        [
+          11,
+          35
+        ],
+        [
+          39,
+          76
+        ],
+        [
+          115,
+          162
+        ]
+      ],
+      "why": "v2類別與資料路徑；不能用folder名稱代替reader版本核對。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/datasets/ego4d_sta_still.py",
+      "git_blob_sha": "fd4717b2e515fcc96e3da8f1b9d2988ad507aae9",
+      "sha256": "5228feac241c882a8be10161f01f6f0f3d667305e5b34370e5af535836460afc",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/datasets/ego4d_sta_still.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still.py",
+      "ranges": [
+        [
+          22,
+          38
+        ],
+        [
+          40,
+          82
+        ],
+        [
+          102,
+          153
+        ],
+        [
+          180,
+          203
+        ],
+        [
+          232,
+          258
+        ]
+      ],
+      "why": "原始STA schema、train清理、硬編碼v1 key與label offsets。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/datasets/ego4d_sta_still_video.py",
+      "git_blob_sha": "ff9520b7f51b0afed3f578aaf5462f5bab826df7",
+      "sha256": "0d43f895e3ed3306cf52db844e36353623e035e18b1a554dc1f3a527f5cf7fb7",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/datasets/ego4d_sta_still_video.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still_video.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still_video.py",
+      "ranges": [
+        [
+          9,
+          17
+        ],
+        [
+          72,
+          110
+        ],
+        [
+          168,
+          226
+        ]
+      ],
+      "why": "past-frame sampler、預測AFF載入／lookup、缺件均勻prior與batch欄位。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/datasets/sta_hlmdb.py",
+      "git_blob_sha": "c9b028f4262bc792070f05f51e1ba2795b768138",
+      "sha256": "c2a7c64e2678486d3eb4ea35efda2f8be5189315244bc39d5625b060f7811a20",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/datasets/sta_hlmdb.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/sta_hlmdb.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/sta_hlmdb.py",
+      "ranges": [
+        [
+          8,
+          21
+        ],
+        [
+          36,
+          56
+        ]
+      ],
+      "why": "LMDB父目錄／10位frame key與JPEG bytes。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/models/stillfast.py",
+      "git_blob_sha": "b9b7c6a0deabca29ac2490effdac2f9a67714c21",
+      "sha256": "5648a6453b1eaac621281c8b86052ae1a47828345c8323b988a15fa9e3c0a041",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/models/stillfast.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/stillfast.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/stillfast.py",
+      "ranges": [
+        [
+          1,
+          25
+        ],
+        [
+          73,
+          128
+        ]
+      ],
+      "why": "Dino/EgoVLP及aff head實際分派、外部StillFast依賴與缺import。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/models/faster_rcnn.py",
+      "git_blob_sha": "85795bddddbd72f1c7a0f17db184f8c7516adee4",
+      "sha256": "eb8c2f20f34ba07a1d160c2b0420aa9ad9b119ac3bc46aea52f5ea908e059143",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/models/faster_rcnn.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn.py",
+      "ranges": [
+        [
+          120,
+          154
+        ]
+      ],
+      "why": "noun_labels改名labels並把AFF附加target送入head。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/models/faster_rcnn_AFF_sta.py",
+      "git_blob_sha": "1d4e874a177d30dcd6c14d72345835dbcec8a8ca",
+      "sha256": "91635ee2e07c3113c361a55b721a23f8a149eba4aa5ef912acbab1f491b71c98",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/stillfast_code/models/faster_rcnn_AFF_sta.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn_AFF_sta.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn_AFF_sta.py",
+      "ranges": [
+        [
+          190,
+          260
+        ],
+        [
+          287,
+          391
+        ],
+        [
+          396,
+          441
+        ],
+        [
+          443,
+          584
+        ]
+      ],
+      "why": "Bayes乘prior再正規化、verb_topk、score/NMS與最終預測。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/tasks/sta.py",
+      "git_blob_sha": "f06378fbf3f5f0435004e53996eb26abe37c23b5",
+      "sha256": "64eecd82cb5e5ec2837297755819575d01ec829006d7a2a1b66d92d728356c10",
+      "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/files/stillfast_code/tasks/sta.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/tasks/sta.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/tasks/sta.py",
+      "ranges": [
+        [
+          36,
+          92
+        ],
+        [
+          94,
+          193
+        ]
+      ],
+      "why": "跨rank收集後uid去重、去AFF target、实际Overall mAP及提交ID還原。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/evaluation/sta_metrics.py",
+      "git_blob_sha": "7a9aa1eac183b32653aa0b33a93106cedf3da285",
+      "sha256": "0b797ca8729203c5ebb9d3c7df468c81bcdf4f291c7136cbd54c54c27ec3c794",
+      "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/files/stillfast_code/evaluation/sta_metrics.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/evaluation/sta_metrics.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/evaluation/sta_metrics.py",
+      "ranges": [
+        [
+          4,
+          59
+        ],
+        [
+          121,
+          205
+        ],
+        [
+          207,
+          359
+        ],
+        [
+          416,
+          523
+        ]
+      ],
+      "why": "具體GT配對、FP預算、VOC積分與global AP/noun-macro mAP分母。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "code_extract_affordances/generate_AFF_labels.py",
+      "git_blob_sha": "a2a83d2d899dcc84f97979d0e97076c5e0cca7f1",
+      "sha256": "dcbae72cd27f48b4536536d54972e863afbb08917c4fc1e78e599753bf78caac",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/code_extract_affordances/generate_AFF_labels.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/generate_AFF_labels.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/generate_AFF_labels.py",
+      "ranges": [
+        [
+          1,
+          26
+        ],
+        [
+          28,
+          61
+        ],
+        [
+          83,
+          91
+        ]
+      ],
+      "why": "cluster/node/visit/STA→每zone標籤分布與資料檔格式。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "propagate_affordances/propagate_AFF_dataset.py",
+      "git_blob_sha": "e41206ce848064305b1d99dad3fd237ecd3b5916",
+      "sha256": "6703022fbff99ee88ded454ba2a63ffddff49b7aaa8c638249569cefda7c0542",
+      "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/files/propagate_affordances/propagate_AFF_dataset.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/propagate_affordances/propagate_AFF_dataset.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/propagate_affordances/propagate_AFF_dataset.py",
+      "ranges": [
+        [
+          8,
+          30
+        ],
+        [
+          80,
+          96
+        ]
+      ],
+      "why": "v2 validation query v_id/frame/STA targets；標籤供diagnostics。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "propagate_affordances/propagate_AFF_from_node.py",
+      "git_blob_sha": "d3aa5b888b9e0863a275d3a66a921d8b5dd73275",
+      "sha256": "54ab9a360fc7f8073a90b6df077984e9abd0f3049d3011d6c18dd6c9ecf5ba0b",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/propagate_affordances/propagate_AFF_from_node.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/propagate_affordances/propagate_AFF_from_node.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/propagate_affordances/propagate_AFF_from_node.py",
+      "ranges": [
+        [
+          24,
+          50
+        ],
+        [
+          61,
+          122
+        ],
+        [
+          124,
+          165
+        ],
+        [
+          281,
+          391
+        ],
+        [
+          396,
+          412
+        ]
+      ],
+      "why": "train-node descriptors、query visual matching、weighted-max priors、診斷分母與輸出未寫檔。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "stillfast_code/datasets/ek_55_sta_dataset.py",
+      "git_blob_sha": "974e0aaeae77a108df061d1befc26dc685d7c1ae",
+      "sha256": "fdec7c6d54adb00074c75ea16678720b7332f049052b9f82adc4fbc23ef6559e",
+      "local_file": "audit/.cache/github_review/repos/lmur98__AFFttention/files/stillfast_code/datasets/ek_55_sta_dataset.py",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ek_55_sta_dataset.py",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ek_55_sta_dataset.py",
+      "ranges": [
+        [
+          79,
+          120
+        ],
+        [
+          138,
+          213
+        ],
+        [
+          224,
+          256
+        ],
+        [
+          260,
+          405
+        ]
+      ],
+      "why": "EPIC專用pickle/eid/timestamp、class merge/filter、normalized框與frame偏移。"
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "code_extract_affordances/STA_nouns_list.json",
+      "git_blob_sha": "676564d499520e05a97e5ce4bd4df19276f51718",
+      "sha256": "41fb75cc9c86c3d3ffec62d388cd8844238f3ca1b021c26043a3996c08df6c39",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/code_extract_affordances/STA_nouns_list.json",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_nouns_list.json",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_nouns_list.json",
+      "json_pointers": [
+        "/0",
+        "/86"
+      ],
+      "why": "解析完整array的ID結構／長度，核讀首末類別；未宣稱全部詞義跨來源對齊。",
+      "array_length": 87
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "code_extract_affordances/STA_verbs_list.json",
+      "git_blob_sha": "fb7321bc627b0d6fe91ce2e4a220d1c763186b61",
+      "sha256": "1f3f7fa65961c218126a6e360bae14a0042522b6d905343149f8bfa1974b29b4",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/code_extract_affordances/STA_verbs_list.json",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_verbs_list.json",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_verbs_list.json",
+      "json_pointers": [
+        "/0",
+        "/73"
+      ],
+      "why": "解析完整array的ID結構／長度，核讀首末類別；未宣稱全部詞義跨來源對齊。",
+      "array_length": 74
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "code_extract_affordances/STA_v2_nouns_list.json",
+      "git_blob_sha": "fc9f647b787e15894f44743da0e93a26cdb43232",
+      "sha256": "fd813bf50dddb3b2046bc869b200a88d47fa946bdc65cb3acbd542b825ad9d1c",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/code_extract_affordances/STA_v2_nouns_list.json",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_v2_nouns_list.json",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_v2_nouns_list.json",
+      "json_pointers": [
+        "/0",
+        "/127"
+      ],
+      "why": "解析完整array的ID結構／長度，核讀首末類別；未宣稱全部詞義跨來源對齊。",
+      "array_length": 128
+    },
+    {
+      "provider": "github",
+      "repo": "lmur98/AFFttention",
+      "commit": "1a1253fa2bde09ef1de4894f3bf872c1fbf270de",
+      "path": "code_extract_affordances/STA_v2_verbs_list.json",
+      "git_blob_sha": "bafe8c2f87b4fa548dca6a0b4b663ea32f538246",
+      "sha256": "037bb8177d28099331ea40ac9684a9a5ae17f64becdb7c176bd17acaccac6685",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/lmur98__AFFttention/code_extract_affordances/STA_v2_verbs_list.json",
+      "url": "https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_v2_verbs_list.json",
+      "raw_url": "https://raw.githubusercontent.com/lmur98/AFFttention/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/STA_v2_verbs_list.json",
+      "json_pointers": [
+        "/0",
+        "/80"
+      ],
+      "why": "解析完整array的ID結構／長度，核讀首末類別；未宣稱全部詞義跨來源對齊。",
+      "array_length": 81
+    }
+  ],
+  "runtime_executed": false
+}

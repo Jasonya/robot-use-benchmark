@@ -1,0 +1,88 @@
+{
+  "paper_id": "P144",
+  "summary": "CAP/EgoGym來源有公開policy和real2sim抓取路徑；此路徑的稀疏成功是提升高度，且包含重力補償輔助，不能由此推定完整EgoGym實驗全部已可重現。",
+  "reading_order": [
+    {
+      "repo": "jeffacce/cap-policy",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          20
+        ]
+      ],
+      "why": "精確論文與發布/硬體指南",
+      "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2"
+    },
+    {
+      "repo": "jeffacce/cap-policy",
+      "path": "imitation-in-homes/dataloaders/decord_dataset.py",
+      "ranges": [
+        [
+          237,
+          251
+        ],
+        [
+          285,
+          292
+        ],
+        [
+          326,
+          351
+        ]
+      ],
+      "why": "video/action/depth共享切片索引和資料格式",
+      "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2"
+    },
+    {
+      "repo": "jeffacce/cap-policy",
+      "path": "imitation-in-homes/real2sim/tasks/pick.py",
+      "ranges": [
+        [
+          22,
+          61
+        ],
+        [
+          99,
+          189
+        ]
+      ],
+      "why": "原生action、目標觀測、carry threshold與輔助physics",
+      "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2"
+    },
+    {
+      "repo": "jeffacce/cap-policy",
+      "path": "imitation-in-homes/real2sim/evaluate.py",
+      "ranges": [
+        [
+          16,
+          51
+        ],
+        [
+          140,
+          188
+        ],
+        [
+          190,
+          213
+        ]
+      ],
+      "why": "object/seed排程、2D/3D/無條件與分母",
+      "commit": "8ab11176ecb61a5e88f290958877ab17a6f3e8e2"
+    }
+  ],
+  "environment": "MuJoCo real2sim scene.xml和可替換物件/幹擾物，另有實機/人類gripper資料；物件asset、機體與scene設定應各自有ID。",
+  "tasks": "接觸條件化policy；已核對的RUM-Pick-v0是具體抓取測試，不等於原文所有utility/EgoGym任務。",
+  "data": "loader按同一trajectory slice取RGB、可選depth及action；sim observation含RGB和object_2d/3d_position。評測可明確使用這些位置作conditioning，屬資訊預算差異；2D投影參數480×360與obs宣告256需核對。",
+  "evaluation": "default sparse以物件升高>carry_threshold(.02)給1，terminated=bool(reward)。dense模式reward一般非零，不能沿用此termination當成功。step含600次physics控制、首次grasp另gravcomp=1和2000步，應保留輔助/成本設定；總成功按指定episode數聚合。",
+  "standardization": {
+    "profile": "contact_conditioned_policy_and_real2sim_grasp",
+    "reuse": "原物件/場景配置、資料切片、目標條件與稀疏lift checker。",
+    "transform": "case區分2D/3D/無條件與合法觀測，保存位置單位/解析度、7D增量/Euler與gripper閾值、physics substeps及重力輔助。",
+    "missing": "完整EgoGym原生manifest/接觸標註、所有utility task規則、素材/模型與校準、dense/sparse判分分離及原文對照。"
+  },
+  "version_note": "固定8ab1117；目前深入的是公開real2sim pick流程，未宣稱每個CAP應用、全部人類資料與實機checker皆公開或已執行。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

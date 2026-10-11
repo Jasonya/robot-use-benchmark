@@ -1,0 +1,1138 @@
+{
+  "paper_id": "P083",
+  "name": "RoboDojo",
+  "title": "RoboDojo: A Unified Sim-and-Real Benchmark for Comprehensive Evaluation of Generalist Robot Manipulation Policies",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2607.04434",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "garment",
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P083",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboDojo與XPolicyLab分別提供sim任務／計分與policy／data adapter。已閉合stack_bowls、push_T的checker、RewardManager、EvalEnv及summary，並讀HDF5→RGB→LeRobot reader。success_rate與partial score不同；unstable/abandoned layout不在相同分母，summary還有embodiment鍵遺失與layout排序問題。",
+    "identity_note": "固定RoboDojo論文為Chen等人的完整sim-and-real benchmark，arXiv:2607.04434v3（2026-07-08）。PDF第1頁直接連兩repo，主README題名/arXiv吻合。XPolicyLab現行README另引用2608.09892（2026年8月的獨立工具論文）；本P083只審其RoboDojo adapter角色，不把那篇的政策數或新功能倒算成7月RoboDojo benchmark。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P083-discovery.json",
+        "selected_json_pointers": [
+          "/title",
+          "/paper_url",
+          "/pdf_sha256",
+          "/code_contexts/1",
+          "/candidates/1",
+          "/candidates/2"
+        ],
+        "paper_version": "2607.04434v3",
+        "pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4",
+        "finding": "第1頁兩個直接code hyperlink，及第12頁XPolicyLab介面定位。",
+        "sha256": "f29aeb6b96df92b534245510dfbf443dec7fd84ff1562a5a8c189f46247a0d98",
+        "text_excerpts": [
+          {
+            "json_pointer": "/opening_text",
+            "character_range": [
+              2240,
+              2277
+            ],
+            "text": "arXiv:2607.04434v3 [cs.RO] 8 Jul 2026",
+            "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+          }
+        ]
+      },
+      {
+        "local_file": "audit/.cache/fulltext_review/P083/pages.json",
+        "sha256": "cc0c6fa4b92d388c3997d17d11e6f9b4abee949f5fd428cd6a997f139eb58278",
+        "selected_json_pointers": [
+          "/6/text",
+          "/8/text"
+        ],
+        "finding": "25Hz／3500訓練軌跡、42-task分層評測；真實18 tasks各10 trials、三位雙盲評分者平均的paper協定。"
+      }
+    ],
+    "environment": "Isaac Sim／Isaac Lab配置化場景，TaskEnv由sim/scene/robot/camera/task YAML建立，可有target雙臂與support arm。選讀stack_bowls從8個bowl asset ID中選3個同類物件，xlim[-0.45,0.45]、ylim[-0.25,0.07]相對Table；評測改讀已存Eval_Layout。主README此版為sim eval-only，真實ARX X5/Piper/Piper X的18 tasks使用RoboDojo-RealEval另行部署；本輪未取得真實trial影片、三人評分或隱藏驗證layout。",
+    "tasks": "summary DIMENSIONS確列42個base tasks：Generalization12、Precision8、Long-Horizon8、Memory6、Open8；12個*_random是對應base task的泛化設定，不另算42以外新canonical任務。stack_bowls完整成功需三碗軸向<45度、最低碗<7度、相鄰中心XY距離<=0.04m且高度差>=0.005m、target robot回原位（每座標差<=0.15m、旋轉<=20度）。此stack checker不驗接觸且未設最大垂直間隔。process score為兩碗階段15、三碗階段100，要求gripper開度>=0.8；transition每action最多推進一階，100仍須完整成功gate。push_T以quat差<7度、XY距離<0.007m及robot回原位成功；is_lift相對初態>0.01m的query允許次數0，觸發即失敗；不是IoU評測。",
+    "data": "case來源為Assets/Eval_Layout/RoboDojo/{config_name}/{eval_seed}/{task}_N.json。SeedManager按N排序後重新以0..len-1編ordinal，該ordinal才是程式layout_id；未取得外部layout JSON，不能用檔名suffix直接替代。runtime obs含data_format_version='v1.0'、instruction、additional_info.frequency、vision/state/action及env_idx；RGB為HWC，float depth保持距離，approximate_depth=clip(raw*1000,0,65535).uint16。實際ObsManager寫extrinsic_matrix，與XPolicyLab README宣稱runtime extrinsics_matrix不同。XPolicyLab load(RoboDojo,v1.0)遞迴讀HDF5、解析instruction/subtasks JSON，colors經decode_image_bit；pose為xyz+qwqxqyqz。legacy JPEG及有XPL-RGB1 COM marker的新JPEG可共存，decoder只對有marker者做BGR→RGB。LeRobot v2.1 converter取state/action下left_arm_joint_states、left_ee_joint_states、right_arm_joint_states、right_ee_joint_states依序串接；三相機映到cam_high/left_wrist/right_wrist，缺相機補黑，各arm補到共同最大維度。paper的3500 trajectories=34訓練tasks各100+100 DLC輔助（Open無task-specific訓練），1859602 frames及25Hz是paper統計，未下載重新點算。",
+    "evaluation": "policy deploy→update_obs/get_action→EvalEnv.take_action→robot control→RewardManager.step→Func_Parser→is_episode_end。check按列表順序移除已完成stage，巢狀list交替OR/AND，query計事件次數；完整reward只回0/1。stack_bowls上限800個take_action，push_T600，非physics ticks；capture frequency另由dt與collect_freq決定。EvalEnv完整成功記episode score=1，失敗若有process score則/100；_result.json含details{record_index:{layout_id,success,score}}、success_rate（0–1）、score（0–100平均）、eval_time（已計數episodes，不是秒）。無效、unstable及部分PhysX broken layouts被排除／補樣，abandoned另存resume manifest；要求50不能當50次嘗試。summary採每task/policy/embodiment/seed最新timestamp結果；獨立task前50筆，Generalization合base25+random25，三seed0/1/2共126個完整cell。先平均每維tasks，再五維等權平均，seed標準差為population std；未完成cell留空，overview可顯示已完成部分平均。真實paper協定每task10 trials、三位評分者分別打成功與substeps後平均，不能以sim RewardManager替代。",
+    "standardization": {
+      "profile": "sim_layout_task_scoring_plus_versioned_policy_trajectory_adapter",
+      "reuse": "42-task capability mapping、base/random關係、layout replay與seed排程、具體幾何／事件／階段checker、逐trial success/score及HDF5／JPEG reader。",
+      "transform": "source同時鎖RoboDojo與XPolicyLab commit；case鍵包含paper/code版、task、base/random、embodiment、config、eval_seed、layout ordinal和實際檔案hash，record_index另存。evaluator區分success、process score、末階段gate、unstable/abandoned與實際分母；按五維聚合而非所有task混平均。資料profile保留v1.0容器、JPEG marker、pose wxyz、觀測／動作對齊、相機缺失與padding mask、原頻率及LeRobot版本。",
+      "missing": "尚缺固定layout/robot/object資產包、原始HDF5樣本、真實評分資料與hidden-layout驗證。summary load_entries其實按details字典record key排序而非payload.layout_id；main又將(policy,embodiment,seed)寫入data[policy][task][seed]，多embodiment同名結果可能互相覆蓋。latest timestamp還會跨不同checkpoint/action_type選最後結果，須額外綁run配置。LeRobot轉換合併多頻率來源時以max_fps建立dataset，convert_one逐原幀寫入無resampling，需保存原時間軸或分流。geometry-only stack條件、runtime extrinsic鍵差異、score gate與unstable排除均需協調者在schema／protocol層明示。"
+    },
+    "version_note": "RoboDojo固定cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c（2026-10-08），不同於舊inventory 726e9aabfaa642203722eb126f5eaf0f37f3e1ad；XPolicyLab固定de9b445e4e46388542c412e406c73d359a5802fd（2026-10-10）。RoboDojo README記9月16–17日get_obs單幀與RGB修正、HF資料更新及swap_T assets修正，要求XPolicyLab bb9a0b5f5136a74503b679af830bfd0a3a837d5c或後續；未獨立驗證本兩pin的完整runtime相容性。7月paper、9月資料修訂、10月程式與8月XPolicyLab paper須分開建版本，不把政策數當benchmark task數。未啟動server、sim、policy或遠端評測。",
+    "runtime_executed": false,
+    "reviewed_on": "2026-10-11",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            5,
+            7
+          ],
+          [
+            13,
+            37
+          ],
+          [
+            54,
+            107
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 127,
+        "sha256": "bd02716d0cd9aae351307ae77772d20675a3bc2cc1e531cffe0b9644525ac944",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/README.md",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/README.md#L5-L7",
+        "why": "paper身份、September資料／RGB修正、sim eval-only與XPolicyLab責任界線。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "task/RoboDojo/task_registry.py",
+        "ranges": [
+          [
+            1,
+            21
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 21,
+        "sha256": "11218028f772d9253ee709a7d85aa72d1e1fd87e4f8d33ee3787d6064438f9ab",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/task_registry.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/task_registry.py#L1-L21",
+        "why": "按task名載入class與YAML，不將檔案數當canonical task數。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "task/RoboDojo/config/_task.yml",
+        "ranges": [
+          [
+            1,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 145,
+        "sha256": "655a87cd59fa6272bf352d32deb8ade162737b49a9824e16d428fecf0803380b",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/config/_task.yml",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/config/_task.yml#L1-L145",
+        "why": "共同設定、teleop/datagen、每task trial覆寫及support robot。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "task/RoboDojo/config/stack_bowls.yml",
+        "ranges": [
+          [
+            1,
+            17
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 17,
+        "sha256": "4e2aaa12b8b0f58ca801f1a93638c46d3b49ebad809c5a8011382ccda846dcb1",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/config/stack_bowls.yml",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/config/stack_bowls.yml#L1-L17",
+        "why": "三個同類bowl、asset候選及桌面初態取值範圍。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "task/RoboDojo/tasks/stack_bowls.py",
+        "ranges": [
+          [
+            5,
+            99
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 99,
+        "sha256": "022c129ec3493183b1a26688a0402f5a00a1546ae011999e9c19f4c0029e2b7d",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/tasks/stack_bowls.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/tasks/stack_bowls.py#L5-L99",
+        "why": "800步、三碗完整成功與15/100 transition process score。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "task/RoboDojo/tasks/push_T.py",
+        "ranges": [
+          [
+            5,
+            37
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 37,
+        "sha256": "a01d753bc320ffbf492ccc29e5f7ab3b39e6c7d255cd25804db1934a30fa5b41",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/tasks/push_T.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/tasks/push_T.py#L5-L37",
+        "why": "600步、7度／7mm位置對齊及禁止lift。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "env/environment/task_env.py",
+        "ranges": [
+          [
+            10,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 100,
+        "sha256": "ac816cf26efabbb8ac4276d2a2a09fbd557e3db805514db0c3dd7ac22b58e931",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/environment/task_env.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/environment/task_env.py#L10-L100",
+        "why": "runtime robot/scene/camera/physics及控制呼叫。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "env/seed_manager/seed_manager.py",
+        "ranges": [
+          [
+            27,
+            100
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 100,
+        "sha256": "292eee4003de1c22b288ec3bc1d04d95c7aee5368f30991679ea1cc4c37247b3",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/seed_manager/seed_manager.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/seed_manager/seed_manager.py#L27-L100",
+        "why": "Eval_Layout JSON排序、layout ordinal、resume排除及實際檔案reader。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "env/observation_manager/obs_manager.py",
+        "ranges": [
+          [
+            16,
+            66
+          ],
+          [
+            81,
+            220
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 220,
+        "sha256": "771d6cda443b591f3e7850b901a06b4e653a2feefcbabd23608042377fe9be4b",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/observation_manager/obs_manager.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/observation_manager/obs_manager.py#L16-L66",
+        "why": "感測同步、frequency、depth/approximate_depth與真實runtime欄位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "env/reward_manager/reward_manager.py",
+        "ranges": [
+          [
+            28,
+            69
+          ],
+          [
+            78,
+            161
+          ],
+          [
+            236,
+            297
+          ],
+          [
+            315,
+            405
+          ],
+          [
+            527,
+            664
+          ],
+          [
+            792,
+            803
+          ],
+          [
+            829,
+            831
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1281,
+        "sha256": "bc56efd3aaa861b4b38960dc4fb7778a9b4da9cf131f815ac3170300dd233a41",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/reward_manager/reward_manager.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/reward_manager/reward_manager.py#L28-L69",
+        "why": "函數descriptor、巢狀AND/OR、query事件計數、transition及滿分成功gate。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "env/reward_manager/func_parser.py",
+        "ranges": [
+          [
+            61,
+            74
+          ],
+          [
+            996,
+            1019
+          ],
+          [
+            1126,
+            1157
+          ],
+          [
+            1523,
+            1536
+          ],
+          [
+            1631,
+            1645
+          ],
+          [
+            1672,
+            1741
+          ],
+          [
+            1978,
+            2001
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 2729,
+        "sha256": "eb928a05c3eb6bae429a922c59e64272c2c3851c22d779143d45627e47b3a504",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/reward_manager/func_parser.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/reward_manager/func_parser.py#L61-L74",
+        "why": "實際object pose幾何、gripper與robot回原位條件。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "src/eval_client/main.py",
+        "ranges": [
+          [
+            254,
+            346
+          ],
+          [
+            347,
+            378
+          ],
+          [
+            378,
+            442
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 453,
+        "sha256": "ca6ba652b6f123506370f1907b1d88060d83f56c9e91ce6e6930f63d9f2b71a8",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/src/eval_client/main.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/src/eval_client/main.py#L254-L346",
+        "why": "合併configs、eval budget、seed排程、PhysX／unstable中斷及補樣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "src/eval_client/eval_env.py",
+        "ranges": [
+          [
+            43,
+            194
+          ],
+          [
+            208,
+            285
+          ],
+          [
+            337,
+            389
+          ],
+          [
+            410,
+            465
+          ],
+          [
+            638,
+            652
+          ],
+          [
+            771,
+            867
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 954,
+        "sha256": "3ae75304d8a840ede2589441f987824f50b2a89cc2ef37f4d43ce0a8dbc4fd88",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/src/eval_client/eval_env.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/src/eval_client/eval_env.py#L43-L194",
+        "why": "policy client、控制步計數、任務結束、partial score與_result.json分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboDojo-Benchmark/RoboDojo",
+        "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+        "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+        "ref": null,
+        "path": "scripts/internal/summarize_result.py",
+        "ranges": [
+          [
+            1,
+            95
+          ],
+          [
+            96,
+            116
+          ],
+          [
+            247,
+            322
+          ],
+          [
+            339,
+            412
+          ],
+          [
+            427,
+            482
+          ],
+          [
+            511,
+            551
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 970,
+        "sha256": "9ec361af587e1788d83d3cf8670e05b817ff252d33c33829a6337dc16ae370d2",
+        "url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/scripts/internal/summarize_result.py",
+        "reading_url": "https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/scripts/internal/summarize_result.py#L1-L95",
+        "why": "42-task taxonomy、25+25／50、三seed、五維等權平均及缺漏cell語義。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "XPolicyLab/XPolicyLab",
+        "requested_repo": "XPolicyLab/XPolicyLab",
+        "commit": "de9b445e4e46388542c412e406c73d359a5802fd",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            7,
+            28
+          ],
+          [
+            323,
+            429
+          ],
+          [
+            448,
+            489
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 546,
+        "sha256": "9f7f3badbe19aa39bf79a45ae69dfad195e425e1af89ab4e1374c982dd1a923f",
+        "url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/README.md",
+        "reading_url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/README.md#L7-L28",
+        "why": "獨立XPolicyLab paper、trajectory v1.0、pose、RGB byte版本與LeRobot profile。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "XPolicyLab/XPolicyLab",
+        "requested_repo": "XPolicyLab/XPolicyLab",
+        "commit": "de9b445e4e46388542c412e406c73d359a5802fd",
+        "ref": null,
+        "path": "policy/demo_policy/deploy.py",
+        "ranges": [
+          [
+            1,
+            42
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 42,
+        "sha256": "4ce7ac892b92ce5eae7d17b94108e7a66f69bcca121bf0cea7b53f5414133680",
+        "url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/policy/demo_policy/deploy.py",
+        "reading_url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/policy/demo_policy/deploy.py#L1-L42",
+        "why": "reset/update_obs/get_action到TASK_ENV.take_action的單例與batch契約。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "XPolicyLab/XPolicyLab",
+        "requested_repo": "XPolicyLab/XPolicyLab",
+        "commit": "de9b445e4e46388542c412e406c73d359a5802fd",
+        "ref": null,
+        "path": "utils/data_loader.py",
+        "ranges": [
+          [
+            1,
+            58
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 58,
+        "sha256": "12c92dccfbd8629556f0c167f470c381e0ff20f4e742655a6e07100355fae95d",
+        "url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/utils/data_loader.py",
+        "reading_url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/utils/data_loader.py#L1-L58",
+        "why": "converter真正reader：RoboDojo/xspark v1.0 HDF5遞迴、JSON語句與RGB decoder。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "XPolicyLab/XPolicyLab",
+        "requested_repo": "XPolicyLab/XPolicyLab",
+        "commit": "de9b445e4e46388542c412e406c73d359a5802fd",
+        "ref": null,
+        "path": "utils/process_data.py",
+        "ranges": [
+          [
+            291,
+            305
+          ],
+          [
+            345,
+            396
+          ],
+          [
+            423,
+            526
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 763,
+        "sha256": "e044e627eb2677907e9227eda8458c857208913bd484c5e922b53025010eef0b",
+        "url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/utils/process_data.py",
+        "reading_url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/utils/process_data.py#L291-L305",
+        "why": "JPEG COM標記XPL-RGB1、legacy／standard byte的RGB解碼分支。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "XPolicyLab/XPolicyLab",
+        "requested_repo": "XPolicyLab/XPolicyLab",
+        "commit": "de9b445e4e46388542c412e406c73d359a5802fd",
+        "ref": null,
+        "path": "scripts/transform_lerobot_v21_format.py",
+        "ranges": [
+          [
+            25,
+            51
+          ],
+          [
+            154,
+            159
+          ],
+          [
+            200,
+            274
+          ],
+          [
+            376,
+            425
+          ],
+          [
+            484,
+            604
+          ],
+          [
+            639,
+            702
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 741,
+        "sha256": "824884df75745d0582839c01466e475e425f674bf74fab69cc4bd963784b594e",
+        "url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/scripts/transform_lerobot_v21_format.py",
+        "reading_url": "https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/scripts/transform_lerobot_v21_format.py#L25-L51",
+        "why": "bimanual state/action欄位、padding／缺相機、原幀逐一轉存及max_fps。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b2d9d2039eb55ba47876950588eb5d31a679fe6ec3d9a3a2ec14516468c5a3ef"
+  },
+  "repository_binding_review_sha256": "b2d9d2039eb55ba47876950588eb5d31a679fe6ec3d9a3a2ec14516468c5a3ef",
+  "repository_bindings": [
+    {
+      "requested_repo": "RoboDojo-Benchmark/RoboDojo",
+      "resolved_repo": "RoboDojo-Benchmark/RoboDojo",
+      "aliases_in_this_review": [
+        "robodojo-benchmark/robodojo"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c",
+          "reviewed_files": [
+            "README.md",
+            "env/environment/task_env.py",
+            "env/observation_manager/obs_manager.py",
+            "env/reward_manager/func_parser.py",
+            "env/reward_manager/reward_manager.py",
+            "env/seed_manager/seed_manager.py",
+            "scripts/internal/summarize_result.py",
+            "src/eval_client/eval_env.py",
+            "src/eval_client/main.py",
+            "task/RoboDojo/config/_task.yml",
+            "task/RoboDojo/config/stack_bowls.yml",
+            "task/RoboDojo/task_registry.py",
+            "task/RoboDojo/tasks/push_T.py",
+            "task/RoboDojo/tasks/stack_bowls.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/RoboDojo-Benchmark/RoboDojo",
+          "pdf_page": 1,
+          "pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/robodojo-benchmark/RoboDojo",
+          "link_label": "GitHub",
+          "project_url": "http://robodojo-benchmark.com/doc",
+          "page_sha256": "d09156effb76d19a9e7b825b6947ff332d5bfe9d935cb9a84185beacd04dfbe9"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/RoboDojo-Benchmark/RoboDojo",
+          "link_label": "RoboDojo-Benchmark/RoboDojo",
+          "project_url": "http://robodojo-benchmark.com/doc",
+          "page_sha256": "d09156effb76d19a9e7b825b6947ff332d5bfe9d935cb9a84185beacd04dfbe9"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboDojo-Benchmark/RoboDojo",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "726e9aabfaa642203722eb126f5eaf0f37f3e1ad"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboDojo-Benchmark/RoboDojo",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "726e9aabfaa642203722eb126f5eaf0f37f3e1ad"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P083",
+          "review_file": "content/github_review/reviews/P083.json",
+          "review_sha256": "b2d9d2039eb55ba47876950588eb5d31a679fe6ec3d9a3a2ec14516468c5a3ef",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "XPolicyLab/XPolicyLab",
+      "resolved_repo": "XPolicyLab/XPolicyLab",
+      "aliases_in_this_review": [
+        "xpolicylab/xpolicylab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "de9b445e4e46388542c412e406c73d359a5802fd",
+          "reviewed_files": [
+            "README.md",
+            "policy/demo_policy/deploy.py",
+            "scripts/transform_lerobot_v21_format.py",
+            "utils/data_loader.py",
+            "utils/process_data.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/XPolicyLab/XPolicyLab",
+          "pdf_page": 1,
+          "pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/XPolicyLab/XPolicyLab",
+          "link_label": "XPolicyLab/XPolicyLab",
+          "project_url": "http://robodojo-benchmark.com/doc",
+          "page_sha256": "d09156effb76d19a9e7b825b6947ff332d5bfe9d935cb9a84185beacd04dfbe9"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P083",
+          "review_file": "content/github_review/reviews/P083.json",
+          "review_sha256": "b2d9d2039eb55ba47876950588eb5d31a679fe6ec3d9a3a2ec14516468c5a3ef",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "衣物與洗護",
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P083",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboDojo，arXiv 2607.04434v3。",
+    "scope_read": "42sim/18real、五能力清單、train/eval數量、評分與hidden-layout驗證。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      16,
+      28,
+      45
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "衣物與洗護",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬與真實操作benchmark",
+    "environment": "Isaac Sim雙臂工作站和3類真機平台；各task有公共reset layouts和hidden驗證布局。",
+    "tasks": "42simulation tasks（12 generalization、6 memory、8 long、8 precision、8 open）＋18real tasks；同名/同goal的sim/real不能先假定60語義去重任務。",
+    "cases": "simulation每task50episodes＝2,100；real每task10trials＝180。sim train34tasks＋DLC共35目錄3,500trajs，real1,800trajs。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 42,
+        "unit": "simulation tasks",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "real tasks",
+        "pages": [
+          7,
+          8
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2100,
+        "unit": "simulation eval episodes",
+        "pages": [
+          7
+        ]
+      },
+      {
+        "field": "case",
+        "value": 180,
+        "unit": "real eval trials／policy",
+        "qualifier": "18×10",
+        "pages": [
+          9
+        ]
+      }
+    ],
+    "evaluation": [
+      "sim binary success＋partial-progress score，五能力宏平均；real三人雙盲評分後平均。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "人工或模型評審"
+    ],
+    "split": "Open8task不在train；generalization每task25標準＋25隨機；正式榜另3seeds及hidden layouts，不加作新task。",
+    "lineage": "参考RoboTwin、RMBench等，使用新規則及共同sim-real介面；公開表與hidden驗證不同地位。",
+    "related_paper_ids": [
+      "P074"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§3.1、圖2",
+        "supports": "42五維、3,500train、2,100eval"
+      },
+      {
+        "pages": [
+          8,
+          9
+        ],
+        "locator": "§3.2–3.3",
+        "supports": "18real、180trials及人工驗證"
+      }
+    ],
+    "unresolved": [
+      "sim/real相同任務之去重關係與hidden驗證量未完整公開。"
+    ],
+    "reuse": "綜合能力與可復現實測的近鄰；我們simulation-only版本需以同等成功／partial score證據比較。",
+    "reviewed_pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboDojo",
+    "year": 2026,
+    "title": "RoboDojo: A Unified Sim-and-Real Benchmark for Comprehensive Evaluation of Generalist Robot Manipulation Policies",
+    "source_url": "https://arxiv.org/abs/2607.04434",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "garment",
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活",
+      "衣物與柔性物操作",
+      "工具使用",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "衣物與洗護",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P083",
+      "domain_ids": [
+        "home",
+        "garment",
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P083",
+          "domain_ids": [
+            "home",
+            "garment",
+            "industry"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            16,
+            28,
+            45
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "42simulation tasks（12 generalization、6 memory、8 long、8 precision、8 open）＋18real tasks；同名/同goal的sim/real不能先假定60語義去重任務。",
+            "Isaac Sim雙臂工作站和3類真機平台；各task有公共reset layouts和hidden驗證布局。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4"
+        },
+        {
+          "paper_id": "P083",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            16,
+            28,
+            45
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "42個模擬task含記憶、長流程、精度與泛化作業。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4",
+      "previous_domain_ids": [
+        "home",
+        "garment",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P083",
+      "name": "RoboDojo",
+      "expected_title": "RoboDojo: A Unified Sim-and-Real Benchmark for Comprehensive Evaluation of Generalist Robot Manipulation Policies",
+      "source_url": "https://arxiv.org/abs/2607.04434",
+      "pdf_url": "https://arxiv.org/pdf/2607.04434",
+      "retrieved_at": "2026-10-02T21:33:51.297383+00:00",
+      "pdf_sha256": "e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4",
+      "text_sha256": "797e097fd716abc49e85ba25c578de407a57d5e9e26743a504bf75a72614153a",
+      "pdf_bytes": 27334326,
+      "pages": 46,
+      "text_characters": 221436,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2607.04434v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2607.04434v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 42,
+        "unit": "simulation tasks",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P083:1",
+        "paper_id": "P083",
+        "benchmark": "RoboDojo",
+        "native_term": "simulation tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.04434v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.04434v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 18,
+        "unit": "real tasks",
+        "pages": [
+          7,
+          8
+        ],
+        "record_id": "review10:P083:2",
+        "paper_id": "P083",
+        "benchmark": "RoboDojo",
+        "native_term": "real tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.04434v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.04434v3",
+            "locator": "PDF pp. 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2100,
+        "unit": "simulation eval episodes",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P083:3",
+        "paper_id": "P083",
+        "benchmark": "RoboDojo",
+        "native_term": "simulation eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.04434v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.04434v3",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 180,
+        "unit": "real eval trials／policy",
+        "qualifier": "18×10",
+        "pages": [
+          9
+        ],
+        "record_id": "review10:P083:4",
+        "paper_id": "P083",
+        "benchmark": "RoboDojo",
+        "native_term": "real eval trials／policy",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2607.04434v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2607.04434v3",
+            "locator": "PDF pp. 9",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "RoboDojo-Benchmark/RoboDojo",
+    "XPolicyLab/XPolicyLab"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,443 @@
+{
+  "paper_id": "P076",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "Ravens的具體評測鏈是task goal→delta reward→test累積return→plot平均，包含部分分數。已核讀插入、清掃及資料writer/reader；done不是統一成功旗標，圖表的百分比標籤也不能直接當原生分數單位。",
+  "identity_note": "對應Transporter Networks: Rearranging the Visual World for Robotic Manipulation，arXiv:2010.14406v3（2022-01-05；CoRL 2020作品）。README明稱此論文的reference repository；正式作者清單以固定PDF為準。固定程式4752ffab487ebd387781ad7890aa540ae2780970為2024-03-14快照，非2020原始版本。",
+  "discovery_evidence": [
+    {
+      "kind": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P076/pages.json",
+      "pages": [
+        1,
+        6
+      ],
+      "pdf_sha256": "3a5e78b5c8881863845c46bda0bf8c9071aa79a59a6f9a9f4d8732690482b228"
+    },
+    {
+      "kind": "pinned_repository_metadata",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "archived": true
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "google-research/ravens",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          28
+        ],
+        [
+          76,
+          103
+        ]
+      ],
+      "why": "十項原始任務、論文關係及data/train/test/plot流程。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/tasks/__init__.py",
+      "ranges": [
+        [
+          18,
+          51
+        ]
+      ],
+      "why": "原生ID與額外easy/translation/sixdof等變體。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/tasks/block_insertion.py",
+      "ranges": [
+        [
+          25,
+          64
+        ],
+        [
+          82,
+          106
+        ]
+      ],
+      "why": "L形物件／fixture、goal tuple、3次primitive上限及6DOF子類。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/tasks/sweeping_piles.py",
+      "ranges": [
+        [
+          25,
+          63
+        ]
+      ],
+      "why": "50小物件、0.12×0.12公尺目標區與zone評分。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/tasks/task.py",
+      "ranges": [
+        [
+          39,
+          75
+        ],
+        [
+          211,
+          320
+        ],
+        [
+          341,
+          364
+        ],
+        [
+          396,
+          404
+        ]
+      ],
+      "why": "完整pose/zone reward、goal消耗、done與取樣點定義。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/environments/environment.py",
+      "ranges": [
+        [
+          45,
+          103
+        ],
+        [
+          179,
+          255
+        ],
+        [
+          270,
+          341
+        ],
+        [
+          398,
+          406
+        ]
+      ],
+      "why": "觀測／action schema、primitive dispatch、timeout與公尺深度重建。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/tasks/primitives.py",
+      "ranges": [
+        [
+          22,
+          128
+        ]
+      ],
+      "why": "實際吸盤pick-place與spatula push，區分高階動作與physics步。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/tasks/cameras.py",
+      "ranges": [
+        [
+          22,
+          62
+        ]
+      ],
+      "why": "三個640×480 RGB-D視角及固定intrinsics/extrinsics。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/demos.py",
+      "ranges": [
+        [
+          43,
+          92
+        ]
+      ],
+      "why": "even/odd seed、oracle成功篩選與末筆None action。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/dataset.py",
+      "ranges": [
+        [
+          26,
+          90
+        ],
+        [
+          96,
+          169
+        ]
+      ],
+      "why": "五類PKL分檔、seed解析、tuple還原及episode/step抽樣。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/test.py",
+      "ranges": [
+        [
+          30,
+          40
+        ],
+        [
+          61,
+          115
+        ]
+      ],
+      "why": "逐test dataset episode還原seed、執行task.max_steps及累積return。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    },
+    {
+      "repo": "google-research/ravens",
+      "path": "ravens/plot.py",
+      "ranges": [
+        [
+          36,
+          67
+        ]
+      ],
+      "why": "真正的mean/std與未乘100的百分比顯示。",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970"
+    }
+  ],
+  "environment": "PyBullet／UR5桌面，工作區0.5×1公尺；三個RealSenseD415模擬視角、640×480 RGB-D。環境預設240 Hz，demos/test腳本明設480 Hz；這是physics頻率，不是示範frame或policy primitive頻率。相機參數在固定cameras.py，沒有逐episode嵌入color/depth檔。",
+  "tasks": "論文十項桌面任務；當前registry有15個ID，包含五個額外子型，不能回填成15項原始benchmark。BlockInsertion的goal是object/match-matrix/target-pose與pose metric，最多3次動作；SweepingPiles配置50個小方塊，最多20次push，以zone內物件取樣點比例給部分分數。",
+  "data": "Dataset分color/depth/action/reward/info五個資料夾，用相同NNNNNN-seed.pkl連接；color uint8、depth float32公尺。每個episode是(obs,act,reward,info)序列，最後一筆act=None。demos先保存當前obs/action與既有reward，才env.step，因此第t筆reward對應前一動作；匯出transition時應將action[t]對上reward[t+1]。info保存GT物件position/quaternion/dimensions；test還會將末筆goal傳給agent，資訊可見性須按policy另記。action含pose0/pose1，各為xyz公尺＋xyzw四元數，並非VIMA的2D位置介面。",
+  "evaluation": "Environment.step→task.primitive→Task.reward/done；pose metric用xy距離<0.01公尺及對稱修正後yaw差<15°。zone metric將每物件局部取樣點轉入zone，算合法點比例；點集由visual-shape尺寸以0.02公尺網格建立，並非精確mesh體積。reward是累積進度差值；test加總成completion return，goal完結或_rewards>0.99才由Task.done回True，primitive timeout也可使env.done=True。論文每task100 unseen runs；程式實際遍歷test Dataset.n_episodes。test資料只收oracle return>0.99的奇數seed，訓練為偶數seed。",
+  "standardization": {
+    "profile": "robot_primitive_episodes_with_partial_credit_goals",
+    "reuse": "十項原始task與變體映射、goal tuple、pose/zone evaluator、seed編碼、RGB-D與原生pick-place/push。",
+    "transform": "source分論文v3與2024commit；case記task變體、seed、goal、primitive步數與physics頻率。保留terminal None action及reward後移配對；evaluator分開二元goal完成、delta reward、0–1累積完成度和展示用×100比例，不能全叫success rate。",
+    "missing": "原論文checkpoint選擇及完整100-case資料manifest、其餘任務checker逐一覆核、相機／資產／seed閉合；6DOF及continuous變體需獨立評測協定。"
+  },
+  "version_note": "固定manifest顯示倉庫已封存。具體問題：plot.py把0–1 mean/std直接印成%且ylabel寫Task Success，沒有×100，也掩蓋partial credit；6DOF插入子類設sixdof與pos_eps=0.02，仍繼承只看xy/yaw的is_match，未增加z/roll/pitch判定。test預設task=hanoi但registry為towers-of-hanoi，應明設task。Dataset.sample是先等機率選episode再選非末步，不是全庫frame均勻抽樣。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/files/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "sha256": "2ce991f08fb04e08043bf3203993cf6dab38b5be2fd1989ea3ec629ae30ea8ad",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/README.md",
+      "read_ranges": [
+        [
+          1,
+          28
+        ],
+        [
+          76,
+          103
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/tasks/__init__.py",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/files/ravens/tasks/__init__.py",
+      "source_manifest": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "sha256": "24d7645181dd89c0fc42c17358ffeb385a305faaf487068305971468280b9bf6",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/__init__.py",
+      "read_ranges": [
+        [
+          18,
+          51
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/tasks/block_insertion.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/tasks/block_insertion.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/tasks/block_insertion.py.receipt.json",
+      "sha256": "53c9be731c304b2f2c4800b7d63c21c19029cf1dccfca221c1aed7bd09b2fe62",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/block_insertion.py",
+      "read_ranges": [
+        [
+          25,
+          64
+        ],
+        [
+          82,
+          106
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/tasks/sweeping_piles.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/tasks/sweeping_piles.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/tasks/sweeping_piles.py.receipt.json",
+      "sha256": "f95f56988f8430fe71f80760a36bae503a06f6772ffd84e43acacd799bd4e841",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/sweeping_piles.py",
+      "read_ranges": [
+        [
+          25,
+          63
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/tasks/task.py",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/files/ravens/tasks/task.py",
+      "source_manifest": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "sha256": "5b1b7d2aa16f60e12acef9004ebf63220ac08d2694bf63a4f1f931849964f905",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/task.py",
+      "read_ranges": [
+        [
+          39,
+          75
+        ],
+        [
+          211,
+          320
+        ],
+        [
+          341,
+          364
+        ],
+        [
+          396,
+          404
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/environments/environment.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/environments/environment.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/environments/environment.py.receipt.json",
+      "sha256": "b3519616d42d78dc5e5a9b83853f133db287175be2dbe94b09a72d79b5a7f6a5",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/environments/environment.py",
+      "read_ranges": [
+        [
+          45,
+          103
+        ],
+        [
+          179,
+          255
+        ],
+        [
+          270,
+          341
+        ],
+        [
+          398,
+          406
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/tasks/primitives.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/tasks/primitives.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/tasks/primitives.py.receipt.json",
+      "sha256": "be2c026cbbcdf6ede3a2756686ae2b4e164d90f8cb835897b01c9601025b2586",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/primitives.py",
+      "read_ranges": [
+        [
+          22,
+          128
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/tasks/cameras.py",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/files/ravens/tasks/cameras.py",
+      "source_manifest": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "sha256": "e1a15569b739a77ac7f7d52b01aea0f36e27bc2414f705c79e9c2a4c7cb3cda7",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/tasks/cameras.py",
+      "read_ranges": [
+        [
+          22,
+          62
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/demos.py",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/files/ravens/demos.py",
+      "source_manifest": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "sha256": "f108bb2994ccd4dc2a99ae57ceebe4e68bd782be5c7227cb6b1e4908ad5ef1a4",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/demos.py",
+      "read_ranges": [
+        [
+          43,
+          92
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/dataset.py",
+      "local_file": "audit/.cache/github_review/repos/google-research__ravens/files/ravens/dataset.py",
+      "source_manifest": "audit/.cache/github_review/repos/google-research__ravens/manifest.json",
+      "sha256": "bf6b6ce26199a669bf517298948ee4818825ffeb9067d26b1501b08bb9b2d9e9",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/dataset.py",
+      "read_ranges": [
+        [
+          26,
+          90
+        ],
+        [
+          96,
+          169
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/test.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/test.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/test.py.receipt.json",
+      "sha256": "a4379937a3385fafa7392e8da0baf8b1f1837696e049afdcd9843856d78395c4",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/test.py",
+      "read_ranges": [
+        [
+          30,
+          40
+        ],
+        [
+          61,
+          115
+        ]
+      ]
+    },
+    {
+      "repo": "google-research/ravens",
+      "commit": "4752ffab487ebd387781ad7890aa540ae2780970",
+      "path": "ravens/plot.py",
+      "local_file": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/plot.py",
+      "source_manifest": "audit/.cache/github_review_worker/P069-P076/sources/google-research__ravens/4752ffab487ebd387781ad7890aa540ae2780970/files/ravens/plot.py.receipt.json",
+      "sha256": "90e3bbadab88b33f41993c6dc2f7f206f90b8fca3160e28444e58b2fe8c79737",
+      "url": "https://raw.githubusercontent.com/google-research/ravens/4752ffab487ebd387781ad7890aa540ae2780970/ravens/plot.py",
+      "read_ranges": [
+        [
+          36,
+          67
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "paper_id": "P246",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "已核固定v2全文的抽樣、三種聚合與不確定性評測公式；原作、cached search、精確arXiv-ID查詢及通訊作者lab頁仍未指向confirmed方法repo。可建立paper-level evaluator規格，但沒有reader、聚合器或scorer可宣稱已核讀；HRI結果是confidence gating模擬，非實體部署。",
+  "identity_note": "Decision-Aware Uncertainty Evaluation of Vision-Language Model-Based Early Action Anticipation for Human-Robot Interaction；Zhaoda Du、Michael Bowman、Qiaojie Zheng、Xiaoli Zhang。固定arXiv:2603.10061v2（2026-03-12），不是2026-03-09的v1。Mines lab首頁的Xiaoli Zhang及聯絡地址與論文對上。PDF第8頁的OpenReview DWkJCSxKU5屬引用的Generating with Confidence，不能借其code作本篇實作。",
+  "reading_order": [],
+  "environment": "EGTEA Gaze+與EPIC-KITCHENS-100離線人類第一人稱影片，包含廚房活動；沒有本篇可reset的robot環境。§VI明言interaction analysis使用模擬confidence-gated decision policy，尚非real robotic deployment。母資料庫約10K及逾90K action segments不是本篇已核test case清單。",
+  "tasks": "雖摘要反覆使用short-term action recognition／temporal prefix措辭，§IV-A明確指定觀測action onset之前的影像、預測緊接的next action。因此保留pre-onset anticipation標記，不將本篇逕改成已開始動作的early recognition。輸出是同一未來動作的Top-K候選verb–noun labels及confidence，K是候選數，不是K步未來序列。Fig.1的after 1 s為示意；實際觀測時窗、提前量、取樣FPS與prefix切點並未由reader固定。",
+  "data": "每input以Gemini 2.5 Flash-lite black-box API及相同prompt獨立抽樣M=5次，temperature=0.8，每次K=10。以a[i,k]記第i次第k順位動作、p[i,k]為該動作的verbalized confidence；這些是論文符號，非已核JSON key。Consistency逐rank多數決，c[k]為該rank支持勝出label的次數/M；Confidence-weighted逐rank以p加權，c[k]=勝出label的confidence總和／所有runs於該rank的confidence總和。PairRank先取跨runs唯一label集合A，由順位生成pairwise preferences，再以Bradley–Terry MLE擬合s(a)，softmax成P(a)並選Top-K。rank-wise confidence不必形成總和1的類別分佈，須保留各方法的原生尺度。單次baseline只有1次抽樣；M、K及唯一label數不能計成額外case。缺prompt、label正規化／parser、實際prediction檔案、model revision、test ID與split reader。",
+  "evaluation": "§III-C／IV-D：Top-1 accuracy與Recall@K按每input唯一GT動作比對。Top-1 ECE及Set-ECE均用[0,1]上的10個等寬bins；Set-ECE以z=1[GT在Top-K]為target、c_bar=(Σ_k c[k])/K為set confidence，再按bin樣本佔比加權絕對校準差。這是作者明定的平均confidence，不能暗換成Top-K機率總和。Selective policy只對首位label採c[1]≥τ；coverage分母為全部N個inputs，selective accuracy分母為通過門檻的inputs。Entropy另先將Top-K的c除以其總和，再算−Σp log p/log K；不得把此正規化後的p倒灌到原生ECE／gating。§IV-A稱官方train/test與test結果，但精確case IDs、GT取得／提交路徑、匹配規則、bin邊界與空bin／零coverage處理均未核到。Fig.5的K=5、τ=0.39只是澄清範例，不是默認整批評測設定或安全保證。",
+  "standardization": {
+    "profile": "paper_only_pre_onset_action_anticipation_uncertainty_evaluation",
+    "reuse": "可保留pre-onset next-action目標、M=5／K=10／temperature0.8、三種aggregation公式、10-bin ECE、作者定義的Set-ECE、coverage/selective-accuracy分母及entropy診斷。尚無可直接重用的已核程式。",
+    "transform": "source固定v2與母資料集版本關係；domain/environment記人類影片觀測，HRI是評測動機。每case保留onset/observation boundary、GT verb/noun、每run每rank的raw label/confidence及聚合結果；evaluator分correctness、calibration、selective utility與confidence geometry，明記confidence構造及entropy專用正規化。保留abstain／retained case集合、model/prompt與採樣預算，不建立跨方法通用success score。",
+    "missing": "作者可確認的repo／commit、精確觀測與test manifest、API model/prompt設定、動作同義詞／label-ID parser、重複label及rank ties規則、Bradley–Terry擬合與正則化、零confidence／零分母／K=1 entropy邊界，以及完整ECE與gating實作。實體HRI控制、clarification真值及安全驗證不在本輪已取得來源內。"
+  },
+  "version_note": "cached「decision aware uncertainty egocentric」repository query為0；一次「\"2603.10061\" in:readme」亦HTTP200、0筆、incomplete_results=false。arXiv v2摘要與PDF沒有本篇code連結；官方Mines lab的publications列表從2022開始，未列2026本篇，不能當作完整現時code庫清單。下列來源只支持尚未確認官方repo，不支持repo絕對不存在；本輪小型補查均200，未遇429或rate-limited403，未執行API模型、聚合器或robot。",
+  "discovery_evidence": [
+    {
+      "provider": "pinned_primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P246/pages.json",
+      "sha256": "9bd6eed76c916decf8902b3d3cd7e040dd9d8991d9b7c45058b288aaa03cac0d",
+      "json_pointers": [
+        "/0/text",
+        "/1/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text",
+        "/7/text"
+      ],
+      "finding": "核讀全部8頁，包括身份、§III-A/B聚合公式、§III-C評測、§IV資料與M/K/temperature、§VI模擬HRI限制及引用的OpenReview連結身份。",
+      "url": "https://arxiv.org/pdf/2603.10061",
+      "version": "arXiv:2603.10061v2",
+      "page_ranges": [
+        [
+          1,
+          8
+        ]
+      ],
+      "pages_read": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "page_line_ranges": [
+        {
+          "page": 1,
+          "ranges": [
+            [
+              1,
+              75
+            ]
+          ]
+        },
+        {
+          "page": 2,
+          "ranges": [
+            [
+              1,
+              65
+            ]
+          ]
+        },
+        {
+          "page": 3,
+          "ranges": [
+            [
+              1,
+              80
+            ]
+          ]
+        },
+        {
+          "page": 4,
+          "ranges": [
+            [
+              1,
+              75
+            ]
+          ]
+        },
+        {
+          "page": 5,
+          "ranges": [
+            [
+              1,
+              65
+            ]
+          ]
+        },
+        {
+          "page": 6,
+          "ranges": [
+            [
+              1,
+              50
+            ]
+          ]
+        },
+        {
+          "page": 7,
+          "ranges": [
+            [
+              1,
+              64
+            ]
+          ]
+        },
+        {
+          "page": 8,
+          "ranges": [
+            [
+              1,
+              76
+            ]
+          ]
+        }
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P246/paper.pdf",
+      "pdf_sha256": "4efc1650b0634e90b675a99e738d4660ad1c454cbd8b1023bc814cafbc53992c"
+    },
+    {
+      "provider": "cached_pdf_link_discovery",
+      "local_file": "audit/.cache/github_review/P246-discovery.json",
+      "sha256": "cef275ad603f829490826d7bb0529bf9b29dfbf4202139db0ef70385d2ab1756",
+      "json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "核對精確論文、PDF指紋、連結候選與code-availability摘錄；候選本身不等同官方repo。"
+    },
+    {
+      "provider": "cached_project_candidates",
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/245"
+      ],
+      "finding": "本ID的project及repository候選均為空；enriched_projects亦無本ID條目。"
+    },
+    {
+      "provider": "cached_github_repository_search",
+      "local_file": "audit/.cache/github_review/search/P246.json",
+      "sha256": "a5e97b303755ca04fbae26e41302c749d8c53c502f7262643fc55863983fd995",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "cached GitHub repository query「decision aware uncertainty egocentric」HTTP200、total_count=0；PDF候選只有arXiv自身及另一篇引用的OpenReview，不是本篇code。"
+    },
+    {
+      "provider": "bounded_exact_github_repository_search",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/exact_id_search.json",
+      "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f",
+      "json_pointers": [
+        "/total_count",
+        "/incomplete_results",
+        "/items"
+      ],
+      "finding": "精確2603.10061 in:readme query返回0筆；限定範圍的discovery，非repo不存在證明。"
+    },
+    {
+      "provider": "shared_paced_search_receipt",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/exact_id_search.json.receipt.json",
+      "sha256": "df7f66650ba6f6a71857d04284d8afbc8052b2c070a1a0a8dc6b3c18004b3a24",
+      "json_pointers": [
+        "/requested_url",
+        "/retrieved_at",
+        "/status",
+        "/sha256"
+      ],
+      "finding": "使用共享network.py節流，HTTP200、無立即重試。"
+    }
+  ],
+  "additional_repo_proposals": [],
+  "source_files": [
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/arxiv_abstract.html",
+      "sha256": "a23c43a004b3ccb29537cc46e04bb2cb752bb683ff52559dbe94182f2f8dd4c6",
+      "url": "https://arxiv.org/abs/2603.10061v2",
+      "retrieved_at": "2026-10-10T07:55:56.293997+00:00",
+      "ranges": [
+        [
+          116,
+          168
+        ],
+        [
+          327,
+          375
+        ]
+      ],
+      "source_role": "cached_primary_metadata",
+      "why": "核對精確身份、v1/v2日期；通用Code/Data服務開關不等同方法repo。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/arxiv_abstract.html.receipt.json",
+      "receipt_sha256": "d73197e4542f9cdf516d726740d9263b7331d36027b3412dd3eaf4c240acd2f3"
+    },
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/lab_home.html",
+      "sha256": "b487b40b4700d0aaea18130082ff6965bbd2e13bd6ca8acc8cf6de0537385b54",
+      "url": "https://xzhanglab.mines.edu/",
+      "retrieved_at": "2026-10-11T02:59:02.068920+00:00",
+      "ranges": [
+        [
+          258,
+          264
+        ],
+        [
+          345,
+          349
+        ]
+      ],
+      "source_role": "official_corresponding_author_lab",
+      "why": "Mines官方lab及Xiaoli Zhang身份、Publications連結；不將lab其他應用範圍套給本篇全部case。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/lab_home.html.receipt.json",
+      "receipt_sha256": "bce352e2e069afabd802c86c0d0da5686a2be317e75f8c7951c6ed4925f6f7d7"
+    },
+    {
+      "provider": "primary_website_snapshot",
+      "local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/lab_publications.html",
+      "sha256": "e264885653b7eed984bca5fb8123509ccfbf86f30dcd8634e4fa1d7074a57643",
+      "url": "https://xzhanglab.mines.edu/publications/",
+      "retrieved_at": "2026-10-11T02:59:23.951336+00:00",
+      "ranges": [
+        [
+          300,
+          365
+        ]
+      ],
+      "source_role": "official_lab_publication_archive",
+      "why": "列表最前面的publication年份為2022／2021；頁內未命中本篇題名或arXiv ID，覆蓋較舊不能推論2026 code未發布。",
+      "receipt_local_file": "audit/.cache/github_review_worker/P242-P246_20261011/P246/lab_publications.html.receipt.json",
+      "receipt_sha256": "f84c6f94ffcaa8d163b24a4cfca529cb4104ce4ebdeea67be4b6ecd678a80daa"
+    }
+  ],
+  "runtime_executed": false
+}

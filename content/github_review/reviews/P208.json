@@ -1,0 +1,119 @@
+{
+  "paper_id": "P208",
+  "reviewed_on": "2026-10-11",
+  "status": "no_confirmed_code_repository",
+  "summary": "DYAD pinned paper 將資料與 benchmark code 列為規劃中的 controlled-access research release；已收錄 PDF／project／GitHub 搜尋沒有可確認的本篇倉庫。已核三個 endpoint 的標註與分母，但沒有公開 reader 或 concrete scorer 可讀，不能把同名 app builder／其他 dyadic dataset 當成來源。",
+  "identity_note": "核對 arXiv:2609.09023v1（2026-09-08），Akhil Ajikumar、Mahya Qorbani、Sakib Reza、Sean Andrist、Mohsen Moghaddam。paper p.3 Table II 明示 planned release，正文說 will provide annotations/manifests/benchmark code under controlled access；未附本篇 release URL。既有 DYAD co-located assistance 搜尋成功回傳 0；DYAD 廣義搜尋前 8／1,197 結果不足以證明全網無倉庫。",
+  "reading_order": [],
+  "environment": "單一 gearbox 組裝工作站的同地人類 performer–helper 協作；20 名 HoloLens 2 佩戴者各一 session，同一受訓 helper 遵循先言語引導、等待自我修正、必要時實體幫助的規則。六 pilot 不計正式 20 sessions／5 小時 58 分鐘。人類示範不是已執行機器人協作。",
+  "tasks": "三個分開評測的 reference endpoints：因果組裝步驟辨識、已知將有介入時的 verbal／physical mode anticipation、給 oracle 脈絡的 helper response generation。八個 step labels 是 Gear on shaft、Bearing in holder、Second holder、First holder、Part search、Shaft assembly in post、Attach crank、Verify rotation。九 trigger labels 是 out of reach、cannot find part、cannot decide next step、wrong part、ordering violation、wrong orientation、wrong screwdriver、stabilization needed、missed screw；null trigger 表示分類外需要，不能當沒有介入的負例。",
+  "data": "論文 Table II 的觀測為 ego RGB 24–30 Hz／896×504、depth 5 Hz／320×288 16-bit、gaze 30 Hz 3D origin/direction、hands 20 Hz 每手 26 joints／4×4 poses、head 30 Hz 4×4 transform、Kinect RGB-D 15 Hz（RGB 1280×720 JPEG）。音訊不在規劃釋出範圍，使用去識別逐字稿。三層標註各有 task step（step/objects/tool）、request（utterance/confidence）、assistance（onset/offset、mode、initiation、hard stop、trigger、objects、helper utterance、outcome）。全部轉 session-relative clock 並保存 null；兩場原始絕對式 hour 欄需保留各自 origin，不能當 elapsed hours。這些是論文 principal fields／單位，尚未核到實際 JSON keys、檔案佈局、reader 或同步轉換程式。",
+  "evaluation": "mode 的論文清點是 export 852→刪一重複 851→有 mode label 850→完整 pre-onset RGB window 829（610 verbal／219 physical）；window=[onset−3.5s,onset−0.5s]。五 fold 各 12/4/4 performers，合併 829 個唯一 OOF events 算 binary macro-F1、physical-class AUPRC，四 seeds 為 0/1/2/42，2,000 participant bootstrap replicates 不能算新 cases。當次 trigger／initiation／outcome／speech／step label 等不得作輸入。step track 是 5 validation／15 test sessions，1 Hz 因果 RGB、四 frame lookback；segment F1@IoU0.1、collapsed-sequence edit、temporal mAP@0.1、frame mAP 與 MoF 分別保留，528 intervals 中一筆 null 不能擅自丟成零標籤。response 將 request end 前5秒至後15秒內最近的 verbal assistance 配對，376 pairs=120 dev+256 held-out test；oracle 提供先前步驟、10輪真實對話、10次介入及 CAD 圖，當次 trigger 不提供。每 query 一次生成、100-token cap；Claude Opus 4.5 依正確性、完整性、脈絡相關性、可行動清晰度、簡潔度與整體各評0–5，另 BERTScore P/R/F1。以上均為 paper protocol；segment matcher、judge prompt／parser、null／例外處理、aggregation 程式未找到，沒有宣稱本輪算過成績。",
+  "standardization": {
+    "profile": "multimodal_human_assistance_event_protocol",
+    "reuse": "可重用三層事件結構、八步驟／九 trigger 原生詞表、單 helper policy、三 endpoint 的資訊邊界與原生分母；規劃 release 與實際可用素材分開記。",
+    "transform": "source 保存 v1 與 controlled-access-planned 狀態；domain 記組裝／協作，environment 記 workstation、performer、helper policy。case 將 session、step interval、request、assistance event 與各 endpoint 的 eligible sample 建關聯，保留原始時鐘／session origin／同步率／nullable 欄。evaluator 分開 mode OOF、step sequence／frame 與 response pair，各自保留 split、seed、可見資訊及分母，三 endpoint 沒有共同成功分數。",
+    "missing": "官方 release／access 流程及程式 URL、native annotation／manifest、同步 clock reader、829 OOF IDs、step null-policy、response 配對與評分實作。沒有 non-intervention negatives，不能接成 assistance-need detector；827 個有 outcome 標籤的事件中 812 個為 effective，這種高度偏態是作者不設 outcome prediction 的原因，不能以所有 851 events 當此 endpoint 分母。"
+  },
+  "version_note": "來源固定為 2609.09023v1 與既有 2026-10-10 discovery/search caches；未確認 repo 就不造 commit 或 source path。851 assistance events、528 step intervals、611 requests、829 mode cases、256 response test pairs、感測影格均為不同單位；數字來自已核 paper，沒有本地 release 逐列驗算。",
+  "discovery_evidence": [
+    {
+      "source": "audit/.cache/github_review/P208-discovery.json",
+      "json_pointers": [
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "已收錄 pinned PDF hyperlinks 沒有 benchmark GitHub／project URL；code_contexts 空值需結合正文 planned release 解讀。"
+    },
+    {
+      "source": "audit/.cache/github_review/project_candidates.json",
+      "json_pointers": [
+        "/207"
+      ],
+      "finding": "無已收錄 author project／repo candidates。"
+    },
+    {
+      "source": "audit/.cache/github_review/search/P208-refined.json",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "精確 co-located assistance 查詢為 0，HTTP 200；不是被限流或網路失敗。"
+    },
+    {
+      "source": "audit/.cache/github_review/search/P208.json",
+      "json_pointers": [
+        "/query",
+        "/total_count",
+        "/results"
+      ],
+      "finding": "廣義 DYAD 回傳 app builder、network library 等，未確立本篇身分，未擴讀那些來源。"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P208/pages.json",
+      "sha256": "f61262a3fa92762b9e82dabc36ddeba2d417818d3994d7d3a52ed7e71313161e",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/1/text",
+        "/2/text",
+        "/3/text",
+        "/4/text",
+        "/5/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P208/paper.pdf",
+      "pdf_sha256": "698811f9c48df7ba4dfef3eab17ed4c8336186b171cbc82e4ea597e06349fdf0",
+      "url": "https://arxiv.org/abs/2609.09023"
+    },
+    {
+      "local_file": "audit/.cache/github_review/P208-discovery.json",
+      "sha256": "5b67407f563d8aecde4c9c033775bf9e588028008f3b94e28d56e7a12b02a81f",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/project_candidates.json",
+      "sha256": "da5a19dc4d7fce2e956297e668c7151833fdaa93bd1b9780c9041a85b0e786f3",
+      "json_pointers": [
+        "/207"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P208.json",
+      "sha256": "4589a8fa416371a8d0806d4acbb2d1524bc258d9f8959fb6493a7e417c964a8f",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P208-refined.json",
+      "sha256": "13c7aa4ea4183065044d92c0fc7f2be614bc51d255a87586bccaf727dfced9b8",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/total_count",
+        "/results"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

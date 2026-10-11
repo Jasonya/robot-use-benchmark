@@ -1,0 +1,510 @@
+{
+  "paper_id": "P145",
+  "name": "NIABench",
+  "title": "Assistance Without Interruption: A Benchmark and LLM-based Framework for Non-Intrusive Human-Robot Assistance",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2605.01368",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "office",
+    "assistance"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P145",
+    "summary": "NIABench有候選動作詞庫、何時/做什麼的ranker與AI2-THOR示例，但詞庫不等於評測題。所讀simulation示例是固定人機階段，尚需完整benchmark閉環。",
+    "environment": "AI2-THOR多agent場景；公開7個simulation腳本是示例，沒有據此推算完整benchmark環境數。",
+    "tasks": "在不打斷人類多步活動的前提下選協助時刻及robot action；candidate primitive、human step、完整episode是不同層級。",
+    "data": "InterventionDataset期待human_task_seq、robot_vocab與oracle_labels(best_robot_action/human_step_idx)，每個oracle label成一訓練example；缺失action會落到index0/unknown no_op，匯入應另外檢查。公開robot_instructions為類別詞庫，訓練episode/權重另待取得。",
+    "evaluation": "reason.py對B×S×C logits joint argmax選step/action；simulation示例固定human→robot→human，不直接調用ranker結果。utils把total_step_count印為Human、人類實做數印Human Saved，需回讀真實分子/分母；影片每frame重複兩次也不能當實際時長。完整非幹擾/省力metric仍需閉合。",
+    "standardization": {
+      "profile": "non_intrusive_assistance_timing_and_action",
+      "reuse": "人類計畫/候選動作/oracle schema、joint決策接口、示例scene與步數紀錄。",
+      "transform": "case固定人類主計畫、合法協助時機與候選集合；原primitive詞庫映射task而非當題庫；evaluator另明定幹擾、助益、任務完成與計算分母。",
+      "missing": "完整benchmark episodes/split/權重、ranker到simulation接線、真正省力/非幹擾scorer、原始評估結果與實機協定。"
+    },
+    "version_note": "固定45065e5；README保留舊renytek13 clone路徑，當前官方組織庫與精確題名一致。未執行模擬或模型。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Cognition2Action-Lab/NIABench",
+        "requested_repo": "Cognition2Action-Lab/NIABench",
+        "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+        "ref": null,
+        "path": "readme.md",
+        "ranges": [
+          [
+            1,
+            11
+          ],
+          [
+            59,
+            86
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 86,
+        "sha256": "0fe6194201d9a775dfc88a62cbc15b67772d9188ac6d9aabcb5914cd440f038c",
+        "url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/readme.md",
+        "reading_url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/readme.md#L1-L11",
+        "why": "原作、model/模擬入口與AI2-THOR來源",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Cognition2Action-Lab/NIABench",
+        "requested_repo": "Cognition2Action-Lab/NIABench",
+        "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+        "ref": null,
+        "path": "datasets/robot_instructions.json",
+        "ranges": [
+          [
+            1,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 789,
+        "sha256": "b5d59f68eb223820cfda2133c53c5b1e2cc3f8f67c2a7bdb826553584833a938",
+        "url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/datasets/robot_instructions.json",
+        "reading_url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/datasets/robot_instructions.json#L1-L80",
+        "why": "候選primitive動作片段，不是完整case",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Cognition2Action-Lab/NIABench",
+        "requested_repo": "Cognition2Action-Lab/NIABench",
+        "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+        "ref": null,
+        "path": "model.py",
+        "ranges": [
+          [
+            114,
+            158
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 524,
+        "sha256": "91aeaf7efa50cbbc1d7a01cb74db579d6e110e82fe218679c0973a3f067502d4",
+        "url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/model.py",
+        "reading_url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/model.py#L114-L158",
+        "why": "human_task_seq/robot_vocab/oracle_labels轉訓練example",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Cognition2Action-Lab/NIABench",
+        "requested_repo": "Cognition2Action-Lab/NIABench",
+        "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+        "ref": null,
+        "path": "reason.py",
+        "ranges": [
+          [
+            46,
+            164
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 164,
+        "sha256": "e5eff4a16eaf5e5f1c6bfdd002b5b70e8943475ab3dd054d446662cb19f17212",
+        "url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/reason.py",
+        "reading_url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/reason.py#L46-L164",
+        "why": "step×candidate joint argmax與未知詞/預設路徑",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Cognition2Action-Lab/NIABench",
+        "requested_repo": "Cognition2Action-Lab/NIABench",
+        "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+        "ref": null,
+        "path": "simulation/cut_tomato.py",
+        "ranges": [
+          [
+            1,
+            47
+          ],
+          [
+            103,
+            115
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 115,
+        "sha256": "97daba0debec513d3c8ed5d1e1f8342a82ed5dbe36a4c11eb7c1b34a49e1ef11",
+        "url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/simulation/cut_tomato.py",
+        "reading_url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/simulation/cut_tomato.py#L1-L47",
+        "why": "FloorPlan28兩agent固定示例流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Cognition2Action-Lab/NIABench",
+        "requested_repo": "Cognition2Action-Lab/NIABench",
+        "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+        "ref": null,
+        "path": "simulation/utils.py",
+        "ranges": [
+          [
+            1,
+            43
+          ],
+          [
+            190,
+            214
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 214,
+        "sha256": "3acb8189ae1e89a1538544a4f836894e2f9f11fdddc3350b176ea01d9c710687",
+        "url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/simulation/utils.py",
+        "reading_url": "https://github.com/Cognition2Action-Lab/NIABench/blob/45065e59dfd30b740bdeab53724ebd0ff1f9d74a/simulation/utils.py#L1-L43",
+        "why": "原生步數計數、影片重複frame與輸出標籤",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4a0cfc08a940530fd8a656ea3b3c5b555bbb8cda245c1b72dbc9cb993ce308c3"
+  },
+  "repository_binding_review_sha256": "4a0cfc08a940530fd8a656ea3b3c5b555bbb8cda245c1b72dbc9cb993ce308c3",
+  "repository_bindings": [
+    {
+      "requested_repo": "Cognition2Action-Lab/NIABench",
+      "resolved_repo": "Cognition2Action-Lab/NIABench",
+      "aliases_in_this_review": [
+        "cognition2action-lab/niabench"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "45065e59dfd30b740bdeab53724ebd0ff1f9d74a",
+          "reviewed_files": [
+            "datasets/robot_instructions.json",
+            "model.py",
+            "readme.md",
+            "reason.py",
+            "simulation/cut_tomato.py",
+            "simulation/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Cognition2Action-Lab/NIABench.git",
+          "link_label": "Code",
+          "project_url": "https://renytek13.github.io/assistance-without-interruption",
+          "page_sha256": "7cb9889eaa1123d102997a0dae03abe34b1ec3bc340116f088a8a458586086ce"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P145",
+          "review_file": "content/github_review/reviews/P145.json",
+          "review_sha256": "4a0cfc08a940530fd8a656ea3b3c5b555bbb8cda245c1b72dbc9cb993ce308c3",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "辦公與教育",
+    "協助、交接與陪伴"
+  ],
+  "source_review": {
+    "paper_id": "P145",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "NIABench，arXiv 2605.01368v1。",
+    "scope_read": "2K來源、7test tasks、非中斷規則、text-only狀態與3指標。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育",
+      "協助、交接與陪伴"
+    ],
+    "role": "對話協作與任務完成",
+    "environment": "AI2-THOR四room categories；4是類型，非精確四個scene IDs。主model採文字state，沒有raw visual perception。",
+    "tasks": "7test tasks：cut tomato、toast bread、watch TV、work、sleep、study、shower；2,000訓練script episodes，human主程序不允許被中断。",
+    "cases": "2K corpus再分train/val；7個代表evaluation episodes；75%一個oracle assistance、20%兩個、5%無需協助。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "room categories",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "held-out代表tasks/episodes",
+        "pages": [
+          3,
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "scripted corpus episodes",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "SelectionAcc比oracle step-action pair；HumanStepSaved減少的人類primitive steps；SuccessAcc查最終sim state。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "2K按scene/oracle數分train/val，7held-out另設；real只2小型驗證任務。",
+    "lineage": "AI2-THOR高階動作adapter；800atomic actions是候選動作詞彙，不是800已實作工作任務。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5
+        ],
+        "locator": "§III、圖2、§V",
+        "supports": "4/2K/7與文字輸入、utility評分"
+      }
+    ],
+    "unresolved": [
+      "7代表情境內是否另有多個隨機initial seeds及確切case量需code核。"
+    ],
+    "reuse": "可加不打斷人類、適時協助與no-op合法答案等規則；不能宣稱2K都為held-out test。",
+    "reviewed_pdf_sha256": "add5ffdd033bc8c450f79b317f31c0df3735d7a4789a9e8f833e3dbcab4f5b12",
+    "reviewed_on": "2026-10-02",
+    "name": "NIABench",
+    "year": 2026,
+    "title": "Assistance Without Interruption: A Benchmark and LLM-based Framework for Non-Intrusive Human-Robot Assistance",
+    "source_url": "https://arxiv.org/abs/2605.01368",
+    "primary_type": "C",
+    "category_name": "輔助與協作",
+    "domain_ids": [
+      "home",
+      "food",
+      "office",
+      "assistance"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "辦公活動",
+      "人機協作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "辦公與教育",
+      "協助、交接與陪伴"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P145",
+      "domain_ids": [
+        "home",
+        "food",
+        "office",
+        "assistance"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P145",
+          "domain_ids": [
+            "home",
+            "food",
+            "office"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "7test tasks：cut tomato、toast bread、watch TV、work、sleep、study、shower；2,000訓練script episodes，human主程序不允許被中断。",
+            "AI2-THOR四room categories；4是類型，非精確四個scene IDs。主model採文字state，沒有raw visual perception。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "add5ffdd033bc8c450f79b317f31c0df3735d7a4789a9e8f833e3dbcab4f5b12"
+        },
+        {
+          "paper_id": "P145",
+          "domain_ids": [
+            "assistance"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "配合人正在進行的活動，提供不中斷對方的協助。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "add5ffdd033bc8c450f79b317f31c0df3735d7a4789a9e8f833e3dbcab4f5b12"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "add5ffdd033bc8c450f79b317f31c0df3735d7a4789a9e8f833e3dbcab4f5b12",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "office"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P145",
+      "name": "NIABench",
+      "expected_title": "Assistance Without Interruption: A Benchmark and LLM-based Framework for Non-Intrusive Human-Robot Assistance",
+      "source_url": "https://arxiv.org/abs/2605.01368",
+      "pdf_url": "https://arxiv.org/pdf/2605.01368",
+      "retrieved_at": "2026-10-02T21:34:27.237638+00:00",
+      "pdf_sha256": "add5ffdd033bc8c450f79b317f31c0df3735d7a4789a9e8f833e3dbcab4f5b12",
+      "text_sha256": "4d0a7686f19d9f3ba7dbb5637c2665888558a956d98cbf0a7b9a8d9f56f00486",
+      "pdf_bytes": 1441218,
+      "pages": 9,
+      "text_characters": 67994,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2605.01368v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2605.01368v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "room categories",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P145:1",
+        "paper_id": "P145",
+        "benchmark": "NIABench",
+        "native_term": "room categories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.01368v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.01368v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "held-out代表tasks/episodes",
+        "pages": [
+          3,
+          5
+        ],
+        "record_id": "review10:P145:2",
+        "paper_id": "P145",
+        "benchmark": "NIABench",
+        "native_term": "held-out代表tasks/episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.01368v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.01368v1",
+            "locator": "PDF pp. 3, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2000,
+        "unit": "scripted corpus episodes",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P145:3",
+        "paper_id": "P145",
+        "benchmark": "NIABench",
+        "native_term": "scripted corpus episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2605.01368v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2605.01368v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Cognition2Action-Lab/NIABench"
+  ],
+  "external_repositories": []
+}

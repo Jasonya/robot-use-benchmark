@@ -1,0 +1,883 @@
+{
+  "paper_id": "P082",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "RoboVerse官方repo已確認，但2026固定commit的MetaSim、trajectory reader與generalization level均有版本變化。已閉合maniskill.pick_cube config-port的初態→PositionShiftChecker→IL SuccessOnce聚合，另讀Zarr產生／載入鏈。發現NaN可令整批checker成功、L2/L3與paper定義錯位，以及trial尾批／normalizer切分問題。",
+  "identity_note": "固定paper為Geng等人的RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning，arXiv:2504.18904v1（2025-04-26）。PDF指roboverseorg.github.io，README 134–141題名、作者與arXiv一致，確認RoboVerseOrg/RoboVerse為官方平臺。本文不等於較早同名RoboVerse環境，也不把整合的RLBench、ManiSkill、LIBERO、ARNOLD等資料算成新獨立來源。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P082-discovery.json",
+      "selected_json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/code_contexts/0"
+      ],
+      "paper_version": "2504.18904v1",
+      "pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008",
+      "sha256": "cf8568095ab448f4c038895712c1b8685d2f6e8c07b12d3b0ee4476e1b6f3ca6",
+      "text_excerpts": [
+        {
+          "json_pointer": "/opening_text",
+          "character_range": [
+            1089,
+            1127
+          ],
+          "text": "arXiv:2504.18904v1 [cs.RO] 26 Apr 2025",
+          "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+        }
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P082/pages.json",
+      "sha256": "b3e3fc910e8f1468742bb70b061eb6ef6137dffa60fa222693bf06ec22266d82",
+      "selected_json_pointers": [
+        "/8/text"
+      ],
+      "finding": "paper Fig.9／V-B：90/10 task-space split；L1環境、L2相機、L3光照與反射。"
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "README.md",
+      "ranges": [
+        [
+          8,
+          13
+        ],
+        [
+          23,
+          55
+        ],
+        [
+          65,
+          101
+        ],
+        [
+          131,
+          143
+        ]
+      ],
+      "why": "身份、MetaSim新目錄與多來源重用，不把整個平臺清單當paper實驗集。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "docs/source/dataset_benchmark/benchmark/overview.md",
+      "ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "why": "benchmark範圍與randomization wrapper宣告。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "docs/source/dataset_benchmark/benchmark/usage.md",
+      "ranges": [
+        [
+          3,
+          55
+        ]
+      ],
+      "why": "仍使用舊RandomizationCfg／L2相機、L3光照的文件版本。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_pack/tasks/maniskill/pick_cube.py",
+      "ranges": [
+        [
+          12,
+          37
+        ]
+      ],
+      "why": "具體4cm cube、Franka、v2軌跡、250步及z位移checker。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_pack/tasks/maniskill/maniskill_base.py",
+      "ranges": [
+        [
+          12,
+          39
+        ],
+        [
+          53,
+          106
+        ]
+      ],
+      "why": "config port與native port不同；初態reader、checker reset及terminated掛接。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/types.py",
+      "ranges": [
+        [
+          29,
+          87
+        ],
+        [
+          133,
+          198
+        ],
+        [
+          237,
+          273
+        ],
+        [
+          336,
+          347
+        ]
+      ],
+      "why": "action/state/camera資料結構、缺省可空欄位及camera wxyz慣例。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/utils/demo_util/loader.py",
+      "ranges": [
+        [
+          9,
+          43
+        ]
+      ],
+      "why": "pickle/gzip/JSON/YAML實際讀取，不執行其中內容。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/utils/demo_util/demo_util.py",
+      "ranges": [
+        [
+          17,
+          118
+        ]
+      ],
+      "why": "依內容辨識v2、明拒v1與roboverse.episode的獨立reader要求。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+      "ranges": [
+        [
+          15,
+          108
+        ]
+      ],
+      "why": "robot→demo[]、init_state/actions/states及flat entity namespace。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+      "ranges": [
+        [
+          1,
+          67
+        ]
+      ],
+      "why": "v3只改in-memory state/action namespace，並非新磁碟trajectory格式。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_learn/il/data2zarr_dp.py",
+      "ranges": [
+        [
+          21,
+          77
+        ],
+        [
+          147,
+          265
+        ],
+        [
+          273,
+          318
+        ],
+        [
+          329,
+          347
+        ]
+      ],
+      "why": "metadata+MP4→Zarr、joint/EE/delta模式及episode_ends。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_learn/il/datasets/robot_image_dataset.py",
+      "ranges": [
+        [
+          33,
+          174
+        ]
+      ],
+      "why": "真正Zarr reader、episode mask、normalizer範圍、相機鍵與postprocess。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/task/base.py",
+      "ranges": [
+        [
+          143,
+          171
+        ],
+        [
+          225,
+          330
+        ]
+      ],
+      "why": "action→handler→terminated/timeout的原生step contract。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+      "ranges": [
+        [
+          8,
+          40
+        ]
+      ],
+      "why": "handler tensor root_state的前三維位置讀取。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+      "ranges": [
+        [
+          189,
+          230
+        ]
+      ],
+      "why": "PositionShiftChecker真正門檻與NaN回傳全True的例外路徑。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "packages/metasim/metasim/randomization/dr_manager.py",
+      "ranges": [
+        [
+          1,
+          41
+        ],
+        [
+          78,
+          90
+        ],
+        [
+          155,
+          203
+        ],
+        [
+          432,
+          474
+        ],
+        [
+          510,
+          516
+        ]
+      ],
+      "why": "現行L1環境/材質、L2光照、L3相機的具體dispatch。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_learn/il/utils/eval_args.py",
+      "ranges": [
+        [
+          9,
+          49
+        ]
+      ],
+      "why": "eval的demo範圍、250決策及level/seed預設。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_learn/il/runners/default_runner.py",
+      "ranges": [
+        [
+          18,
+          30
+        ],
+        [
+          280,
+          309
+        ],
+        [
+          346,
+          546
+        ]
+      ],
+      "why": "真正評測的init-state selection、DR、SuccessOnce/End與分母。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "path": "roboverse_learn/il/runners/default_eval_runner.py",
+      "ranges": [
+        [
+          17,
+          45
+        ],
+        [
+          71,
+          95
+        ]
+      ],
+      "why": "checkpoint/EMA、obs/action chunk配置與policy輸出。",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+    }
+  ],
+  "environment": "平臺把task/robot/scene內容放roboverse_pack，模擬核心在packages/metasim/metasim。已讀範例是Franka提起4cm紅cube，ScenarioCfg與runtime backend共同決定物理／相機／控制時間；不能賦予全平臺單一FPS。eval建立camera0的256×256 RGB/depth並依task選pose。此maniskill.pick_cube是跨simulator config port，該基類文件明分它與*_native/SAPIEN3 official-demo port；未獨立驗證任何跨引擎parity。",
+  "tasks": "pick_cube alias與maniskill.pick_cube共用一個task，目標cube比reset初態沿z移動>=0.1m，最大250原生步；不要求抓持或放置。traj_filepath指roboverse_data/trajs/maniskill/pick_cube/v2/franka_v2.pkl.gz，下載helper在constructor被呼叫，本輪未執行。全平臺registry條目、object variants、來源task、demo與benchmark trial必須分開；本輪未聲稱現行registry總數等於paper task數。",
+  "data": "legacy v2內容為{robot_name:[{init_state,actions,states?},...]}，init/state是entity→pos/rot/dof_pos；actions支援dof_pos_target/dof_vel_target/dof_effort_target。v3轉換只是把state分objects/robots、action包上robot名稱；缺states仍可回初態+actions，但不能做state-anchored replay。現行get_traj按內容辨識、拒v1，遇roboverse.episode會要求load_episode另一API，不能只改副檔名。TensorState保存objects/robots/cameras；root/body state為[pos,quat,lin_vel,ang_vel]13維，joint資料與body_names需綁定，部分backend欄位可None。另一路data2zarr讀demo_NNNN/metadata.json及各camera.mp4（head_camera可退到rgb.mp4），用joint_qpos、joint_qpos_target或robot_root_state/robot_ee_state(_target)生成state/action；EE為robot-local xyz+wxyz+兩指共9D，delta_ee另有相對quat。輸出data/{camera,state,action}與meta/episode_ends，保留downsample/padding/action-space設定。RobotImageDataset從Zarr抽episode內sequence、相機值除255。未取得外部traj、MP4或Zarr，case數應依實際episode_ends／檔案manifest，而非metadata要求處理的num_episodes。",
+  "evaluation": "DefaultRunner.evaluate→get_task_class→ManiskillBaseTask→get_traj(v2→v3)→env.reset/checker.reset→BaseTaskEnv.step→handler.set_dof_targets/simulate/get_states→_terminated→PositionShiftChecker.check→util.get_pos。正常checker以reset差值z>=0.1m且總位移<=100m回bool，base reward仍為0，timeout另回。runner每個outer step執行joint action一次、EE action兩次，僅讀最後一次success；SuccessOnce是outer steps上的OR，SuccessEnd是末步，TimeOut只累積不停止個別env；全batch曾成功或max_step耗盡才退出。final_stats為SuccessOnce成功數/總完成數，並保存demo索引、DR level/mode/seed。選取demo靠task_id_range_low/high及max_demo，並沒有自動套用paper90/10索引。現行DRManager確為L1 scene+material、L2加light、L3加camera，與paper／舊usage文件的L2 camera、L3 light/reflection不能同名比較。",
+  "standardization": {
+    "profile": "versioned_multi_backend_task_and_trajectory_adapter",
+    "reuse": "官方native task ID／aliases、ScenarioCfg、typed state/action、v2 parser和v3轉換、metadata→Zarr鏈、具體checker及SuccessOnce/End結果。",
+    "transform": "source保留paper v1與2026 code snapshot；task標config_port或native_port並連回ManiSkill等上游。case保存robot、task、原demo index、asset/初態hash、backend、控制步長及DR實際factor，不只存level數字。明分v2磁碟trajectory、v3記憶體state、roboverse.episode與IL Zarr四種接口；保留joint名稱／單位、wxyz、camera座標及EE local/delta語義。",
+    "missing": "PositionShiftChecker 219–221只要cur_pos任何元素NaN就回整批True，沿此task鏈會被SuccessOnce計成功，需先修補並標版本。尾批demo_end_idx只截到num_demos、不截到要求的low+max_demos，SuccessOnce分母固定num_envs，需核對超額或不滿批處理。RobotImageDataset normalizer.fit吃全buffer而非train mask；get_validation_dataset取downsample後train_mask的補集，可能把未選訓練episodes納入val，需固定真正paper split。尚缺2025實驗commit/資產/90-10 case清單及舊L2/L3到現行factor對照；v1資料已明示不支援。"
+  },
+  "version_note": "固定RoboVerseOrg/RoboVerse@5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14（2026-09-08），對應paper 2504.18904v1（2025-04-26）的官方延續repo，而非paper原始實驗pin。README如今把MetaSim與RoboVerse分成同tag發行的兩套package；trajectory v2/v3、native/config ports與generalization protocol各自記版本。舊usage的RandomizationCfg不可直接作現行DRConfig schema；本輪只選讀所列task／data／evaluator。",
+  "runtime_executed": false,
+  "reviewed_on": "2026-10-11",
+  "source_files": [
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/RoboVerseOrg__RoboVerse/files/README.md",
+      "sha256": "5ac2049d6c9744536608c70421957b52a6b7fea60f4dc676f861cbdc5acbac54",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/RoboVerseOrg__RoboVerse/manifest.json",
+      "read_ranges": [
+        [
+          8,
+          13
+        ],
+        [
+          23,
+          55
+        ],
+        [
+          65,
+          101
+        ],
+        [
+          131,
+          143
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "docs/source/dataset_benchmark/benchmark/overview.md",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md",
+      "sha256": "07037596b4367cea54827c7a9c83fb926c26794fbbc97fbbcdafd83dbd6cf250",
+      "lines": 12,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md",
+        "retrieved_at": "2026-10-11T00:24:39.517835+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 662,
+        "sha256": "07037596b4367cea54827c7a9c83fb926c26794fbbc97fbbcdafd83dbd6cf250"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          1,
+          12
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "docs/source/dataset_benchmark/benchmark/usage.md",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md",
+      "sha256": "58aa5c2a191aa0824a0d76bc073bd6311d60e5a5bfcfe582e15e27c5aa8a6132",
+      "lines": 58,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md",
+        "retrieved_at": "2026-10-11T00:24:40.520770+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 1770,
+        "sha256": "58aa5c2a191aa0824a0d76bc073bd6311d60e5a5bfcfe582e15e27c5aa8a6132"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          3,
+          55
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_pack/tasks/maniskill/pick_cube.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py",
+      "sha256": "addc671dd6b0ce0daeb5e887c6a58eeef6ca5b31a11d15e6343ac39d9c74d45c",
+      "lines": 37,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py",
+        "retrieved_at": "2026-10-11T00:24:45.520998+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 1111,
+        "sha256": "addc671dd6b0ce0daeb5e887c6a58eeef6ca5b31a11d15e6343ac39d9c74d45c"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          12,
+          37
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_pack/tasks/maniskill/maniskill_base.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py",
+      "sha256": "859a687050fce7319de0970b051fc36856da949bac9d27cf237cd7eae801f694",
+      "lines": 106,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py",
+        "retrieved_at": "2026-10-11T00:25:17.757502+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 5534,
+        "sha256": "859a687050fce7319de0970b051fc36856da949bac9d27cf237cd7eae801f694"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          12,
+          39
+        ],
+        [
+          53,
+          106
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/types.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py",
+      "sha256": "c40fd8e1e165953869be581b2efa3ef66ea2ff6a0db8ca230710fdb3d9db8715",
+      "lines": 426,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py",
+        "retrieved_at": "2026-10-11T00:24:42.520724+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 16944,
+        "sha256": "c40fd8e1e165953869be581b2efa3ef66ea2ff6a0db8ca230710fdb3d9db8715"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          29,
+          87
+        ],
+        [
+          133,
+          198
+        ],
+        [
+          237,
+          273
+        ],
+        [
+          336,
+          347
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/utils/demo_util/loader.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py",
+      "sha256": "75d83777ef4d7f283d269b1c9826445454a3629fc25a91015e291a1e01ce52c8",
+      "lines": 66,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py",
+        "retrieved_at": "2026-10-11T00:24:43.524519+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2001,
+        "sha256": "75d83777ef4d7f283d269b1c9826445454a3629fc25a91015e291a1e01ce52c8"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          9,
+          43
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/utils/demo_util/demo_util.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py",
+      "sha256": "01fed75d749ac76653dbd96e888c765c1a218f694f21b604d3961a949abdb295",
+      "lines": 217,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py",
+        "retrieved_at": "2026-10-11T00:24:44.521092+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 9730,
+        "sha256": "01fed75d749ac76653dbd96e888c765c1a218f694f21b604d3961a949abdb295"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          17,
+          118
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+      "sha256": "ae2fd5c25d4bf002e7c2405a7a2a1ca5ba86adda1e95305b2eae345fd1bffbf1",
+      "lines": 108,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+        "retrieved_at": "2026-10-11T00:25:18.758863+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 4462,
+        "sha256": "ae2fd5c25d4bf002e7c2405a7a2a1ca5ba86adda1e95305b2eae345fd1bffbf1"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          15,
+          108
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+      "sha256": "a6e80d2b1c806b36750e369caea4cc742f6846df2ed4b5f4a53f6ed7b9ee5299",
+      "lines": 67,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+        "retrieved_at": "2026-10-11T00:25:19.753386+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 2074,
+        "sha256": "a6e80d2b1c806b36750e369caea4cc742f6846df2ed4b5f4a53f6ed7b9ee5299"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          1,
+          67
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_learn/il/data2zarr_dp.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py",
+      "sha256": "cf886b0a88c6d50d80710135444915871f8fc05bdfb043477d46818533f1dc0e",
+      "lines": 353,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py",
+        "retrieved_at": "2026-10-11T00:25:56.655746+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 14210,
+        "sha256": "cf886b0a88c6d50d80710135444915871f8fc05bdfb043477d46818533f1dc0e"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          21,
+          77
+        ],
+        [
+          147,
+          265
+        ],
+        [
+          273,
+          318
+        ],
+        [
+          329,
+          347
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_learn/il/datasets/robot_image_dataset.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py",
+      "sha256": "097d71eae0088a3f513104f6177aaea3509c1a0946d7b300f54759958a1703f8",
+      "lines": 212,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py",
+        "retrieved_at": "2026-10-11T00:24:47.520290+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 8098,
+        "sha256": "097d71eae0088a3f513104f6177aaea3509c1a0946d7b300f54759958a1703f8"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          33,
+          174
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/task/base.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py",
+      "sha256": "b986cf7eacd115cc3e229d263895252e54de3600401b26d21e349543aa760876",
+      "lines": 352,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py",
+        "retrieved_at": "2026-10-11T00:24:41.525500+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 14913,
+        "sha256": "b986cf7eacd115cc3e229d263895252e54de3600401b26d21e349543aa760876"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          143,
+          171
+        ],
+        [
+          225,
+          330
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+      "sha256": "fb823d4d98572a52b8e2866a425306e3a550cd877fc30895152690799b214005",
+      "lines": 83,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+        "retrieved_at": "2026-10-11T00:26:49.653663+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 3026,
+        "sha256": "fb823d4d98572a52b8e2866a425306e3a550cd877fc30895152690799b214005"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          8,
+          40
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+      "sha256": "0de9a15a7a779ab4511adbce42bbccc119193370e765feb300447342a4256c60",
+      "lines": 230,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+        "retrieved_at": "2026-10-11T00:25:16.751162+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 9327,
+        "sha256": "0de9a15a7a779ab4511adbce42bbccc119193370e765feb300447342a4256c60"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          189,
+          230
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "packages/metasim/metasim/randomization/dr_manager.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py",
+      "sha256": "ad7fa8615e8b1bffa5243a6d7a9a18471bede770102cbe2aa72d982107dd4408",
+      "lines": 605,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py",
+        "retrieved_at": "2026-10-11T00:26:59.559530+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 24196,
+        "sha256": "ad7fa8615e8b1bffa5243a6d7a9a18471bede770102cbe2aa72d982107dd4408"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          1,
+          41
+        ],
+        [
+          78,
+          90
+        ],
+        [
+          155,
+          203
+        ],
+        [
+          432,
+          474
+        ],
+        [
+          510,
+          516
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_learn/il/utils/eval_args.py",
+      "local_file": "audit/.cache/github_review/repos/RoboVerseOrg__RoboVerse/files/roboverse_learn/il/utils/eval_args.py",
+      "sha256": "0afa045ac1ec63fc9a504268a50f342b40285380e452e40bf6c51ae5e080faed",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/utils/eval_args.py",
+      "source_manifest": "audit/.cache/github_review/repos/RoboVerseOrg__RoboVerse/manifest.json",
+      "read_ranges": [
+        [
+          9,
+          49
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_learn/il/runners/default_runner.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py",
+      "sha256": "fa38c0433bc3c4825a7cc284b8410b55c3ff4441060b81d81e25e3a60cb19e35",
+      "lines": 637,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py",
+        "retrieved_at": "2026-10-11T00:25:55.653529+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 26044,
+        "sha256": "fa38c0433bc3c4825a7cc284b8410b55c3ff4441060b81d81e25e3a60cb19e35"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          18,
+          30
+        ],
+        [
+          280,
+          309
+        ],
+        [
+          346,
+          546
+        ]
+      ]
+    },
+    {
+      "repo": "RoboVerseOrg/RoboVerse",
+      "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+      "path": "roboverse_learn/il/runners/default_eval_runner.py",
+      "url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/RoboVerseOrg__RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py",
+      "sha256": "794489fb70b682f7269408a7799445e2429234fbf02076f1ded922caf9495044",
+      "lines": 95,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py",
+        "retrieved_at": "2026-10-11T00:24:51.522288+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/RoboVerseOrg/RoboVerse/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 3910,
+        "sha256": "794489fb70b682f7269408a7799445e2429234fbf02076f1ded922caf9495044"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          17,
+          45
+        ],
+        [
+          71,
+          95
+        ]
+      ]
+    }
+  ]
+}

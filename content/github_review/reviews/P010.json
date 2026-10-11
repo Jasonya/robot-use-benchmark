@@ -1,0 +1,157 @@
+{
+  "paper_id": "P010",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EPIC-KITCHENS-100 需保留五項挑戰各自的資料與評測約定；本次核讀總標註、敘述工具及 C1 動作辨識實際指標，沒有把其他挑戰概括成已整合。",
+  "reading_order": [
+    {
+      "repo": "epic-kitchens/epic-kitchens-100-annotations",
+      "path": "README.md",
+      "commit": "ea8b40457a400c3fffa1c7f406ef3dc169cc2522",
+      "ranges": [
+        [
+          1,
+          120
+        ],
+        [
+          136,
+          193
+        ],
+        [
+          375,
+          421
+        ],
+        [
+          544,
+          579
+        ]
+      ],
+      "why": "五項挑戰、欄位、版本與錯誤修正"
+    },
+    {
+      "repo": "epic-kitchens/epic-kitchens-100-narrator",
+      "path": "README.md",
+      "commit": "d9d429819ca6d032efc63911d1071c2e9b2d4cea",
+      "ranges": [
+        [
+          1,
+          68
+        ],
+        [
+          192,
+          229
+        ]
+      ],
+      "why": "narration 標註工具與時間來源"
+    },
+    {
+      "repo": "epic-kitchens/C1-Action-Recognition",
+      "path": "README.md",
+      "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+      "ranges": [
+        [
+          1,
+          99
+        ]
+      ],
+      "why": "C1 輸出維度、narration_id 與評測輸入"
+    },
+    {
+      "repo": "epic-kitchens/C1-Action-Recognition",
+      "path": "utils/metrics.py",
+      "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+      "ranges": [
+        [
+          7,
+          13
+        ],
+        [
+          24,
+          30
+        ],
+        [
+          35,
+          41
+        ],
+        [
+          53,
+          65
+        ],
+        [
+          90,
+          106
+        ],
+        [
+          113,
+          129
+        ],
+        [
+          143,
+          155
+        ],
+        [
+          166,
+          175
+        ],
+        [
+          179,
+          193
+        ]
+      ],
+      "why": "top-k、unseen 與 tail 子集實作"
+    }
+  ],
+  "environment": "沿用部分 EPIC-55 廚房影片並新增拍攝；PXX_YY 與 PXX_1YY 的影片來源不同，不能把兩版影片量相加當作獨立場景。",
+  "tasks": "包含動作辨識、弱監督辨識、動作預測、無監督領域適應、影片文字檢索。verb、noun、action 類別與檢索句子各有原生 ID，挑戰種類不等於獨立任務數。",
+  "data": "train／validation／test_timestamps CSV 以 narration_id 對齊片段；narration_timestamp、start/stop_timestamp、frame 邊界各自儲存。anticipation 使用動作前 5 秒觀測並留 1 秒間隔；UDA 的 source/target 與 retrieval 的 sentence 表另列。C1 預測含 verb_output[N,97]、noun_output[N,300] 及 narration_id。",
+  "evaluation": "C1 utils/metrics.py 計算全部樣本 verb／noun／action top-1/top-5，以及 unseen participants、tail verbs／nouns／actions 的對應 top-1 子集；布林遮罩決定分母。其他四項挑戰需各自取得 evaluator，不可沿用 C1 得分。",
+  "standardization": {
+    "profile": "video_action_multitrack",
+    "reuse": "動作／敘述時間、原生 split、tail／unseen 子集、C1 分數格式與 top-k evaluator；narrator 可作為標註來源工具。",
+    "transform": "source 版本標 EPIC-100 並建立對 EPIC-55 的 video 重用邊；task／case 記錄 challenge、narration_id、合法觀測窗；retrieval 與 anticipation 分成不同 profile；指標保留原生子集與分母。",
+    "missing": "尚未下載影片、驗證 frame 修正版、取得隱藏測試或執行提交；C2–C5 的完整 loader／evaluator 仍需另外核讀與測試。"
+  },
+  "version_note": "固定提交的說明列出 P01_109、P27_103 預抽幀錯誤；原始影片與標註不受影響，資料取得時必須儲存修正版本。narrator 是工具，並非額外 benchmark。EPIC-55 many-shot P/R 不等於本版 tail 指標。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "epic-kitchens/epic-kitchens-100-annotations",
+      "path": "README.md",
+      "commit": "ea8b40457a400c3fffa1c7f406ef3dc169cc2522",
+      "sha256": "e3f5eeb0d7c7908d55d43ad9fe8bc877c6717b89d22a94f8373f03ae158c523f",
+      "url": "https://github.com/epic-kitchens/epic-kitchens-100-annotations/blob/ea8b40457a400c3fffa1c7f406ef3dc169cc2522/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__epic-kitchens-100-annotations/files/README.md"
+    },
+    {
+      "repo": "epic-kitchens/epic-kitchens-100-narrator",
+      "path": "README.md",
+      "commit": "d9d429819ca6d032efc63911d1071c2e9b2d4cea",
+      "sha256": "0081eb0e952c5b66196ba9c6a89e4b688f7abff4ce49c1f8466a4b552d709c19",
+      "url": "https://github.com/epic-kitchens/epic-kitchens-100-narrator/blob/d9d429819ca6d032efc63911d1071c2e9b2d4cea/README.md",
+      "local_file": "audit/.cache/github_review/repos/epic-kitchens__epic-kitchens-100-narrator/files/README.md"
+    },
+    {
+      "repo": "epic-kitchens/C1-Action-Recognition",
+      "path": "README.md",
+      "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+      "sha256": "67770d0c58b02e2ad9ea401fb1c689b63991bbaed29c8b4be58fe0f61189fbf2",
+      "url": "https://github.com/epic-kitchens/C1-Action-Recognition/blob/277586f7fcb6752cf79872dd67d7914baa541c1e/README.md",
+      "local_file": "audit/.cache/github_review_worker/early/files/epic-kitchens__C1-Action-Recognition/README.md"
+    },
+    {
+      "repo": "epic-kitchens/C1-Action-Recognition",
+      "path": "utils/metrics.py",
+      "commit": "277586f7fcb6752cf79872dd67d7914baa541c1e",
+      "sha256": "d23a7d515b5c1377e6174569b5798ff55b819a55e763d31e64873d78fcccf69c",
+      "url": "https://github.com/epic-kitchens/C1-Action-Recognition/blob/277586f7fcb6752cf79872dd67d7914baa541c1e/utils/metrics.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/epic-kitchens__C1-Action-Recognition/utils/metrics.py"
+    }
+  ],
+  "additional_repo_proposals": [
+    {
+      "repo": "epic-kitchens/C1-Action-Recognition",
+      "role": "100 版動作辨識挑戰 evaluator",
+      "evidence": "100 版 annotations README 的 C1 連結與倉庫自述一致"
+    }
+  ]
+}

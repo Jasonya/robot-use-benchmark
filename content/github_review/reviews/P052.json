@@ -1,0 +1,222 @@
+{
+  "paper_id": "P052",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "StillFast在Ego4D STA上預測下一個互動物件、動作與接觸時間；官方測試提交和本機validation必須分開記錄。",
+  "reading_order": [
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          102
+        ]
+      ],
+      "why": "確認Ego4D v1/v2、資料與官方評分入口。",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4"
+    },
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "stillfast/datasets/ego4d_sta_still.py",
+      "ranges": [
+        [
+          17,
+          23
+        ],
+        [
+          34,
+          41
+        ],
+        [
+          48,
+          54
+        ],
+        [
+          56,
+          67
+        ],
+        [
+          78,
+          84
+        ],
+        [
+          93,
+          136
+        ],
+        [
+          144,
+          154
+        ]
+      ],
+      "why": "讀UID、影格、objects和類別offset。",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4"
+    },
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "stillfast/tasks/sta.py",
+      "ranges": [
+        [
+          1,
+          178
+        ]
+      ],
+      "why": "追到validation metric與提交JSON的類別還原。",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4"
+    },
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "stillfast/evaluation/sta_metrics.py",
+      "ranges": [
+        [
+          2,
+          6
+        ],
+        [
+          15,
+          19
+        ],
+        [
+          32,
+          40
+        ],
+        [
+          61,
+          203
+        ],
+        [
+          205,
+          217
+        ],
+        [
+          233,
+          237
+        ],
+        [
+          266,
+          270
+        ],
+        [
+          288,
+          292
+        ],
+        [
+          294,
+          298
+        ],
+        [
+          308,
+          312
+        ],
+        [
+          359,
+          363
+        ],
+        [
+          368,
+          378
+        ],
+        [
+          380,
+          388
+        ],
+        [
+          398,
+          402
+        ],
+        [
+          407,
+          411
+        ],
+        [
+          414,
+          420
+        ],
+        [
+          428,
+          439
+        ],
+        [
+          463,
+          467
+        ],
+        [
+          487,
+          491
+        ],
+        [
+          496,
+          500
+        ],
+        [
+          523,
+          529
+        ],
+        [
+          532,
+          543
+        ],
+        [
+          551,
+          555
+        ],
+        [
+          566,
+          592
+        ]
+      ],
+      "why": "讀匹配、K個false-positive折免及STA具體條件。",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4"
+    }
+  ],
+  "environment": "Ego4D影片的觀測影格及短歷史片段，無互動模擬環境。",
+  "tasks": "共同預測box、noun、verb、time_to_contact；四種STA指標組合不是四份獨立素材。",
+  "data": "annotation以uid、video_id、frame和objects索引；objects含box／noun_category_id／verb_category_id／time_to_contact。訓練標籤有noun+1與依ROI版本決定的verb offset，輸出JSON再還原。",
+  "evaluation": "實際validation呼叫OverallMeanAveragePrecision(top_k=5)：IoU嚴格大於0.5、TTC誤差不超過0.25；依GT數折免(K−1)×GT個高分false positives。正式成績依README指定的Ego4D evaluator／隱藏test。",
+  "standardization": {
+    "profile": "short_term_object_interaction_anticipation",
+    "reuse": "STA annotation、uid結果格式、類別offset還原及原生匹配規則。",
+    "transform": "case保留版本、frame／歷史窗口、物件GT與TTC單位；box數與影片題數分開，evaluator保存top_k、IoU/TTC及類別平均規則。",
+    "missing": "影片／LMDB與split閉合、官方evaluator版本對照及空預測／標籤offset邊界案例核對。"
+  },
+  "version_note": "本機Overall mAP有更多診斷組合，不等於官方只報的STA欄位；靜態核讀還發現add的空字典分支有不可達的內層len(preds)>0條件，整合前須核對空輸出對分母的影響。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "README.md",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+      "sha256": "54e738e945f097e7e3b13000493280b8cb1278f6a5de0b829c286f052b05ad01",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/stillfast/199ba4902b7a09e4a55c8d3906068d4063bd15a4/README.md",
+      "permalink": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/README.md",
+      "local_path": "audit/.cache/github_review/repos/fpv-iplab__stillfast/files/README.md"
+    },
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "stillfast/datasets/ego4d_sta_still.py",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+      "sha256": "bbad2974754df6fa2ef4a4c1b6f05c7b3050207539d1ba71c6518eabfc590a22",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/stillfast/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/datasets/ego4d_sta_still.py",
+      "permalink": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/datasets/ego4d_sta_still.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/fpv-iplab__stillfast/stillfast/datasets/ego4d_sta_still.py"
+    },
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "stillfast/tasks/sta.py",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+      "sha256": "af9a8e58613ed72e38d8000f37ec8a9671645f0eafe01543c56fc1c689875e6d",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/stillfast/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/tasks/sta.py",
+      "permalink": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/tasks/sta.py",
+      "local_path": "audit/.cache/github_review/repos/fpv-iplab__stillfast/files/stillfast/tasks/sta.py"
+    },
+    {
+      "repo": "fpv-iplab/stillfast",
+      "path": "stillfast/evaluation/sta_metrics.py",
+      "commit": "199ba4902b7a09e4a55c8d3906068d4063bd15a4",
+      "sha256": "0b797ca8729203c5ebb9d3c7df468c81bcdf4f291c7136cbd54c54c27ec3c794",
+      "url": "https://raw.githubusercontent.com/fpv-iplab/stillfast/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/evaluation/sta_metrics.py",
+      "permalink": "https://github.com/fpv-iplab/stillfast/blob/199ba4902b7a09e4a55c8d3906068d4063bd15a4/stillfast/evaluation/sta_metrics.py",
+      "local_path": "audit/.cache/github_review/repos/fpv-iplab__stillfast/files/stillfast/evaluation/sta_metrics.py"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "paper_id": "P143",
+  "summary": "PARTNR的題目已包含命題、依賴與過程限制。判分追蹤何時完成，並用約束取消不合法的命題，不能只比對最後物件位置。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/partnr-planner",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          36
+        ],
+        [
+          46,
+          79
+        ]
+      ],
+      "why": "原作、agent/planner/tool/skill、集中/分散與資訊流",
+      "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+    },
+    {
+      "repo": "facebookresearch/partnr-planner",
+      "path": "INSTALLATION.md",
+      "ranges": [
+        [
+          14,
+          26
+        ],
+        [
+          32,
+          62
+        ]
+      ],
+      "why": "Habitat0.3.3、HSSD partnr和原episodes依賴",
+      "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+    },
+    {
+      "repo": "facebookresearch/partnr-planner",
+      "path": "habitat_llm/agent/env/dataset.py",
+      "ranges": [
+        [
+          30,
+          54
+        ],
+        [
+          101,
+          129
+        ]
+      ],
+      "why": "CollaborationEpisode欄位與constraint類別解析",
+      "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+    },
+    {
+      "repo": "facebookresearch/partnr-planner",
+      "path": "habitat_llm/agent/env/measures.py",
+      "ranges": [
+        [
+          84,
+          154
+        ],
+        [
+          182,
+          196
+        ],
+        [
+          219,
+          259
+        ]
+      ],
+      "why": "數量展開、首次滿足時間、constraint與success鏈",
+      "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+    },
+    {
+      "repo": "facebookresearch/partnr-planner",
+      "path": "habitat_llm/agent/env/evaluation/evaluation_functions.py",
+      "ranges": [
+        [
+          354,
+          381
+        ],
+        [
+          421,
+          450
+        ],
+        [
+          453,
+          525
+        ],
+        [
+          601,
+          677
+        ]
+      ],
+      "why": "時序DAG、終態持續條件與percent-complete分母",
+      "commit": "ddfff19f4b6c098a31edea4d19e7b75db72433c2"
+    }
+  ],
+  "environment": "Habitat中的人/機器人協作與HSSD partnr資產；房屋與episode分開，val_mini/train_2k是原split子集而非新獨立資料。",
+  "tasks": "自然語言規劃/協作、具體物件目標與前後順序/同物件等約束；Agent使用Tool/Skill和WorldGraph，因此可支援多模態工具流程的來源設計。",
+  "data": "CollaborationEpisode繼承scene/初態，再存instruction、evaluation_propositions、proposition_dependencies、evaluation_constraints、object_states。quantity可unroll成多命題，需保留原/展開ID；真值條件和planner可見world graph不同。",
+  "evaluation": "先按依賴決定哪些proposition能評，記首次滿足時間；TemporalConstraint要求前置嚴格更早，TerminalSatisfaction要求指定命題在最後仍成立。percent_complete是已滿足且未被任一constraint取消的命題比例，空命題回0；success需比例==1。",
+  "standardization": {
+    "profile": "multi_agent_tool_planning_with_temporal_constraints",
+    "reuse": "原生episode、命題/依賴/DAG/終態規則、agent/tool資訊契約與評分軌跡。",
+    "transform": "case保存原命題及展開映射、agent權限/觀測/工具/步數預算；evaluator保留首次時間和完整state sequence，不能扁平化為一組終態AND。",
+    "missing": "全部scene/asset/skill版本閉合、原始split和環境去重、模態/工具預算公平性、原生與共同grader對照執行。"
+  },
+  "version_note": "固定ddfff19；先前已取得111652train+1000val題目metadata是不同階段的庫存，不因本次code核讀再加一次。Habitat-Sim0.3.3及HSSD partnr版本需要與本paper綁定。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

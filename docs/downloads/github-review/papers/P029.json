@@ -1,0 +1,646 @@
+{
+  "paper_id": "P029",
+  "name": "EgoThink",
+  "title": "EgoThink: Evaluating First-Person Perspective Thinking Capability of Vision-Language Models",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2311.15596",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food",
+    "craft"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P029",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EgoThink 是單影像第一人稱思考問答。已核讀資料樣本、推論輸出、實際裁判 prompt 選擇與分數聚合；程式沿用 FastChat 格式，但原生分數不是其通用 1–10 分。",
+    "environment": "來自人類第一人稱影像；樣本 source_dataset=ego4d，image_path 為本地圖片。能力目錄不等於生活場域或新實體環境；原影片時間／地點需另外補來源對映。",
+    "tasks": "六類能力目錄 Activity、Forecast、Localization、Object、Planning、Reasoning，下含 12 份 annotations.json。導航／協助題是文字規劃問答，未要求機器人執行。",
+    "data": "樣本含 source_dataset、image_path、question、answer；eval.py 用 image_path[0] 的檔名定位影像，依目錄順序重新給 question_id，輸出 question/model_answer/reference_answer JSONL。assistance/navigation token 預算300，其他30，需保留差異。",
+    "evaluation": "gen_judgment.py 實際採 judges[math] 的 single-math-v2 prompt：只看問題、參考與模型文字、不看圖片，給 0/.5/1；common.py 解析 [[rating]]，最多嘗試3次，失敗=-1。show_result.py 排除 -1 後平均，去重被註解；應額外報有效率和重複題，不能將保留樣本平均當全題 accuracy。",
+    "standardization": {
+      "profile": "image_qa_reference_judge",
+      "reuse": "十二能力題集結構、單影像 QA schema、原參考答案與具體 0/.5/1 裁判流程。",
+      "transform": "case 用 source+能力目錄+原始 row/hash 建穩定 ID，儲存生成 question_id 對映；記錄圖片、token budget、reference、judge model/version/prompt、原 judgment、解析重試與缺失。各能力分項，與 physical navigation evaluator 分開。",
+      "missing": "未執行模型／付費裁判。僅讀 Activity 第一筆資料樣本，未逐題查圖片與標籤；需確認各子集來源 video/time、去重與盲測切分。API 模型版本與裁判可靠性需另外驗證。"
+    },
+    "version_note": "README 列 VidEgoThink 為另一篇後續工作；不能因同 repo 宣傳連結就把其影片題目計入 EgoThink。現行預設裁判為 gpt-4o，原論文使用的模型／prompt 必須另依對應版本釘選。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            117
+          ],
+          [
+            152,
+            197
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 197,
+        "sha256": "73682fb124df788f56990b1c42c5d17edec3220c645a9803b42150eb548018fd",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/README.md",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/README.md#L1-L117",
+        "why": "精確論文身份、能力與流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "data/Activity/annotations.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/0"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/0",
+            "selected_value_sha256": "f68ba416931b63bb37bba5ae741f2b4597a1a9eeda9e152e8d9e5179b8d007f9"
+          }
+        ],
+        "read_scope": "Only selected JSON entries read; no full-file or full-line review claimed",
+        "line_count": 802,
+        "sha256": "91dea9b694644e70df90478597f680e80637f183031c1b10327f30cb1c62b81d",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/data/Activity/annotations.json",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/data/Activity/annotations.json",
+        "why": "JSON /0 樣本欄位與 Ego4D parent",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "eval.py",
+        "ranges": [
+          [
+            1,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 145,
+        "sha256": "dfef7972deca51e3bacd38ff6f74b804a11f2488277072a8c8160c135354fde4",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/eval.py",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/eval.py#L1-L145",
+        "why": "單影像讀取、預算與重編 ID",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "judge_prompts.jsonl",
+        "ranges": [
+          [
+            1,
+            9
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 9,
+        "sha256": "10880d0de01f057fdfd1ecda1f2c2cb41fee29bc8192aeb9e932a4f7906f03cd",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/judge_prompts.jsonl",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/judge_prompts.jsonl#L1-L9",
+        "why": "原生 reference-only 0/.5/1 prompt",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "gen_judgment.py",
+        "ranges": [
+          [
+            19,
+            24
+          ],
+          [
+            29,
+            33
+          ],
+          [
+            71,
+            75
+          ],
+          [
+            112,
+            116
+          ],
+          [
+            142,
+            146
+          ],
+          [
+            168,
+            175
+          ],
+          [
+            178,
+            182
+          ],
+          [
+            184,
+            199
+          ],
+          [
+            201,
+            205
+          ],
+          [
+            212,
+            225
+          ],
+          [
+            234,
+            242
+          ],
+          [
+            276,
+            296
+          ],
+          [
+            310,
+            329
+          ],
+          [
+            341,
+            349
+          ],
+          [
+            352,
+            356
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 362,
+        "sha256": "860ddd030cceb90336a4e8806c96859728951fa0ce402a1289414897b424eb9a",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/gen_judgment.py",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/gen_judgment.py#L19-L24",
+        "why": "實際選用 single-math-v2",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "common.py",
+        "ranges": [
+          [
+            129,
+            137
+          ],
+          [
+            152,
+            160
+          ],
+          [
+            173,
+            196
+          ],
+          [
+            343,
+            354
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 738,
+        "sha256": "cb52b685cf693c67ffe40145f3d0157d9a0c95749be8808af493ab77f990958e",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/common.py",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/common.py#L129-L137",
+        "why": "rating 解析／失敗／重試",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "AdaCheng/EgoThink",
+        "requested_repo": "AdaCheng/EgoThink",
+        "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+        "ref": null,
+        "path": "show_result.py",
+        "ranges": [
+          [
+            3,
+            11
+          ],
+          [
+            32,
+            133
+          ],
+          [
+            142,
+            157
+          ],
+          [
+            169,
+            181
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 181,
+        "sha256": "2b4dd98f628e64821f040140e18d87cb4d1e0c514646f317bf10fa2ebc726352",
+        "url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/show_result.py",
+        "reading_url": "https://github.com/AdaCheng/EgoThink/blob/fbafe8fe4e963c8b30be62bafd5ce16f61bb0141/show_result.py#L3-L11",
+        "why": "排除 -1、分組平均與未啟用去重",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ea6e938341460e440798d918aa59c0f2f9604477a32b66881c4e9146269afe88"
+  },
+  "repository_binding_review_sha256": "ea6e938341460e440798d918aa59c0f2f9604477a32b66881c4e9146269afe88",
+  "repository_bindings": [
+    {
+      "requested_repo": "AdaCheng/EgoThink",
+      "resolved_repo": "AdaCheng/EgoThink",
+      "aliases_in_this_review": [
+        "adacheng/egothink"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "fbafe8fe4e963c8b30be62bafd5ce16f61bb0141",
+          "reviewed_files": [
+            "README.md",
+            "common.py",
+            "data/Activity/annotations.json",
+            "eval.py",
+            "gen_judgment.py",
+            "judge_prompts.jsonl",
+            "show_result.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/AdaCheng/EgoThink",
+          "pdf_page": 1,
+          "pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/AdaCheng/EgoThink/",
+          "pdf_page": 1,
+          "pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040",
+          "basis": "pdf_extracted_text"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/AdaCheng/EgoThink",
+          "link_label": "Code",
+          "project_url": "https://adacheng.github.io/EgoThink/",
+          "page_sha256": "bb528b689e9c3bbf820ea20eb989ed1e467873fead6df9783ccaccf0499fcec8"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/AdaCheng/EgoThink/blob/main/index.html",
+          "link_label": "index.html",
+          "project_url": "https://adacheng.github.io/EgoThink/",
+          "page_sha256": "bb528b689e9c3bbf820ea20eb989ed1e467873fead6df9783ccaccf0499fcec8"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P029",
+          "review_file": "content/github_review/reviews/P029.json",
+          "review_sha256": "ea6e938341460e440798d918aa59c0f2f9604477a32b66881c4e9146269afe88",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪",
+    "工藝與修繕"
+  ],
+  "source_review": {
+    "paper_id": "P029",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoThink，arXiv 2311.15596v2。",
+    "scope_read": "人工QA蒐集、700題統計、六能力十二維度、judge協定。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      13,
+      14
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕"
+    ],
+    "role": "影片問答與推理",
+    "environment": "595個Ego4D母影片；scene統計是語義場景如kitchen，不能當相同數量的獨立物理房間。",
+    "tasks": "6能力／12細分維度：物件、活動、定位、推理、forecasting、planning；輸入為單張影像。",
+    "cases": "700影像QA，無重複選圖；每維度至少50題，activity與forecasting各100。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "能力類別",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "細分題型",
+        "pages": [
+          5,
+          14
+        ]
+      },
+      {
+        "field": "case",
+        "value": 700,
+        "unit": "影像QA",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "data",
+        "value": 595,
+        "unit": "母影片",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "GPT-4依問題、答案、reference打0／0.5／1分；是模型評審分數，不是精確答案匹配accuracy。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審"
+    ],
+    "split": "zero-shot評測；無一般train/val/test訓練配額。人工審核QA與後續模型judge分開。",
+    "lineage": "抽Ego4D影格，最多同video兩張；能力分類不等同生活domain分類。",
+    "related_paper_ids": [
+      "P013"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          14
+        ],
+        "locator": "§3.2、表4",
+        "supports": "700／595及題型"
+      },
+      {
+        "pages": [
+          6
+        ],
+        "locator": "Single-answer grading",
+        "supports": "0/0.5/1 judge"
+      }
+    ],
+    "unresolved": [
+      "跨庫母影片重疊及judge版本穩定性需實作端固定。"
+    ],
+    "reuse": "可借主觀／開放答案rubric；planning問答不能當作控制成功證據。",
+    "reviewed_pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoThink",
+    "year": 2023,
+    "title": "EgoThink: Evaluating First-Person Perspective Thinking Capability of Vision-Language Models",
+    "source_url": "https://arxiv.org/abs/2311.15596",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home",
+      "food",
+      "craft"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "工藝與修繕",
+      "戶外移動"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "工藝與修繕"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P029",
+      "domain_ids": [
+        "home",
+        "food",
+        "craft"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P029",
+          "domain_ids": [
+            "home",
+            "food",
+            "craft"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            13,
+            14
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "6能力／12細分維度：物件、活動、定位、推理、forecasting、planning；輸入為單張影像。",
+            "595個Ego4D母影片；scene統計是語義場景如kitchen，不能當相同數量的獨立物理房間。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040",
+      "previous_domain_ids": [
+        "home",
+        "food",
+        "craft"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P029",
+      "name": "EgoThink",
+      "expected_title": "EgoThink: Evaluating First-Person Perspective Thinking Capability of Vision-Language Models",
+      "source_url": "https://arxiv.org/abs/2311.15596",
+      "pdf_url": "https://arxiv.org/pdf/2311.15596",
+      "retrieved_at": "2026-10-02T21:33:21.391635+00:00",
+      "pdf_sha256": "f52b14647c715c4187f0f53bb90bde9e7d6f2f5d10eefc5da2a39b714076e040",
+      "text_sha256": "002ec1a7ec7b0b97e1eae2a070556e9d1f9d80cc3c9ffc6e1d98f4471b23d38d",
+      "pdf_bytes": 4910653,
+      "pages": 19,
+      "text_characters": 122743,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2311.15596v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2311.15596v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "能力類別",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P029:1",
+        "paper_id": "P029",
+        "benchmark": "EgoThink",
+        "native_term": "能力類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.15596v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.15596v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 12,
+        "unit": "細分題型",
+        "pages": [
+          5,
+          14
+        ],
+        "record_id": "review10:P029:2",
+        "paper_id": "P029",
+        "benchmark": "EgoThink",
+        "native_term": "細分題型",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.15596v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.15596v2",
+            "locator": "PDF pp. 5, 14",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 700,
+        "unit": "影像QA",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P029:3",
+        "paper_id": "P029",
+        "benchmark": "EgoThink",
+        "native_term": "影像QA",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.15596v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.15596v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 595,
+        "unit": "母影片",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P029:4",
+        "paper_id": "P029",
+        "benchmark": "EgoThink",
+        "native_term": "母影片",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2311.15596v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2311.15596v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "AdaCheng/EgoThink"
+  ],
+  "external_repositories": []
+}

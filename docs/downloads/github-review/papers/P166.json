@@ -1,0 +1,496 @@
+{
+  "paper_id": "P166",
+  "name": "SafeVLA-Bench",
+  "title": "SafeVLA-Bench: A Benchmark for the Success-Safety Gap in Vision-Language-Action Models",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2606.00773",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "website_only",
+  "review": {
+    "paper_id": "P166",
+    "reviewed_on": "2026-10-11",
+    "status": "website_only",
+    "summary": "已確認SafeVLA-Bench的作者網站庫與原論文相符；榜單提供task-aware安全評估定義，但新找到的SafeVLA-Bench-release入口取得回404，尚未讀到其STL scorer。",
+    "environment": "沿用LIBERO四suite及RoboCasa-365 atomic-seen，所加的是事後trajectory instrumentation與安全規則；不自動增加獨立scene或task。",
+    "tasks": "論文p5記58個既有task，使用7種機制template組合和物件tag選適用條款。8個安全family分scene interaction、object handling、execution三組；規則條款數不是task數。",
+    "data": "作者榜單宣稱24policy、27policy–benchmark entries、22,500 scored rollouts；LIBERO每row每suite10task×20episode=200，RoboCasa18family×50=900。這些是已報run數，不能直接當獨立評測case量；兩組RoboCasa seed互不配對。",
+    "evaluation": "SR沿用父benchmark；Safety=滿足所有適用條款的episode比例；SBU=成功且違規佔全部episode，SBU/SR才是成功中違規比例；VSI為每episode最嚴重違規的正規化深度。signal不可用是N/A。9月版本由per-step force重新算RoboCasa，舊action-log數字不能混報。閾值屬文中模擬proxy，不是實體安全認證。",
+    "standardization": {
+      "profile": "posthoc_task_aware_trajectory_audit",
+      "reuse": "適用條款registry概念、原生success與附加規則分離、四種度量的分母及結果版本註記。",
+      "transform": "task保留原LIBERO/RoboCasa ID，evaluator另版本化STL/threshold/tags；case保留相同input/action/budget，新增per-step raw signal evidence與N/A，而非把安全規則乘成新task數。",
+      "missing": "release repo可存取、compute_stl_robustness.py實作、per-episode verdict/force logs、clauses與template明細及重現。"
+    },
+    "version_note": "網站固定3178c93並直接引用2606.00773；leaderboard L160連JFan5/SafeVLA-Bench-release，但本次API404。Jatshi同名庫是另一研究，未混入。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2606.00773",
+      "pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a",
+      "paper_pages_read": [
+        4,
+        5
+      ],
+      "release_access": {
+        "requested_url": "https://api.github.com/repos/JFan5/SafeVLA-Bench-release",
+        "retrieved_at": "2026-10-11T00:49:01.733399+00:00",
+        "status": 404,
+        "error": "Not Found"
+      }
+    },
+    "additional_repo_proposals": [
+      {
+        "repo": "JFan5/SafeVLA-Bench-release",
+        "reason": "作者固定版leaderboard.html L157–165明確連結的評估release；本次取得404，作待取得入口。",
+        "source_role": "announced_evaluation_release",
+        "access_status": 404
+      }
+    ],
+    "repository_candidate_dispositions": [
+      {
+        "repo": "JFan5/SafeVLA-Bench-release",
+        "status": "announced_repository_unavailable",
+        "reason": "原作／作者頁明列的入口；保存於2026-10-11T00:49:01.733399+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/JFan5/SafeVLA-Bench-release",
+            "retrieved_at": "2026-10-11T00:49:01.733399+00:00",
+            "status": 404,
+            "error": "Not Found"
+          }
+        ]
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "JFan5/safevla.org",
+        "requested_repo": "JFan5/safevla.org",
+        "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            30
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 30,
+        "sha256": "2242a00fab3169b5cc8bd2e3a261fcb66632fd85466464525692f9d796c15701",
+        "url": "https://github.com/JFan5/safevla.org/blob/3178c93fc6a73ea58dd1ad0467e65c921fcea69c/README.md",
+        "reading_url": "https://github.com/JFan5/safevla.org/blob/3178c93fc6a73ea58dd1ad0467e65c921fcea69c/README.md#L1-L30",
+        "why": "網站用途、safevla.org與展示內容",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "JFan5/safevla.org",
+        "requested_repo": "JFan5/safevla.org",
+        "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+        "ref": null,
+        "path": "index.html",
+        "ranges": [
+          [
+            13,
+            16
+          ],
+          [
+            43,
+            86
+          ],
+          [
+            343,
+            373
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 467,
+        "sha256": "e157e6c406d8bc31d3467d21cf8e39d3f715629d673fc4a663249cc9d138b0de",
+        "url": "https://github.com/JFan5/safevla.org/blob/3178c93fc6a73ea58dd1ad0467e65c921fcea69c/index.html",
+        "reading_url": "https://github.com/JFan5/safevla.org/blob/3178c93fc6a73ea58dd1ad0467e65c921fcea69c/index.html#L13-L16",
+        "why": "精確論文ID、榜單規模、8spec與N/A語義",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "JFan5/safevla.org",
+        "requested_repo": "JFan5/safevla.org",
+        "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+        "ref": null,
+        "path": "leaderboard.html",
+        "ranges": [
+          [
+            128,
+            177
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 193,
+        "sha256": "1710784ec60247aa81527767204137f518ccd9a1f154b42505196cffcc80b3b0",
+        "url": "https://github.com/JFan5/safevla.org/blob/3178c93fc6a73ea58dd1ad0467e65c921fcea69c/leaderboard.html",
+        "reading_url": "https://github.com/JFan5/safevla.org/blob/3178c93fc6a73ea58dd1ad0467e65c921fcea69c/leaderboard.html#L128-L177",
+        "why": "每suite rollout分母、種子群組、release入口與9月重計版本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "451a976cf5977db4df95a74b26e2795f999fb908e4e965548344851d7232a695"
+  },
+  "repository_binding_review_sha256": "451a976cf5977db4df95a74b26e2795f999fb908e4e965548344851d7232a695",
+  "repository_bindings": [
+    {
+      "requested_repo": "JFan5/safevla.org",
+      "resolved_repo": "JFan5/safevla.org",
+      "aliases_in_this_review": [
+        "jfan5/safevla.org"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "project_or_leaderboard_website",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "website_only",
+      "versions": [
+        {
+          "commit": "3178c93fc6a73ea58dd1ad0467e65c921fcea69c",
+          "reviewed_files": [
+            "README.md",
+            "index.html",
+            "leaderboard.html"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P166",
+          "review_file": "content/github_review/reviews/P166.json",
+          "review_sha256": "451a976cf5977db4df95a74b26e2795f999fb908e4e965548344851d7232a695",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [
+    {
+      "requested_repo": "JFan5/SafeVLA-Bench-release",
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P166",
+          "review_sha256": "451a976cf5977db4df95a74b26e2795f999fb908e4e965548344851d7232a695",
+          "proposal": {
+            "repo": "JFan5/SafeVLA-Bench-release",
+            "reason": "作者固定版leaderboard.html L157–165明確連結的評估release；本次取得404，作待取得入口。",
+            "source_role": "announced_evaluation_release",
+            "access_status": 404
+          }
+        }
+      ],
+      "selection_status": "explained_source_lead",
+      "candidate_scope": "Retained discovery lead, not a confirmed implementation for this paper.",
+      "disposition_type": "announced_repository_unavailable",
+      "disposition_note": "原作／作者頁明列的入口；保存於2026-10-11T00:49:01.733399+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+      "disposition_evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/JFan5/SafeVLA-Bench-release",
+          "retrieved_at": "2026-10-11T00:49:01.733399+00:00",
+          "status": 404,
+          "error": "Not Found"
+        }
+      ]
+    }
+  ],
+  "group": "docs",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P166",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "SafeVLA-Bench，arXiv 2606.00773v2（2026-09-30）。",
+    "scope_read": "STL庫、8scored families、適用性registry、58tasks/27entries及指標定義。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      34,
+      46
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "安全與約束評測",
+    "environment": "LIBERO＋RoboCasa365兩host，事後instrumentation保留原生觀測/動作/初態/success。",
+    "tasks": "58tasks＝LIBERO四10-task suites＋RoboCasa365 atomic-seen18tasks；8safety families歸scene/object/robot三group。",
+    "cases": "LIBERO每model-suite200episodes（10×20），RC每task50；24distinct policies、27policy-host entries不是27benchmarks。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 58,
+        "unit": "host task types",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "scored safety clause families",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 200,
+        "unit": "LIBERO每policy-suite episodes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "RC每policy-task episodes",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "native SR、Safety、Success-but-Unsafe、Violation Severity Index；VSI是spec-normalized worst violation depth。",
+      "有意義且signals可用才套STL，額外diagnostics不影響Safety；代理threshold不是物理安全認證。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "固定seeds配對；RC policies有兩個独立seed groups，跨組unpaired；不跨host直接排總榜。",
+    "lineage": "對既有LIBERO/RC trajectories加规则評分；不是新生成58個目標任務。",
+    "related_paper_ids": [
+      "P064",
+      "P071",
+      "P116"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          34
+        ],
+        "locator": "§3–4、表2/26",
+        "supports": "8/58、applicability、episode分母與VSI"
+      }
+    ],
+    "unresolved": [
+      "缺人類近距離、實際spill/thermal等signals；composite全程排除某clause可能漏掉部分phase。"
+    ],
+    "reuse": "本庫規則擴充應借其適用性registry與success/safety分離，而不是每task強乘所有評估方式。",
+    "reviewed_pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a",
+    "reviewed_on": "2026-10-02",
+    "name": "SafeVLA-Bench",
+    "year": 2026,
+    "title": "SafeVLA-Bench: A Benchmark for the Success-Safety Gap in Vision-Language-Action Models",
+    "source_url": "https://arxiv.org/abs/2606.00773",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P166",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P166",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            34,
+            46
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "58tasks＝LIBERO四10-task suites＋RoboCasa365 atomic-seen18tasks；8safety families歸scene/object/robot三group。",
+            "LIBERO＋RoboCasa365兩host，事後instrumentation保留原生觀測/動作/初態/success。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P166",
+      "name": "SafeVLA-Bench",
+      "expected_title": "SafeVLA-Bench: A Benchmark for the Success-Safety Gap in Vision-Language-Action Models",
+      "source_url": "https://arxiv.org/abs/2606.00773",
+      "pdf_url": "https://arxiv.org/pdf/2606.00773",
+      "retrieved_at": "2026-10-02T21:34:34.650959+00:00",
+      "pdf_sha256": "ecb59f541415c25bcb45263b2c7058d15a124829c8dab6d7b5eac681f36c1f4a",
+      "text_sha256": "a706c7eada22246383545dfeca5a3e6f9b922c4cabc5391526e75fe5abd92b77",
+      "pdf_bytes": 8412056,
+      "pages": 46,
+      "text_characters": 191458,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2606.00773v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2606.00773v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 58,
+        "unit": "host task types",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P166:1",
+        "paper_id": "P166",
+        "benchmark": "SafeVLA-Bench",
+        "native_term": "host task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.00773v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.00773v2",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "scored safety clause families",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P166:2",
+        "paper_id": "P166",
+        "benchmark": "SafeVLA-Bench",
+        "native_term": "scored safety clause families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.00773v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.00773v2",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 200,
+        "unit": "LIBERO每policy-suite episodes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P166:3",
+        "paper_id": "P166",
+        "benchmark": "SafeVLA-Bench",
+        "native_term": "LIBERO每policy-suite episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.00773v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.00773v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "RC每policy-task episodes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P166:4",
+        "paper_id": "P166",
+        "benchmark": "SafeVLA-Bench",
+        "native_term": "RC每policy-task episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2606.00773v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2606.00773v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "JFan5/safevla.org"
+  ],
+  "external_repositories": []
+}

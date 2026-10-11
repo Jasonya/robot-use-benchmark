@@ -1,0 +1,151 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RoboVerse｜GitHub怎么读与整理 · Robot-use Benchmark</title>
+  <meta name="description" content="RoboVerse官方repo已确认，但2026固定commit的MetaSim、trajectory reader与generalization level均有版本变化。已闭合maniskill.pick_cube config-port的初态→PositionShiftChecker→IL SuccessOnce聚合，另读Zarr产生／加载链。发现NaN可令整批checker成功、L2/L3与paper定义错位，以及trial尾批／normalizer切分问题。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P082.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P082.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P082.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="RoboVerse｜GitHub怎么读与整理 · Robot-use Benchmark"><meta property="og:description" content="RoboVerse官方repo已确认，但2026固定commit的MetaSim、trajectory reader与generalization level均有版本变化。已闭合maniskill.pick_cube config-port的初态→PositionShiftChecker→IL SuccessOnce聚合，另读Zarr产生／加载链。发现NaN可令整批checker成功、L2/L3与paper定义错位，以及trial尾批／normalizer切分问题。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P082.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"github/P082.html","title":"RoboVerse｜GitHub怎么读与整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hans.js?v=081237f01e25","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原作定义／设置","staticOnly":"本卡记录来源索引；任务环境规格的对齐和运行验证分别记录。","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"索引出处与对应细节","empty":"没有符合的索引条目","showing":"显示","records":"笔索引条目","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原作任务ID","native_task_class":"原作任务类别","native_task_registration":"原作任务注册","native_task_module":"原作任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务schema","generator_configuration":"生成器设置","integration_registration_group":"框架注册组","evaluation_protocol":"评测协定","video_task_schema":"视频／任务题型","human_sim_task_mapping":"人类／模拟任务对应","native_task_template":"任务模板","instructional_activity_definition":"人类活动定义","native_task_definition":"原作任务定义","information_task_schema":"信息题型定义"},"buckets":{"native_task_candidates":"原作robot任务条目（待对齐）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类活动／流程定义（视频来源）","information_task_definitions":"信息任务／问答题型定义"},"recordMeaning":"索引型态","meaningByBucket":{"native_task_candidates":"原作者列出的robot任务条目；在本库等待共同规格与来源对齐。","human_activity_definitions":"人类活动类别与流程来源，可对应多部视频；任务环境另建对应。","integration_or_protocol":"框架注册、协定或生成设置，可指向多个任务／样本；一条索引不等于一个环境。","video_pairing":"视频题型或人类／模拟任务对应；观测数据与物理环境规格分开。","documented_examples":"示范程序入口；可作定义与实作线索，尚不直接代表独立环境。","information_task_definitions":"原作的信息任务或问题类型；题目实数另外按question_id或case_id计数。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../coverage.html">覆盖与比较</a><a href="../native-tasks.html">任务清单</a><a href="../survey-union.html">来源名录</a><a href="../design.html">整体设计</a><a href="../collection-pipeline.html">数据流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核读</a><a href="../library.html">文献</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/github/P082.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="P082.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>P082 · RoboVerse</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P082 · RoboVerse</h1><p class="lede">RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇总表</a><span class="github-status core">内核内容已核读</span>
+      <span>benchmark／数据／评测主来源</span><a href="https://arxiv.org/abs/2504.18904" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p082">用途与原生规模依据</a>
+    </div>
+    <p class="github-scope">核读快照 2026-10-11。已读范围限所列片段；本轮未运行上游程序。</p>
+    <p class="github-summary">RoboVerse官方repo已确认，但2026固定commit的MetaSim、trajectory reader与generalization level均有版本变化。已闭合maniskill.pick_cube config-port的初态→PositionShiftChecker→IL SuccessOnce聚合，另读Zarr产生／加载链。发现NaN可令整批checker成功、L2/L3与paper定义错位，以及trial尾批／normalizer切分问题。</p>
+    <aside class="github-version"><b>版本与身份</b><p>固定RoboVerseOrg/RoboVerse@5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14（2026-09-08），对应paper 2504.18904v1（2025-04-26）的官方延续repo，而非paper原始实验pin。README如今把MetaSim与RoboVerse分成同tag发行的两套package；trajectory v2/v3、native/config ports与generalization protocol各自记版本。旧usage的RandomizationCfg不可直接作现行DRConfig schema；本轮只选读所列task／data／evaluator。</p><p>固定paper为Geng等人的RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning，arXiv:2504.18904v1（2025-04-26）。PDF指roboverseorg.github.io，README 134–141题名、作者与arXiv一致，确认RoboVerseOrg/RoboVerse为官方平台。本文不等于较早同名RoboVerse环境，也不把集成的RLBench、ManiSkill、LIBERO、ARNOLD等数据算成新独立来源。</p></aside>
+    <dl class="github-five-fields"><div><dt>领域</dt><dd>居家整理与清洁、衣物与洗护、装配与生产作业、通用对象与机动作业</dd></div><div><dt>环境</dt><dd>平台把task/robot/scene内容放roboverse_pack，模拟内核在packages/metasim/metasim。已读范例是Franka提起4cm红cube，ScenarioCfg与runtime backend共同决定物理／相机／控制时间；不能赋予全平台单一FPS。eval创建camera0的256×256 RGB/depth并依task选pose。此maniskill.pick_cube是跨simulator config port，该基类文件明分它与*_native/SAPIEN3 official-demo port；未独立验证任何跨引擎parity。</dd></div><div><dt>任务</dt><dd>pick_cube alias与maniskill.pick_cube共用一个task，目标cube比reset初态沿z移动&gt;=0.1m，最大250原生步；不要求抓持或放置。traj_filepath指roboverse_data/trajs/maniskill/pick_cube/v2/franka_v2.pkl.gz，下载helper在constructor被调用，本轮未运行。全平台registry条目、object variants、来源task、demo与benchmark trial必须分开；本轮未声称现行registry总数等于paper task数。</dd></div><div><dt>题数与数据</dt><dd>legacy v2内容为{robot_name:[{init_state,actions,states?},...]}，init/state是entity→pos/rot/dof_pos；actions支持dof_pos_target/dof_vel_target/dof_effort_target。v3转换只是把state分objects/robots、action包上robot名称；缺states仍可回初态+actions，但不能做state-anchored replay。现行get_traj按内容辨识、拒v1，遇roboverse.episode会要求load_episode另一API，不能只改扩展名。TensorState保存objects/robots/cameras；root/body state为[pos,quat,lin_vel,ang_vel]13维，joint数据与body_names需绑定，部分backend字段可None。另一路data2zarr读demo_NNNN/metadata.json及各camera.mp4（head_camera可退到rgb.mp4），用joint_qpos、joint_qpos_target或robot_root_state/robot_ee_state(_target)生成state/action；EE为robot-local xyz+wxyz+两指共9D，delta_ee另有相对quat。输出data/{camera,state,action}与meta/episode_ends，保留downsample/padding/action-space设置。RobotImageDataset从Zarr抽episode内sequence、相机值除255。未取得外部traj、MP4或Zarr，case数应依实际episode_ends／文件manifest，而非metadata要求处理的num_episodes。</dd></div><div><dt>评估方式</dt><dd>DefaultRunner.evaluate→get_task_class→ManiskillBaseTask→get_traj(v2→v3)→env.reset/checker.reset→BaseTaskEnv.step→handler.set_dof_targets/simulate/get_states→_terminated→PositionShiftChecker.check→util.get_pos。正常checker以reset差值z&gt;=0.1m且总位移&lt;=100m回bool，base reward仍为0，timeout另回。runner每个outer step运行joint action一次、EE action两次，仅读最后一次success；SuccessOnce是outer steps上的OR，SuccessEnd是末步，TimeOut只累积不停止个别env；全batch曾成功或max_step耗尽才退出。final_stats为SuccessOnce成功数/总完成数，并保存demo索引、DR level/mode/seed。选取demo靠task_id_range_low/high及max_demo，并没有自动套用paper90/10索引。现行DRManager确为L1 scene+material、L2加light、L3加camera，与paper／旧usage文件的L2 camera、L3 light/reflection不能同名比较。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作数字：保留论文的单位与页码</summary><p>下列为既有原文审阅摘录；GitHub快照和本库取得范围另见上文，不互相代替。</p><ul><li><strong>90</strong> navigation Matterport3D scenes · 原文页 8</li><li><strong>276</strong> 已迁移操作task categories · 原文页 7, 8</li><li><strong>510,500</strong> 操作trajectories · 原文510.5K · 原文页 8</li><li><strong>6</strong> 主IL实验代表tasks · 原文页 10</li></ul></details>
+    <h2 id="reading">依这个顺序读</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/README.md#L8-L13" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>身份、MetaSim新目录与多来源重用，不把整个平台清单当paper实验集。</p><small>L8–13 · L23–55 · L65–101 · L131–143</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 5ac2049d6c9744536608c70421957b52a6b7fea60f4dc676f861cbdc5acbac54</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md#L1-L12" target="_blank" rel="noopener noreferrer"><code>docs/source/dataset_benchmark/benchmark/overview.md</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>benchmark范围与randomization wrapper声明。</p><small>L1–12</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 07037596b4367cea54827c7a9c83fb926c26794fbbc97fbbcdafd83dbd6cf250</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md#L3-L55" target="_blank" rel="noopener noreferrer"><code>docs/source/dataset_benchmark/benchmark/usage.md</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>仍使用旧RandomizationCfg／L2相机、L3光照的文件版本。</p><small>L3–55</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 58aa5c2a191aa0824a0d76bc073bd6311d60e5a5bfcfe582e15e27c5aa8a6132</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py#L12-L37" target="_blank" rel="noopener noreferrer"><code>roboverse_pack/tasks/maniskill/pick_cube.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>具体4cm cube、Franka、v2轨迹、250步及z位移checker。</p><small>L12–37</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 addc671dd6b0ce0daeb5e887c6a58eeef6ca5b31a11d15e6343ac39d9c74d45c</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py#L12-L39" target="_blank" rel="noopener noreferrer"><code>roboverse_pack/tasks/maniskill/maniskill_base.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>config port与native port不同；初态reader、checker reset及terminated挂接。</p><small>L12–39 · L53–106</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 859a687050fce7319de0970b051fc36856da949bac9d27cf237cd7eae801f694</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py#L29-L87" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/types.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>action/state/camera数据结构、预设可空字段及camera wxyz惯例。</p><small>L29–87 · L133–198 · L237–273 · L336–347</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 c40fd8e1e165953869be581b2efa3ef66ea2ff6a0db8ca230710fdb3d9db8715</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py#L9-L43" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/utils/demo_util/loader.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>pickle/gzip/JSON/YAML实际读取，不运行其中内容。</p><small>L9–43</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 75d83777ef4d7f283d269b1c9826445454a3629fc25a91015e291a1e01ce52c8</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py#L17-L118" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/utils/demo_util/demo_util.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>依内容辨识v2、明拒v1与roboverse.episode的独立reader要求。</p><small>L17–118</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 01fed75d749ac76653dbd96e888c765c1a218f694f21b604d3961a949abdb295</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py#L15-L108" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/utils/demo_util/demo_util_v2.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>robot→demo[]、init_state/actions/states及flat entity namespace。</p><small>L15–108</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 ae2fd5c25d4bf002e7c2405a7a2a1ca5ba86adda1e95305b2eae345fd1bffbf1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py#L1-L67" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/utils/demo_util/demo_util_v3.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>v3只改in-memory state/action namespace，并非新磁盘trajectory格式。</p><small>L1–67</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 a6e80d2b1c806b36750e369caea4cc742f6846df2ed4b5f4a53f6ed7b9ee5299</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py#L21-L77" target="_blank" rel="noopener noreferrer"><code>roboverse_learn/il/data2zarr_dp.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>metadata+MP4→Zarr、joint/EE/delta模式及episode_ends。</p><small>L21–77 · L147–265 · L273–318 · L329–347</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 cf886b0a88c6d50d80710135444915871f8fc05bdfb043477d46818533f1dc0e</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py#L33-L174" target="_blank" rel="noopener noreferrer"><code>roboverse_learn/il/datasets/robot_image_dataset.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>真正Zarr reader、episode mask、normalizer范围、相机键与postprocess。</p><small>L33–174</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 097d71eae0088a3f513104f6177aaea3509c1a0946d7b300f54759958a1703f8</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py#L143-L171" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/task/base.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>action→handler→terminated/timeout的原生step contract。</p><small>L143–171 · L225–330</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 b986cf7eacd115cc3e229d263895252e54de3600401b26d21e349543aa760876</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py#L8-L40" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/example/example_pack/tasks/checkers/util.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>handler tensor root_state的前三维位置读取。</p><small>L8–40</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 fb823d4d98572a52b8e2866a425306e3a550cd877fc30895152690799b214005</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py#L189-L230" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>PositionShiftChecker真正门槛与NaN回传全True的例外路径。</p><small>L189–230</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 0de9a15a7a779ab4511adbce42bbccc119193370e765feb300447342a4256c60</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py#L1-L41" target="_blank" rel="noopener noreferrer"><code>packages/metasim/metasim/randomization/dr_manager.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>现行L1环境/材质、L2光照、L3相机的具体dispatch。</p><small>L1–41 · L78–90 · L155–203 · L432–474 · L510–516</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 ad7fa8615e8b1bffa5243a6d7a9a18471bede770102cbe2aa72d982107dd4408</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/utils/eval_args.py#L9-L49" target="_blank" rel="noopener noreferrer"><code>roboverse_learn/il/utils/eval_args.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>eval的demo范围、250决策及level/seed预设。</p><small>L9–49</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 0afa045ac1ec63fc9a504268a50f342b40285380e452e40bf6c51ae5e080faed</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py#L18-L30" target="_blank" rel="noopener noreferrer"><code>roboverse_learn/il/runners/default_runner.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>真正评测的init-state selection、DR、SuccessOnce/End与分母。</p><small>L18–30 · L280–309 · L346–546</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 fa38c0433bc3c4825a7cc284b8410b55c3ff4441060b81d81e25e3a60cb19e35</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py#L17-L45" target="_blank" rel="noopener noreferrer"><code>roboverse_learn/il/runners/default_eval_runner.py</code> ↗</a><span>GitHub · RoboVerseOrg/RoboVerse · 5f3ec0185d</span></div>
+      <p>checkpoint/EMA、obs/action chunk配置与policy输出。</p><small>L17–45 · L71–95</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 794489fb70b682f7269408a7799445e2429234fbf02076f1ded922caf9495044</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎么接入我们的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>官方native task ID／aliases、ScenarioCfg、typed state/action、v2 parser和v3转换、metadata→Zarr链、具体checker及SuccessOnce/End结果。</p></section><section><h3>需要转换</h3><p>source保留paper v1与2026 code snapshot；task标config_port或native_port并连回ManiSkill等上游。case保存robot、task、原demo index、asset/初态hash、backend、控制步长及DR实际factor，不只存level数字。明分v2磁盘trajectory、v3内存state、roboverse.episode与IL Zarr四种界面；保留joint名称／单位、wxyz、camera座标及EE local/delta语义。</p></section><section><h3>仍需补齐</h3><p>PositionShiftChecker 219–221只要cur_pos任何元素NaN就回整批True，沿此task链会被SuccessOnce计成功，需先修补并标版本。尾批demo_end_idx只截到num_demos、不截到要求的low+max_demos，SuccessOnce分母固定num_envs，需核对超额或不满批处理。RobotImageDataset normalizer.fit吃全buffer而非train mask；get_validation_dataset取downsample后train_mask的补集，可能把未选训练episodes纳入val，需固定真正paper split。尚缺2025实验commit/资产/90-10 case清单及旧L2/L3到现行factor对照；v1数据已明示不支持。</p></section></div>
+    <details class="github-discovery"><summary>查看来源确认纪录</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P082-discovery.json&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/code_contexts/0&quot;
+    ],
+    &quot;paper_version&quot;: &quot;2504.18904v1&quot;,
+    &quot;pdf_sha256&quot;: &quot;8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008&quot;,
+    &quot;sha256&quot;: &quot;cf8568095ab448f4c038895712c1b8685d2f6e8c07b12d3b0ee4476e1b6f3ca6&quot;,
+    &quot;text_excerpts&quot;: [
+      {
+        &quot;json_pointer&quot;: &quot;/opening_text&quot;,
+        &quot;character_range&quot;: [
+          1089,
+          1127
+        ],
+        &quot;text&quot;: &quot;arXiv:2504.18904v1 [cs.RO] 26 Apr 2025&quot;,
+        &quot;scope&quot;: &quot;僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。&quot;
+      }
+    ]
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P082/pages.json&quot;,
+    &quot;sha256&quot;: &quot;b3e3fc910e8f1468742bb70b061eb6ef6137dffa60fa222693bf06ec22266d82&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/8/text&quot;
+    ],
+    &quot;finding&quot;: &quot;paper Fig.9／V-B：90/10 task-space split；L1環境、L2相機、L3光照與反射。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同结构与格式说明 →</a><a href="../../downloads/github-review/papers/P082.json" download>本篇JSON与证据 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇阅读"><a href="P081.html">← 上一篇 · ARNOLD</a><a href="P083.html">下一篇 → · RoboDojo</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理与逐篇报告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hans.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆盖总览与前作比较</a><a href="../design.html">目前主设计</a><a href="../research.html">文献与分类</a><a href="../counting.html">计数细节与旧代号</a><a href="../../downloads/source-review/source-review-zh-hans.pdf">用途归纳PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">历史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初筛、183份关键章节审阅、672笔原生数量摘录；183/183份来源完成21类用途归纳；4类判分分项保留。GitHub核读增补：250/250篇有处理结果，范围与程序运行分开。旧配额已撤回，全库任务与环境去重仍待完成。 <a href="../github-review.html">逐篇GitHub与标准化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

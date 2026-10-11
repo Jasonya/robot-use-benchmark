@@ -1,0 +1,523 @@
+{
+  "paper_id": "P064",
+  "name": "LIBERO",
+  "title": "LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2306.03310",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P064",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "LIBERO最清楚的入口是benchmark註冊表：每個Task把語言、BDDL、init-state檔與示範路徑連起來。成功判定要沿wrapper找到實際problem子類；base class的False是佔位。",
+    "environment": "problem類型、MuJoCo場景與物件資產由BDDL和wrapper連接；suite或task數不能直接當layout數。",
+    "tasks": "Task含name/language/problem/problem_folder/bddl_file/init_states_file。原作100-task集合拆成90/10；程式有五個suite清單但不可重算同一組任務。",
+    "data": "HDF5示範含多視角RGB/可選depth、proprioception、action/state/reward/done；另存模型XML和初態。評測需固定.pruned_init等來源。",
+    "evaluation": "具體problem子類以parsed goal predicates合取檢查成功；evaluation腳本固定步數和checkpoint，保存loss與success_rate兩種不同指標。",
+    "standardization": {
+      "profile": "structured_goals_and_robot_episodes",
+      "reuse": "Task註冊、BDDL及init states、HDF5示範和具體problem evaluator。",
+      "transform": "保持task、scene/assets、initial state、case protocol分離；將原生goal program與predicate實作一起引用，HDF5映到typed episode資料。",
+      "missing": "跨來源等價判定、素材閉合、controller/相機一致性與本庫case驗證。"
+    },
+    "version_note": "不能只讀bddl_base_domain._check_success就斷言沒有判分器；必須追TASK_MAPPING到實際problem子類。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Lifelong-Robot-Learning/LIBERO",
+        "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+        "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            15,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 184,
+        "sha256": "e87d5b284da3d7c127e1bc8282ea80b5da02aad3e9272c13adc96c4eca0eaa41",
+        "url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/README.md",
+        "reading_url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/README.md#L15-L55",
+        "why": "核對130任務、suite劃分與原始用途。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Lifelong-Robot-Learning/LIBERO",
+        "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+        "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+        "ref": null,
+        "path": "libero/libero/benchmark/__init__.py",
+        "ranges": [
+          [
+            35,
+            77
+          ],
+          [
+            108,
+            160
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 219,
+        "sha256": "4ce6edbb00b3280692f2e2b2e8a14bf6e2d5878965b0484a386c0355a867ecc5",
+        "url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/benchmark/__init__.py",
+        "reading_url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/benchmark/__init__.py#L35-L77",
+        "why": "找Task欄位、BDDL、示範和初態引用；90/10不重複加成。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Lifelong-Robot-Learning/LIBERO",
+        "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+        "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+        "ref": null,
+        "path": "libero/libero/envs/env_wrapper.py",
+        "ranges": [
+          [
+            25,
+            104
+          ],
+          [
+            118,
+            145
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 278,
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0",
+        "url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/env_wrapper.py",
+        "reading_url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/env_wrapper.py#L25-L104",
+        "why": "看控制/相機約定、TASK_MAPPING和初態恢復。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Lifelong-Robot-Learning/LIBERO",
+        "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+        "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+        "ref": null,
+        "path": "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+        "ranges": [
+          [
+            135,
+            143
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 212,
+        "sha256": "0defb17c0bbab8f6bd34c021ac15598ea101fe1e48690cb440d4ef92762880fe",
+        "url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+        "reading_url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/libero/envs/problems/libero_tabletop_manipulation.py#L135-L143",
+        "why": "以具體problem確認goal_state經predicate逐一判定。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Lifelong-Robot-Learning/LIBERO",
+        "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+        "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+        "ref": null,
+        "path": "scripts/create_dataset.py",
+        "ranges": [
+          [
+            20,
+            60
+          ],
+          [
+            238,
+            278
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 282,
+        "sha256": "6ff09687a6ca8cb5df16b828cce2326467099da2b4dd6e5af557644d3e60f37f",
+        "url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/scripts/create_dataset.py",
+        "reading_url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/scripts/create_dataset.py#L20-L60",
+        "why": "核對HDF5的感測、actions、states、rewards、dones和init_state。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Lifelong-Robot-Learning/LIBERO",
+        "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+        "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+        "ref": null,
+        "path": "libero/lifelong/evaluate.py",
+        "ranges": [
+          [
+            72,
+            114
+          ],
+          [
+            261,
+            301
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 305,
+        "sha256": "84dea8f168406884e460acd5df9d2dcab5802e297b9a7b4333a5c17fcb24b50f",
+        "url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/lifelong/evaluate.py",
+        "reading_url": "https://github.com/Lifelong-Robot-Learning/LIBERO/blob/8f1084e3132a39270c3a13ebe37270a43ece2a01/libero/lifelong/evaluate.py#L72-L114",
+        "why": "固定task/checkpoint/seed，區分行為模仿loss與rollout success。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7650256a79f4b401becd3e1e6c7d6d9713b53ad2f28d47cea289815ce63a8053"
+  },
+  "repository_binding_review_sha256": "7650256a79f4b401becd3e1e6c7d6d9713b53ad2f28d47cea289815ce63a8053",
+  "repository_bindings": [
+    {
+      "requested_repo": "Lifelong-Robot-Learning/LIBERO",
+      "resolved_repo": "Lifelong-Robot-Learning/LIBERO",
+      "aliases_in_this_review": [
+        "lifelong-robot-learning/libero"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+          "reviewed_files": [
+            "README.md",
+            "libero/libero/benchmark/__init__.py",
+            "libero/libero/envs/env_wrapper.py",
+            "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+            "libero/lifelong/evaluate.py",
+            "scripts/create_dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "previous_inventory",
+          "repo": "Lifelong-Robot-Learning/LIBERO",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "Lifelong-Robot-Learning/LIBERO",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P064",
+          "review_file": "content/github_review/reviews/P064.json",
+          "review_sha256": "7650256a79f4b401becd3e1e6c7d6d9713b53ad2f28d47cea289815ce63a8053",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P064",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LIBERO，arXiv 2306.03310v2。",
+    "scope_read": "任務生成、PDDL goals、4 suites、lifelong指標及pretraining切分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9,
+      10
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "Robosuite場景配置；layout／objects由PDDL定義，本文已讀段落未報去重layout總數。",
+    "tasks": "130＝Spatial10＋Object10＋Goal10＋LIBERO100；LIBERO100內90短程預訓練＋10長程。LIBERO-Long不是再額外增加10。",
+    "cases": "各task有human demos与隨機初態評估；可生成不代表固定無限題庫已发布。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 130,
+        "unit": "task definitions",
+        "pages": [
+          1,
+          2,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "task suites",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "LIBERO100內pretraining tasks",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "LIBERO100內long tasks",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "全部goal predicates為真才成功；以success計forward transfer、negative backward transfer、AUC。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "lifelong順序學task，過往資料限制；90→Long10预训练與Spatial/Object/Goal控制變因是不同協定。",
+    "lineage": "明確由Ego4D語言behavior templates生成task instructions，實作建於Robosuite；已是人類程序到robot benchmark的先例。",
+    "related_paper_ids": [
+      "P013",
+      "P069",
+      "P105",
+      "P165"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5
+        ],
+        "locator": "§4.1–4.2、圖2",
+        "supports": "Ego4D→PDDL→130及suite包含關係"
+      },
+      {
+        "pages": [
+          6
+        ],
+        "locator": "Metrics",
+        "supports": "success/FWT/NBT/AUC"
+      }
+    ],
+    "unresolved": [
+      "各發布demo／init-state精確ID數需對照版本，不從別篇約5K反推。"
+    ],
+    "reuse": "與本研究來源聯集主線高度相關；新貢獻需超過同類模板生成與桌面範圍。",
+    "reviewed_pdf_sha256": "ff7d943e2eb37760df684f3ae2931a5a35ef8ea465bd387e62afe49507b8e414",
+    "reviewed_on": "2026-10-02",
+    "name": "LIBERO",
+    "year": 2023,
+    "title": "LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning",
+    "source_url": "https://arxiv.org/abs/2306.03310",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P064",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P064",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            9,
+            10
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "130＝Spatial10＋Object10＋Goal10＋LIBERO100；LIBERO100內90短程預訓練＋10長程。LIBERO-Long不是再額外增加10。",
+            "Robosuite場景配置；layout／objects由PDDL定義，本文已讀段落未報去重layout總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "ff7d943e2eb37760df684f3ae2931a5a35ef8ea465bd387e62afe49507b8e414"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "ff7d943e2eb37760df684f3ae2931a5a35ef8ea465bd387e62afe49507b8e414",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P064",
+      "name": "LIBERO",
+      "expected_title": "LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning",
+      "source_url": "https://arxiv.org/abs/2306.03310",
+      "pdf_url": "https://arxiv.org/pdf/2306.03310",
+      "retrieved_at": "2026-10-02T21:33:45.389804+00:00",
+      "pdf_sha256": "ff7d943e2eb37760df684f3ae2931a5a35ef8ea465bd387e62afe49507b8e414",
+      "text_sha256": "4c2c2dae0d27793e513c5602961fb902e10296b03a7b3e49a6d5f71f23fdd938",
+      "pdf_bytes": 37420885,
+      "pages": 44,
+      "text_characters": 105107,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2306.03310v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2306.03310v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 130,
+        "unit": "task definitions",
+        "pages": [
+          1,
+          2,
+          5
+        ],
+        "record_id": "review10:P064:1",
+        "paper_id": "P064",
+        "benchmark": "LIBERO",
+        "native_term": "task definitions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.03310v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.03310v2",
+            "locator": "PDF pp. 1, 2, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "task suites",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P064:2",
+        "paper_id": "P064",
+        "benchmark": "LIBERO",
+        "native_term": "task suites",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.03310v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.03310v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 90,
+        "unit": "LIBERO100內pretraining tasks",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P064:3",
+        "paper_id": "P064",
+        "benchmark": "LIBERO",
+        "native_term": "LIBERO100內pretraining tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.03310v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.03310v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "LIBERO100內long tasks",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P064:4",
+        "paper_id": "P064",
+        "benchmark": "LIBERO",
+        "native_term": "LIBERO100內long tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.03310v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.03310v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Lifelong-Robot-Learning/LIBERO"
+  ],
+  "external_repositories": []
+}

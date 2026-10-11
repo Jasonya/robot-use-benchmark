@@ -1,0 +1,1012 @@
+{
+  "paper_id": "P082",
+  "name": "RoboVerse",
+  "title": "RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2504.18904",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "garment",
+    "industry",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P082",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "RoboVerse官方repo已確認，但2026固定commit的MetaSim、trajectory reader與generalization level均有版本變化。已閉合maniskill.pick_cube config-port的初態→PositionShiftChecker→IL SuccessOnce聚合，另讀Zarr產生／載入鏈。發現NaN可令整批checker成功、L2/L3與paper定義錯位，以及trial尾批／normalizer切分問題。",
+    "identity_note": "固定paper為Geng等人的RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning，arXiv:2504.18904v1（2025-04-26）。PDF指roboverseorg.github.io，README 134–141題名、作者與arXiv一致，確認RoboVerseOrg/RoboVerse為官方平臺。本文不等於較早同名RoboVerse環境，也不把整合的RLBench、ManiSkill、LIBERO、ARNOLD等資料算成新獨立來源。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P082-discovery.json",
+        "selected_json_pointers": [
+          "/title",
+          "/paper_url",
+          "/pdf_sha256",
+          "/code_contexts/0"
+        ],
+        "paper_version": "2504.18904v1",
+        "pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008",
+        "sha256": "cf8568095ab448f4c038895712c1b8685d2f6e8c07b12d3b0ee4476e1b6f3ca6",
+        "text_excerpts": [
+          {
+            "json_pointer": "/opening_text",
+            "character_range": [
+              1089,
+              1127
+            ],
+            "text": "arXiv:2504.18904v1 [cs.RO] 26 Apr 2025",
+            "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+          }
+        ]
+      },
+      {
+        "local_file": "audit/.cache/fulltext_review/P082/pages.json",
+        "sha256": "b3e3fc910e8f1468742bb70b061eb6ef6137dffa60fa222693bf06ec22266d82",
+        "selected_json_pointers": [
+          "/8/text"
+        ],
+        "finding": "paper Fig.9／V-B：90/10 task-space split；L1環境、L2相機、L3光照與反射。"
+      }
+    ],
+    "environment": "平臺把task/robot/scene內容放roboverse_pack，模擬核心在packages/metasim/metasim。已讀範例是Franka提起4cm紅cube，ScenarioCfg與runtime backend共同決定物理／相機／控制時間；不能賦予全平臺單一FPS。eval建立camera0的256×256 RGB/depth並依task選pose。此maniskill.pick_cube是跨simulator config port，該基類文件明分它與*_native/SAPIEN3 official-demo port；未獨立驗證任何跨引擎parity。",
+    "tasks": "pick_cube alias與maniskill.pick_cube共用一個task，目標cube比reset初態沿z移動>=0.1m，最大250原生步；不要求抓持或放置。traj_filepath指roboverse_data/trajs/maniskill/pick_cube/v2/franka_v2.pkl.gz，下載helper在constructor被呼叫，本輪未執行。全平臺registry條目、object variants、來源task、demo與benchmark trial必須分開；本輪未聲稱現行registry總數等於paper task數。",
+    "data": "legacy v2內容為{robot_name:[{init_state,actions,states?},...]}，init/state是entity→pos/rot/dof_pos；actions支援dof_pos_target/dof_vel_target/dof_effort_target。v3轉換只是把state分objects/robots、action包上robot名稱；缺states仍可回初態+actions，但不能做state-anchored replay。現行get_traj按內容辨識、拒v1，遇roboverse.episode會要求load_episode另一API，不能只改副檔名。TensorState保存objects/robots/cameras；root/body state為[pos,quat,lin_vel,ang_vel]13維，joint資料與body_names需綁定，部分backend欄位可None。另一路data2zarr讀demo_NNNN/metadata.json及各camera.mp4（head_camera可退到rgb.mp4），用joint_qpos、joint_qpos_target或robot_root_state/robot_ee_state(_target)生成state/action；EE為robot-local xyz+wxyz+兩指共9D，delta_ee另有相對quat。輸出data/{camera,state,action}與meta/episode_ends，保留downsample/padding/action-space設定。RobotImageDataset從Zarr抽episode內sequence、相機值除255。未取得外部traj、MP4或Zarr，case數應依實際episode_ends／檔案manifest，而非metadata要求處理的num_episodes。",
+    "evaluation": "DefaultRunner.evaluate→get_task_class→ManiskillBaseTask→get_traj(v2→v3)→env.reset/checker.reset→BaseTaskEnv.step→handler.set_dof_targets/simulate/get_states→_terminated→PositionShiftChecker.check→util.get_pos。正常checker以reset差值z>=0.1m且總位移<=100m回bool，base reward仍為0，timeout另回。runner每個outer step執行joint action一次、EE action兩次，僅讀最後一次success；SuccessOnce是outer steps上的OR，SuccessEnd是末步，TimeOut只累積不停止個別env；全batch曾成功或max_step耗盡才退出。final_stats為SuccessOnce成功數/總完成數，並保存demo索引、DR level/mode/seed。選取demo靠task_id_range_low/high及max_demo，並沒有自動套用paper90/10索引。現行DRManager確為L1 scene+material、L2加light、L3加camera，與paper／舊usage文件的L2 camera、L3 light/reflection不能同名比較。",
+    "standardization": {
+      "profile": "versioned_multi_backend_task_and_trajectory_adapter",
+      "reuse": "官方native task ID／aliases、ScenarioCfg、typed state/action、v2 parser和v3轉換、metadata→Zarr鏈、具體checker及SuccessOnce/End結果。",
+      "transform": "source保留paper v1與2026 code snapshot；task標config_port或native_port並連回ManiSkill等上游。case保存robot、task、原demo index、asset/初態hash、backend、控制步長及DR實際factor，不只存level數字。明分v2磁碟trajectory、v3記憶體state、roboverse.episode與IL Zarr四種接口；保留joint名稱／單位、wxyz、camera座標及EE local/delta語義。",
+      "missing": "PositionShiftChecker 219–221只要cur_pos任何元素NaN就回整批True，沿此task鏈會被SuccessOnce計成功，需先修補並標版本。尾批demo_end_idx只截到num_demos、不截到要求的low+max_demos，SuccessOnce分母固定num_envs，需核對超額或不滿批處理。RobotImageDataset normalizer.fit吃全buffer而非train mask；get_validation_dataset取downsample後train_mask的補集，可能把未選訓練episodes納入val，需固定真正paper split。尚缺2025實驗commit/資產/90-10 case清單及舊L2/L3到現行factor對照；v1資料已明示不支援。"
+    },
+    "version_note": "固定RoboVerseOrg/RoboVerse@5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14（2026-09-08），對應paper 2504.18904v1（2025-04-26）的官方延續repo，而非paper原始實驗pin。README如今把MetaSim與RoboVerse分成同tag發行的兩套package；trajectory v2/v3、native/config ports與generalization protocol各自記版本。舊usage的RandomizationCfg不可直接作現行DRConfig schema；本輪只選讀所列task／data／evaluator。",
+    "runtime_executed": false,
+    "reviewed_on": "2026-10-11",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            8,
+            13
+          ],
+          [
+            23,
+            55
+          ],
+          [
+            65,
+            101
+          ],
+          [
+            131,
+            143
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 143,
+        "sha256": "5ac2049d6c9744536608c70421957b52a6b7fea60f4dc676f861cbdc5acbac54",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/README.md",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/README.md#L8-L13",
+        "why": "身份、MetaSim新目錄與多來源重用，不把整個平臺清單當paper實驗集。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "docs/source/dataset_benchmark/benchmark/overview.md",
+        "ranges": [
+          [
+            1,
+            12
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 12,
+        "sha256": "07037596b4367cea54827c7a9c83fb926c26794fbbc97fbbcdafd83dbd6cf250",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/overview.md#L1-L12",
+        "why": "benchmark範圍與randomization wrapper宣告。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "docs/source/dataset_benchmark/benchmark/usage.md",
+        "ranges": [
+          [
+            3,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 58,
+        "sha256": "58aa5c2a191aa0824a0d76bc073bd6311d60e5a5bfcfe582e15e27c5aa8a6132",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/docs/source/dataset_benchmark/benchmark/usage.md#L3-L55",
+        "why": "仍使用舊RandomizationCfg／L2相機、L3光照的文件版本。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_pack/tasks/maniskill/pick_cube.py",
+        "ranges": [
+          [
+            12,
+            37
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 37,
+        "sha256": "addc671dd6b0ce0daeb5e887c6a58eeef6ca5b31a11d15e6343ac39d9c74d45c",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/pick_cube.py#L12-L37",
+        "why": "具體4cm cube、Franka、v2軌跡、250步及z位移checker。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_pack/tasks/maniskill/maniskill_base.py",
+        "ranges": [
+          [
+            12,
+            39
+          ],
+          [
+            53,
+            106
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 106,
+        "sha256": "859a687050fce7319de0970b051fc36856da949bac9d27cf237cd7eae801f694",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_pack/tasks/maniskill/maniskill_base.py#L12-L39",
+        "why": "config port與native port不同；初態reader、checker reset及terminated掛接。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/types.py",
+        "ranges": [
+          [
+            29,
+            87
+          ],
+          [
+            133,
+            198
+          ],
+          [
+            237,
+            273
+          ],
+          [
+            336,
+            347
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 426,
+        "sha256": "c40fd8e1e165953869be581b2efa3ef66ea2ff6a0db8ca230710fdb3d9db8715",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/types.py#L29-L87",
+        "why": "action/state/camera資料結構、缺省可空欄位及camera wxyz慣例。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/utils/demo_util/loader.py",
+        "ranges": [
+          [
+            9,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 66,
+        "sha256": "75d83777ef4d7f283d269b1c9826445454a3629fc25a91015e291a1e01ce52c8",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/loader.py#L9-L43",
+        "why": "pickle/gzip/JSON/YAML實際讀取，不執行其中內容。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/utils/demo_util/demo_util.py",
+        "ranges": [
+          [
+            17,
+            118
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 217,
+        "sha256": "01fed75d749ac76653dbd96e888c765c1a218f694f21b604d3961a949abdb295",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util.py#L17-L118",
+        "why": "依內容辨識v2、明拒v1與roboverse.episode的獨立reader要求。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+        "ranges": [
+          [
+            15,
+            108
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 108,
+        "sha256": "ae2fd5c25d4bf002e7c2405a7a2a1ca5ba86adda1e95305b2eae345fd1bffbf1",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v2.py#L15-L108",
+        "why": "robot→demo[]、init_state/actions/states及flat entity namespace。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+        "ranges": [
+          [
+            1,
+            67
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 67,
+        "sha256": "a6e80d2b1c806b36750e369caea4cc742f6846df2ed4b5f4a53f6ed7b9ee5299",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/utils/demo_util/demo_util_v3.py#L1-L67",
+        "why": "v3只改in-memory state/action namespace，並非新磁碟trajectory格式。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_learn/il/data2zarr_dp.py",
+        "ranges": [
+          [
+            21,
+            77
+          ],
+          [
+            147,
+            265
+          ],
+          [
+            273,
+            318
+          ],
+          [
+            329,
+            347
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 353,
+        "sha256": "cf886b0a88c6d50d80710135444915871f8fc05bdfb043477d46818533f1dc0e",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/data2zarr_dp.py#L21-L77",
+        "why": "metadata+MP4→Zarr、joint/EE/delta模式及episode_ends。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_learn/il/datasets/robot_image_dataset.py",
+        "ranges": [
+          [
+            33,
+            174
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 212,
+        "sha256": "097d71eae0088a3f513104f6177aaea3509c1a0946d7b300f54759958a1703f8",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/datasets/robot_image_dataset.py#L33-L174",
+        "why": "真正Zarr reader、episode mask、normalizer範圍、相機鍵與postprocess。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/task/base.py",
+        "ranges": [
+          [
+            143,
+            171
+          ],
+          [
+            225,
+            330
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 352,
+        "sha256": "b986cf7eacd115cc3e229d263895252e54de3600401b26d21e349543aa760876",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/task/base.py#L143-L171",
+        "why": "action→handler→terminated/timeout的原生step contract。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+        "ranges": [
+          [
+            8,
+            40
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 83,
+        "sha256": "fb823d4d98572a52b8e2866a425306e3a550cd877fc30895152690799b214005",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/util.py#L8-L40",
+        "why": "handler tensor root_state的前三維位置讀取。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+        "ranges": [
+          [
+            189,
+            230
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 230,
+        "sha256": "0de9a15a7a779ab4511adbce42bbccc119193370e765feb300447342a4256c60",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py#L189-L230",
+        "why": "PositionShiftChecker真正門檻與NaN回傳全True的例外路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "packages/metasim/metasim/randomization/dr_manager.py",
+        "ranges": [
+          [
+            1,
+            41
+          ],
+          [
+            78,
+            90
+          ],
+          [
+            155,
+            203
+          ],
+          [
+            432,
+            474
+          ],
+          [
+            510,
+            516
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 605,
+        "sha256": "ad7fa8615e8b1bffa5243a6d7a9a18471bede770102cbe2aa72d982107dd4408",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/packages/metasim/metasim/randomization/dr_manager.py#L1-L41",
+        "why": "現行L1環境/材質、L2光照、L3相機的具體dispatch。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_learn/il/utils/eval_args.py",
+        "ranges": [
+          [
+            9,
+            49
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 49,
+        "sha256": "0afa045ac1ec63fc9a504268a50f342b40285380e452e40bf6c51ae5e080faed",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/utils/eval_args.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/utils/eval_args.py#L9-L49",
+        "why": "eval的demo範圍、250決策及level/seed預設。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_learn/il/runners/default_runner.py",
+        "ranges": [
+          [
+            18,
+            30
+          ],
+          [
+            280,
+            309
+          ],
+          [
+            346,
+            546
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 637,
+        "sha256": "fa38c0433bc3c4825a7cc284b8410b55c3ff4441060b81d81e25e3a60cb19e35",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_runner.py#L18-L30",
+        "why": "真正評測的init-state selection、DR、SuccessOnce/End與分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "RoboVerseOrg/RoboVerse",
+        "requested_repo": "RoboVerseOrg/RoboVerse",
+        "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+        "ref": null,
+        "path": "roboverse_learn/il/runners/default_eval_runner.py",
+        "ranges": [
+          [
+            17,
+            45
+          ],
+          [
+            71,
+            95
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 95,
+        "sha256": "794489fb70b682f7269408a7799445e2429234fbf02076f1ded922caf9495044",
+        "url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py",
+        "reading_url": "https://github.com/RoboVerseOrg/RoboVerse/blob/5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14/roboverse_learn/il/runners/default_eval_runner.py#L17-L45",
+        "why": "checkpoint/EMA、obs/action chunk配置與policy輸出。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "93a425c2e8c5e4ce145571cc39ffb2c1706284429f412eb6edcdbf371e9bb074"
+  },
+  "repository_binding_review_sha256": "93a425c2e8c5e4ce145571cc39ffb2c1706284429f412eb6edcdbf371e9bb074",
+  "repository_bindings": [
+    {
+      "requested_repo": "RoboVerseOrg/RoboVerse",
+      "resolved_repo": "RoboVerseOrg/RoboVerse",
+      "aliases_in_this_review": [
+        "roboverseorg/roboverse"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14",
+          "reviewed_files": [
+            "README.md",
+            "docs/source/dataset_benchmark/benchmark/overview.md",
+            "docs/source/dataset_benchmark/benchmark/usage.md",
+            "packages/metasim/metasim/example/example_pack/tasks/checkers/checkers.py",
+            "packages/metasim/metasim/example/example_pack/tasks/checkers/util.py",
+            "packages/metasim/metasim/randomization/dr_manager.py",
+            "packages/metasim/metasim/task/base.py",
+            "packages/metasim/metasim/types.py",
+            "packages/metasim/metasim/utils/demo_util/demo_util.py",
+            "packages/metasim/metasim/utils/demo_util/demo_util_v2.py",
+            "packages/metasim/metasim/utils/demo_util/demo_util_v3.py",
+            "packages/metasim/metasim/utils/demo_util/loader.py",
+            "roboverse_learn/il/data2zarr_dp.py",
+            "roboverse_learn/il/datasets/robot_image_dataset.py",
+            "roboverse_learn/il/runners/default_eval_runner.py",
+            "roboverse_learn/il/runners/default_runner.py",
+            "roboverse_learn/il/utils/eval_args.py",
+            "roboverse_pack/tasks/maniskill/maniskill_base.py",
+            "roboverse_pack/tasks/maniskill/pick_cube.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/RoboVerseOrg/RoboVerse",
+          "link_label": "Code",
+          "project_url": "https://roboverseorg.github.io/",
+          "page_sha256": "5870c46aaa6685984e6fcfab3d4368db0b0a4ca0e894af094c8b39b1aab1f27e"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboVerseOrg/RoboVerse",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/scale_first/source_catalogue.json",
+          "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+        },
+        {
+          "kind": "previous_inventory",
+          "repo": "RoboVerseOrg/RoboVerse",
+          "basis": "previous_pinned_inventory",
+          "record_file": "content/survey_union/source_summaries.json",
+          "commit": "5f3ec0185d2d3bcb59d53b0bd1f5b0f8a6f2ce14"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P082",
+          "review_file": "content/github_review/reviews/P082.json",
+          "review_sha256": "93a425c2e8c5e4ce145571cc39ffb2c1706284429f412eb6edcdbf371e9bb074",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "衣物與洗護",
+    "裝配與生產作業",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P082",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboVerse，arXiv 2504.18904v1。",
+    "scope_read": "MetaSim架構、來源遷移全表、操作/導航/人形資料、4級泛化與實驗子集。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      34
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "衣物與洗護",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "role": "跨資料集整合與評测方法",
+    "environment": "操作多底座遷移；導航重用90個Matterport3D scenes；59camera候選不是59環境。",
+    "tasks": "表I遷移276 manipulation task categories，另導航／人形。RLBench取80、CALVIN7、LIBERO10等為其遷移子集，不是全源benchmark相加。",
+    "cases": "510.5K manipulation trajectories、約5.5K assets；navigation另R2R10K、RxR20K episodes。主要IL表只評6個代表task。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "navigation Matterport3D scenes",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 276,
+        "unit": "已遷移操作task categories",
+        "pages": [
+          7,
+          8
+        ]
+      },
+      {
+        "field": "data",
+        "value": 510500,
+        "unit": "操作trajectories",
+        "qualifier": "原文510.5K",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "主IL實驗代表tasks",
+        "pages": [
+          10
+        ]
+      }
+    ],
+    "evaluation": [
+      "統一success checker／success rate；L0 task-space、L1場景、L2camera、L3光照反射。",
+      "不同simulator的migration成功不保證完全等價物理；需固定backend。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "原作90/10；主IL取10train設定＋10validation設定，3seeds；OpenVLA另限制20test scenarios。",
+    "lineage": "直接整合ManiSkill、RLBench、CALVIN、MetaWorld、Robosuite/MimicGen、GAPartNet、Open6DOR、ARNOLD、LIBERO、SIMPLER、RLAfford、GraspNet、GarmentLab、UniDoorManip、GAPartManip；導航R2R/RxR、人形HumanoidBench等。",
+    "related_paper_ids": [
+      "P062",
+      "P063",
+      "P064",
+      "P065",
+      "P066",
+      "P067",
+      "P068",
+      "P069",
+      "P081",
+      "P087",
+      "P094",
+      "P095",
+      "P104"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8
+        ],
+        "locator": "Migration與表I",
+        "supports": "276/510.5K及來源子集"
+      },
+      {
+        "pages": [
+          9,
+          10
+        ],
+        "locator": "Benchmark protocol、表II–IV",
+        "supports": "4級泛化與6task實驗"
+      }
+    ],
+    "unresolved": [
+      "276類是否存在跨源語義等價未在本文提供完整去重證據；需追MetaConfig IDs。"
+    ],
+    "reuse": "本研究最重要的整合型比較對象之一；『把前作放一起』已有實作，新增貢獻要在coverage、規則、來源聯集與評估完整度。",
+    "reviewed_pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboVerse",
+    "year": 2025,
+    "title": "RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning",
+    "source_url": "https://arxiv.org/abs/2504.18904",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "garment",
+      "industry",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活",
+      "衣物與柔性物操作",
+      "室內導航",
+      "戶外移動",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "衣物與洗護",
+      "裝配與生產作業",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P082",
+      "domain_ids": [
+        "home",
+        "garment",
+        "industry",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P082",
+          "domain_ids": [
+            "home",
+            "garment",
+            "industry"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            34
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "表I遷移276 manipulation task categories，另導航／人形。RLBench取80、CALVIN7、LIBERO10等為其遷移子集，不是全源benchmark相加。",
+            "操作多底座遷移；導航重用90個Matterport3D scenes；59camera候選不是59環境。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008"
+        },
+        {
+          "paper_id": "P082",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            34
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "多來源操作／導航／人形技能的跨機體通用作業整合。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008",
+      "previous_domain_ids": [
+        "home",
+        "garment",
+        "industry"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P082",
+      "name": "RoboVerse",
+      "expected_title": "RoboVerse: Towards a Unified Platform, Dataset and Benchmark for Scalable and Generalizable Robot Learning",
+      "source_url": "https://arxiv.org/abs/2504.18904",
+      "pdf_url": "https://arxiv.org/pdf/2504.18904",
+      "retrieved_at": "2026-10-02T21:34:02.681201+00:00",
+      "pdf_sha256": "8c0cb543ef3f0c9a033f06cbbd73a86f2f1177029751e72e86a54d366c355008",
+      "text_sha256": "9c308ed78ec0cc9474fa97eaa7759098b6d0b97d1bbe65b932ec8a9c79547566",
+      "pdf_bytes": 40749103,
+      "pages": 36,
+      "text_characters": 213156,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2504.18904v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2504.18904v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 90,
+        "unit": "navigation Matterport3D scenes",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P082:1",
+        "paper_id": "P082",
+        "benchmark": "RoboVerse",
+        "native_term": "navigation Matterport3D scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2504.18904v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2504.18904v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 276,
+        "unit": "已遷移操作task categories",
+        "pages": [
+          7,
+          8
+        ],
+        "record_id": "review10:P082:2",
+        "paper_id": "P082",
+        "benchmark": "RoboVerse",
+        "native_term": "已遷移操作task categories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2504.18904v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2504.18904v1",
+            "locator": "PDF pp. 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 510500,
+        "unit": "操作trajectories",
+        "qualifier": "原文510.5K",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P082:3",
+        "paper_id": "P082",
+        "benchmark": "RoboVerse",
+        "native_term": "操作trajectories",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2504.18904v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2504.18904v1",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "主IL實驗代表tasks",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P082:4",
+        "paper_id": "P082",
+        "benchmark": "RoboVerse",
+        "native_term": "主IL實驗代表tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2504.18904v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2504.18904v1",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "RoboVerseOrg/RoboVerse"
+  ],
+  "external_repositories": []
+}

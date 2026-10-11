@@ -1,0 +1,100 @@
+{
+  "paper_id": "P109",
+  "summary": "REFLECT/RoboFail公開失敗設定、歷史摘要與修正執行流程；LLM對子目標的Yes判斷和修正後的模擬狀態成功是兩種不同證據。",
+  "reading_order": [
+    {
+      "repo": "columbia-ai-robotics/reflect",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          51
+        ]
+      ],
+      "why": "原論文、sim/real資料與模組角色",
+      "commit": "c2f9db993e372250321ca74e56ae27519716c934"
+    },
+    {
+      "repo": "columbia-ai-robotics/reflect",
+      "path": "main/tasks.json",
+      "ranges": [
+        [
+          1,
+          61
+        ]
+      ],
+      "why": "兩個具體task/scene/失敗注入/GT時間與目標schema",
+      "commit": "c2f9db993e372250321ca74e56ae27519716c934"
+    },
+    {
+      "repo": "columbia-ai-robotics/reflect",
+      "path": "main/data.py",
+      "ranges": [
+        [
+          1,
+          35
+        ]
+      ],
+      "why": "逐事件pickle與nav/interact動作索引",
+      "commit": "c2f9db993e372250321ca74e56ae27519716c934"
+    },
+    {
+      "repo": "columbia-ai-robotics/reflect",
+      "path": "main/exp.py",
+      "ranges": [
+        [
+          238,
+          347
+        ],
+        [
+          350,
+          395
+        ]
+      ],
+      "why": "子目標/計畫失敗推理、輸出解析及修正計畫生成",
+      "commit": "c2f9db993e372250321ca74e56ae27519716c934"
+    },
+    {
+      "repo": "columbia-ai-robotics/reflect",
+      "path": "main/execute_replan.py",
+      "ranges": [
+        [
+          13,
+          29
+        ],
+        [
+          194,
+          200
+        ]
+      ],
+      "why": "執行修正動作後實際調用task checker",
+      "commit": "c2f9db993e372250321ca74e56ae27519716c934"
+    },
+    {
+      "repo": "columbia-ai-robotics/reflect",
+      "path": "main/utils.py",
+      "ranges": [
+        [
+          269,
+          355
+        ]
+      ],
+      "why": "時間字串轉換、10個task index的具體終態檢查",
+      "commit": "c2f9db993e372250321ca74e56ae27519716c934"
+    }
+  ],
+  "environment": "AI2-THOR FloorPlan場景和另附真實感測資料；RGB-D、聲音、robot state形成scene graph，GT detection與感知模型模式需區分。",
+  "tasks": "失敗原因／時刻辨識、執行錯誤與規劃錯誤、生成恢復計畫及執行檢查。tasks.json的scenario會共用task_idx，但failure設定／原計畫不同。",
+  "data": "name/task_idx/scene/actions/success_condition、chosen_failure/params、gt_failure_reason/step；GT時間可能字串或list，轉換需原video_fps。events/step_i.pickle與nav_actions/interact_actions及L1/L2摘要有共同時間關係。",
+  "evaluation": "run_reasoning以ans.split(\", \")[0]==\"Yes\"解析子目標，輸出prediction和GT並列於reasoning.json，GT不可迴流模型。修正後另用check_task_success讀THOR物件狀態；例如task_idx=5檢查乾淨mug裝有coffee，未檢查countertop位置。原checker並非完整自然語言目標所有條件，自建規則須另版，不覆寫原分數。",
+  "standardization": {
+    "profile": "robot_failure_explanation_and_recovery",
+    "reuse": "scenario/parent task、失敗注入、感測時間鏈、原子actions及實體狀態checker。",
+    "transform": "同一case分診斷/恢復protocol，隔離GT原因與時間；保留parser、LLM版本、history截止、預算及原checker範圍，新加目標條件以derived-rule標記。",
+    "missing": "全量感測資產與物件對映、GT/感知模式公平性、文字診斷一致性、任務自然語言與程式predicate差異審核。"
+  },
+  "version_note": "原columbia-ai-robotics/reflect已轉址real-stanford/reflect，屬同一來源。README含舊commit示例連結；本筆固定c2f9db9，未執行LLM或模擬器。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

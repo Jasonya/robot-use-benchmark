@@ -1,0 +1,624 @@
+{
+  "paper_id": "P204",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "官方 S-EMBER 已有具體 JSONL reader、五選一 scorer、temporal IoU 與 optional Gemini judge；核讀專用 sember task 及兩條模型／API 路徑。此 commit 預設只回報 MCQ accuracy 或 mIoU，尚未實作 paper v2 的完整 clean／overall／hallucination／R@1／GQ 協定；另有缺片降為純文字與 judge 非同步錯配等整合問題。",
+  "identity_note": "pinned arXiv:2607.02689v2 首頁直接指定 facebookresearch/S-EMBER 與 facebook/S-EMBER dataset；README 題名、作者及 arXiv 對應一致。倉庫包含 lmms-eval 的其他 task，但本篇只追 lmms_eval/tasks/sember 與其直接呼叫；沒有把 FALCONBench 等繼承 task 當成本篇資料。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          63
+        ],
+        [
+          124,
+          168
+        ],
+        [
+          191,
+          213
+        ]
+      ],
+      "why": "確認 paper／repo／dataset 身分及 grounding 預設與 optional judge 的差別。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "data/README.md",
+      "ranges": [
+        [
+          75,
+          174
+        ]
+      ],
+      "why": "核對八類、JSONL 欄位與以秒計的 query／evidence 時間。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/tasks/sember/sember_mcq.yaml",
+      "ranges": [
+        [
+          1,
+          31
+        ]
+      ],
+      "why": "定位 test JSONL、doc_to_visual、結果處理與自訂 aggregator。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/tasks/sember/sember_grounding.yaml",
+      "ranges": [
+        [
+          1,
+          35
+        ]
+      ],
+      "why": "確認 grounding 的公開 metric 只有 temporal IoU。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/api/task.py",
+      "ranges": [
+        [
+          1138,
+          1174
+        ],
+        [
+          1206,
+          1208
+        ],
+        [
+          1571,
+          1582
+        ]
+      ],
+      "why": "追到 datasets.load_dataset 與實際 test split／task callback。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/tasks/sember/utils.py",
+      "ranges": [
+        [
+          17,
+          163
+        ],
+        [
+          171,
+          289
+        ]
+      ],
+      "why": "核對影片解析、MCQ parser、IoU 公式、失敗與聚合分母。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/models/simple/internvl3.py",
+      "ranges": [
+        [
+          154,
+          218
+        ],
+        [
+          363,
+          405
+        ],
+        [
+          455,
+          506
+        ]
+      ],
+      "why": "追秒→frame index、None 過濾、缺片空回答與 video bounds。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/models/simple/qwen3_vl.py",
+      "ranges": [
+        [
+          182,
+          244
+        ],
+        [
+          285,
+          366
+        ],
+        [
+          378,
+          447
+        ]
+      ],
+      "why": "追 video_end 傳遞、frame budget、metadata 及缺片仍生成文字回答的路徑。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "scripts/data/filter_jsonl_by_videos.py",
+      "ranges": [
+        [
+          28,
+          100
+        ]
+      ],
+      "why": "核對本地影片過濾如何改變被評題目與印出的錯誤混合單位。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "scripts/mcq/run_qwen3vl.sh",
+      "ranges": [
+        [
+          51,
+          87
+        ]
+      ],
+      "why": "確認提供的 Qwen runner 預設 768 frames，與 paper v2 主表不同。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "tools/api_baseline.py",
+      "ranges": [
+        [
+          110,
+          188
+        ],
+        [
+          249,
+          281
+        ],
+        [
+          464,
+          658
+        ],
+        [
+          666,
+          720
+        ]
+      ],
+      "why": "追 API 的裁片／抽幀、JSONL reader、失敗保留與實際 scorer。"
+    },
+    {
+      "repo": "facebookresearch/S-EMBER",
+      "path": "tools/judge_grounding.py",
+      "ranges": [
+        [
+          53,
+          119
+        ],
+        [
+          122,
+          174
+        ],
+        [
+          177,
+          224
+        ]
+      ],
+      "why": "核對 gold-answer union、verdict parser、非同步順序與逐題／分類分母。"
+    }
+  ],
+  "environment": "613 名使用者以 Ray-Ban Meta 錄下日常人類第一人稱、visual-only 觀測。論文的 2,090 fine-grained scenario labels 合併為 33 activity categories，均非可執行場景資產或去重實體場所數。",
+  "tasks": "原生八類為 location_trace、sequential_action、counting_objects_events、visual_detail_recall、temporal_ordering_recognition、time_duration、object_comparison、spatial_aware_reasoning。兩個 task entry 是 sember_mcq（五選一）與 sember_grounding（答案＋證據時間段）；同題三種 verbosity 參考答案及 MCQ 變體不產生三倍獨立 case。",
+  "data": "兩個 YAML 以 datasets.load_dataset(path=\"json\", data_files={test: data/sember_*.jsonl}) 載入 test split。程式按 SEMBER_VIDEO_DIR/<video_id>.mp4 取影片，忽略 HF 的 video 路徑欄；doc_to_visual 產生 {video_path, video_end: question_time}。MCQ 使用 question_id、question、options、correct_letter（scorer 可 fallback correct_index）、question_category；grounding 使用 answer、answers[].answer_text、answer_start_time／answer_end_time，並保留 memory_recency、answer_range、duration、video_category。question_time、證據區間及 duration 以原片秒為單位；未做跨影片共用時間軸。論文／README 報 9,448 QA、3,141 videos、388 小時，本輪未下載 HF JSONL／影片，未把這些數字宣稱為本地驗算。",
+  "evaluation": "MCQ parser 優先接受單一 A–E，否則取第一個獨立字母；空白／不可解析為錯。aggregate = 100×答對數／所有傳入結果，另印每類 accuracy／parsed 數，並非八類 macro。grounding 只解析 Answer: 與 Time:[非負數,非負數]；IoU = max(0,min(end)−max(start))／(max(end)−min(start))，缺 GT、無法解析或 union≤0 均為 0。mIoU = 100×IoU 總和／所有結果，未解析仍在分母，未裁到 question_time／duration。API summary 同樣把 FAILURE 留在分母；--max-samples 限制後只對該子集計分。optional judge 收集 answer 與 answers[].answer_text，以任一可接受答案匹配；CORRECT／WRONG／UNPARSED／ERROR 均入 total，僅 CORRECT 入分子。paper v2 的 Acccl、Accov、hallucination union-check、R@1≥τ 及 GQ@τ 並未在上述專用公開 scorer 實作；其論文主表以原始 IoU 0–1 報告，而程式回傳 0–100。",
+  "implementation_findings": [
+    {
+      "finding": "smoke runner 主動將 JSONL 改成現有影片子集；filter 的 questions kept 分母卻是保留題數＋缺失影片種類數，混用 QA 與 video 單位，不能作完整題數。",
+      "paths": [
+        "scripts/run_mcq_smoke.sh:59-75",
+        "scripts/data/filter_jsonl_by_videos.py:64-95"
+      ]
+    },
+    {
+      "finding": "缺片時 task 返回 None。InternVL video 分支回空字串而計錯；Qwen 分支僅跳過視覺內容，仍把問題送入 model.generate，因此可能以純文字猜對，不能視作缺片必定零分。",
+      "paths": [
+        "lmms_eval/tasks/sember/utils.py:36-59",
+        "lmms_eval/models/simple/internvl3.py:363-405,455-460",
+        "lmms_eval/models/simple/qwen3_vl.py:298-329,354-366,412-447"
+      ]
+    },
+    {
+      "finding": "judge 的 _run 按 asyncio.as_completed 順序收集不含 question ID 的 verdict，再 zip 原始 rows，完成順序不同時逐題與分類成績會錯配；總 CORRECT 數仍保留。verdict parser 採 substring，INCORRECT 也含 CORRECT，需改成精確解析。均為靜態核讀結論，未呼叫 judge。",
+      "paths": [
+        "tools/judge_grounding.py:103-119,122-166,193-209"
+      ]
+    },
+    {
+      "finding": "專用 utils scorer 在缺 correct_letter／correct_index 時默認 A；YAML doc_to_target 卻指定 correct_letter，API 分支也不使用 index fallback。應先驗證 schema，不能把 README 的二擇一保證套用全部路徑。",
+      "paths": [
+        "lmms_eval/tasks/sember/utils.py:105-112",
+        "lmms_eval/tasks/sember/sember_mcq.yaml:18",
+        "tools/api_baseline.py:478-486,522-525"
+      ]
+    }
+  ],
+  "standardization": {
+    "profile": "causal_video_mcq_and_temporal_grounding",
+    "reuse": "可重用原生八類、兩個 task YAML、JSONL loader、per-question logs、五選一 parser／deterministic IoU 作待修正的原生 evaluator；保留完整／缺片子集與 API／local 路徑。",
+    "transform": "source 記 paper v2、repo commit、HF 另行固定的資料版本及 lmms-eval 衍生關係；domain／environment 從 video_category_broad／video_category 分層，不能將 2,090 labels 當 scene assets。case 以 question_id 關聯 video_id、question_time、options／answer variants 與多 reference intervals，MCQ／grounding 共用 parent QA。evaluator 各自保存 score unit、全分母、parsed／failed／缺片數、可見 prefix、frame/pixel budget；追加 paper v2 的各分項與同題 joint GQ，保留和舊版 scorer 的差別。",
+    "missing": "HF 原生題目／影片 manifest 及資料 revision、有效題數驗算、缺片一致處置、strict schema／timestamp validation、judge ID 對齊與 parser 修正、完整 paper v2 metrics 接線。Qwen 的實際解碼委派 qwen-vl-utils>=0.0.14，未固定精確版本；需另驗證取樣時間／外部 reader 的 cutoff，不宣稱已完成 runtime 重現。"
+  },
+  "version_note": "固定 code 18db1323a60c86f50d9cf91df2083237a9895c50（2026-07-08）早於 paper 2607.02689v2（2026-08-26）。pyproject 標 lmms_eval 0.7.1、task metadata 0.2；Qwen runner 預設 uniform_nframes=768、fixed_frame_pixels=786432，而 paper v2 主表是 open models 128 frames。此讀取範圍不是整個繼承 framework 或所有外部 decoder 已核。",
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P204/pages.json",
+      "sha256": "93ab007fed71ace63a43543418b568dc2c1f996a7c9c3540d0bbbd44bad94c66",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        4,
+        5,
+        6,
+        7,
+        14
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text",
+        "/13/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P204/paper.pdf",
+      "pdf_sha256": "a19dd911977b7b7ad2651673df90d5ea20fbd44471297b335afdb6e3a0884e04",
+      "url": "https://arxiv.org/abs/2607.02689"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__S-EMBER/files/README.md",
+      "sha256": "0df3577674c9618ac70ff4b1530c78c0f1d0f087df22873dc8a31542cdec78b4",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "README.md",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "fbc577c001cb16d0a42d4fcf882757187fa7234b",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/README.md",
+      "ranges": [
+        [
+          1,
+          213
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__S-EMBER/files/data/README.md",
+      "sha256": "82d5f0bcc1098ef579bfcb9b562210f3343f470798ed2cf182d340b9baa22227",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "data/README.md",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "2f4de12f168d95869cafd127e5215b453e1792fb",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/data/README.md",
+      "ranges": [
+        [
+          1,
+          188
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__S-EMBER/files/pyproject.toml",
+      "sha256": "aa5efbb9b8d14a95aba6baa1eee2c41f006b585a415cc06d5d18b239d6556c5f",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "pyproject.toml",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "c2edce25c555061e371e4e51d074d29fe97d70df",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/pyproject.toml",
+      "ranges": [
+        [
+          1,
+          35
+        ],
+        [
+          65,
+          78
+        ],
+        [
+          112,
+          142
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/tasks/sember/sember_mcq.yaml",
+      "sha256": "145d8b5e5ef4b04644f05f574c4d4334d2bf89fb4d2593f517f72f63384ba0a5",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/tasks/sember/sember_mcq.yaml",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "cd6a0aadc808d5a897a3a7b9f2b49d1e6798722f",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/tasks/sember/sember_mcq.yaml",
+      "ranges": [
+        [
+          1,
+          31
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/tasks/sember/sember_mcq.yaml.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/tasks/sember/sember_grounding.yaml",
+      "sha256": "348b6ddbf30c362a5a7fecaf4cd4123aea149d7ec42fdf7f1983eeee10d7feab",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/tasks/sember/sember_grounding.yaml",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "2687a0ed1af29b7ecaf7f8c52843379e960e5d1c",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/tasks/sember/sember_grounding.yaml",
+      "ranges": [
+        [
+          1,
+          35
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/tasks/sember/sember_grounding.yaml.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/tasks/sember/utils.py",
+      "sha256": "346fd46c49f466671c6fea7dd236fb31b3ec697b0489136ce15c2a9b2fdb2bb1",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/tasks/sember/utils.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "86bff7b035560964eaea99bf37251c013c7191b9",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/tasks/sember/utils.py",
+      "ranges": [
+        [
+          1,
+          289
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/tasks/sember/utils.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/data/filter_jsonl_by_videos.py",
+      "sha256": "3bf4e99754852e94536b55a9062b376cee81ee71c3a02896b441bd20f458207b",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "scripts/data/filter_jsonl_by_videos.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "1c8d16c392d3a3befc87aecc8f2dc5ffda49bf7d",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/scripts/data/filter_jsonl_by_videos.py",
+      "ranges": [
+        [
+          1,
+          100
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/data/filter_jsonl_by_videos.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/run_mcq_smoke.sh",
+      "sha256": "c556f34d595dde45ac37754d84206d58e2fc3fd4790a3dbd2886606e7b608909",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "scripts/run_mcq_smoke.sh",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "22d91236b60d9eb62db630e9b77ab5328dddc32d",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/scripts/run_mcq_smoke.sh",
+      "ranges": [
+        [
+          1,
+          75
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/run_mcq_smoke.sh.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/mcq/run_qwen3vl.sh",
+      "sha256": "76c47f6b26613f608559a6b04fa5d70dd296d7bf056cd88484ee98e5abbef2e4",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "scripts/mcq/run_qwen3vl.sh",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "35f65455cf44ab8a9e6f04c691b0d3664fa5c191",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/scripts/mcq/run_qwen3vl.sh",
+      "ranges": [
+        [
+          1,
+          87
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/mcq/run_qwen3vl.sh.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/grounding/run_qwen3vl.sh",
+      "sha256": "eb100fcf161bc55f7d08c6d90772272e1786210c6773c2eb561dc2c4e720bbe1",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "scripts/grounding/run_qwen3vl.sh",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "26e82987b1487fe089cd39f30501bad9420873e4",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/scripts/grounding/run_qwen3vl.sh",
+      "ranges": [
+        [
+          1,
+          93
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/scripts/grounding/run_qwen3vl.sh.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/tools/judge_grounding.py",
+      "sha256": "1be85d783d601ccf2ca0a9b4643abc59df58bd9342fdf3f4f73a627a592b2c74",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "tools/judge_grounding.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "5be32a2c1a14d76d643f3e826e0ff0065e50e8a7",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/tools/judge_grounding.py",
+      "ranges": [
+        [
+          1,
+          228
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/tools/judge_grounding.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/tools/api_baseline.py",
+      "sha256": "92f28427c8179ee92b4c95db842212ad33ff66de40d5658072e4b3e4d23a0553",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "tools/api_baseline.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "bb2317ff5a52484d00165d7206ce776d156c84fb",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/tools/api_baseline.py",
+      "ranges": [
+        [
+          100,
+          195
+        ],
+        [
+          249,
+          287
+        ],
+        [
+          455,
+          658
+        ],
+        [
+          663,
+          727
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/tools/api_baseline.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/models/simple/qwen3_vl.py",
+      "sha256": "be0092e407752b40b0e39805cb08d02642c2e0d73ae58eeff7173d16e6a8881f",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/models/simple/qwen3_vl.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "73467fc7d38fd24a7369103e4631c2336e7f836c",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/models/simple/qwen3_vl.py",
+      "ranges": [
+        [
+          1,
+          132
+        ],
+        [
+          170,
+          244
+        ],
+        [
+          246,
+          276
+        ],
+        [
+          285,
+          447
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/models/simple/qwen3_vl.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/models/simple/internvl3.py",
+      "sha256": "8edfdd6cd7aa9362a48df56f5b8709fa2e6ee974e0d0dad2817a10e71e88eafd",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/models/simple/internvl3.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "25f708fc8406601f82a2ab06747daeeea877bec2",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/models/simple/internvl3.py",
+      "ranges": [
+        [
+          154,
+          218
+        ],
+        [
+          355,
+          412
+        ],
+        [
+          427,
+          506
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/models/simple/internvl3.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/api/task.py",
+      "sha256": "bf95a77229148b8a7c739ce96baf3683b44c3320cedfa45c1c53af1cedf155d0",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/api/task.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "2233bfd37e4538d5f5640e8671e2680f9731660b",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/api/task.py",
+      "ranges": [
+        [
+          905,
+          954
+        ],
+        [
+          957,
+          979
+        ],
+        [
+          1138,
+          1174
+        ],
+        [
+          1190,
+          1210
+        ],
+        [
+          1571,
+          1590
+        ],
+        [
+          1724,
+          1725
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/api/task.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/evaluator.py",
+      "sha256": "55ed485c02018d35126229386e43fb4a31f59a418d7cfdef031b10bffcf27efa",
+      "repo": "facebookresearch/S-EMBER",
+      "path": "lmms_eval/evaluator.py",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "git_blob_sha": "2ec3e68c6e4d88e3213147d39a91e21ff9974d26",
+      "url": "https://raw.githubusercontent.com/facebookresearch/S-EMBER/18db1323a60c86f50d9cf91df2083237a9895c50/lmms_eval/evaluator.py",
+      "ranges": [
+        [
+          1100,
+          1139
+        ],
+        [
+          1155,
+          1203
+        ],
+        [
+          1309,
+          1315
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/facebookresearch__S-EMBER/files/lmms_eval/evaluator.py.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__S-EMBER/manifest.json",
+      "sha256": "db0df38fe74ad265214448c28079e3103a6af97dda22539950d440031b1e529a",
+      "json_pointers": [
+        "/commit",
+        "/commit_date",
+        "/tree_truncated",
+        "/metadata"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/facebookresearch__S-EMBER/tree.json",
+      "sha256": "5eb87c24880eb951ae8934adc0cbf5e634bd9323f18f0fdb2c48bfffc0a91c09",
+      "repo": "facebookresearch/S-EMBER",
+      "commit": "18db1323a60c86f50d9cf91df2083237a9895c50",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree/970",
+        "/tree/971",
+        "/tree/972",
+        "/tree/973",
+        "/tree/995",
+        "/tree/996"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/P204-discovery.json",
+      "sha256": "b732c12d1a09bdc1018bd7fb43afd4ba779f1070d316d3af35bd78f20475e55a",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/0",
+        "/candidates/1",
+        "/code_contexts"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

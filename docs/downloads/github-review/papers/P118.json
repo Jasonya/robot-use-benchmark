@@ -1,0 +1,306 @@
+{
+  "paper_id": "P118",
+  "name": "EgoMimic",
+  "title": "EgoMimic: Scaling Imitation Learning via Egocentric Video",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2410.24221",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P118",
+    "summary": "EgoMimic把Aria人類資料與Eve機器人資料轉成相似HDF5結構，但人類future palm位置和機器人關節動作仍是不同動作語義。",
+    "environment": "Aria Glasses的人類觀測與Eve/ViperX單臂或雙臂桌面平臺；實際camera extrinsics/arm側及人機資料來源要分開。",
+    "tasks": "人機共同模仿學習，示例包括groceries、laundry、小物放碗；mask/插值與同一demo多chunk是表示／樣本擴充，不是新增語義任務。",
+    "data": "人類future palm經future camera→world→目前camera變換，單手3D／雙手6D，actions_xyz再插值成100步actions_xyz_act；每300frame另存demo。robot原HDF5為qpos/qvel/effort/action14D，影像可JPEG padded且compress_len另存。type欄明記human/robot。",
+    "evaluation": "eval_real輸出actions_joints_act，可temporal aggregate，按query_frequency送到實機；此選讀程式是rollout，不提供統一任務成功判分。資料篩掉出界/跳動frame，case需保存原時間對映；offline action loss與physical success分開。",
+    "standardization": {
+      "profile": "human_robot_cotraining_with_camera_frame_actions",
+      "reuse": "人機兩域、轉換矩陣、原HDF5/處理後chunk關係、type與action keys。",
+      "transform": "source保留raw VRS/MPS與Eve session；case分domain/action語義/arm/camera/normalization，300frame chunk共享parent demo避免split洩漏，插值點不當獨立觀測。",
+      "missing": "原始資產與校準版本、前處理保留索引、robot/human action對齊驗證、下游人工/物理判分協定與全量split。"
+    },
+    "version_note": "主README仍連舊Eve名稱；已讀EgoMimic-Eve README明確回指本作。兩repo commit各固定；不把hardware代碼等同資料已取得。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic",
+        "requested_repo": "SimarKareer/EgoMimic",
+        "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            18
+          ],
+          [
+            37,
+            54
+          ],
+          [
+            82,
+            92
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 114,
+        "sha256": "062559890ea4df91f0ac47f65d4904d7b36ad75c80b145d11938176af6b4c36b",
+        "url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/README.md",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/README.md#L1-L18",
+        "why": "原作、三組樣本資料與獨立人/機器人normalization",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic",
+        "requested_repo": "SimarKareer/EgoMimic",
+        "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645",
+        "ref": null,
+        "path": "data_processing.md",
+        "ranges": [
+          [
+            19,
+            77
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 77,
+        "sha256": "505a74fef9a36d18c506a7fd1d2a2a0124e9851159eb6545230fb7462472ab61",
+        "url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/data_processing.md",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/data_processing.md#L19-L77",
+        "why": "手眼標定與人類/機器人轉換入口",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic",
+        "requested_repo": "SimarKareer/EgoMimic",
+        "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645",
+        "ref": null,
+        "path": "egomimic/scripts/aria_process/aria_to_robomimic.py",
+        "ranges": [
+          [
+            181,
+            258
+          ],
+          [
+            299,
+            330
+          ],
+          [
+            468,
+            519
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 571,
+        "sha256": "2575b31149a19450b55c3d9ea81d7dd2b5a292fef0e61b98980b6c9d9c13ef55",
+        "url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/egomimic/scripts/aria_process/aria_to_robomimic.py",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/egomimic/scripts/aria_process/aria_to_robomimic.py#L181-L258",
+        "why": "future palm到目前camera frame、篩樣、HDF5 chunk與插值",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic",
+        "requested_repo": "SimarKareer/EgoMimic",
+        "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645",
+        "ref": null,
+        "path": "egomimic/utils/dataset.py",
+        "ranges": [
+          [
+            122,
+            196
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 196,
+        "sha256": "c727698b0b5460a814bc7a22f6f32dba9a8cdcfcd9ee8a759be047a82109b803",
+        "url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/egomimic/utils/dataset.py",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/egomimic/utils/dataset.py#L122-L196",
+        "why": "時序padding/goal採樣及robot=0/hand=1標記",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic",
+        "requested_repo": "SimarKareer/EgoMimic",
+        "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645",
+        "ref": null,
+        "path": "egomimic/scripts/evaluation/eval_real.py",
+        "ranges": [
+          [
+            225,
+            240
+          ],
+          [
+            279,
+            303
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 407,
+        "sha256": "a8fc12481f24d828f91734c0de38beeeb0e525118f835d0e15c27a2812832758",
+        "url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/egomimic/scripts/evaluation/eval_real.py",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic/blob/6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645/egomimic/scripts/evaluation/eval_real.py#L225-L240",
+        "why": "joint-action rollout/temporal aggregation而非任務判分",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic-Eve",
+        "requested_repo": "SimarKareer/EgoMimic-Eve",
+        "commit": "b0e45c3f750f009204309060fdb12e2bd57c402c",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            31
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 98,
+        "sha256": "ed49727bbae07cdc6d5d672a3449d66c530b8d02deae82a887266bdfae73f964",
+        "url": "https://github.com/SimarKareer/EgoMimic-Eve/blob/b0e45c3f750f009204309060fdb12e2bd57c402c/README.md",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic-Eve/blob/b0e45c3f750f009204309060fdb12e2bd57c402c/README.md#L1-L31",
+        "why": "硬體repo與主論文的相互認領",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "SimarKareer/EgoMimic-Eve",
+        "requested_repo": "SimarKareer/EgoMimic-Eve",
+        "commit": "b0e45c3f750f009204309060fdb12e2bd57c402c",
+        "ref": null,
+        "path": "scripts/record_episodes.py",
+        "ranges": [
+          [
+            302,
+            338
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 446,
+        "sha256": "4e6c509735684998c3be502adb74c4fc3a3fb2ed8ba5d9c05287e2aed2c71680",
+        "url": "https://github.com/SimarKareer/EgoMimic-Eve/blob/b0e45c3f750f009204309060fdb12e2bd57c402c/scripts/record_episodes.py",
+        "reading_url": "https://github.com/SimarKareer/EgoMimic-Eve/blob/b0e45c3f750f009204309060fdb12e2bd57c402c/scripts/record_episodes.py#L302-L338",
+        "why": "原robot14D關節/動作、JPEG壓縮長度與HDF5格式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "65cdc8342c249b720f3d12450a3da32b4ec556dccc29d308ef524619d37e518f"
+  },
+  "repository_binding_review_sha256": "65cdc8342c249b720f3d12450a3da32b4ec556dccc29d308ef524619d37e518f",
+  "repository_bindings": [
+    {
+      "requested_repo": "SimarKareer/EgoMimic",
+      "resolved_repo": "SimarKareer/EgoMimic",
+      "aliases_in_this_review": [
+        "simarkareer/egomimic"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "6d63e9a3cd1dcc1d24860a11d7d9c5b2d5cba645",
+          "reviewed_files": [
+            "README.md",
+            "data_processing.md",
+            "egomimic/scripts/aria_process/aria_to_robomimic.py",
+            "egomimic/scripts/evaluation/eval_real.py",
+            "egomimic/utils/dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SimarKareer/EgoMimic",
+          "link_label": "Code",
+          "project_url": "https://egomimic.github.io/",
+          "page_sha256": "68435fffd74a86d0b5a43dda5287646f05b6590d014fda2cafeade8aede97b63"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P118",
+          "review_file": "content/github_review/reviews/P118.json",
+          "review_sha256": "65cdc8342c249b720f3d12450a3da32b4ec556dccc29d308ef524619d37e518f",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "SimarKareer/EgoMimic-Eve",
+      "resolved_repo": "SimarKareer/EgoMimic-Eve",
+      "aliases_in_this_review": [
+        "simarkareer/egomimic-eve"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b0e45c3f750f009204309060fdb12e2bd57c402c",
+          "reviewed_files": [
+            "README.md",
+            "scripts/record_episodes.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/SimarKareer/EgoMimic-Eve",
+          "link_label": "Hardware Code",
+          "project_url": "https://egomimic.github.io/",
+          "page_sha256": "68435fffd74a86d0b5a43dda5287646f05b6590d014fda2cafeade8aede97b63"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P118",
+          "review_file": "content/github_review/reviews/P118.json",
+          "review_sha256": "65cdc8342c249b720f3d12450a3da32b4ec556dccc29d308ef524619d37e518f",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "SimarKareer/EgoMimic",
+    "SimarKareer/EgoMimic-Eve"
+  ],
+  "external_repositories": []
+}

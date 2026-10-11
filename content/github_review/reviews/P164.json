@@ -1,0 +1,150 @@
+{
+  "paper_id": "P164",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "The Imitator Game提供人類影片→robot模仿的配對資料、分級場景與模擬評估。任務完成、軌跡相似及盲測偏好是三種不同證據。",
+  "reading_order": [
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          100
+        ]
+      ],
+      "why": "原作、場景/資料/基線與human A/B評測定位"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "examples/baselines/lerobot_dataset/README.md",
+      "ranges": [
+        [
+          1,
+          115
+        ]
+      ],
+      "why": "LeRobot時間/episode、同row MANO與原影片關係"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "examples/baselines/_template/eval_template_imitator.py",
+      "ranges": [
+        [
+          113,
+          160
+        ]
+      ],
+      "why": "共用eval呼叫與status字段語義"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "examples/baselines/lerobot_dataset/evaluate_processor.py",
+      "ranges": [
+        [
+          217,
+          262
+        ],
+        [
+          293,
+          326
+        ]
+      ],
+      "why": "human↔sim task mapping及reference episode抽樣"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "examples/baselines/diffusion_policy/eval_dp_imitator.py",
+      "ranges": [
+        [
+          97,
+          139
+        ],
+        [
+          178,
+          276
+        ],
+        [
+          314,
+          409
+        ]
+      ],
+      "why": "分級設定、video/language輸入、雙臂action與batch/truncation/TSS流程"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "examples/baselines/lerobot_dataset/trajectory_metrics.py",
+      "ranges": [
+        [
+          1,
+          21
+        ],
+        [
+          47,
+          103
+        ],
+        [
+          130,
+          175
+        ],
+        [
+          273,
+          302
+        ]
+      ],
+      "why": "DTW/TSS公式與隨機GT trajectory"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "mani_skill/envs/tasks/tabletop/dual_tasks/_008_pick_apple_banana_baskets.py",
+      "ranges": [
+        [
+          337,
+          415
+        ]
+      ],
+      "why": "具體雙物件入籃checker"
+    },
+    {
+      "repo": "imitator-game/The-Imitator-Game",
+      "commit": "d6d16ec511bc389e0a207692730c137bc022ef14",
+      "path": "mani_skill/envs/tasks/tabletop/dual_tasks_l3/_008_pick_apple_banana_baskets_l3.py",
+      "ranges": [
+        [
+          283,
+          346
+        ]
+      ],
+      "why": "L3對應checker與相同goal關係"
+    }
+  ],
+  "environment": "ManiSkill/SAPIEN雙Panda imitator scene，人類demonstrator另有影片。pinned tree中L0/L1/L2/L3各50個config，合計200個task-level設定；不能未去重就宣稱200個獨立語義任務。",
+  "tasks": "以示範模仿操作，可用video-only、language-only或兩者。task透過human/robot/sim ID mapping關聯，L-level與input mode保留case設定；盲測arena另有human preference協定。",
+  "data": "LeRobot metadata/parquet/video對齊timestamp秒與episode；MANO姿態是同episode特徵，不是另一資料集。is_right=-1表示缺偵測、數值補0需mask。評測按task隨機抽human episode與video frame；原始action範例雙臂8+8=16D，應固定reference IDs與normalizer。",
+  "evaluation": "例子成功為兩物件幾何中心在各籃XY bounds及Z上界，is_robot_static另外輸出但未加入success。TSS=1/(1+DTW/path_length)，直接對action向量L2，尺度/單位會影響分數；success軌跡截到首次成功，fail截GT長度；ss<2走fail分支需核驗。eval status=success代表流程完成，物理完成另看success_once/at_end。GT seed=None且batch任一truncated就重置群組，需要固定抽樣/同步假設。",
+  "standardization": {
+    "profile": "video_conditioned_cross_embodiment_imitation",
+    "reuse": "人類/robot/sim mapping、native level configs、LeRobot schema、完成與TSS的獨立指標。",
+    "transform": "case固定human示範及frame IDs、sim資產/初態、level/input mode、雙臂action spec；reference trajectory與方法輸出分隔，success/TSS/human preference分欄報告。",
+    "missing": "所有task checker覆蓋、完整IG10K資產取得、case固定種子、action尺度/TSS可比性、同步batch條件與盲測評審一致性。"
+  },
+  "version_note": "固定d6d16ec；README對應2608.22301。所讀為共用DP評測鏈與兩個具體task版本，未宣稱整個ManiSkill內含任務或全部基線已驗證。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "structural_counts": {
+      "L0_configs": 50,
+      "L1_configs": 50,
+      "L2_configs": 50,
+      "L3_configs": 50
+    },
+    "basis": "pinned recursive tree path count; not manual review of all configs or semantic task deduplication",
+    "tree_sha256": "a22bfbf428a035336bbac1dc271d34933b99a04943962292af11463165263bc9"
+  }
+}

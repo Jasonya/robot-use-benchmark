@@ -1,0 +1,386 @@
+{
+  "paper_id": "P079",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "FMB有真實Franka資料轉RLDS與策略rollout，但環境step固定回reward=0、done=False；成功需依官方實物評測程序另行記錄。已追到combined／insert-only builder、ResNet reader與robot action，發現state/peg_id欄位不相容、負ID轉uint8、primitive過濾後episode邊界未重算等具體整合問題。",
+  "identity_note": "固定論文為Luo、Xu等人的FMB: a Functional Manipulation Benchmark for Generalizable Robotic Learning，arXiv:2401.08553v3（2024-09-03）。PDF及README均指functional-manipulation-benchmark.github.io，README 136–140列相同作者與arXiv；綁定中的專案Code連結指rail-berkeley/fmb。此repo是控制器／資料builder／baseline，CAD與資料壓縮包另行發布。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P079-discovery.json",
+      "selected_json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/code_contexts/0",
+        "/code_contexts/2"
+      ],
+      "paper_version": "2401.08553v3",
+      "pdf_sha256": "c0d7c39378cfc46b87289276d517c5e9ef6aa5932fece6c5d2b0b4a4f120f9e8",
+      "sha256": "415824c31fac20069f5a488aa0362acaa739d3857c80739eb4d6cc9b77d1222d",
+      "text_excerpts": [
+        {
+          "json_pointer": "/opening_text",
+          "character_range": [
+            1581,
+            1618
+          ],
+          "text": "arXiv:2401.08553v3 [cs.RO] 3 Sep 2024",
+          "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+        }
+      ]
+    },
+    {
+      "local_file": "audit/.cache/fulltext_review/P079/pages.json",
+      "sha256": "77df76136703831965fdee18f3a112eea5cae0f7971e1607a42129c00e249115",
+      "selected_json_pointers": [
+        "/6/text",
+        "/7/text"
+      ],
+      "finding": "論文Table 1的22,550是切分後primitive軌跡；第3.7節將初態與held-out物件作為protocol。"
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P077-P084/primary_pages/P079-procedure.html",
+      "url": "https://functional-manipulation-benchmark.github.io/procedure/index.html",
+      "sha256": "587a5f64e4cfc09c9e7b64c60e5c42e7ef4c0a8cd4e9ee615a223460a97ffa59",
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/P079-primary-page.json",
+      "extracted_text_file": "audit/.cache/github_review_worker/P077-P084/primary_pages/P079-procedure.txt",
+      "text_sha256": "2598da5ef076ba68c286f73ab99231f57c305e11331fdd2e538bc62bcdd1db8b",
+      "read_ranges": [
+        [
+          1,
+          76
+        ]
+      ],
+      "finding": "官方procedure文字的實物成功條件與每skill／assembly的trial預算；未解析附圖的精確佈局座標。"
+    }
+  ],
+  "reading_order": [
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          16
+        ],
+        [
+          30,
+          66
+        ],
+        [
+          95,
+          140
+        ]
+      ],
+      "why": "身份、builder與checkpoint設定、force/torque座標框架更動、實物評測入口。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "ResNet/README.md",
+      "ranges": [
+        [
+          28,
+          46
+        ],
+        [
+          49,
+          62
+        ]
+      ],
+      "why": "dataset版本、primitive/object篩選、tcp_frame及action chunk選項。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "fmb_dataset_builder/fmb_dataset/fmb_dataset_dataset_builder.py",
+      "ranges": [
+        [
+          36,
+          97
+        ],
+        [
+          135,
+          280
+        ],
+        [
+          285,
+          469
+        ]
+      ],
+      "why": "實際raw keys→RLDS欄位、語言生成、terminal reward、ID dtype與train-only split。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "fmb_dataset_builder/fmb_single_object_insert_dataset/fmb_single_object_insert_dataset_dataset_builder.py",
+      "ranges": [
+        [
+          166,
+          215
+        ],
+        [
+          241,
+          397
+        ]
+      ],
+      "why": "只保留insert步卻沿用原始i計算is_first/is_last，以及其實際schema。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "ResNet/src/rlds/rlds_dataset.py",
+      "ranges": [
+        [
+          16,
+          181
+        ],
+        [
+          229,
+          260
+        ]
+      ],
+      "why": "95/5切分、primitive/peg filter、decoder必讀state、eef→tcp rename及chunk padding。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "robot_infra/envs/franka_fmb_env.py",
+      "ranges": [
+        [
+          36,
+          82
+        ],
+        [
+          133,
+          149
+        ],
+        [
+          197,
+          221
+        ],
+        [
+          225,
+          270
+        ]
+      ],
+      "why": "10Hz、7D delta action、四相機觀測、實機HTTP狀態及無成功checker。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "path": "ResNet/src/rollout_main.py",
+      "ranges": [
+        [
+          24,
+          42
+        ],
+        [
+          106,
+          179
+        ],
+        [
+          216,
+          270
+        ],
+        [
+          348,
+          384
+        ]
+      ],
+      "why": "人工reset/object ID、policy縮放、rollout忽略reward/done、影片保存及每primitive預算。",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925"
+    }
+  ],
+  "environment": "真實Franka Panda、兩個側面與兩個腕部RGB-D相機、抓取區、reorientation fixture及插入板。論文單物體位置隨機於20×20cm、板於35×35cm；多物體抓取區20×30cm，板固定。控制器預設10Hz；gripper切換會另等待，影片以20fps寫出，均不能用來推定原始資料有精確等間隔timestamp。形狀／顏色／長短／大小是物件屬性，板號或相機數不等於environment/case數。",
+  "tasks": "原生任務含single_object_manipulation及三種multi_object assembly；combined builder的primitive有grasp、place_on_fixture、regrasp、rotate、move_up、go_to_board、insert。論文Table 1的六種分段標籤與程式中的過渡primitive不強制一對一合併。22,550為論文統計的分段軌跡（single 15,350、multi 7,200），不等於完整任務episodes：論文另列2,700個single全流程、4,050個額外insert及每assembly150個multi全流程。本輪未下載檔案，無實際落地case計數。",
+  "data": "combined builder 1.0.0讀.npy dictionary：actions(T,7)、primitive[T]、obs/{side_1,side_2,wrist_1,wrist_2及_depth,q,dq,tcp_pose,tcp_vel,tcp_force,tcp_torque,gripper_pose}，single另有object_info。RLDS steps.observation為256×256 JPEG RGB、float32 depth、joint_pos/vel(7)、eef_pose(7)、eef_vel(6)、eef_force/torque(3)、state_gripper_pose及object/shape/color/size/length；episode_metadata保留file_path、episode_task與生成語句，USE embedding為512D。depth僅astype，未提供raw depth到公尺的scale；size/length為類別字串。action是base-frame xyz增量（m）、左乘的xyz Euler增量（rad）及gripper 0=open/1=close；env裁剪前六維至±0.06m／±0.25rad。builder只有train，ResNet reader預設train[:95%]/train[95%:]，不是物件held-out benchmark split。reward在原始最後步硬設1、discount全1，不能作量測成功標籤。",
+  "evaluation": "callchain：ResNet simulate_policy→rollout→FrankaFMB.step；env固定回(obs,0,False,{})，rollout亦丟棄reward/done、可按Esc停止，只存observation/action與影片。N=100是程式呼叫參數，不是官方protocol；grasp/regrasp 60步、insert/place_on_fixture 100步、rotate 200步、long_horizon 300步，action chunk可能跨越外層上限。官方procedure另定grasp/rotate/place/regrasp各50 trials（5 seen+5 unseen物件各5次）、insert 45（9 shapes各5次）、single multi-stage 10、每multi-object assembly 10（5初態各2次）。成功依牢固抓持、fixture上斜放、rotate ±15度、底面完全插入正確孔等實物條件；multi-object需全部插入。未找到此路徑的機器自動量測或success JSON，必須保留人工／外部判讀地位。",
+  "standardization": {
+    "profile": "real_robot_rlds_primitives_with_physical_protocol",
+    "reuse": "raw→RLDS欄位、primitive語句與object屬性、父軌跡file_path、控制器delta-action定義、官方逐skill初態／trial／成功準則。",
+    "transform": "source同時綁paper v3、repo commit與TFDS dataset名稱/1.0.0；task區分完整assembly與primitive；case保留父episode、原始frame index、board/object ID、切分後segment及protocol trial。物件泛化split需另存held-out清單，不沿用95/5切片。把raw depth scale、force/torque frame、gripper及action正規化作profile欄位；evaluator單列合成demo reward與實物成功判讀。",
+    "missing": "combined及insert-only builder均無observation.state/peg_id，但ResNet decoder 137–140無條件讀state，peg filter/shape_vec又用peg_id；需版本化adapter，不能宣稱可直接串接。combined把-1 ID sentinel轉uint8後成255，schema文字卻仍說-1。insert-only過濾後仍用原始i標is_first/is_last，可能沒有first或terminal步。README說舊checkpoint force/torque在base frame、新dataset預期eef frame，不能只按同名欄位合併。尚缺深度尺度、物理資產／相機校正、protocol附圖座標、實際trial結果與觀察者判讀記錄。"
+  },
+  "version_note": "固定rail-berkeley/fmb@d4da6ce044a9806f41e58bf7423b5a3c05289925（2024-05-28），早於論文v3（2024-09-03）；不能認定涵蓋v3所有實驗。官方procedure是以SHA256固定的網站文字快照，無與paper/commit同版的證明。combined、single、multi、insert-only TFDS builders是不同schema／subset，不能僅因均1.0.0合併；本輪選讀combined與insert-only。",
+  "runtime_executed": false,
+  "reviewed_on": "2026-10-11",
+  "source_files": [
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "README.md",
+      "local_file": "audit/.cache/github_review/repos/rail-berkeley__fmb/files/README.md",
+      "sha256": "13bc324ee1a06b3e5e41dd4c1c7b736899be011b4cda0c42f5cc36a2d6f65122",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/rail-berkeley__fmb/manifest.json",
+      "read_ranges": [
+        [
+          1,
+          16
+        ],
+        [
+          30,
+          66
+        ],
+        [
+          95,
+          140
+        ]
+      ]
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "ResNet/README.md",
+      "local_file": "audit/.cache/github_review/repos/rail-berkeley__fmb/files/ResNet/README.md",
+      "sha256": "ff66ec3c511058ffb520582de314a5622492f6599cad24a2eddc00656ed6912f",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/README.md",
+      "source_manifest": "audit/.cache/github_review/repos/rail-berkeley__fmb/manifest.json",
+      "read_ranges": [
+        [
+          28,
+          46
+        ],
+        [
+          49,
+          62
+        ]
+      ]
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "fmb_dataset_builder/fmb_dataset/fmb_dataset_dataset_builder.py",
+      "local_file": "audit/.cache/github_review/repos/rail-berkeley__fmb/files/fmb_dataset_builder/fmb_dataset/fmb_dataset_dataset_builder.py",
+      "sha256": "47f5fe705bc736fe9d91b614add1cc77f5bbf6fe6fac525a7e7d929c7d4cb85a",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/fmb_dataset_builder/fmb_dataset/fmb_dataset_dataset_builder.py",
+      "source_manifest": "audit/.cache/github_review/repos/rail-berkeley__fmb/manifest.json",
+      "read_ranges": [
+        [
+          36,
+          97
+        ],
+        [
+          135,
+          280
+        ],
+        [
+          285,
+          469
+        ]
+      ]
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "fmb_dataset_builder/fmb_single_object_insert_dataset/fmb_single_object_insert_dataset_dataset_builder.py",
+      "local_file": "audit/.cache/github_review/repos/rail-berkeley__fmb/files/fmb_dataset_builder/fmb_single_object_insert_dataset/fmb_single_object_insert_dataset_dataset_builder.py",
+      "sha256": "7e6f557328dc0a3ac21091a684f57235ec19897f64c2ebf6dd6cebd299d5615b",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/fmb_dataset_builder/fmb_single_object_insert_dataset/fmb_single_object_insert_dataset_dataset_builder.py",
+      "source_manifest": "audit/.cache/github_review/repos/rail-berkeley__fmb/manifest.json",
+      "read_ranges": [
+        [
+          166,
+          215
+        ],
+        [
+          241,
+          397
+        ]
+      ]
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "ResNet/src/rlds/rlds_dataset.py",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rlds/rlds_dataset.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/rail-berkeley__fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rlds/rlds_dataset.py",
+      "sha256": "f237ffb7d926411adfc107c4af22bbf32f2b36805f46d6d25f0621761f5e8f7a",
+      "lines": 260,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rlds/rlds_dataset.py",
+        "retrieved_at": "2026-10-11T00:17:35.841193+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rlds/rlds_dataset.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 11648,
+        "sha256": "f237ffb7d926411adfc107c4af22bbf32f2b36805f46d6d25f0621761f5e8f7a"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          16,
+          181
+        ],
+        [
+          229,
+          260
+        ]
+      ]
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "robot_infra/envs/franka_fmb_env.py",
+      "local_file": "audit/.cache/github_review/repos/rail-berkeley__fmb/files/robot_infra/envs/franka_fmb_env.py",
+      "sha256": "39c81bef944156079fcfcd8f376d655b532c376cfaf95694bc96da54268f70e0",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/robot_infra/envs/franka_fmb_env.py",
+      "source_manifest": "audit/.cache/github_review/repos/rail-berkeley__fmb/manifest.json",
+      "read_ranges": [
+        [
+          36,
+          82
+        ],
+        [
+          133,
+          149
+        ],
+        [
+          197,
+          221
+        ],
+        [
+          225,
+          270
+        ]
+      ]
+    },
+    {
+      "repo": "rail-berkeley/fmb",
+      "commit": "d4da6ce044a9806f41e58bf7423b5a3c05289925",
+      "path": "ResNet/src/rollout_main.py",
+      "url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rollout_main.py",
+      "local_file": "audit/.cache/github_review_worker/P077-P084/files/rail-berkeley__fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rollout_main.py",
+      "sha256": "ad535a553460fd863d65eee9b5d6f0a7e44907074a8f0ada503b17e453bebe43",
+      "lines": 388,
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rollout_main.py",
+        "retrieved_at": "2026-10-11T00:17:36.840428+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/rail-berkeley/fmb/d4da6ce044a9806f41e58bf7423b5a3c05289925/ResNet/src/rollout_main.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 14354,
+        "sha256": "ad535a553460fd863d65eee9b5d6f0a7e44907074a8f0ada503b17e453bebe43"
+      },
+      "source_manifest": "audit/.cache/github_review_worker/P077-P084/additional_sources.json",
+      "read_ranges": [
+        [
+          24,
+          42
+        ],
+        [
+          106,
+          179
+        ],
+        [
+          216,
+          270
+        ],
+        [
+          348,
+          384
+        ]
+      ]
+    }
+  ]
+}

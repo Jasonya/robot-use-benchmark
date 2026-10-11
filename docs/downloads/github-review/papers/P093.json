@@ -1,0 +1,421 @@
+{
+  "paper_id": "P093",
+  "name": "MoDeSuite",
+  "title": "MoDeSuite: Robot Learning Task Suite for Benchmarking Mobile Manipulation with Deformable Objects",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2507.21796",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P093",
+    "summary": "MoDeSuite有8種移動柔性物任務；具體Spot-Place程式可追到9維控制、觀測組合與on_table判定，但結束訊號及README命令需要核對。",
+    "environment": "Isaac Sim 4.2／Isaac Lab，Spot帶臂與輪式Franka；含桿、帶、布等及桌面、走廊、障礙。Spot-Place使用USD桌與桿，num_envs=4是平行複本，不是4種不同環境。",
+    "tasks": "README列Place/Bend/Transport/Drag/Lift/Uncover/Cover/Curtain共8種，分5彈性／3塑性；Gym的機體與PPO/SAC註冊不能當新語義任務。Cover文字誤重複Uncover描述，需以各具體程式與論文釐清。",
+    "data": "Spot-Place配置9維動作=3基座+6手臂，sim.dt=1/200、decimation=2；policy觀測拼桿節點位置、機體位置／四元數、桌中心、關節位置／速度。play記action/obs/reward/timestep至pickle；不可把58維配置宣告當已驗證實際tensor形狀。",
+    "evaluation": "on_table要求桿端落在桌中心x±0.38、y±0.54、z至z+0.08內且桿中點高於桌面；reward另外含距離、成功bonus及失衡罰分。_get_dones返回(time_out, on_table或失衡)，對DirectRLEnv介面的terminated/truncated及wrapper需專門驗證，不能直接把done當成功。",
+    "standardization": {
+      "profile": "sim_mobile_deformable_control",
+      "reuse": "8種原生任務標籤、機體／USD配置、各task class、控制與成功predicate。",
+      "transform": "task連原生class，environment拆資產/初態/機體；case記seed、步頻、控制約定及資訊預算；evaluator獨立保留success、失衡、timeout與reward。",
+      "missing": "USD／示範資料閉合、Isaac Lab精確版本、各8類具體predicate逐項接線、done順序與實際obs維度執行驗證；本機未執行。"
+    },
+    "version_note": "README連2507.21796，倉庫2026發布。README寫scripts/，實際程式在script/；安裝／授權需讀正式檔案，不僅靠MIT徽章。本筆以Spot-Place為具體程式抽讀，不宣稱8類所有程式都逐行核讀。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "carolzyy/MoDeSuite",
+        "requested_repo": "carolzyy/MoDeSuite",
+        "commit": "470681a7ff117e487060ad52bc4f199e3fa34474",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            150
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 173,
+        "sha256": "a327b5db87de904996b48973c99ef1c1e34c275959ff8f56d18909f3ec7456d9",
+        "url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/README.md",
+        "reading_url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/README.md#L1-L150",
+        "why": "核對精確論文、8種任務、兩種機體及外部資料",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "carolzyy/MoDeSuite",
+        "requested_repo": "carolzyy/MoDeSuite",
+        "commit": "470681a7ff117e487060ad52bc4f199e3fa34474",
+        "ref": null,
+        "path": "task/Drag/__init__.py",
+        "ranges": [
+          [
+            1,
+            49
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 49,
+        "sha256": "a4f6788cea70634b1336a4a1ac2c970046061ba125bd93f6b00c6e3978e1e9e7",
+        "url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/task/Drag/__init__.py",
+        "reading_url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/task/Drag/__init__.py#L1-L49",
+        "why": "同一任務因機體／演算法出現不同Gym ID",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "carolzyy/MoDeSuite",
+        "requested_repo": "carolzyy/MoDeSuite",
+        "commit": "470681a7ff117e487060ad52bc4f199e3fa34474",
+        "ref": null,
+        "path": "task/Place/spot_place_env.py",
+        "ranges": [
+          [
+            25,
+            98
+          ],
+          [
+            171,
+            204
+          ],
+          [
+            249,
+            365
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 365,
+        "sha256": "571726e0b8c4b70f47e5247d77dcf00e1892e7732847084e09bf623be66dd59b",
+        "url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/task/Place/spot_place_env.py",
+        "reading_url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/task/Place/spot_place_env.py#L25-L98",
+        "why": "資產、步頻、控制／觀測、原生成功條件與done順序",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "carolzyy/MoDeSuite",
+        "requested_repo": "carolzyy/MoDeSuite",
+        "commit": "470681a7ff117e487060ad52bc4f199e3fa34474",
+        "ref": null,
+        "path": "script/play.py",
+        "ranges": [
+          [
+            168,
+            218
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 237,
+        "sha256": "f0edaeb2e3856e96999ca45b8b8e971c65a9047215794ef1ce7562439325d7a1",
+        "url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/script/play.py",
+        "reading_url": "https://github.com/carolzyy/MoDeSuite/blob/470681a7ff117e487060ad52bc4f199e3fa34474/script/play.py#L168-L218",
+        "why": "rollout記錄與輸出格式；不是已驗證總表評分器",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e7d73bd65abda643a71c7c8c5ce3d3486b7ceffe105c6c235b524e7f123d6793"
+  },
+  "repository_binding_review_sha256": "e7d73bd65abda643a71c7c8c5ce3d3486b7ceffe105c6c235b524e7f123d6793",
+  "repository_bindings": [
+    {
+      "requested_repo": "carolzyy/MoDeSuite",
+      "resolved_repo": "carolzyy/MoDeSuite",
+      "aliases_in_this_review": [
+        "carolzyy/modesuite"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "470681a7ff117e487060ad52bc4f199e3fa34474",
+          "reviewed_files": [
+            "README.md",
+            "script/play.py",
+            "task/Drag/__init__.py",
+            "task/Place/spot_place_env.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/carolzyy/MoDeSuite",
+          "link_label": "Dataset and Code",
+          "project_url": "https://sites.google.com/view/modesuite/home",
+          "page_sha256": "e4550c08911c35a07491e94523a3d7ef7d26e73c6a3bc52230448c3021c92a07"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P093",
+          "review_file": "content/github_review/reviews/P093.json",
+          "review_sha256": "e7d73bd65abda643a71c7c8c5ce3d3486b7ceffe105c6c235b524e7f123d6793",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P093",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "MoDeSuite，arXiv 2507.21796v1。",
+    "scope_read": "兩種mobile robot、8task逐項定義、source繼承及learning評測。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "衣物與洗護"
+    ],
+    "role": "柔性物操作benchmark",
+    "environment": "IsaacSim／PhysX；Ridgeback-Franka與Spot arm，走廊／桌面配置。",
+    "tasks": "8＝新5elastic（Place/Bend/Transport/Drag/Lift）＋3既有cloth-like（Cover/Uncover/Curtain）；需base與arm協同。",
+    "cases": "RL5獨立runs，success在20eval trials計算；非每task20個語義新任務。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "mobile deformable tasks",
+        "pages": [
+          1,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "新增elastic tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "評測trials／設定",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "依task幾何位置、跨越／覆蓋與無碰撞條件報success；episode return和stability penalty另列。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "不同機體／state/RGB輸入分開；本文無單一全庫train/test IDs總量。",
+    "lineage": "3cloth tasks從前作擴充mobile base control；FEM與PBD為不同材料物理，不是新生活domain。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "Framework、Task Suite、Experiments",
+        "supports": "5+3、robot與20trial metric"
+      }
+    ],
+    "unresolved": [
+      "原3task來源與精確scene/config IDs需從引用30及code進一步對齊。"
+    ],
+    "reuse": "可補『移動時攜帶／拖拉柔性物』而非純桌面摺布；規則包含通過障礙與穩定。",
+    "reviewed_pdf_sha256": "7487d599b51f5e6b76f91382e89b71c431f6314db66766625b35dda08d345dca",
+    "reviewed_on": "2026-10-02",
+    "name": "MoDeSuite",
+    "year": 2025,
+    "title": "MoDeSuite: Robot Learning Task Suite for Benchmarking Mobile Manipulation with Deformable Objects",
+    "source_url": "https://arxiv.org/abs/2507.21796",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "home",
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與柔性物操作",
+      "室內導航",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P093",
+      "domain_ids": [
+        "home",
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P093",
+          "domain_ids": [
+            "home",
+            "garment"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "8＝新5elastic（Place/Bend/Transport/Drag/Lift）＋3既有cloth-like（Cover/Uncover/Curtain）；需base與arm協同。",
+            "IsaacSim／PhysX；Ridgeback-Franka與Spot arm，走廊／桌面配置。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "7487d599b51f5e6b76f91382e89b71c431f6314db66766625b35dda08d345dca"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "7487d599b51f5e6b76f91382e89b71c431f6314db66766625b35dda08d345dca",
+      "previous_domain_ids": [
+        "home",
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P093",
+      "name": "MoDeSuite",
+      "expected_title": "MoDeSuite: Robot Learning Task Suite for Benchmarking Mobile Manipulation with Deformable Objects",
+      "source_url": "https://arxiv.org/abs/2507.21796",
+      "pdf_url": "https://arxiv.org/pdf/2507.21796",
+      "retrieved_at": "2026-10-02T21:34:00.977520+00:00",
+      "pdf_sha256": "7487d599b51f5e6b76f91382e89b71c431f6314db66766625b35dda08d345dca",
+      "text_sha256": "b94b02e84019073186d3e6d05de504a77ec82e6e2276e6f7899ffa976cfcc38c",
+      "pdf_bytes": 39176634,
+      "pages": 9,
+      "text_characters": 58961,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2507.21796v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2507.21796v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "mobile deformable tasks",
+        "pages": [
+          1,
+          3,
+          4,
+          5
+        ],
+        "record_id": "review10:P093:1",
+        "paper_id": "P093",
+        "benchmark": "MoDeSuite",
+        "native_term": "mobile deformable tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21796v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21796v1",
+            "locator": "PDF pp. 1, 3, 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "新增elastic tasks",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P093:2",
+        "paper_id": "P093",
+        "benchmark": "MoDeSuite",
+        "native_term": "新增elastic tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21796v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21796v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "評測trials／設定",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P093:3",
+        "paper_id": "P093",
+        "benchmark": "MoDeSuite",
+        "native_term": "評測trials／設定",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2507.21796v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2507.21796v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "carolzyy/MoDeSuite"
+  ],
+  "external_repositories": []
+}

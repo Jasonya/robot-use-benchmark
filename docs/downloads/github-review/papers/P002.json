@@ -1,0 +1,470 @@
+{
+  "paper_id": "P002",
+  "name": "HowTo100M",
+  "title": "HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips",
+  "year": 2019,
+  "paper_url": "https://arxiv.org/abs/1906.03327",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "office",
+    "craft",
+    "care",
+    "transport",
+    "garden",
+    "leisure",
+    "animal"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P002",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "這個倉庫提供影片—文字表徵訓練與跨資料集檢索評測；HowTo100M 是訓練資料來源，程式的主要評測入口另外讀 MSR-VTT、YouCook2 和 LSMDC。",
+    "environment": "原作影片／YouTube 來源作觀測脈絡；這個倉庫沒有可直接當成本庫互動環境的 scene registry。",
+    "tasks": "保留 CSV 的人類 task 標籤與影片—文字檢索題型；不能把字幕片段或人類活動直接改成機器人任務。",
+    "data": "CSV video_id/task/path、caption 起訖時間、2D/3D 特徵。loader 明示兩種特徵各自的取樣頻率；完整影片與特徵由外部下載。",
+    "evaluation": "eval.py 將影片與文字配對矩陣送到 metrics.py，以正確配對的排名算 R@1/5/10、median rank。README 指出 YouCook2 使用 validation 集合。",
+    "standardization": {
+      "profile": "video_annotations_and_retrieval",
+      "reuse": "影片 ID、字幕時段、活動標籤、下游檢索 split 與 metric 可以保留。",
+      "transform": "轉成 video/context 紀錄與檢索 case；分開保存原片時間、各特徵頻率及對應關係，另記真正使用的下游資料來源。",
+      "missing": "原始素材／特徵下載閉合、跨來源影片重複、共同用途映射與本庫 evaluator 接線。"
+    },
+    "version_note": "本輪讀取固定 commit 的公開程式；不把 README 的歷史「largest」敘述當成現時排名。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "antoine77340/howto100m",
+        "requested_repo": "antoine77340/howto100m",
+        "commit": "50af0ffb10ff5d9a1c9c682fa2094151dc852aa7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            65
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 121,
+        "sha256": "24f9eefd2badb57f1eb0d5fb5c9c18fbd83449aa6097447c4bb44e9d1739febf",
+        "url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/README.md",
+        "reading_url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/README.md#L1-L65",
+        "why": "先區分 HowTo100M 訓練資料與三個下游檢索評測集合。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "antoine77340/howto100m",
+        "requested_repo": "antoine77340/howto100m",
+        "commit": "50af0ffb10ff5d9a1c9c682fa2094151dc852aa7",
+        "ref": null,
+        "path": "youtube_dataloader.py",
+        "ranges": [
+          [
+            19,
+            52
+          ],
+          [
+            144,
+            150
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 150,
+        "sha256": "4fa3c2f34787430ebcd82b933e6c91f2c52e1a1d474ceaa04199641b621fcdb5",
+        "url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/youtube_dataloader.py",
+        "reading_url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/youtube_dataloader.py#L19-L52",
+        "why": "看影片 ID、task、字幕時間段和不同頻率特徵如何組成輸入。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "antoine77340/howto100m",
+        "requested_repo": "antoine77340/howto100m",
+        "commit": "50af0ffb10ff5d9a1c9c682fa2094151dc852aa7",
+        "ref": null,
+        "path": "eval.py",
+        "ranges": [
+          [
+            83,
+            94
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 107,
+        "sha256": "7e675ea472282bdbfe5e3528fadf16ee15a2aaea5f818e328e3e65f1d85f7b7b",
+        "url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/eval.py",
+        "reading_url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/eval.py#L83-L94",
+        "why": "找到檢索評測入口及送入 metric 的影片—文字相似度矩陣。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "antoine77340/howto100m",
+        "requested_repo": "antoine77340/howto100m",
+        "commit": "50af0ffb10ff5d9a1c9c682fa2094151dc852aa7",
+        "ref": null,
+        "path": "metrics.py",
+        "ranges": [
+          [
+            9,
+            29
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 29,
+        "sha256": "a2addc0968225bd5cbcc415cbc7ff7b08c16935ee4b9293e8e03dfdb63c7ea5a",
+        "url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/metrics.py",
+        "reading_url": "https://github.com/antoine77340/howto100m/blob/50af0ffb10ff5d9a1c9c682fa2094151dc852aa7/metrics.py#L9-L29",
+        "why": "核對 R@1、R@5、R@10 和 median rank 的實作。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ad0f23b28cc86d615c08e92c8b821baa2810dbc15c6154d5b3c4fc440e2241db"
+  },
+  "repository_binding_review_sha256": "ad0f23b28cc86d615c08e92c8b821baa2810dbc15c6154d5b3c4fc440e2241db",
+  "repository_bindings": [
+    {
+      "requested_repo": "antoine77340/howto100m",
+      "resolved_repo": "antoine77340/howto100m",
+      "aliases_in_this_review": [
+        "antoine77340/howto100m"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "50af0ffb10ff5d9a1c9c682fa2094151dc852aa7",
+          "reviewed_files": [
+            "README.md",
+            "eval.py",
+            "metrics.py",
+            "youtube_dataloader.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/antoine77340/howto100m'",
+          "link_label": "URL in page source",
+          "project_url": "https://www.di.ens.fr/willow/research/howto100m",
+          "page_sha256": "ee772f9440a6d45b9cee831814157105cd80bdad0f2af0402a0c3f47fd97897a"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P002",
+          "review_file": "content/github_review/reviews/P002.json",
+          "review_sha256": "ad0f23b28cc86d615c08e92c8b821baa2810dbc15c6154d5b3c4fc440e2241db",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "辦公與教育",
+    "工藝與修繕",
+    "個人照護",
+    "交通移動與車輛維修",
+    "農業與園藝",
+    "休閒與運動",
+    "寵物照護與動物活動"
+  ],
+  "source_review": {
+    "paper_id": "P002",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "人類程序影片與步驟定位",
+    "domains": [
+      "餐飲與烹飪",
+      "辦公與教育",
+      "工藝與修繕",
+      "個人照護",
+      "交通移動與車輛維修",
+      "農業與園藝",
+      "休閒與運動",
+      "寵物照護與動物活動"
+    ],
+    "environment": "YouTube instructional/vlog等影片；12 WikiHow用途類別，不是12個物理場景。",
+    "tasks": "23,611 visual tasks是WikiHow搜尋活動標籤，未正規化成robot goals。",
+    "cases": "1.22M影片／136.6M弱配對clip-caption；本庫主要供pretraining，下游評CrossTask等既有benchmark。",
+    "native_counts": [
+      {
+        "field": "domain",
+        "value": 12,
+        "unit": "WikiHow來源用途類別",
+        "pages": [
+          3,
+          4
+        ]
+      },
+      {
+        "field": "task",
+        "value": 23611,
+        "unit": "human visual-task query labels",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 136600000,
+        "unit": "weak clip-caption pairs（約數）",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "下游step recall、retrieval R@K/median rank；非136.6M人工驗證評測題。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對"
+    ],
+    "split": "移除CrossTask test與YouCook2 val重複video IDs；仍可能有重上傳內容。",
+    "lineage": "WikiHow活動×YouTube搜尋；片段共享長影片，後續world-model/ego conversion又會重用。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "原作抽400pairs僅51%至少一項提及與畫面吻合；不能直接將全部字幕當程序ground truth。"
+    ],
+    "reuse": "是擴大生活/工作用途的重要來源；活動標籤、可觀測步驟及robot可執行目標需逐層轉換。",
+    "reviewed_pdf_sha256": "f55dbcb6598acecdedd0178243457eed6daf14626744e9bc50b0622cdbf58894",
+    "reviewed_on": "2026-10-02",
+    "name": "HowTo100M",
+    "year": 2019,
+    "title": "HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips",
+    "source_url": "https://arxiv.org/abs/1906.03327",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "food",
+      "office",
+      "craft",
+      "care",
+      "transport",
+      "garden",
+      "leisure",
+      "animal"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "工藝與修繕",
+      "園藝與戶外",
+      "照護與個人活動",
+      "交通工具與維修",
+      "寵物照護",
+      "運動與身體技能",
+      "辦公活動"
+    ],
+    "domain_names": [
+      "餐飲與烹飪",
+      "辦公與教育",
+      "工藝與修繕",
+      "個人照護",
+      "交通移動與車輛維修",
+      "農業與園藝",
+      "休閒與運動",
+      "寵物照護與動物活動"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P002",
+      "domain_ids": [
+        "food",
+        "office",
+        "craft",
+        "care",
+        "transport",
+        "garden",
+        "leisure",
+        "animal"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P002",
+          "domain_ids": [
+            "food",
+            "office",
+            "craft",
+            "care",
+            "transport",
+            "garden",
+            "leisure",
+            "animal"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "23,611 visual tasks是WikiHow搜尋活動標籤，未正規化成robot goals。",
+            "YouTube instructional/vlog等影片；12 WikiHow用途類別，不是12個物理場景。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "f55dbcb6598acecdedd0178243457eed6daf14626744e9bc50b0622cdbf58894"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "f55dbcb6598acecdedd0178243457eed6daf14626744e9bc50b0622cdbf58894",
+      "previous_domain_ids": [
+        "food",
+        "office",
+        "craft",
+        "care",
+        "transport",
+        "garden",
+        "leisure",
+        "animal"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer"
+    ],
+    "receipt": {
+      "paper_id": "P002",
+      "name": "HowTo100M",
+      "expected_title": "HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips",
+      "source_url": "https://arxiv.org/abs/1906.03327",
+      "pdf_url": "https://arxiv.org/pdf/1906.03327",
+      "retrieved_at": "2026-10-02T22:13:12.382645+00:00",
+      "pdf_sha256": "f55dbcb6598acecdedd0178243457eed6daf14626744e9bc50b0622cdbf58894",
+      "text_sha256": "b7b01e7a7c26f5922e9baa48f48303ecd9fa9922f184bc65e8b7ead6ad3fcc80",
+      "pdf_bytes": 7505357,
+      "pages": 14,
+      "text_characters": 87346,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1906.03327v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1906.03327v2"
+    },
+    "counts": [
+      {
+        "field": "domain",
+        "value": 12,
+        "unit": "WikiHow來源用途類別",
+        "pages": [
+          3,
+          4
+        ],
+        "record_id": "review10:P002:1",
+        "paper_id": "P002",
+        "benchmark": "HowTo100M",
+        "native_term": "WikiHow來源用途類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1906.03327v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1906.03327v2",
+            "locator": "PDF pp. 3, 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 23611,
+        "unit": "human visual-task query labels",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P002:2",
+        "paper_id": "P002",
+        "benchmark": "HowTo100M",
+        "native_term": "human visual-task query labels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1906.03327v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1906.03327v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 136600000,
+        "unit": "weak clip-caption pairs（約數）",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P002:3",
+        "paper_id": "P002",
+        "benchmark": "HowTo100M",
+        "native_term": "weak clip-caption pairs（約數）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1906.03327v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1906.03327v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "antoine77340/howto100m"
+  ],
+  "external_repositories": []
+}

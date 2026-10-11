@@ -1,0 +1,123 @@
+{
+  "paper_id": "P107",
+  "summary": "Colosseum在20個RLBench任務上加入擾動；變體產生、示範seed及RVT評測在不同檔案／倉庫。RVT所稱success rate來自100倍縮放的成功reward。",
+  "reading_order": [
+    {
+      "repo": "robot-colosseum/robot-colosseum",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          54
+        ]
+      ],
+      "why": "原論文、20任務/14變化因子、原生RVT評測repo",
+      "commit": "098a910ae1d490524adb49b8d50735b00a1a62de"
+    },
+    {
+      "repo": "robot-colosseum/robot-colosseum",
+      "path": "colosseum/rlbench/tasks/close_box.py",
+      "ranges": [
+        [
+          1,
+          32
+        ]
+      ],
+      "why": "具體JointCondition成功predicate和語言變體",
+      "commit": "098a910ae1d490524adb49b8d50735b00a1a62de"
+    },
+    {
+      "repo": "robot-colosseum/robot-colosseum",
+      "path": "colosseum/variations/manager.py",
+      "ranges": [
+        [
+          29,
+          104
+        ]
+      ],
+      "why": "factor enable/targets及reset/step時套用",
+      "commit": "098a910ae1d490524adb49b8d50735b00a1a62de"
+    },
+    {
+      "repo": "robot-colosseum/robot-colosseum",
+      "path": "colosseum/rlbench/extensions/scene.py",
+      "ranges": [
+        [
+          66,
+          120
+        ]
+      ],
+      "why": "TTM資產與變體生命週期、RLBench fork相容性",
+      "commit": "098a910ae1d490524adb49b8d50735b00a1a62de"
+    },
+    {
+      "repo": "robot-colosseum/robot-colosseum",
+      "path": "colosseum/rlbench/extensions/task_environment.py",
+      "ranges": [
+        [
+          59,
+          85
+        ]
+      ],
+      "why": "demo NumPy狀態保存與重設",
+      "commit": "098a910ae1d490524adb49b8d50735b00a1a62de"
+    },
+    {
+      "repo": "robot-colosseum/rvt_colosseum",
+      "path": "rvt/eval.py",
+      "ranges": [
+        [
+          194,
+          218
+        ],
+        [
+          295,
+          362
+        ]
+      ],
+      "why": "25episodes/25step默認、示範初態及CSV聚合",
+      "commit": "3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08"
+    },
+    {
+      "repo": "robot-colosseum/rvt_colosseum",
+      "path": "rvt/utils/custom_rlbench_env.py",
+      "ranges": [
+        [
+          219,
+          219
+        ],
+        [
+          328,
+          350
+        ],
+        [
+          377,
+          406
+        ]
+      ],
+      "why": "reward_scale=100、動作錯誤處理、demo reset與variation",
+      "commit": "3cd92a3f01e4373d1b580fed3f0842a5ee3bfc08"
+    }
+  ],
+  "environment": "RLBench/PyRep/CoppeliaSim TTM場景；scene載入自定義TTM並在episode／step套變體。原README20任務×14因素不可直接當280獨立場景／新語義任務。",
+  "tasks": "源任務＋物件/桌面/背景/相機/光照/物理參數等擾動。例CloseBox只有1原生task variation、4句說明，成功登記JointCondition(box_joint,2.6)，依固定RLBench版本判。",
+  "data": "factor含variation/name/enabled/targets及參數；demo保存NumPy random state，可依指定demo index恢復。正式示範在外部tar，未取得，例項必須帶variant配置與資產版本。",
+  "evaluation": "官方連結RVT runner以指定demo初態評測，例預設25episodes和25控制步，使用規劃式末端姿態＋離散gripper。wrapper將原task reward>=1的成功縮放100；IK/path/invalid-action錯誤給0並終止。CSV success rate取eval_envs/return，需保留0–100尺度與實際完成／缺題數。",
+  "standardization": {
+    "profile": "manipulation_generalization_factors",
+    "reuse": "20task定義、factor schema、TTM/示範seed、原生成功條件與RVT評測入口。",
+    "transform": "task連RLBench父任務，case固定factor值/啟用時間/初態/控制預算；evaluator保存成功布林、100倍報分和錯誤分母，重複來源不增語義任務。",
+    "missing": "RLBench/PyRep/fork精確依賴閉合、所有factor資產與demo取得、YARR聚合環節和同預算原生跑通。"
+  },
+  "version_note": "scene程式用函式參數數量相容upstream/PerAct RLBench；安裝可成功不代表兩版本物理／評分完全一致。RVT repo沿用RVT README，身份由Colosseum官方README明確連結確認。",
+  "additional_repo_proposals": [
+    {
+      "repo": "robot-colosseum/rvt_colosseum",
+      "role": "official_baseline_evaluation",
+      "basis": "primary benchmark README line54 links this repo"
+    }
+  ],
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

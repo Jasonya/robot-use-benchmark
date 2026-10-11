@@ -1,0 +1,110 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ActFusion｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="已核 ActFusion 的 feature/label loader、full_len 遮罩推論、TAS scorer 與 LTA MoC。固定 release 的預設 LTA 仍使用完整影片長度；不可標成論文 ActFusion† 的未知未來長度協定。訓練亦用 test split 分數選 best checkpoint，需保留模型選擇條件。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P236.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P236.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P236.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="ActFusion｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="已核 ActFusion 的 feature/label loader、full_len 遮罩推論、TAS scorer 與 LTA MoC。固定 release 的預設 LTA 仍使用完整影片長度；不可標成論文 ActFusion† 的未知未來長度協定。訓練亦用 test split 分數選 best checkpoint，需保留模型選擇條件。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P236.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P236.html","title":"ActFusion｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P236.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P236.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P236 · ActFusion</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P236 · ActFusion</h1><p class="lede">ActFusion: a Unified Diffusion Model for Action Segmentation and Anticipation</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>方法／綜述參考</span><a href="https://arxiv.org/abs/2412.04353" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+
+    </div>
+    <p class="github-scope">核讀快照 2026-10-11。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">已核 ActFusion 的 feature/label loader、full_len 遮罩推論、TAS scorer 與 LTA MoC。固定 release 的預設 LTA 仍使用完整影片長度；不可標成論文 ActFusion† 的未知未來長度協定。訓練亦用 test split 分數選 best checkpoint，需保留模型選擇條件。</p>
+    <aside class="github-version"><b>版本與身份</b><p>固定 00ba6c1df0ac30cfcb90110278dd3616a589ced4。release 的 50 Salads epochs=7001、n_mask=10，Breakfast batch_size=16、feature layers=[7,8,9]；論文表 S5／§5.2 有 5000 epochs、50 Salads mask=25、Breakfast batch_size=4 等差異，不能把公開 JSON 稱作逐項相同的論文設定。README 的 default_configs.py 實際位於 src/default_configs.py。本次未執行任何上游模型或訓練。</p><p>arXiv:2412.04353v1（2024-12-05），Dayoung Gong、Suha Kwak、Minsu Cho，NeurIPS 2024。官方作者帳號 gongda0e 的 README 明列相同 arXiv、題名、作者與會議；搜尋中更早同名 magrogovich/ActFusion 不採用。PDF 提及 FUTR 和 DiffAct 是比較方法／重用程式，不能拿它們當 ActFusion release。此 repo 建立及固定 commit 為 2025-07-08，晚於論文。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>方法／綜述參考，未另作來源用途歸納。</dd></div><div><dt>環境</dt><dd>離執行緒序活動影片；Breakfast 與 50 Salads 是第三人稱烹飪來源，GTEA 是第一人稱烹飪來源，不能全部標 Ego 或機器人環境。程式以預先提取 I3D 特徵為輸入，不提供物理控制或 robot success。</dd></div><div><dt>任務</dt><dd>同一模型做 temporal action segmentation（TAS，完整觀測）及 dense long-term anticipation（LTA，部分觀測）；論文 TAS 用 50 Salads/Breakfast/GTEA，LTA 用前兩者。原生 action 數從外部 mapping.txt 的列數取得，event_list 的行序編碼與 read_mapping_dict 的首欄數字必須一致；這次未取得該資料包，未冒稱固定程式類別數。論文 50 Salads 的 50 videos/17 fine-grained labels、Breakfast 的 1712 videos/48 labels、GTEA 的 28 videos/11 labels是原作統計，不能直接當本次載入的有效 case 數。</dd></div><div><dt>題數與資料</dt><dd>datasets/{dataset}/features/{video}.npy、groundTruth/{video}.txt（一行一個 frame label）、mapping.txt（ID 名稱）、splits/{train,test}.split{split}.bundle。reader 接受二／三維 features，swapaxes 後為 augmentation×T×F，assert T 與 GT/boundary 長度一致；未知 label=-100。事件邊界在 label 改變點及前一格置1，再可 Gaussian smoothing。sample_rate=8（50 Salads）或1（Breakfast），temporal_aug 對各 offset::rate 建樣本，但 dataset 長度仍是 video 數；回復用 nearest interpolation 與首末值填充。時間原生為 annotation frame index，無可靠 fps/秒轉換資產隨 repo；2048 是輸入 feature 維度。paper 指 5/4/4 folds，程式每次只讀指定 --split，沒有自動跨 fold 聚合；完整資料包及有效長度未下載。</dd></div><div><dt>評估方式</dt><dd>預設 decoder-agg：LTA α=0.2/0.3，full_len=feature[0]時間長度，observed_len=round(α×full_len)，切掉未來視覺特徵後仍把 full_len 傳給 ddim_sample 追加 mask tokens；這是已知全長設定。各 temporal offset 機率平均，median filter（50 Salads=30、Breakfast=15 個取樣位置）、argmax，回復至 GT 全長。LTA 對 β=0.1/0.2/0.3/0.5，以 [int(αT):int((α+β)T)] 的原始 frame 範圍計各 GT 類別 n_T/n_F，先跨 videos 累加，再對有 GT frame 的類平均 n_T/(n_T+n_F)×100；不是 frame micro accuracy，也不是 best-of-K。TAS Acc=所有評測 frame 正確數/總 frame；Edit=每影片壓縮連續同標籤後的 (1-Levenshtein/max(segment_count))×100 再影片平均；F1@10/25/50 以同類 segment IoU 門檻一對一配對，跨影片累積 TP/FP/FN 後計 F1。只排除字面 background，不能預設所有 SIL/action_start 類被排除。LTA 同時回傳的 Acc/Edit/F1 是 observed prefix 上的分段分數，不能標成 future MoC。sampling seed=video_idx，25 sampling steps／1000 diffusion steps；offset 不是新增試驗數。</dd></div></dl>
+
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/README.md#L1-L9" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>精確論文與作者、自稱官方 release、MS-TCN 資料／DiffAct 重用。</p><small>L1–9 · L31–64 · L84–109</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 63c987de3018e7b48ef45f960b1c4e2cb9b6d19b35066cd477fefd13c052beaa</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/main.py#L29-L46" target="_blank" rel="noopener noreferrer"><code>main.py</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>mapping、bundle split、單模型 TAS/LTA 入口與 α 設定。</p><small>L29–46 · L62–109 · L115–145</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 2db6997f2cccc733b72c11fe91353c25d15dbec3c277f279d4b9f98a71ca34ed</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/dataset.py#L11-L107" target="_blank" rel="noopener noreferrer"><code>src/dataset.py</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>feature/GT 對齊、未知標籤、時間降取樣、boundary 與回復全長。</p><small>L11–107 · L110–126 · L129–189</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 c8f2f2f90166708d48fa5b15effac0dbf6535c19941d565e39cb0afccb28c65b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/model/actfusion.py#L192-L248" target="_blank" rel="noopener noreferrer"><code>src/model/actfusion.py</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>訓練遮罩與推論 full_len mask-token、DDIM步數／seed。</p><small>L192–248 · L342–429</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 421cd0a3499a782684f9cd9d767347a239e6afc8f53bd6aa72ce801a0c3b4c80</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/trainer.py#L150-L186" target="_blank" rel="noopener noreferrer"><code>src/trainer.py</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>各 offset 聚合／median、MoC 呼叫及 test 指標選 checkpoint。</p><small>L150–186 · L278–381 · L384–481 · L519–547</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 c65cc64a802c6072302e4f66dce2fcee4ad456f6d6017432e0c519c6bc75a138</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/utils.py#L71-L200" target="_blank" rel="noopener noreferrer"><code>src/utils.py</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>具體 frame Acc、segment Edit/F1、MoC 的計數與分母。</p><small>L71–200 · L239–264</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 71e898bfc1fb91904fee9505d6f763a67e3f563fd11990e990fa563400b52e9a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/default_configs.py#L5-L73" target="_blank" rel="noopener noreferrer"><code>src/default_configs.py</code> ↗</a><span>GitHub · gongda0e/ActFusion · 00ba6c1df0</span></div>
+      <p>只產生兩資料集設定；核對 release 與論文超引數差異。</p><small>L5–73 · L75–167</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 e400fe7af78e0611719e319679a061fd907bd0af1cf21280297d06e202885d59</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>bundle/video key、mapping、逐格 labels/features 對齊、TAS 具體 Edit/F1 與 LTA class-count scorer。</p></section><section><h3>需要轉換</h3><p>source 儲存 paper version/commit 及 MS-TCN feature來源；domain/environment 依資料集視角分開；task 分 TAS 和 LTA，case=(dataset revision,fold,video,α,β,length_protocol)，frames/segments/augmentation 不互相加總。另記 F、feature_stride、offset、original_frame_index、round/int 邊界、median 窗、seed、DDIM budget；evaluator 區分 frame micro、video-mean Edit、pooled segment F1、class macro MoC。</p></section><section><h3>仍需補齊</h3><p>需固定完整 mapping/split/feature bytes與原始 fps，檢驗 mapping 行序=數字 ID、未知 -100、背景與末 segment end 的邊界（實作最終 end=i，非 i+1）。論文 §5.4 的 ActFusion† 用 r=4×observed length，此 release 的 CLI/config/已核 sampler 未提供該協定；須新增明確 adapter/取得對應作者版本。train 在 test_test_dataset 上計 TAS 五項平均與八格 LTA MoC 平均選 best／combined 模型，須改為獨立 validation 或如實標註。TAS及不同 α 共寫同一 prediction/{video}.txt，匯入須另用 protocol key 防覆寫。GTEA 無隨附設定與資料；不能只憑 main.py 的分支宣稱已接通。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;provider&quot;: &quot;primary_paper&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P236/pages.json&quot;,
+    &quot;sha256&quot;: &quot;62da085eafdea5e2b8ffcffd6af45dafafaf9dc7504ee724fb264e4b17d0ec6a&quot;,
+    &quot;url&quot;: &quot;https://arxiv.org/pdf/2412.04353&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/0/text&quot;,
+      &quot;/4/text&quot;,
+      &quot;/5/text&quot;,
+      &quot;/6/text&quot;,
+      &quot;/8/text&quot;,
+      &quot;/19/text&quot;,
+      &quot;/20/text&quot;
+    ],
+    &quot;version&quot;: &quot;arXiv:2412.04353v1; NeurIPS 2024&quot;,
+    &quot;pdf_local_file&quot;: &quot;audit/.cache/fulltext_review/P236/paper.pdf&quot;,
+    &quot;pdf_sha256&quot;: &quot;293b05c5a75e8e5dfde9523b8a82d4183e30c3926cca5c439816b3708d42cf2d&quot;,
+    &quot;pages&quot;: [
+      1,
+      5,
+      6,
+      7,
+      9,
+      20,
+      21
+    ]
+  },
+  {
+    &quot;provider&quot;: &quot;cached_github_search&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/search/P236.json&quot;,
+    &quot;sha256&quot;: &quot;a09da5700212b70b867d2da80f35d2849ae4992abd69b3ea8ace55a65b5850e9&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/query&quot;,
+      &quot;/receipt&quot;,
+      &quot;/results&quot;
+    ],
+    &quot;note&quot;: &quot;核對官方作者候選、同名不相關 repo 與後續 fork；不以搜尋排名替代作者／論文身分。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P236.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P235.html">← 上一篇 · TransFusion</a><a href="P237.html">下一篇 → · Gated Temporal Diffusion</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

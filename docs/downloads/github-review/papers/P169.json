@@ -1,0 +1,404 @@
+{
+  "paper_id": "P169",
+  "name": "X2Real",
+  "title": "X2Real: an eXtensive simulation benchmark for real-world generalist policies",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.27449",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "general"
+  ],
+  "status": "repository_unavailable",
+  "review": {
+    "paper_id": "P169",
+    "reviewed_on": "2026-10-11",
+    "status": "repository_unavailable",
+    "summary": "X2Real論文提出44個階層式長序列task與Policy Space統一接口，但本次官方GitHub及專案頁均回404；只能先登錄原文規模與介面設計。",
+    "environment": "論文以Isaac Lab-Arena/Mana設計單臂、雙臂、移動操作及可換gripper；多軸appearance/task setting/embodiment隨機化，不以其笛卡兒積宣稱已驗證環境數。",
+    "tasks": "原文摘要44個階層長序列task、10項能力維度；後文分reasoning4項、manipulation5項與挑戰任務，能力taxonomy不是生活用途domain。每task以subtask DAG描述。",
+    "data": "論文近300h標註模擬軌跡；桌面task每個300條demo、移動每個1000條，3個challenge超20,000條。這些是training/demo量，不能當評測題數；未取得case/split/asset manifest。",
+    "evaluation": "原文DAG節點有rule checker、episode有進度與success；Policy Space處理觀測映射、action適配、歷史與episode lifecycle。需要實作才能核驗same task/observation/budget與ID/OOD分離；未重現其0.84 sim-real相關性。",
+    "standardization": {
+      "profile": "hierarchical_simulation_manipulation",
+      "reuse": "44task的原作比較規模、DAG子任務、與policy-specific前處理解耦的介面概念。",
+      "transform": "source固定2609.27449版本，先整理task/spec並保留planned/imported區別；case日後綁定相同DAG、asset/seed、randomization和evaluator；demo與trial獨立計數。",
+      "missing": "可取得的code與專案頁、44task對應原始規格、全部case及asset、Policy Space adapter與實際評測重現。"
+    },
+    "version_note": "2609.27449v1 p1明列X-Square-Robot/x2real；2026-10-10T07:46:54Z GitHub API回404，原作專案頁亦404。保留明確入口與取得紀錄，未以第三方名稱相似庫替代。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.27449",
+      "pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521",
+      "paper_pages_read": [
+        1,
+        4,
+        5,
+        6
+      ],
+      "repository_access": {
+        "requested_url": "https://api.github.com/repos/X-Square-Robot/x2real",
+        "retrieved_at": "2026-10-10T07:46:54.540567+00:00",
+        "status": 404,
+        "error": "Not Found"
+      },
+      "project_access": {
+        "requested_url": "https://x2robot.com/en/pages/x2real",
+        "retrieved_at": "2026-10-10T07:37:56.369351+00:00",
+        "status": 404,
+        "error": "Not Found"
+      }
+    },
+    "repository_candidate_dispositions": [
+      {
+        "repo": "X-Square-Robot/x2real",
+        "status": "announced_repository_unavailable",
+        "reason": "原作／作者頁明列的入口；保存於2026-10-10T07:46:54.540567+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+        "evidence": [
+          {
+            "requested_url": "https://api.github.com/repos/X-Square-Robot/x2real",
+            "retrieved_at": "2026-10-10T07:46:54.540567+00:00",
+            "status": 404,
+            "error": "Not Found"
+          }
+        ]
+      }
+    ],
+    "reading_order": [],
+    "review_sha256": "6e7ce60ec2d271e3e20d5440b2e86e947b3947bb682b93270fd9a7bd81e87812"
+  },
+  "repository_binding_review_sha256": "6e7ce60ec2d271e3e20d5440b2e86e947b3947bb682b93270fd9a7bd81e87812",
+  "repository_bindings": [],
+  "repository_candidates": [
+    {
+      "requested_repo": "X-Square-Robot/x2real",
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/X-Square-Robot/x2real",
+          "pdf_page": 1,
+          "pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521",
+          "basis": "pinned_pdf_hyperlink"
+        }
+      ],
+      "selection_status": "explained_source_lead",
+      "candidate_scope": "Retained discovery lead, not a confirmed implementation for this paper.",
+      "disposition_type": "announced_repository_unavailable",
+      "disposition_note": "原作／作者頁明列的入口；保存於2026-10-10T07:46:54.540567+00:00的GitHub API回應為404。保留取得失敗紀錄，不表示作者從未公開，也不是已讀到實作。",
+      "disposition_evidence": [
+        {
+          "requested_url": "https://api.github.com/repos/X-Square-Robot/x2real",
+          "retrieved_at": "2026-10-10T07:46:54.540567+00:00",
+          "status": 404,
+          "error": "Not Found"
+        }
+      ]
+    }
+  ],
+  "group": "unresolved",
+  "domains": [
+    "居家整理與清潔",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P169",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "X2Real，arXiv 2609.27449v1。",
+    "scope_read": "44task架構、training/eval分離、資產/DSL、DAG metrics、desktop/mobile與sim-real驗證。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      13,
+      14,
+      23,
+      24,
+      27,
+      28,
+      29
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "role": "模擬操作benchmark",
+    "environment": "Mana/IsaacLab場景；多embodiments与green-booth訓練配置，appearance/task/embodiment分別擾動。",
+    "tasks": "44simulation tasks／10能力維度；含3mobile tasks與3challenge tasks，能力數不是生活domain數。",
+    "cases": "近300小時訓練軌跡；desktop各300demo、mobile各1,000、3challenging總>20K trajectories；mobile eval每task每ID/OOD40episodes。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 44,
+        "unit": "simulation tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "能力維度",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "mobile tasks",
+        "pages": [
+          29
+        ]
+      },
+      {
+        "field": "case",
+        "value": 40,
+        "unit": "mobile每task每condition episodes",
+        "pages": [
+          29
+        ]
+      }
+    ],
+    "evaluation": [
+      "DAG依赖達成、無failure且sink nodes完成才success；latched node進度加權10分；層級macro平均避免大類壟斷。",
+      "sim-real本文overall r為success0.74/progress0.84，精密task更弱，不用一般task子集高r外推全部。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "green-booth demonstrations與OOD背景/task/robot配置分離；模型不取得frame-level subtask標籤。",
+    "lineage": "Mana基於IsaacLab/Arena，資產來自多3D庫與AIG3D；不等同建立完整新生活任務ontology。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          6,
+          23,
+          27,
+          29
+        ],
+        "locator": "Overview、Data、Metrics、Sim-real、Model Evaluation",
+        "supports": "44/10、資料範圍、DAG、40mobile episodes"
+      }
+    ],
+    "unresolved": [
+      "desktop完整eval case IDs與3challenge是否納同一overall分母需release設定核。"
+    ],
+    "reuse": "統一runtime、DAG過程與收集/評測分離可借；主張泛化應按能力與實測subset支持。",
+    "reviewed_pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521",
+    "reviewed_on": "2026-10-02",
+    "name": "X2Real",
+    "year": 2026,
+    "title": "X2Real: an eXtensive simulation benchmark for real-world generalist policies",
+    "source_url": "https://arxiv.org/abs/2609.27449",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "室內導航",
+      "工具使用",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P169",
+      "domain_ids": [
+        "home",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P169",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            13,
+            14,
+            23,
+            24,
+            27,
+            28,
+            29
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "44simulation tasks／10能力維度；含3mobile tasks與3challenge tasks，能力數不是生活domain數。",
+            "Mana/IsaacLab場景；多embodiments与green-booth訓練配置，appearance/task/embodiment分別擾動。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521"
+        },
+        {
+          "paper_id": "P169",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            13,
+            14,
+            23,
+            24,
+            27,
+            28,
+            29
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "桌面／移動等44項基礎操作與能力維度。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P169",
+      "name": "X2Real",
+      "expected_title": "X2Real: an eXtensive simulation benchmark for real-world generalist policies",
+      "source_url": "https://arxiv.org/abs/2609.27449",
+      "pdf_url": "https://arxiv.org/pdf/2609.27449",
+      "retrieved_at": "2026-10-02T21:34:45.619590+00:00",
+      "pdf_sha256": "5cff92f0d0a008824b9299b9e8f9259404e6177fd54a55c4d4eede0aff18f521",
+      "text_sha256": "fc98c912d50074c50daa7c282e2bd3bee4aa76e7e88933b34003a8401d6ce590",
+      "pdf_bytes": 63012499,
+      "pages": 53,
+      "text_characters": 209939,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.27449v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.27449v1"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 44,
+        "unit": "simulation tasks",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P169:1",
+        "paper_id": "P169",
+        "benchmark": "X2Real",
+        "native_term": "simulation tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.27449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.27449v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "能力維度",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P169:2",
+        "paper_id": "P169",
+        "benchmark": "X2Real",
+        "native_term": "能力維度",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.27449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.27449v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "mobile tasks",
+        "pages": [
+          29
+        ],
+        "record_id": "review10:P169:3",
+        "paper_id": "P169",
+        "benchmark": "X2Real",
+        "native_term": "mobile tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.27449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.27449v1",
+            "locator": "PDF pp. 29",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 40,
+        "unit": "mobile每task每condition episodes",
+        "pages": [
+          29
+        ],
+        "record_id": "review10:P169:4",
+        "paper_id": "P169",
+        "benchmark": "X2Real",
+        "native_term": "mobile每task每condition episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.27449v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.27449v1",
+            "locator": "PDF pp. 29",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

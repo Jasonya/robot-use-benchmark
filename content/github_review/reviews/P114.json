@@ -1,0 +1,108 @@
+{
+  "paper_id": "P114",
+  "summary": "RobotArena∞公開Genesis測試與GVL裁判流程，但自動場景生成仍列未發布。實際GVL入口使用影像加NPZ特權狀態，不是單純影片問答。",
+  "reading_order": [
+    {
+      "repo": "offjangir/RobotArena",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          40
+        ],
+        [
+          400,
+          465
+        ],
+        [
+          557,
+          585
+        ],
+        [
+          605,
+          617
+        ]
+      ],
+      "why": "精確來源、擾動與原生發行範圍",
+      "commit": "31ae6000067c120a0060165dc5506145c09c29aa"
+    },
+    {
+      "repo": "offjangir/RobotArena",
+      "path": "bash_scripts/GVL.bash",
+      "ranges": [
+        [
+          6,
+          8
+        ],
+        [
+          10,
+          16
+        ]
+      ],
+      "why": "真實入口GVL_multithreaded和模型/重複設定",
+      "commit": "31ae6000067c120a0060165dc5506145c09c29aa"
+    },
+    {
+      "repo": "offjangir/RobotArena",
+      "path": "src/pipeline/default_test.py",
+      "ranges": [
+        [
+          417,
+          450
+        ],
+        [
+          497,
+          516
+        ]
+      ],
+      "why": "動作與場景軌跡保存、預熱及焊接輔助",
+      "commit": "31ae6000067c120a0060165dc5506145c09c29aa"
+    },
+    {
+      "repo": "offjangir/RobotArena",
+      "path": "src/pipeline/GVL_multithreaded.py",
+      "ranges": [
+        [
+          27,
+          88
+        ],
+        [
+          465,
+          548
+        ],
+        [
+          623,
+          755
+        ]
+      ],
+      "why": "裁判輸入、狀態/接觸近似、採樣/解析與缺值",
+      "commit": "31ae6000067c120a0060165dc5506145c09c29aa"
+    },
+    {
+      "repo": "offjangir/RobotArena",
+      "path": "src/pipeline/GVL_metrics.py",
+      "ranges": [
+        [
+          1,
+          122
+        ]
+      ],
+      "why": "跨裁判repeat中位數、top30%與尾段聚合",
+      "commit": "31ae6000067c120a0060165dc5506145c09c29aa"
+    }
+  ],
+  "environment": "真實畫面轉成Genesis Robot Arenas；預設／生成scene及背景、相機、物件位置擾動。∞指生成擴展能力，不是無限個已取得環境；README自動生成碼未勾選發布。",
+  "tasks": "指定語言的操作目標在多擾動設定下評測。支援多個policy server是方法接口，不能按policy數擴大任務量。",
+  "data": "預設測試65步含5步預熱，存5fps MP4和同名NPZ；world/base是末端pos/quat/gripper，物件是13維pos/quat/linear/angular velocity。可加入weld抓持約束，須記assistance模式。",
+  "evaluation": "GVL入口以Gemini影像＋NPZ狀態評0–100進度，可做no_object/no_robot/none ablation；接觸文字由5cm距離啟發式推估。分數regex抓整數後clip，解析/API失敗可漏frame。聚合對repeat取逐frame median，再取最高30%等；avg_last_10實際取最後num_top幀，不固定10。需固定frame身份與完整分母。",
+  "standardization": {
+    "profile": "real_to_sim_generation_and_multimodal_progress_judging",
+    "reuse": "scene/variant配置、成對MP4/NPZ、policy接口、明確裁判提示與聚合碼。",
+    "transform": "case固定原真實來源、生成版本、scene/擾動/輔助抓持；judge輸入與policy輸入分開，記模型版本/ablation/採樣/每frame回執和native聚合公式。",
+    "missing": "自動場景生成release、全部資產與原生匹配、實體成功checker對照、裁判一致性/漏frame處理及完整可重跑protocol。"
+  },
+  "version_note": "固定預設branch fix/stable_version_genesis；README的Preview措辭與bash實際gemini-2.5-pro參數不同，需以執行manifest為準。未呼叫Gemini。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

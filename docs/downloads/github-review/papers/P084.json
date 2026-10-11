@@ -1,0 +1,1081 @@
+{
+  "paper_id": "P084",
+  "name": "KinDER",
+  "title": "KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2604.25788",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "logistics",
+    "general"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P084",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "KinDER將程序化環境與baselines分兩repo；已讀ClutteredRetrieval2D／Motion2D的具體幾何成功、5D動作與vector schema，再追到demo保存／IL reader及MPC評測CSV。非成功demo可被手動保存卻未被reader篩除；MPC steps漏算成功那一步，execution_time也不是環境執行時間。",
+    "identity_note": "固定paper為Huang、Li、Saxena等人的KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning，arXiv:2604.25788v2（2026-05-04）。PDF首頁指prpl-group.com/kinder-site；已讀該專案頁快照中精確title、arXiv、kindergarden主repo及kinder-baselines companion連結，避免只靠作者頁上的其他研究連結。主repo提供KinDERGarden/Gym，companion提供KinDERBench方法，不是兩份獨立benchmark。",
+    "discovery_evidence": [
+      {
+        "local_file": "audit/.cache/github_review/P084-discovery.json",
+        "selected_json_pointers": [
+          "/title",
+          "/paper_url",
+          "/pdf_sha256"
+        ],
+        "paper_version": "2604.25788v2",
+        "pdf_sha256": "39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900",
+        "sha256": "3c9963672f69cc68bc6e0a31443348f56c4061260deb584c3a44bb6ce9bccab6",
+        "text_excerpts": [
+          {
+            "json_pointer": "/opening_text",
+            "character_range": [
+              665,
+              702
+            ],
+            "text": "arXiv:2604.25788v2 [cs.RO] 4 May 2026",
+            "scope": "僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。"
+          }
+        ]
+      },
+      {
+        "local_file": "audit/.cache/github_review/http/12d8be66cd5af315ad933f24e055d95ee328048b90c48e06af859cf5f766dd40.body",
+        "url": "https://prpl-group.com/kinder-site/",
+        "sha256": "e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81",
+        "read_ranges": [
+          [
+            6,
+            8
+          ],
+          [
+            69,
+            71
+          ],
+          [
+            77,
+            79
+          ],
+          [
+            260,
+            262
+          ],
+          [
+            288,
+            290
+          ],
+          [
+            292,
+            294
+          ],
+          [
+            359,
+            361
+          ],
+          [
+            532,
+            534
+          ],
+          [
+            533,
+            535
+          ]
+        ],
+        "source_manifest": "audit/.cache/github_review_worker/P077-P084/P084-primary-identity.json",
+        "finding": "專用project page的title／arXiv與兩repo之直接連結。"
+      },
+      {
+        "local_file": "audit/.cache/fulltext_review/P084/pages.json",
+        "sha256": "7a3e287563b1f1cc14c4b4ec7c41f46f67b862237fa4e8ba3d73642d0e6d5c94",
+        "selected_json_pointers": [
+          "/4/text"
+        ],
+        "finding": "paper Kinematic3D與Dynamic3D的不同轉移／grasping模型，及TidyBot++、Kinova、Robotiq設定；不能把現行新增Vega backend倒算至paper。"
+      }
+    ],
+    "environment": "paper v2宣告25個程序化環境／13 baselines，跨Kinematic2D、Dynamic2D、Kinematic3D、Dynamic3D；現行0.2.5另列kinematic3d_v2/Vega等內容，須依paper版本選子集。已讀兩個Kinematic2D環境的world=[0,2.5]²，原點左下、x向右、y向上；使用2D原生長度座標與theta弧度，不把render DPI當物理尺度。CRV robot是圓形底座、伸縮臂與吸盤；kinematic轉移沒有速度積分。觀測排除固定牆面等initial_constant_state，planner可透過專用state API取得；allow_state_access是方法可見資訊條件。",
+    "tasks": "ClutteredRetrieval2D需把target_block完整放入target_region；o1/o10/o25代表阻擋物數，registry保存同一class的variant_ids，並非固定case數。最初robot必須在最大free-space連通分量，目標不得已與region重疊；這是初態有效性檢查，不等於已證明全局可解。Motion2D-p0-v0是MPC預設task，成功只要求robot的(x,y)參考位置在target rectangle內；與完整block包含判定不同。每步reward均-1，包含成功那一步，不能當正向成功獎勵。",
+    "data": "ConstantObjectKinDEREnv由exemplar與type_features產生可逆vectorize/devectorize；ClutteredRetrieval-o1文檔具體39維：robot9維，target_block/target_region/obstruction各10維（x,y,theta,static,color_rgb,z_order,width,height）。名稱及feature順序需保留，不能按任意字典排序重新編號。action=[dx,dy,dtheta,darm,vac]：位移±0.05、角度±π/16、臂長增量±0.1、vac∈[0,1]；吸附物件按前一步gripper相對變換搬移，碰撞則整個候選state不採用。demo寫{sanitized_env_id}/{seed}/{timestamp}.p（dill），有env_id/timestamp/seed/observations/actions/rewards/terminated/truncated，T actions通常配T+1 observations；timestamp是保存時間，不是逐frame時間。GUI render_fps=20不能證明每action間隔固定。IL reader依數字seed目錄排序、每目錄取glob第一個.p，zip(observations[:-1],actions)生成observation.state/action/episode_index/frame_index；預設無images，render_images=True才以同seed和actions重播產生影像，本輪未執行。",
+    "evaluation": "ClutteredRetrieval chain為vector wrapper.step→ObjectCentricKinematic2DRobotEnv.step→_get_reward_and_done→is_inside，逐一檢查target rectangle頂點是否在goal rectangle；base回truncated=False、無原生maximum horizon。MPC另一條完整路徑：run_experiment依Motion2D-p0配置建立eval env及allow_state_access=True的獨立sim env→TrajOptAgent/PredictiveSampling→KinderTrajOptProblem.get_transition→Motion2D.contains_point，實際eval success直接取env.step的terminated。預設每cfg seed50 episodes、max_eval_steps=200；planning horizon=100、num_rollouts=10、replan_interval=3是規劃預算，不是trial數。results.csv記success、steps、planning_time、execution_time、reward及正常episode的eval_episode；例外直接插入失敗／零數值列。evaluate_stats讀config.env.env_id、seed與CSV success，先取每job成功率，再對收集到的job rates平均與sample std(ddof=1)。",
+    "standardization": {
+      "profile": "procedural_object_centric_reasoning_environments_and_planning_trials",
+      "reuse": "環境class/variant registry、程序化reset、object/feature映射、action bounds、幾何checker、.p軌跡schema及具體MPC success CSV。",
+      "transform": "source鎖paper v2與兩repo commit，environment再綁backend/package版本與完整config；task家族、variant物件數、reset seed/case和method trial分開。case保存初態vector+feature manifest及父demo檔案hash，保留T/T+1關係。evaluator保存terminated/truncated、execution步數、planning rollout預算、state-access／world-model設定；rendered images標為重播衍生資料，連回原seed與code版本。",
+      "missing": "collector手動G鍵可保存terminated=False，但IL loader不檢查terminated/truncated，並任選同seed第一個.p、未驗證各episode env_id一致；需明確挑檔及成功標籤。重播影像只依seed、未比對stored observations，環境修訂後不能宣稱畫面仍對齊。MPC steps在done前break而少算成功步；execution_time只包agent.update，不含env.step；抽到的實際episode seed未寫CSV，例外列又缺eval_episode。summarizer不依seed去重，重複job可冒充更多獨立seed。需補paper環境／baseline清單、外部3D資產及prpl_utils/relational_structs/tomsgeoms2d精確版本；未驗證其餘dynamic tasks或真實mobile-manipulator實驗。"
+    },
+    "version_note": "主repo固定5b2dbac482142b879b48449b3fa2af63f641aed3（2026-09-11，pyproject 0.2.5），baselines固定f763946435c9ed8ab0f89e645f1014b07c1a1e8a（2026-09-15），均晚於paper v2。env ID的-v0不表示reset/碰撞實作從未變更；registry還會因backend導入失敗而跳過整組環境，本機可用ID數不能作全庫case/env數。paper的25/13與現行README新增項目分開保留；本輪未安裝、run CI、重播、訓練或執行planner。",
+    "runtime_executed": false,
+    "reviewed_on": "2026-10-11",
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            7,
+            16
+          ],
+          [
+            26,
+            57
+          ],
+          [
+            79,
+            99
+          ],
+          [
+            124,
+            147
+          ],
+          [
+            149,
+            194
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 206,
+        "sha256": "aaf7f0b80cd6bbcf754f769fcc39536f998f97af6e54808db2c1e5f15049e7cb",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/README.md",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/README.md#L7-L16",
+        "why": "官方主環境、object-centric/vector API、backend版本與外部assets／demos。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            31
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 43,
+        "sha256": "de1a74ea8173e46a2bdb4939021706dfb761fb0a81b00bfe6875d6054cab9563",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/README.md",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/README.md#L1-L31",
+        "why": "companion baselines與model/skill套件角色。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "pyproject.toml",
+        "ranges": [
+          [
+            5,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 128,
+        "sha256": "cebbd20989daa5bedcca7d4cbcc9062f48d9f60b04e52f1e986a050ade101ad3",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/pyproject.toml",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/pyproject.toml#L5-L43",
+        "why": "package 0.2.5、Pymunk/MuJoCo與未鎖精確版次的幾何依賴。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "src/kinder/__init__.py",
+        "ranges": [
+          [
+            34,
+            96
+          ],
+          [
+            119,
+            136
+          ],
+          [
+            560,
+            592
+          ],
+          [
+            647,
+            654
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 702,
+        "sha256": "18921c796b28b353633ea8ce7773fc97441d001f91ba739c68176ce6d7a982b9",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/__init__.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/__init__.py#L34-L96",
+        "why": "按backend註冊、o1/o10/o25 variants及metadata，不從本機註冊結果推全庫數量。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "src/kinder/core.py",
+        "ranges": [
+          [
+            124,
+            199
+          ],
+          [
+            215,
+            267
+          ],
+          [
+            300,
+            318
+          ],
+          [
+            344,
+            350
+          ],
+          [
+            376,
+            407
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 414,
+        "sha256": "46d64f7ba12ed06f45bb546365e27ed79ed9a6602b6486e1f83b57fc582241b2",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/core.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/core.py#L124-L199",
+        "why": "vector/object映射、state-access權限與planner內部transition。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "src/kinder/envs/kinematic2d/clutteredretrieval2d.py",
+        "ranges": [
+          [
+            36,
+            86
+          ],
+          [
+            137,
+            248
+          ],
+          [
+            306,
+            438
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 464,
+        "sha256": "83fe2315ce0694a4b79fb325e150975101c05c26c0f6995b5eba9506f0f9f8ea",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/clutteredretrieval2d.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/clutteredretrieval2d.py#L36-L86",
+        "why": "原生2D座標、物件初態、碰撞採樣、完整包含checker與固定feature順序。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "src/kinder/envs/kinematic2d/base_env.py",
+        "ranges": [
+          [
+            99,
+            199
+          ],
+          [
+            206,
+            249
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 273,
+        "sha256": "3f915eacb6aa5db037e0ec1c7549cd4be2e8613a61fa738839f9b05366475e85",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/base_env.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/base_env.py#L99-L199",
+        "why": "5D action、上一時刻吸附物件轉換、碰撞回退、reward/termination與無預設horizon。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "src/kinder/envs/kinematic2d/utils.py",
+        "ranges": [
+          [
+            422,
+            437
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 527,
+        "sha256": "273895b460c0c76f1139c2a0309617af7986eabe630caee74ae2847b17b024ed",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/utils.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/utils.py#L422-L437",
+        "why": "真正包含判定：inner rectangle的每個頂點皆在outer rectangle內。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "src/kinder/envs/kinematic2d/motion2d.py",
+        "ranges": [
+          [
+            34,
+            55
+          ],
+          [
+            117,
+            145
+          ],
+          [
+            261,
+            297
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 323,
+        "sha256": "4c4e467f82ceb3b69b08b0050100490c9b3bb310a2e8886ccd12121743e74a40",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/motion2d.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/src/kinder/envs/kinematic2d/motion2d.py#L34-L55",
+        "why": "MPC預設Motion2D的實際goal：robot參考位置落入region。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "docs/envs/ClutteredRetrieval2D.md",
+        "ranges": [
+          [
+            7,
+            43
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 47,
+        "sha256": "d34d60a8bf54571f3c3d79b8502b2685452d291314eb722b91c43b85dfba7d9d",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/docs/envs/ClutteredRetrieval2D.md",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/docs/envs/ClutteredRetrieval2D.md#L7-L43",
+        "why": "task/variant及action欄位說明；25-step random-action展示不是評測預算。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "docs/envs/variants/ClutteredRetrieval2D/ClutteredRetrieval2D-o1.md",
+        "ranges": [
+          [
+            24,
+            66
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 66,
+        "sha256": "482d7158fb0037015d1339b0c2c847755f3dd81ad6b79d06a1036cf212fbe0af",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/docs/envs/variants/ClutteredRetrieval2D/ClutteredRetrieval2D-o1.md",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/docs/envs/variants/ClutteredRetrieval2D/ClutteredRetrieval2D-o1.md#L24-L66",
+        "why": "o1版本的39維feature索引。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+        "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+        "ref": null,
+        "path": "scripts/collect_demos.py",
+        "ranges": [
+          [
+            1,
+            10
+          ],
+          [
+            95,
+            119
+          ],
+          [
+            152,
+            195
+          ],
+          [
+            233,
+            260
+          ],
+          [
+            348,
+            372
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 395,
+        "sha256": "ae00cdbd88a5955cc306da1a54cd065e1c40192d4c8f6358190f7f9edd7c02bc",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/scripts/collect_demos.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/blob/5b2dbac482142b879b48449b3fa2af63f641aed3/scripts/collect_demos.py#L1-L10",
+        "why": "dill .p欄位、T+1觀測、手動保存非成功軌跡與20fps GUI。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-imitation-learning/src/kinder_imitation_learning/dataset.py",
+        "ranges": [
+          [
+            18,
+            174
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 451,
+        "sha256": "6f67af1765de28c6d25921874ecdd4c9461506ccac52d3317f964ead01a4a3c6",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-imitation-learning/src/kinder_imitation_learning/dataset.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-imitation-learning/src/kinder_imitation_learning/dataset.py#L18-L174",
+        "why": "實際.p reader、首檔選擇、obs/action對齊、可選重播影像與丟棄flags。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-trajopt/experiments/conf/config.yaml",
+        "ranges": [
+          [
+            17,
+            28
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 28,
+        "sha256": "9414fa0877078ead547ffcf54f30fd375adc8b23332e5fcc2b559c3c7bc1b78c",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/conf/config.yaml",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/conf/config.yaml#L17-L28",
+        "why": "50評測episodes、100步planning horizon、10候選rollouts。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-trajopt/experiments/conf/env/motion2d-p0.yaml",
+        "ranges": [
+          [
+            1,
+            5
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 5,
+        "sha256": "72f238ca929d22ca11f6444f34ca0ca2779d0bda6ef5d841917a28adcef7c1fd",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/conf/env/motion2d-p0.yaml",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/conf/env/motion2d-p0.yaml#L1-L5",
+        "why": "Motion2D-p0-v0、200執行步、每3步replan及不用world-model checkpoint。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-trajopt/src/kinder_trajopt/agent.py",
+        "ranges": [
+          [
+            26,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 80,
+        "sha256": "9321140f6b9f9e8535dac16b61623fbc10e09cc42b1a4d528dae5a8696afcea0",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/src/kinder_trajopt/agent.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/src/kinder_trajopt/agent.py#L26-L80",
+        "why": "PredictiveSampling/MPC設定、觀測到action與可選world-model。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-trajopt/src/kinder_trajopt/trajopt_problem.py",
+        "ranges": [
+          [
+            18,
+            44
+          ],
+          [
+            68,
+            108
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 129,
+        "sha256": "618c1cc76011479354534e39967a72bfe018135e298542e4aeaed9f121cad270",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/src/kinder_trajopt/trajopt_problem.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/src/kinder_trajopt/trajopt_problem.py#L18-L44",
+        "why": "simulated candidate成本為到termination前的負累積reward；可選world-model仍用env reward。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-trajopt/experiments/run_experiment.py",
+        "ranges": [
+          [
+            33,
+            107
+          ],
+          [
+            110,
+            146
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 150,
+        "sha256": "fe15472ac742cc192fb610177768ba80a3b272803f3e24207edda3e5764d6c59",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/run_experiment.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/experiments/run_experiment.py#L33-L107",
+        "why": "實際eval loop、seed、success CSV、exception fallback及時間／步數指標範圍。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+        "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+        "ref": null,
+        "path": "kinder-trajopt/scripts/evaluate_stats.py",
+        "ranges": [
+          [
+            17,
+            67
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 74,
+        "sha256": "77ca3c9f4437f455a97882675fbe0e68a067e5f15c3bfc06ef59d85ab1b869fb",
+        "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/scripts/evaluate_stats.py",
+        "reading_url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/blob/f763946435c9ed8ab0f89e645f1014b07c1a1e8a/kinder-trajopt/scripts/evaluate_stats.py#L17-L67",
+        "why": "每job success平均與job間ddof=1標準差；不是獨立重評審。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "cb4f3eea9dbb912346c40a22790fbc42b990a549e4699899f38ee1dbb1833355"
+  },
+  "repository_binding_review_sha256": "cb4f3eea9dbb912346c40a22790fbc42b990a549e4699899f38ee1dbb1833355",
+  "repository_bindings": [
+    {
+      "requested_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+      "resolved_repo": "Princeton-Robot-Planning-and-Learning/kinder-baselines",
+      "aliases_in_this_review": [
+        "princeton-robot-planning-and-learning/kinder-baselines"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "f763946435c9ed8ab0f89e645f1014b07c1a1e8a",
+          "reviewed_files": [
+            "README.md",
+            "kinder-imitation-learning/src/kinder_imitation_learning/dataset.py",
+            "kinder-trajopt/experiments/conf/config.yaml",
+            "kinder-trajopt/experiments/conf/env/motion2d-p0.yaml",
+            "kinder-trajopt/experiments/run_experiment.py",
+            "kinder-trajopt/scripts/evaluate_stats.py",
+            "kinder-trajopt/src/kinder_trajopt/agent.py",
+            "kinder-trajopt/src/kinder_trajopt/trajopt_problem.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines",
+          "link_label": "kinder-baselines",
+          "project_url": "https://prpl-group.com/kinder-site/",
+          "page_sha256": "e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kinder-baselines/issues",
+          "link_label": "KinDER Baselines",
+          "project_url": "https://prpl-group.com/kinder-site/",
+          "page_sha256": "e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P084",
+          "review_file": "content/github_review/reviews/P084.json",
+          "review_sha256": "cb4f3eea9dbb912346c40a22790fbc42b990a549e4699899f38ee1dbb1833355",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+      "resolved_repo": "Princeton-Robot-Planning-and-Learning/kindergarden",
+      "aliases_in_this_review": [
+        "princeton-robot-planning-and-learning/kindergarden"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5b2dbac482142b879b48449b3fa2af63f641aed3",
+          "reviewed_files": [
+            "README.md",
+            "docs/envs/ClutteredRetrieval2D.md",
+            "docs/envs/variants/ClutteredRetrieval2D/ClutteredRetrieval2D-o1.md",
+            "pyproject.toml",
+            "scripts/collect_demos.py",
+            "src/kinder/__init__.py",
+            "src/kinder/core.py",
+            "src/kinder/envs/kinematic2d/base_env.py",
+            "src/kinder/envs/kinematic2d/clutteredretrieval2d.py",
+            "src/kinder/envs/kinematic2d/motion2d.py",
+            "src/kinder/envs/kinematic2d/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "code",
+          "project_url": "https://yixuanhuang98.github.io/",
+          "page_sha256": "a1cfe30980a7130b9a0577b17c244076857b8fdc4e7ab8745b2534bd30fc952e"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "Code",
+          "project_url": "https://jaraxxus-me.github.io/",
+          "page_sha256": "03d47d3890c984e76fe8c5e7cb944a8b895a71f41646d5a2420870a297f37b00"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "Code",
+          "project_url": "https://sites.google.com/view/vaibhavsaxena",
+          "page_sha256": "a9966ec6580f3135297cc1d5efc8fbebb93e9d0edcc43689fc4d028737d45bc6"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "Code",
+          "project_url": "https://yichao-liang.github.io/",
+          "page_sha256": "4f97721c8af23991d3f3a1d587ee8ae58e615b8666dc46af13907c81d5cd17d0"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "Code",
+          "project_url": "https://lihzha.github.io/",
+          "page_sha256": "f32278ee694574b6e915564294f9c9d1627bebb4d881ed987d5b8d600048e40a"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "Code",
+          "project_url": "https://prpl-group.com/kinder-site/",
+          "page_sha256": "e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden",
+          "link_label": "GitHub repository",
+          "project_url": "https://prpl-group.com/kinder-site/",
+          "page_sha256": "e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Princeton-Robot-Planning-and-Learning/kindergarden/issues",
+          "link_label": "KinDER (environments)",
+          "project_url": "https://prpl-group.com/kinder-site/",
+          "page_sha256": "e40e3b2620dc917a6828660e30d0009856e767dc3c7d619795690f4844706d81"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P084",
+          "review_file": "content/github_review/reviews/P084.json",
+          "review_sha256": "cb4f3eea9dbb912346c40a22790fbc42b990a549e4699899f38ee1dbb1833355",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "包裝、倉儲與物流",
+    "通用物件與機動作業"
+  ],
+  "source_review": {
+    "paper_id": "P084",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "KinDER，arXiv 2604.25788v2。",
+    "scope_read": "五大physical-reasoning要求、25環境、4種物理抽象、8實驗環境及metrics。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      14
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "包裝、倉儲與物流",
+      "通用物件與機動作業"
+    ],
+    "role": "物理推理與規劃benchmark",
+    "environment": "25 procedural task-environments：6 Kinematic2D＋4 Dynamic2D＋5 Kinematic3D＋10 Dynamic3D；不是25生活场域。",
+    "tasks": "工具、nonprehensile、多物體、幾何、動力約束；KinDERBench主實驗只取8代表環境，13baselines。",
+    "cases": "10環境各≥100precollected demos；eval每seed50episodes×5seeds，8環境合計2,000runs／baseline（含重複seed運行）。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 25,
+        "unit": "procedural task-environments",
+        "pages": [
+          4,
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主實驗環境",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每環境每seed eval episodes",
+        "pages": [
+          7
+        ]
+      }
+    ],
+    "evaluation": [
+      "success rate；只在成功episodes比較累積步數cost（每步-1），另報inference time。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "不同物體數量OOD；state／RGB與提供skills/PDDL的資訊差異需明示。Kinematic版本碰撞回退、rigid attachment，不等同dynamic真抓取。",
+    "lineage": "PyMunk／PyBullet／MuJoCo不同backend；借RoboCasa/MimicLabs資產及BDDL設計。",
+    "related_paper_ids": [
+      "P070",
+      "P100"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "locator": "§IV–VI、圖3",
+        "supports": "25／8、物理層次、eval與資訊條件"
+      }
+    ],
+    "unresolved": [
+      "程序分布無固定題庫上限；僅8環境有主baseline結果，不能聲稱全25已同程度驗證。"
+    ],
+    "reuse": "支持明確規則／物理抽象的比較；不得將kinematic、dynamic的成功直接合成無條件難度分數。",
+    "reviewed_pdf_sha256": "39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900",
+    "reviewed_on": "2026-10-02",
+    "name": "KinDER",
+    "year": 2026,
+    "title": "KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning",
+    "source_url": "https://arxiv.org/abs/2604.25788",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "home",
+      "logistics",
+      "general"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "室內導航",
+      "工具使用",
+      "包裝與倉儲",
+      "表面清潔"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "包裝、倉儲與物流",
+      "通用物件與機動作業"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P084",
+      "domain_ids": [
+        "home",
+        "logistics",
+        "general"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P084",
+          "domain_ids": [
+            "home",
+            "logistics"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            14
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "工具、nonprehensile、多物體、幾何、動力約束；KinDERBench主實驗只取8代表環境，13baselines。",
+            "25 procedural task-environments：6 Kinematic2D＋4 Dynamic2D＋5 Kinematic3D＋10 Dynamic3D；不是25生活场域。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900"
+        },
+        {
+          "paper_id": "P084",
+          "domain_ids": [
+            "general"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            14
+          ],
+          "locator": "已核讀任務／端點定義",
+          "observed_tasks": [
+            "工具、幾何、動力與多物件控制的代表性問題。"
+          ],
+          "reasoning": "將相同用途定義套用到全庫中符合條件的既有來源。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900",
+      "previous_domain_ids": [
+        "home",
+        "logistics"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P084",
+      "name": "KinDER",
+      "expected_title": "KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning",
+      "source_url": "https://arxiv.org/abs/2604.25788",
+      "pdf_url": "https://arxiv.org/pdf/2604.25788",
+      "retrieved_at": "2026-10-02T21:33:53.636818+00:00",
+      "pdf_sha256": "39d1283a971b7b903edb7885cabdc9dea9c412bd3cfcc8431f0c39154ba44900",
+      "text_sha256": "f86fadd2089d81b8bff5cf7f07d41a28396f372d7a52f726279e8cbcd75e6b65",
+      "pdf_bytes": 13639917,
+      "pages": 21,
+      "text_characters": 122818,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2604.25788v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2604.25788v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 25,
+        "unit": "procedural task-environments",
+        "pages": [
+          4,
+          5
+        ],
+        "record_id": "review10:P084:1",
+        "paper_id": "P084",
+        "benchmark": "KinDER",
+        "native_term": "procedural task-environments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.25788v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.25788v2",
+            "locator": "PDF pp. 4, 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 8,
+        "unit": "主實驗環境",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P084:2",
+        "paper_id": "P084",
+        "benchmark": "KinDER",
+        "native_term": "主實驗環境",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.25788v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.25788v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每環境每seed eval episodes",
+        "pages": [
+          7
+        ],
+        "record_id": "review10:P084:3",
+        "paper_id": "P084",
+        "benchmark": "KinDER",
+        "native_term": "每環境每seed eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2604.25788v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2604.25788v2",
+            "locator": "PDF pp. 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Princeton-Robot-Planning-and-Learning/kindergarden",
+    "Princeton-Robot-Planning-and-Learning/kinder-baselines"
+  ],
+  "external_repositories": []
+}

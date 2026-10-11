@@ -1,0 +1,127 @@
+{
+  "paper_id": "P198",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "TACO的公開庫主要是人體手–工具–物件資料載入和投影工具。pre-release與V1的序列、triplet和視角數不同，必須分版計數。",
+  "reading_order": [
+    {
+      "repo": "leolyliu/TACO-Instructions",
+      "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ],
+        [
+          198,
+          223
+        ]
+      ],
+      "why": "原作、244/2317版本差異及後加annotation工具"
+    },
+    {
+      "repo": "leolyliu/TACO-Instructions",
+      "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+      "path": "dataset_utils/hand_pose_loader.py",
+      "ranges": [
+        [
+          10,
+          76
+        ]
+      ],
+      "why": "MANO shape/pose/translation與mm→m"
+    },
+    {
+      "repo": "leolyliu/TACO-Instructions",
+      "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+      "path": "dataset_utils/video_utils.py",
+      "ranges": [
+        [
+          16,
+          49
+        ]
+      ],
+      "why": "影片順序、BGR/RGB與frame cap"
+    },
+    {
+      "repo": "leolyliu/TACO-Instructions",
+      "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+      "path": "dataset_utils/project_pose_to_egocentric_view.py",
+      "ranges": [
+        [
+          20,
+          120
+        ]
+      ],
+      "why": "cm物件mesh→m、世界pose、逐frame world-to-camera與資料完整性"
+    },
+    {
+      "repo": "liesliy/tlabel",
+      "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          99
+        ]
+      ],
+      "why": "確認是後加的跨感測觸覺annotation工具，不是原TACO資料。"
+    },
+    {
+      "repo": "liesliy/tlabel",
+      "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+      "path": "docs/tlabel-format.md",
+      "ranges": [
+        [
+          1,
+          112
+        ]
+      ],
+      "why": "核對schema版本、capabilities、sensor_info與episode引用，保留物理單位。"
+    },
+    {
+      "repo": "liesliy/tlabel",
+      "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+      "path": "tlabel/core/schema.py",
+      "ranges": [
+        [
+          21,
+          102
+        ]
+      ],
+      "why": "確認14個語義欄位、缺省confidence及使用者自述data_quality。"
+    },
+    {
+      "repo": "liesliy/tlabel",
+      "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+      "path": "tlabel/quality/scorer.py",
+      "ranges": [
+        [
+          39,
+          89
+        ]
+      ],
+      "why": "區分資料完整性／平滑／一致性加權分數與robot任務成功。"
+    }
+  ],
+  "environment": "真實雙手工具操作，多視角RGB與ego RGB-D。pre-release為8個allocentric views，V1為12個，且共用206object models；不同view或release不當成獨立物理場景。",
+  "tasks": "〈tool,action,object〉triplet理解與generalization：pre-release244sequences/137triplets，V1 2317sequences/151triplets。triplet是原生語義組合，sequence是觀測樣本，不自行當151種可執行robot目標。",
+  "data": "按triplet/sequence組織RGB-D、Hand_Poses、Object_Poses及Camera_Parameters；MANO48Dpose+10Dshape+translation，輸出778vertices/21joints。hand模型結果除1000、object_cm.obj乘0.01後進同m座標；camera extrinsics明示world_to_camera。缺shape helper會補0beta，需標missing/default。 額外工具TLabel的固定README／schema已補讀：它另有schema_version、sensor_info、capabilities、episodes，以及14個觸覺語義欄位；這不表示原TACO已有這些觸覺訊號。TLabel的L1–L4描述資訊完整程度，非本benchmark的任務難度。",
+  "evaluation": "所讀是loader與可視化，不是完整原作benchmark grader；frame數與pose數不符會跳過。需要原作task split/metric才可做辨識/軌跡/互動評測。後加TLabel workflow只是工具支援，不能據此把原作RGB-D清單宣稱新增實測觸覺模態。 TLabel的QualityScorer以一致性30%、平滑25%、完整性25%、覆蓋20%合成資料品質分數；不是對GT量測準確率、機器人成功率或校準後的難度。data_quality另可使用者自述；schema缺省confidence=1.0也不能當已驗證的可信度。",
+  "standardization": {
+    "profile": "bimanual_tool_action_object_motion_data",
+    "reuse": "版本化triplet/sequence ID、MANO/物件pose/camera校準、單位明確的投影流程。",
+    "transform": "source保留pre-release→V1 relation；case以triplet+sequence+時間/視角定位；camera/object/hand座標及units統一但保留原始值，缺frame/shape單列invalid/default狀態。",
+    "missing": "完整data/asset與官方split、原benchmark scorer與基線、object/contact物理化以轉robot任務、default shape與時間同步驗證。"
+  },
+  "version_note": "固定b385ac1；CVPR2024原作2401.08399，README後續更新到V1與額外工具。未將可視化成功當作理解或機器人操作成功。 已補核TLabel be7121d0的文件、schema與quality入口，限後加工具角色；未執行adapter／export或宣稱TACO數量因此增加。",
+  "runtime_executed": false,
+  "additional_repo_proposals": [
+    {
+      "repo": "liesliy/tlabel",
+      "role": "optional_annotation_tool_not_original_benchmark",
+      "evidence": "TACO新版README的額外工具建議；本輪已補核TLabel文件／schema／quality入口，與原始資料及benchmark分開。"
+    }
+  ]
+}

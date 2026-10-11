@@ -1,0 +1,124 @@
+{
+  "paper_id": "P130",
+  "summary": "ALOHA提供雙臂蒐集，ACT提供訓練及兩個模擬任務。sim的成功從最高reward判定；真實模式的reward佔位不能當原文實機成功率。",
+  "reading_order": [
+    {
+      "repo": "tonyzhaozh/aloha",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          12
+        ]
+      ],
+      "why": "硬體/蒐集與ACT的角色分工",
+      "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557"
+    },
+    {
+      "repo": "tonyzhaozh/act",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          25
+        ],
+        [
+          55,
+          68
+        ]
+      ],
+      "why": "兩個原生sim環境與示範/方法入口",
+      "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488"
+    },
+    {
+      "repo": "tonyzhaozh/aloha",
+      "path": "aloha_scripts/record_episodes.py",
+      "ranges": [
+        [
+          88,
+          101
+        ],
+        [
+          127,
+          165
+        ]
+      ],
+      "why": "T+1觀測蒐集後存T、14D雙臂HDF5",
+      "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557"
+    },
+    {
+      "repo": "tonyzhaozh/aloha",
+      "path": "aloha_scripts/real_env.py",
+      "ranges": [
+        [
+          111,
+          112
+        ],
+        [
+          142,
+          151
+        ]
+      ],
+      "why": "真實reward佔位與每臂6關節+gripper",
+      "commit": "06369f03cd8e0a47e16d3a90167853fd33af7557"
+    },
+    {
+      "repo": "tonyzhaozh/act",
+      "path": "utils.py",
+      "ranges": [
+        [
+          23,
+          76
+        ]
+      ],
+      "why": "sim/real不同action時間偏移、padding與normalization",
+      "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488"
+    },
+    {
+      "repo": "tonyzhaozh/act",
+      "path": "sim_env.py",
+      "ranges": [
+        [
+          143,
+          169
+        ],
+        [
+          192,
+          229
+        ]
+      ],
+      "why": "Transfer/Insertion具體接觸式分階reward",
+      "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488"
+    },
+    {
+      "repo": "tonyzhaozh/act",
+      "path": "imitate_episodes.py",
+      "ranges": [
+        [
+          179,
+          194
+        ],
+        [
+          280,
+          313
+        ]
+      ],
+      "why": "最高reward成功聚合及real模式限制",
+      "commit": "742c753c0d4a5d87076c8f69e5628c79a8cc5488"
+    }
+  ],
+  "environment": "真實雙臂ALOHA與MuJoCo/DM-Control兩個模擬場景分開；資料中的四相機／四個主從臂不算四種任務環境。",
+  "tasks": "ACT repo兩個sim任務為Transfer Cube/Bimanual Insertion；joint-control和EE-control是執行表示，scripted/human是示範來源，不能各算新的語義task。",
+  "data": "HDF5 obs qpos/qvel/effort與action均14D，RGB相機分key。蒐集T次action產T+1 timesteps，但儲存配對只取前T。ACT real資料從start_ts−1取action，sim從start_ts取，padding與mean/std要保存。",
+  "evaluation": "sim Transfer reward4為左gripper接觸且方塊不接觸桌；Insertion reward4為peg碰到pin。eval用全episode最高reward==max_reward作成功，非最後穩定狀態。real_env.get_reward固定0，eval real分支max_reward也0，此自動數值不能代替實機任務審核。",
+  "standardization": {
+    "profile": "bimanual_demonstration_and_sim_benchmark",
+    "reuse": "HDF5原結構、兩個sim checker、機體/相機配置、action/padding與示範來源。",
+    "transform": "real/sim分protocol；case固定初態與目標、joint或EE動作、資料時間偏移、temporal aggregation及原最高reward指標。新加穩定性規則另版。",
+    "missing": "原實機任務rubric、全量素材／split、終端觀測與T對齊、sim/real重播與獨立成功判定。"
+  },
+  "version_note": "ALOHA/ACT各固定commit；真實環境中的0 reward是軟體接口佔位，不能推論原論文實機研究使用此欄自動評分。未執行硬體或sim。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

@@ -1,0 +1,216 @@
+{
+  "paper_id": "P213",
+  "name": "Vision to Harvest",
+  "title": "From Vision to Harvest: Benchmarking Vision-Language Models for Multi-Arm Robotic Fruit Harvesting",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.13606",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garden"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P213",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "Vision to Harvest評估從果園影像生成多臂採收計畫；原文的harvested ratio與collision ratio是計畫幾何指標，不能當作實際採摘完成與碰撞感測結果。未確認官方GitHub。",
+    "environment": "兩份真實orchard RGB-D來源：Fuji apple與citrus；citrus父資料432張影像，論文再取heldout場景，未提供本次可取得的benchmark場景ID manifest。",
+    "tasks": "從初始canopy觀測分配水果及生成各Cartesian arm的順序/waypoints。作者明說online perception/replanning留待future work，因此屬觀測後計畫評測，不是完整閉環採果。",
+    "data": "oracle採GroundingDINO/SAM2→depth投3D→DBSCAN→MIP分配/規劃；VLM用原始影像及workspace/robot constraints，輸出每臂JSON順序/waypoints，未提供定時軌跡。沒有公開reader/標註子集入口可核驗。",
+    "evaluation": "五類原生指標為detection ratio、距離門檻內waypoint的harvested ratio、含x軸arm-order violation的scene比例、總路徑距離、tokens/scene。Verifier不修復計畫；碰撞定義是順序可行性proxy，沒有實際觸碰或水果detach驗收。",
+    "standardization": {
+      "profile": "multiarm_orchard_visual_planning",
+      "reuse": "農業用途、原圖→多臂計畫的任務定義、原生空間可行性與效率指標。",
+      "transform": "case綁crop/scene/image-depth標定、arm配置/工作空間、固定prompt與距離門檻；將計畫品質和可執行物理採收分層，保留oracle與VLM合法輸入差異。",
+      "missing": "官方code、heldout scene/GT清單、JSON parser/一對一水果匹配/ verifier與完整控制、動態feedback及真正採果驗收。"
+    },
+    "version_note": "已讀2609.13606v1 p3/5與現有repository discovery；未確認source code或將相關harvesting/MIP工具當作本篇完整實作。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.13606",
+      "pdf_sha256": "b3ee03d5d25e728c85d714de947fb09d06f56e94067923961d75c365281c22eb",
+      "paper_pages_read": [
+        3,
+        5
+      ],
+      "search_receipts": [
+        "audit/.cache/github_review/search/P213-refined.json",
+        "audit/.cache/github_review/search/P213.json"
+      ]
+    },
+    "reading_order": [],
+    "review_sha256": "60b9406d32b5351ac55ed7355b1fceb2e8ebe8c06c4bcaf55ebc4b83e72f87ef"
+  },
+  "repository_binding_review_sha256": "60b9406d32b5351ac55ed7355b1fceb2e8ebe8c06c4bcaf55ebc4b83e72f87ef",
+  "repository_bindings": [],
+  "repository_candidates": [],
+  "group": "unresolved",
+  "domains": [
+    "農業與園藝"
+  ],
+  "source_review": {
+    "paper_id": "P213",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "From Vision to Harvest: Benchmarking Vision-Language Models for Multi-Arm Robotic Fruit Harvesting；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "role": "專業場域規劃benchmark",
+    "domains": [
+      "農業與園藝"
+    ],
+    "environment": "Fuji apple及citrus orchard RGB-D資料；citrus父庫432images，实际held-outscene數未報。",
+    "tasks": "multi-armCartesian fruit harvesting的offlineallocation/waypointplanning；apple/citrus兩作物設定。",
+    "cases": "每crop共用同一held-outimage集合；未報可核固定題數，不能將父庫432全填成eval cases。",
+    "native_counts": [
+      {
+        "field": "asset",
+        "value": 2,
+        "unit": "crop types，非兩種生活domain",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "detection/harvested ratio、arm-order violation、pathdistance/token成本；harvested其實是waypoint距離門檻0.25/0.5/1m。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "環境狀態與過程檢查"
+    ],
+    "split": "zeroshot同prompt；沒有在線replanning或真的摘果控制。",
+    "lineage": "既有果園資料＋新plan/verifier；collision指order違反，非完整動力學碰撞檢查。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "exactevalsceneIDs未報；高harvestedratio不可當物理摘取成功。"
+    ],
+    "reuse": "補農業用途與多臂分配，但轉成執行benchmark仍需assets、接觸和摘取驗收。",
+    "reviewed_pdf_sha256": "b3ee03d5d25e728c85d714de947fb09d06f56e94067923961d75c365281c22eb",
+    "reviewed_on": "2026-10-02",
+    "name": "Vision to Harvest",
+    "year": 2026,
+    "title": "From Vision to Harvest: Benchmarking Vision-Language Models for Multi-Arm Robotic Fruit Harvesting",
+    "source_url": "https://arxiv.org/abs/2609.13606",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "garden"
+    ],
+    "review_tags": [
+      "園藝與戶外",
+      "多機器人協作"
+    ],
+    "domain_names": [
+      "農業與園藝"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P213",
+      "domain_ids": [
+        "garden"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P213",
+          "domain_ids": [
+            "garden"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "multi-armCartesian fruit harvesting的offlineallocation/waypointplanning；apple/citrus兩作物設定。",
+            "Fuji apple及citrus orchard RGB-D資料；citrus父庫432images，实际held-outscene數未報。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b3ee03d5d25e728c85d714de947fb09d06f56e94067923961d75c365281c22eb"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b3ee03d5d25e728c85d714de947fb09d06f56e94067923961d75c365281c22eb",
+      "previous_domain_ids": [
+        "garden"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P213",
+      "name": "Vision to Harvest",
+      "expected_title": "From Vision to Harvest: Benchmarking Vision-Language Models for Multi-Arm Robotic Fruit Harvesting",
+      "source_url": "https://arxiv.org/abs/2609.13606",
+      "pdf_url": "https://arxiv.org/pdf/2609.13606",
+      "retrieved_at": "2026-10-02T22:14:18.186523+00:00",
+      "pdf_sha256": "b3ee03d5d25e728c85d714de947fb09d06f56e94067923961d75c365281c22eb",
+      "text_sha256": "de209f31d0fe82898ea1660ba9cdfc14f7ef6e2de24bdbadee510664c5d698c7",
+      "pdf_bytes": 7813040,
+      "pages": 10,
+      "text_characters": 60993,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.13606v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.13606v1"
+    },
+    "counts": [
+      {
+        "field": "asset",
+        "value": 2,
+        "unit": "crop types，非兩種生活domain",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P213:1",
+        "paper_id": "P213",
+        "benchmark": "Vision to Harvest",
+        "native_term": "crop types，非兩種生活domain",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.13606v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.13606v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

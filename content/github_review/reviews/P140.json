@@ -1,0 +1,84 @@
+{
+  "paper_id": "P140",
+  "summary": "VIP學習的是視覺reward/表示；embedding距離和環境任務成功是不同評估。程式的success門檻是episode累積solved次數，並非連續穩定時間。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/vip",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          24,
+          38
+        ],
+        [
+          68,
+          82
+        ]
+      ],
+      "why": "原作、Ego4D/自訂影片與reward用途",
+      "commit": "81b052014591bb157cfb036fc3bd0b213653e86b"
+    },
+    {
+      "repo": "facebookresearch/vip",
+      "path": "vip/models/model_vip.py",
+      "ranges": [
+        [
+          68,
+          91
+        ]
+      ],
+      "why": "圖像預處理及負Euclidean embedding距離",
+      "commit": "81b052014591bb157cfb036fc3bd0b213653e86b"
+    },
+    {
+      "repo": "facebookresearch/vip",
+      "path": "evaluation/trajopt/trajopt/run_mppi.py",
+      "ranges": [
+        [
+          27,
+          67
+        ],
+        [
+          94,
+          103
+        ],
+        [
+          126,
+          134
+        ]
+      ],
+      "why": "目標embedding、MPPI取樣預算與trajectory儲存",
+      "commit": "81b052014591bb157cfb036fc3bd0b213653e86b"
+    },
+    {
+      "repo": "facebookresearch/vip",
+      "path": "evaluation/mj_envs/mj_envs/envs/env_base.py",
+      "ranges": [
+        [
+          260,
+          282
+        ]
+      ],
+      "why": "原environment success百分比及solved數門檻",
+      "commit": "81b052014591bb157cfb036fc3bd0b213653e86b"
+    }
+  ],
+  "environment": "Ego4D人類訓練影片、實機示例和MuJoCo系下游環境；原場景與資料仍屬各父來源。",
+  "tasks": "以goal-image/embedding引導robot任務與reward learning；fold_towel等展示是應用例子，不能由曲線距離直接認定任務語義正確。",
+  "data": "自訂影片依video資料夾存frames；model依影像shape resize/crop224和normalization，max>2時除255。sim=-L2(embedding1,embedding2)，此單位是特徵距離而非幾何公尺。",
+  "evaluation": "MPPI讀goal_embedding並用H/paths_per_cpu/num_cpu/kappa配置優化；env.evaluate_success預設判sum(solved)>5再按paths算百分比，未要求連續。embedding reward、原生solved與工程時間分開保存。",
+  "standardization": {
+    "profile": "visual_reward_learning_reference",
+    "reuse": "表示/goal資料接口、原reward數學定義、MPPI配置與環境成功引用。",
+    "transform": "evaluator標明learned reward或ground-truth環境條件；case固定goal frame、相機、normalization、planner預算和solved門檻，避免將reward作通用正解。",
+    "missing": "各task實際solved predicate、原素材/goal設定、planner與環境版本、reward與任務正確性的反例校準。"
+  },
+  "version_note": "固定81b0520；前述sum門檻屬目前公開env基底，具體task可能另override，整合每task時仍需沿具體class核對。未跑MPPI。",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

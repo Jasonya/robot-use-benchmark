@@ -1,0 +1,122 @@
+{
+  "paper_id": "P055",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "FUTR重用Breakfast與50Salads，預測動作類別及持續比例；觀測／預測百分比和frame級MoC是原生協定的一部分。",
+  "reading_order": [
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          97
+        ]
+      ],
+      "why": "確認精確論文、父資料與split／觀測比例。",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8"
+    },
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "data/basedataset.py",
+      "ranges": [
+        [
+          1,
+          162
+        ]
+      ],
+      "why": "讀特徵／GT窗口、duration與padding規則。",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8"
+    },
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "predict.py",
+      "ranges": [
+        [
+          8,
+          14
+        ],
+        [
+          42,
+          48
+        ],
+        [
+          69,
+          111
+        ]
+      ],
+      "why": "讀duration展開、截取窗口和MoC類別平均。",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8"
+    },
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "utils.py",
+      "ranges": [
+        [
+          7,
+          20
+        ],
+        [
+          23,
+          31
+        ],
+        [
+          39,
+          60
+        ]
+      ],
+      "why": "核對每類影格正誤與duration正規化入口。",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8"
+    }
+  ],
+  "environment": "既有長影片及預計算視覺特徵，無新可操作場景。",
+  "tasks": "從過去影片預測後續動作分段；一支影片的多個觀測比例是不同評測設定，不是不同語義任務。",
+  "data": "groundTruth逐影格標籤、features/*.npy及mapping.txt；dataset返回features、past_label、trans_future_target、trans_future_dur，保留sample_rate、NONE、pad_idx及n_query截斷。",
+  "evaluation": "predict.py將預測類別／duration展開到未來影格，再按觀測與預測比例截取；eval_file累積每類正誤影格，最後對有GT的類別平均得到MoC，非全影格micro accuracy。",
+  "standardization": {
+    "profile": "long_horizon_action_segmentation_forecasting",
+    "reuse": "來源影片／split、逐影格GT、類別字典與MoC計算。",
+    "transform": "case保留來源影片長度、obs_fraction、pred_fraction、特徵步長及label mapping；duration比例要連同影片長度保存，不改寫成固定秒數。",
+    "missing": "影片／特徵閉合、Breakfast四split／50Salads五split核對及共同輸出adapter。"
+  },
+  "version_note": "FUTR是方法repo，父資料與EGO-TOPO／其他預測方法可能重用；樣本窗口與原片不能重複相加。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "README.md",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8",
+      "sha256": "c06c6305929dfd85f9e25de246bfa06adb76aef72c6d9aae2c80e7fd16bd5a28",
+      "url": "https://raw.githubusercontent.com/gongda0e/FUTR/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/README.md",
+      "permalink": "https://github.com/gongda0e/FUTR/blob/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/README.md",
+      "local_path": "audit/.cache/github_review/repos/gongda0e__FUTR/files/README.md"
+    },
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "data/basedataset.py",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8",
+      "sha256": "65f3117f467e552ba5af47b2e25ef99eee360d300c4af1aed22f52fe0f00f978",
+      "url": "https://raw.githubusercontent.com/gongda0e/FUTR/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/data/basedataset.py",
+      "permalink": "https://github.com/gongda0e/FUTR/blob/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/data/basedataset.py",
+      "local_path": "audit/.cache/github_review/repos/gongda0e__FUTR/files/data/basedataset.py"
+    },
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "predict.py",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8",
+      "sha256": "1eccacaa622658f8bd21852d74e3f7c8abcc78c5ba1f4cf441f369edc4f0e5cc",
+      "url": "https://raw.githubusercontent.com/gongda0e/FUTR/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/predict.py",
+      "permalink": "https://github.com/gongda0e/FUTR/blob/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/predict.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/gongda0e__FUTR/predict.py"
+    },
+    {
+      "repo": "gongda0e/FUTR",
+      "path": "utils.py",
+      "commit": "a3440100ef56db9c8d5c11dcedcb18dfaf0386b8",
+      "sha256": "0644aa6565f5d3d71fc93c3bf745d6fe07c4aa8335f09c38125cc1066ad4bbfb",
+      "url": "https://raw.githubusercontent.com/gongda0e/FUTR/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/utils.py",
+      "permalink": "https://github.com/gongda0e/FUTR/blob/a3440100ef56db9c8d5c11dcedcb18dfaf0386b8/utils.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/gongda0e__FUTR/utils.py"
+    }
+  ]
+}

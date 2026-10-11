@@ -1,0 +1,615 @@
+{
+  "paper_id": "P198",
+  "name": "TACO",
+  "title": "TACO: Benchmarking Generalizable Bimanual Tool-ACtion-Object Understanding",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2401.08399",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "food",
+    "home",
+    "wearable"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P198",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "TACO的公開庫主要是人體手–工具–物件資料載入和投影工具。pre-release與V1的序列、triplet和視角數不同，必須分版計數。",
+    "environment": "真實雙手工具操作，多視角RGB與ego RGB-D。pre-release為8個allocentric views，V1為12個，且共用206object models；不同view或release不當成獨立物理場景。",
+    "tasks": "〈tool,action,object〉triplet理解與generalization：pre-release244sequences/137triplets，V1 2317sequences/151triplets。triplet是原生語義組合，sequence是觀測樣本，不自行當151種可執行robot目標。",
+    "data": "按triplet/sequence組織RGB-D、Hand_Poses、Object_Poses及Camera_Parameters；MANO48Dpose+10Dshape+translation，輸出778vertices/21joints。hand模型結果除1000、object_cm.obj乘0.01後進同m座標；camera extrinsics明示world_to_camera。缺shape helper會補0beta，需標missing/default。 額外工具TLabel的固定README／schema已補讀：它另有schema_version、sensor_info、capabilities、episodes，以及14個觸覺語義欄位；這不表示原TACO已有這些觸覺訊號。TLabel的L1–L4描述資訊完整程度，非本benchmark的任務難度。",
+    "evaluation": "所讀是loader與可視化，不是完整原作benchmark grader；frame數與pose數不符會跳過。需要原作task split/metric才可做辨識/軌跡/互動評測。後加TLabel workflow只是工具支援，不能據此把原作RGB-D清單宣稱新增實測觸覺模態。 TLabel的QualityScorer以一致性30%、平滑25%、完整性25%、覆蓋20%合成資料品質分數；不是對GT量測準確率、機器人成功率或校準後的難度。data_quality另可使用者自述；schema缺省confidence=1.0也不能當已驗證的可信度。",
+    "standardization": {
+      "profile": "bimanual_tool_action_object_motion_data",
+      "reuse": "版本化triplet/sequence ID、MANO/物件pose/camera校準、單位明確的投影流程。",
+      "transform": "source保留pre-release→V1 relation；case以triplet+sequence+時間/視角定位；camera/object/hand座標及units統一但保留原始值，缺frame/shape單列invalid/default狀態。",
+      "missing": "完整data/asset與官方split、原benchmark scorer與基線、object/contact物理化以轉robot任務、default shape與時間同步驗證。"
+    },
+    "version_note": "固定b385ac1；CVPR2024原作2401.08399，README後續更新到V1與額外工具。未將可視化成功當作理解或機器人操作成功。 已補核TLabel be7121d0的文件、schema與quality入口，限後加工具角色；未執行adapter／export或宣稱TACO數量因此增加。",
+    "runtime_executed": false,
+    "additional_repo_proposals": [
+      {
+        "repo": "liesliy/tlabel",
+        "role": "optional_annotation_tool_not_original_benchmark",
+        "evidence": "TACO新版README的額外工具建議；本輪已補核TLabel文件／schema／quality入口，與原始資料及benchmark分開。"
+      }
+    ],
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "leolyliu/TACO-Instructions",
+        "requested_repo": "leolyliu/TACO-Instructions",
+        "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            85
+          ],
+          [
+            198,
+            223
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 261,
+        "sha256": "e0337ac8612f708575a821727db899e23835611d2db2604f7abd35f01b244745",
+        "url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/README.md",
+        "reading_url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/README.md#L1-L85",
+        "why": "原作、244/2317版本差異及後加annotation工具",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leolyliu/TACO-Instructions",
+        "requested_repo": "leolyliu/TACO-Instructions",
+        "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+        "ref": null,
+        "path": "dataset_utils/hand_pose_loader.py",
+        "ranges": [
+          [
+            10,
+            76
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 86,
+        "sha256": "7c3367fbe11e5afe5aea060df70f1e76adf3fea70df8cc0229d1d62b6cbce4ab",
+        "url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/dataset_utils/hand_pose_loader.py",
+        "reading_url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/dataset_utils/hand_pose_loader.py#L10-L76",
+        "why": "MANO shape/pose/translation與mm→m",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leolyliu/TACO-Instructions",
+        "requested_repo": "leolyliu/TACO-Instructions",
+        "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+        "ref": null,
+        "path": "dataset_utils/video_utils.py",
+        "ranges": [
+          [
+            16,
+            49
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 75,
+        "sha256": "6d2ca3864594f5853f5f8415781e5fea67f51b3387e52b1eb21e869f7518bfce",
+        "url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/dataset_utils/video_utils.py",
+        "reading_url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/dataset_utils/video_utils.py#L16-L49",
+        "why": "影片順序、BGR/RGB與frame cap",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "leolyliu/TACO-Instructions",
+        "requested_repo": "leolyliu/TACO-Instructions",
+        "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+        "ref": null,
+        "path": "dataset_utils/project_pose_to_egocentric_view.py",
+        "ranges": [
+          [
+            20,
+            120
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 140,
+        "sha256": "5c94ea41cb6e3b743738fb0eb719f371eaf2c81adc22b2ba07964c0106d06a5b",
+        "url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/dataset_utils/project_pose_to_egocentric_view.py",
+        "reading_url": "https://github.com/leolyliu/TACO-Instructions/blob/b385ac1e89f35214bfbbef0d63e6df0ac8dac02e/dataset_utils/project_pose_to_egocentric_view.py#L20-L120",
+        "why": "cm物件mesh→m、世界pose、逐frame world-to-camera與資料完整性",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liesliy/tlabel",
+        "requested_repo": "liesliy/tlabel",
+        "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            99
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 235,
+        "sha256": "22cb76b86958a4957d43b2a3c55112a2a67dfc021a96252e459d8a90b0c050bb",
+        "url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/README.md",
+        "reading_url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/README.md#L1-L99",
+        "why": "確認是後加的跨感測觸覺annotation工具，不是原TACO資料。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liesliy/tlabel",
+        "requested_repo": "liesliy/tlabel",
+        "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+        "ref": null,
+        "path": "docs/tlabel-format.md",
+        "ranges": [
+          [
+            1,
+            112
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 304,
+        "sha256": "1592833571bfbca780dbf7ed278d356c454208d8c65fd89d143837f7c61be245",
+        "url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/docs/tlabel-format.md",
+        "reading_url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/docs/tlabel-format.md#L1-L112",
+        "why": "核對schema版本、capabilities、sensor_info與episode引用，保留物理單位。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liesliy/tlabel",
+        "requested_repo": "liesliy/tlabel",
+        "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+        "ref": null,
+        "path": "tlabel/core/schema.py",
+        "ranges": [
+          [
+            21,
+            102
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 417,
+        "sha256": "74f98dc203347256687b63b861572a66a714a280fdd200a5fa995263c601acc6",
+        "url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/tlabel/core/schema.py",
+        "reading_url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/tlabel/core/schema.py#L21-L102",
+        "why": "確認14個語義欄位、缺省confidence及使用者自述data_quality。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "liesliy/tlabel",
+        "requested_repo": "liesliy/tlabel",
+        "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+        "ref": null,
+        "path": "tlabel/quality/scorer.py",
+        "ranges": [
+          [
+            39,
+            89
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 286,
+        "sha256": "3b212b0308cce6761e50d0591fd240af78fb9409848d44965b3e73226fdd408b",
+        "url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/tlabel/quality/scorer.py",
+        "reading_url": "https://github.com/liesliy/tlabel/blob/be7121d01134fd3e916d8823cff4d7f8c82aa921/tlabel/quality/scorer.py#L39-L89",
+        "why": "區分資料完整性／平滑／一致性加權分數與robot任務成功。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "8281df68d21e5fb5c1d3febeca8385c376f52a871bc5bb2092c8b95804bc64f1"
+  },
+  "repository_binding_review_sha256": "8281df68d21e5fb5c1d3febeca8385c376f52a871bc5bb2092c8b95804bc64f1",
+  "repository_bindings": [
+    {
+      "requested_repo": "leolyliu/TACO-Instructions",
+      "resolved_repo": "leolyliu/TACO-Instructions",
+      "aliases_in_this_review": [
+        "leolyliu/taco-instructions"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b385ac1e89f35214bfbbef0d63e6df0ac8dac02e",
+          "reviewed_files": [
+            "README.md",
+            "dataset_utils/hand_pose_loader.py",
+            "dataset_utils/project_pose_to_egocentric_view.py",
+            "dataset_utils/video_utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/leolyliu/TACO-Instructions",
+          "link_label": "Code",
+          "project_url": "https://taco2024.github.io",
+          "page_sha256": "ddb482e2ac82c8a2fc45c171593fe57aa03e6203f4676320f83cc51f3b04b274"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P198",
+          "review_file": "content/github_review/reviews/P198.json",
+          "review_sha256": "8281df68d21e5fb5c1d3febeca8385c376f52a871bc5bb2092c8b95804bc64f1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "liesliy/tlabel",
+      "resolved_repo": "liesliy/tlabel",
+      "aliases_in_this_review": [
+        "liesliy/tlabel"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "be7121d01134fd3e916d8823cff4d7f8c82aa921",
+          "reviewed_files": [
+            "README.md",
+            "docs/tlabel-format.md",
+            "tlabel/core/schema.py",
+            "tlabel/quality/scorer.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P198",
+          "review_sha256": "8281df68d21e5fb5c1d3febeca8385c376f52a871bc5bb2092c8b95804bc64f1",
+          "proposal": {
+            "repo": "liesliy/tlabel",
+            "role": "optional_annotation_tool_not_original_benchmark",
+            "evidence": "TACO新版README的額外工具建議；本輪已補核TLabel文件／schema／quality入口，與原始資料及benchmark分開。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P198",
+          "review_file": "content/github_review/reviews/P198.json",
+          "review_sha256": "8281df68d21e5fb5c1d3febeca8385c376f52a871bc5bb2092c8b95804bc64f1",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "餐飲與烹飪",
+    "居家整理與清潔",
+    "穿戴互動與動作介面"
+  ],
+  "source_review": {
+    "paper_id": "P198",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "TACO，arXiv 2401.08399v2。",
+    "scope_read": "capture/annotation、131triplets、資料與generalization splits、三benchmark與metrics。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "role": "雙手工具互動理解與預測benchmark",
+    "environment": "12third-person+1ego相機的capture工作站；作者明列缺乏scene diversity。",
+    "tasks": "3研究端點：compositional action recognition、motion forecasting、cooperative grasp synthesis；15actions、131tool-action-object triplets。",
+    "cases": "約2.5K motion sequences、5.2M多視角frames；196物件meshes/20categories/14participants。不是5.2M獨立互動題。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "benchmark endpoints",
+        "pages": [
+          6,
+          7,
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 131,
+        "unit": "tool-category/action/target-category triplets",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "action labels",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2500,
+        "unit": "motion sequences",
+        "qualifier": "約2.5K",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "recognition Top1/5；forecast10frames→10frames的joint/translation/rotation error；grasp penetration/contact/collision/FID，非執行成功率。"
+    ],
+    "evaluation_types": [
+      "答案或標籤比對",
+      "數值誤差與相似度"
+    ],
+    "split": "train:S1:S2:S3:S4＝4:1:1:1.5:2.5，分已見、geometry、interaction、compound；另60/40sequence的annotation驗證不可混成主split。",
+    "lineage": "自己的multi-view capture；DexYCB交叉資料驗證；marker removal使用inpainting。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "locator": "Statistics、§5.1–5.4",
+        "supports": "131/15、ratio與三類判分"
+      }
+    ],
+    "unresolved": [
+      "完整各split精確sequence數需manifest；不含articulated objects，不能外推完整工具環境。"
+    ],
+    "reuse": "把動作、物件組合和研究端點分層記錄，支援工具互動的組合泛化設計。",
+    "reviewed_pdf_sha256": "2cd9fef96e133851d367c485aad1578b4979baef4d9b57037a1a246476735efd",
+    "reviewed_on": "2026-10-02",
+    "name": "TACO",
+    "year": 2024,
+    "title": "TACO: Benchmarking Generalizable Bimanual Tool-ACtion-Object Understanding",
+    "source_url": "https://arxiv.org/abs/2401.08399",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food",
+      "wearable"
+    ],
+    "review_tags": [
+      "工具使用",
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪",
+      "穿戴互動與動作介面"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P198",
+      "summary": "用原作工具—動作—物件組合歸納：倒液與攪拌屬餐飲，清潔器具屬居家，手物動作建模亦服務AR／VR介面。",
+      "evidence": [
+        {
+          "paper_id": "P198",
+          "domain_ids": [
+            "food",
+            "home"
+          ],
+          "pages": [
+            2,
+            5
+          ],
+          "locator": "Introduction；Fig.3–5（含圖像核讀）",
+          "observed_tasks": [
+            "以spatula在pan攪拌",
+            "水壺向碗倒液",
+            "刷、刮、除塵等器具處理"
+          ],
+          "reasoning": "由Fig.3–5的實際動作與器具判斷，沒有把『工具使用』留作未分類。",
+          "basis": "task_goal_induction",
+          "source_pdf_sha256": "2cd9fef96e133851d367c485aad1578b4979baef4d9b57037a1a246476735efd"
+        },
+        {
+          "paper_id": "P198",
+          "domain_ids": [
+            "wearable"
+          ],
+          "pages": [
+            2
+          ],
+          "locator": "Introduction",
+          "observed_tasks": [
+            "VR／AR的雙手—物件互動建模"
+          ],
+          "reasoning": "原文應用說明支持動作介面用途。",
+          "basis": "stated_application",
+          "source_pdf_sha256": "2cd9fef96e133851d367c485aad1578b4979baef4d9b57037a1a246476735efd"
+        }
+      ],
+      "domain_ids": [
+        "food",
+        "home",
+        "wearable"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2cd9fef96e133851d367c485aad1578b4979baef4d9b57037a1a246476735efd",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P198",
+      "name": "TACO",
+      "expected_title": "TACO: Benchmarking Generalizable Bimanual Tool-ACtion-Object Understanding",
+      "source_url": "https://arxiv.org/abs/2401.08399",
+      "pdf_url": "https://arxiv.org/pdf/2401.08399",
+      "retrieved_at": "2026-10-02T21:35:00.321964+00:00",
+      "pdf_sha256": "2cd9fef96e133851d367c485aad1578b4979baef4d9b57037a1a246476735efd",
+      "text_sha256": "a31554783b1f05c2cf079e2d8ed8488c5f73eeac7cfc67de5dacba7479156581",
+      "pdf_bytes": 21336823,
+      "pages": 21,
+      "text_characters": 112625,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2401.08399v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2401.08399v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "benchmark endpoints",
+        "pages": [
+          6,
+          7,
+          8
+        ],
+        "record_id": "review10:P198:1",
+        "paper_id": "P198",
+        "benchmark": "TACO",
+        "native_term": "benchmark endpoints",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2401.08399v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2401.08399v2",
+            "locator": "PDF pp. 6, 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 131,
+        "unit": "tool-category/action/target-category triplets",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P198:2",
+        "paper_id": "P198",
+        "benchmark": "TACO",
+        "native_term": "tool-category/action/target-category triplets",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2401.08399v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2401.08399v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 15,
+        "unit": "action labels",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P198:3",
+        "paper_id": "P198",
+        "benchmark": "TACO",
+        "native_term": "action labels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2401.08399v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2401.08399v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 2500,
+        "unit": "motion sequences",
+        "qualifier": "約2.5K",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P198:4",
+        "paper_id": "P198",
+        "benchmark": "TACO",
+        "native_term": "motion sequences",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2401.08399v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2401.08399v2",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "leolyliu/TACO-Instructions",
+    "liesliy/tlabel"
+  ],
+  "external_repositories": []
+}

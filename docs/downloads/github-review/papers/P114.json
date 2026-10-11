@@ -1,0 +1,444 @@
+{
+  "paper_id": "P114",
+  "name": "RobotArena infinity",
+  "title": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2510.23571",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P114",
+    "summary": "RobotArena∞公開Genesis測試與GVL裁判流程，但自動場景生成仍列未發布。實際GVL入口使用影像加NPZ特權狀態，不是單純影片問答。",
+    "environment": "真實畫面轉成Genesis Robot Arenas；預設／生成scene及背景、相機、物件位置擾動。∞指生成擴展能力，不是無限個已取得環境；README自動生成碼未勾選發布。",
+    "tasks": "指定語言的操作目標在多擾動設定下評測。支援多個policy server是方法接口，不能按policy數擴大任務量。",
+    "data": "預設測試65步含5步預熱，存5fps MP4和同名NPZ；world/base是末端pos/quat/gripper，物件是13維pos/quat/linear/angular velocity。可加入weld抓持約束，須記assistance模式。",
+    "evaluation": "GVL入口以Gemini影像＋NPZ狀態評0–100進度，可做no_object/no_robot/none ablation；接觸文字由5cm距離啟發式推估。分數regex抓整數後clip，解析/API失敗可漏frame。聚合對repeat取逐frame median，再取最高30%等；avg_last_10實際取最後num_top幀，不固定10。需固定frame身份與完整分母。",
+    "standardization": {
+      "profile": "real_to_sim_generation_and_multimodal_progress_judging",
+      "reuse": "scene/variant配置、成對MP4/NPZ、policy接口、明確裁判提示與聚合碼。",
+      "transform": "case固定原真實來源、生成版本、scene/擾動/輔助抓持；judge輸入與policy輸入分開，記模型版本/ablation/採樣/每frame回執和native聚合公式。",
+      "missing": "自動場景生成release、全部資產與原生匹配、實體成功checker對照、裁判一致性/漏frame處理及完整可重跑protocol。"
+    },
+    "version_note": "固定預設branch fix/stable_version_genesis；README的Preview措辭與bash實際gemini-2.5-pro參數不同，需以執行manifest為準。未呼叫Gemini。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "offjangir/RobotArena",
+        "requested_repo": "offjangir/RobotArena",
+        "commit": "31ae6000067c120a0060165dc5506145c09c29aa",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            40
+          ],
+          [
+            400,
+            465
+          ],
+          [
+            557,
+            585
+          ],
+          [
+            605,
+            617
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 622,
+        "sha256": "46e1f797fdbd6f2c632349ec6acee6c4a8dd04df2fa5bb0cf1de12b92a9c6bd6",
+        "url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/README.md",
+        "reading_url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/README.md#L1-L40",
+        "why": "精確來源、擾動與原生發行範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "offjangir/RobotArena",
+        "requested_repo": "offjangir/RobotArena",
+        "commit": "31ae6000067c120a0060165dc5506145c09c29aa",
+        "ref": null,
+        "path": "bash_scripts/GVL.bash",
+        "ranges": [
+          [
+            6,
+            8
+          ],
+          [
+            10,
+            16
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 17,
+        "sha256": "5957a002123e29e227127f1b536e61e0cd984284dabf14bea7274251a39fbd15",
+        "url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/bash_scripts/GVL.bash",
+        "reading_url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/bash_scripts/GVL.bash#L6-L8",
+        "why": "真實入口GVL_multithreaded和模型/重複設定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "offjangir/RobotArena",
+        "requested_repo": "offjangir/RobotArena",
+        "commit": "31ae6000067c120a0060165dc5506145c09c29aa",
+        "ref": null,
+        "path": "src/pipeline/default_test.py",
+        "ranges": [
+          [
+            417,
+            450
+          ],
+          [
+            497,
+            516
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 660,
+        "sha256": "524e264ed8f08c86003e7b8e9c16d904f4da9e38a45033acd1c13534cb625026",
+        "url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/src/pipeline/default_test.py",
+        "reading_url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/src/pipeline/default_test.py#L417-L450",
+        "why": "動作與場景軌跡保存、預熱及焊接輔助",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "offjangir/RobotArena",
+        "requested_repo": "offjangir/RobotArena",
+        "commit": "31ae6000067c120a0060165dc5506145c09c29aa",
+        "ref": null,
+        "path": "src/pipeline/GVL_multithreaded.py",
+        "ranges": [
+          [
+            27,
+            88
+          ],
+          [
+            465,
+            548
+          ],
+          [
+            623,
+            755
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 842,
+        "sha256": "6c5c45e175b8c4f529515f1ad06d429d9cd36c63dcc76dca1ed025094bad57e9",
+        "url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/src/pipeline/GVL_multithreaded.py",
+        "reading_url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/src/pipeline/GVL_multithreaded.py#L27-L88",
+        "why": "裁判輸入、狀態/接觸近似、採樣/解析與缺值",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "offjangir/RobotArena",
+        "requested_repo": "offjangir/RobotArena",
+        "commit": "31ae6000067c120a0060165dc5506145c09c29aa",
+        "ref": null,
+        "path": "src/pipeline/GVL_metrics.py",
+        "ranges": [
+          [
+            1,
+            122
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 168,
+        "sha256": "935625fc49d4da45458fa3f37d0d0539a06f35fbbba489c260bfc1e17394c54e",
+        "url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/src/pipeline/GVL_metrics.py",
+        "reading_url": "https://github.com/offjangir/RobotArena/blob/31ae6000067c120a0060165dc5506145c09c29aa/src/pipeline/GVL_metrics.py#L1-L122",
+        "why": "跨裁判repeat中位數、top30%與尾段聚合",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "e528336fb10ebadac172a1d9d4b8680e7181c8bff4b523c9965a8916fe3cf4d8"
+  },
+  "repository_binding_review_sha256": "e528336fb10ebadac172a1d9d4b8680e7181c8bff4b523c9965a8916fe3cf4d8",
+  "repository_bindings": [
+    {
+      "requested_repo": "offjangir/RobotArena",
+      "resolved_repo": "offjangir/RobotArena",
+      "aliases_in_this_review": [
+        "offjangir/robotarena"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "31ae6000067c120a0060165dc5506145c09c29aa",
+          "reviewed_files": [
+            "README.md",
+            "bash_scripts/GVL.bash",
+            "src/pipeline/GVL_metrics.py",
+            "src/pipeline/GVL_multithreaded.py",
+            "src/pipeline/default_test.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/offjangir/RobotArena",
+          "pdf_page": 15,
+          "pdf_sha256": "d08b1e9db69b3e2efbb9e51be4044370272927d0d53c97807368bfdb42892ba9",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/offjangir/RobotArena",
+          "link_label": "Benchmark Code",
+          "project_url": "https://robotarenainf.github.io",
+          "page_sha256": "bb7530c6cea3b307dfbfba6d9d977169e379b56bb1a772b8efa805033ea1ce4c"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P114",
+          "review_file": "content/github_review/reviews/P114.json",
+          "review_sha256": "e528336fb10ebadac172a1d9d4b8680e7181c8bff4b523c9965a8916fe3cf4d8",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P114",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RobotArena∞，arXiv 2510.23571v3；與RoboArena分列。",
+    "scope_read": "real-to-sim來源、VLM評分與human BT ranking、BridgeSim規模及real驗證範圍。",
+    "pages_read": [
+      1,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      25
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "轉移與評測有效性",
+    "environment": "BridgeSim70環境；另DROIDSim、RH20TSim。總量僅概述hundreds，不能用70代稱三套全庫。",
+    "tasks": "由真實demo生成task＋digital twin，再擾動初態/texture；未給共同語義task類別總數。",
+    "cases": "BridgeSim上8,749pairwise comparisons；是對policy影片的偏好標註，不是8,749不同task。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 70,
+        "unit": "BridgeSim環境",
+        "pages": [
+          9,
+          25
+        ]
+      },
+      {
+        "field": "data",
+        "value": 8749,
+        "unit": "BridgeSim人類pairwise comparisons",
+        "pages": [
+          8,
+          25
+        ]
+      }
+    ],
+    "evaluation": [
+      "Gemini結合video＋privileged sim states評progress，取最後30%frames平均；human pairwise BT ranking另列。",
+      "real/sim相關驗證只展示1個carrot-to-plate任務的3policy，不能外推全庫已校準。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審"
+    ],
+    "split": "Bridge/DROID/RH20T來源與policy訓練來源分in/out；同場景pairwise保持相同初態。",
+    "lineage": "真實Bridge、DROID、RH20T衍生；不同於RoboArena在真機直接分散評估。",
+    "related_paper_ids": [
+      "P108",
+      "P129",
+      "P104"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          6,
+          7,
+          8,
+          9,
+          25
+        ],
+        "locator": "§4–5、Human Evaluation附錄",
+        "supports": "70／8,749、VLM state輸入与1任務real校準"
+      }
+    ],
+    "unresolved": [
+      "DROIDSim／RH20TSim精確場景ID量與跨來源等價未匯入。"
+    ],
+    "reuse": "提供多來源real-to-sim與偏好評分途徑；要區分生成場景、物理成功checker和VLM judge。",
+    "reviewed_pdf_sha256": "d08b1e9db69b3e2efbb9e51be4044370272927d0d53c97807368bfdb42892ba9",
+    "reviewed_on": "2026-10-02",
+    "name": "RobotArena infinity",
+    "year": 2025,
+    "title": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation",
+    "source_url": "https://arxiv.org/abs/2510.23571",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "桌面物件操作",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P114",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P114",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            25
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "由真實demo生成task＋digital twin，再擾動初態/texture；未給共同語義task類別總數。",
+            "BridgeSim70環境；另DROIDSim、RH20TSim。總量僅概述hundreds，不能用70代稱三套全庫。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "d08b1e9db69b3e2efbb9e51be4044370272927d0d53c97807368bfdb42892ba9"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "d08b1e9db69b3e2efbb9e51be4044370272927d0d53c97807368bfdb42892ba9",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P114",
+      "name": "RobotArena infinity",
+      "expected_title": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation",
+      "source_url": "https://arxiv.org/abs/2510.23571",
+      "pdf_url": "https://arxiv.org/pdf/2510.23571",
+      "retrieved_at": "2026-10-02T21:34:21.285221+00:00",
+      "pdf_sha256": "d08b1e9db69b3e2efbb9e51be4044370272927d0d53c97807368bfdb42892ba9",
+      "text_sha256": "6f8d08840999184212bb11784abf44182494162228f3cfdc0f476570175c2c13",
+      "pdf_bytes": 8639862,
+      "pages": 26,
+      "text_characters": 93098,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2510.23571v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2510.23571v3"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 70,
+        "unit": "BridgeSim環境",
+        "pages": [
+          9,
+          25
+        ],
+        "record_id": "review10:P114:1",
+        "paper_id": "P114",
+        "benchmark": "RobotArena infinity",
+        "native_term": "BridgeSim環境",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.23571v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.23571v3",
+            "locator": "PDF pp. 9, 25",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 8749,
+        "unit": "BridgeSim人類pairwise comparisons",
+        "pages": [
+          8,
+          25
+        ],
+        "record_id": "review10:P114:2",
+        "paper_id": "P114",
+        "benchmark": "RobotArena infinity",
+        "native_term": "BridgeSim人類pairwise comparisons",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.23571v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.23571v3",
+            "locator": "PDF pp. 8, 25",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "offjangir/RobotArena"
+  ],
+  "external_repositories": []
+}

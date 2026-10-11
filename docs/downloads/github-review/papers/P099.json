@@ -1,0 +1,711 @@
+{
+  "paper_id": "P099",
+  "name": "HomeRobot",
+  "title": "HomeRobot: Open-Vocabulary Mobile Manipulation",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2306.11565",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P099",
+    "summary": "HomeRobot的OVMM流程分找物、抓物、找容器、放置；真正overall成功還要求零robot-scene碰撞。已沿官方submodule讀到實際放置與穩定性checker。",
+    "environment": "真實Stretch與Habitat模擬分開；模擬依賴HSSD ovmm資產、物件、Stretch模型和episode配置。相同HSSD屋子被多任務重用需按父資產鍵去重。",
+    "tasks": "將指定類別物件從起始容器搬到目標容器；四階段是同一長程任務進度，不自動算4道獨立題。原生episode允許多個candidate物件／容器。",
+    "data": "OVMMEpisode記object_category/start_recep_category/goal_recep_category及candidate goal集合。wrapper讀head_rgb/depth、GPS/compass/joint及task goal；depth由[0,1]映射min/max並特判邊值；相機座標模式與GT semantic開關必須記入protocol。",
+    "evaluation": "原子放置量測檢查物件與合法容器接觸、排除地板與過深穿透，父checker再檢查放開、末端回rest距離及可選的穩定步數。階段success具有歷史累積性；metrics_utils的overall_success=END.ovmm_place_success且robot_scene_colls==0，partial=(找物+抓物+找容器+overall)/4。缺失欄位在聚合時被略過，須額外保存完整預期episode與缺值數。",
+    "standardization": {
+      "profile": "open_vocabulary_mobile_manipulation",
+      "reuse": "物件／容器category、候選集合、場景episode身份、觀測/動作轉換、原子與階段checker。",
+      "transform": "case固定資料版本、scene_episode、機體、GT或感知模式、步數與控制比例；native放置、overall零碰撞及partial三項分開存。依賴源釘選b727ca9而非目前Habitat main。",
+      "missing": "HSSD/機體/episode資產閉合、感測配置與相機內參檢查、原生感知／控制執行驗證、論文與2024挑戰版本對照。"
+    },
+    "version_note": "home-robot tree把Habitat-Lab釘在b727ca9f7123101aaedb737ca9ccc1b153525dd9；本次直接讀此版checker，沒有用現行HabitatHEAD代替。README另指定home-robot-ovmm-challenge-2024 tag，與本main快照分開。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "facebookresearch/home-robot",
+        "requested_repo": "facebookresearch/home-robot",
+        "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            10,
+            48
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 210,
+        "sha256": "45dd1f535ffbe1b825999deb73c10dc66d28dcc26feb5e78b7cb8afe7442cb11",
+        "url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/README.md",
+        "reading_url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/README.md#L10-L48",
+        "why": "OVMM任務與2024挑戰tag",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/home-robot",
+        "requested_repo": "facebookresearch/home-robot",
+        "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+        "ref": null,
+        "path": "projects/habitat_ovmm/README.md",
+        "ranges": [
+          [
+            10,
+            67
+          ],
+          [
+            130,
+            163
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 163,
+        "sha256": "602d58b04f9359bff292a6e62080e400198240752481d10ed8f2f923a76cccb2",
+        "url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/projects/habitat_ovmm/README.md",
+        "reading_url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/projects/habitat_ovmm/README.md#L10-L67",
+        "why": "HSSD資產、episode與GT/Detic評測條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/home-robot",
+        "requested_repo": "facebookresearch/home-robot",
+        "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+        "ref": null,
+        "path": ".gitmodules",
+        "ranges": [
+          [
+            1,
+            6
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 24,
+        "sha256": "a5b54c5c9af4656a4ba232502e9f1bfc13e61bb116afedad2f4f3fd96fb5cfa2",
+        "url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/.gitmodules",
+        "reading_url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/.gitmodules#L1-L6",
+        "why": "官方依賴Habitat-Lab；tree另固定submodule commit",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/home-robot",
+        "requested_repo": "facebookresearch/home-robot",
+        "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+        "ref": null,
+        "path": "src/home_robot_sim/home_robot_sim/env/habitat_ovmm_env/habitat_ovmm_env.py",
+        "ranges": [
+          [
+            114,
+            181
+          ],
+          [
+            220,
+            241
+          ],
+          [
+            290,
+            398
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 398,
+        "sha256": "f4597514de83420fe74cb5f5cfe2e76fce2f92a753e778cdb22ba0d0b42e13f1",
+        "url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/src/home_robot_sim/home_robot_sim/env/habitat_ovmm_env/habitat_ovmm_env.py",
+        "reading_url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/src/home_robot_sim/home_robot_sim/env/habitat_ovmm_env/habitat_ovmm_env.py#L114-L181",
+        "why": "觀測／深度／相機座標與動作轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/home-robot",
+        "requested_repo": "facebookresearch/home-robot",
+        "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+        "ref": null,
+        "path": "projects/habitat_ovmm/evaluator.py",
+        "ranges": [
+          [
+            194,
+            224
+          ],
+          [
+            255,
+            324
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 486,
+        "sha256": "58aa3bf657b89a8d04e80a3e7ebfa7f5c283b6626c8e7b8fe37fdecbf0721575",
+        "url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/projects/habitat_ovmm/evaluator.py",
+        "reading_url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/projects/habitat_ovmm/evaluator.py#L194-L224",
+        "why": "scene_episode鍵、階段/END指標與分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/home-robot",
+        "requested_repo": "facebookresearch/home-robot",
+        "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+        "ref": null,
+        "path": "projects/habitat_ovmm/utils/metrics_utils.py",
+        "ranges": [
+          [
+            1,
+            113
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 113,
+        "sha256": "1d6f30b63a67fba7cb5766dc03e57fee9f40ac62a961361c78dbbb3bcbd6a18b",
+        "url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/projects/habitat_ovmm/utils/metrics_utils.py",
+        "reading_url": "https://github.com/facebookresearch/home-robot/blob/ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5/projects/habitat_ovmm/utils/metrics_utils.py#L1-L113",
+        "why": "零碰撞overall成功與四項partial平均",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+        "ref": null,
+        "path": "habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+        "ranges": [
+          [
+            27,
+            41
+          ],
+          [
+            153,
+            204
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 204,
+        "sha256": "faf708e4bb118b95b36c737efcb5cd7f8dbe3fb95a966fd3d99b8b34fa0825f8",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py#L27-L41",
+        "why": "OVMM categories/candidate goal與episode subset",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+        "ref": null,
+        "path": "habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+        "ranges": [
+          [
+            453,
+            585
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 585,
+        "sha256": "fd897ea13ebaf6147cda37d4b318bf44a6a671a9c2623f00d989f2086cf526f8",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py#L453-L585",
+        "why": "階段成功保留歷史且依賴前一階段",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+        "ref": null,
+        "path": "habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+        "ranges": [
+          [
+            83,
+            144
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 193,
+        "sha256": "9a72526ee574a8ba48b72d23fb2ee76f6d4a5396e6264ce0d22ada1c8a360278",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py#L83-L144",
+        "why": "接觸目標容器、穿透限制與排除地板",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "facebookresearch/habitat-lab",
+        "requested_repo": "facebookresearch/habitat-lab",
+        "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+        "ref": null,
+        "path": "habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py",
+        "ranges": [
+          [
+            206,
+            347
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 405,
+        "sha256": "dc91abe762d5a22b6767ab46d2626345250f16613297b7214f03e03ce9e0229e",
+        "url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py",
+        "reading_url": "https://github.com/facebookresearch/habitat-lab/blob/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py#L206-L347",
+        "why": "放置穩定性與具體PlaceSuccess條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f442d6cb16e19af44838afaff69d87cbcdd84b1097879b841ed9e033e69b34cf"
+  },
+  "repository_binding_review_sha256": "f442d6cb16e19af44838afaff69d87cbcdd84b1097879b841ed9e033e69b34cf",
+  "repository_bindings": [
+    {
+      "requested_repo": "facebookresearch/habitat-lab",
+      "resolved_repo": "facebookresearch/habitat-lab",
+      "aliases_in_this_review": [
+        "facebookresearch/habitat-lab"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+          "reviewed_files": [
+            "habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+            "habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+            "habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+            "habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P099",
+          "review_file": "content/github_review/reviews/P099.json",
+          "review_sha256": "f442d6cb16e19af44838afaff69d87cbcdd84b1097879b841ed9e033e69b34cf",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "facebookresearch/home-robot",
+      "resolved_repo": "facebookresearch/home-robot",
+      "aliases_in_this_review": [
+        "facebookresearch/home-robot"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5",
+          "reviewed_files": [
+            ".gitmodules",
+            "README.md",
+            "projects/habitat_ovmm/README.md",
+            "projects/habitat_ovmm/evaluator.py",
+            "projects/habitat_ovmm/utils/metrics_utils.py",
+            "src/home_robot_sim/home_robot_sim/env/habitat_ovmm_env/habitat_ovmm_env.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/facebookresearch/home-robot",
+          "pdf_page": 2,
+          "pdf_sha256": "518b6ba6f64a2c51a1bda3b92902e6ad0d2cbf5567d6d07e93207a28155d61e3",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/home-robot",
+          "link_label": "Code",
+          "project_url": "https://ovmm.github.io/",
+          "page_sha256": "9f7a7ea306ff0e977848b3b1389eff3ba00317a6082e3957ef43d9e1bc40155b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/home-robot/",
+          "link_label": "HomeRobot",
+          "project_url": "https://ovmm.github.io/",
+          "page_sha256": "9f7a7ea306ff0e977848b3b1389eff3ba00317a6082e3957ef43d9e1bc40155b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/home-robot",
+          "link_label": "",
+          "project_url": "https://ovmm.github.io/",
+          "page_sha256": "9f7a7ea306ff0e977848b3b1389eff3ba00317a6082e3957ef43d9e1bc40155b"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/facebookresearch/home-robot}",
+          "link_label": "URL in page source",
+          "project_url": "https://ovmm.github.io/",
+          "page_sha256": "9f7a7ea306ff0e977848b3b1389eff3ba00317a6082e3957ef43d9e1bc40155b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P099",
+          "review_file": "content/github_review/reviews/P099.json",
+          "review_sha256": "f442d6cb16e19af44838afaff69d87cbcdd84b1097879b841ed9e033e69b34cf",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P099",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "HomeRobot，arXiv 2306.11565v2。",
+    "scope_read": "HSSD實際子集、OVMM四stage、scene/objects切分、sim/real成功定義。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      17,
+      18,
+      19,
+      20,
+      24,
+      27
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "室內長流程操作",
+    "environment": "HSSD原庫200+，本文實驗只用60scenes＝38train/12val/10test；real為1個3-room apartment。",
+    "tasks": "1個OVMM family：find object→pick→find receptacle→place；129物件類別與21receptacle類，不是129/21個新任務。",
+    "cases": "2,535物件模型；sim程序產生object/start/goal cases，已讀段未給單一全庫題量。real兩baseline各20experiments。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 60,
+        "unit": "實際benchmark HSSD scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "test scenes",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "OVMM task family",
+        "pages": [
+          5,
+          7
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2535,
+        "unit": "objects",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "real experiments／baseline",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "四stage全過為success、partial success作tie-break；sim Place需靜穩50steps。",
+      "sim Pick是0.8m內magic snap，real Pick要實抓；兩者判準不同。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "未見scene及未見object instances，另seen/unseen categories；sim1250step、real300step budget。",
+    "lineage": "HSSD＋AI2-THOR/ABO/GSO objects，與PARTNR HSSD衍生共享環境家族。",
+    "related_paper_ids": [
+      "P143"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6
+        ],
+        "locator": "§3.1–3.2",
+        "supports": "200+源庫vs60實用、objects與20real"
+      },
+      {
+        "pages": [
+          18
+        ],
+        "locator": "附錄C",
+        "supports": "四stage及magic snap/穩定判準"
+      }
+    ],
+    "unresolved": [
+      "HSSD不同專案的branch/scene ID對照需查；不能把HomeRobot60與PARTNR60直接算120houses。"
+    ],
+    "reuse": "可提供open-vocabulary尋物與搬運；需在共同庫標記抓持抽象層級。",
+    "reviewed_pdf_sha256": "518b6ba6f64a2c51a1bda3b92902e6ad0d2cbf5567d6d07e93207a28155d61e3",
+    "reviewed_on": "2026-10-02",
+    "name": "HomeRobot",
+    "year": 2023,
+    "title": "HomeRobot: Open-Vocabulary Mobile Manipulation",
+    "source_url": "https://arxiv.org/abs/2306.11565",
+    "primary_type": "N",
+    "category_name": "導航與家務執行",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "室內導航"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P099",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P099",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            17,
+            18,
+            19,
+            20,
+            24,
+            27
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "1個OVMM family：find object→pick→find receptacle→place；129物件類別與21receptacle類，不是129/21個新任務。",
+            "HSSD原庫200+，本文實驗只用60scenes＝38train/12val/10test；real為1個3-room apartment。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "518b6ba6f64a2c51a1bda3b92902e6ad0d2cbf5567d6d07e93207a28155d61e3"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "518b6ba6f64a2c51a1bda3b92902e6ad0d2cbf5567d6d07e93207a28155d61e3",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P099",
+      "name": "HomeRobot",
+      "expected_title": "HomeRobot: Open-Vocabulary Mobile Manipulation",
+      "source_url": "https://arxiv.org/abs/2306.11565",
+      "pdf_url": "https://arxiv.org/pdf/2306.11565",
+      "retrieved_at": "2026-10-02T21:34:12.874277+00:00",
+      "pdf_sha256": "518b6ba6f64a2c51a1bda3b92902e6ad0d2cbf5567d6d07e93207a28155d61e3",
+      "text_sha256": "1462cedbf476b9de11a1cb39d7a16b407e853c475fc25c14207f64417751d9e5",
+      "pdf_bytes": 22419355,
+      "pages": 37,
+      "text_characters": 123758,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2306.11565v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2306.11565v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 60,
+        "unit": "實際benchmark HSSD scenes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P099:1",
+        "paper_id": "P099",
+        "benchmark": "HomeRobot",
+        "native_term": "實際benchmark HSSD scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.11565v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.11565v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "environment",
+        "value": 10,
+        "unit": "test scenes",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P099:2",
+        "paper_id": "P099",
+        "benchmark": "HomeRobot",
+        "native_term": "test scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.11565v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.11565v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 1,
+        "unit": "OVMM task family",
+        "pages": [
+          5,
+          7
+        ],
+        "record_id": "review10:P099:3",
+        "paper_id": "P099",
+        "benchmark": "HomeRobot",
+        "native_term": "OVMM task family",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.11565v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.11565v2",
+            "locator": "PDF pp. 5, 7",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "asset",
+        "value": 2535,
+        "unit": "objects",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P099:4",
+        "paper_id": "P099",
+        "benchmark": "HomeRobot",
+        "native_term": "objects",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.11565v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.11565v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 20,
+        "unit": "real experiments／baseline",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P099:5",
+        "paper_id": "P099",
+        "benchmark": "HomeRobot",
+        "native_term": "real experiments／baseline",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.11565v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.11565v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "facebookresearch/home-robot",
+    "facebookresearch/habitat-lab"
+  ],
+  "external_repositories": []
+}

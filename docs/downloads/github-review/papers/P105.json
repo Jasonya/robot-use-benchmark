@@ -1,0 +1,469 @@
+{
+  "paper_id": "P105",
+  "name": "LIBERO-Plus",
+  "title": "LIBERO-Plus: In-depth Robustness Analysis of Vision-Language-Action Models",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2510.13626",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P105",
+    "summary": "LIBERO-Plus的10,030是擾動任務條目；實際分類JSON確有10,030筆，但大量條目共享原LIBERO任務和初態。原difficulty level保留為來源標籤。",
+    "environment": "重用LIBERO桌面，擴充物件、紋理、相機、光照、機器人初態及noise。多擾動名稱不代表不同房屋或獨立原始資料。",
+    "tasks": "7擾動維度；分類檔結構計數：spatial2,402、object2,518、goal2,591、libero_10為2,519，合10,030。這是native variant entries，不是本庫10,030去重語義目標。",
+    "data": "Task保留name/language/problem_folder/bddl_file/init_states_file；getter依_language_/_view_/_table_/_light_等字樣回取共同或專屬初態。分類JSON的id基準與API task index需明確對映。",
+    "evaluation": "具體_check_success逐一AND goal_state predicate；rollout在max_steps內累積done成功。README要求num_trials_per_task由50改1，是該擾動協定，不等同所有來源都一試可充分估計成功率。difficulty_level為作者擾動級別，尚非跨benchmark校準難度。",
+    "standardization": {
+      "profile": "language_manipulation_perturbation_variants",
+      "reuse": "10,030原生分類條目、7維度與level、BDDL/語言和init-state來源。",
+      "transform": "保留base-task→perturbation variant→case關係，normalization不丟variant；level存native_difficulty，原假設／配置／seed與規則差異可追。",
+      "missing": "10,030條目逐筆asset/init-state閉合、語言/variant語義等價審核、外部training資料取得與分母／CI。"
+    },
+    "version_note": "fork替代LIBERO套件使用方式不代表資料獨立；RLDS/LeRobot連結是訓練資料表示，不能各自重複計數。當前分類筆數為檔案結構核對，未執行全部變體。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "sylvestf/LIBERO-plus",
+        "requested_repo": "sylvestf/LIBERO-plus",
+        "commit": "4976dc30028e805ff8094b55501d532c48fec182",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            43
+          ],
+          [
+            67,
+            91
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 140,
+        "sha256": "9d06a91f7e7043c7b7cb633eebbe91dd793376a6662aa444033b5f7620f62ef5",
+        "url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/README.md",
+        "reading_url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/README.md#L1-L43",
+        "why": "精確來源、7擾動維度、外部資產與每變體1trial建議",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "sylvestf/LIBERO-plus",
+        "requested_repo": "sylvestf/LIBERO-plus",
+        "commit": "4976dc30028e805ff8094b55501d532c48fec182",
+        "ref": null,
+        "path": "libero/libero/benchmark/task_classification.json",
+        "ranges": [],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/libero_spatial/0",
+          "/libero_spatial/1"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/libero_spatial/0",
+            "selected_value_sha256": "4433255564a3cdb8ebbb3d74c74ee820dc770d03a2774ef929d81a1590a946c7"
+          },
+          {
+            "pointer": "/libero_spatial/1",
+            "selected_value_sha256": "64e67badd742a4df4fa6de5121e72c2f4047df7ded50ff057c2ee11abbaa91d7"
+          }
+        ],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 60190,
+        "sha256": "faa87cce3e3ba434da01df7c77523a391b5f2912e4774330b0aa1be5f6a999e6",
+        "url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/libero/benchmark/task_classification.json",
+        "reading_url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/libero/benchmark/task_classification.json",
+        "why": "抽讀id/name/category/difficulty_level；全量筆數僅結構計數，不宣稱每筆人工語義核對",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "sylvestf/LIBERO-plus",
+        "requested_repo": "sylvestf/LIBERO-plus",
+        "commit": "4976dc30028e805ff8094b55501d532c48fec182",
+        "ref": null,
+        "path": "libero/libero/benchmark/__init__.py",
+        "ranges": [
+          [
+            37,
+            96
+          ],
+          [
+            154,
+            245
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 306,
+        "sha256": "70ed74d8a05cdc0808d0347536781e4a0e3d8fec45437f06e7b570f84b94e4e9",
+        "url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/libero/benchmark/__init__.py",
+        "reading_url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/libero/benchmark/__init__.py#L37-L96",
+        "why": "Task欄位、語言重寫與變體如何共用init-state",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "sylvestf/LIBERO-plus",
+        "requested_repo": "sylvestf/LIBERO-plus",
+        "commit": "4976dc30028e805ff8094b55501d532c48fec182",
+        "ref": null,
+        "path": "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+        "ranges": [
+          [
+            253,
+            273
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 31666,
+        "sha256": "6f97cfbaaea1fed9c7ba2711b75558ae97d3559d5199d15edeef0ff38648b0ba",
+        "url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/libero/envs/problems/libero_tabletop_manipulation.py",
+        "reading_url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/libero/envs/problems/libero_tabletop_manipulation.py#L253-L273",
+        "why": "具體成功為全部goal predicate合取",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "sylvestf/LIBERO-plus",
+        "requested_repo": "sylvestf/LIBERO-plus",
+        "commit": "4976dc30028e805ff8094b55501d532c48fec182",
+        "ref": null,
+        "path": "libero/lifelong/evaluate.py",
+        "ranges": [
+          [
+            261,
+            288
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 305,
+        "sha256": "84dea8f168406884e460acd5df9d2dcab5802e297b9a7b4333a5c17fcb24b50f",
+        "url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/lifelong/evaluate.py",
+        "reading_url": "https://github.com/sylvestf/LIBERO-plus/blob/4976dc30028e805ff8094b55501d532c48fec182/libero/lifelong/evaluate.py#L261-L288",
+        "why": "done成功累積與預算／分母",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "ba37b08ffe3e882b54c6d278db4aab4be88bd861c65e16dd9f293b6121ae4a20"
+  },
+  "repository_binding_review_sha256": "ba37b08ffe3e882b54c6d278db4aab4be88bd861c65e16dd9f293b6121ae4a20",
+  "repository_bindings": [
+    {
+      "requested_repo": "sylvestf/LIBERO-plus",
+      "resolved_repo": "sylvestf/LIBERO-plus",
+      "aliases_in_this_review": [
+        "sylvestf/libero-plus"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "4976dc30028e805ff8094b55501d532c48fec182",
+          "reviewed_files": [
+            "README.md",
+            "libero/libero/benchmark/__init__.py",
+            "libero/libero/benchmark/task_classification.json",
+            "libero/libero/envs/problems/libero_tabletop_manipulation.py",
+            "libero/lifelong/evaluate.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/sylvestf/LIBERO-plus",
+          "pdf_page": 1,
+          "pdf_sha256": "661de08e0ed1bb4bb4774177cac9fafa94f06b5385fa2f4107a1927b9a4aada7",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/sylvestf/LIBERO-plus",
+          "link_label": "Code",
+          "project_url": "https://sylvestf.github.io/LIBERO-plus/",
+          "page_sha256": "7d4ff4b94f143df30665a57cd4e937b6bb39570a911a30f4d7cc9ccfa50f73ce"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P105",
+          "review_file": "content/github_review/reviews/P105.json",
+          "review_sha256": "ba37b08ffe3e882b54c6d278db4aab4be88bd861c65e16dd9f293b6121ae4a20",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P105",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LIBERO-Plus，arXiv 2510.13626v3。",
+    "scope_read": "7擾動因素、10,030生成設定、難度分級、額外train資料與評分。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      16
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "穩健性與分布外評測",
+    "environment": "LIBERO场景擾動：layout、camera、robot初態、語言、light、texture、noise；不是10K新生活場景。",
+    "tasks": "7factors／21components；原作稱10,030tasks，多為原LIBERO語義任務的擾動配置。",
+    "cases": "10,030benchmark settings；額外>20K成功訓練trajectories分開。",
+    "native_counts": [
+      {
+        "field": "case",
+        "value": 10030,
+        "unit": "擾動task settings",
+        "pages": [
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "擾動factors",
+        "pages": [
+          2,
+          8
+        ]
+      },
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "擾動components",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "物理success／success drop，依factor平均；5級難度由4個参考模型實測accuracy分層。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "原LIBERO訓練到擾動測試，另外有泛化資料post-training；難度依賴校準模型，不能當永久內在難度。",
+    "lineage": "直接衍生LIBERO；10,030不等於10,030互異goal family。",
+    "related_paper_ids": [
+      "P064"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          2,
+          8,
+          9
+        ],
+        "locator": "§2.1、§6、表2",
+        "supports": "10,030、7/21、5級模型校準與>20Ktrain"
+      }
+    ],
+    "unresolved": [
+      "10,030各父task、擾動config和split的逐條去重仍待manifest。"
+    ],
+    "reuse": "已有萬級評測設定的規模先例；我們若比task數必須先使用共同語義粒度。",
+    "reviewed_pdf_sha256": "661de08e0ed1bb4bb4774177cac9fafa94f06b5385fa2f4107a1927b9a4aada7",
+    "reviewed_on": "2026-10-02",
+    "name": "LIBERO-Plus",
+    "year": 2025,
+    "title": "LIBERO-Plus: In-depth Robustness Analysis of Vision-Language-Action Models",
+    "source_url": "https://arxiv.org/abs/2510.13626",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "桌面物件操作"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P105",
+      "summary": "LIBERO-Plus改變觀測與初態條件，未改掉原任務的餐具擺放、廚房設備及收納用途。",
+      "evidence": [
+        {
+          "paper_id": "P105",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            2
+          ],
+          "locator": "§2 Perturbation Factors",
+          "observed_tasks": [
+            "沿用LIBERO的目標，改變相機、語言、燈光、材質與物件布局"
+          ],
+          "reasoning": "衍生評測先查被重用的任務，擾動因素本身不另當生活用途。",
+          "basis": "inherited_task_scope",
+          "source_pdf_sha256": "661de08e0ed1bb4bb4774177cac9fafa94f06b5385fa2f4107a1927b9a4aada7"
+        },
+        {
+          "paper_id": "P064",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            3,
+            4
+          ],
+          "locator": "LIBERO任務與場景設計",
+          "observed_tasks": [
+            "廚房／桌面物件取放、餐具與收納目標"
+          ],
+          "reasoning": "用途繼承以原作選用的操作目標為依據，不根據『camera/noise』等字面詞決定。",
+          "basis": "inherited_task_scope",
+          "source_pdf_sha256": "ff7d943e2eb37760df684f3ae2931a5a35ef8ea465bd387e62afe49507b8e414"
+        }
+      ],
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "661de08e0ed1bb4bb4774177cac9fafa94f06b5385fa2f4107a1927b9a4aada7",
+      "previous_domain_ids": [],
+      "resolved_from_v0_10": true
+    },
+    "domain_reclassified": true,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P105",
+      "name": "LIBERO-Plus",
+      "expected_title": "LIBERO-Plus: In-depth Robustness Analysis of Vision-Language-Action Models",
+      "source_url": "https://arxiv.org/abs/2510.13626",
+      "pdf_url": "https://arxiv.org/pdf/2510.13626",
+      "retrieved_at": "2026-10-02T21:34:17.815081+00:00",
+      "pdf_sha256": "661de08e0ed1bb4bb4774177cac9fafa94f06b5385fa2f4107a1927b9a4aada7",
+      "text_sha256": "2e07cc5f09e5ba585314da6603bdec753685346d4dbc42379443f51edd952038",
+      "pdf_bytes": 6947607,
+      "pages": 32,
+      "text_characters": 115122,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2510.13626v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2510.13626v3"
+    },
+    "counts": [
+      {
+        "field": "case",
+        "value": 10030,
+        "unit": "擾動task settings",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P105:1",
+        "paper_id": "P105",
+        "benchmark": "LIBERO-Plus",
+        "native_term": "擾動task settings",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.13626v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.13626v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 7,
+        "unit": "擾動factors",
+        "pages": [
+          2,
+          8
+        ],
+        "record_id": "review10:P105:2",
+        "paper_id": "P105",
+        "benchmark": "LIBERO-Plus",
+        "native_term": "擾動factors",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.13626v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.13626v3",
+            "locator": "PDF pp. 2, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 21,
+        "unit": "擾動components",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P105:3",
+        "paper_id": "P105",
+        "benchmark": "LIBERO-Plus",
+        "native_term": "擾動components",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2510.13626v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2510.13626v3",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "sylvestf/LIBERO-plus"
+  ],
+  "external_repositories": []
+}

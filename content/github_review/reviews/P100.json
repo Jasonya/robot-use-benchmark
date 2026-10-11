@@ -1,0 +1,92 @@
+{
+  "paper_id": "P100",
+  "summary": "BEHAVIOR-1K的activity、definition、instance已在原程式分開；1,000種活動不等於1,000個已載入case。Q-score與全條件成功也有不同分母。",
+  "reading_order": [
+    {
+      "repo": "StanfordVL/BEHAVIOR-1K",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          24
+        ]
+      ],
+      "why": "精確論文、1,000活動為作者聲明",
+      "commit": "cd484e0477e79bf1f17d373af232c53431ccc660"
+    },
+    {
+      "repo": "StanfordVL/BEHAVIOR-1K",
+      "path": "OmniGibson/omnigibson/tasks/behavior_task.py",
+      "ranges": [
+        [
+          65,
+          99
+        ],
+        [
+          166,
+          181
+        ],
+        [
+          201,
+          250
+        ]
+      ],
+      "why": "活動/定義/例項身份、各並行環境的predicate scope",
+      "commit": "cd484e0477e79bf1f17d373af232c53431ccc660"
+    },
+    {
+      "repo": "StanfordVL/BEHAVIOR-1K",
+      "path": "OmniGibson/omnigibson/termination_conditions/predicate_goal.py",
+      "ranges": [
+        [
+          1,
+          53
+        ]
+      ],
+      "why": "BDDL目標判斷與成功終止",
+      "commit": "cd484e0477e79bf1f17d373af232c53431ccc660"
+    },
+    {
+      "repo": "StanfordVL/BEHAVIOR-1K",
+      "path": "OmniGibson/omnigibson/metrics/task_metric.py",
+      "ranges": [
+        [
+          1,
+          81
+        ]
+      ],
+      "why": "Q-score確切分子／分母、時間與初態",
+      "commit": "cd484e0477e79bf1f17d373af232c53431ccc660"
+    },
+    {
+      "repo": "StanfordVL/BEHAVIOR-1K",
+      "path": "OmniGibson/omnigibson/eval/evaluator.py",
+      "ranges": [
+        [
+          265,
+          295
+        ],
+        [
+          636,
+          697
+        ]
+      ],
+      "why": "相機/超時設定、instance和rollout輸出",
+      "commit": "cd484e0477e79bf1f17d373af232c53431ccc660"
+    }
+  ],
+  "environment": "OmniGibson場景、物件／材料／系統、機器人與預取樣狀態；scene_model和activity_instance_id共同定位初態，不按並行num_envs增算場景種類。",
+  "tasks": "原生activity_name是活動，activity_definition_id選同一活動不同完成規格，activity_instance_id選預配置狀態。新增definition可能改規則；重跑rollout_id只改試驗，不增加活動數。",
+  "data": "cached filename含scene_model/activity/definition/instance；evaluator逐例項寫task、instance_id、rollout_id、steps、success及metrics。可選online sampling、robot pose、asset whitelist/blacklist及task highlighting，均影響合法題目配置。",
+  "evaluation": "PredicateGoal委派compiled BDDL目標檢查，各env用獨立object scope。成功Q=1；未成功時對每一備選goal，計初態不滿足而現在滿足的predicate數÷該option全部predicate數，再取最大。此分母不是初態未滿足數。timeout可依人類示範長度乘係數或明定max_steps；時間標準化需保留human stats版本。",
+  "standardization": {
+    "profile": "predicate_defined_household_simulation",
+    "reuse": "活動/definition/instance、BDDL目標、預取樣場景與細項metrics。",
+    "transform": "來源活動與本庫語義任務分開，environment接scene+assets，case保留definition/instance/機體/感測/初態；Q-score及success分欄並保存初始predicate mask和備選goal。",
+    "missing": "資產／知識庫／BDDL／模擬器版本閉合、全部活動定義及可執行子集清單、物理有效性與原生重播。"
+  },
+  "version_note": "本次HEAD為2026-10快照，內含新BDDL3及向量化eval；README引用2024論文。此前庫存用4b0f43d版本，兩次快照不混算已取得任務與cases。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

@@ -1,0 +1,116 @@
+{
+  "paper_id": "P104",
+  "summary": "SIMPLER是實機設定的模擬評測，不是新的實機大資料集；兩種配置為視覺匹配與變體平均。已核對子模組中的done=success及抓取歷史成功規則。",
+  "reading_order": [
+    {
+      "repo": "simpler-env/SimplerEnv",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          64
+        ],
+        [
+          78,
+          100
+        ]
+      ],
+      "why": "兩種實轉模擬協定與ManiSkill2/3版本",
+      "commit": "eddb5690749a1e34267807c0f7b5eede323918d7"
+    },
+    {
+      "repo": "simpler-env/SimplerEnv",
+      "path": "simpler_env/__init__.py",
+      "ranges": [
+        [
+          1,
+          88
+        ]
+      ],
+      "why": "task alias至環境/參數對映，變體不能按名稱全加",
+      "commit": "eddb5690749a1e34267807c0f7b5eede323918d7"
+    },
+    {
+      "repo": "simpler-env/SimplerEnv",
+      "path": "simpler_env/evaluation/maniskill2_evaluator.py",
+      "ranges": [
+        [
+          15,
+          219
+        ]
+      ],
+      "why": "初態掃描、模型/控制輸出、終止與最後成功判定",
+      "commit": "eddb5690749a1e34267807c0f7b5eede323918d7"
+    },
+    {
+      "repo": "simpler-env/SimplerEnv",
+      "path": "simpler_env/utils/metrics.py",
+      "ranges": [
+        [
+          134,
+          163
+        ]
+      ],
+      "why": "sim-real Pearson及MMRV的模型排序分母",
+      "commit": "eddb5690749a1e34267807c0f7b5eede323918d7"
+    },
+    {
+      "repo": "simpler-env/ManiSkill2_real2sim",
+      "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+      "path": "mani_skill2_real2sim/envs/sapien_env.py",
+      "ranges": [
+        [
+          547,
+          582
+        ]
+      ],
+      "why": "此版本terminated直接取info.success"
+    },
+    {
+      "repo": "simpler-env/ManiSkill2_real2sim",
+      "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+      "path": "mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+      "ranges": [
+        [
+          401,
+          461
+        ]
+      ],
+      "why": "提起高度、接觸與歷史5步成功條件"
+    }
+  ],
+  "environment": "Google Robot與WidowX+Bridge的SAPIEN/ManiSkill2實轉模擬設定；背景overlay、紋理、光照、幹擾物等變體是設定，不自動新增語義任務。",
+  "tasks": "抓取、移近、抽屜開關／放物，以及WidowX放置／堆疊等；ENVIRONMENT_MAP把不同罐姿態映射同class＋參數，需保留variant關係。",
+  "data": "reset options指定robot xy/quat和object xy或episode_id；模型輸出world_vector、rot_axangle、gripper、terminate_episode。控制頻率、sim_freq、相機、overlay與subtask推進全部是case協定。",
+  "evaluation": "此釘選子庫get_done=info.success；外層直到模型停止或truncated，保存最後done。抓取可按提起>1cm且無有效外部接觸，或連握5步；開啟episode_stats時曾顯著提起>2cm達5步亦可成功。另以Pearson/MMRV比較模型sim-real表現排序，不是單題完成率。",
+  "standardization": {
+    "profile": "real_to_sim_policy_evaluation",
+    "reuse": "真實setup對應、task alias/config、初態掃描及原生task metrics。",
+    "transform": "case保留視覺匹配/變體平均、variant權重、時間/動作約定；evaluator存瞬間/歷史成功旗標、subtask及固定子庫版本。sim-real correlation另為模型層聚合。",
+    "missing": "完整資產、真實結果配對與不確定性、每變體分母/權重、各task具體checker接線、原生模型執行。"
+  },
+  "version_note": "SimplerEnv main基於CPU ManiSkill2；README另連maniskill3分支。此tree的ManiSkill2_real2sim釘在ef7a4d4；不得替換為最新ManiSkill3後仍稱同設定。",
+  "source_files": [
+    {
+      "repo": "simpler-env/ManiSkill2_real2sim",
+      "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+      "path": "mani_skill2_real2sim/envs/sapien_env.py",
+      "url": "https://raw.githubusercontent.com/simpler-env/ManiSkill2_real2sim/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/mani_skill2_real2sim/envs/sapien_env.py",
+      "local_file": "audit/.cache/github_review/explicit/simpler-env__ManiSkill2_real2sim/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/files/mani_skill2_real2sim/envs/sapien_env.py",
+      "sha256": "7a6bec0915ccd014283a8cd0a2325a0c624e8ebc9f06b05e00e29a4bb86f5d8b",
+      "lines": 780
+    },
+    {
+      "repo": "simpler-env/ManiSkill2_real2sim",
+      "commit": "ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682",
+      "path": "mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+      "url": "https://raw.githubusercontent.com/simpler-env/ManiSkill2_real2sim/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+      "local_file": "audit/.cache/github_review/explicit/simpler-env__ManiSkill2_real2sim/ef7a4d4fdf4b69f2c2154db5b15b9ac8dfe10682/files/mani_skill2_real2sim/envs/custom_scenes/grasp_single_in_scene.py",
+      "sha256": "c067aa46582a2ad9ced5a360b583221a9be635fab578368a0441685dced1965d",
+      "lines": 861
+    }
+  ],
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

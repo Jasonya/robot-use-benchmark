@@ -1,0 +1,356 @@
+{
+  "paper_id": "P170",
+  "name": "MotionForge",
+  "title": "MotionForge: A Data Generation Pipeline and Large-Scale Benchmark for Long-Horizon Manipulation of Dynamic Objects with Domain Shifts",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.25689",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "industry",
+    "logistics"
+  ],
+  "status": "no_confirmed_code_repository",
+  "review": {
+    "paper_id": "P170",
+    "reviewed_on": "2026-10-11",
+    "status": "no_confirmed_code_repository",
+    "summary": "MotionForge原文定義動態操作與延遲感知評測；已排除同名Blender動畫工具倉庫，精確paper-ID與robot關鍵字搜尋仍未確認本篇官方code。",
+    "environment": "原文分Factory Conveyor、Circular Motion、Home Tabletop、Embodied Interaction四個scene family，各10task；families代表場景/動態配置，非四個完全獨立生活用途。",
+    "tasks": "40個semantic task families中17個long-horizon，11種primary motion pattern；只改速度的variants在原文計數協定合併，這點可直接用來對齊我們的task granularity。",
+    "data": "生成約20kepisodes，訓練每task只取50successful demo、共2000；每scene family訓練一個model，所以每policy方法有4個family-specific模型。80k訓練steps×batch32不是獨立資料題量。",
+    "evaluation": "每task每方法50個固定seed，對40task macro-average；R1環境120Hz獨立於推論前進，action execution horizon預設16，latency按方法原生pipeline量測。ID/OOD只改指定因素，測例需要保存連續時間/延遲規則，不可換同步step後沿用原作分數。",
+    "standardization": {
+      "profile": "dynamic_manipulation_with_realtime_latency",
+      "reuse": "原文40task/17long/11motion分類、速度variant去重口徑與R1時間協定。",
+      "transform": "task以語義family去重，case另含動態因果/速度/物件/外觀與seed；result保留latency、policy-family training scope與真實時間控制規則。",
+      "missing": "官方repo、task與motion生成器、固定case/scene/asset manifest、R1 scheduler/scorer及來源實測。"
+    },
+    "version_note": "原文2609.25689v1；同名mayalhc/motionforge是Blender動畫工具，與作者/任務不同。2026-10-11兩個精確GitHub查詢均無結果；只宣稱本次未確認，不宣稱程式永久不存在。",
+    "runtime_executed": false,
+    "discovery_evidence": {
+      "paper_url": "https://arxiv.org/abs/2609.25689",
+      "pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a",
+      "paper_pages_read": [
+        3,
+        6
+      ],
+      "excluded_candidate_evidence": {
+        "repo": "mayalhc/motionforge",
+        "commit": "d902da1352848b478e7976b8587cefd14396a8a4",
+        "path": "docs/index.md",
+        "sha256": "7f8ed3890bde70d5e715cf9c388bdecd70069e08d9b203917415d9e1b20f7c48",
+        "ranges": [
+          [
+            1,
+            30
+          ]
+        ],
+        "finding": "Blender character-animation guide using ARDY/MotionBricks; not the dynamic-object manipulation paper"
+      },
+      "search_receipts": [
+        "audit/.cache/github_review/search/P170-paper-id.json",
+        "audit/.cache/github_review/search/P170.json",
+        "audit/.cache/github_review/search/P170-robot.json"
+      ]
+    },
+    "excluded_repositories": [
+      {
+        "repo": "mayalhc/motionforge",
+        "reason": "Blender/ARDY角色動畫工具，非2609.25689動態機器人操作benchmark。"
+      }
+    ],
+    "reading_order": [],
+    "review_sha256": "7b644e2c160292c9a19c44f15bf6e1ddd8c491aa9d62f56779ed4960e5a29814"
+  },
+  "repository_binding_review_sha256": "7b644e2c160292c9a19c44f15bf6e1ddd8c491aa9d62f56779ed4960e5a29814",
+  "repository_bindings": [],
+  "repository_candidates": [
+    {
+      "requested_repo": "mayalhc/motionforge",
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "MotionForge",
+          "search_receipt_sha256": "ea3a017cfbea4bd685644eb934e339db056b43aca96eb7701270e265b699c4c9",
+          "url": "https://github.com/mayalhc/motionforge",
+          "officiality": "requires_source_identity_review"
+        }
+      ],
+      "selection_status": "excluded_as_unrelated",
+      "candidate_scope": "Retained discovery lead, not a confirmed implementation for this paper.",
+      "exclusion_reason": "Blender/ARDY角色動畫工具，非2609.25689動態機器人操作benchmark。"
+    }
+  ],
+  "group": "unresolved",
+  "domains": [
+    "裝配與生產作業",
+    "包裝、倉儲與物流"
+  ],
+  "source_review": {
+    "paper_id": "P170",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "MotionForge，arXiv 2609.25689v1。",
+    "scope_read": "40semantic families、motion taxonomy、實時協定、生成validation及ID/OOD50seeds。",
+    "pages_read": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "裝配與生產作業",
+      "包裝、倉儲與物流"
+    ],
+    "role": "動態操作benchmark",
+    "environment": "4scene families：Factory Conveyor、Circular Motion、Home Tabletop、Embodied Interaction；5K背景variation非5Klayouts。",
+    "tasks": "40semantic tasks、11motion patterns；17long/23short，僅改速度的variants合併為同family。",
+    "cases": "約20K產生demo中選每task50＝2Ktrain；每task每ID/OOD condition50固定seeds，7policies另算rollouts。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "scene families",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 40,
+        "unit": "semantic task families",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 17,
+        "unit": "long-horizon families",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task每condition eval episodes",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "macro task success；policy推論時環境仍以120Hz進行，latency對成功有實際影響。",
+      "LH依8秒+2skills或20秒門檻定義，作者明示長不一定更難。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查",
+      "數值誤差與相似度"
+    ],
+    "split": "object/background/light/speed單factor與joint OOD；保留不支援最高speed的task例外。",
+    "lineage": "generated scenes＋共用oracle skills；task質檢要求oracle>50%為生成合格條件，不是learning-policy成績。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "locator": "表I、§III–V",
+        "supports": "40/11/17、latency、50seed及qualifying oracle"
+      }
+    ],
+    "unresolved": [
+      "不同硬體的native inference latency不可無條件比較，需固定evaluation hardware/runtime。"
+    ],
+    "reuse": "補傳送帶、拋接與動態速度規則；可區分場景生成量與語義task量。",
+    "reviewed_pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a",
+    "reviewed_on": "2026-10-02",
+    "name": "MotionForge",
+    "year": 2026,
+    "title": "MotionForge: A Data Generation Pipeline and Large-Scale Benchmark for Long-Horizon Manipulation of Dynamic Objects with Domain Shifts",
+    "source_url": "https://arxiv.org/abs/2609.25689",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "industry",
+      "logistics"
+    ],
+    "review_tags": [
+      "工業製造",
+      "包裝與倉儲",
+      "桌面物件操作",
+      "人機協作"
+    ],
+    "domain_names": [
+      "裝配與生產作業",
+      "包裝、倉儲與物流"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P170",
+      "domain_ids": [
+        "industry",
+        "logistics"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P170",
+          "domain_ids": [
+            "industry",
+            "logistics"
+          ],
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "40semantic tasks、11motion patterns；17long/23short，僅改速度的variants合併為同family。",
+            "4scene families：Factory Conveyor、Circular Motion、Home Tabletop、Embodied Interaction；5K背景variation非5Klayouts。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a",
+      "previous_domain_ids": [
+        "industry",
+        "logistics"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P170",
+      "name": "MotionForge",
+      "expected_title": "MotionForge: A Data Generation Pipeline and Large-Scale Benchmark for Long-Horizon Manipulation of Dynamic Objects with Domain Shifts",
+      "source_url": "https://arxiv.org/abs/2609.25689",
+      "pdf_url": "https://arxiv.org/pdf/2609.25689",
+      "retrieved_at": "2026-10-02T21:34:37.192154+00:00",
+      "pdf_sha256": "26bf90c839b269529d60ec9d7b97df9c98670c0297089faf96f14d7e2bfc8c1a",
+      "text_sha256": "4bebd0ba56d017e80d0606c61309b383f61519c92c6c33c7537669852a9c87e2",
+      "pdf_bytes": 4966396,
+      "pages": 9,
+      "text_characters": 74618,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.25689v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.25689v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 4,
+        "unit": "scene families",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P170:1",
+        "paper_id": "P170",
+        "benchmark": "MotionForge",
+        "native_term": "scene families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.25689v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.25689v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 40,
+        "unit": "semantic task families",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P170:2",
+        "paper_id": "P170",
+        "benchmark": "MotionForge",
+        "native_term": "semantic task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.25689v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.25689v1",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 17,
+        "unit": "long-horizon families",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P170:3",
+        "paper_id": "P170",
+        "benchmark": "MotionForge",
+        "native_term": "long-horizon families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.25689v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.25689v1",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 50,
+        "unit": "每task每condition eval episodes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P170:4",
+        "paper_id": "P170",
+        "benchmark": "MotionForge",
+        "native_term": "每task每condition eval episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.25689v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.25689v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [],
+  "external_repositories": []
+}

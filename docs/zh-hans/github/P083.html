@@ -1,0 +1,155 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RoboDojo｜GitHub怎么读与整理 · Robot-use Benchmark</title>
+  <meta name="description" content="RoboDojo与XPolicyLab分别提供sim任务／计分与policy／data adapter。已闭合stack_bowls、push_T的checker、RewardManager、EvalEnv及summary，并读HDF5→RGB→LeRobot reader。success_rate与partial score不同；unstable/abandoned layout不在相同分母，summary还有embodiment键遗失与layout排序问题。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P083.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P083.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P083.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="RoboDojo｜GitHub怎么读与整理 · Robot-use Benchmark"><meta property="og:description" content="RoboDojo与XPolicyLab分别提供sim任务／计分与policy／data adapter。已闭合stack_bowls、push_T的checker、RewardManager、EvalEnv及summary，并读HDF5→RGB→LeRobot reader。success_rate与partial score不同；unstable/abandoned layout不在相同分母，summary还有embodiment键遗失与layout排序问题。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P083.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"github/P083.html","title":"RoboDojo｜GitHub怎么读与整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hans.js?v=081237f01e25","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原作定义／设置","staticOnly":"本卡记录来源索引；任务环境规格的对齐和运行验证分别记录。","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"索引出处与对应细节","empty":"没有符合的索引条目","showing":"显示","records":"笔索引条目","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原作任务ID","native_task_class":"原作任务类别","native_task_registration":"原作任务注册","native_task_module":"原作任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务schema","generator_configuration":"生成器设置","integration_registration_group":"框架注册组","evaluation_protocol":"评测协定","video_task_schema":"视频／任务题型","human_sim_task_mapping":"人类／模拟任务对应","native_task_template":"任务模板","instructional_activity_definition":"人类活动定义","native_task_definition":"原作任务定义","information_task_schema":"信息题型定义"},"buckets":{"native_task_candidates":"原作robot任务条目（待对齐）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类活动／流程定义（视频来源）","information_task_definitions":"信息任务／问答题型定义"},"recordMeaning":"索引型态","meaningByBucket":{"native_task_candidates":"原作者列出的robot任务条目；在本库等待共同规格与来源对齐。","human_activity_definitions":"人类活动类别与流程来源，可对应多部视频；任务环境另建对应。","integration_or_protocol":"框架注册、协定或生成设置，可指向多个任务／样本；一条索引不等于一个环境。","video_pairing":"视频题型或人类／模拟任务对应；观测数据与物理环境规格分开。","documented_examples":"示范程序入口；可作定义与实作线索，尚不直接代表独立环境。","information_task_definitions":"原作的信息任务或问题类型；题目实数另外按question_id或case_id计数。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../coverage.html">覆盖与比较</a><a href="../native-tasks.html">任务清单</a><a href="../survey-union.html">来源名录</a><a href="../design.html">整体设计</a><a href="../collection-pipeline.html">数据流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核读</a><a href="../library.html">文献</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/github/P083.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="P083.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>P083 · RoboDojo</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P083 · RoboDojo</h1><p class="lede">RoboDojo: A Unified Sim-and-Real Benchmark for Comprehensive Evaluation of Generalist Robot Manipulation Policies</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇总表</a><span class="github-status core">内核内容已核读</span>
+      <span>benchmark／数据／评测主来源</span><a href="https://arxiv.org/abs/2607.04434" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p083">用途与原生规模依据</a>
+    </div>
+    <p class="github-scope">核读快照 2026-10-11。已读范围限所列片段；本轮未运行上游程序。</p>
+    <p class="github-summary">RoboDojo与XPolicyLab分别提供sim任务／计分与policy／data adapter。已闭合stack_bowls、push_T的checker、RewardManager、EvalEnv及summary，并读HDF5→RGB→LeRobot reader。success_rate与partial score不同；unstable/abandoned layout不在相同分母，summary还有embodiment键遗失与layout排序问题。</p>
+    <aside class="github-version"><b>版本与身份</b><p>RoboDojo固定cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c（2026-10-08），不同于旧inventory 726e9aabfaa642203722eb126f5eaf0f37f3e1ad；XPolicyLab固定de9b445e4e46388542c412e406c73d359a5802fd（2026-10-10）。RoboDojo README记9月16–17日get_obs单帧与RGB修正、HF数据更新及swap_T assets修正，要求XPolicyLab bb9a0b5f5136a74503b679af830bfd0a3a837d5c或后续；未独立验证本两pin的完整runtime兼容性。7月paper、9月数据修订、10月程序与8月XPolicyLab paper须分开建版本，不把政策数当benchmark task数。未启动server、sim、policy或远程评测。</p><p>固定RoboDojo论文为Chen等人的完整sim-and-real benchmark，arXiv:2607.04434v3（2026-07-08）。PDF第1页直接连两repo，主README题名/arXiv吻合。XPolicyLab现行README另引用2608.09892（2026年8月的独立工具论文）；本P083只审其RoboDojo adapter角色，不把那篇的政策数或新功能倒算成7月RoboDojo benchmark。</p></aside>
+    <dl class="github-five-fields"><div><dt>领域</dt><dd>居家整理与清洁、衣物与洗护、装配与生产作业、通用对象与机动作业</dd></div><div><dt>环境</dt><dd>Isaac Sim／Isaac Lab配置化场景，TaskEnv由sim/scene/robot/camera/task YAML创建，可有target双臂与support arm。选读stack_bowls从8个bowl asset ID中选3个同类对象，xlim[-0.45,0.45]、ylim[-0.25,0.07]相对Table；评测改读已存Eval_Layout。主README此版为sim eval-only，真实ARX X5/Piper/Piper X的18 tasks使用RoboDojo-RealEval另行部署；本轮未取得真实trial视频、三人评分或隐藏验证layout。</dd></div><div><dt>任务</dt><dd>summary DIMENSIONS确列42个base tasks：Generalization12、Precision8、Long-Horizon8、Memory6、Open8；12个*_random是对应base task的泛化设置，不另算42以外新canonical任务。stack_bowls完整成功需三碗轴向&lt;45度、最低碗&lt;7度、相邻中心XY距离&lt;=0.04m且高度差&gt;=0.005m、target robot回原位（每座标差&lt;=0.15m、旋转&lt;=20度）。此stack checker不验接触且未设最大垂直间隔。process score为两碗阶段15、三碗阶段100，要求gripper开度&gt;=0.8；transition每action最多推进一阶，100仍须完整成功gate。push_T以quat差&lt;7度、XY距离&lt;0.007m及robot回原位成功；is_lift相对初态&gt;0.01m的query允许次数0，触发即失败；不是IoU评测。</dd></div><div><dt>题数与数据</dt><dd>case来源为Assets/Eval_Layout/RoboDojo/{config_name}/{eval_seed}/{task}_N.json。SeedManager按N排序后重新以0..len-1编ordinal，该ordinal才是程序layout_id；未取得外部layout JSON，不能用文件名suffix直接替代。runtime obs含data_format_version=&#39;v1.0&#39;、instruction、additional_info.frequency、vision/state/action及env_idx；RGB为HWC，float depth保持距离，approximate_depth=clip(raw*1000,0,65535).uint16。实际ObsManager写extrinsic_matrix，与XPolicyLab README宣称runtime extrinsics_matrix不同。XPolicyLab load(RoboDojo,v1.0)递归读HDF5、解析instruction/subtasks JSON，colors经decode_image_bit；pose为xyz+qwqxqyqz。legacy JPEG及有XPL-RGB1 COM marker的新JPEG可共存，decoder只对有marker者做BGR→RGB。LeRobot v2.1 converter取state/action下left_arm_joint_states、left_ee_joint_states、right_arm_joint_states、right_ee_joint_states依序串接；三相机映到cam_high/left_wrist/right_wrist，缺相机补黑，各arm补到共同最大维度。paper的3500 trajectories=34训练tasks各100+100 DLC辅助（Open无task-specific训练），1859602 frames及25Hz是paper统计，未下载重新点算。</dd></div><div><dt>评估方式</dt><dd>policy deploy→update_obs/get_action→EvalEnv.take_action→robot control→RewardManager.step→Func_Parser→is_episode_end。check按列表顺序移除已完成stage，嵌套list交替OR/AND，query计事件次数；完整reward只回0/1。stack_bowls上限800个take_action，push_T600，非physics ticks；capture frequency另由dt与collect_freq决定。EvalEnv完整成功记episode score=1，失败若有process score则/100；_result.json含details{record_index:{layout_id,success,score}}、success_rate（0–1）、score（0–100平均）、eval_time（已计数episodes，不是秒）。无效、unstable及部分PhysX broken layouts被排除／补样，abandoned另存resume manifest；要求50不能当50次尝试。summary采每task/policy/embodiment/seed最新timestamp结果；独立task前50笔，Generalization合base25+random25，三seed0/1/2共126个完整cell。先平均每维tasks，再五维等权平均，seed标准差为population std；未完成cell留空，overview可显示已完成部分平均。真实paper协定每task10 trials、三位评分者分别打成功与substeps后平均，不能以sim RewardManager替代。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作数字：保留论文的单位与页码</summary><p>下列为既有原文审阅摘录；GitHub快照和本库取得范围另见上文，不互相代替。</p><ul><li><strong>42</strong> simulation tasks · 原文页 7</li><li><strong>18</strong> real tasks · 原文页 7, 8</li><li><strong>2,100</strong> simulation eval episodes · 原文页 7</li><li><strong>180</strong> real eval trials／policy · 18×10 · 原文页 9</li></ul></details>
+    <h2 id="reading">依这个顺序读</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/README.md#L5-L7" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>paper身份、September数据／RGB修正、sim eval-only与XPolicyLab责任界线。</p><small>L5–7 · L13–37 · L54–107</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 bd02716d0cd9aae351307ae77772d20675a3bc2cc1e531cffe0b9644525ac944</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/task_registry.py#L1-L21" target="_blank" rel="noopener noreferrer"><code>task/RoboDojo/task_registry.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>按task名加载class与YAML，不将文件数当canonical task数。</p><small>L1–21</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 11218028f772d9253ee709a7d85aa72d1e1fd87e4f8d33ee3787d6064438f9ab</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/config/_task.yml#L1-L145" target="_blank" rel="noopener noreferrer"><code>task/RoboDojo/config/_task.yml</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>共同设置、teleop/datagen、每task trial覆写及support robot。</p><small>L1–145</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 655a87cd59fa6272bf352d32deb8ade162737b49a9824e16d428fecf0803380b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/config/stack_bowls.yml#L1-L17" target="_blank" rel="noopener noreferrer"><code>task/RoboDojo/config/stack_bowls.yml</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>三个同类bowl、asset候选及桌面初态取值范围。</p><small>L1–17</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 4e2aaa12b8b0f58ca801f1a93638c46d3b49ebad809c5a8011382ccda846dcb1</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/tasks/stack_bowls.py#L5-L99" target="_blank" rel="noopener noreferrer"><code>task/RoboDojo/tasks/stack_bowls.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>800步、三碗完整成功与15/100 transition process score。</p><small>L5–99</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 022c129ec3493183b1a26688a0402f5a00a1546ae011999e9c19f4c0029e2b7d</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/task/RoboDojo/tasks/push_T.py#L5-L37" target="_blank" rel="noopener noreferrer"><code>task/RoboDojo/tasks/push_T.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>600步、7度／7mm位置对齐及禁止lift。</p><small>L5–37</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 a01d753bc320ffbf492ccc29e5f7ab3b39e6c7d255cd25804db1934a30fa5b41</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/environment/task_env.py#L10-L100" target="_blank" rel="noopener noreferrer"><code>env/environment/task_env.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>runtime robot/scene/camera/physics及控制调用。</p><small>L10–100</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 ac816cf26efabbb8ac4276d2a2a09fbd557e3db805514db0c3dd7ac22b58e931</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/seed_manager/seed_manager.py#L27-L100" target="_blank" rel="noopener noreferrer"><code>env/seed_manager/seed_manager.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>Eval_Layout JSON排序、layout ordinal、resume排除及实际文件reader。</p><small>L27–100</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 292eee4003de1c22b288ec3bc1d04d95c7aee5368f30991679ea1cc4c37247b3</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/observation_manager/obs_manager.py#L16-L66" target="_blank" rel="noopener noreferrer"><code>env/observation_manager/obs_manager.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>传感同步、frequency、depth/approximate_depth与真实runtime字段。</p><small>L16–66 · L81–220</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 771d6cda443b591f3e7850b901a06b4e653a2feefcbabd23608042377fe9be4b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/reward_manager/reward_manager.py#L28-L69" target="_blank" rel="noopener noreferrer"><code>env/reward_manager/reward_manager.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>函数descriptor、嵌套AND/OR、query事件计数、transition及满分成功gate。</p><small>L28–69 · L78–161 · L236–297 · L315–405 · L527–664 · L792–803 · L829–831</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 bc56efd3aaa861b4b38960dc4fb7778a9b4da9cf131f815ac3170300dd233a41</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/env/reward_manager/func_parser.py#L61-L74" target="_blank" rel="noopener noreferrer"><code>env/reward_manager/func_parser.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>实际object pose几何、gripper与robot回原位条件。</p><small>L61–74 · L996–1019 · L1126–1157 · L1523–1536 · L1631–1645 · L1672–1741 · L1978–2001</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 eb928a05c3eb6bae429a922c59e64272c2c3851c22d779143d45627e47b3a504</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/src/eval_client/main.py#L254-L346" target="_blank" rel="noopener noreferrer"><code>src/eval_client/main.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>合并configs、eval budget、seed调度、PhysX／unstable中断及补样。</p><small>L254–346 · L347–378 · L378–442</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 ca6ba652b6f123506370f1907b1d88060d83f56c9e91ce6e6930f63d9f2b71a8</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/src/eval_client/eval_env.py#L43-L194" target="_blank" rel="noopener noreferrer"><code>src/eval_client/eval_env.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>policy client、控制步计数、任务结束、partial score与_result.json分母。</p><small>L43–194 · L208–285 · L337–389 · L410–465 · L638–652 · L771–867</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 3ae75304d8a840ede2589441f987824f50b2a89cc2ef37f4d43ce0a8dbc4fd88</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/RoboDojo-Benchmark/RoboDojo/blob/cb2a37d58dbbeb2777b0c2b30e97ecb8ab91095c/scripts/internal/summarize_result.py#L1-L95" target="_blank" rel="noopener noreferrer"><code>scripts/internal/summarize_result.py</code> ↗</a><span>GitHub · RoboDojo-Benchmark/RoboDojo · cb2a37d58d</span></div>
+      <p>42-task taxonomy、25+25／50、三seed、五维等权平均及缺漏cell语义。</p><small>L1–95 · L96–116 · L247–322 · L339–412 · L427–482 · L511–551</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 9ec361af587e1788d83d3cf8670e05b817ff252d33c33829a6337dc16ae370d2</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/README.md#L7-L28" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · XPolicyLab/XPolicyLab · de9b445e4e</span></div>
+      <p>独立XPolicyLab paper、trajectory v1.0、pose、RGB byte版本与LeRobot profile。</p><small>L7–28 · L323–429 · L448–489</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 9f7f3badbe19aa39bf79a45ae69dfad195e425e1af89ab4e1374c982dd1a923f</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/policy/demo_policy/deploy.py#L1-L42" target="_blank" rel="noopener noreferrer"><code>policy/demo_policy/deploy.py</code> ↗</a><span>GitHub · XPolicyLab/XPolicyLab · de9b445e4e</span></div>
+      <p>reset/update_obs/get_action到TASK_ENV.take_action的单例与batch契约。</p><small>L1–42</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 4ce7ac892b92ce5eae7d17b94108e7a66f69bcca121bf0cea7b53f5414133680</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/utils/data_loader.py#L1-L58" target="_blank" rel="noopener noreferrer"><code>utils/data_loader.py</code> ↗</a><span>GitHub · XPolicyLab/XPolicyLab · de9b445e4e</span></div>
+      <p>converter真正reader：RoboDojo/xspark v1.0 HDF5递归、JSON语句与RGB decoder。</p><small>L1–58</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 12c92dccfbd8629556f0c167f470c381e0ff20f4e742655a6e07100355fae95d</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/utils/process_data.py#L291-L305" target="_blank" rel="noopener noreferrer"><code>utils/process_data.py</code> ↗</a><span>GitHub · XPolicyLab/XPolicyLab · de9b445e4e</span></div>
+      <p>JPEG COM标记XPL-RGB1、legacy／standard byte的RGB解码分支。</p><small>L291–305 · L345–396 · L423–526</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 e044e627eb2677907e9227eda8458c857208913bd484c5e922b53025010eef0b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/XPolicyLab/XPolicyLab/blob/de9b445e4e46388542c412e406c73d359a5802fd/scripts/transform_lerobot_v21_format.py#L25-L51" target="_blank" rel="noopener noreferrer"><code>scripts/transform_lerobot_v21_format.py</code> ↗</a><span>GitHub · XPolicyLab/XPolicyLab · de9b445e4e</span></div>
+      <p>bimanual state/action字段、padding／缺相机、原帧逐一转存及max_fps。</p><small>L25–51 · L154–159 · L200–274 · L376–425 · L484–604 · L639–702</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 824884df75745d0582839c01466e475e425f674bf74fab69cc4bd963784b594e</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎么接入我们的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>42-task capability mapping、base/random关系、layout replay与seed调度、具体几何／事件／阶段checker、逐trial success/score及HDF5／JPEG reader。</p></section><section><h3>需要转换</h3><p>source同时锁RoboDojo与XPolicyLab commit；case键包含paper/code版、task、base/random、embodiment、config、eval_seed、layout ordinal和实际文件hash，record_index另存。evaluator区分success、process score、末阶段gate、unstable/abandoned与实际分母；按五维聚合而非所有task混平均。数据profile保留v1.0容器、JPEG marker、pose wxyz、观测／动作对齐、相机缺失与padding mask、原频率及LeRobot版本。</p></section><section><h3>仍需补齐</h3><p>尚缺固定layout/robot/object资产包、原始HDF5样本、真实评分数据与hidden-layout验证。summary load_entries其实按details字典record key排序而非payload.layout_id；main又将(policy,embodiment,seed)写入data[policy][task][seed]，多embodiment同名结果可能互相覆盖。latest timestamp还会跨不同checkpoint/action_type选最后结果，须额外绑run配置。LeRobot转换合并多频率来源时以max_fps创建dataset，convert_one逐原帧写入无resampling，需保存原时间轴或分流。geometry-only stack条件、runtime extrinsic键差异、score gate与unstable排除均需协调者在schema／protocol层明示。</p></section></div>
+    <details class="github-discovery"><summary>查看来源确认纪录</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P083-discovery.json&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/code_contexts/1&quot;,
+      &quot;/candidates/1&quot;,
+      &quot;/candidates/2&quot;
+    ],
+    &quot;paper_version&quot;: &quot;2607.04434v3&quot;,
+    &quot;pdf_sha256&quot;: &quot;e07c215f30169dde6a792c34b046b1f54818d09331763988732dcf9ead89a9d4&quot;,
+    &quot;finding&quot;: &quot;第1頁兩個直接code hyperlink，及第12頁XPolicyLab介面定位。&quot;,
+    &quot;sha256&quot;: &quot;f29aeb6b96df92b534245510dfbf443dec7fd84ff1562a5a8c189f46247a0d98&quot;,
+    &quot;text_excerpts&quot;: [
+      {
+        &quot;json_pointer&quot;: &quot;/opening_text&quot;,
+        &quot;character_range&quot;: [
+          2240,
+          2277
+        ],
+        &quot;text&quot;: &quot;arXiv:2607.04434v3 [cs.RO] 8 Jul 2026&quot;,
+        &quot;scope&quot;: &quot;僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。&quot;
+      }
+    ]
+  },
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P083/pages.json&quot;,
+    &quot;sha256&quot;: &quot;cc0c6fa4b92d388c3997d17d11e6f9b4abee949f5fd428cd6a997f139eb58278&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/6/text&quot;,
+      &quot;/8/text&quot;
+    ],
+    &quot;finding&quot;: &quot;25Hz／3500訓練軌跡、42-task分層評測；真實18 tasks各10 trials、三位雙盲評分者平均的paper協定。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同结构与格式说明 →</a><a href="../../downloads/github-review/papers/P083.json" download>本篇JSON与证据 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇阅读"><a href="P082.html">← 上一篇 · RoboVerse</a><a href="P084.html">下一篇 → · KinDER</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理与逐篇报告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hans.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆盖总览与前作比较</a><a href="../design.html">目前主设计</a><a href="../research.html">文献与分类</a><a href="../counting.html">计数细节与旧代号</a><a href="../../downloads/source-review/source-review-zh-hans.pdf">用途归纳PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">历史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初筛、183份关键章节审阅、672笔原生数量摘录；183/183份来源完成21类用途归纳；4类判分分项保留。GitHub核读增补：250/250篇有处理结果，范围与程序运行分开。旧配额已撤回，全库任务与环境去重仍待完成。 <a href="../github-review.html">逐篇GitHub与标准化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

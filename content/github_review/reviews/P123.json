@@ -1,0 +1,128 @@
+{
+  "paper_id": "P123",
+  "summary": "WatchAct有14種行為理解題型，規劃用符號狀態評分，LIBERO另跑物理執行；Plan Success、完整終態一致和實體成功不能合併成同一數值。",
+  "reading_order": [
+    {
+      "repo": "Baiqi-Li/WatchAct",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          19
+        ],
+        [
+          38,
+          49
+        ],
+        [
+          66,
+          100
+        ]
+      ],
+      "why": "14題型/4能力與規劃、翻譯、物理執行分離",
+      "commit": "97d8873e413601a2f511906a9860aa17740cb80e"
+    },
+    {
+      "repo": "Baiqi-Li/WatchAct",
+      "path": "video_planning/scripts/run_vlm_evaluation.py",
+      "ranges": [
+        [
+          542,
+          608
+        ],
+        [
+          712,
+          732
+        ]
+      ],
+      "why": "輸入欄位、影片採樣及original_id群組抽樣",
+      "commit": "97d8873e413601a2f511906a9860aa17740cb80e"
+    },
+    {
+      "repo": "Baiqi-Li/WatchAct",
+      "path": "video_planning/scripts/run_action_plan_simulation.py",
+      "ranges": [
+        [
+          205,
+          272
+        ],
+        [
+          476,
+          482
+        ]
+      ],
+      "why": "planning simulation是符號狀態更新",
+      "commit": "97d8873e413601a2f511906a9860aa17740cb80e"
+    },
+    {
+      "repo": "Baiqi-Li/WatchAct",
+      "path": "video_planning/scripts/run_action_plan_scoring.py",
+      "ranges": [
+        [
+          370,
+          468
+        ],
+        [
+          586,
+          621
+        ],
+        [
+          708,
+          736
+        ]
+      ],
+      "why": "目標變化、完整狀態、sequence覆寫與分母",
+      "commit": "97d8873e413601a2f511906a9860aa17740cb80e"
+    },
+    {
+      "repo": "Baiqi-Li/WatchAct",
+      "path": "action_execution/run_libero_execution.py",
+      "ranges": [
+        [
+          123,
+          140
+        ],
+        [
+          185,
+          215
+        ],
+        [
+          246,
+          269
+        ],
+        [
+          460,
+          498
+        ]
+      ],
+      "why": "物理執行done、原始/初始/net completion與trial聚合",
+      "commit": "97d8873e413601a2f511906a9860aa17740cb80e"
+    },
+    {
+      "repo": "Baiqi-Li/WatchAct",
+      "path": "action_execution/custom_predicates.py",
+      "ranges": [
+        [
+          122,
+          199
+        ]
+      ],
+      "why": "Right/Horizontal必須resting及幾何條件",
+      "commit": "97d8873e413601a2f511906a9860aa17740cb80e"
+    }
+  ],
+  "environment": "觀察人類影片後在LIBERO桌面執行；影片camera_perspective/spatial_reference與模擬相機／世界坐標要分開。符號場景圖不等於新的物理場景。",
+  "tasks": "14native題型如Imitation/Reversal/Temporal_Sort、Count/Moment、Implicit Intent與Episodic等，屬行為條件與推理方式；具體robot goal／物件／初態另定，不把14題型當14生活用途。",
+  "data": "row有id/original_id、language_instruction、video、camera_perspective、spatial_reference；按original_id群組抽樣。規劃輸出action_plan_json，翻譯/符號推演產initial/final/goal_state；執行端是BDDL、init_state、prompt切換與policy action chunk。",
+  "evaluation": "Plan SR對需變化的interest objects全對即成功，可能忽略side effects；all_success才要求完整終態相等。Imitation/Reversal可改用序列匹配SR。LIBERO物理成功從done取，progress另記max(0,final-initial)，Right/Horizontal檢查幾何且物件已釋放、接觸桌面。彙總依evaluated_count加權，error_count與缺題需另保留。",
+  "standardization": {
+    "profile": "human_video_grounded_planning_and_execution",
+    "reuse": "影片/語言/視角條件、原題型、original_id lineage、planning與physical兩種checker。",
+    "transform": "同一來源題分planning case與execution case，各固定translator/模型資訊/預算；存PlanSR/all_success/physical_success、原始及net progress不同metric。新加無副作用規則另版。",
+    "missing": "全影片與BDDL/init-state資產對齊、翻譯前後語義驗證、底層LIBERO版本、初態已達標剔除與完整missing/error分母協定。"
+  },
+  "version_note": "本次固定97d8873；先前原作索引使用7036927快照，不能直接當同版本。未呼叫VLM、translator或policy server，也未執行LIBERO。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

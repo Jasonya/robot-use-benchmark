@@ -1,0 +1,502 @@
+{
+  "paper_id": "P109",
+  "name": "REFLECT / RoboFail",
+  "title": "REFLECT: Summarizing Robot Experiences for Failure Explanation and Correction",
+  "year": 2023,
+  "paper_url": "https://arxiv.org/abs/2306.15724",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P109",
+    "summary": "REFLECT/RoboFail公開失敗設定、歷史摘要與修正執行流程；LLM對子目標的Yes判斷和修正後的模擬狀態成功是兩種不同證據。",
+    "environment": "AI2-THOR FloorPlan場景和另附真實感測資料；RGB-D、聲音、robot state形成scene graph，GT detection與感知模型模式需區分。",
+    "tasks": "失敗原因／時刻辨識、執行錯誤與規劃錯誤、生成恢復計畫及執行檢查。tasks.json的scenario會共用task_idx，但failure設定／原計畫不同。",
+    "data": "name/task_idx/scene/actions/success_condition、chosen_failure/params、gt_failure_reason/step；GT時間可能字串或list，轉換需原video_fps。events/step_i.pickle與nav_actions/interact_actions及L1/L2摘要有共同時間關係。",
+    "evaluation": "run_reasoning以ans.split(\", \")[0]==\"Yes\"解析子目標，輸出prediction和GT並列於reasoning.json，GT不可迴流模型。修正後另用check_task_success讀THOR物件狀態；例如task_idx=5檢查乾淨mug裝有coffee，未檢查countertop位置。原checker並非完整自然語言目標所有條件，自建規則須另版，不覆寫原分數。",
+    "standardization": {
+      "profile": "robot_failure_explanation_and_recovery",
+      "reuse": "scenario/parent task、失敗注入、感測時間鏈、原子actions及實體狀態checker。",
+      "transform": "同一case分診斷/恢復protocol，隔離GT原因與時間；保留parser、LLM版本、history截止、預算及原checker範圍，新加目標條件以derived-rule標記。",
+      "missing": "全量感測資產與物件對映、GT/感知模式公平性、文字診斷一致性、任務自然語言與程式predicate差異審核。"
+    },
+    "version_note": "原columbia-ai-robotics/reflect已轉址real-stanford/reflect，屬同一來源。README含舊commit示例連結；本筆固定c2f9db9，未執行LLM或模擬器。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "real-stanford/reflect",
+        "requested_repo": "columbia-ai-robotics/reflect",
+        "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            51
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 70,
+        "sha256": "34c1a039df5d78b77274843320108d0d9b574102fe778e9449b0b9bc2cc3db89",
+        "url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/README.md",
+        "reading_url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/README.md#L1-L51",
+        "why": "原論文、sim/real資料與模組角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/reflect",
+        "requested_repo": "columbia-ai-robotics/reflect",
+        "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+        "ref": null,
+        "path": "main/tasks.json",
+        "ranges": [
+          [
+            1,
+            61
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 230,
+        "sha256": "daaf57bbcaa8e330a927b81005be13712c240f09bc273ba847e635a974cdc126",
+        "url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/tasks.json",
+        "reading_url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/tasks.json#L1-L61",
+        "why": "兩個具體task/scene/失敗注入/GT時間與目標schema",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/reflect",
+        "requested_repo": "columbia-ai-robotics/reflect",
+        "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+        "ref": null,
+        "path": "main/data.py",
+        "ranges": [
+          [
+            1,
+            35
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 35,
+        "sha256": "2872c5fe3fdec72f7e281d88e8cd21910bb862a1848ab11d4c64b758cba2896b",
+        "url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/data.py",
+        "reading_url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/data.py#L1-L35",
+        "why": "逐事件pickle與nav/interact動作索引",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/reflect",
+        "requested_repo": "columbia-ai-robotics/reflect",
+        "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+        "ref": null,
+        "path": "main/exp.py",
+        "ranges": [
+          [
+            238,
+            347
+          ],
+          [
+            350,
+            395
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 395,
+        "sha256": "d318b09630b58cc91e39bb62c97c3606089cbe1ea92e28c8d4512e3394d934cc",
+        "url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/exp.py",
+        "reading_url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/exp.py#L238-L347",
+        "why": "子目標/計畫失敗推理、輸出解析及修正計畫生成",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/reflect",
+        "requested_repo": "columbia-ai-robotics/reflect",
+        "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+        "ref": null,
+        "path": "main/execute_replan.py",
+        "ranges": [
+          [
+            13,
+            29
+          ],
+          [
+            194,
+            200
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 203,
+        "sha256": "a153adf66d707a3ae0c4962e0ae458efaecfbfdc806d39ad5a0a2e296d638927",
+        "url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/execute_replan.py",
+        "reading_url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/execute_replan.py#L13-L29",
+        "why": "執行修正動作後實際調用task checker",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "real-stanford/reflect",
+        "requested_repo": "columbia-ai-robotics/reflect",
+        "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+        "ref": null,
+        "path": "main/utils.py",
+        "ranges": [
+          [
+            269,
+            355
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 355,
+        "sha256": "967ad5638804ab72c97db3f6aa52fba2fd71646d4f12c03ac8d8decf8cb476c1",
+        "url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/utils.py",
+        "reading_url": "https://github.com/real-stanford/reflect/blob/c2f9db993e372250321ca74e56ae27519716c934/main/utils.py#L269-L355",
+        "why": "時間字串轉換、10個task index的具體終態檢查",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "f653943c285f4967704bfd68e963a88454e3f30b38dc9fe4c553406b48f31733"
+  },
+  "repository_binding_review_sha256": "f653943c285f4967704bfd68e963a88454e3f30b38dc9fe4c553406b48f31733",
+  "repository_bindings": [
+    {
+      "requested_repo": "columbia-ai-robotics/reflect",
+      "resolved_repo": "real-stanford/reflect",
+      "aliases_in_this_review": [
+        "columbia-ai-robotics/reflect",
+        "real-stanford/reflect"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "c2f9db993e372250321ca74e56ae27519716c934",
+          "reviewed_files": [
+            "README.md",
+            "main/data.py",
+            "main/execute_replan.py",
+            "main/exp.py",
+            "main/tasks.json",
+            "main/utils.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/columbia-ai-robotics/reflect",
+          "link_label": "Code",
+          "project_url": "https://robot-reflect.github.io/",
+          "page_sha256": "472cee6ca0ed704455d3493c759b20eaa744a2ed1e808657d3e794fc696bff39"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P109",
+          "review_file": "content/github_review/reviews/P109.json",
+          "review_sha256": "f653943c285f4967704bfd68e963a88454e3f30b38dc9fe4c553406b48f31733",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P109",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "REFLECT/RoboFail，arXiv 2306.15724v4。",
+    "scope_read": "資料規模與錯誤taxonomy、說明／定位／修正三種評測及GT資訊。",
+    "pages_read": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "AI2-THOR simulation與UR5e toy kitchen；sim用GT物件／狀態辨識，real靠感知。",
+    "tasks": "10simulation tasks、11real tasks；規劃失敗與執行失敗兩大群。",
+    "cases": "100sim failure cases（每task10）＋30real failure demonstrations；沒有把正常train影片混入失敗case總量。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "simulation task types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 11,
+        "unit": "real task types",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "simulation failure cases",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "real failure demonstrations",
+        "pages": [
+          5
+        ]
+      }
+    ],
+    "evaluation": [
+      "Exp：人工判說明正確且有用；Loc：時間落在標註區間；Co-plan：执行修正後goal state成功。",
+      "real結果表主要報Exp/Loc，不能把sim約80% Co-plan當real自主恢復率。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審",
+      "標準答案比對",
+      "環境狀態與過程檢查"
+    ],
+    "split": "方法zero-shot failure reasoning；GT perception與action primitives降低sim難度。",
+    "lineage": "sim手動注入failures，real由teleop模擬失敗政策；並非全為自主機器人自然犯錯。",
+    "evidence": [
+      {
+        "pages": [
+          5,
+          6,
+          7
+        ],
+        "locator": "§4–5、圖4、表1–2",
+        "supports": "100/30、來源方式與三種證據"
+      }
+    ],
+    "unresolved": [
+      "sim/real語義task重疊未去重；完整raw failure時間／場景ID仍待匯入。"
+    ],
+    "reuse": "可借規劃與執行失敗taxonomy，明確分『指出錯誤』『提出修正』『真的恢復』。",
+    "reviewed_pdf_sha256": "6018e97d117acefc2b31a0df616b29eb479b95035bf47ea2fd5882a6631ae6c3",
+    "reviewed_on": "2026-10-02",
+    "name": "REFLECT / RoboFail",
+    "year": 2023,
+    "title": "REFLECT: Summarizing Robot Experiences for Failure Explanation and Correction",
+    "source_url": "https://arxiv.org/abs/2306.15724",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P109",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P109",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "10simulation tasks、11real tasks；規劃失敗與執行失敗兩大群。",
+            "AI2-THOR simulation與UR5e toy kitchen；sim用GT物件／狀態辨識，real靠感知。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "6018e97d117acefc2b31a0df616b29eb479b95035bf47ea2fd5882a6631ae6c3"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "6018e97d117acefc2b31a0df616b29eb479b95035bf47ea2fd5882a6631ae6c3",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "judge",
+      "answer",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P109",
+      "name": "REFLECT / RoboFail",
+      "expected_title": "REFLECT: Summarizing Robot Experiences for Failure Explanation and Correction",
+      "source_url": "https://arxiv.org/abs/2306.15724",
+      "pdf_url": "https://arxiv.org/pdf/2306.15724",
+      "retrieved_at": "2026-10-02T21:34:18.428320+00:00",
+      "pdf_sha256": "6018e97d117acefc2b31a0df616b29eb479b95035bf47ea2fd5882a6631ae6c3",
+      "text_sha256": "f502aaa0da8cd84bb8cca836c47a74c753ee071e472496bd78cad5067f32c8c2",
+      "pdf_bytes": 7240743,
+      "pages": 17,
+      "text_characters": 88501,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2306.15724v4",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2306.15724v4"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 10,
+        "unit": "simulation task types",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P109:1",
+        "paper_id": "P109",
+        "benchmark": "REFLECT / RoboFail",
+        "native_term": "simulation task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.15724v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.15724v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 11,
+        "unit": "real task types",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P109:2",
+        "paper_id": "P109",
+        "benchmark": "REFLECT / RoboFail",
+        "native_term": "real task types",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.15724v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.15724v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 100,
+        "unit": "simulation failure cases",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P109:3",
+        "paper_id": "P109",
+        "benchmark": "REFLECT / RoboFail",
+        "native_term": "simulation failure cases",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.15724v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.15724v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 30,
+        "unit": "real failure demonstrations",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P109:4",
+        "paper_id": "P109",
+        "benchmark": "REFLECT / RoboFail",
+        "native_term": "real failure demonstrations",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2306.15724v4",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2306.15724v4",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "real-stanford/reflect"
+  ],
+  "external_repositories": []
+}

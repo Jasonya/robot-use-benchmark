@@ -1,0 +1,83 @@
+{
+  "paper_id": "P199",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已確認OpenEgo官方對應repo，提供六來源的統一資料API與LeRobot轉檔。其290 tasks是原作來源表加總，與本庫跨來源去重任務聯集不同。",
+  "reading_order": [
+    {
+      "repo": "ahadjawaid/openego",
+      "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          95
+        ]
+      ],
+      "why": "精確原作ID、六父來源、原生加總與API宣告"
+    },
+    {
+      "repo": "ahadjawaid/openego",
+      "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+      "path": "openego/data/openego.py",
+      "ranges": [
+        [
+          1,
+          137
+        ]
+      ],
+      "why": "實際影片索引、source辨識、EgoDex特殊載入與未實作分支"
+    },
+    {
+      "repo": "ahadjawaid/openego",
+      "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+      "path": "openego/data/annotations.py",
+      "ranges": [
+        [
+          9,
+          105
+        ]
+      ],
+      "why": "action timestamps/actors/objects、frame界線及visibility"
+    },
+    {
+      "repo": "ahadjawaid/openego",
+      "commit": "51f704ae36a34b6d91636295142138262ebb26e0",
+      "path": "port_openego_to_lerobot.py",
+      "ranges": [
+        [
+          32,
+          77
+        ],
+        [
+          84,
+          122
+        ],
+        [
+          173,
+          226
+        ]
+      ],
+      "why": "126D人手狀態/next-frame target、終態與不同FPS/缺標註處理"
+    }
+  ],
+  "environment": "彙整CaptainCook4D、HOI4D、HoloAssist、EgoDex、HOT3D、HO-Cap；原作1107h/119.6Mframes/344.5krecordings/600+environments沿用父來源，並非重新拍攝的獨立環境池。",
+  "tasks": "意圖對齊action primitives與dexterous hand trajectory學習。原表24+16+20+194+33+3=290個原生task labels；各父來源粒度可能不同，須保留來源再歸併。",
+  "data": "API按mp4列demo，讀joints.hdf5、annotation.json、metadata.hdf5；Action.start/end是秒，round(timestamp×fps)並採end-exclusive slice。EgoDex joint slice與annotation getter仍NotImplemented；按parent目錄建name索引會讓同目錄多影片互相覆寫查找。EgoDex直接取transform平移，需核驗與camera-frame宣告的對齊。",
+  "evaluation": "此repo主要是資料API/轉檔，不含可核驗的手軌跡baseline evaluator。LeRobot action實際存下一frame雙手21×3×2=126D座標，末frame重複，非robot actuator command。缺visibility會補全1、缺annotation會空列表、不同FPS僅warning並截各模態最短長度，正式case不得默認這些都有效。",
+  "standardization": {
+    "profile": "multi_source_egocentric_human_hand_trajectories",
+    "reuse": "原source ID、Action時間/物件/actor、統一reader與顯式next-pose轉檔schema。",
+    "transform": "用父source+完整video相對路徑+segment界線建ID；保留measured/estimated/converted pose與座標單位、visibility unknown、原FPS；126D next-pose prediction與robot執行action分開profile。",
+    "missing": "EgoDex未實作分支、六來源坐標/units/hand-order轉換驗證、case級去重與split、parent資料權利、真正預測scorer和robot retarget驗證。"
+  },
+  "version_note": "固定51f704a，README明確連2509.05513及原作網站；有MIT code不代表六份底層資料享有同一授權。未下載完整1107h或執行轉檔。",
+  "runtime_executed": false,
+  "additional_repo_proposals": [
+    {
+      "repo": "ahadjawaid/openego",
+      "role": "author_dataset_api_and_converter",
+      "basis": "README連精確2509.05513及www.openegocentric.com；repo owner與第一作者相符。"
+    }
+  ]
+}

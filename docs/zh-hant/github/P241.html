@@ -1,0 +1,156 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AFF-ttention｜GitHub怎麼讀與整理 · Robot-use Benchmark</title>
+  <meta name="description" content="已核STA reader→預測affordance prior→AFF ROI head→OverallMeanAveragePrecision，以及新增EPIC STA pickle的讀取格式。固定release的v2設定仍遇v1欄位硬編碼及未隨repo提供的import；AFF、hotspots和完整執行環境尚未閉合，不能以README結果或外部權重連結宣稱可重現整篇。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P241.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P241.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P241.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="AFF-ttention｜GitHub怎麼讀與整理 · Robot-use Benchmark"><meta property="og:description" content="已核STA reader→預測affordance prior→AFF ROI head→OverallMeanAveragePrecision，以及新增EPIC STA pickle的讀取格式。固定release的v2設定仍遇v1欄位硬編碼及未隨repo提供的import；AFF、hotspots和完整執行環境尚未閉合，不能以README結果或外部權重連結宣稱可重現整篇。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P241.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hant","route":"github/P241.html","title":"AFF-ttention｜GitHub怎麼讀與整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hant.js?v=081237f01e25","text":{"copied":"已複製連結","copyFallback":"請複製瀏覽器網址列的連結","searchMatches":"符合的結果：","searchLoading":"正在載入搜尋索引…","searchLoadFailed":"搜尋索引暫時未能載入，請稍後再試；章節與資料庫仍可直接閱讀。","searchHint":"可搜尋章節、物件、論文名稱或 ID，例如「摺衣」「記憶」「SC-H15」「Ego4D」。","noSearch":"沒有找到結果，試試較短的關鍵字或 ID。","showing":"顯示","records":"筆","allShown":"已顯示全部","paginate":"分頁顯示","showAll":"顯示全部","shareResults":"複製目前篩選的連結","continueReading":"繼續上次閱讀","demoA":"相同毛巾，目標 A 沿長軸摺疊。核對邊緣配對、層次、形狀與穩定釋放。","demoB":"更換示範，目標 B 沿短軸摺疊。場景不變，行為必須跟隨新的目標。","kinds":{"chapter":"章節","task":"情境藍圖","family":"任務家族","paper":"文獻","probe":"Ego 觀測題型","metric":"評測指標","reference":"參考資料","native":"原生來源紀錄"},"native":{"source":"來源","unit":"原生單位","definition":"定義路徑","aliases":"原生別名／層級對應","assets":"場景檔案引用","viewSource":"檢視固定版本的原作定義／設定","staticOnly":"本卡記錄來源索引；任務環境規格的對齊和執行驗證分別記錄。","configOnly":"已標示：僅場景／軌跡配置衍生 class","datasetYes":"有 dataset registry 對應","datasetNo":"任務目錄項；未出現在該 dataset registry","details":"索引出處與對應細節","empty":"沒有符合的索引條目","showing":"顯示","records":"筆索引條目","units":{"activity_definition_directory":"活動定義目錄","native_task_id":"原作任務ID","native_task_class":"原作任務類別","native_task_registration":"原作任務註冊","native_task_module":"原作任務模組","demo_entrypoint":"示範程式入口","task_scene_entrypoint":"任務場景入口","native_task_schema":"任務schema","generator_configuration":"生成器設定","integration_registration_group":"框架註冊組","evaluation_protocol":"評測協定","video_task_schema":"影片／任務題型","human_sim_task_mapping":"人類／模擬任務對應","native_task_template":"任務模板","instructional_activity_definition":"人類活動定義","native_task_definition":"原作任務定義","information_task_schema":"資訊題型定義"},"buckets":{"native_task_candidates":"原作robot任務條目（待對齊）","integration_or_protocol":"整合框架／協定／生成配置","video_pairing":"影片配對／認知 schema","documented_examples":"示範程式入口","human_activity_definitions":"人類活動／流程定義（影片來源）","information_task_definitions":"資訊任務／問答題型定義"},"recordMeaning":"索引型態","meaningByBucket":{"native_task_candidates":"原作者列出的robot任務條目；在本庫等待共同規格與來源對齊。","human_activity_definitions":"人類活動類別與流程來源，可對應多部影片；任務環境另建對應。","integration_or_protocol":"框架註冊、協定或生成設定，可指向多個任務／樣本；一條索引不等於一個環境。","video_pairing":"影片題型或人類／模擬任務對應；觀測資料與物理環境規格分開。","documented_examples":"示範程式入口；可作定義與實作線索，尚不直接代表獨立環境。","information_task_definitions":"原作的資訊任務或問題型別；題目實數另外按question_id或case_id計數。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要內容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要導覽"><a href="../coverage.html">覆蓋與比較</a><a href="../native-tasks.html">任務清單</a><a href="../survey-union.html">來源名錄</a><a href="../design.html">整體設計</a><a href="../collection-pipeline.html">資料流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核讀</a><a href="../library.html">文獻</a><a class="mobile-search" href="../search.html">全文搜尋</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜尋整個網站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="語言"><a href="P241.html" data-locale="zh-hant" hreflang="zh-Hant" aria-current="true">繁體</a><a href="../../zh-hans/github/P241.html" data-locale="zh-hans" hreflang="zh-Hans">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">選單</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首頁</a><span>/</span><span>P241 · AFF-ttention</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P241 · AFF-ttention</h1><p class="lede">AFF-ttention! Affordances and Attention models for Short-Term Object Interaction Anticipation</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇總表</a><span class="github-status core">核心內容已核讀</span>
+      <span>benchmark／資料／評測主來源</span><a href="https://arxiv.org/abs/2406.01194" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p241">用途與原生規模依據</a>
+    </div>
+    <p class="github-scope">核讀快照 2026-10-11。已讀範圍限所列片段；本輪未執行上游程式。</p>
+    <p class="github-summary">已核STA reader→預測affordance prior→AFF ROI head→OverallMeanAveragePrecision，以及新增EPIC STA pickle的讀取格式。固定release的v2設定仍遇v1欄位硬編碼及未隨repo提供的import；AFF、hotspots和完整執行環境尚未閉合，不能以README結果或外部權重連結宣稱可重現整篇。</p>
+    <aside class="github-version"><b>版本與身份</b><p>固定 1a1253fa2bde09ef1de4894f3bf872c1fbf270de（2024-07-15）。已核propagate_AFF_from_node.py用top1/3/5 visual及cross-modal鄰居、1.5×最近距離篩選、softmax(2×similarity)加權後逐類max、max-normalize再softmax；論文式(3)是加權sum後exp，不能混成同一prior配方。該指令碼np.save被註解，不能直接認定會產出reader所需檔；其diagnostic n_samples從1起算、最後分母多1，也不是STA mAP。generate_AFF_labels.py是另一cluster頻率版本，root標TRAIN但輸出名含VAL，需要provenance而非靠檔名判split。README連的weights與config checkpoint亦不同。只核以上核心source／小型詞表，未跑模型、simulator或下載大資產。</p><p>AFF-ttention! Affordances and Attention models for Short-Term Object Interaction Anticipation，Lorenzo Mur-Labadia、Ruben Martinez-Cantin、Jose J. Guerrero、Giovanni Maria Farinella、Antonino Furnari；Guerrero在清單/README也寫Josechu。快取arXiv:2406.01194v2（2024-06-05），README對應ECCV 2024，PDF hyperlink discovery直接指lmur98/AFFttention。README另連2407.04369 challenge report，不能混為本篇PDF版本或後續STAformer++。</p></aside>
+    <dl class="github-five-fields"><div><dt>領域</dt><dd>餐飲與烹飪</dd></div><div><dt>環境</dt><dd>Ego4D v1/v2日常活動與作者整理的EPIC-Kitchens STA第一人稱影片。affordance node/zone是影片中視覺相似的活動區域及其已觀察互動，不是3D場景layout或機器人可執行技能；hotspot是影像中的人手互動機率。</dd></div><div><dt>任務</dt><dd>下一次物件互動的box、noun、verb、TTC與confidence。v1 taxonomy87 nouns/74 verbs，v2 128/81；類別、prediction frame、GT object、zone/visit與policy trial各為不同單位。P241有新的curated EPIC STA標註貢獻，不能與P235的EK100 pseudo-box實驗或母EK action資料直接合併計數。</dd></div><div><dt>題數與資料</dt><dd>Ego4D JSON讀info.video_metadata與annotations；每ann含uid、video_id(v1)/video_uid(v2)、frame、objects[{box,noun_category_id,verb_category_id,time_to_contact}]。still圖為video_id_七位frame.jpg；fast LMDB以video_id為父目錄、video_id_十位frame為key，值是JPEG；sampler取frame-15..frame共16格、早於0補0，沒有取未來影格。frame索引與TTC秒保留各自單位。target是boxes/noun_labels/verb_labels/ttc_targets；noun固定+1，verb在ROI_HEADS.VERSION不含v1時+1，因此兩個aff設定都+1，與資料集v1/v2名稱無關。train移除退化框／無物件ann；test無objects時loader製造假框與0 label，不能作GT。AFF檔是list[dict]的numpy物件容器，key為v_id、frame、AFF_N_top3、AFF_V_top3等；reader把它們命名AFF_N_GT/AFF_V_GT，實際來源是predicted_AFF檔，缺項填全1 prior。EPIC pickle則是[{eid,video_id,timestamp,objects:{noun_category_id[],verb_category_id[],boxes[],time_to_contact[]}}]；框被當normalized xyxy乘(1920,1080,1920,1080)。影像frame=int(timestamp*30+1)，AFF lookup卻round(timestamp*30)+2；timestamp秒與這兩個索引不可混用。EPIC noun合群/排除others、verb刪除稀用詞都會改case分母；test分支實際重用val_annotations.pkl。未取得完整標註資產，未宣稱有效case總數。</dd></div><div><dt>評估方式</dt><dd>STATask.validation_epoch_end先list_gather所有rank、以uid建立pred/GT dict去重，再OverallMeanAveragePrecision(top_k=5)。每圖依score排序，針對各配對條件對尚未匹配的GT選最大IoU；IoU用xyxy畫素端點+1面積，門檻&gt;0.5，TTC abs(error)&lt;=0.25秒。Top-5對每圖每條件豁免(5-1)×GT物件數個最高分FP；餘下按confidence建立precision=TP/(TP+FP)、recall=TP/該類GT物件數，取單調precision envelope的VOC積分。12個輸出中前8個是合併類別的AP，後4個map_box_noun、map_box_noun_verb、map_box_noun_ttc、map_box_noun_verb_ttc才按有GT的noun類別宏平均×100；checkpoint用最後一項，不能把global AP混入主表mAP。AFF head將預測prior×各head softmax後重新正規化，去背景、每proposal保留verb_topk=1、noun×verb分數&gt;0.002（不是config的0.05），per verb–noun NMS後最多100 detections；此預測budget與scorer的Top-5 FP豁免不同。export把noun減1、verb減相應offset，輸出results[uid]的box/score/noun_category_id/verb_category_id/time_to_contact。test僅匯出，無公開GT scorer結果。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作數字：保留論文的單位與頁碼</summary><p>下列為既有原文審閱摘錄；GitHub快照和本庫取得範圍另見上文，不互相代替。</p><ul><li><strong>1</strong> STA joint prediction formulation · 原文頁 10</li></ul></details>
+    <h2 id="reading">依這個順序讀</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/README.md#L3-L14" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>精確論文、STAformer/AFF/hotspot角色、Ego4D版本及新增EPIC STA標註。</p><small>L3–14 · L25–51 · L55–76</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 a4c37c474099ed28ecbecdf1d247f2feb9ceee85cb8d06634e25a7d3743cd672</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v1/config.yaml#L13-L35" target="_blank" rel="noopener noreferrer"><code>stillfast_code/test_dir/Aff_ttention_v1/config.yaml</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>v1類別、16-frame輸入、aff head、split與輸出開關。</p><small>L13–35 · L39–76 · L114–162</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 d8ed72a7f475f6db8ce0073b13ebac5447a7b352e31a281a570f2c03ab88b2a3</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/test_dir/Aff_ttention_v2/config.yaml#L11-L35" target="_blank" rel="noopener noreferrer"><code>stillfast_code/test_dir/Aff_ttention_v2/config.yaml</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>v2類別與資料路徑；不能用folder名稱代替reader版本核對。</p><small>L11–35 · L39–76 · L115–162</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 c2003b9a4830b711750a6e6b0b5f4dd438a327cc5e97d20c228e7bfcef12829b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still.py#L22-L38" target="_blank" rel="noopener noreferrer"><code>stillfast_code/datasets/ego4d_sta_still.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>原始STA schema、train清理、硬編碼v1 key與label offsets。</p><small>L22–38 · L40–82 · L102–153 · L180–203 · L232–258</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 5228feac241c882a8be10161f01f6f0f3d667305e5b34370e5af535836460afc</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ego4d_sta_still_video.py#L9-L17" target="_blank" rel="noopener noreferrer"><code>stillfast_code/datasets/ego4d_sta_still_video.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>past-frame sampler、預測AFF載入／lookup、缺件均勻prior與batch欄位。</p><small>L9–17 · L72–110 · L168–226</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 0d43f895e3ed3306cf52db844e36353623e035e18b1a554dc1f3a527f5cf7fb7</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/sta_hlmdb.py#L8-L21" target="_blank" rel="noopener noreferrer"><code>stillfast_code/datasets/sta_hlmdb.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>LMDB父目錄／10位frame key與JPEG bytes。</p><small>L8–21 · L36–56</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 c2a7c64e2678486d3eb4ea35efda2f8be5189315244bc39d5625b060f7811a20</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/stillfast.py#L1-L25" target="_blank" rel="noopener noreferrer"><code>stillfast_code/models/stillfast.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>Dino/EgoVLP及aff head實際分派、外部StillFast依賴與缺import。</p><small>L1–25 · L73–128</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 5648a6453b1eaac621281c8b86052ae1a47828345c8323b988a15fa9e3c0a041</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn.py#L120-L154" target="_blank" rel="noopener noreferrer"><code>stillfast_code/models/faster_rcnn.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>noun_labels改名labels並把AFF附加target送入head。</p><small>L120–154</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 eb8c2f20f34ba07a1d160c2b0420aa9ad9b119ac3bc46aea52f5ea908e059143</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/models/faster_rcnn_AFF_sta.py#L190-L260" target="_blank" rel="noopener noreferrer"><code>stillfast_code/models/faster_rcnn_AFF_sta.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>Bayes乘prior再正規化、verb_topk、score/NMS與最終預測。</p><small>L190–260 · L287–391 · L396–441 · L443–584</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 91635ee2e07c3113c361a55b721a23f8a149eba4aa5ef912acbab1f491b71c98</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/tasks/sta.py#L36-L92" target="_blank" rel="noopener noreferrer"><code>stillfast_code/tasks/sta.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>跨rank收集後uid去重、去AFF target、實際Overall mAP及提交ID還原。</p><small>L36–92 · L94–193</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 64eecd82cb5e5ec2837297755819575d01ec829006d7a2a1b66d92d728356c10</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/evaluation/sta_metrics.py#L4-L59" target="_blank" rel="noopener noreferrer"><code>stillfast_code/evaluation/sta_metrics.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>具體GT配對、FP預算、VOC積分與global AP/noun-macro mAP分母。</p><small>L4–59 · L121–205 · L207–359 · L416–523</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 0b797ca8729203c5ebb9d3c7df468c81bcdf4f291c7136cbd54c54c27ec3c794</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/code_extract_affordances/generate_AFF_labels.py#L1-L26" target="_blank" rel="noopener noreferrer"><code>code_extract_affordances/generate_AFF_labels.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>cluster/node/visit/STA→每zone標籤分佈與資料檔格式。</p><small>L1–26 · L28–61 · L83–91</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 dcbae72cd27f48b4536536d54972e863afbb08917c4fc1e78e599753bf78caac</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/propagate_affordances/propagate_AFF_dataset.py#L8-L30" target="_blank" rel="noopener noreferrer"><code>propagate_affordances/propagate_AFF_dataset.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>v2 validation query v_id/frame/STA targets；標籤供diagnostics。</p><small>L8–30 · L80–96</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 6703022fbff99ee88ded454ba2a63ffddff49b7aaa8c638249569cefda7c0542</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/propagate_affordances/propagate_AFF_from_node.py#L24-L50" target="_blank" rel="noopener noreferrer"><code>propagate_affordances/propagate_AFF_from_node.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>train-node descriptors、query visual matching、weighted-max priors、診斷分母與輸出未寫檔。</p><small>L24–50 · L61–122 · L124–165 · L281–391 · L396–412</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 54ab9a360fc7f8073a90b6df077984e9abd0f3049d3011d6c18dd6c9ecf5ba0b</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/lmur98/AFFttention/blob/1a1253fa2bde09ef1de4894f3bf872c1fbf270de/stillfast_code/datasets/ek_55_sta_dataset.py#L79-L120" target="_blank" rel="noopener noreferrer"><code>stillfast_code/datasets/ek_55_sta_dataset.py</code> ↗</a><span>GitHub · lmur98/AFFttention · 1a1253fa2b</span></div>
+      <p>EPIC專用pickle/eid/timestamp、class merge/filter、normalized框與frame偏移。</p><small>L79–120 · L138–213 · L224–256 · L260–405</small>
+      <details class="github-hash"><summary>內容指紋</summary><code>SHA256 fdec7c6d54adb00074c75ea16678720b7332f049052b9f82adc4fbc23ef6559e</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎麼接入我們的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>Ego4D v1/v2 taxonomy、STA JSON與EPIC pickle reader的原生欄位、predicted-prior lookup／Bayes fusion、具體mAP與submission adapter。</p></section><section><h3>需要轉換</h3><p>source記paper/commit、Ego4D或curated EPIC annotation revision、StillFast base與prior/hotspot資產；domain/environment為人類影片和zone provenance。task保持STA；case用dataset+split+uid/eid，另存video/frame/timestamp、原框座標、class_remap/背景offset。zone/visit/node及其training STA/narration是source附屬資料，不增加case。evaluator固定score生成、verb_topk/NMS/100候選、Top-5豁免、TTC門檻、noun macro AP與uid去重；跨source不等價為robot success。</p></section><section><h3>仍需補齊</h3><p>優先修復Ego4D reader的video_id硬編碼與v2 video_uid；固定StillFast base commit／安裝佈局，補缺的ego4d_sta_hands_still_video、faster_rcnn_HANDS_sta、faster_rcnn_prior_HANDS_sta、detr_criterion等被無條件import的模組。移除...及作者絕對路徑，固定完整split/annotation與predicted_AFF/hotspot SHA。AFF資料庫生成／descriptor取樣仍需train-only及時間可見性核驗；當前code以train_nodes匹配visual query，不能因GT欄名就指為oracle，也不能因檔名train就視為已證明無洩漏。EPIC需要固定class_names、實際class remap及兩套frame偏移，且test=val不能當獨立test。hotspot讀入有外部placeholder，當前Ego4D __getitem__的contact-point呼叫與heatmap target被註解，selected aff鏈未核到完整hotspot重權重執行路徑。</p></section></div>
+    <details class="github-discovery"><summary>檢視來源確認紀錄</summary><pre><code>[
+  {
+    &quot;provider&quot;: &quot;primary_paper&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/fulltext_review/P241/pages.json&quot;,
+    &quot;sha256&quot;: &quot;d400f4c6f4fc201703bd9f88efabe8090a65d20b994d8166fc7d3b9026b7f926&quot;,
+    &quot;url&quot;: &quot;https://arxiv.org/pdf/2406.01194&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/0/text&quot;,
+      &quot;/3/text&quot;,
+      &quot;/6/text&quot;,
+      &quot;/7/text&quot;,
+      &quot;/8/text&quot;,
+      &quot;/9/text&quot;,
+      &quot;/10/text&quot;,
+      &quot;/12/text&quot;
+    ],
+    &quot;version&quot;: &quot;arXiv:2406.01194v2; ECCV 2024&quot;,
+    &quot;pdf_local_file&quot;: &quot;audit/.cache/fulltext_review/P241/paper.pdf&quot;,
+    &quot;pdf_sha256&quot;: &quot;5bc6b87af40d139d6f59d0cb6bd989130ccd236b866623dc409b6fe248d789a5&quot;,
+    &quot;pages&quot;: [
+      1,
+      4,
+      7,
+      8,
+      9,
+      10,
+      11,
+      13
+    ]
+  },
+  {
+    &quot;provider&quot;: &quot;cached_paper_discovery&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P241-discovery.json&quot;,
+    &quot;sha256&quot;: &quot;fb8e66188c3187c9dbfc82d5671be9c152d79d9d3a81e5359e0788258b725d9c&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/pdf_sha256&quot;,
+      &quot;/candidates/0&quot;
+    ],
+    &quot;note&quot;: &quot;固定PDF hyperlink→作者repo。&quot;
+  },
+  {
+    &quot;provider&quot;: &quot;github_tree_snapshot&quot;,
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/repos/lmur98__AFFttention/tree.json&quot;,
+    &quot;sha256&quot;: &quot;37cf77cd06ef6ee1482a0f5b4e0524a2f486ee00d4ba7ca081b48061e0fc9cbd&quot;,
+    &quot;json_pointers&quot;: [
+      &quot;/sha&quot;,
+      &quot;/truncated&quot;,
+      &quot;/tree&quot;
+    ],
+    &quot;repo&quot;: &quot;lmur98/AFFttention&quot;,
+    &quot;commit&quot;: &quot;1a1253fa2bde09ef1de4894f3bf872c1fbf270de&quot;,
+    &quot;note&quot;: &quot;完整178項tree；核對無條件import的缺件，不把不存在的路徑列為已讀source。&quot;
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同結構與格式說明 →</a><a href="../../downloads/github-review/papers/P241.json" download>本篇JSON與證據 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇閱讀"><a href="P240.html">← 上一篇 · ANTICIPATR</a><a href="P242.html">下一篇 → · NAOGAT</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作總庫 → Survey分類 → 任務聯集 → 任務與規則擴充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理與逐篇報告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hant.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆蓋總覽與前作比較</a><a href="../design.html">目前主設計</a><a href="../research.html">文獻與分類</a><a href="../counting.html">計數細節與舊代號</a><a href="../../downloads/source-review/source-review-zh-hant.pdf">用途歸納PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">歷史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初篩、183份關鍵章節審閱、672筆原生數量摘錄；183/183份來源完成21類用途歸納；4類判分分項保留。GitHub核讀增補：250/250篇有處理結果，範圍與程式執行分開。舊配額已撤回，全庫任務與環境去重仍待完成。 <a href="../github-review.html">逐篇GitHub與標準化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜尋整個網站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜尋章節、任務或文獻…" aria-label="關鍵字" aria-describedby="global-search-help"><button id="close-search" aria-label="關閉搜尋">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

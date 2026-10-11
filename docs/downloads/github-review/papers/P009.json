@@ -1,0 +1,1123 @@
+{
+  "paper_id": "P009",
+  "name": "EPIC-KITCHENS",
+  "title": "Scaling Egocentric Vision: The EPIC-KITCHENS Dataset",
+  "year": 2018,
+  "paper_url": "https://arxiv.org/abs/1804.02748",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P009",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "EPIC-KITCHENS 原始版的標註、讀取工具與評分庫分開發布；舊網址現已轉嚮明確的 55 版倉庫。已核讀動作／物件標註、GulpIO 流程與分類指標。 2026-10-11 補讀官方共用 downloader 的版本選擇；舊 download-scripts URL 的 404 保留為候選處置。",
+    "environment": "真實第一人稱廚房影片；participant_id、video_id 與 seen／unseen kitchen 測試條件須保留。影片、拍攝者與廚房不是同一個環境計數。",
+    "tasks": "動作辨識以 verb_class、noun_class 及其組合定義；物件框另有自己的標註時間軸。這些是人類影片標籤，不是可直接執行的機器人任務。",
+    "data": "action CSV 含 uid、video_id、participant_id、narration、start/stop_timestamp、start/stop_frame、verb/noun_class 與 all_noun_classes。物件框使用 (top,left,height,width)；object_frame 和 action_frame 需依對照表對齊。S1/S2 測試只公開片段時間；narration 時間不可代替動作邊界。 補讀：原 55 starter-kit 的 Snakefile 由 train/test_seen/test_unseen_video_ids.csv 產生 Bristol 的逐影片 RGB／flow tar 路徑。另由官方 2022 網頁直接連結的 epic-kitchens-download-scripts 提供 epic_downloader.py：先讀 55 的 video_id/split 和 100 的 ar/da/cmr 布林 split CSV，依 video_id 後段長度辨認 extension，再以 --epic55-only 或 --extension-only 過濾；兩旗標互斥，未指定時涵蓋 100（含重用的 55）。輸出一律使用 EPIC-KITCHENS/participant/媒體類型 目錄，原始 55 遠端 train/test 路徑另由 epic_55_split 決定。",
+    "evaluation": "epic-lib 計算 verb、noun、action 的 top-1/top-5；沒有 action 分數時可由 verb/noun 分數構造。precision/recall 先逐類計算，再對指定 many-shot 類別平均；與 100 版的 tail／unseen 指標不同。top-k 使用每列排名內是否包含 GT 的平均。 下載器的 --action-recognition/--train 等篩選取自 100 版 challenge 欄位；--epic55-only 只限制影片來源，不能替代原 55 的 S1/S2。需仍沿用 55 starter-kit 的 seen→s1、unseen→s2 與原標註契約。MD5 只用於判斷檔案是否可跳過下載，不是辨識指標；本次未執行下載或校驗媒體。",
+    "standardization": {
+      "profile": "video_action_segments",
+      "reuse": "原生類別字典、片段 uid、S1/S2 切分、框座標、GulpIO 資料流程與評分函式。 可重用已釘選的取得程式、兩版 split CSV 欄位、原生 URL 與輸出路徑映射。",
+      "transform": "source 固定為 EPIC-55；case 保留 uid 與原始 split；segment 同時保留秒與 frame，記錄實際抽幀版本；動作／物件時間軸以顯式對映關聯。verb/noun/action 與 many-shot 報表分項儲存。 另記錄 acquisition_repo/commit、資料 edition、video_id、來源 split、challenge split、媒體類型與 errata/校驗表版本；55/100 重用影片共用 ancestry，但各自保留評測切分。",
+      "missing": "尚未取得影片／flow／隱藏測試標籤，也未執行 GulpIO 或官方提交；跨來源與 EPIC-100 重用關係需由 video_id 建立。 需固定下載器實際依賴的 split/md5/errata CSV 版本，驗證完整取得與雜湊；本次 split 僅核讀欄位和列出的樣列，未宣稱逐列審核。"
+    },
+    "version_note": "固定提交的 annotations／starter-kit／epic-lib 舊路徑均轉向 EPIC-55。epic-lib README 警告 v1.4.0 及更早版本的 Gulp flow 可能亂序；原始 GoPro 與釋出抽幀版本的 fps／frame index 不可混用。 補讀 downloader 固定 4f11fb2b579833f360c3c7bb917bf1e24a9787b5，不宣稱是 download-scripts 的已驗證轉址。其 README 說 data/ 未追蹤，但該提交完整 tree 列有四份 CSV，且兩份 split 已實讀；以固定檔案為準。原 Snakefile 的 annotations/master 連結需替換為既有 55 固定版本，不能依今天的預設 challenge 選項推回 2018 評測。",
+    "runtime_executed": false,
+    "additional_repo_proposals": [
+      {
+        "repo": "epic-kitchens/epic-lib",
+        "role": "55 版讀取與實際指標庫",
+        "evidence": "starter-kit 文件連結；倉庫解析為 epic-kitchens/epic-kitchens-55-lib"
+      },
+      {
+        "repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "role": "官方另連結的 EPIC-55／100 共用資料取得工具；已核讀版本與路徑選擇",
+        "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+        "evidence": [
+          "https://epic-kitchens.github.io/2022",
+          "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/README.md#L1-L3"
+        ]
+      }
+    ],
+    "repository_candidate_dispositions": [
+      {
+        "repo": "epic-kitchens/download-scripts",
+        "status": "repository_unavailable",
+        "reason": "原 55 官方 README 直接連結此候選，但快取 GitHub metadata GET 為 404；無可釘選提交或程式閱讀，不把此狀態推為所有 EPIC 取得工具不可用。另依官方網頁連結補讀 epic-kitchens/epic-kitchens-download-scripts，未確認兩網址為轉址別名。",
+        "evidence": [
+          "https://github.com/epic-kitchens/epic-kitchens-55-annotations/blob/63fa7d78eba41a8d2280374061a6b1bab3e7e41d/README.md#L352-L369",
+          {
+            "url": "https://api.github.com/repos/epic-kitchens/download-scripts",
+            "status": 404,
+            "retrieved_at": "2026-10-10T08:09:01.323478+00:00",
+            "error": "Not Found",
+            "receipt_file": "audit/.cache/github_review/repos/epic-kitchens__download-scripts/manifest.json"
+          }
+        ]
+      }
+    ],
+    "discovery_evidence": [
+      {
+        "url": "https://epic-kitchens.github.io/2022",
+        "receipt": {
+          "requested_url": "https://epic-kitchens.github.io/2022",
+          "retrieved_at": "2026-10-10T07:37:47.663422+00:00",
+          "status": 200,
+          "resolved_url": "https://epic-kitchens.github.io/2022",
+          "content_type": "text/html; charset=utf-8",
+          "bytes": 61406,
+          "sha256": "d482be9751cdd66e885d0179e629ad8d3acd0c270de59b68e86a6d1e1ddd2220"
+        },
+        "ranges": [
+          [
+            239,
+            243
+          ]
+        ],
+        "finding": "官方下載段落直接連結 epic-kitchens/epic-kitchens-download-scripts；再由已讀 README／程式核對其 55 支援，不僅依候選列表認定。"
+      }
+    ],
+    "follow_up": {
+      "reviewed_on": "2026-10-11",
+      "repo": "epic-kitchens/download-scripts",
+      "status": "repository_unavailable",
+      "reviewed_alternative_repo": "epic-kitchens/epic-kitchens-download-scripts",
+      "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+      "scope": "保留舊 URL 的 404；補讀官方共用 downloader 與原 55 取得入口，不變更論文 edition。"
+    },
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-55-annotations",
+        "requested_repo": "epic-kitchens/annotations",
+        "commit": "63fa7d78eba41a8d2280374061a6b1bab3e7e41d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            3
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            31,
+            35
+          ],
+          [
+            47,
+            61
+          ],
+          [
+            67,
+            71
+          ],
+          [
+            75,
+            80
+          ],
+          [
+            82,
+            96
+          ],
+          [
+            100,
+            220
+          ],
+          [
+            222,
+            227
+          ],
+          [
+            229,
+            262
+          ],
+          [
+            264,
+            290
+          ],
+          [
+            296,
+            343
+          ],
+          [
+            347,
+            354
+          ],
+          [
+            370,
+            390
+          ],
+          [
+            392,
+            396
+          ],
+          [
+            401,
+            405
+          ],
+          [
+            410,
+            416
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 416,
+        "sha256": "a288fdf3f7de59db661fe7ac8d7533283d173bec5dcc052f5dab6a5862fd6e96",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-55-annotations/blob/63fa7d78eba41a8d2280374061a6b1bab3e7e41d/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-55-annotations/blob/63fa7d78eba41a8d2280374061a6b1bab3e7e41d/README.md#L1-L3",
+        "why": "55 版欄位、框座標、原始影片與測試條件",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-55-starter-kit-action-recognition",
+        "requested_repo": "epic-kitchens/starter-kit-action-recognition",
+        "commit": "200ba5a49745d2dc01765998dd23ed062de8d08a",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            158
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 158,
+        "sha256": "d7613739ca07969a43f8bfb1cc78be2b3b524b59ebf3ee9125c54099e406643c",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-55-starter-kit-action-recognition/blob/200ba5a49745d2dc01765998dd23ed062de8d08a/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-55-starter-kit-action-recognition/blob/200ba5a49745d2dc01765998dd23ed062de8d08a/README.md#L1-L158",
+        "why": "從標註到 RGB／flow 片段與 GulpIO 的流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-lib",
+        "requested_repo": "epic-kitchens/epic-lib",
+        "commit": "7f2499aff5fdb62a66e6da92322e5c060ea4a414",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            33
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 33,
+        "sha256": "3be15d4d10ab35e665d7e11b35ed4b3bbf8fbb3543f709b13e9d44c2caf31cd4",
+        "url": "https://github.com/epic-kitchens/epic-lib/blob/7f2499aff5fdb62a66e6da92322e5c060ea4a414/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-lib/blob/7f2499aff5fdb62a66e6da92322e5c060ea4a414/README.md#L1-L33",
+        "why": "資料讀取與版本限制",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-lib",
+        "requested_repo": "epic-kitchens/epic-lib",
+        "commit": "7f2499aff5fdb62a66e6da92322e5c060ea4a414",
+        "ref": null,
+        "path": "epic_kitchens/metrics.py",
+        "ranges": [
+          [
+            12,
+            18
+          ],
+          [
+            35,
+            41
+          ],
+          [
+            75,
+            95
+          ],
+          [
+            118,
+            124
+          ],
+          [
+            129,
+            157
+          ],
+          [
+            162,
+            184
+          ],
+          [
+            188,
+            194
+          ],
+          [
+            196,
+            202
+          ],
+          [
+            221,
+            242
+          ],
+          [
+            258,
+            267
+          ],
+          [
+            274,
+            346
+          ],
+          [
+            348,
+            356
+          ],
+          [
+            369,
+            385
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 394,
+        "sha256": "ad4d095f0ae6833703e211fac89088390c0ccdc872aac7405e6f3a4635f8f22c",
+        "url": "https://github.com/epic-kitchens/epic-lib/blob/7f2499aff5fdb62a66e6da92322e5c060ea4a414/epic_kitchens/metrics.py",
+        "reading_url": "https://github.com/epic-kitchens/epic-lib/blob/7f2499aff5fdb62a66e6da92322e5c060ea4a414/epic_kitchens/metrics.py#L12-L18",
+        "why": "top-k 及 many-shot precision／recall 實作",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-55-annotations",
+        "requested_repo": "epic-kitchens/annotations",
+        "commit": "63fa7d78eba41a8d2280374061a6b1bab3e7e41d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            352,
+            369
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 416,
+        "sha256": "a288fdf3f7de59db661fe7ac8d7533283d173bec5dcc052f5dab6a5862fd6e96",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-55-annotations/blob/63fa7d78eba41a8d2280374061a6b1bab3e7e41d/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-55-annotations/blob/63fa7d78eba41a8d2280374061a6b1bab3e7e41d/README.md#L352-L369",
+        "why": "補讀直接連向舊 download-scripts 的官方 55 版取得說明；404 候選另列處置。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/starter-kit-action-recognition",
+        "requested_repo": "epic-kitchens/starter-kit-action-recognition",
+        "commit": "200ba5a49745d2dc01765998dd23ed062de8d08a",
+        "ref": null,
+        "path": "Snakefile",
+        "ranges": [
+          [
+            9,
+            48
+          ],
+          [
+            53,
+            105
+          ],
+          [
+            130,
+            147
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 246,
+        "sha256": "9f0d4507c1393b46ec80918b6e965273727a085cf11773eea293a613c3d32ddc",
+        "url": "https://github.com/epic-kitchens/starter-kit-action-recognition/blob/200ba5a49745d2dc01765998dd23ed062de8d08a/Snakefile",
+        "reading_url": "https://github.com/epic-kitchens/starter-kit-action-recognition/blob/200ba5a49745d2dc01765998dd23ed062de8d08a/Snakefile#L9-L48",
+        "why": "核對原 55 資料取得的 video_id 清單、Bristol tar 路徑及 S1→seen／S2→unseen；metadata URL 仍指向 master。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "requested_repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            18
+          ],
+          [
+            48,
+            63
+          ],
+          [
+            109,
+            121
+          ],
+          [
+            139,
+            167
+          ],
+          [
+            169,
+            189
+          ],
+          [
+            239,
+            281
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 287,
+        "sha256": "18097b63928621a7f05b2da065f0cecfce2811dee7846089f895da5f4969a395",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/README.md",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/README.md#L1-L18",
+        "why": "官方另連結的 55／100 共用 downloader；資料類型、版本旗標與輸出目錄。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "requested_repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+        "ref": null,
+        "path": "epic_downloader.py",
+        "ranges": [
+          [
+            30,
+            68
+          ],
+          [
+            133,
+            161
+          ],
+          [
+            174,
+            215
+          ],
+          [
+            248,
+            320
+          ],
+          [
+            328,
+            363
+          ],
+          [
+            366,
+            486
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 486,
+        "sha256": "3e23b4989a375ae8555f4db9f3c40d6a7ab1e011d377cb77fdfbe3f7d78d21f5",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/epic_downloader.py",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/epic_downloader.py#L30-L68",
+        "why": "實際 caller→split CSV→版本篩選→URL／輸出路徑；核對預設全資料、MD5 跳過條件與 CLI。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "requested_repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+        "ref": null,
+        "path": "data/epic_55_splits.csv",
+        "ranges": [
+          [
+            1,
+            8
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 433,
+        "sha256": "5acf8b924a51819b7dda91cb56b867f6fc08d367dd0e3f6c99ecdb0f8a9c45e4",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/data/epic_55_splits.csv",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/data/epic_55_splits.csv#L1-L8",
+        "why": "55 版 metadata 的 participant_id／video_id／split 欄位與樣列。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "requested_repo": "epic-kitchens/epic-kitchens-download-scripts",
+        "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+        "ref": null,
+        "path": "data/epic_100_splits.csv",
+        "ranges": [
+          [
+            1,
+            8
+          ],
+          [
+            20,
+            24
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 701,
+        "sha256": "7f03f09311ebe28d9a4b4b825041dd476fdee8b828d725de2e0bd89d253593f8",
+        "url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/data/epic_100_splits.csv",
+        "reading_url": "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/data/epic_100_splits.csv#L1-L8",
+        "why": "100 版 challenge 布林欄位及舊／新增影片共表；不把資料來源 filter 當成 55 評測 split。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a"
+  },
+  "repository_binding_review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+  "repository_bindings": [
+    {
+      "requested_repo": "epic-kitchens/annotations",
+      "resolved_repo": "epic-kitchens/epic-kitchens-55-annotations",
+      "aliases_in_this_review": [
+        "epic-kitchens/annotations",
+        "epic-kitchens/epic-kitchens-55-annotations"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "63fa7d78eba41a8d2280374061a6b1bab3e7e41d",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/annotations",
+          "link_label": "GitHub Repo epic-kitchens/annotations"
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/annotations/issues",
+          "link_label": "URL in page source"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P009",
+          "review_file": "content/github_review/reviews/P009.json",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/starter-kit-action-recognition",
+      "resolved_repo": "epic-kitchens/epic-kitchens-55-starter-kit-action-recognition",
+      "aliases_in_this_review": [
+        "epic-kitchens/epic-kitchens-55-starter-kit-action-recognition",
+        "epic-kitchens/starter-kit-action-recognition"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "200ba5a49745d2dc01765998dd23ed062de8d08a",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/starter-kit-action-recognition",
+          "link_label": ""
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/starter-kit-action-recognition",
+          "link_label": "starter pack"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P009",
+          "review_file": "content/github_review/reviews/P009.json",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/epic-kitchens-download-scripts",
+      "resolved_repo": "epic-kitchens/epic-kitchens-download-scripts",
+      "aliases_in_this_review": [
+        "epic-kitchens/epic-kitchens-download-scripts"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+          "reviewed_files": [
+            "README.md",
+            "data/epic_100_splits.csv",
+            "data/epic_55_splits.csv",
+            "epic_downloader.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P009",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "proposal": {
+            "repo": "epic-kitchens/epic-kitchens-download-scripts",
+            "role": "官方另連結的 EPIC-55／100 共用資料取得工具；已核讀版本與路徑選擇",
+            "commit": "4f11fb2b579833f360c3c7bb917bf1e24a9787b5",
+            "evidence": [
+              "https://epic-kitchens.github.io/2022",
+              "https://github.com/epic-kitchens/epic-kitchens-download-scripts/blob/4f11fb2b579833f360c3c7bb917bf1e24a9787b5/README.md#L1-L3"
+            ]
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P009",
+          "review_file": "content/github_review/reviews/P009.json",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/epic-lib",
+      "resolved_repo": "epic-kitchens/epic-lib",
+      "aliases_in_this_review": [
+        "epic-kitchens/epic-lib"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "7f2499aff5fdb62a66e6da92322e5c060ea4a414",
+          "reviewed_files": [
+            "README.md",
+            "epic_kitchens/metrics.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P009",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "proposal": {
+            "repo": "epic-kitchens/epic-lib",
+            "role": "55 版讀取與實際指標庫",
+            "evidence": "starter-kit 文件連結；倉庫解析為 epic-kitchens/epic-kitchens-55-lib"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P009",
+          "review_file": "content/github_review/reviews/P009.json",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "epic-kitchens/starter-kit-action-recognition",
+      "resolved_repo": "epic-kitchens/starter-kit-action-recognition",
+      "aliases_in_this_review": [
+        "epic-kitchens/starter-kit-action-recognition"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "200ba5a49745d2dc01765998dd23ed062de8d08a",
+          "reviewed_files": [
+            "Snakefile"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/starter-kit-action-recognition",
+          "link_label": ""
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/starter-kit-action-recognition",
+          "link_label": "starter pack"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P009",
+          "review_file": "content/github_review/reviews/P009.json",
+          "review_sha256": "a12958b4b93f6757c16de99f718c0ef2b839a0daa52bd0dd629f32cc9464a74a",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [
+    {
+      "requested_repo": "epic-kitchens/download-scripts",
+      "link_evidence": [
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/download-scripts/blob/master/download_videos.sh",
+          "link_label": "videos"
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/download-scripts/blob/master/download_frames_rgb_flow.sh",
+          "link_label": "frames"
+        },
+        {
+          "kind": "author_project_followup",
+          "project_url": "https://epic-kitchens.github.io/2018",
+          "page_sha256": "e9cac560b1eb00e29734ecd1f2991ddde7cad907cc42ad5d2849f8a48af32def",
+          "url": "https://github.com/epic-kitchens/download-scripts/blob/master/download_object_detection_images.sh",
+          "link_label": "object annotation images"
+        }
+      ],
+      "selection_status": "explained_source_lead",
+      "candidate_scope": "Retained discovery lead, not a confirmed implementation for this paper.",
+      "disposition_type": "repository_unavailable",
+      "disposition_note": "原 55 官方 README 直接連結此候選，但快取 GitHub metadata GET 為 404；無可釘選提交或程式閱讀，不把此狀態推為所有 EPIC 取得工具不可用。另依官方網頁連結補讀 epic-kitchens/epic-kitchens-download-scripts，未確認兩網址為轉址別名。",
+      "disposition_evidence": [
+        "https://github.com/epic-kitchens/epic-kitchens-55-annotations/blob/63fa7d78eba41a8d2280374061a6b1bab3e7e41d/README.md#L352-L369",
+        {
+          "url": "https://api.github.com/repos/epic-kitchens/download-scripts",
+          "status": 404,
+          "retrieved_at": "2026-10-10T08:09:01.323478+00:00",
+          "error": "Not Found",
+          "receipt_file": "audit/.cache/github_review/repos/epic-kitchens__download-scripts/manifest.json"
+        }
+      ]
+    }
+  ],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P009",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "PDF標題相符；arXiv 1804.02748v2，2018版。",
+    "scope_read": "資料蒐集與詞彙、split、物件偵測、動作識別及anticipation完整評測章節。",
+    "pages_read": [
+      1,
+      3,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "影片資料與感知評測",
+    "environment": "32位參與者／32個廚房；S2保留4位參與者的未見廚房。",
+    "tasks": "3個端點：active-object detection、action recognition、action anticipation；§3.4詞彙125 verbs／331 nouns，詞彙數不是機器人任務數。",
+    "cases": "55小時、39,596動作片段、454,255物件框；同一片段可支援不同端點，不能把三種端點直接乘成獨立題。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 32,
+        "unit": "錄製廚房",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "benchmark端點",
+        "pages": [
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "field": "task",
+        "value": 125,
+        "unit": "動詞類別",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "task",
+        "value": 331,
+        "unit": "名詞類別",
+        "pages": [
+          10
+        ]
+      },
+      {
+        "field": "data",
+        "value": 39596,
+        "unit": "動作片段",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 454255,
+        "unit": "物件框",
+        "pages": [
+          3
+        ]
+      }
+    ],
+    "evaluation": [
+      "偵測：mAP，IoU 0.05／0.5／0.75。",
+      "識別與anticipation：verb／noun／action各報top-1、top-5及per-class precision／recall。",
+      "anticipation觀測1秒，截止於動作開始前1秒；與看到整段動作的recognition分開。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "S1已見廚房按完整sequence約80/20切分；S2保留4位參與者／廚房。各端點可評類別又有最少訓練樣本門檻。",
+    "lineage": "為EPIC-KITCHENS-100、VISOR、EPIC Fields等後續來源的上游家族；不得把共用影片／廚房重複相加。",
+    "related_paper_ids": [
+      "P010",
+      "P011",
+      "P024"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          3,
+          10,
+          11
+        ],
+        "locator": "Dataset、§3.4、Evaluation protocols",
+        "supports": "資料規模、原生词彙及廚房切分"
+      },
+      {
+        "pages": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "locator": "§4.1–4.3，表6–8",
+        "supports": "三端點及時間／評分約定"
+      }
+    ],
+    "unresolved": [
+      "各原生split精確可下載ID數未以本版manifest重算。",
+      "表中與正文不同聚合詞彙口徑應保留版本，不能混加。"
+    ],
+    "reuse": "可引入物件、操作與短期預測題型；原生語言動作類別需另對齊正式robot goal與判分。",
+    "reviewed_pdf_sha256": "2b7fe522827a041638ef2d3b27c9508ace434bd504e22c3e3d43894ea144b7a7",
+    "reviewed_on": "2026-10-02",
+    "name": "EPIC-KITCHENS",
+    "year": 2018,
+    "title": "Scaling Egocentric Vision: The EPIC-KITCHENS Dataset",
+    "source_url": "https://arxiv.org/abs/1804.02748",
+    "primary_type": "V",
+    "category_name": "人類影片與動作資料",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "餐飲與料理",
+      "居家生活"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P009",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P009",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            3,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "3個端點：active-object detection、action recognition、action anticipation；§3.4詞彙125 verbs／331 nouns，詞彙數不是機器人任務數。",
+            "32位參與者／32個廚房；S2保留4位參與者的未見廚房。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "2b7fe522827a041638ef2d3b27c9508ace434bd504e22c3e3d43894ea144b7a7"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "2b7fe522827a041638ef2d3b27c9508ace434bd504e22c3e3d43894ea144b7a7",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P009",
+      "name": "EPIC-KITCHENS",
+      "expected_title": "Scaling Egocentric Vision: The EPIC-KITCHENS Dataset",
+      "source_url": "https://arxiv.org/abs/1804.02748",
+      "pdf_url": "https://arxiv.org/pdf/1804.02748",
+      "retrieved_at": "2026-10-02T21:32:55.776134+00:00",
+      "pdf_sha256": "2b7fe522827a041638ef2d3b27c9508ace434bd504e22c3e3d43894ea144b7a7",
+      "text_sha256": "0e5f90de99e2486acccd1a514d7ca9310db18d379dccee74323ec3c3aba07ecd",
+      "pdf_bytes": 9863756,
+      "pages": 19,
+      "text_characters": 579360,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "1804.02748v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/1804.02748v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 32,
+        "unit": "錄製廚房",
+        "pages": [
+          1,
+          3
+        ],
+        "record_id": "review10:P009:1",
+        "paper_id": "P009",
+        "benchmark": "EPIC-KITCHENS",
+        "native_term": "錄製廚房",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.02748v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.02748v2",
+            "locator": "PDF pp. 1, 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "benchmark端點",
+        "pages": [
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "record_id": "review10:P009:2",
+        "paper_id": "P009",
+        "benchmark": "EPIC-KITCHENS",
+        "native_term": "benchmark端點",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.02748v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.02748v2",
+            "locator": "PDF pp. 11, 12, 13, 14, 15",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 125,
+        "unit": "動詞類別",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P009:3",
+        "paper_id": "P009",
+        "benchmark": "EPIC-KITCHENS",
+        "native_term": "動詞類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.02748v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.02748v2",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 331,
+        "unit": "名詞類別",
+        "pages": [
+          10
+        ],
+        "record_id": "review10:P009:4",
+        "paper_id": "P009",
+        "benchmark": "EPIC-KITCHENS",
+        "native_term": "名詞類別",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.02748v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.02748v2",
+            "locator": "PDF pp. 10",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 39596,
+        "unit": "動作片段",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P009:5",
+        "paper_id": "P009",
+        "benchmark": "EPIC-KITCHENS",
+        "native_term": "動作片段",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.02748v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.02748v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 454255,
+        "unit": "物件框",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P009:6",
+        "paper_id": "P009",
+        "benchmark": "EPIC-KITCHENS",
+        "native_term": "物件框",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "1804.02748v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/1804.02748v2",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "epic-kitchens/epic-kitchens-55-annotations",
+    "epic-kitchens/epic-kitchens-55-starter-kit-action-recognition",
+    "epic-kitchens/epic-lib",
+    "epic-kitchens/starter-kit-action-recognition",
+    "epic-kitchens/epic-kitchens-download-scripts"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,72 @@
+{
+  "paper_id": "P159",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "tinyBenchmarks提供用少量anchor題推估原benchmark分數的IRT工具；對本計畫是抽樣與難度校準參考，100題不是所有robot領域適用的固定答案。",
+  "reading_order": [
+    {
+      "repo": "felipemaiapolo/tinyBenchmarks",
+      "commit": "e9a8b1031b0340571beb6c9ca3a27891be09a8fd",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "why": "100anchor設計、資料角色與seed選擇說明"
+    },
+    {
+      "repo": "felipemaiapolo/tinyBenchmarks",
+      "commit": "e9a8b1031b0340571beb6c9ca3a27891be09a8fd",
+      "path": "tinyBenchmarks/__init__.py",
+      "ranges": [
+        [
+          1,
+          105
+        ]
+      ],
+      "why": "IRT sigmoid、theta擬合、scenario權重及三種估計式"
+    },
+    {
+      "repo": "felipemaiapolo/efficbench",
+      "commit": "c9df1547a460d5f1d2ad1ad88b6a117979858fbc",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          14
+        ]
+      ],
+      "why": "原論文實驗庫與工具庫區分"
+    },
+    {
+      "repo": "felipemaiapolo/efficbench",
+      "commit": "c9df1547a460d5f1d2ad1ad88b6a117979858fbc",
+      "path": "run_experiment.py",
+      "ranges": [
+        [
+          1,
+          93
+        ],
+        [
+          155,
+          196
+        ]
+      ],
+      "why": "model-level IID/non-IID split及sampling/latent dimension設定"
+    }
+  ],
+  "environment": "原研究為LLM評估題庫，沒有robot物理環境；MMLU、AlpacaEval等是父benchmark。",
+  "tasks": "評估任務是以少數已跑題估計完整benchmark/model表現。100為每個tiny dataset的anchor數，非100個新語義task；模型family外推與題目抽樣需分開切分。",
+  "data": "package讀seen_examples、examples_weights、A/B、optimal_lambdas與scenario/subscenario positions；y_input為按anchor順序的response向量。原實驗data包含models與各benchmark結果矩陣，以model row拆IID/non-IID。未下載或反序列化pickle。",
+  "evaluation": "以sigmoid(sum(a×theta−b))擬合能力，IRT加權anchor、pIRT混合觀測與未測預測、gpIRT再混合；不是補出真正執行結果。README說公開小集從5seed選test平均最佳版本，因此新robot設計應另留獨立validation/test model families，不能直接保證相同誤差。",
+  "standardization": {
+    "profile": "benchmark_subsampling_and_irt",
+    "reuse": "anchor/index/權重、模型response矩陣、IRT估計流程與分佈外評估概念。",
+    "transform": "先取得本benchmark多policy×case的實測response，再按來源/場域/任務分層；calibration、anchor selection與最終model test分開，預估分數明標estimate並附誤差。",
+    "missing": "robot response矩陣、跨policy/embodiment外推驗證、難度參數穩定性與估計CI；不能用目前metadata假造IRT難度。"
+  },
+  "version_note": "工具固定e9a8b10，原實驗庫c9df154；package缺pickle時連mutable main下載，正式adapter需把數值資產另行固定hash。未執行模型/IRT或pickle。",
+  "runtime_executed": false
+}

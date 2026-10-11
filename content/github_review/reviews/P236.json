@@ -1,0 +1,409 @@
+{
+  "paper_id": "P236",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已核 ActFusion 的 feature/label loader、full_len 遮罩推論、TAS scorer 與 LTA MoC。固定 release 的預設 LTA 仍使用完整影片長度；不可標成論文 ActFusion† 的未知未來長度協定。訓練亦用 test split 分數選 best checkpoint，需保留模型選擇條件。",
+  "identity_note": "arXiv:2412.04353v1（2024-12-05），Dayoung Gong、Suha Kwak、Minsu Cho，NeurIPS 2024。官方作者帳號 gongda0e 的 README 明列相同 arXiv、題名、作者與會議；搜尋中更早同名 magrogovich/ActFusion 不採用。PDF 提及 FUTR 和 DiffAct 是比較方法／重用程式，不能拿它們當 ActFusion release。此 repo 建立及固定 commit 為 2025-07-08，晚於論文。",
+  "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+  "reading_order": [
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          31,
+          64
+        ],
+        [
+          84,
+          109
+        ]
+      ],
+      "why": "精確論文與作者、自稱官方 release、MS-TCN 資料／DiffAct 重用。"
+    },
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "main.py",
+      "ranges": [
+        [
+          29,
+          46
+        ],
+        [
+          62,
+          109
+        ],
+        [
+          115,
+          145
+        ]
+      ],
+      "why": "mapping、bundle split、單模型 TAS/LTA 入口與 α 設定。"
+    },
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "src/dataset.py",
+      "ranges": [
+        [
+          11,
+          107
+        ],
+        [
+          110,
+          126
+        ],
+        [
+          129,
+          189
+        ]
+      ],
+      "why": "feature/GT 對齊、未知標籤、時間降採樣、boundary 與回復全長。"
+    },
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "src/model/actfusion.py",
+      "ranges": [
+        [
+          192,
+          248
+        ],
+        [
+          342,
+          429
+        ]
+      ],
+      "why": "訓練遮罩與推論 full_len mask-token、DDIM步數／seed。"
+    },
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "src/trainer.py",
+      "ranges": [
+        [
+          150,
+          186
+        ],
+        [
+          278,
+          381
+        ],
+        [
+          384,
+          481
+        ],
+        [
+          519,
+          547
+        ]
+      ],
+      "why": "各 offset 聚合／median、MoC 呼叫及 test 指標選 checkpoint。"
+    },
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "src/utils.py",
+      "ranges": [
+        [
+          71,
+          200
+        ],
+        [
+          239,
+          264
+        ]
+      ],
+      "why": "具體 frame Acc、segment Edit/F1、MoC 的計數與分母。"
+    },
+    {
+      "repo": "gongda0e/ActFusion",
+      "path": "src/default_configs.py",
+      "ranges": [
+        [
+          5,
+          73
+        ],
+        [
+          75,
+          167
+        ]
+      ],
+      "why": "只產生兩資料集設定；核對 release 與論文超參數差異。"
+    }
+  ],
+  "environment": "離線程序活動影片；Breakfast 與 50 Salads 是第三人稱烹飪來源，GTEA 是第一人稱烹飪來源，不能全部標 Ego 或機器人環境。程式以預先提取 I3D 特徵為輸入，不提供物理控制或 robot success。",
+  "tasks": "同一模型做 temporal action segmentation（TAS，完整觀測）及 dense long-term anticipation（LTA，部分觀測）；論文 TAS 用 50 Salads/Breakfast/GTEA，LTA 用前兩者。原生 action 數從外部 mapping.txt 的列數取得，event_list 的行序編碼與 read_mapping_dict 的首欄數字必須一致；這次未取得該資料包，未冒稱固定程式類別數。論文 50 Salads 的 50 videos/17 fine-grained labels、Breakfast 的 1712 videos/48 labels、GTEA 的 28 videos/11 labels是原作統計，不能直接當本次載入的有效 case 數。",
+  "data": "datasets/{dataset}/features/{video}.npy、groundTruth/{video}.txt（一行一個 frame label）、mapping.txt（ID 名稱）、splits/{train,test}.split{split}.bundle。reader 接受二／三維 features，swapaxes 後為 augmentation×T×F，assert T 與 GT/boundary 長度一致；未知 label=-100。事件邊界在 label 改變點及前一格置1，再可 Gaussian smoothing。sample_rate=8（50 Salads）或1（Breakfast），temporal_aug 對各 offset::rate 建樣本，但 dataset 長度仍是 video 數；回復用 nearest interpolation 與首末值填充。時間原生為 annotation frame index，無可靠 fps/秒轉換資產隨 repo；2048 是輸入 feature 維度。paper 指 5/4/4 folds，程式每次只讀指定 --split，沒有自動跨 fold 聚合；完整資料包及有效長度未下載。",
+  "evaluation": "預設 decoder-agg：LTA α=0.2/0.3，full_len=feature[0]時間長度，observed_len=round(α×full_len)，切掉未來視覺特徵後仍把 full_len 傳給 ddim_sample 追加 mask tokens；這是已知全長設定。各 temporal offset 機率平均，median filter（50 Salads=30、Breakfast=15 個採樣位置）、argmax，回復至 GT 全長。LTA 對 β=0.1/0.2/0.3/0.5，以 [int(αT):int((α+β)T)] 的原始 frame 範圍計各 GT 類別 n_T/n_F，先跨 videos 累加，再對有 GT frame 的類平均 n_T/(n_T+n_F)×100；不是 frame micro accuracy，也不是 best-of-K。TAS Acc=所有評測 frame 正確數/總 frame；Edit=每影片壓縮連續同標籤後的 (1-Levenshtein/max(segment_count))×100 再影片平均；F1@10/25/50 以同類 segment IoU 門檻一對一配對，跨影片累積 TP/FP/FN 後計 F1。只排除字面 background，不能默認所有 SIL/action_start 類被排除。LTA 同時回傳的 Acc/Edit/F1 是 observed prefix 上的分段分數，不能標成 future MoC。sampling seed=video_idx，25 sampling steps／1000 diffusion steps；offset 不是新增試驗數。",
+  "standardization": {
+    "profile": "offline_dense_action_timeline_segmentation_and_forecasting",
+    "reuse": "bundle/video key、mapping、逐格 labels/features 對齊、TAS 具體 Edit/F1 與 LTA class-count scorer。",
+    "transform": "source 保存 paper version/commit 及 MS-TCN feature來源；domain/environment 依資料集視角分開；task 分 TAS 和 LTA，case=(dataset revision,fold,video,α,β,length_protocol)，frames/segments/augmentation 不互相加總。另記 F、feature_stride、offset、original_frame_index、round/int 邊界、median 窗、seed、DDIM budget；evaluator 區分 frame micro、video-mean Edit、pooled segment F1、class macro MoC。",
+    "missing": "需固定完整 mapping/split/feature bytes與原始 fps，檢驗 mapping 行序=數字 ID、未知 -100、背景與末 segment end 的邊界（實作最終 end=i，非 i+1）。論文 §5.4 的 ActFusion† 用 r=4×observed length，此 release 的 CLI/config/已核 sampler 未提供該協定；須新增明確 adapter/取得對應作者版本。train 在 test_test_dataset 上計 TAS 五項平均與八格 LTA MoC 平均選 best／combined 模型，須改為獨立 validation 或如實標註。TAS及不同 α 共寫同一 prediction/{video}.txt，匯入須另用 protocol key 防覆寫。GTEA 無隨附設定與資料；不能只憑 main.py 的分支宣稱已接通。"
+  },
+  "version_note": "固定 00ba6c1df0ac30cfcb90110278dd3616a589ced4。release 的 50 Salads epochs=7001、n_mask=10，Breakfast batch_size=16、feature layers=[7,8,9]；論文表 S5／§5.2 有 5000 epochs、50 Salads mask=25、Breakfast batch_size=4 等差異，不能把公開 JSON 稱作逐項相同的論文設定。README 的 default_configs.py 實際位於 src/default_configs.py。本次未執行任何上游模型或訓練。",
+  "discovery_evidence": [
+    {
+      "provider": "primary_paper",
+      "local_file": "audit/.cache/fulltext_review/P236/pages.json",
+      "sha256": "62da085eafdea5e2b8ffcffd6af45dafafaf9dc7504ee724fb264e4b17d0ec6a",
+      "url": "https://arxiv.org/pdf/2412.04353",
+      "json_pointers": [
+        "/0/text",
+        "/4/text",
+        "/5/text",
+        "/6/text",
+        "/8/text",
+        "/19/text",
+        "/20/text"
+      ],
+      "version": "arXiv:2412.04353v1; NeurIPS 2024",
+      "pdf_local_file": "audit/.cache/fulltext_review/P236/paper.pdf",
+      "pdf_sha256": "293b05c5a75e8e5dfde9523b8a82d4183e30c3926cca5c439816b3708d42cf2d",
+      "pages": [
+        1,
+        5,
+        6,
+        7,
+        9,
+        20,
+        21
+      ]
+    },
+    {
+      "provider": "cached_github_search",
+      "local_file": "audit/.cache/github_review/search/P236.json",
+      "sha256": "a09da5700212b70b867d2da80f35d2849ae4992abd69b3ea8ace55a65b5850e9",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/results"
+      ],
+      "note": "核對官方作者候選、同名不相關 repo 與後續 fork；不以搜尋排名替代作者／論文身分。"
+    }
+  ],
+  "source_files": [
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "README.md",
+      "git_blob_sha": "791fecce04a3b348a8e64021846d886318361469",
+      "sha256": "63c987de3018e7b48ef45f960b1c4e2cb9b6d19b35066cd477fefd13c052beaa",
+      "local_file": "audit/.cache/github_review/repos/gongda0e__ActFusion/files/README.md",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/README.md",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          31,
+          64
+        ],
+        [
+          84,
+          109
+        ]
+      ],
+      "why": "精確論文與作者、自稱官方 release、MS-TCN 資料／DiffAct 重用。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "main.py",
+      "git_blob_sha": "cbbbad69e299166c33d8bfd1a55cb2da036484ea",
+      "sha256": "2db6997f2cccc733b72c11fe91353c25d15dbec3c277f279d4b9f98a71ca34ed",
+      "local_file": "audit/.cache/github_review/repos/gongda0e__ActFusion/files/main.py",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/main.py",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/main.py",
+      "ranges": [
+        [
+          29,
+          46
+        ],
+        [
+          62,
+          109
+        ],
+        [
+          115,
+          145
+        ]
+      ],
+      "why": "mapping、bundle split、單模型 TAS/LTA 入口與 α 設定。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "src/dataset.py",
+      "git_blob_sha": "99854130baefd8f9383b4ca4d6d01e07ed588513",
+      "sha256": "c8f2f2f90166708d48fa5b15effac0dbf6535c19941d565e39cb0afccb28c65b",
+      "local_file": "audit/.cache/github_review/repos/gongda0e__ActFusion/files/src/dataset.py",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/dataset.py",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/dataset.py",
+      "ranges": [
+        [
+          11,
+          107
+        ],
+        [
+          110,
+          126
+        ],
+        [
+          129,
+          189
+        ]
+      ],
+      "why": "feature/GT 對齊、未知標籤、時間降採樣、boundary 與回復全長。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "src/model/actfusion.py",
+      "git_blob_sha": "6b3c6eb9f8d26f1066fa46c78a915546e2beee5f",
+      "sha256": "421cd0a3499a782684f9cd9d767347a239e6afc8f53bd6aa72ce801a0c3b4c80",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/gongda0e__ActFusion/src/model/actfusion.py",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/model/actfusion.py",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/model/actfusion.py",
+      "ranges": [
+        [
+          192,
+          248
+        ],
+        [
+          342,
+          429
+        ]
+      ],
+      "why": "訓練遮罩與推論 full_len mask-token、DDIM步數／seed。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "src/trainer.py",
+      "git_blob_sha": "3e78c8dd87e29dfd6a66b69e6a387931f5573d21",
+      "sha256": "c65cc64a802c6072302e4f66dce2fcee4ad456f6d6017432e0c519c6bc75a138",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/gongda0e__ActFusion/src/trainer.py",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/trainer.py",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/trainer.py",
+      "ranges": [
+        [
+          150,
+          186
+        ],
+        [
+          278,
+          381
+        ],
+        [
+          384,
+          481
+        ],
+        [
+          519,
+          547
+        ]
+      ],
+      "why": "各 offset 聚合／median、MoC 呼叫及 test 指標選 checkpoint。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "src/utils.py",
+      "git_blob_sha": "2503202ca31eb9262709f9b77d060e24972cbb19",
+      "sha256": "71e898bfc1fb91904fee9505d6f763a67e3f563fd11990e990fa563400b52e9a",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/gongda0e__ActFusion/src/utils.py",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/utils.py",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/utils.py",
+      "ranges": [
+        [
+          71,
+          200
+        ],
+        [
+          239,
+          264
+        ]
+      ],
+      "why": "具體 frame Acc、segment Edit/F1、MoC 的計數與分母。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "src/default_configs.py",
+      "git_blob_sha": "4a62eaaade8a134334e46e08ee91367125127df0",
+      "sha256": "e400fe7af78e0611719e319679a061fd907bd0af1cf21280297d06e202885d59",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/gongda0e__ActFusion/src/default_configs.py",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/default_configs.py",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/src/default_configs.py",
+      "ranges": [
+        [
+          5,
+          73
+        ],
+        [
+          75,
+          167
+        ]
+      ],
+      "why": "只產生兩資料集設定；核對 release 與論文超參數差異。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "configs/50salads.json",
+      "git_blob_sha": "f49c5cba70c0990f8159d5ccc74d1b85be9f02d1",
+      "sha256": "7d2f2d13bbfec1bbef949e9d89b11070e8d252af6a9ca8672882ac2f53e9402c",
+      "local_file": "audit/.cache/github_review/repos/gongda0e__ActFusion/files/configs/50salads.json",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/configs/50salads.json",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/configs/50salads.json",
+      "json_pointers": [
+        "/dataset_name",
+        "/sample_rate",
+        "/temporal_aug",
+        "/encoder_params",
+        "/diffusion_params",
+        "/batch_size",
+        "/num_epochs",
+        "/set_sampling_seed",
+        "/postprocess"
+      ],
+      "why": "核讀固定 JSON 設定與相依推論預算。"
+    },
+    {
+      "provider": "github",
+      "repo": "gongda0e/ActFusion",
+      "commit": "00ba6c1df0ac30cfcb90110278dd3616a589ced4",
+      "path": "configs/Breakfast.json",
+      "git_blob_sha": "df73ca22c7bd5f71dd116d2d88eb4475a3450017",
+      "sha256": "b507acbba4d7f483d58bccdba37d6710dfdb35aac80680b4457cb8b117b191a4",
+      "local_file": "audit/.cache/github_review_worker/P234-P241_20261011/files/gongda0e__ActFusion/configs/Breakfast.json",
+      "url": "https://github.com/gongda0e/ActFusion/blob/00ba6c1df0ac30cfcb90110278dd3616a589ced4/configs/Breakfast.json",
+      "raw_url": "https://raw.githubusercontent.com/gongda0e/ActFusion/00ba6c1df0ac30cfcb90110278dd3616a589ced4/configs/Breakfast.json",
+      "json_pointers": [
+        "/dataset_name",
+        "/sample_rate",
+        "/temporal_aug",
+        "/encoder_params",
+        "/diffusion_params",
+        "/batch_size",
+        "/num_epochs",
+        "/set_sampling_seed",
+        "/postprocess"
+      ],
+      "why": "核讀固定 JSON 設定與相依推論預算。"
+    }
+  ],
+  "runtime_executed": false
+}

@@ -1,0 +1,501 @@
+{
+  "paper_id": "P112",
+  "name": "EgoOops",
+  "title": "EgoOops: A Dataset for Mistake Action Detection from Egocentric Videos referring to Procedural Texts",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2410.05343",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "craft",
+    "industry",
+    "lab"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P112",
+    "summary": "EgoOops官方庫公開程序／影片／錯誤標註；檔案5種task key對應論文4類活動。實際instruction有-1特殊值，不能照README的零基索引直接取句子。",
+    "environment": "第一人稱程序活動影片，包括化學演示、紙板製作、電路和積木；task key/QR物件不是可執行機器人場景。",
+    "tasks": "程序文字對齊與錯誤動作偵測/解釋。blacklight與ion都映射論文IR活動；6個mistake labels包括修正動作，不能一律當物理失敗。",
+    "data": "已取得metadata結構計數50video紀錄、538segments、5個procedure key。segment有秒制startTime/endTime、instruction、labels/caption；[]和空caption表示正確步。實際有instruction=-1，應保留特殊值而非Python負索引。全量只結構掃描，未逐段人工驗證。",
+    "evaluation": "此倉庫是annotations/metadata，未包含官方模型scorer或可用split定義；原文評分需另接入。538標註片段不是538道已驗證測試題，影片資產與合法觀測尚未閉合。",
+    "standardization": {
+      "profile": "human_procedural_video_mistake_annotations",
+      "reuse": "影片/task/segment身份、秒制時間、程序文本、multi-label與QR物件對映。",
+      "transform": "保留原5task keys並連論文4活動名稱；case連video/time/instruction，-1轉明確特殊狀態而不丟原值；錯誤/修正/正確和字幕各保留。",
+      "missing": "影片取得、participant/split清單、-1語義正式確認、原文scorer與原生評測再現。"
+    },
+    "version_note": "官方README明示資料task名稱與paper不同；annotations快照和外部影片ZIP版本需雙重固定。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Y-Haneji/EgoOops-annotations",
+        "requested_repo": "Y-Haneji/EgoOops-annotations",
+        "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 89,
+        "sha256": "ffa199d880fc798ad24a688ebbd84dce745ec4be57534c1a8571adfd5d923210",
+        "url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/README.md",
+        "reading_url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/README.md#L1-L72",
+        "why": "標註schema、影片來源與資料/論文名稱對映",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Y-Haneji/EgoOops-annotations",
+        "requested_repo": "Y-Haneji/EgoOops-annotations",
+        "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e",
+        "ref": null,
+        "path": "meta/metadata.json",
+        "ranges": [
+          [
+            1,
+            80
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [
+          "/videos/1/segments/4",
+          "/instructions/cardboard/0"
+        ],
+        "json_pointer_evidence": [
+          {
+            "pointer": "/videos/1/segments/4",
+            "selected_value_sha256": "0de4fbcb50e344d560c5c98773d9d8df48c04791a36b64729901c8558995e0c1"
+          },
+          {
+            "pointer": "/instructions/cardboard/0",
+            "selected_value_sha256": "d3c470730792e0410836afcbef1caa3da9d836bbed7546c272524a43eb1fd42b"
+          }
+        ],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 4318,
+        "sha256": "c17ec048774a42f5c7d65b483f93ecc429baec3dcc8c0820741a8e4c99792789",
+        "url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/meta/metadata.json",
+        "reading_url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/meta/metadata.json#L1-L80",
+        "why": "完整首例與一筆-1錯誤片段、程序文本；全量只做結構計數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Y-Haneji/EgoOops-annotations",
+        "requested_repo": "Y-Haneji/EgoOops-annotations",
+        "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e",
+        "ref": null,
+        "path": "meta/mistake_classes.json",
+        "ranges": [
+          [
+            1,
+            8
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 8,
+        "sha256": "e9978df7d59ecdc0d0a137fa6af1ef28761cd181c4aae65775e2b12bff141cd4",
+        "url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/meta/mistake_classes.json",
+        "reading_url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/meta/mistake_classes.json#L1-L8",
+        "why": "6個原生mistake label類別",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Y-Haneji/EgoOops-annotations",
+        "requested_repo": "Y-Haneji/EgoOops-annotations",
+        "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e",
+        "ref": null,
+        "path": "meta/microqr/blacklight.json",
+        "ranges": [
+          [
+            1,
+            16
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 16,
+        "sha256": "1f5ae29ce9c3d1b2cc4aed846ec7bf75e7e99a942612d37e3914dfdfd2e8af95",
+        "url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/meta/microqr/blacklight.json",
+        "reading_url": "https://github.com/Y-Haneji/EgoOops-annotations/blob/ec0746d4dd71efad43437235a6e04ebf6f1ccf8e/meta/microqr/blacklight.json#L1-L16",
+        "why": "同一程序內QR物件編號對映",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "aa28b4ff48680e4487e3c99651ffe30aaa5a90afec2295a17cd56093e1af248b"
+  },
+  "repository_binding_review_sha256": "aa28b4ff48680e4487e3c99651ffe30aaa5a90afec2295a17cd56093e1af248b",
+  "repository_bindings": [
+    {
+      "requested_repo": "Y-Haneji/EgoOops-annotations",
+      "resolved_repo": "Y-Haneji/EgoOops-annotations",
+      "aliases_in_this_review": [
+        "y-haneji/egooops-annotations"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "ec0746d4dd71efad43437235a6e04ebf6f1ccf8e",
+          "reviewed_files": [
+            "README.md",
+            "meta/metadata.json",
+            "meta/microqr/blacklight.json",
+            "meta/mistake_classes.json"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "paper_link",
+          "url": "https://github.com/Y-Haneji/EgoOops-annotations/",
+          "pdf_page": 15,
+          "pdf_sha256": "fcf3b48c7dea45c46f41391de07a874453ef74d8762655f4104e34d8dfa9bb23",
+          "basis": "pinned_pdf_hyperlink"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Y-Haneji/EgoOops-annotations/",
+          "link_label": "The GitHub repository",
+          "project_url": "https://y-haneji.github.io/EgoOops-project-page/",
+          "page_sha256": "2b9fac8aff0f67d57f584195624988674a4443c81befd412ec0569b1ed08f59b"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P112",
+          "review_file": "content/github_review/reviews/P112.json",
+          "review_sha256": "aa28b4ff48680e4487e3c99651ffe30aaa5a90afec2295a17cd56093e1af248b",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "工藝與修繕",
+    "裝配與生產作業",
+    "實驗室操作"
+  ],
+  "source_review": {
+    "paper_id": "P112",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EgoOops，arXiv 2410.05343，PDF標題相符。",
+    "scope_read": "5程序完整清單、6種執行錯誤、50影片、cross-validation與三端點。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      15
+    ],
+    "domains": [
+      "工藝與修繕",
+      "裝配與生產作業",
+      "實驗室操作"
+    ],
+    "role": "錯誤辨識與程序恢復",
+    "environment": "固定坐姿工作站，原物件／工具／程序文字位置固定；4名學生佩戴ego camera。",
+    "tasks": "5task：電路、混色、離子反應、積木、紙板工藝；6執行錯誤類型，未涵蓋所有順序／漏步錯誤。",
+    "cases": "50videos、538segments、95execution mistakes；每fold30train/10val/10test，5-fold。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "程序tasks",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "錯誤taxonomy類型",
+        "pages": [
+          3
+        ]
+      },
+      {
+        "field": "data",
+        "value": 50,
+        "unit": "videos",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "data",
+        "value": 538,
+        "unit": "segments",
+        "pages": [
+          4
+        ]
+      },
+      {
+        "field": "case",
+        "value": 95,
+        "unit": "標註execution mistakes（全庫）",
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "evaluation": [
+      "端到端step alignment＋mistake/correction mAP@tIoU0.1/0.2/0.3；GT segments分類是oracle子問題。",
+      "alignment另F1/precision/recall/MoF。"
+    ],
+    "evaluation_types": [
+      "標準答案比對",
+      "數值誤差與相似度"
+    ],
+    "split": "每fold各task一正常一错误test影片；作者稱group-kfold控制worker，精確ID仍需查。",
+    "lineage": "自錄多領域程序；一半刻意錯、一半盡量正常但也有自然失誤。",
+    "evidence": [
+      {
+        "pages": [
+          3,
+          4,
+          6,
+          7
+        ],
+        "locator": "§3、表2–3、§5",
+        "supports": "5/50/538/95、split与GT/full差異"
+      }
+    ],
+    "unresolved": [
+      "4名参与者與5-fold worker grouping的精確分配需manifest查。"
+    ],
+    "reuse": "補料理以外程序錯誤；規則由文字指定，不能僅憑視覺常識判定。",
+    "reviewed_pdf_sha256": "fcf3b48c7dea45c46f41391de07a874453ef74d8762655f4104e34d8dfa9bb23",
+    "reviewed_on": "2026-10-02",
+    "name": "EgoOops",
+    "year": 2024,
+    "title": "EgoOops: A Dataset for Mistake Action Detection from Egocentric Videos referring to Procedural Texts",
+    "source_url": "https://arxiv.org/abs/2410.05343",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "craft",
+      "industry",
+      "lab"
+    ],
+    "review_tags": [
+      "實驗室操作",
+      "工藝與修繕",
+      "組裝與拆解"
+    ],
+    "domain_names": [
+      "工藝與修繕",
+      "裝配與生產作業",
+      "實驗室操作"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P112",
+      "domain_ids": [
+        "craft",
+        "industry",
+        "lab"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P112",
+          "domain_ids": [
+            "craft",
+            "industry",
+            "lab"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            15
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "5task：電路、混色、離子反應、積木、紙板工藝；6執行錯誤類型，未涵蓋所有順序／漏步錯誤。",
+            "固定坐姿工作站，原物件／工具／程序文字位置固定；4名學生佩戴ego camera。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "fcf3b48c7dea45c46f41391de07a874453ef74d8762655f4104e34d8dfa9bb23"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "fcf3b48c7dea45c46f41391de07a874453ef74d8762655f4104e34d8dfa9bb23",
+      "previous_domain_ids": [
+        "craft",
+        "industry",
+        "lab"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "answer",
+      "distance"
+    ],
+    "receipt": {
+      "paper_id": "P112",
+      "name": "EgoOops",
+      "expected_title": "EgoOops: A Dataset for Mistake Action Detection from Egocentric Videos referring to Procedural Texts",
+      "source_url": "https://arxiv.org/abs/2410.05343",
+      "pdf_url": "https://arxiv.org/pdf/2410.05343",
+      "retrieved_at": "2026-10-02T21:34:21.329532+00:00",
+      "pdf_sha256": "fcf3b48c7dea45c46f41391de07a874453ef74d8762655f4104e34d8dfa9bb23",
+      "text_sha256": "1c6fac43ca133951edb6446346ba67e0ce128b6dc719e5177817de1d2272f5ea",
+      "pdf_bytes": 9235399,
+      "pages": 17,
+      "text_characters": 101134,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2410.05343v3",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2410.05343v3"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "程序tasks",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P112:1",
+        "paper_id": "P112",
+        "benchmark": "EgoOops",
+        "native_term": "程序tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.05343v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.05343v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 6,
+        "unit": "錯誤taxonomy類型",
+        "pages": [
+          3
+        ],
+        "record_id": "review10:P112:2",
+        "paper_id": "P112",
+        "benchmark": "EgoOops",
+        "native_term": "錯誤taxonomy類型",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.05343v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.05343v3",
+            "locator": "PDF pp. 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 50,
+        "unit": "videos",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P112:3",
+        "paper_id": "P112",
+        "benchmark": "EgoOops",
+        "native_term": "videos",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.05343v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.05343v3",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 538,
+        "unit": "segments",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P112:4",
+        "paper_id": "P112",
+        "benchmark": "EgoOops",
+        "native_term": "segments",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.05343v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.05343v3",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 95,
+        "unit": "標註execution mistakes（全庫）",
+        "pages": [
+          4
+        ],
+        "record_id": "review10:P112:5",
+        "paper_id": "P112",
+        "benchmark": "EgoOops",
+        "native_term": "標註execution mistakes（全庫）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2410.05343v3",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2410.05343v3",
+            "locator": "PDF pp. 4",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Y-Haneji/EgoOops-annotations"
+  ],
+  "external_repositories": []
+}

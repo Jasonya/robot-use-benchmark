@@ -1,0 +1,192 @@
+{
+  "paper_id": "P137",
+  "name": "pi0.5",
+  "title": "$π_{0.5}$: a Vision-Language-Action Model with Open-World Generalization",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2504.16054",
+  "scope": "related_reference",
+  "domain_ids": [],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P137",
+    "summary": "π0.5與π0共用openpi，但state離散token、prompt預算和模型旗標不同。公開LIBERO示例還固定了雙相機、5步action chunk與原suite預算。",
+    "environment": "π0.5原研究開放環境泛化與公開LIBERO/DROID示例不是同一環境集合；公開示例重用父benchmark資產。",
+    "tasks": "升級的VLA方法和跨環境泛化；不因π0.5/model-head或checkpoint新名字重計底層LIBERO任務。",
+    "data": "pi05旗標預設離散state輸入，prompt max_token_len200（π0預設48）；TokenizePrompt需state與prompt。LIBERO範例傳agentview/wrist RGB各旋轉180度、EEF pose/gripper state及task文字，資料可見性和只RGB baseline不同。",
+    "evaluation": "公開LIBERO預設50trials/task、10步暖機、每次執行action chunk前5步；suite上限220/280/300/520/400，按原env.done計成功，seed與預存初態都要固定。這些是公開示例協定，不等於原文全部open-world評測。",
+    "standardization": {
+      "profile": "state_tokenized_vla_and_downstream_eval",
+      "reuse": "π0.5專屬配置/transform、公開LIBERO runner與原native成功來源。",
+      "transform": "method_version區分π0/0.5；case固定state可見性、prompt/token預算、雙相機方向、replan/暖機/suite步數，父benchmark與資料重用關係獨立保存。",
+      "missing": "原文泛化場景與trial manifest、完整訓練／測試素材、模型head/資料切分對照、公平資訊預算與原生結果再現。"
+    },
+    "version_note": "README明示此repo目前只支援π0.5 flow matching head；不能宣稱公開碼已覆蓋原作所有head和私有資料。與P136共用repo/commit但分開記錄方法配置。",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            19
+          ],
+          [
+            73,
+            81
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 323,
+        "sha256": "567fc57766bd736664f50126cab8145af4071ca16cc5e238f2b11e369169c3b5",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/README.md",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/README.md#L1-L19",
+        "why": "π0.5與公開flow-head/下游checkpoints的範圍",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "src/openpi/models/pi0_config.py",
+        "ranges": [
+          [
+            18,
+            55
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 117,
+        "sha256": "d321858c30b398126035ea2b6da09e1c422eeeebb5ebf8df631daf9dc77647fa",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/models/pi0_config.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/models/pi0_config.py#L18-L55",
+        "why": "pi05/discrete_state_input與48/200 prompt長度",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "src/openpi/transforms.py",
+        "ranges": [
+          [
+            247,
+            267
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 460,
+        "sha256": "a1b94e9e72849a18834778f229c6bb389a495eb7fbe0aa800edea728b9424ff4",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/transforms.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/src/openpi/transforms.py#L247-L267",
+        "why": "state進prompt token的真實轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Physical-Intelligence/openpi",
+        "requested_repo": "Physical-Intelligence/openpi",
+        "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "ref": null,
+        "path": "examples/libero/main.py",
+        "ranges": [
+          [
+            25,
+            40
+          ],
+          [
+            57,
+            71
+          ],
+          [
+            89,
+            156
+          ],
+          [
+            189,
+            197
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 219,
+        "sha256": "d53748c95804ada559e3ca867305b8f755d8651c4c7f4e2723ef80aea55a3943",
+        "url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/examples/libero/main.py",
+        "reading_url": "https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/examples/libero/main.py#L25-L40",
+        "why": "原benchmark物件初態、相機方向、chunk與成功",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "7ab06733144996f4cb121e38881fc1dbc7beebed0d3f16b10950b2fa6ed10234"
+  },
+  "repository_binding_review_sha256": "7ab06733144996f4cb121e38881fc1dbc7beebed0d3f16b10950b2fa6ed10234",
+  "repository_bindings": [
+    {
+      "requested_repo": "Physical-Intelligence/openpi",
+      "resolved_repo": "Physical-Intelligence/openpi",
+      "aliases_in_this_review": [
+        "physical-intelligence/openpi"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+          "reviewed_files": [
+            "README.md",
+            "examples/libero/main.py",
+            "src/openpi/models/pi0_config.py",
+            "src/openpi/transforms.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "openpi",
+          "search_receipt_sha256": "91bc75c88db5974ccd9993705399e29be89d0ce3a7816bda161c76412b1543f7",
+          "url": "https://github.com/Physical-Intelligence/openpi",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P137",
+          "review_file": "content/github_review/reviews/P137.json",
+          "review_sha256": "7ab06733144996f4cb121e38881fc1dbc7beebed0d3f16b10950b2fa6ed10234",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [],
+  "source_review": null,
+  "repositories": [
+    "Physical-Intelligence/openpi"
+  ],
+  "external_repositories": []
+}

@@ -1,0 +1,523 @@
+{
+  "paper_id": "P172",
+  "name": "LabUtopia",
+  "title": "LabUtopia: High-Fidelity Simulation and Hierarchical Benchmark for Scientific Embodied Agents",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2505.22634",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "lab"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P172",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "LabUtopia把場景/觀測放在task、完成檢查放在controller；只讀task類別會漏掉真正判分。此版同時存在不同HDF5欄位格式，匯入時需要分開對接。",
+    "environment": "實驗室USD場景和Franka/移動機器人等配置；所讀level1_pick指定lab_001、3相機與物件初態range。多個YAML/相機不直接當獨立物理環境。",
+    "tasks": "以基礎、組合、泛化和長序列四層組織實驗室操作；配置task_type/controller_type決定行為，scene/物件組合構成具體case。此輪核讀pick，不將每個config別名視為新語義task。",
+    "data": "NavDataset使用joint_positions/robot_position/cam_01_rgb/cam_02_rgb/hand_cam_rgb，action取joint_positions序列；其validation只copy同一資料與sequence表，非獨立holdout。新converter期待agent_pose/actions與相機欄位，缺shape預設7、缺FPS預設60；source<=target FPS時保留所有frame，須確認輸出timebase。",
+    "evaluation": "pick controller要求物體Z比初始高0.1且連續60次check；reset時計success_count。task.done只是reset_needed，base timeout還調on_task_complete(True)，不能用task.done替代controller成功。50個inference episodes只是README範例；正式case/budget須按發布協定固定。",
+    "standardization": {
+      "profile": "hierarchical_scientific_lab_simulation",
+      "reuse": "YAML場景/感測/初態、task/controller分工、具體pick evaluator與HDF5→LeRobot路徑。",
+      "transform": "先辨識HDF5 schema版本和action是否command/state；建立episode級split；case記physics/control/check頻率、連續成功時間與timeout獨立結果；原文規模和當前config取樣分開。",
+      "missing": "全部task完成checker、原文到當前版本對照、獨立validation、舊/新資料schema轉接、FPS/shape fallback驗證與場景資產/基線重現。"
+    },
+    "version_note": "固定8df7278，README已指IsaacSim5.1；論文為2505.22634，不能把現在的軟體依賴版本直接當成2025原論文設定。未執行Isaac或遠端policy。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            95
+          ],
+          [
+            274,
+            313
+          ],
+          [
+            328,
+            373
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 404,
+        "sha256": "9c226c4680e07acea9d6f9a772aa7846905393ffbad4644210d50b96e54c2713",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/README.md",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/README.md#L1-L95",
+        "why": "當前Isaac版本、task/controller分工與60Hz資料約定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "config/level1_pick.yaml",
+        "ranges": [
+          [
+            1,
+            69
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 69,
+        "sha256": "33c43699818ec74a2d89abc9ba0723c5282db04ffdc82a915b6292c678f7fc60",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/config/level1_pick.yaml",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/config/level1_pick.yaml#L1-L69",
+        "why": "具體場景、物件range、3相機、robot和budget",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "tasks/base_task.py",
+        "ranges": [
+          [
+            286,
+            356
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 371,
+        "sha256": "9fc21d99a2d279d4d4a7835da230066a78f46597407f3f11ea66ea4150f4170c",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/tasks/base_task.py",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/tasks/base_task.py#L286-L356",
+        "why": "觀測state與reset/timeout訊號",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "controllers/base_controller.py",
+        "ranges": [
+          [
+            19,
+            41
+          ],
+          [
+            122,
+            150
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 165,
+        "sha256": "ddd30e2790d6442401e0aef3d015ea8358be06ed5d8d9b631cb6845cf975312f",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/controllers/base_controller.py",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/controllers/base_controller.py#L19-L41",
+        "why": "60次持續成功及episode計數",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "controllers/pick_controller.py",
+        "ranges": [
+          [
+            20,
+            25
+          ],
+          [
+            50,
+            78
+          ],
+          [
+            129,
+            154
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 165,
+        "sha256": "49abcec84c4250bbffb0d1519934d161f67a3512eb955d9dccb5be17c974404a",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/controllers/pick_controller.py",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/controllers/pick_controller.py#L20-L25",
+        "why": "pick抬高0.1m的具體連續判定",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "policy/dataset/nav_dataset.py",
+        "ranges": [
+          [
+            1,
+            41
+          ],
+          [
+            81,
+            121
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 253,
+        "sha256": "54cc5104839f5a499dcf8dd274f3e111d167ca03097ee15b10875e6832e14d0b",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/policy/dataset/nav_dataset.py",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/policy/dataset/nav_dataset.py#L1-L41",
+        "why": "HDF5舊schema、state/action視窗及validation副本",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "Rui-li023/LabUtopia",
+        "requested_repo": "Rui-li023/LabUtopia",
+        "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+        "ref": null,
+        "path": "scripts/convert_labsim_data_to_lerobot.py",
+        "ranges": [
+          [
+            55,
+            84
+          ],
+          [
+            109,
+            162
+          ],
+          [
+            183,
+            244
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 427,
+        "sha256": "4a0bc5e8612f842b8a321aac9429c52a18622deb4dafb922fde3078b9c1b2319",
+        "url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/scripts/convert_labsim_data_to_lerobot.py",
+        "reading_url": "https://github.com/Rui-li023/LabUtopia/blob/8df72784265c375a327ffa3f0a0cf8c676f229a7/scripts/convert_labsim_data_to_lerobot.py#L55-L84",
+        "why": "新schema、FPS偵測/降採樣及LeRobot欄位轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "b1e8da0aa3fb8caa38443614868bf9b25aecac1bdd30216d7a74dae8499a4511"
+  },
+  "repository_binding_review_sha256": "b1e8da0aa3fb8caa38443614868bf9b25aecac1bdd30216d7a74dae8499a4511",
+  "repository_bindings": [
+    {
+      "requested_repo": "Rui-li023/LabUtopia",
+      "resolved_repo": "Rui-li023/LabUtopia",
+      "aliases_in_this_review": [
+        "rui-li023/labutopia"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8df72784265c375a327ffa3f0a0cf8c676f229a7",
+          "reviewed_files": [
+            "README.md",
+            "config/level1_pick.yaml",
+            "controllers/base_controller.py",
+            "controllers/pick_controller.py",
+            "policy/dataset/nav_dataset.py",
+            "scripts/convert_labsim_data_to_lerobot.py",
+            "tasks/base_task.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/Rui-li023/LabUtopia",
+          "link_label": "Code",
+          "project_url": "https://rui-li023.github.io/labutopia-site/",
+          "page_sha256": "8fa55291f7c8d7f3aa67fe834987bcd41300d47f2f24bd31424150233d4bdc40"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P172",
+          "review_file": "content/github_review/reviews/P172.json",
+          "review_sha256": "b1e8da0aa3fb8caa38443614868bf9b25aecac1bdd30216d7a74dae8499a4511",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "實驗室操作"
+  ],
+  "source_review": {
+    "paper_id": "P172",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "LabUtopia，arXiv 2505.22634v2。",
+    "scope_read": "LabSim/LabScene、scene與儀器來源、5levels、success協定及實驗範圍。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "domains": [
+      "實驗室操作"
+    ],
+    "role": "專業場域操作benchmark",
+    "environment": "約100expert-reviewed lab scene assets，另程序填入儀器；物件類別/scene數不得相加。",
+    "tasks": "摘要30distinct tasks、結論>30，§4另稱>50；5levels從atomic到mobile，但level3主要是generalization條件，並非全是新語義task。",
+    "cases": "各level有demo/rollout實驗，本文已讀段未報统一case總量；表2列10atomic及6短流程，long流程另3例。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 100,
+        "unit": "基礎lab scene assets",
+        "qualifier": "約數",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "task",
+        "value": 30,
+        "unit": "摘要聲稱distinct tasks",
+        "qualifier": "與§4 >50不一致，未定為全庫唯一值",
+        "pages": [
+          1,
+          3
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "benchmark levels",
+        "pages": [
+          7,
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "task完成後goal tolerance需維持2秒；success rate與long流程stage分開。",
+      "chemical engine由知識庫＋LLM推state變化，不等同第一原理化學物理。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "novel shape/material/layout設定；全在simulation，real transfer留未來。",
+    "lineage": "designer scene assets、PubChem資料與IsaacSim；procedure模板需逐task核，不從約100场景×50tasks直接乘題量。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          10
+        ],
+        "locator": "§3–6",
+        "supports": "100scene、30/>50衝突、2秒success與全sim"
+      }
+    ],
+    "unresolved": [
+      "最終task registry究竟30或>50，以及scene/instrument各精確IDs，需code版本確認。"
+    ],
+    "reuse": "補實驗室用途與流程；其階層是設計/泛化混合，需用共同task粒度對齊。",
+    "reviewed_pdf_sha256": "b0b27a506f9ec028871b09e93a5a3aead74e382739b65fa5092af90ab062e862",
+    "reviewed_on": "2026-10-02",
+    "name": "LabUtopia",
+    "year": 2025,
+    "title": "LabUtopia: High-Fidelity Simulation and Hierarchical Benchmark for Scientific Embodied Agents",
+    "source_url": "https://arxiv.org/abs/2505.22634",
+    "primary_type": "M",
+    "category_name": "一般操作 benchmark",
+    "domain_ids": [
+      "lab"
+    ],
+    "review_tags": [
+      "實驗室操作"
+    ],
+    "domain_names": [
+      "實驗室操作"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P172",
+      "domain_ids": [
+        "lab"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P172",
+          "domain_ids": [
+            "lab"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "摘要30distinct tasks、結論>30，§4另稱>50；5levels從atomic到mobile，但level3主要是generalization條件，並非全是新語義task。",
+            "約100expert-reviewed lab scene assets，另程序填入儀器；物件類別/scene數不得相加。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "b0b27a506f9ec028871b09e93a5a3aead74e382739b65fa5092af90ab062e862"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "b0b27a506f9ec028871b09e93a5a3aead74e382739b65fa5092af90ab062e862",
+      "previous_domain_ids": [
+        "lab"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P172",
+      "name": "LabUtopia",
+      "expected_title": "LabUtopia: High-Fidelity Simulation and Hierarchical Benchmark for Scientific Embodied Agents",
+      "source_url": "https://arxiv.org/abs/2505.22634",
+      "pdf_url": "https://arxiv.org/pdf/2505.22634",
+      "retrieved_at": "2026-10-02T21:34:38.625495+00:00",
+      "pdf_sha256": "b0b27a506f9ec028871b09e93a5a3aead74e382739b65fa5092af90ab062e862",
+      "text_sha256": "be613547e672e7a3b534be0570df47e2ac197c42fbf5058cdaf9f13b65d14174",
+      "pdf_bytes": 13215883,
+      "pages": 30,
+      "text_characters": 102760,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2505.22634v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2505.22634v2"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 100,
+        "unit": "基礎lab scene assets",
+        "qualifier": "約數",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P172:1",
+        "paper_id": "P172",
+        "benchmark": "LabUtopia",
+        "native_term": "基礎lab scene assets",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.22634v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.22634v2",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 30,
+        "unit": "摘要聲稱distinct tasks",
+        "qualifier": "與§4 >50不一致，未定為全庫唯一值",
+        "pages": [
+          1,
+          3
+        ],
+        "record_id": "review10:P172:2",
+        "paper_id": "P172",
+        "benchmark": "LabUtopia",
+        "native_term": "摘要聲稱distinct tasks",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.22634v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.22634v2",
+            "locator": "PDF pp. 1, 3",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 5,
+        "unit": "benchmark levels",
+        "pages": [
+          7,
+          8
+        ],
+        "record_id": "review10:P172:3",
+        "paper_id": "P172",
+        "benchmark": "LabUtopia",
+        "native_term": "benchmark levels",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2505.22634v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2505.22634v2",
+            "locator": "PDF pp. 7, 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "Rui-li023/LabUtopia"
+  ],
+  "external_repositories": []
+}

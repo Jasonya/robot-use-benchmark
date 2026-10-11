@@ -1,0 +1,179 @@
+{
+  "paper_id": "P202",
+  "reviewed_on": "2026-10-11",
+  "status": "website_only",
+  "summary": "susu801/EgoMonth 的 README 與網站對應同名論文的 301 小時／738 clips／1,443 QA／14 題型，但 pinned 完整 tree 只有靜態頁面與圖片。文件聲稱存在的 scripts/ 與評測程式均不在此 commit；尚不能視為已公開可執行 benchmark。",
+  "identity_note": "核對 arXiv:2608.13113v1 首頁題名、作者及正文。候選倉庫完整題名、統計與題型一致，足以確認內容所指論文；但 pinned PDF 未連到該倉庫，README/index.html 僅署名 EgoMonth Team，未提供作者名單或 arXiv 反向連結，因此 susu801 的作者官方身分仍未獨立證實。",
+  "reading_order": [
+    {
+      "repo": "susu801/EgoMonth",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ],
+        [
+          35,
+          99
+        ]
+      ],
+      "why": "確認論文對應、文件宣告的資料鍵、macro/micro 及缺失 scripts 宣告。"
+    },
+    {
+      "repo": "susu801/EgoMonth",
+      "path": "index.html",
+      "ranges": [
+        [
+          27,
+          73
+        ],
+        [
+          86,
+          112
+        ],
+        [
+          181,
+          218
+        ]
+      ],
+      "why": "核對網站題型、Code 按鈕與所列評測命令；Code 僅回到同一倉庫。"
+    }
+  ],
+  "environment": "人類日常第一人稱錄影，20 名參與者各跨 20–120 天、室內外與不同裝置；論文有學習工作、交通、飲食、購物、休閒、家務六種活動分類，沒有可執行 scene registry 或實體場所去重總數。",
+  "tasks": "保留 Table 1 的 14 QA 類型：Habit Inference、Personality Inference；Detail Retrieval、Spatial Relation、Self-localization、Temporal Ordering、Event Time、Object Location；Procedure Planning、Event Counting、Object Counting、Route Reasoning、Cross-view Spatial Reasoning、Direction Judgement。三組分別是 Schema Consolidation、Episodic Indexing、Cascading Reasoning；它們是影片記憶／推理題型，非機器人動作任務。",
+  "data": "已讀到的 schema 僅是 README 文件示例：JSON list，每筆 video_path 為一至多個相對影片路徑，question、四個 options、correct_options 字母與 task_type；文件稱以 CONFIG[\"video_root\"] 接路徑，但沒有可核對的 loader。論文報 738 clips、18,072 分鐘與 1,443 人工四選一題；這些是論文統計，未取得 QA manifest，不能宣稱已清點實際 release。跨日參與者／session ID、時間戳格式、每類實際題數與 split 檔均未見。",
+  "evaluation": "論文 §4.1 與 README 定義 micro Acc = 全部答對題數／全部題數（完整論文集合 N=1,443），macro Avg = 14 個題型各自 accuracy 的等權平均；直接比對正解，無 LLM judge。各模型觀測預算不同，例如 16／64／256／512 frames 或 1 fps，需保留。固定 tree 未含 README 所稱的 Qwen 等腳本，因此無法核對答案字母 parser、多影片拼接／抽幀、錯誤／空回答如何入分母，也沒有可追的 concrete scorer。",
+  "standardization": {
+    "profile": "longitudinal_egocentric_mcq_documentation",
+    "reuse": "可重用有來源的 14 題型、三認知層級、論文統計、文件示例 schema，以及 macro／micro 的分開定義；倉庫先列文件來源。",
+    "transform": "source 保留 paper v1 與候選 repo commit／身分狀態；environment 用參與者與生活錄影脈絡；task 保留原生 task_type。release 到位後，case 以原始 QA ID 關聯有序 video_path[]、question/options/correct_options，另保存 participant/day/session、媒體時間及觀測預算；單片與跨片同屬一題，不能按片重複計數。evaluator 分列 micro 與每類及 macro 分母。",
+    "missing": "作者官方連結、QA／split／影片 manifest、可讀 loader、實際答案解析與 scorer、跨日時間對齊、抽幀及例外處理。現階段不能產生已驗證可執行 case 清單。"
+  },
+  "version_note": "程式來源固定 81143141d98b4511ff1adcae9a5ccf3a9f0f9606（2026-09-22），PDF 為 2608.13113v1。非截斷 tree 的 15 個 entries 中沒有 scripts/、.py 或資料 JSON；README/index.html 的存在宣告與此版本實物不一致。未嘗試用別人的同名倉庫填補。",
+  "discovery_evidence": [
+    {
+      "source": "audit/.cache/github_review/search/P202.json",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/results/0"
+      ],
+      "finding": "既有精確 EgoMonth 搜尋只回傳 susu801/EgoMonth；搜尋候選本身不等於官方證明。"
+    },
+    {
+      "source": "audit/.cache/github_review/P202-discovery.json",
+      "json_pointers": [
+        "/candidates",
+        "/code_contexts"
+      ],
+      "finding": "已核 pinned PDF 連結集合，沒有此 repo／project 連結。"
+    },
+    {
+      "source": "audit/.cache/github_review/repos/susu801__EgoMonth/tree.json",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree"
+      ],
+      "finding": "已核完整 tree；缺失檔案不是只因 heuristic cache 未下載。"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P202/pages.json",
+      "sha256": "6806084e139caf26aead13d506835f9e392bef1afd507fa1c66020ec643e1581",
+      "role": "pinned_paper_text",
+      "pages": [
+        1,
+        4,
+        5,
+        6,
+        7
+      ],
+      "json_pointers": [
+        "/0/text",
+        "/3/text",
+        "/4/text",
+        "/5/text",
+        "/6/text"
+      ],
+      "pdf_local_file": "audit/.cache/fulltext_review/P202/paper.pdf",
+      "pdf_sha256": "6747ddc4c6f9303ea3e7ed2e427b1e8707235e60cd4cf05e45abfd4d13cdffc1",
+      "url": "https://arxiv.org/abs/2608.13113"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/susu801__EgoMonth/files/README.md",
+      "sha256": "48e4787f96128d8a7244dcd1677e0a81ccc10318b8749275fc170fd9ed39ca0a",
+      "repo": "susu801/EgoMonth",
+      "path": "README.md",
+      "commit": "81143141d98b4511ff1adcae9a5ccf3a9f0f9606",
+      "git_blob_sha": "1030361b2b5695e699a88e2180c295dd23a54a23",
+      "url": "https://raw.githubusercontent.com/susu801/EgoMonth/81143141d98b4511ff1adcae9a5ccf3a9f0f9606/README.md",
+      "ranges": [
+        [
+          1,
+          99
+        ]
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/susu801__EgoMonth/files/index.html",
+      "sha256": "7a45458d9d4dd4bf38ccf33b550735a67411a12c6f2a17bbc87ece757f919c48",
+      "repo": "susu801/EgoMonth",
+      "path": "index.html",
+      "commit": "81143141d98b4511ff1adcae9a5ccf3a9f0f9606",
+      "git_blob_sha": "94001bfac1d5c773b46a78abdc31f28530023ffe",
+      "url": "https://raw.githubusercontent.com/susu801/EgoMonth/81143141d98b4511ff1adcae9a5ccf3a9f0f9606/index.html",
+      "ranges": [
+        [
+          1,
+          218
+        ]
+      ],
+      "receipt_file": "audit/.cache/github_review_worker/P202_P209_2026-10-11/repos/susu801__EgoMonth/files/index.html.receipt.json"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/susu801__EgoMonth/tree.json",
+      "sha256": "ea40aecf02fb9a53f4092fa9ad5bc255e76de61fab1ba63611176279ce45b7e0",
+      "repo": "susu801/EgoMonth",
+      "commit": "81143141d98b4511ff1adcae9a5ccf3a9f0f9606",
+      "json_pointers": [
+        "/sha",
+        "/truncated",
+        "/tree"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/susu801__EgoMonth/manifest.json",
+      "sha256": "c9c4a97d10ce6fe1520aaa09624ddbd5ac929d9dce76930518a1685fc7f60021",
+      "json_pointers": [
+        "/commit",
+        "/commit_date",
+        "/metadata",
+        "/files/0"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/search/P202.json",
+      "sha256": "52dd4977b3420326940b6e179c2105b8b683fbb18adbac8dd5a19e28ad5b0253",
+      "json_pointers": [
+        "/query",
+        "/receipt",
+        "/results"
+      ]
+    },
+    {
+      "local_file": "audit/.cache/github_review/P202-discovery.json",
+      "sha256": "a997605b4e06258f1ebee9609e71247622da0dc3860d63dc97d7d9f8db71febe",
+      "json_pointers": [
+        "/title",
+        "/paper_url",
+        "/pdf_sha256",
+        "/candidates",
+        "/code_contexts"
+      ]
+    }
+  ],
+  "runtime_executed": false
+}

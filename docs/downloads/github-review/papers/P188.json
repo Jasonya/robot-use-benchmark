@@ -1,0 +1,621 @@
+{
+  "paper_id": "P188",
+  "name": "DRAPER",
+  "title": "DRAPER: Towards a Robust Robot Deployment and Reliable Evaluation for Quasi-Static Pick-and-Place Cloth-Shaping Neural Controllers",
+  "year": 2024,
+  "paper_url": "https://arxiv.org/abs/2409.15159",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "garment"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P188",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "DRAPER的來源分散在SoftGym擴充、Agent-Arena和real-robot介面；兩個倉庫已有改名。需固定三者版本、資料模式與task config，不能把同一布料環境的fork視為獨立benchmark。",
+    "environment": "共用SoftGym布料整形與realadapt towel場景；realadapt config宣告1000variation，但eval tier只取30、val取3。Franka/UR3e是另一硬體接口層，未執行。",
+    "tasks": "主要布料攤平/整形及跨sim-real適應；domain字串如rainbow-rectangular-fabrics是布料分佈設定，不是生活用途domain。多論文共享initial_states需建立reuse關係。",
+    "data": "TrajectoryDataset以observation/action/goal/trajectory_lengths存資料，T+1觀測對T個action並附terminal補0；whole/cross-trajectory模式與goal索引需驗證。實機接口RGB由BGR轉換，v1/v2 depth作單frame min-max並將背景置1，已非metric depth；action為4個[-1,1]pick-place座標另帶orientation。",
+    "evaluation": "Towel flattening成功需要keypoints全可見且normalized coverage≥0.99，canonical模式另加IoU。記錄coverage/improvement/形狀距離與首次成功步；perform_single可因environment done、agent terminate/success、arena success或max_steps終止，因此done不等於完成。當前towel.step呼叫reward參數數目與定義不同，正式adapter需修正/驗證。",
+    "standardization": {
+      "profile": "cloth_shaping_sim_to_real_control",
+      "reuse": "明確arena配置、eval/val初態索引、source改名關係、T+1 trajectory和real-depth/action轉換。",
+      "transform": "source分方法/框架/模擬/硬體repo角色；case固定init-state hash、觀測尺度、像素順序、policy checkpoint與停止條件；保留整形metric各自分母。",
+      "missing": "原DRAPER paper-era configuration/checkpoint對照、repo版本相容、reward/trajectory mode接口驗證、初態資產與全部pipeline重現。"
+    },
+    "version_note": "softgym-deepcloth解析到halid1020/softgym(8a21966)，agent-arena-v0解析到actoris_harena(4d9c9c9)，硬體庫405d4c2；目前generic框架不等於原論文固定實驗release。",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "halid1020/softgym",
+        "requested_repo": "halid1020/softgym-deepcloth",
+        "commit": "8a2196648c4ef6c4463ca862324bae442bcba22d",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            7
+          ],
+          [
+            32,
+            46
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 178,
+        "sha256": "49611eeceddfcc478d095b9696608b1fff8fd66c31a741d4543dc9c0a4ca730d",
+        "url": "https://github.com/halid1020/softgym/blob/8a2196648c4ef6c4463ca862324bae442bcba22d/README.md",
+        "reading_url": "https://github.com/halid1020/softgym/blob/8a2196648c4ef6c4463ca862324bae442bcba22d/README.md#L1-L7",
+        "why": "DRAPER/其他論文共用擴充與初態資料",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            19
+          ],
+          [
+            41,
+            45
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 100,
+        "sha256": "e65097f33c4e1f6696bb85c8acc52a64b4e0afcf4b712aeec970e0e028d63a0d",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/README.md",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/README.md#L1-L19",
+        "why": "Agent-Arena與共用SoftGym關係",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "agent_arena/api.py",
+        "ranges": [
+          [
+            80,
+            127
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 190,
+        "sha256": "30c8bd817499861557c65df18e37e0cc2b5d32907672c1c8f912760d405fcdaf",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/api.py",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/api.py#L80-L127",
+        "why": "eval configs與checkpoint、已存在結果跳過",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "agent_arena/arena/softgym/builder.py",
+        "ranges": [
+          [
+            7,
+            62
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 62,
+        "sha256": "3aa7ee9aa2866d673abc5be775b97e0003c3d15740267aae381d1238880e177c",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/arena/softgym/builder.py",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/arena/softgym/builder.py#L7-L62",
+        "why": "domain/task/action/picker設定解析",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "agent_arena/arena/softgym/builders/fabric_domain_builder.py",
+        "ranges": [
+          [
+            99,
+            112
+          ],
+          [
+            298,
+            318
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 773,
+        "sha256": "2a00903f37a220316bbbebc519da423bdd4ddd7dca2849f5e526ff7778d97c66",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/arena/softgym/builders/fabric_domain_builder.py",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/arena/softgym/builders/fabric_domain_builder.py#L99-L112",
+        "why": "flattening接線與1000variation中30eval/3val",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "agent_arena/arena/softgym/tasks/rect_fabric/towel_flattening.py",
+        "ranges": [
+          [
+            18,
+            55
+          ],
+          [
+            93,
+            162
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 300,
+        "sha256": "c129e41360b25cfeb32869201ff94c3df674b5d175fb794b9cc79944759b7846",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/arena/softgym/tasks/rect_fabric/towel_flattening.py",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/arena/softgym/tasks/rect_fabric/towel_flattening.py#L18-L55",
+        "why": "可見性/coverage成功與多種progress metrics",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "agent_arena/utilities/perform_single.py",
+        "ranges": [
+          [
+            7,
+            126
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 126,
+        "sha256": "58040c7952af0e2d3720157ad1683a70abfcb0eaed6534aa137451a90fe51adf",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/utilities/perform_single.py",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/utilities/perform_single.py#L7-L126",
+        "why": "終止、成功、動作耗時與逐步評估",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/actoris_harena",
+        "requested_repo": "halid1020/agent-arena-v0",
+        "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+        "ref": null,
+        "path": "agent_arena/utilities/trajectory_dataset.py",
+        "ranges": [
+          [
+            224,
+            269
+          ],
+          [
+            325,
+            374
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 398,
+        "sha256": "063b0f68469a376d9adabaa53fb531e9119872ee553599af7a4eb61b8d6c87c0",
+        "url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/utilities/trajectory_dataset.py",
+        "reading_url": "https://github.com/halid1020/actoris_harena/blob/4d9c9c92733f681da8327d31c4050f93faf49d3a/agent_arena/utilities/trajectory_dataset.py#L224-L269",
+        "why": "T+1觀測/terminal action補0與不同window模式",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/robot_control_cloth",
+        "requested_repo": "halid1020/robot_control_cloth",
+        "commit": "405d4c2ae433619d3c2931c1b3304260f4069cd0",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            7
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 165,
+        "sha256": "474a85a49b713de6d8974077434dfcbe1bb74c733dd30704a57977394acdcf40",
+        "url": "https://github.com/halid1020/robot_control_cloth/blob/405d4c2ae433619d3c2931c1b3304260f4069cd0/README.md",
+        "reading_url": "https://github.com/halid1020/robot_control_cloth/blob/405d4c2ae433619d3c2931c1b3304260f4069cd0/README.md#L1-L7",
+        "why": "DRAPER的ROS硬體接口角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "halid1020/robot_control_cloth",
+        "requested_repo": "halid1020/robot_control_cloth",
+        "commit": "405d4c2ae433619d3c2931c1b3304260f4069cd0",
+        "ref": null,
+        "path": "interface/agent_arena_interface.py",
+        "ranges": [
+          [
+            96,
+            125
+          ],
+          [
+            140,
+            186
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 285,
+        "sha256": "23dc066ef093775101b91be80af6ec2aa8e98731adf8773309d80f84bb6efa8a",
+        "url": "https://github.com/halid1020/robot_control_cloth/blob/405d4c2ae433619d3c2931c1b3304260f4069cd0/interface/agent_arena_interface.py",
+        "reading_url": "https://github.com/halid1020/robot_control_cloth/blob/405d4c2ae433619d3c2931c1b3304260f4069cd0/interface/agent_arena_interface.py#L96-L125",
+        "why": "normalized pixel action及real-depth轉換",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "5b31324706bde1aeb1cbe0ec4fc9293bfa36228b4e7b4e00beeec3ee645ab0aa"
+  },
+  "repository_binding_review_sha256": "5b31324706bde1aeb1cbe0ec4fc9293bfa36228b4e7b4e00beeec3ee645ab0aa",
+  "repository_bindings": [
+    {
+      "requested_repo": "halid1020/agent-arena-v0",
+      "resolved_repo": "halid1020/actoris_harena",
+      "aliases_in_this_review": [
+        "halid1020/actoris_harena",
+        "halid1020/agent-arena-v0"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "4d9c9c92733f681da8327d31c4050f93faf49d3a",
+          "reviewed_files": [
+            "README.md",
+            "agent_arena/api.py",
+            "agent_arena/arena/softgym/builder.py",
+            "agent_arena/arena/softgym/builders/fabric_domain_builder.py",
+            "agent_arena/arena/softgym/tasks/rect_fabric/towel_flattening.py",
+            "agent_arena/utilities/perform_single.py",
+            "agent_arena/utilities/trajectory_dataset.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/halid1020/agent-arena-v0/tree/main/agent_arena/agent/bc/diffusion",
+          "link_label": "Diffusion Policy",
+          "project_url": "https://sites.google.com/view/draper-pnp",
+          "page_sha256": "ffdd3ea11446dd7711f11e8f9a90137bf9e9379b83c52644da8f39d18721f0ea"
+        },
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/halid1020/agent-arena-v0/tree/main/agent_arena/configuration/train_and_evaluate/diffusion_policy",
+          "link_label": "Configurations",
+          "project_url": "https://sites.google.com/view/draper-pnp",
+          "page_sha256": "ffdd3ea11446dd7711f11e8f9a90137bf9e9379b83c52644da8f39d18721f0ea"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P188",
+          "review_file": "content/github_review/reviews/P188.json",
+          "review_sha256": "5b31324706bde1aeb1cbe0ec4fc9293bfa36228b4e7b4e00beeec3ee645ab0aa",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "halid1020/robot_control_cloth",
+      "resolved_repo": "halid1020/robot_control_cloth",
+      "aliases_in_this_review": [
+        "halid1020/robot_control_cloth"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "405d4c2ae433619d3c2931c1b3304260f4069cd0",
+          "reviewed_files": [
+            "README.md",
+            "interface/agent_arena_interface.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/halid1020/robot_control_cloth",
+          "link_label": "Robot Control Scripts",
+          "project_url": "https://sites.google.com/view/draper-pnp",
+          "page_sha256": "ffdd3ea11446dd7711f11e8f9a90137bf9e9379b83c52644da8f39d18721f0ea"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P188",
+          "review_file": "content/github_review/reviews/P188.json",
+          "review_sha256": "5b31324706bde1aeb1cbe0ec4fc9293bfa36228b4e7b4e00beeec3ee645ab0aa",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "halid1020/softgym-deepcloth",
+      "resolved_repo": "halid1020/softgym",
+      "aliases_in_this_review": [
+        "halid1020/softgym",
+        "halid1020/softgym-deepcloth"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "8a2196648c4ef6c4463ca862324bae442bcba22d",
+          "reviewed_files": [
+            "README.md"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "author_project_link",
+          "url": "https://github.com/halid1020/softgym-deepcloth",
+          "link_label": "Benchmarks and Oracles",
+          "project_url": "https://sites.google.com/view/draper-pnp",
+          "page_sha256": "ffdd3ea11446dd7711f11e8f9a90137bf9e9379b83c52644da8f39d18721f0ea"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P188",
+          "review_file": "content/github_review/reviews/P188.json",
+          "review_sha256": "5b31324706bde1aeb1cbe0ec4fc9293bfa36228b4e7b4e00beeec3ee645ab0aa",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "衣物與洗護"
+  ],
+  "source_review": {
+    "paper_id": "P188",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "DRAPER: Towards a Robust Robot Deployment and Reliable Evaluation for Quasi-Static Pick-and-Place Cloth-Shaping Neural Controllers；以本次PDF指紋固定來源。",
+    "scope_read": "原作資料構成、任務定義與實驗協定相關段落；閱讀範圍限所列PDF頁，非全文逐字或程式重現。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6
+    ],
+    "role": "柔性物操作benchmark",
+    "domains": [
+      "衣物與洗護"
+    ],
+    "environment": "RealAdapt Towels改SoftGym grasp近似；Franka與UR3e對照，camera/gripper差異顯式處理。",
+    "tasks": "flattening及3種foldpatterns：allcornersinward、corners-edgeinward、diagonal-cross。",
+    "cases": "flatteningtrain2Ktrajectories，foldtrain1K；UR3eablation每setting10trials。",
+    "native_counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "fold pattern definitions",
+        "pages": [
+          5,
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "UR3e ablation trials per setting",
+        "pages": [
+          6
+        ]
+      }
+    ],
+    "evaluation": [
+      "realflattening NC>95%且20steps內；simulation>99%/30steps；fold用IoU/proxy並承認自遮擋限制。"
+    ],
+    "evaluation_types": [
+      "數值誤差與相似度",
+      "環境狀態與過程檢查"
+    ],
+    "split": "materials/size/camera/platform泛化；各policy保持相近trainingbudget，非直接沿用原bestscore。",
+    "lineage": "既有四controller在共同deploymentframework；RealAdapt是grasping/physics規則衍生環境。",
+    "evidence": [
+      {
+        "pages": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "locator": "原作Dataset / Task / Evaluation段落及表格，詳見閱讀範圍",
+        "supports": "本列環境、任務、資料／題數、判分及重用關係；未報值不推估"
+      }
+    ],
+    "unresolved": [
+      "real與sim門檻不同不能混算同一SR；多層抓取和tweezerhardware要入taskinterface。"
+    ],
+    "reuse": "這類工作正是all-in-one需借鑑的共同執行/判分控制，而非只搬tasknames。",
+    "reviewed_pdf_sha256": "82f9a63cec8b5a6595ee60eff3f5f7d00bfb25d91cfd2fbe557897633d230632",
+    "reviewed_on": "2026-10-02",
+    "name": "DRAPER",
+    "year": 2024,
+    "title": "DRAPER: Towards a Robust Robot Deployment and Reliable Evaluation for Quasi-Static Pick-and-Place Cloth-Shaping Neural Controllers",
+    "source_url": "https://arxiv.org/abs/2409.15159",
+    "primary_type": "D",
+    "category_name": "布料／柔性物操作",
+    "domain_ids": [
+      "garment"
+    ],
+    "review_tags": [
+      "衣物與紡織"
+    ],
+    "domain_names": [
+      "衣物與洗護"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P188",
+      "domain_ids": [
+        "garment"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P188",
+          "domain_ids": [
+            "garment"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "flattening及3種foldpatterns：allcornersinward、corners-edgeinward、diagonal-cross。",
+            "RealAdapt Towels改SoftGym grasp近似；Franka與UR3e對照，camera/gripper差異顯式處理。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "82f9a63cec8b5a6595ee60eff3f5f7d00bfb25d91cfd2fbe557897633d230632"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "82f9a63cec8b5a6595ee60eff3f5f7d00bfb25d91cfd2fbe557897633d230632",
+      "previous_domain_ids": [
+        "garment"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "distance",
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P188",
+      "name": "DRAPER",
+      "expected_title": "DRAPER: Towards a Robust Robot Deployment and Reliable Evaluation for Quasi-Static Pick-and-Place Cloth-Shaping Neural Controllers",
+      "source_url": "https://arxiv.org/abs/2409.15159",
+      "pdf_url": "https://arxiv.org/pdf/2409.15159",
+      "retrieved_at": "2026-10-02T22:14:09.772488+00:00",
+      "pdf_sha256": "82f9a63cec8b5a6595ee60eff3f5f7d00bfb25d91cfd2fbe557897633d230632",
+      "text_sha256": "db868d3cfe9f0eeb17d5562d9a24cfa133dfacb1f819e0d0c3c05a248b0a216b",
+      "pdf_bytes": 2943912,
+      "pages": 8,
+      "text_characters": 54792,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2409.15159v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2409.15159v2"
+    },
+    "counts": [
+      {
+        "field": "task",
+        "value": 3,
+        "unit": "fold pattern definitions",
+        "pages": [
+          5,
+          6
+        ],
+        "record_id": "review10:P188:1",
+        "paper_id": "P188",
+        "benchmark": "DRAPER",
+        "native_term": "fold pattern definitions",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2409.15159v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2409.15159v2",
+            "locator": "PDF pp. 5, 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 10,
+        "unit": "UR3e ablation trials per setting",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P188:2",
+        "paper_id": "P188",
+        "benchmark": "DRAPER",
+        "native_term": "UR3e ablation trials per setting",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2409.15159v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2409.15159v2",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "halid1020/softgym",
+    "halid1020/actoris_harena",
+    "halid1020/robot_control_cloth"
+  ],
+  "external_repositories": []
+}

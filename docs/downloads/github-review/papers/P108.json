@@ -1,0 +1,454 @@
+{
+  "paper_id": "P108",
+  "name": "RoboArena",
+  "title": "RoboArena: Distributed Real-World Evaluation of Generalist Robot Policies",
+  "year": 2025,
+  "paper_url": "https://arxiv.org/abs/2506.18123",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home",
+    "food"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P108",
+    "summary": "RoboArena主庫是遠端policy接口，志工client收集實機A/B偏好與部分成功。它是跨站實機評測流程，不是固定題庫自動判分器。",
+    "environment": "DROID真實機器人各站點、相機和桌面設定；evaluation session記錄現場任務及A/B兩次rollout。自願站點數、機體、任務及試驗各是不同單位。",
+    "tasks": "現場人員先輸入任務，再分配A/B policies；人工重設同一初態，兩者是成對試驗，不是兩種任務。另連sim-evals是提交前模擬檢查。",
+    "data": "policy obs有wrist/exterior RGB、7joint/6cartesian/1gripper state與prompt；actions為N×8或N×7且整chunk執行。client存逐步state/action NPZ、3視角影片、session/command、partial/binary success及valid標記；控頻約15Hz但影片編碼10fps，媒體時間需對齊。",
+    "evaluation": "人員給0–100部分分數後除100，只有==1才binary成功；另給A/B/tie偏好、長文字和session有效性。主庫沒有本機全局排名scorer，中央服務未訪問；須保留人評protocol和成對初態／有效性，不能以主觀partial當物理predicate。",
+    "standardization": {
+      "profile": "distributed_real_robot_pairwise_evaluation",
+      "reuse": "policy介面、感測／action chunk需求、A/B session設計、人評與逐步證據schema。",
+      "transform": "environment記站點/配置，case記任務與reset證據；trial按session×policy獨立存，pairwise preference作比較記錄。去識別人員資訊，公開報表保留站點分組與有效性。",
+      "missing": "中央排名算法與完整資料存取、人工rubric一致性、各站機體/時間校準、實體任務初態對等及完整分母。"
+    },
+    "version_note": "主庫與志工client分開固定commit；後者owner名與原第一作者Pranav Atreya相符且明示RoboArena志工用途。未執行其服務登入、上傳或機器人指令。",
+    "reviewed_on": "2026-10-10",
+    "status": "selected_core_source_sections_reviewed",
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "robo-arena/roboarena",
+        "requested_repo": "robo-arena/roboarena",
+        "commit": "a07f93db004e2357aee931069a7011d7e52774ed",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            72
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 72,
+        "sha256": "e01a2eff7b82a386e1853d95c553171054d7af5c2635aeb4b21c07d1a2c70fd0",
+        "url": "https://github.com/robo-arena/roboarena/blob/a07f93db004e2357aee931069a7011d7e52774ed/README.md",
+        "reading_url": "https://github.com/robo-arena/roboarena/blob/a07f93db004e2357aee931069a7011d7e52774ed/README.md#L1-L72",
+        "why": "原benchmark、policy服務與DROID/模擬測試角色",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robo-arena/roboarena",
+        "requested_repo": "robo-arena/roboarena",
+        "commit": "a07f93db004e2357aee931069a7011d7e52774ed",
+        "ref": null,
+        "path": "roboarena/policy.py",
+        "ranges": [
+          [
+            7,
+            30
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 30,
+        "sha256": "7e430373aa802c311f2429fadb976d33fa836ab5cfaed3b0b7300d265b6df3ad",
+        "url": "https://github.com/robo-arena/roboarena/blob/a07f93db004e2357aee931069a7011d7e52774ed/roboarena/policy.py",
+        "reading_url": "https://github.com/robo-arena/roboarena/blob/a07f93db004e2357aee931069a7011d7e52774ed/roboarena/policy.py#L7-L30",
+        "why": "觀測欄位、action chunk和session reset",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "robo-arena/roboarena",
+        "requested_repo": "robo-arena/roboarena",
+        "commit": "a07f93db004e2357aee931069a7011d7e52774ed",
+        "ref": null,
+        "path": "roboarena/policy_server.py",
+        "ranges": [
+          [
+            12,
+            48
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 124,
+        "sha256": "9ddeb5fbf8b53592716623b1de7643110902936672e1105e8b8b4f4529881f04",
+        "url": "https://github.com/robo-arena/roboarena/blob/a07f93db004e2357aee931069a7011d7e52774ed/roboarena/policy_server.py",
+        "reading_url": "https://github.com/robo-arena/roboarena/blob/a07f93db004e2357aee931069a7011d7e52774ed/roboarena/policy_server.py#L12-L48",
+        "why": "相機需求、控制space及服務schema",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pranavatreya/roboarena_evaluator",
+        "requested_repo": "pranavatreya/roboarena_evaluator",
+        "commit": "5992b26f91a94137424c5f79d31119b8a14eb067",
+        "ref": null,
+        "path": "README.md",
+        "ranges": [
+          [
+            1,
+            9
+          ],
+          [
+            60,
+            75
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 106,
+        "sha256": "fc7cc6c7eb5c3515f6c2ed4a02f8edd8bd6e7ce64ed5f6ec0000c1008b4d3fe2",
+        "url": "https://github.com/pranavatreya/roboarena_evaluator/blob/5992b26f91a94137424c5f79d31119b8a14eb067/README.md",
+        "reading_url": "https://github.com/pranavatreya/roboarena_evaluator/blob/5992b26f91a94137424c5f79d31119b8a14eb067/README.md#L1-L9",
+        "why": "志工client的A/B偏好／部分分數／有效session流程",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "pranavatreya/roboarena_evaluator",
+        "requested_repo": "pranavatreya/roboarena_evaluator",
+        "commit": "5992b26f91a94137424c5f79d31119b8a14eb067",
+        "ref": null,
+        "path": "evaluation_client/main.py",
+        "ranges": [
+          [
+            385,
+            465
+          ],
+          [
+            474,
+            552
+          ],
+          [
+            552,
+            586
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 628,
+        "sha256": "e6be440c234b1659e085064bc36e2c18c82777750a4f6df446d36a1ce334fadc",
+        "url": "https://github.com/pranavatreya/roboarena_evaluator/blob/5992b26f91a94137424c5f79d31119b8a14eb067/evaluation_client/main.py",
+        "reading_url": "https://github.com/pranavatreya/roboarena_evaluator/blob/5992b26f91a94137424c5f79d31119b8a14eb067/evaluation_client/main.py#L385-L465",
+        "why": "15Hz控制、部分分數轉binary、媒體／NPZ回傳及人工reset",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "64d03c15f701cfaebf2408ad7088d8f0d481f3126237e78f1943b60ce8d6b6d4"
+  },
+  "repository_binding_review_sha256": "64d03c15f701cfaebf2408ad7088d8f0d481f3126237e78f1943b60ce8d6b6d4",
+  "repository_bindings": [
+    {
+      "requested_repo": "pranavatreya/roboarena_evaluator",
+      "resolved_repo": "pranavatreya/roboarena_evaluator",
+      "aliases_in_this_review": [
+        "pranavatreya/roboarena_evaluator"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "5992b26f91a94137424c5f79d31119b8a14eb067",
+          "reviewed_files": [
+            "README.md",
+            "evaluation_client/main.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "RoboArena",
+          "search_receipt_sha256": "57d1b284fab7a82df9f0dff6cf06c3fccae36640fe79576c7e99597c626e1ca6",
+          "url": "https://github.com/pranavatreya/roboarena_evaluator",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P108",
+          "review_file": "content/github_review/reviews/P108.json",
+          "review_sha256": "64d03c15f701cfaebf2408ad7088d8f0d481f3126237e78f1943b60ce8d6b6d4",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    },
+    {
+      "requested_repo": "robo-arena/roboarena",
+      "resolved_repo": "robo-arena/roboarena",
+      "aliases_in_this_review": [
+        "robo-arena/roboarena"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "a07f93db004e2357aee931069a7011d7e52774ed",
+          "reviewed_files": [
+            "README.md",
+            "roboarena/policy.py",
+            "roboarena/policy_server.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "repository_search_candidate",
+          "query": "RoboArena",
+          "search_receipt_sha256": "57d1b284fab7a82df9f0dff6cf06c3fccae36640fe79576c7e99597c626e1ca6",
+          "url": "https://github.com/robo-arena/roboarena",
+          "officiality": "requires_source_identity_review"
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P108",
+          "review_file": "content/github_review/reviews/P108.json",
+          "review_sha256": "64d03c15f701cfaebf2408ad7088d8f0d481f3126237e78f1943b60ce8d6b6d4",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔",
+    "餐飲與烹飪"
+  ],
+  "source_review": {
+    "paper_id": "P108",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "RoboArena，arXiv 2506.18123v2。",
+    "scope_read": "分散式A/B協定、偏好排名模型、DROID平台與完整實驗分母。",
+    "pages_read": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "domains": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "role": "分散式真實評測",
+    "environment": "7個學術機構使用DROID平台，evaluators自行選scene/task；沒有固定封閉的環境總數。",
+    "tasks": "開放指令集合，涵蓋數百task instructions；不是固定17task，17是外部窄基準比較。",
+    "cases": "超過600次pairwise評估；為建立oracle ranking，額外跑其餘5policies，全計4,284 policy rollouts。不能稱4,284獨立題。",
+    "native_counts": [
+      {
+        "field": "data",
+        "value": 7,
+        "unit": "參與機構（非scene）",
+        "pages": [
+          1
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4284,
+        "unit": "跨7policies的實測rollouts",
+        "pages": [
+          8
+        ]
+      }
+    ],
+    "evaluation": [
+      "双盲pairwise preference＋progress；擴充Bradley–Terry估計policy排名與task effects，另產生有影片證據的質性報告。"
+    ],
+    "evaluation_types": [
+      "人工或模型評審"
+    ],
+    "split": "連續累積開放評測；沒有一般train/test固定題庫；同一次A/B需相同task條件。",
+    "lineage": "DROID共同硬體/資料；RoboReward重用其真實成功／失敗rollouts。與RobotArena∞是不同工作。",
+    "related_paper_ids": [
+      "P111",
+      "P114"
+    ],
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          8
+        ],
+        "locator": "§3.1–3.2、§5.1–5.2",
+        "supports": "A/B、task-aware排名、4,284分母"
+      }
+    ],
+    "unresolved": [
+      "精確去重scene與語義task總量需要evaluation database，不從hundreds推成確定數。"
+    ],
+    "reuse": "可作開放題庫／偏好排名的評測方法參考；規模必須標明是rollouts還是task。",
+    "reviewed_pdf_sha256": "0f793633ba5767b6e93f01056dcd5c3357dabcaf70844cd0a157a364fa843698",
+    "reviewed_on": "2026-10-02",
+    "name": "RoboArena",
+    "year": 2025,
+    "title": "RoboArena: Distributed Real-World Evaluation of Generalist Robot Policies",
+    "source_url": "https://arxiv.org/abs/2506.18123",
+    "primary_type": "R",
+    "category_name": "穩健性、失敗與評測品質",
+    "domain_ids": [
+      "home",
+      "food"
+    ],
+    "review_tags": [
+      "居家生活",
+      "餐飲與料理",
+      "桌面物件操作",
+      "工具使用"
+    ],
+    "domain_names": [
+      "居家整理與清潔",
+      "餐飲與烹飪"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P108",
+      "domain_ids": [
+        "home",
+        "food"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P108",
+          "domain_ids": [
+            "home",
+            "food"
+          ],
+          "pages": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "開放指令集合，涵蓋數百task instructions；不是固定17task，17是外部窄基準比較。",
+            "7個學術機構使用DROID平台，evaluators自行選scene/task；沒有固定封閉的環境總數。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "0f793633ba5767b6e93f01056dcd5c3357dabcaf70844cd0a157a364fa843698"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "0f793633ba5767b6e93f01056dcd5c3357dabcaf70844cd0a157a364fa843698",
+      "previous_domain_ids": [
+        "home",
+        "food"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "judge"
+    ],
+    "receipt": {
+      "paper_id": "P108",
+      "name": "RoboArena",
+      "expected_title": "RoboArena: Distributed Real-World Evaluation of Generalist Robot Policies",
+      "source_url": "https://arxiv.org/abs/2506.18123",
+      "pdf_url": "https://arxiv.org/pdf/2506.18123",
+      "retrieved_at": "2026-10-02T21:34:18.958710+00:00",
+      "pdf_sha256": "0f793633ba5767b6e93f01056dcd5c3357dabcaf70844cd0a157a364fa843698",
+      "text_sha256": "65c4d6a6095dbed2cc0353eef436a13328d18231579f20ea66bc5dfde97989dc",
+      "pdf_bytes": 12267206,
+      "pages": 29,
+      "text_characters": 119948,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2506.18123v2",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2506.18123v2"
+    },
+    "counts": [
+      {
+        "field": "data",
+        "value": 7,
+        "unit": "參與機構（非scene）",
+        "pages": [
+          1
+        ],
+        "record_id": "review10:P108:1",
+        "paper_id": "P108",
+        "benchmark": "RoboArena",
+        "native_term": "參與機構（非scene）",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.18123v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.18123v2",
+            "locator": "PDF pp. 1",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "data",
+        "value": 4284,
+        "unit": "跨7policies的實測rollouts",
+        "pages": [
+          8
+        ],
+        "record_id": "review10:P108:2",
+        "paper_id": "P108",
+        "benchmark": "RoboArena",
+        "native_term": "跨7policies的實測rollouts",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2506.18123v2",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2506.18123v2",
+            "locator": "PDF pp. 8",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "robo-arena/roboarena",
+    "pranavatreya/roboarena_evaluator"
+  ],
+  "external_repositories": []
+}

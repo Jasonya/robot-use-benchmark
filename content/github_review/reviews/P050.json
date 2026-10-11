@@ -1,0 +1,94 @@
+{
+  "paper_id": "P050",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "已找到作者名下的PALM程式，README明列動作辨識、影像描述與語言模型預測三個模組；不能把論文引用的VideoBLIP倉庫當成PALM。",
+  "reading_order": [
+    {
+      "repo": "kim-sanghwan/PALM",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          9
+        ]
+      ],
+      "why": "核對精確論文身份及三階段輸入輸出。",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320"
+    },
+    {
+      "repo": "kim-sanghwan/PALM",
+      "path": "action_anticipation_module/EGO4D-prediction/utils/annotation_utils.py",
+      "ranges": [
+        [
+          1,
+          100
+        ]
+      ],
+      "why": "核對clip/video關係和原生verb/noun映射。",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320"
+    },
+    {
+      "repo": "kim-sanghwan/PALM",
+      "path": "action_anticipation_module/EGO4D-prediction/utils/eval_utils.py",
+      "ranges": [
+        [
+          1,
+          59
+        ]
+      ],
+      "why": "核對候選最小ED、前綴AUED與實際呼叫。",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320"
+    }
+  ],
+  "environment": "Ego4D影片與clip觀測脈絡；annotation_utils將clip_uid映到video_uid和影片scenario，這些不是機器人可互動場景。",
+  "tasks": "先取得辨識動作與影像caption，再預測未來verb/noun序列；本篇是重用既有長期動作預測資料的方法，不新增獨立機器人工作庫。",
+  "data": "README指定recognized-action JSON與caption JSON進入預測模組；annotation_utils保留clip/video關係，並將原生verbs/nouns詞彙及同義字映成taxonomy索引。",
+  "evaluation": "eval_utils對形狀N×Z×K的候選序列計正規化editdistance.eval，逐樣本取K候選最小值再平均；AUED對不同前綴長度的ED做梯形積分。K、Z和文字到標籤解析都影響分數。",
+  "standardization": {
+    "profile": "action_sequence_anticipation",
+    "reuse": "三段模型輸入路徑、clip/video血緣、詞彙映射、候選序列與ED/AUED程式。",
+    "transform": "建立以原生clip與觀測截止點為鍵的forecast case；分開模型可見的辨識動作、caption、未來GT及候選預算，保留taxonomy和解析規則版本。",
+    "missing": "原始影片、辨識/caption中間檔與split閉合；需核對原作配置的預測長度、候選數及依賴版本，並接回正式Ego4D評測。"
+  },
+  "version_note": "固定commit為7d4e6cd6426a51857214cdd3ec818568624ab320。metric註解提到Damerau，但實作呼叫editdistance.eval；移植時應保持函式及套件版本，不能只照註解更換公式。annotation_utils也有作者本機絕對路徑，需改成版本化資料引用。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "kim-sanghwan/PALM",
+      "path": "README.md",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320",
+      "sha256": "019b68fb2685e65218821c8c91d908a2c90884a965c34c9c08a273d0abfc4068",
+      "url": "https://raw.githubusercontent.com/kim-sanghwan/PALM/7d4e6cd6426a51857214cdd3ec818568624ab320/README.md",
+      "permalink": "https://github.com/kim-sanghwan/PALM/blob/7d4e6cd6426a51857214cdd3ec818568624ab320/README.md",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/kim-sanghwan__PALM/README.md"
+    },
+    {
+      "repo": "kim-sanghwan/PALM",
+      "path": "action_anticipation_module/EGO4D-prediction/utils/annotation_utils.py",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320",
+      "sha256": "cc7cea6d020ddad177e73f4ee03ea83b57da4f2dc58f09eece5dbc8b10e13bbd",
+      "url": "https://raw.githubusercontent.com/kim-sanghwan/PALM/7d4e6cd6426a51857214cdd3ec818568624ab320/action_anticipation_module/EGO4D-prediction/utils/annotation_utils.py",
+      "permalink": "https://github.com/kim-sanghwan/PALM/blob/7d4e6cd6426a51857214cdd3ec818568624ab320/action_anticipation_module/EGO4D-prediction/utils/annotation_utils.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/kim-sanghwan__PALM/action_anticipation_module/EGO4D-prediction/utils/annotation_utils.py"
+    },
+    {
+      "repo": "kim-sanghwan/PALM",
+      "path": "action_anticipation_module/EGO4D-prediction/utils/eval_utils.py",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320",
+      "sha256": "91cf4c95a7e7a299b9b97429207e099e7959a37821ebb1b9f204d1a0d252f4f4",
+      "url": "https://raw.githubusercontent.com/kim-sanghwan/PALM/7d4e6cd6426a51857214cdd3ec818568624ab320/action_anticipation_module/EGO4D-prediction/utils/eval_utils.py",
+      "permalink": "https://github.com/kim-sanghwan/PALM/blob/7d4e6cd6426a51857214cdd3ec818568624ab320/action_anticipation_module/EGO4D-prediction/utils/eval_utils.py",
+      "local_path": "audit/.cache/github_review_worker/P044-P091/files/kim-sanghwan__PALM/action_anticipation_module/EGO4D-prediction/utils/eval_utils.py"
+    }
+  ],
+  "identity_note": "GitHub精確名稱搜尋找到kim-sanghwan/PALM；README自述為ECCV2024 PALM官方實作，論文標題與作者Sanghwan Kim相符。原PDF只列VideoBLIP等引用，已分開處理。",
+  "additional_repo_proposals": [
+    {
+      "repo": "kim-sanghwan/PALM",
+      "commit": "7d4e6cd6426a51857214cdd3ec818568624ab320",
+      "basis": "README第1–9行與論文精確題名/作者相符；已核讀主要annotation與evaluation程式。",
+      "suggested_role": "author_method_implementation"
+    }
+  ]
+}

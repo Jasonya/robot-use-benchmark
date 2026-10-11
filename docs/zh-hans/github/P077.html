@@ -1,0 +1,116 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CLIPort｜GitHub怎么读与整理 · Robot-use Benchmark</title>
+  <meta name="description" content="CLIPort已追到Ravens/PyBullet的bowl／rope任务、示范读写与Task.reward/is_match。mean_reward可含部分分数；bowl文字目标与checker有一对一配对落差，且eval没有按episode seed重设Python random，不能保证完全重建示范语义变体。"><meta name="theme-color" content="#146e5b"><link rel="canonical" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P077.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://jasonya.github.io/robot-use-benchmark/zh-hant/github/P077.html"><link rel="alternate" hreflang="zh-Hans" href="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P077.html">
+  <meta property="og:type" content="website"><meta property="og:title" content="CLIPort｜GitHub怎么读与整理 · Robot-use Benchmark"><meta property="og:description" content="CLIPort已追到Ravens/PyBullet的bowl／rope任务、示范读写与Task.reward/is_match。mean_reward可含部分分数；bowl文字目标与checker有一对一配对落差，且eval没有按episode seed重设Python random，不能保证完全重建示范语义变体。"><meta property="og:url" content="https://jasonya.github.io/robot-use-benchmark/zh-hans/github/P077.html"><meta property="og:image" content="https://jasonya.github.io/robot-use-benchmark/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../../assets/site.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/survey-union.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/counting.css?v=081237f01e25">
+  <link rel="stylesheet" href="../../assets/coverage.css?v=081237f01e25">
+
+
+<link rel="stylesheet" href="../../assets/github-review.css?v=081237f01e25">
+
+  <script>document.documentElement.classList.add('js');</script><script>window.ROBOT_SITE={"locale":"zh-hans","route":"github/P077.html","title":"CLIPort｜GitHub怎么读与整理","kind":"github-paper","localeRoot":"../","searchIndexURL":"../../assets/search-zh-hans.js?v=081237f01e25","text":{"copied":"已拷贝链接","copyFallback":"请拷贝浏览器网址列的链接","searchMatches":"符合的结果：","searchLoading":"正在加载搜索索引…","searchLoadFailed":"搜索索引暂时未能加载，请稍后再试；章节与数据库仍可直接阅读。","searchHint":"可搜索章节、对象、论文名称或 ID，例如「折衣」「记忆」「SC-H15」「Ego4D」。","noSearch":"没有找到结果，试试较短的关键字或 ID。","showing":"显示","records":"笔","allShown":"已显示全部","paginate":"分页显示","showAll":"显示全部","shareResults":"拷贝目前筛选的链接","continueReading":"继续上次阅读","demoA":"相同毛巾，目标 A 沿长轴折叠。核对边缘配对、层次、形状与稳定释放。","demoB":"更换示范，目标 B 沿短轴折叠。场景不变，行为必须跟随新的目标。","kinds":{"chapter":"章节","task":"情境蓝图","family":"任务家族","paper":"文献","probe":"Ego 观测题型","metric":"评测指针","reference":"参考资料","native":"原生来源纪录"},"native":{"source":"来源","unit":"原生单位","definition":"定义路径","aliases":"原生别名／层级对应","assets":"场景文件引用","viewSource":"查看固定版本的原作定义／设置","staticOnly":"本卡记录来源索引；任务环境规格的对齐和运行验证分别记录。","configOnly":"已标示：仅场景／轨迹配置衍生 class","datasetYes":"有 dataset registry 对应","datasetNo":"任务目录项；未出现在该 dataset registry","details":"索引出处与对应细节","empty":"没有符合的索引条目","showing":"显示","records":"笔索引条目","units":{"activity_definition_directory":"活动定义目录","native_task_id":"原作任务ID","native_task_class":"原作任务类别","native_task_registration":"原作任务注册","native_task_module":"原作任务模块","demo_entrypoint":"示范程序入口","task_scene_entrypoint":"任务场景入口","native_task_schema":"任务schema","generator_configuration":"生成器设置","integration_registration_group":"框架注册组","evaluation_protocol":"评测协定","video_task_schema":"视频／任务题型","human_sim_task_mapping":"人类／模拟任务对应","native_task_template":"任务模板","instructional_activity_definition":"人类活动定义","native_task_definition":"原作任务定义","information_task_schema":"信息题型定义"},"buckets":{"native_task_candidates":"原作robot任务条目（待对齐）","integration_or_protocol":"集成框架／协定／生成配置","video_pairing":"视频配对／认知 schema","documented_examples":"示范程序入口","human_activity_definitions":"人类活动／流程定义（视频来源）","information_task_definitions":"信息任务／问答题型定义"},"recordMeaning":"索引型态","meaningByBucket":{"native_task_candidates":"原作者列出的robot任务条目；在本库等待共同规格与来源对齐。","human_activity_definitions":"人类活动类别与流程来源，可对应多部视频；任务环境另建对应。","integration_or_protocol":"框架注册、协定或生成设置，可指向多个任务／样本；一条索引不等于一个环境。","video_pairing":"视频题型或人类／模拟任务对应；观测数据与物理环境规格分开。","documented_examples":"示范程序入口；可作定义与实作线索，尚不直接代表独立环境。","information_task_definitions":"原作的信息任务或问题类型；题目实数另外按question_id或case_id计数。"}}}};</script>
+  <script defer src="../../assets/site.js?v=081237f01e25"></script></head>
+  <body><a class="skip-link" href="#main-content">跳至主要内容</a><header class="site-header"><div class="wrap header-inner">
+  <a class="brand" href="../index.html"><span class="brand-mark"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><path d="M4 6h5v5H4zM15 6h5v5h-5zM4 17h5v5H4zM15 17h5v5h-5z"/><path d="M9 8.5h6M6.5 11v6M17.5 11v6M9 19.5h6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span><span>Robot-use Benchmark<small>RESEARCH ATLAS</small></span></a>
+  <nav class="primary-nav" id="primary-nav" aria-label="主要导览"><a href="../coverage.html">覆盖与比较</a><a href="../native-tasks.html">任务清单</a><a href="../survey-union.html">来源名录</a><a href="../design.html">整体设计</a><a href="../collection-pipeline.html">数据流程</a><a href="../github-review.html" class="active" aria-current="page">GitHub核读</a><a href="../library.html">文献</a><a class="mobile-search" href="../search.html">全文搜索</a></nav>
+  <div class="header-tools"><button class="search-trigger js-only" aria-label="搜索整个网站" aria-haspopup="dialog"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><kbd>/</kbd></button>
+  <div class="language-switch" aria-label="语言"><a href="../../zh-hant/github/P077.html" data-locale="zh-hant" hreflang="zh-Hant">繁體</a><a href="P077.html" data-locale="zh-hans" hreflang="zh-Hans" aria-current="true">简体</a></div>
+  <button class="menu-button" aria-controls="primary-nav" aria-expanded="false">菜单</button></div></div></header><main class="wrap github-paper" id="main-content">
+    <div class="page-head"><div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>P077 · CLIPort</span></div><div class="eyebrow">RESEARCH ATLAS</div><h1>P077 · CLIPort</h1><p class="lede">CLIPort: What and Where Pathways for Robotic Manipulation</p></div>
+    <div class="github-paper-links"><a href="../github-review.html">返回逐篇总表</a><span class="github-status core">内核内容已核读</span>
+      <span>benchmark／数据／评测主来源</span><a href="https://arxiv.org/abs/2109.12098" target="_blank" rel="noopener noreferrer">原作 ↗</a>
+      <a href="../coverage.html#source-p077">用途与原生规模依据</a>
+    </div>
+    <p class="github-scope">核读快照 2026-10-11。已读范围限所列片段；本轮未运行上游程序。</p>
+    <p class="github-summary">CLIPort已追到Ravens/PyBullet的bowl／rope任务、示范读写与Task.reward/is_match。mean_reward可含部分分数；bowl文字目标与checker有一对一配对落差，且eval没有按episode seed重设Python random，不能保证完全重建示范语义变体。</p>
+    <aside class="github-version"><b>版本与身份</b><p>本轮固定cliport/cliport@2be5c47b5bb9bb7040ad90693288b87b1e18e7ad（2023-05-22），晚于2021v1；未取得论文实验的逐项commit对照。README承认部分seen/unseen train相同、多任务Google对象训练集较小及旋转augmentation与方向语句冲突。记录的是所列选读区段；不声称全仓库／完整数据／实机实验已验证。</p><p>固定论文为 Shridhar、Manuelli、Fox 的 CLIPort: What and Where Pathways for Robotic Manipulation，arXiv:2109.12098v1／CoRL 2021。PDF 的 code-availability 指向 cliport.github.io；仓库 README 1–9 同时吻合题名、三位作者、arXiv 与项目网址，足以确认 cliport/cliport 为本论文官方程式。openai/CLIP 与 Ravens 是重用依赖，不能另算 CLIPort benchmark。</p></aside>
+    <dl class="github-five-fields"><div><dt>领域</dt><dd>包装、仓储与物流、通用对象与机动作业</dd></div><div><dt>环境</dt><dd>PyBullet 桌面 UR5／预设吸盘；agent有三个480×640无噪RGB-D视角，oracle另有俯视图像与segmentation。示范与评测入口将physics设为480Hz，但每笔数据是完成pick/place primitive并等待物体静止后的决策步，不能当480fps视频。工作区x=[0.25,0.75]、y=[-0.5,0.5]公尺；Task bounds的z上限0.3，dataset/action bounds为0.28，需按用途保留。实机Franka结果不等于此UR5环境可直接重播。</dd></div><div><dt>任务</dt><dd>任务文件的10个goal-conditioned家族需与seen/unseen/full属性子集及seq流程分开。已读PutBlockInBowl：随机1–3个碗、1至碗数个block、6个distractor，语言指定两种颜色；goal=(objects,matches,target_poses,replace,rotations,metric,params,max_reward)，步数重设为blocks+1。seen与unseen类别在train均取TRAIN_COLORS，unseen只在非train改EVAL_COLORS。AlignRope是20节绳／四种边方向、可正反向匹配；节数、语句变化与生成seed均不能当添加任务数。</dd></div><div><dt>题数与数据</dt><dd>RavensDataset把同一episode写成color/depth/action/reward/info五个目录下的{episode_id:06d}-{seed}.pkl；color为uint8、depth为float32公尺。串行元素为(obs,act,reward,info)，最后一笔act=None；reward是到达该obs的前一步回馈。act.pose0/pose1各是(position_xyz公尺,quaternion_xyzw)；info含lang_goal及object_id→(pos,rot,dimensions)特权状态。读入后以3.125mm/pixel融合成320×160×6 RGB+重复三次height，p0_theta固定0、p1_theta为相对负yaw（弧度）。seq以i+1为goal，其他任务用末帧。train seed从0每次+2，val从1、test从10001每次+2；只保存oracle总reward&gt;0.99，实际case数须枚举落地文件，不能用要求生成的n或README估计值替代。</dd></div><div><dt>评估方式</dt><dd>callchain：eval.main→ds.load(i)/seed→env.reset（Python random非逐case重设）→最多task.max_steps次env.step→Task.reward→is_match或zone点覆盖。pose逐object在可配对target中找到任一匹配即加max_reward/objects；is_match只看XY距离与对称性处理的z-yaw，不看高度，bowl容差0.05m、rope0.02m。zone算局部座标点落入矩形范围且低于z上限的比例。reward为累计完成度差值，完成当前goal后弹出相应语言；done是goals空或_rewards&gt;0.99，primitive timeout也会直接done=True且reward=0。结果JSON保存episodes=(total_reward,last_info)与mean_reward；预设n_demos=100、n_repeats=1，test_best依val mean_reward选模型（未找到则last.ckpt）。因此不得把done、mean_reward与二元success混用。</dd></div></dl>
+    <details class="github-native-counts"><summary>原作数字：保留论文的单位与页码</summary><p>下列为既有原文审阅摘录；GitHub快照和本库取得范围另见上文，不互相代替。</p><ul><li><strong>10</strong> language-conditioned Ravens task types · 原文页 6</li><li><strong>100</strong> evaluation runs per setting · 原文页 6</li></ul></details>
+    <h2 id="reading">依这个顺序读</h2>
+    <ol class="github-reading"><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/README.md#L1-L18" target="_blank" rel="noopener noreferrer"><code>README.md</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>身份、四阶段 train/val/test 流程、重复训练集与 SE(2) augmentation 限制。</p><small>L1–18 · L121–148 · L273–284 · L319–331</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 78b0cb666583ae89c57f1b56dc26875eac3c0abd3b4df39289715f09c4ca56b8</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/README.md#L1-L58" target="_blank" rel="noopener noreferrer"><code>cliport/tasks/README.md</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>10 个 goal-conditioned 原生任务家族与 seen/unseen/full/seq 标签、Ravens 重用及修改 COM 的资产。</p><small>L1–58 · L60–66</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 b3b656e4aafd231c0dc45f3cf431d9b5981ea8458f0e3120ee1ccd0b68688393</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/put_block_in_bowl.py#L11-L99" target="_blank" rel="noopener noreferrer"><code>cliport/tasks/put_block_in_bowl.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>具体语言、对象数、goal tuple、5cm XY 容差、步数和颜色切分。</p><small>L11–99</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 13530c4909bc76cbd6a1b1493b2a9bebb836c9870e21272783ba8cff49d0c4f8</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/align_rope.py#L14-L104" target="_blank" rel="noopener noreferrer"><code>cliport/tasks/align_rope.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>20 节绳、四个方向描述、可反向 match matrix 与20步上限；不是20个独立case。</p><small>L14–104</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 f43fc2a0a9514b06b41de1bfdda72b96bb0ad4bc1bd519f743327b8ca617d5b3</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/cameras.py#L7-L58" target="_blank" rel="noopener noreferrer"><code>cliport/tasks/cameras.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>三个480×640 RGB-D视角与只供oracle使用的俯视相机。</p><small>L7–58</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 346563c741af91abae8b7af5945e2dd7c1f591d835e936374dc03e13ebba0dab</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/environments/environment.py#L20-L84" target="_blank" rel="noopener noreferrer"><code>cliport/environments/environment.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>pose0/pose1运行、settle后计分、timeout终止、depth还原与特权info。</p><small>L20–84 · L149–151 · L198–233 · L250–301 · L305–323</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 7e5cfb7247c5b12ff60685648d3aab7297194b44d73b3efe603ec2ae4ae94fee</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/demos.py#L15-L89" target="_blank" rel="noopener noreferrer"><code>cliport/demos.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>偶／奇seed与test偏移、macro-action步记录、只保存总reward&gt;0.99的示范。</p><small>L15–89</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 938dd9e385554da6c47084102a9504ff4333d4858822f8bc7c072a91ec0a1c9a</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/dataset.py#L24-L208" target="_blank" rel="noopener noreferrer"><code>cliport/dataset.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>五个pickle字段、seed命名、heightmap/角度标签、sequential goal选择与多任务切分。</p><small>L24–208 · L243–263 · L395–449</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 30f21291a194722284892fa57bf7f67ecaa86d57d7c39fffbf94da34c82a517d</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/tasks/task.py#L19-L54" target="_blank" rel="noopener noreferrer"><code>cliport/tasks/task.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>pose与zone的真正checker、delta reward、goal推进及done语义。</p><small>L19–54 · L165–227 · L229–270 · L316–323</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 5dd28eefa22925f949edf575d3b85084111c9ca74674c92ca8d5debf5d9d4109</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/eval.py#L16-L49" target="_blank" rel="noopener noreferrer"><code>cliport/eval.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>依示范seed重建case、累积reward平均与val最佳checkpoint挑选。</p><small>L16–49 · L83–165 · L168–215</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 559a37fe368dd9d0209b7d7ee46ff49fde52509762f9dd160a4d559f52807c13</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/cfg/eval.yaml#L10-L38" target="_blank" rel="noopener noreferrer"><code>cliport/cfg/eval.yaml</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>预设100个val instances、一次repeat与路径依赖。</p><small>L10–38</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 2385d67cd065e2efd5eb2ab8a33948500c2c866a6eadb0b3486ea884c39eb36e</code></details>
+    </li><li>
+      <div class="github-file-head"><a href="https://github.com/cliport/cliport/blob/2be5c47b5bb9bb7040ad90693288b87b1e18e7ad/cliport/utils/utils.py#L773-L780" target="_blank" rel="noopener noreferrer"><code>cliport/utils/utils.py</code> ↗</a><span>GitHub · cliport/cliport · 2be5c47b5b</span></div>
+      <p>确认Python random只随train_run初始化；eval每case的env.seed只改局部NumPy RNG。</p><small>L773–780</small>
+      <details class="github-hash"><summary>内容指纹</summary><code>SHA256 930285f2ae9155a4e867143d6a92cbced96e961c10b3fe39b242316eb12139ea</code></details>
+    </li></ol>
+
+    <h2 id="mapping">怎么接入我们的benchmark</h2>
+    <div class="github-mapping"><section><h3>可重用</h3><p>重用task class与原生属性切分、goal tuple、语言顺序、episode seed、相机与pose-action字段、具体reward/checker。</p></section><section><h3>需要转换</h3><p>source绑paper edition+commit；environment绑资产／相机／物理设置；task保留家族及seen/unseen/full/seq；case以task+mode+seed+示范文件识别并保存五档引用；evaluator分列delta_reward、total_reward、done及终止原因。把世界座标、公尺、xyzw、heightmap投影和特权info可见性写入profile；同一train数据的seen/unseen别名记reuse关系。</p></section><section><h3>仍需补齐</h3><p>尚未闭合Google Scanned Objects修改COM后资产、所有case档与实机采集格式。PutBlockInBowl注解要求每block放不同碗，goal也设replace=False，但reward丢弃replace并逐对象独立匹配，不消耗target；加上只验XY，需协调者明列原生checker限制，不能宣称严格一对一装碗或3D落碗验证。val_best只取目录第一个匹配results-val档，且n_repeats共用同checkpoint／case seed，需固定文件与replicate定义才能可比较。另有seed再现性缺口：demos.py同时以episode seed重设np.random与Python random；eval.py只在repeat开始用train_run调用utils.set_seed，逐case仅重设np.random及env.seed，而env.seed只创建self._random。PutBlockInBowl等任务的random.sample颜色未按case重设，因此存下seed不等于已验证同一示范场景／语句；需保存或修订完整RNG协定。</p></section></div>
+    <details class="github-discovery"><summary>查看来源确认纪录</summary><pre><code>[
+  {
+    &quot;local_file&quot;: &quot;audit/.cache/github_review/P077-discovery.json&quot;,
+    &quot;selected_json_pointers&quot;: [
+      &quot;/title&quot;,
+      &quot;/paper_url&quot;,
+      &quot;/pdf_sha256&quot;,
+      &quot;/code_contexts/1&quot;
+    ],
+    &quot;paper_version&quot;: &quot;2109.12098v1&quot;,
+    &quot;pdf_sha256&quot;: &quot;3cc19664beabda203cb1a1ad86659f75f60a099189820d92d59d20067c9ab003&quot;,
+    &quot;finding&quot;: &quot;論文作者／版次與 benchmark、code availability 文字相符；README 交叉確認官方身份。&quot;,
+    &quot;sha256&quot;: &quot;618eb5eed4f937847728c2982cba6e15040a5f984e1cbfb58cf7ea7e9c19c79f&quot;,
+    &quot;text_excerpts&quot;: [
+      {
+        &quot;json_pointer&quot;: &quot;/opening_text&quot;,
+        &quot;character_range&quot;: [
+          860,
+          898
+        ],
+        &quot;text&quot;: &quot;arXiv:2109.12098v1 [cs.RO] 24 Sep 2021&quot;,
+        &quot;scope&quot;: &quot;僅選讀精確arXiv版次戳記；完整論文身份另由title、authors及repository README交叉確認。&quot;
+      }
+    ]
+  }
+]</code></pre></details>
+    <div class="github-paper-links"><a href="../github-standard.html">共同结构与格式说明 →</a><a href="../../downloads/github-review/papers/P077.json" download>本篇JSON与证据 ↓</a></div>
+    <nav class="github-adjacent" aria-label="逐篇阅读"><a href="P076.html">← 上一篇 · Ravens / Transporter Networks</a><a href="P078.html">下一篇 → · PerAct</a></nav>
+  </main><footer class="site-footer"><div class="wrap"><div class="footer-top"><div><strong>Robot-use Benchmark</strong><br>前作总库 → Survey分类 → 任务联集 → 任务与规则扩充。</div>
+  <div class="footer-links"><a href="../github-report.html">完整整理与逐篇报告</a><a href="../../downloads/github-review/robot-use-source-atlas-zh-hans.pdf">完整整理PDF · 2026-10-11</a><a href="../coverage.html">覆盖总览与前作比较</a><a href="../design.html">目前主设计</a><a href="../research.html">文献与分类</a><a href="../counting.html">计数细节与旧代号</a><a href="../../downloads/source-review/source-review-zh-hans.pdf">用途归纳PDF · v0.11快照</a><a href="../../downloads/current-report-zh-hant.pdf">历史完整PDF · 9/29快照</a><a href="https://github.com/Jasonya/robot-use-benchmark" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div>
+  <p class="footer-note">v0.11：250篇原作初筛、183份关键章节审阅、672笔原生数量摘录；183/183份来源完成21类用途归纳；4类判分分项保留。GitHub核读增补：250/250篇有处理结果，范围与程序运行分开。旧配额已撤回，全库任务与环境去重仍待完成。 <a href="../github-review.html">逐篇GitHub与标准化 →</a></p></div></footer>
+  <dialog class="search-dialog" id="global-search" aria-label="搜索整个网站"><div class="dialog-search-head"><svg viewBox="0 0 24 26" aria-hidden="true" fill="currentColor"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="global-search-input" type="search" autocomplete="off" placeholder="搜索章节、任务或文献…" aria-label="关键字" aria-describedby="global-search-help"><button id="close-search" aria-label="关闭搜索">Esc</button></div><p class="search-help" id="global-search-help" aria-live="polite"></p><div class="search-results" id="global-search-results"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div></body></html>

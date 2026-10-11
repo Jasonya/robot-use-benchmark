@@ -1,0 +1,41 @@
+{
+  "paper_id": "P216",
+  "reviewed_on": "2026-10-11",
+  "status": "public_readme_only",
+  "summary": "HAP官方GitHub目前只有接受後公開的承諾。原文可提供hand-driven head-motion prediction的格式與評估參考，但沒有可核讀的模型/資料處理實作。",
+  "reading_order": [
+    {
+      "repo": "HAP-ego/HAP",
+      "commit": "525d603983f492aea36359c87a2451e262ce2ebb",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "why": "目前只承諾paper接受後發布程式/重現資料"
+    }
+  ],
+  "environment": "EgoPAT3Dv2與新增Bottle的ego RGB-D；Bottle382clips來自12sessions，10train/1val/1test。session不是直接可執行robot environment。",
+  "tasks": "以觀測手部motion、target intention與occlusion context預測未來6-DoF頭部運動；不是已完成robot active-camera control或grasping benchmark。",
+  "data": "原文用camera motion作head proxy，DA3估計/平滑、另以ORB-SLAM3對照；9D輸出含translation與rotation representation。Bottle手/物件由視覺模型和depth處理，需保留estimated標記、split與觀測窗口。",
+  "evaluation": "四指標tADE/tFDE(毫米)、rADE/rFDE(SO3 geodesic角度)。不同pose-estimation backend、平滑/觀測長度/預測horizon必須固定；沒有code時不能確認causal preprocessing或masked未來步的計分。",
+  "standardization": {
+    "profile": "hand_conditioned_egocentric_head_motion_prediction",
+    "reuse": "Bottle session split、6DoF/9D表示、角度/位置分項誤差與遮擋條件。",
+    "transform": "case保存camera/head proxy來源、hand/object annotation方法、observed prefix/horizon/有效未來mask；head motion prediction與控制攝影機效益另分evaluator。",
+    "missing": "公開implementation、Bottle clip IDs/annotations、表示/尺度/clock與scorer、causal feature處理及基線重現。"
+  },
+  "version_note": "固定525d603 README6行；原作2609.18548明說code will be released。未因repo存在就計為核心程式已公開。",
+  "runtime_executed": false,
+  "discovery_evidence": {
+    "paper_url": "https://arxiv.org/abs/2609.18548",
+    "pdf_sha256": "0cbfc4268916f842b362862865080ed9f76fbefdab51c290d6e567b9e03abf8a",
+    "paper_pages_read": [
+      5,
+      6
+    ],
+    "search_receipts": []
+  }
+}

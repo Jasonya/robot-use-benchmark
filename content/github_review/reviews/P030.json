@@ -1,0 +1,126 @@
+{
+  "paper_id": "P030",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EgoPlan-Bench 使用 EPIC-100／Ego4D 的人類影片做下一步四選一；已核讀 sample schema、Video-LLaMA 介面與實際比較方式。EgoPlan-IT 是另外的訓練資料。",
+  "reading_order": [
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "README.md",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "ranges": [
+        [
+          1,
+          176
+        ],
+        [
+          205,
+          263
+        ]
+      ],
+      "why": "原生訓練／評測量、欄位與父資料"
+    },
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "src/__init__.py",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "ranges": [
+        [
+          1,
+          11
+        ]
+      ],
+      "why": "模型介面入口"
+    },
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "src/egoplan_video_llama_interface.py",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "ranges": [
+        [
+          32,
+          64
+        ],
+        [
+          70,
+          78
+        ],
+        [
+          81,
+          92
+        ],
+        [
+          95,
+          109
+        ],
+        [
+          138,
+          160
+        ],
+        [
+          169,
+          175
+        ]
+      ],
+      "why": "合法影片讀取與四選項 loss"
+    },
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "eval_multiple_choice.py",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "ranges": [
+        [
+          1,
+          78
+        ]
+      ],
+      "why": "實際文字比較及入口變數問題"
+    }
+  ],
+  "environment": "來源為既有 EPIC-100 與 Ego4D。video_source/video_id 連原影片，目標與進度是題目上下文，不能把同影片不同目標當新實體環境。",
+  "tasks": "給 task_goal、進度片段與當前觀測，選最合理下一步。原檔案列 Val 3,355、Test 1,584（隱藏 GT）、IT 50K；額外 164K 通用 instruction 不屬測試題數。",
+  "data": "sample_id、video_source、video_id、task_goal、choice_a–d、golden_choice_idx、answer、current_observation_frame、task_progress_metadata 的 narration/start/stop_frame。Ego4D 介面只取最近4個 action、每個8 frames，再加當前影格；不足片段以 padding+clip_mask 補齊。",
+  "evaluation": "介面對四個候選計模型 loss，取 argmin 回傳候選文字；eval_multiple_choice.py 將該文字與 sample.answer 完全比較，再算 accuracy。對外 submission 則是 sample_id+label A–D，兩種表示需顯式對映。",
+  "standardization": {
+    "profile": "video_next_action_mcqa",
+    "reuse": "目標／進度／當前影格與候選 schema、兩個父庫對映、四選一 loss scoring。",
+    "transform": "source 分 Bench-Val／Bench-Test／IT，case ID 留原 sample_id、video_source、video_id 與 frame 範圍；記合法 action 邊界資訊、最近4片段與取樣預算。輸出同時保留候選索引／原字串與 choice2loss，未見 label 不補 GT。",
+    "missing": "未下載影片／IT、執行模型或提交。入口引用未定義 subset_name（列印與 predict_choice 呼叫），需修正為來源分支後驗證；短 action 可能讓 (end-start)//8=0，需記錄例外策略。不能把問答正確率當物理規劃成功。"
+  },
+  "version_note": "原 README 包含不同模型的輸入設定，必須記錄 history segmentation 是否給定。IT 的自動答案與人工核驗 Bench split 不能合併宣稱同等標註品質。",
+  "runtime_executed": false,
+  "source_files": [
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "README.md",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "sha256": "8da2ab45618f311490380f63ed341145143284785d30f9450d0c9070dfee63e7",
+      "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/README.md",
+      "local_file": "audit/.cache/github_review/repos/ChenYi99__EgoPlan/files/README.md"
+    },
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "src/__init__.py",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "sha256": "402e6dfa9554137d152bb871fe550114c1d3e2bf2b33df663e29c38fd2d118a0",
+      "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/src/__init__.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/ChenYi99__EgoPlan/src/__init__.py"
+    },
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "src/egoplan_video_llama_interface.py",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "sha256": "b98f7e45e3df1303455daf2d6a16b5a970bc43faf93229f65561bd319aa13cb4",
+      "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/src/egoplan_video_llama_interface.py",
+      "local_file": "audit/.cache/github_review_worker/early/files/ChenYi99__EgoPlan/src/egoplan_video_llama_interface.py"
+    },
+    {
+      "repo": "ChenYi99/EgoPlan",
+      "path": "eval_multiple_choice.py",
+      "commit": "1510afc12bc832b50d6285d83503ecbdca093bf4",
+      "sha256": "31dbf21d6a5e36f23a1a53aa6dbcac2e31ac861cf8c533ce255411ba48358332",
+      "url": "https://github.com/ChenYi99/EgoPlan/blob/1510afc12bc832b50d6285d83503ecbdca093bf4/eval_multiple_choice.py",
+      "local_file": "audit/.cache/github_review/repos/ChenYi99__EgoPlan/files/eval_multiple_choice.py"
+    }
+  ]
+}

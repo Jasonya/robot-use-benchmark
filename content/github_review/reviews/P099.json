@@ -1,0 +1,198 @@
+{
+  "paper_id": "P099",
+  "summary": "HomeRobot的OVMM流程分找物、抓物、找容器、放置；真正overall成功還要求零robot-scene碰撞。已沿官方submodule讀到實際放置與穩定性checker。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/home-robot",
+      "path": "README.md",
+      "ranges": [
+        [
+          10,
+          48
+        ]
+      ],
+      "why": "OVMM任務與2024挑戰tag",
+      "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5"
+    },
+    {
+      "repo": "facebookresearch/home-robot",
+      "path": "projects/habitat_ovmm/README.md",
+      "ranges": [
+        [
+          10,
+          67
+        ],
+        [
+          130,
+          163
+        ]
+      ],
+      "why": "HSSD資產、episode與GT/Detic評測條件",
+      "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5"
+    },
+    {
+      "repo": "facebookresearch/home-robot",
+      "path": ".gitmodules",
+      "ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "why": "官方依賴Habitat-Lab；tree另固定submodule commit",
+      "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5"
+    },
+    {
+      "repo": "facebookresearch/home-robot",
+      "path": "src/home_robot_sim/home_robot_sim/env/habitat_ovmm_env/habitat_ovmm_env.py",
+      "ranges": [
+        [
+          114,
+          181
+        ],
+        [
+          220,
+          241
+        ],
+        [
+          290,
+          398
+        ]
+      ],
+      "why": "觀測／深度／相機座標與動作轉換",
+      "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5"
+    },
+    {
+      "repo": "facebookresearch/home-robot",
+      "path": "projects/habitat_ovmm/evaluator.py",
+      "ranges": [
+        [
+          194,
+          224
+        ],
+        [
+          255,
+          324
+        ]
+      ],
+      "why": "scene_episode鍵、階段/END指標與分母",
+      "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5"
+    },
+    {
+      "repo": "facebookresearch/home-robot",
+      "path": "projects/habitat_ovmm/utils/metrics_utils.py",
+      "ranges": [
+        [
+          1,
+          113
+        ]
+      ],
+      "why": "零碰撞overall成功與四項partial平均",
+      "commit": "ede6a67a2d0c0c8e12ad3b9726f330cea6cf90f5"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+      "ranges": [
+        [
+          27,
+          41
+        ],
+        [
+          153,
+          204
+        ]
+      ],
+      "why": "OVMM categories/candidate goal與episode subset"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+      "ranges": [
+        [
+          453,
+          585
+        ]
+      ],
+      "why": "階段成功保留歷史且依賴前一階段"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+      "ranges": [
+        [
+          83,
+          144
+        ]
+      ],
+      "why": "接觸目標容器、穿透限制與排除地板"
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py",
+      "ranges": [
+        [
+          206,
+          347
+        ]
+      ],
+      "why": "放置穩定性與具體PlaceSuccess條件"
+    }
+  ],
+  "environment": "真實Stretch與Habitat模擬分開；模擬依賴HSSD ovmm資產、物件、Stretch模型和episode配置。相同HSSD屋子被多任務重用需按父資產鍵去重。",
+  "tasks": "將指定類別物件從起始容器搬到目標容器；四階段是同一長程任務進度，不自動算4道獨立題。原生episode允許多個candidate物件／容器。",
+  "data": "OVMMEpisode記object_category/start_recep_category/goal_recep_category及candidate goal集合。wrapper讀head_rgb/depth、GPS/compass/joint及task goal；depth由[0,1]映射min/max並特判邊值；相機座標模式與GT semantic開關必須記入protocol。",
+  "evaluation": "原子放置量測檢查物件與合法容器接觸、排除地板與過深穿透，父checker再檢查放開、末端回rest距離及可選的穩定步數。階段success具有歷史累積性；metrics_utils的overall_success=END.ovmm_place_success且robot_scene_colls==0，partial=(找物+抓物+找容器+overall)/4。缺失欄位在聚合時被略過，須額外保存完整預期episode與缺值數。",
+  "standardization": {
+    "profile": "open_vocabulary_mobile_manipulation",
+    "reuse": "物件／容器category、候選集合、場景episode身份、觀測/動作轉換、原子與階段checker。",
+    "transform": "case固定資料版本、scene_episode、機體、GT或感知模式、步數與控制比例；native放置、overall零碰撞及partial三項分開存。依賴源釘選b727ca9而非目前Habitat main。",
+    "missing": "HSSD/機體/episode資產閉合、感測配置與相機內參檢查、原生感知／控制執行驗證、論文與2024挑戰版本對照。"
+  },
+  "version_note": "home-robot tree把Habitat-Lab釘在b727ca9f7123101aaedb737ca9ccc1b153525dd9；本次直接讀此版checker，沒有用現行HabitatHEAD代替。README另指定home-robot-ovmm-challenge-2024 tag，與本main快照分開。",
+  "source_files": [
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+      "url": "https://raw.githubusercontent.com/facebookresearch/habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+      "local_file": "audit/.cache/github_review/explicit/facebookresearch__habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/files/habitat-lab/habitat/datasets/ovmm/ovmm_dataset.py",
+      "sha256": "faf708e4bb118b95b36c737efcb5cd7f8dbe3fb95a966fd3d99b8b34fa0825f8",
+      "lines": 204
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+      "url": "https://raw.githubusercontent.com/facebookresearch/habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+      "local_file": "audit/.cache/github_review/explicit/facebookresearch__habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/files/habitat-lab/habitat/tasks/ovmm/ovmm_sensors.py",
+      "sha256": "fd897ea13ebaf6147cda37d4b318bf44a6a671a9c2623f00d989f2086cf526f8",
+      "lines": 585
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+      "url": "https://raw.githubusercontent.com/facebookresearch/habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+      "local_file": "audit/.cache/github_review/explicit/facebookresearch__habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/files/habitat-lab/habitat/tasks/ovmm/sub_tasks/place_sensors.py",
+      "sha256": "9a72526ee574a8ba48b72d23fb2ee76f6d4a5396e6264ce0d22ada1c8a360278",
+      "lines": 193
+    },
+    {
+      "repo": "facebookresearch/habitat-lab",
+      "commit": "b727ca9f7123101aaedb737ca9ccc1b153525dd9",
+      "path": "habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py",
+      "url": "https://raw.githubusercontent.com/facebookresearch/habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py",
+      "local_file": "audit/.cache/github_review/explicit/facebookresearch__habitat-lab/b727ca9f7123101aaedb737ca9ccc1b153525dd9/files/habitat-lab/habitat/tasks/rearrange/sub_tasks/place_sensors.py",
+      "sha256": "dc91abe762d5a22b6767ab46d2626345250f16613297b7214f03e03ce9e0229e",
+      "lines": 405
+    }
+  ],
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

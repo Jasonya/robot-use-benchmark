@@ -1,0 +1,76 @@
+{
+  "paper_id": "P096",
+  "summary": "ALFRED把家務類型、具體場景／物件／軌跡和語言repeat分開；成功取決於終態條件，與每步API成功、reward和示範長度加權分數不同。",
+  "reading_order": [
+    {
+      "repo": "askforalfred/alfred",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          53
+        ]
+      ],
+      "why": "原始論文、資料版本與環境依賴",
+      "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b"
+    },
+    {
+      "repo": "askforalfred/alfred",
+      "path": "models/eval/eval_task.py",
+      "ranges": [
+        [
+          1,
+          206
+        ]
+      ],
+      "why": "完整具體rollout評測、task/repeat身份、停止與分母",
+      "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b"
+    },
+    {
+      "repo": "askforalfred/alfred",
+      "path": "env/tasks.py",
+      "ranges": [
+        [
+          75,
+          124
+        ],
+        [
+          126,
+          155
+        ],
+        [
+          237,
+          272
+        ]
+      ],
+      "why": "reward與成功分離，拿物照燈的具體條件",
+      "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b"
+    },
+    {
+      "repo": "askforalfred/alfred",
+      "path": "gen/utils/dataset_management_util.py",
+      "ranges": [
+        [
+          5,
+          51
+        ]
+      ],
+      "why": "goal/物件/容器/scene與多trial目錄身份",
+      "commit": "f91f4c0c96c7a29f33d0557f86b0a21035379b3b"
+    }
+  ],
+  "environment": "AI2-THOR室內場景與物件狀態；原生目錄tuple包含scene_num，具體軌跡還需原始初態與版本。現行README仍指THOR2.1.0資料／文件。",
+  "tasks": "評測器分7種家務類型：直接放置、清潔後放置、加熱後放置、冷卻後放置、放兩物、持物照燈、透過可移容器放置。物件／場景／語言repeat是下層條件，不與7種直接混算。",
+  "data": "traj task_id/task_type、pddl_params、plan.high_pddl/low_actions、turk_annotations.anns[repeat_idx].task_desc；模型輸出離散action與互動mask。原生trial名稱不等於本庫policy重跑trial。",
+  "evaluation": "EvalTask從視覺和語言rollout，STOP／max_steps／max_fails可終止，再取get_goal_satisfied與條件滿足數。例：照燈要求持有目標且燈可見並開啟。GC全局累加條件分母，PLW按原示範low_actions長度加權，非導航圖最短距離SPL。t=0的除法及被exception跳過的題需adapter明確處理。",
+  "standardization": {
+    "profile": "language_conditioned_household_interaction",
+    "reuse": "7種native task類別、PDDL參數、初態／低層操作與終態條件、language repeats。",
+    "transform": "原task_id/scene/repeat_idx拆為source instance與case鍵，留示範／語言父子關係；原生SR/GC/PLW分開記錄，失敗和未產出題也入分母清單。",
+    "missing": "完整THOR初態重播、資產版本、split與合法模型資訊、missing/error題處理和原生/共同協定對照。"
+  },
+  "version_note": "主程式同時保留原論文與後續model links；不把所有外部model repo當新benchmark。ALFWorld是同系環境的不同介面，需顯式重用關係。",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "runtime_executed": false
+}

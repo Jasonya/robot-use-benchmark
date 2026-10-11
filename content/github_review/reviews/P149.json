@@ -1,0 +1,112 @@
+{
+  "paper_id": "P149",
+  "reviewed_on": "2026-10-11",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "V-JEPA 2同庫包含2、2-AC及較新2.1。可復用EPIC動作預測評測與DROID reader，但既有資料集和新模型結果不能另算一套獨立任務庫。",
+  "reading_order": [
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "README.md",
+      "ranges": [
+        [
+          1,
+          75
+        ]
+      ],
+      "why": "論文身分與2/2-AC/2.1版本範圍"
+    },
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "configs/eval/vitl/ek100.yaml",
+      "ranges": [
+        [
+          1,
+          38
+        ]
+      ],
+      "why": "EK100 split、32frame/8fps與預測時間設定"
+    },
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "evals/action_anticipation_frozen/dataloader.py",
+      "ranges": [
+        [
+          15,
+          81
+        ]
+      ],
+      "why": "實際導向EK100 reader"
+    },
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "evals/action_anticipation_frozen/epickitchens.py",
+      "ranges": [
+        [
+          99,
+          154
+        ]
+      ],
+      "why": "標註frame到合法觀測區間的實際公式"
+    },
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "evals/action_anticipation_frozen/eval.py",
+      "ranges": [
+        [
+          90,
+          101
+        ],
+        [
+          230,
+          277
+        ],
+        [
+          640,
+          710
+        ]
+      ],
+      "why": "val時間點預設及多probe分項max聚合"
+    },
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "evals/action_anticipation_frozen/metrics.py",
+      "ranges": [
+        [
+          1,
+          58
+        ]
+      ],
+      "why": "class-mean recall和sample accuracy不同分母"
+    },
+    {
+      "repo": "facebookresearch/vjepa2",
+      "commit": "204698b45b3712590f06245fbfba32d3be539812",
+      "path": "app/vjepa_droid/droid.py",
+      "ranges": [
+        [
+          87,
+          229
+        ]
+      ],
+      "why": "DROID影片/HDF5對齊、相機座標與相鄰狀態差分action"
+    }
+  ],
+  "environment": "自然影片理解/預測與DROID真實機器人軌跡；原資料的廚房、場景和相機沿用父來源，不因V-JEPA checkpoint新增環境。",
+  "tasks": "影片理解、下一動作anticipation、action-conditioned latent預測與影像目標規劃是不同評估用途；本次程式核讀重點為EK100與DROID，不據此列出完整機器人測例。",
+  "data": "EK100使用start_frame/stop_frame、verb_class/noun_class；32frame、8fps及1秒時間設定需保留。實作取af=sf×ap+(1−ap)×ef−at×fps，val預設ap=0，應核定該stop-frame基準與目標協定；不足歷史以首frame補。DROID從trajectory.h5載入cartesian_position/gripper_position及相機外參，降採樣後算平移/相對旋轉/夾爪變化量；失敗樣本會隨機換另一樣本。",
+  "evaluation": "ClassMeanRecall預設top5，recall對有出現的類別平均，accuracy對樣本平均，均乘100。validation對多個probe分別取accuracy/recall最大值，可能不是同一probe；不能當單一固定模型完整結果。機器人任務成功checker未在本次所讀路徑確認。",
+  "standardization": {
+    "profile": "video_anticipation_and_robot_world_model",
+    "reuse": "EK100評估公式與split接口、DROID姿態/外參/視角的資料流程。",
+    "transform": "來源關聯指向EPIC/DROID；case顯式保存觀測截止、target frame、補幀與樣本替代策略；action保存delta與camera_frame選項；evaluator保留topk、分母和probe選擇規則。",
+    "missing": "觀測時間基準核驗、完整robot planning/evaluation協定、資產/權重取得、固定case而非重抽樣及原生重現。"
+  },
+  "version_note": "固定204698b；當前README已加入2.1，本條文獻仍為2506.09985的V-JEPA 2，不把2.1新增內容當作原版論文成果。",
+  "runtime_executed": false
+}

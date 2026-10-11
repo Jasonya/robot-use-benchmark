@@ -1,0 +1,337 @@
+{
+  "paper_id": "P059",
+  "reviewed_on": "2026-10-10",
+  "status": "selected_core_source_sections_reviewed",
+  "summary": "EMAG 是重用 Ego4D／EPIC-Kitchens-55 的雙手位置預測方法。已讀資料與 ADE/FDE 計算程式，但公開設定、讀取器與 trainer 的欄位／時間維度不一致；不可標成可直接執行的跨資料集評測。",
+  "identity_note": "README 自稱 ECCVW 2024 官方實作，列 Hatano、Hachiuma、Saito，與 arXiv:2405.20030 論文及其指定作者頁一致；作者頁 Code 連至 masashi-hatano/EMAG。論文也引用 SORT、hoi-forecast、EGO4D/forecasting 作為相關工具／比較方法，不能把它們替代成本論文的實作。",
+  "reading_order": [
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "README.md",
+      "ranges": [
+        [
+          4,
+          20
+        ],
+        [
+          32,
+          52
+        ]
+      ],
+      "why": "確認完整作品／作者及公開訓練、評測入口。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "configs/config_ego4d.yaml",
+      "ranges": [
+        [
+          1,
+          96
+        ]
+      ],
+      "why": "核對預設 val split、八幀輸入／四步輸出、間隔、外部路徑及排除影片。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "configs/config_epic.yaml",
+      "ranges": [
+        [
+          1,
+          15
+        ],
+        [
+          42,
+          90
+        ]
+      ],
+      "why": "確認 EPIC 間隔16與另一套 normalization，不把兩資料設定視為等價。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "datamodule/ego4d_dataset.py",
+      "ranges": [
+        [
+          35,
+          62
+        ],
+        [
+          77,
+          171
+        ],
+        [
+          179,
+          239
+        ],
+        [
+          241,
+          290
+        ]
+      ],
+      "why": "追 JSON 標註、五時點遮罩、RGB/flow/3×3矩陣與 pickle bounding boxes 的實際欄位。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "datamodule/lit_ego4d_data_module.py",
+      "ranges": [
+        [
+          33,
+          51
+        ],
+        [
+          53,
+          110
+        ],
+        [
+          128,
+          134
+        ]
+      ],
+      "why": "確認 test_type=val 且只實例化 Ego4D 讀取器。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "lit_main.py",
+      "ranges": [
+        [
+          12,
+          38
+        ],
+        [
+          63,
+          76
+        ]
+      ],
+      "why": "核對實際預設設定、checkpoint 與 test 呼叫。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "models/lit_EMAGTrainer.py",
+      "ranges": [
+        [
+          15,
+          31
+        ],
+        [
+          74,
+          98
+        ],
+        [
+          243,
+          316
+        ],
+        [
+          334,
+          359
+        ]
+      ],
+      "why": "核對輸入契約、四時點 reshape、遮罩及每隻手平均／最終歐氏距離。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "utils/util.py",
+      "ranges": [
+        [
+          4,
+          28
+        ]
+      ],
+      "why": "確認從正規化座標回復到來源影格 h/w，並未自行縮到高256。"
+    }
+  ],
+  "environment": "論文在 EPIC-Kitchens-55 廚房影片及 Ego4D 多種人類活動上做同資料集／跨資料集預測；資料屬人類第一視角影像，沒有機器人可執行動作介面。已讀程式入口使用 Ego4D schema，EPIC 另有設定但沒有獨立 loader／轉換腳本。",
+  "tasks": "論文 §4.2 用八張 4 FPS 觀測，預測未來一秒四時點的左右手 2D 位置，並以未來 ego-motion 為輔助訓練目標。跨資料集的方向（EPIC→Ego4D 或反向）及 train/val 必須各自保留；活動類別分析不是新增機器人任務。",
+  "data": "讀 annotations/fho_hands_{mode}.json 的 /clips/*/{video_uid,clip_uid,frames}，由 frames/*/{pre_45,pre_30,pre_15,pre_frame,contact_frame}/boxes 的 left_hand/right_hand 建立 [2,5,2] 座標與 [2,5] mask；以來源 w/h 正規化。排除設定 delete 清單、pre_45.clip_frame≤interval×8 或全零 mask。輸入 image_frame/{clip_uid}/{frame:06d}.png、optical_flow/{clip_uid}/npy/*.npy、fundamental/{clip_uid}/*.npy，另讀 hand-objects/interval={interval}/{clip_uid}/{pre45}.pkl 的 bboxes_obj/bboxes_hand/attention_mask。回傳 frames、flows、bboxes、ego_feat、future_hands、future_egos、hands_mask、egos_mask 與影格 h/w；八個觀測索引終於 pre45-interval。影格步長不能直接當秒；pickle 與影像均未下載／反序列化。",
+  "evaluation": "論文 §4.3 定義影像高度256 px尺度的 ADE（所有未來時點、左右手）與 FDE（末時點、左右手）。實作 test_step 固定四時點、套 hands_mask，scaling_original 按 meta 中的來源 w/h 還原像素；calculate_L2_loss 排除 GT=(0,0)，分別累積左右手所有有效時點與第四時點的 L2 距離，test_epoch_end 只輸出四個分手平均。沒有此處的左右手合併報表，也沒有保證來源 PNG 高度為256的轉換步驟；原始解析度不同會改變分數。",
+  "standardization": {
+    "profile": "egocentric_2d_hand_forecasting",
+    "reuse": "原生 clip_uid、觀測錨點、標註時點與有效性 mask，左右手／物件框引用及分手位移算法。",
+    "transform": "case 以父資料集版本+split+clip_uid+錨點定位；保留 2D x/y、來源影格尺寸與秒／幀對照，明列四步 horizon、兩手缺失規則與影像高度256的評分尺度。跨資料集保留訓練來源與評測來源，不合併其原生 case。",
+    "missing": "須補齊影像、flow、手物框與 ego-motion 前處理來源／版本及 EPIC 格式轉換；修復 ego_feat/egos_input key、五標註時點對四輸出時點的契約與缺少的 model_config.loss 設定，確認兩手合併、解析度及遮罩後才可執行驗證。"
+  },
+  "version_note": "固定 0386bd9de2bd2ec3504e5b645a095c46e9a565ca（2025-03-25），與 2024 論文區分。loader 傳 ego_feat，trainer 卻讀 egos_input；loader 保留五時點且沒有裁切，test_step reshape 明定四時點；兩份設定皆未定義 trainer 初始化所讀的 model_config.loss。論文稱 homography，檔案路徑／變數稱 fundamental/fmat，未取得矩陣資產前不能宣稱兩者等價。非截斷 tree 未列 EPIC 專用 loader 或前處理釋出。",
+  "discovery_evidence": [
+    {
+      "local_file": "audit/.cache/github_review/P059-discovery.json",
+      "json_pointers": [
+        "/title",
+        "/pdf_sha256",
+        "/candidates/3",
+        "/code_contexts/0"
+      ],
+      "sha256": "84dc9ef3fb6d29764c17fbf0358c4d8b5998524c1fc8a3cdfba470539b26ba13"
+    }
+  ],
+  "source_files": [
+    {
+      "local_file": "audit/.cache/fulltext_review/P059/pages.json",
+      "sha256": "cc477f9b002c67eac12c32bdb49c481d61ba7b54728537fd393fc5960184af35",
+      "json_pointers": [
+        "/7/text",
+        "/8/text"
+      ],
+      "why": "PDF 頁8–9：父資料／標註來源、4FPS與四步預測及 ADE/FDE 正式定義。"
+    },
+    {
+      "local_file": "audit/.cache/github_review/http/17b3b8222140b395f4273104b2ec74aff4ea68aef3b6876456c41d22dd3bf798.body",
+      "sha256": "e77370fcc5c5d3fb183050fee452758a167da1decb39f6b773f5dc5424304048",
+      "url": "https://masashi-hatano.github.io/EMAG/",
+      "ranges": [
+        [
+          58,
+          75
+        ],
+        [
+          105,
+          116
+        ],
+        [
+          281,
+          289
+        ]
+      ],
+      "why": "確認作者、repo 及正式引用。"
+    },
+    {
+      "local_file": "audit/.cache/github_review/repos/masashi-hatano__EMAG/tree.json",
+      "sha256": "2447d41cabd49e044e40caca25905fb4cbf9b0de3e7e7b4be7cbdc25e31beed9",
+      "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+      "json_pointers": [
+        "/truncated",
+        "/tree"
+      ],
+      "why": "完整 tree 僅列 Ego4D dataset/data module；EPIC 只有設定檔。"
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "configs/config_epic.yaml",
+      "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+      "url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_epic.yaml",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_epic.yaml",
+        "retrieved_at": "2026-10-10T23:34:17.641831+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/configs/config_epic.yaml",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 1953,
+        "sha256": "b89e76b8c3e8495c847d71f695882b670a64e9903b4e48210ddc4330f9e36025"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/masashi-hatano__EMAG/configs/config_epic.yaml",
+      "sha256": "b89e76b8c3e8495c847d71f695882b670a64e9903b4e48210ddc4330f9e36025",
+      "git_blob_sha": "47723f5b97c91c45963bd370de373268796bd649",
+      "lines": 90,
+      "ranges": [
+        [
+          1,
+          15
+        ],
+        [
+          42,
+          90
+        ]
+      ]
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "datamodule/lit_ego4d_data_module.py",
+      "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+      "url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/lit_ego4d_data_module.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/lit_ego4d_data_module.py",
+        "retrieved_at": "2026-10-10T23:34:16.641656+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/datamodule/lit_ego4d_data_module.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 4003,
+        "sha256": "45248586cbde072f4f88b706ce39670c7caddcc1839495b3d22d0b40a0993e4d"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/masashi-hatano__EMAG/datamodule/lit_ego4d_data_module.py",
+      "sha256": "45248586cbde072f4f88b706ce39670c7caddcc1839495b3d22d0b40a0993e4d",
+      "git_blob_sha": "a22bdd7d9d8dba251f1f23552391993c4c60be3f",
+      "lines": 134,
+      "ranges": [
+        [
+          33,
+          51
+        ],
+        [
+          53,
+          110
+        ],
+        [
+          128,
+          134
+        ]
+      ]
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "models/lit_EMAGTrainer.py",
+      "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+      "url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/models/lit_EMAGTrainer.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/models/lit_EMAGTrainer.py",
+        "retrieved_at": "2026-10-10T23:34:15.633132+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/models/lit_EMAGTrainer.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 15039,
+        "sha256": "b28727273377f7048c2eca2ec0cfc783129145eb69156c76ef9caaf3cfb58369"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/masashi-hatano__EMAG/models/lit_EMAGTrainer.py",
+      "sha256": "b28727273377f7048c2eca2ec0cfc783129145eb69156c76ef9caaf3cfb58369",
+      "git_blob_sha": "8d495b429170235b50e66b7ff619913d776e05b6",
+      "lines": 359,
+      "ranges": [
+        [
+          15,
+          31
+        ],
+        [
+          74,
+          98
+        ],
+        [
+          243,
+          316
+        ],
+        [
+          334,
+          359
+        ]
+      ]
+    },
+    {
+      "repo": "masashi-hatano/EMAG",
+      "path": "utils/util.py",
+      "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+      "url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/utils/util.py",
+      "receipt": {
+        "requested_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/utils/util.py",
+        "retrieved_at": "2026-10-10T23:34:39.099884+00:00",
+        "status": 200,
+        "resolved_url": "https://raw.githubusercontent.com/masashi-hatano/EMAG/0386bd9de2bd2ec3504e5b645a095c46e9a565ca/utils/util.py",
+        "content_type": "text/plain; charset=utf-8",
+        "bytes": 737,
+        "sha256": "959987b7e4ef8021908737b9a5383273f4c8ec3288deed37bb37c79fa73feda7"
+      },
+      "http_receipt_existed_before": false,
+      "local_file": "audit/.cache/github_review_worker/P057-P061/files/masashi-hatano__EMAG/utils/util.py",
+      "sha256": "959987b7e4ef8021908737b9a5383273f4c8ec3288deed37bb37c79fa73feda7",
+      "git_blob_sha": "bbb35515a596c4dddcc337149bbf82649f6a6ab3",
+      "lines": 28,
+      "ranges": [
+        [
+          4,
+          28
+        ]
+      ]
+    }
+  ],
+  "commit": "0386bd9de2bd2ec3504e5b645a095c46e9a565ca",
+  "source_manifest": "audit/.cache/github_review/repos/masashi-hatano__EMAG/manifest.json",
+  "runtime_executed": false,
+  "source_manifest_sha256": "6ba9dfc3515c4957624bd28a220605bdbb558d5ead77a6635d36c199e28df1b8"
+}

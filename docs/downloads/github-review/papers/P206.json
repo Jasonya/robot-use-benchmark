@@ -1,0 +1,770 @@
+{
+  "paper_id": "P206",
+  "name": "EmbodiedMemory-Bench",
+  "title": "EmbodiedMemory-Bench: Benchmarking Embodied Memory for Long-Horizon Embodied Tasks",
+  "year": 2026,
+  "paper_url": "https://arxiv.org/abs/2609.28236",
+  "scope": "benchmark_or_data_source",
+  "domain_ids": [
+    "home"
+  ],
+  "status": "selected_core_source_sections_reviewed",
+  "review": {
+    "paper_id": "P206",
+    "reviewed_on": "2026-10-11",
+    "status": "selected_core_source_sections_reviewed",
+    "summary": "循官方 project 搬移頁確認 ZJU-OmniAI/Embodied-Omni 的 embodied_memory/ 為本篇公開程式，已追 manifest loader、history sanitization、simulator runner、四家族具體 success／ERR 與 macro 分母。HF 有 frozen release，但公開 loader 與發布路徑不一致；code 亦將任一 ERR 視為不能成功，與 paper 的可恢復終態 SR 有實質差異。",
+    "identity_note": "pinned arXiv:2609.28236v1 題名及 Lizhou Liang 等作者與 embodied_memory/README 一致。PDF 原始 ZJU-OmniAI project 轉址到 Embodied-Omni/EmbodiedMemoryBench，新頁直接連官方 monorepo 與 lzLiang/EmbodiedMemoryBench；不將參考文獻的 OpenBMB/MiniCPM-V 當成 benchmark。只核本篇 embodied_memory 子樹，未擴讀同 monorepo 的 reasoner／navigator。",
+    "environment": "AI2-THOR 單房間組合的多房間脈絡與 ProcTHOR 場景；論文 Table 9 報 1,118 個 globally unique source scene IDs、四 room types，不能加總各家族重疊 scene counts。當前 env 以 probe.scene reset，使用 500×500 RGB、visible_objects、agent_state、available_actions 與高階離散目標動作。原生 x/y/z、objectId、rotation_y（0–360）及相機角度須保留；不把 Navigate／PickUp 等介面當連續機器人關節控制。",
+    "tasks": "manifest 四家族 l2_passive、l2_dynamic、l2_interaction、l3_owner_habit 分別對應 Passive Observation、Dynamic Tracking、Interaction Failure、Experience Generalization。probe_retrieve／probe_track_location 要到記憶位置並拾取目標；probe_avoid_failure 要選非已知鎖定容器存放物品；owner_habit 以先前 correction 對新物件選擇合規 receptacle。construction schema 的 L0–L3 enums 不等於四個發布家族。",
+    "data": "data.load_manifest 讀 JSONL 的 id、family、source.episode_path、source.episode_sha256；拒絕重複 id，先依 family／per_family 選擇，再檢查 episode 檔與可選 SHA256。run 另以 source.probe_id 精確配對一個 probe。episode JSON loader 是 json.load；schema 含 episode_id/name/difficulty、sessions[].context_trajectory.steps[] 的 step_id/image_path/visible_objects/agent_state/action/feedback、micro_probe 或 macro_probe，以及 hidden_rules／memory_cues／expected_actions／evaluation_hooks。時間原生單位是有序 session／step，非影片秒。paper 與 HF metadata／audit report 同報 2,554=1,036+1,052+263+203、split=all；本輪僅機械清點小型 experience_generalization manifest 的 203 個唯一 id，未重新驗證全部 2,554 episodes。",
+    "evaluation": "實際鏈為 CLI evaluate→load_manifest→run.evaluate→env.step→EpisodeEvaluator.evaluate_probe。env 為每次 action 嘗試記 success／feedback，無效動作及 Done／Stop 也計入 actual_steps；預設 8-step budget 覆蓋 schema 的 30／60 預設。success 讀 simulator world_state 的持物／parent／狀態並核對成功執行的導航或放置；L2 可接受原生指定的同類且同記憶容器物件，owner_habit 保留 executable receptacle alias。ERR 只比對成功動作的 frozen triggers，L2 是先去不同 receptacle type、interaction 是重複已知錯誤 action–target、owner_habit 是違規放置；每 subtask ERR=min(1,觸發數/max(1,required_memory_integration 數))，probe 對 subtasks 平均。run.summarize 以每家族 task_completed 布林值／已記錄 rows 計 SR，再對實際出現家族等權 macro；ERR 同樣先家族平均。不能將 smoke 選樣或中止前 summary 當 Full-2554。InvalidPhaseOutput 保留作該例失敗，infra exception 寫錯誤並中止，不產生新的完整 summary。RAR/AES/MAE 是附帶 diagnostics，不等於 paper 主 metric。",
+    "implementation_findings": [
+      {
+        "finding": "已核 HF family manifest 保留相對但不可攜的 source.episode_path=output/trajectories/...；真正下載位置在 organized_view.episode_json=episodes/experience_generalization/...。HF root tree 無 output/，data.py 與 run.py 卻只取 source 路徑，因此直接照 README 使用發布根目錄會找不到檔案；需另建保留原欄位的 execution manifest。",
+        "sources": [
+          "src/emem_bench/data.py:22-58",
+          "src/emem_bench/evaluation/run.py:58-76",
+          "HF manifests/experience_generalization.jsonl:1-2",
+          "HF README.md:137-158"
+        ]
+      },
+      {
+        "finding": "paper p.22 明說觸發 ERR 後仍可恢復並完成任務；公開 _semantic_completed 在 err_events 非空時立即 False，會永久否決本次 probe 成功。此版不是純終態 SR，必須在來源版本及 evaluator 協定中分開記錄。",
+        "sources": [
+          "src/emem_bench/evaluation/evaluator.py:332-357",
+          "paper p.22"
+        ]
+      },
+      {
+        "finding": "CLI score 呼叫 evaluate_probe 時未傳 world_state；正常 L2／owner_habit scorer 要求世界狀態，故此 offline action-list 入口不能替代實際 simulator 評測。module docstring 所說 online future layer 亦已落後於 run/env 的實作。",
+        "sources": [
+          "src/emem_bench/cli.py:208-217",
+          "src/emem_bench/evaluation/evaluator.py:4-11,377-385,518-535"
+        ]
+      },
+      {
+        "finding": "full_context 與 emem 各 session 最多讀前 80 steps；paper p.21 說 canonical 最長 session 78，因此論文聲稱完整涵蓋，而新資料仍須驗證此上限。模型輸入需經 sanitizer，不可把 raw episode 的 hidden_rules／expected_actions 整份塞入。",
+        "sources": [
+          "src/emem_bench/evaluation/planner.py:409-461",
+          "src/emem_bench/evaluation/tool_agent.py:160-200",
+          "paper p.21"
+        ]
+      }
+    ],
+    "standardization": {
+      "profile": "interactive_memory_episode_manifest_and_state_evaluator",
+      "reuse": "官方 frozen manifest 身分／family／hash、episode schema、session-step 脈絡、模型可見欄位過濾、動態 action registry、trace 與具體 state／ERR evaluator 可重用；case、probe、action attempts 需分開。",
+      "transform": "source 同時記 paper v1、GitHub commit 與 HF revision；domain／environment 保留 room type、host simulator、scene provenance 與重用關係。task 維持四家族／probe 規則；case key 用 manifest id 及 episode_id+probe_id，另以 organized_view 建可攜 execution_path，不覆寫原研究路徑或 lineage。history/action/feedback、model-visible context 與 evaluator-only rules 分開映射；evaluator 保存 terminal-state SR 與此版 ERR-veto SR 差異、逐類分母、8-step／80-per-session budget、grounding repair 與實際 world-state。",
+      "missing": "修正 published manifest→loader 路徑橋接、核對 ERR-veto 與論文 scorer、全 release hashes／素材／scene reset 閉合、完整 runtime 及同一預算重現。單一 nested episode 嘗試超過本輪 512 KiB 小文字上限，已停止且保留 receipt；不把該檔視為已讀或不存在，亦未下載 RGB／模型／simulator。"
+    },
+    "version_note": "code 固定 f0409a8ecd858acd1f53c69f6424e0c4af83737b，只核 embodied_memory 子專案。HF 固定 3b45bd3f3a67a23b09b78d27c3ab563a700e832a；README 說公開 episode-level 名稱／描述／probe instructions 已英文化並更新 hash，原語言 revision 為 28694bf83b78049ac96ba01c9ffb13aeac7eaef9，不能混用。HF canonical manifest SHA256=6c69644b9fc4755065830e4884a12898e3ed0db32c1825dbecf623c37b9b1bc2 是發布者 metadata 聲明，本輪未下載 full2554 逐例重播驗算。",
+    "additional_repo_proposals": [
+      {
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "path_prefix": "embodied_memory/",
+        "role": "official_benchmark_and_memory_implementation",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "proposal": "協調者可補入本篇 binding；證據是原 project 轉址→新官方頁→具相同作者／arXiv 的 README。"
+      }
+    ],
+    "discovery_evidence": [
+      {
+        "source": "audit/.cache/github_review/projects/933f70e98505167917485649b47cbf67ff9abacd705eeec2fead2592d5ac1856.txt",
+        "ranges": [
+          [
+            1,
+            5
+          ]
+        ],
+        "finding": "原 project 的明示搬移鏈。"
+      },
+      {
+        "source": "audit/.cache/github_review_worker/P202_P209_2026-10-11/P206/project.html",
+        "ranges": [
+          [
+            24,
+            30
+          ],
+          [
+            92,
+            98
+          ]
+        ],
+        "finding": "新官方頁直接連 GitHub 與 HF；既有兩個名稱搜尋為空已被此 primary evidence 補正。"
+      },
+      {
+        "source": "audit/.cache/github_review/P206-discovery.json",
+        "json_pointers": [
+          "/candidates/0",
+          "/candidates/59",
+          "/code_contexts"
+        ],
+        "finding": "MiniCPM-V 是文獻中的模型參考，非本篇 benchmark code。"
+      }
+    ],
+    "runtime_executed": false,
+    "reading_order": [
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/README.md",
+        "ranges": [
+          [
+            10,
+            31
+          ],
+          [
+            49,
+            77
+          ],
+          [
+            127,
+            196
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 223,
+        "sha256": "14af5c5e095343e810342d46ad845ff0e063e49c4db8263171dac06f289586bb",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/README.md",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/README.md#L10-L31",
+        "why": "確認 paper／project／data 身分及 compact public evaluation 入口。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/data.py",
+        "ranges": [
+          [
+            8,
+            58
+          ],
+          [
+            61,
+            112
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 112,
+        "sha256": "06cafa91afbf61a0a0b1679755a8197a3948ea9715673b14b555b5c42a3fee55",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/data.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/data.py#L8-L58",
+        "why": "核 manifest id／family／source path、hash 檢查與 history 圖片解析。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/construction/schema.py",
+        "ranges": [
+          [
+            153,
+            225
+          ],
+          [
+            243,
+            344
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 376,
+        "sha256": "a20135cfd45f85dcb90ac2464de1a2fc0963bc7dc7521c04b97f0fd27cffb2fb",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/construction/schema.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/construction/schema.py#L153-L225",
+        "why": "核對 actions／feedback、sessions、micro／macro probes 及 evaluator-only annotations。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/cli.py",
+        "ranges": [
+          [
+            20,
+            28
+          ],
+          [
+            132,
+            157
+          ],
+          [
+            182,
+            217
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 238,
+        "sha256": "4ff53f6874d62c9bb3f8f1c66f8b04e88e5dab8b9d40cd012b984c1bb2938ef8",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/cli.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/cli.py#L20-L28",
+        "why": "確認預設每家族 1 例、8 steps、evaluate／offline score 不同路徑。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/run.py",
+        "ranges": [
+          [
+            18,
+            38
+          ],
+          [
+            58,
+            175
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 175,
+        "sha256": "18ae30f0342388bfaff84094a313d676a551086c4d885d4e6fc0adbdf1bde231",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/run.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/run.py#L18-L38",
+        "why": "追實際 simulator 執行、單一 manifest probe 配對、infra failure 與分母。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/env.py",
+        "ranges": [
+          [
+            135,
+            193
+          ],
+          [
+            209,
+            374
+          ],
+          [
+            711,
+            748
+          ],
+          [
+            845,
+            977
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1255,
+        "sha256": "f47fc262e58145563dc61d5d6a4748c3095e85d9b5fde47dcf159a8dfe4662b1",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/env.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/env.py#L135-L193",
+        "why": "看場景 reset、動作嘗試、終止、世界狀態及當前 action ID。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/evaluator.py",
+        "ranges": [
+          [
+            202,
+            357
+          ],
+          [
+            377,
+            424
+          ],
+          [
+            518,
+            562
+          ],
+          [
+            717,
+            866
+          ],
+          [
+            1073,
+            1152
+          ],
+          [
+            1154,
+            1288
+          ],
+          [
+            1405,
+            1438
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1489,
+        "sha256": "02db5bd67a63d1f10007c7b484bfcf5a5e771ef1f8b1bdbeb3c5ea6c1aa4f9d1",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/evaluator.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/evaluator.py#L202-L357",
+        "why": "追四家族可執行終態判定、同類 receptacle alias、ERR 觸發與聚合；不是採用 ordered-subsequence stub。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/planner.py",
+        "ranges": [
+          [
+            409,
+            461
+          ],
+          [
+            740,
+            806
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1272,
+        "sha256": "62b484a1faadaf6abbd06b9cfe52e117379f960fcc75f87bd3fdbfa6658d00c1",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/planner.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/planner.py#L409-L461",
+        "why": "核對 full_context 真正給模型的字段及每 session 80-step 上限。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/protocol.py",
+        "ranges": [
+          [
+            902,
+            971
+          ],
+          [
+            1017,
+            1161
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 1161,
+        "sha256": "4ced96a7991683c9f4594e791f9c0fb725c6e578af86f6057b5ee9332e90b817",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/protocol.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/protocol.py#L902-L971",
+        "why": "核對 emem ingestion 可見資料、序列動作重新綁定與 simulator fail 處理。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/tool_agent.py",
+        "ranges": [
+          [
+            160,
+            290
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 290,
+        "sha256": "ec73cc9122fd26760452380d5ca4e833fd7c448b4f7092760666d3ca35f47912",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/tool_agent.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/tool_agent.py#L160-L290",
+        "why": "核對先 ingest 歷史再接 target，僅從可見 feedback 作後續 memory writes。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      },
+      {
+        "provider": "github",
+        "repo": "ZJU-OmniAI/Embodied-Omni",
+        "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+        "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+        "ref": null,
+        "path": "embodied_memory/src/emem_bench/evaluation/grounding.py",
+        "ranges": [
+          [
+            98,
+            269
+          ],
+          [
+            272,
+            459
+          ]
+        ],
+        "text_encoding": "utf-8",
+        "json_pointers": [],
+        "json_pointer_evidence": [],
+        "read_scope": "Explicitly recorded sections only",
+        "line_count": 459,
+        "sha256": "1331964b6c3001cc25f241b1eebd079c3c57930e65ef844f611629a5b9fb0ab6",
+        "url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/grounding.py",
+        "reading_url": "https://github.com/ZJU-OmniAI/Embodied-Omni/blob/f0409a8ecd858acd1f53c69f6424e0c4af83737b/embodied_memory/src/emem_bench/evaluation/grounding.py#L98-L269",
+        "why": "確認依當前 available_actions 修復／綁定模型預測並保存修復紀錄。",
+        "verification": "local_source_hash_and_recorded_locators_checked"
+      }
+    ],
+    "review_sha256": "4ecf170e21bd154877d7b263b76e9e522b6a53750e3f5c842232ce01f9b9a54d"
+  },
+  "repository_binding_review_sha256": "4ecf170e21bd154877d7b263b76e9e522b6a53750e3f5c842232ce01f9b9a54d",
+  "repository_bindings": [
+    {
+      "requested_repo": "ZJU-OmniAI/Embodied-Omni",
+      "resolved_repo": "ZJU-OmniAI/Embodied-Omni",
+      "aliases_in_this_review": [
+        "zju-omniai/embodied-omni"
+      ],
+      "selection_status": "source_sections_recorded_at_pinned_revisions",
+      "source_role": "reviewed_source",
+      "identity_scope": "See authored paper-specific identity and version notes; roles may include dependencies.",
+      "review_status": "selected_core_source_sections_reviewed",
+      "versions": [
+        {
+          "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+          "reviewed_files": [
+            "embodied_memory/README.md",
+            "embodied_memory/src/emem_bench/cli.py",
+            "embodied_memory/src/emem_bench/construction/schema.py",
+            "embodied_memory/src/emem_bench/data.py",
+            "embodied_memory/src/emem_bench/evaluation/env.py",
+            "embodied_memory/src/emem_bench/evaluation/evaluator.py",
+            "embodied_memory/src/emem_bench/evaluation/grounding.py",
+            "embodied_memory/src/emem_bench/evaluation/planner.py",
+            "embodied_memory/src/emem_bench/evaluation/protocol.py",
+            "embodied_memory/src/emem_bench/evaluation/run.py",
+            "embodied_memory/src/emem_bench/evaluation/tool_agent.py"
+          ]
+        }
+      ],
+      "link_evidence": [
+        {
+          "kind": "authored_discovery_lead",
+          "paper_id": "P206",
+          "review_sha256": "4ecf170e21bd154877d7b263b76e9e522b6a53750e3f5c842232ce01f9b9a54d",
+          "proposal": {
+            "repo": "ZJU-OmniAI/Embodied-Omni",
+            "path_prefix": "embodied_memory/",
+            "role": "official_benchmark_and_memory_implementation",
+            "commit": "f0409a8ecd858acd1f53c69f6424e0c4af83737b",
+            "proposal": "協調者可補入本篇 binding；證據是原 project 轉址→新官方頁→具相同作者／arXiv 的 README。"
+          }
+        },
+        {
+          "kind": "authored_source_review",
+          "paper_id": "P206",
+          "review_file": "content/github_review/reviews/P206.json",
+          "review_sha256": "4ecf170e21bd154877d7b263b76e9e522b6a53750e3f5c842232ce01f9b9a54d",
+          "basis": "Pinned file sections and source-specific identity/version notes"
+        }
+      ]
+    }
+  ],
+  "repository_candidates": [],
+  "group": "core",
+  "domains": [
+    "居家整理與清潔"
+  ],
+  "source_review": {
+    "paper_id": "P206",
+    "status": "benchmark_sections_reviewed",
+    "identity_note": "EmbodiedMemory-Bench / EMem-Bench，arXiv 2609.28236v1。",
+    "scope_read": "四family、AI2THOR/ProcTHOR場景生成、2554驗證episodes、sim success及source/split設計。",
+    "pages_read": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      15,
+      18,
+      27
+    ],
+    "domains": [
+      "居家整理與清潔"
+    ],
+    "role": "可執行具身記憶benchmark",
+    "environment": "1,118source scenes；AI2-THOR單房間組成virtualhome并保存狀態、ProcTHOR multi-room篩選。不是1118全部新建獨立house。",
+    "tasks": "4families：Passive Observation、Dynamic Tracking、Interaction Failure、Experience Generalization；125visible object types/83target/33receptacle是資產類別。",
+    "cases": "2,554episodes＝1,036+1,052+263+203；143候選被排除。四history介入條件同用800episodes而非新增3200unique basecases。",
+    "native_counts": [
+      {
+        "field": "environment",
+        "value": 1118,
+        "unit": "benchmark source scenes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "memory task families",
+        "pages": [
+          5
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2554,
+        "unit": "validated executable episodes",
+        "pages": [
+          6
+        ]
+      },
+      {
+        "field": "case",
+        "value": 800,
+        "unit": "history介入paired base episodes",
+        "pages": [
+          27
+        ]
+      }
+    ],
+    "evaluation": [
+      "執行action到sim目標終態的SR，四family等權macro避免1036/1052大類壟斷；另history介入成對比較。"
+    ],
+    "evaluation_types": [
+      "環境狀態與過程檢查"
+    ],
+    "split": "訓練與eval scenes/trajectories分離，parent trajectories先split再展開turns；target task在history之後才給。",
+    "lineage": "AI2-THOR/ProcTHOR、PDDL distractor、LLM生成experience後必須ground與重播驗證；這是episode而非2554獨立語義families。",
+    "evidence": [
+      {
+        "pages": [
+          4,
+          5,
+          6,
+          18,
+          27
+        ],
+        "locator": "§3、Construction、Supervision、History interventions",
+        "supports": "1118/4/2554、split-before-expansion與800paired"
+      }
+    ],
+    "unresolved": [
+      "scene IDs跨host重用與完整episode manifest需原生release核；同history多condition需保留pair ID。"
+    ],
+    "reuse": "和我們『既有環境＋新任務/規則』非常接近；差异要用更廣用途與來源聯集證明，不能只比episode數。",
+    "reviewed_pdf_sha256": "14adce97c24c0e4080ec7f707206f2dcc6ff9155bacf63b0d6cf84287eba4580",
+    "reviewed_on": "2026-10-02",
+    "name": "EmbodiedMemory-Bench",
+    "year": 2026,
+    "title": "EmbodiedMemory-Bench: Benchmarking Embodied Memory for Long-Horizon Embodied Tasks",
+    "source_url": "https://arxiv.org/abs/2609.28236",
+    "primary_type": "Q",
+    "category_name": "理解、推理與規劃",
+    "domain_ids": [
+      "home"
+    ],
+    "review_tags": [
+      "居家生活",
+      "室內導航"
+    ],
+    "domain_names": [
+      "居家整理與清潔"
+    ],
+    "domain_status": "task_grounded_coded",
+    "domain_assignment": {
+      "paper_id": "P206",
+      "domain_ids": [
+        "home"
+      ],
+      "summary": "依已核讀的任務、活動或場景保留用途歸納；原作任務細節與分類依據一起提供。",
+      "evidence": [
+        {
+          "paper_id": "P206",
+          "domain_ids": [
+            "home"
+          ],
+          "pages": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            15,
+            18,
+            27
+          ],
+          "locator": "2026-10-02原作任務／場景審閱範圍",
+          "observed_tasks": [
+            "4families：Passive Observation、Dynamic Tracking、Interaction Failure、Experience Generalization；125visible object types/83target/33receptacle是資產類別。",
+            "1,118source scenes；AI2-THOR單房間組成virtualhome并保存狀態、ProcTHOR multi-room篩選。不是1118全部新建獨立house。"
+          ],
+          "reasoning": "保留前輪已具來源支持的正向用途編碼；本版改存逐篇判定，不由網站在建置時比對字詞。",
+          "basis": "retained_task_review",
+          "source_pdf_sha256": "14adce97c24c0e4080ec7f707206f2dcc6ff9155bacf63b0d6cf84287eba4580"
+        }
+      ],
+      "version": "domains-0.11",
+      "classified_on": "2026-10-04",
+      "source_pdf_sha256": "14adce97c24c0e4080ec7f707206f2dcc6ff9155bacf63b0d6cf84287eba4580",
+      "previous_domain_ids": [
+        "home"
+      ],
+      "resolved_from_v0_10": false
+    },
+    "domain_reclassified": false,
+    "evaluation_methods": [
+      "state_process"
+    ],
+    "receipt": {
+      "paper_id": "P206",
+      "name": "EmbodiedMemory-Bench",
+      "expected_title": "EmbodiedMemory-Bench: Benchmarking Embodied Memory for Long-Horizon Embodied Tasks",
+      "source_url": "https://arxiv.org/abs/2609.28236",
+      "pdf_url": "https://arxiv.org/pdf/2609.28236",
+      "retrieved_at": "2026-10-02T21:35:05.810234+00:00",
+      "pdf_sha256": "14adce97c24c0e4080ec7f707206f2dcc6ff9155bacf63b0d6cf84287eba4580",
+      "text_sha256": "3ea541a71199c606e971533a9612bea09461d4f48672c93edffcce60c7dade8b",
+      "pdf_bytes": 8957656,
+      "pages": 30,
+      "text_characters": 141405,
+      "acquisition_status": "pdf_text_extracted",
+      "reading_status": "not_reviewed_in_this_pass",
+      "note": "Downloading/extracting is not paper review; reading evidence must be authored separately.",
+      "reviewed_version": "2609.28236v1",
+      "reviewed_pdf_url": "https://arxiv.org/pdf/2609.28236v1"
+    },
+    "counts": [
+      {
+        "field": "environment",
+        "value": 1118,
+        "unit": "benchmark source scenes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P206:1",
+        "paper_id": "P206",
+        "benchmark": "EmbodiedMemory-Bench",
+        "native_term": "benchmark source scenes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.28236v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.28236v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "task",
+        "value": 4,
+        "unit": "memory task families",
+        "pages": [
+          5
+        ],
+        "record_id": "review10:P206:2",
+        "paper_id": "P206",
+        "benchmark": "EmbodiedMemory-Bench",
+        "native_term": "memory task families",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.28236v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.28236v1",
+            "locator": "PDF pp. 5",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 2554,
+        "unit": "validated executable episodes",
+        "pages": [
+          6
+        ],
+        "record_id": "review10:P206:3",
+        "paper_id": "P206",
+        "benchmark": "EmbodiedMemory-Bench",
+        "native_term": "validated executable episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.28236v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.28236v1",
+            "locator": "PDF pp. 6",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      },
+      {
+        "field": "case",
+        "value": 800,
+        "unit": "history介入paired base episodes",
+        "pages": [
+          27
+        ],
+        "record_id": "review10:P206:4",
+        "paper_id": "P206",
+        "benchmark": "EmbodiedMemory-Bench",
+        "native_term": "history介入paired base episodes",
+        "value_kind": "native_text",
+        "scope": "paper_reported_see_qualifier",
+        "source_version": "2609.28236v1",
+        "eligible_for_global_sum": false,
+        "evidence": [
+          {
+            "source": "https://arxiv.org/pdf/2609.28236v1",
+            "locator": "PDF pp. 27",
+            "basis": "authored_primary_section_review"
+          }
+        ]
+      }
+    ]
+  },
+  "repositories": [
+    "ZJU-OmniAI/Embodied-Omni"
+  ],
+  "external_repositories": []
+}
